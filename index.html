@@ -1,0 +1,1614 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SPDX 3.0 SBOM Visualizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script type="module" src="js/app.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.15.6/dist/cdn.min.js"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              spackage: '#3b82f6',
+              sfile: '#10b981',
+              stool: '#f59e0b',
+              sbuild: '#8b5cf6',
+              sagent: '#ef4444',
+              slicense: '#ec4899',
+              sconfig: '#14b8a6'
+            }
+          }
+        }
+      };
+    </script>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+
+  <body class="bg-slate-900 text-slate-200 h-screen overflow-hidden" x-data="spdxApp()" x-cloak>
+    <!-- FILE DROP ZONE (shown before data loaded) -->
+    <div x-show="!dataLoaded" class="flex items-center justify-center h-screen">
+      <div class="text-center max-w-lg mx-auto px-6">
+        <div class="mb-8">
+          <div
+            class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center"
+          >
+            <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+          </div>
+          <h1 class="text-3xl font-bold text-white mb-2">SPDX 3.0 SBOM Visualizer</h1>
+          <p class="text-slate-400">Drop one or more SPDX 3.0 JSON-LD files to explore</p>
+          <p class="text-slate-500 text-xs mt-1">
+            Multiple files will be merged &mdash; cross-references resolved automatically
+          </p>
+        </div>
+        <div
+          class="drop-zone rounded-2xl p-12 text-center"
+          id="dropZone"
+          @dragover.prevent="$el.classList.add('drag-over')"
+          @dragleave="$el.classList.remove('drag-over')"
+          @drop.prevent="handleFileDrop($event)"
+        >
+          <svg
+            class="w-12 h-12 mx-auto mb-4 text-slate-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.5"
+              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+            />
+          </svg>
+          <p class="text-slate-400 mb-3">
+            Drag & drop your <code class="text-blue-400">.jsonld</code> files here
+          </p>
+          <p class="text-slate-500 text-sm mb-4">or</p>
+          <label
+            class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg cursor-pointer transition-colors font-medium text-sm"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+              />
+            </svg>
+            Browse files
+            <input
+              type="file"
+              accept=".json,.jsonld"
+              class="hidden"
+              multiple
+              @change="handleFileInput($event)"
+            />
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN APP (shown after data loaded) -->
+    <div x-show="dataLoaded" class="flex h-screen">
+      <!-- SIDEBAR -->
+      <aside class="w-60 bg-slate-800/50 border-r border-slate-700/50 flex flex-col flex-shrink-0">
+        <div class="p-4 border-b border-slate-700/50">
+          <div class="flex items-center gap-2.5">
+            <div
+              class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0"
+            >
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <div class="text-sm font-semibold text-white truncate">SPDX Visualizer</div>
+              <div class="text-xs text-slate-400">v3.0.1</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="px-3 pt-4 pb-1">
+          <span class="text-[10px] font-semibold uppercase tracking-widest text-slate-500"
+            >Navigation</span
+          >
+        </div>
+        <nav class="flex-1 px-2 pb-2 space-y-0.5 overflow-y-auto">
+          <template x-for="v in views" :key="v.id">
+            <div
+              class="nav-item"
+              :class="currentView === v.id && 'active'"
+              @click="switchView(v.id)"
+            >
+              <span x-html="v.icon" class="nav-icon"></span>
+              <span x-text="v.label" class="flex-1"></span>
+              <span
+                x-show="v.count"
+                x-text="v.count"
+                class="text-[10px] bg-slate-700/60 px-1.5 py-0.5 rounded text-slate-400"
+              ></span>
+            </div>
+          </template>
+        </nav>
+
+        <div class="p-4 border-t border-slate-700/50 space-y-2 text-xs">
+          <div class="flex items-center justify-between text-slate-400">
+            <span>Packages</span
+            ><span class="text-spackage font-semibold" x-text="packages.length"></span>
+          </div>
+          <div class="flex items-center justify-between text-slate-400">
+            <span>Files</span><span class="text-sfile font-semibold" x-text="files.length"></span>
+          </div>
+          <div class="flex items-center justify-between text-slate-400">
+            <span>Build Configs</span
+            ><span class="text-sconfig font-semibold" x-text="buildConfigs.length"></span>
+          </div>
+          <div class="flex items-center justify-between text-slate-400">
+            <span>Relationships</span
+            ><span class="text-sbuild font-semibold" x-text="relationships.length"></span>
+          </div>
+          <div class="flex items-center justify-between text-slate-400">
+            <span>Tools</span><span class="text-stool font-semibold" x-text="tools.length"></span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- MAIN CONTENT -->
+      <div class="flex-1 flex flex-col min-w-0">
+        <!-- HEADER -->
+        <header
+          class="h-14 border-b border-slate-700/50 bg-slate-800/30 flex items-center justify-between px-5 flex-shrink-0"
+        >
+          <div class="flex items-center gap-3 min-w-0">
+            <h2
+              class="text-sm font-semibold text-white flex-shrink-0"
+              x-text="currentViewLabel"
+            ></h2>
+            <!-- Loaded file pills -->
+            <div class="flex items-center gap-1.5 min-w-0 overflow-x-auto">
+              <template x-for="(f, i) in loadedFiles" :key="i">
+                <span
+                  class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs bg-slate-700/60 text-slate-300 flex-shrink-0"
+                >
+                  <svg
+                    class="w-3 h-3 text-slate-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                  <span x-text="f.name" class="truncate max-w-[120px]"></span>
+                  <button
+                    @click="removeFile(i)"
+                    class="ml-0.5 text-slate-500 hover:text-red-400 transition-colors"
+                    title="Remove this file"
+                  >
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                </span>
+              </template>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 flex-shrink-0">
+            <!-- Search -->
+            <div class="relative" x-show="currentView !== 'graph'">
+              <svg
+                class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+              <input
+                type="text"
+                x-model="searchQuery"
+                placeholder="Search..."
+                class="w-56 pl-9 pr-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
+              />
+            </div>
+            <!-- Add more files -->
+            <label
+              class="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg cursor-pointer transition-colors text-slate-300 hover:text-white text-xs font-medium"
+              title="Add more SPDX files"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              Add files
+              <input
+                type="file"
+                accept=".json,.jsonld"
+                class="hidden"
+                multiple
+                @change="handleFileInput($event)"
+              />
+            </label>
+          </div>
+        </header>
+
+        <!-- VIEW CONTENT -->
+        <main class="flex-1 overflow-y-auto p-6" id="mainContent">
+          <!-- ========== DASHBOARD ========== -->
+          <div x-show="currentView === 'dashboard'" class="fade-in space-y-6 max-w-6xl">
+            <!-- Document metadata -->
+            <div class="card">
+              <div class="flex items-start justify-between">
+                <div>
+                  <h3 class="text-lg font-semibold text-white mb-1" x-text="docName"></h3>
+                  <p class="text-sm text-slate-400 mb-1" x-text="docNamespace"></p>
+                  <p x-show="loadedFiles.length > 1" class="text-xs text-slate-500 mb-3">
+                    Merged from
+                    <span class="text-slate-300 font-medium" x-text="loadedFiles.length"></span>
+                    files:
+                    <span x-text="loadedFiles.map(f => f.name).join(', ')"></span>
+                  </p>
+                  <p x-show="loadedFiles.length <= 1" class="mb-3"></p>
+                  <div class="flex flex-wrap gap-2">
+                    <template x-for="p in profileConformance" :key="p">
+                      <span class="badge bg-emerald-500/15 text-emerald-400">
+                        <svg
+                          class="w-3 h-3 mr-1"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                        <span x-text="p"></span>
+                      </span>
+                    </template>
+                  </div>
+                </div>
+                <div class="text-right text-sm">
+                  <div class="text-slate-400">
+                    Spec <span class="text-white font-medium" x-text="specVersion"></span>
+                  </div>
+                  <div class="text-slate-400 mt-1">
+                    Created
+                    <span class="text-white font-medium" x-text="formatDate(createdDate)"></span>
+                  </div>
+                  <div class="mt-2">
+                    <span
+                      class="badge bg-pink-500/15 text-pink-400"
+                      x-text="dataLicenseLabel"
+                    ></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stats grid -->
+            <div class="grid grid-cols-5 gap-4">
+              <div class="card stat-card blue">
+                <div class="text-2xl font-bold text-white" x-text="packages.length"></div>
+                <div class="text-sm text-slate-400 mt-1">Packages</div>
+                <div
+                  class="w-8 h-8 mt-2 rounded-lg bg-blue-500/15 flex items-center justify-center"
+                >
+                  <svg
+                    class="w-4 h-4 text-blue-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div class="card stat-card green">
+                <div class="text-2xl font-bold text-white" x-text="files.length"></div>
+                <div class="text-sm text-slate-400 mt-1">Files</div>
+                <div
+                  class="w-8 h-8 mt-2 rounded-lg bg-emerald-500/15 flex items-center justify-center"
+                >
+                  <svg
+                    class="w-4 h-4 text-emerald-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div class="card stat-card teal" style="--stat-color: #14b8a6">
+                <div class="text-2xl font-bold text-white" x-text="buildConfigs.length"></div>
+                <div class="text-sm text-slate-400 mt-1">Build Configs</div>
+                <div
+                  class="w-8 h-8 mt-2 rounded-lg bg-teal-500/15 flex items-center justify-center"
+                >
+                  <svg
+                    class="w-4 h-4 text-teal-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div class="card stat-card purple">
+                <div class="text-2xl font-bold text-white" x-text="relationships.length"></div>
+                <div class="text-sm text-slate-400 mt-1">Relationships</div>
+                <div
+                  class="w-8 h-8 mt-2 rounded-lg bg-purple-500/15 flex items-center justify-center"
+                >
+                  <svg
+                    class="w-4 h-4 text-purple-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div class="card stat-card amber">
+                <div class="text-2xl font-bold text-white" x-text="tools.length"></div>
+                <div class="text-sm text-slate-400 mt-1">Build Tools</div>
+                <div
+                  class="w-8 h-8 mt-2 rounded-lg bg-amber-500/15 flex items-center justify-center"
+                >
+                  <svg
+                    class="w-4 h-4 text-amber-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                    />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- Relationship breakdown -->
+            <div class="card">
+              <h3 class="text-sm font-semibold text-white mb-4">Relationship Types</h3>
+              <div class="space-y-3">
+                <template x-for="rt in relTypeCounts" :key="rt.type">
+                  <div>
+                    <div class="flex items-center justify-between text-sm mb-1">
+                      <span class="text-slate-300" x-text="rt.type"></span>
+                      <span class="text-slate-400" x-text="rt.count"></span>
+                    </div>
+                    <div class="h-2 bg-slate-700 rounded-full overflow-hidden">
+                      <div
+                        class="h-full rounded-full transition-all duration-500"
+                        :style="`width: ${rt.pct}%; background-color: ${rt.color}`"
+                      ></div>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
+
+            <!-- Quick jump -->
+            <div class="grid grid-cols-4 gap-4">
+              <button
+                @click="switchView('graph')"
+                class="card hover:border-blue-500/50 text-left group"
+              >
+                <div class="text-blue-400 mb-2">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"
+                    />
+                  </svg>
+                </div>
+                <div class="font-medium text-white text-sm">Explore Graph</div>
+                <div class="text-xs text-slate-400 mt-1">
+                  Interactive force-directed visualization
+                </div>
+              </button>
+              <button
+                @click="switchView('packages')"
+                class="card hover:border-blue-500/50 text-left group"
+              >
+                <div class="text-emerald-400 mb-2">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                    />
+                  </svg>
+                </div>
+                <div class="font-medium text-white text-sm">Browse Packages</div>
+                <div class="text-xs text-slate-400 mt-1">
+                  Search and explore <span x-text="packages.length"></span> packages
+                </div>
+              </button>
+              <button
+                @click="switchView('configs')"
+                class="card hover:border-teal-500/50 text-left group"
+              >
+                <div class="text-teal-400 mb-2">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
+                    />
+                  </svg>
+                </div>
+                <div class="font-medium text-white text-sm">Build Configs</div>
+                <div class="text-xs text-slate-400 mt-1">Compiler flags, defines, targets</div>
+              </button>
+              <button
+                @click="switchView('dependencies')"
+                class="card hover:border-purple-500/50 text-left group"
+              >
+                <div class="text-purple-400 mb-2">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M4 6h16M4 10h16M4 14h16M4 18h16"
+                    />
+                  </svg>
+                </div>
+                <div class="font-medium text-white text-sm">Dependency Tree</div>
+                <div class="text-xs text-slate-400 mt-1">Hierarchical dependency view</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- ========== GRAPH VIEW ========== -->
+          <div x-show="currentView === 'graph'" class="fade-in h-full flex flex-col -m-6">
+            <!-- Graph controls -->
+            <div
+              class="flex items-center gap-3 px-5 py-3 bg-slate-800/50 border-b border-slate-700/50 flex-shrink-0 flex-wrap"
+            >
+              <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider"
+                >Show:</span
+              >
+              <template x-for="f in graphFilters" :key="f.key">
+                <label class="flex items-center gap-1.5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    x-model="f.active"
+                    @change="updateGraph()"
+                    class="rounded border-slate-600 bg-slate-700 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5"
+                  />
+                  <span class="text-xs" :style="`color: ${f.color}`" x-text="f.label"></span>
+                </label>
+              </template>
+              <div class="ml-auto flex items-center gap-2">
+                <button
+                  @click="resetGraphZoom()"
+                  class="text-xs px-2.5 py-1 bg-slate-700 hover:bg-slate-600 rounded-md transition-colors text-slate-300"
+                >
+                  Reset Zoom
+                </button>
+              </div>
+            </div>
+            <!-- Graph canvas -->
+            <div class="flex-1 relative graph-container" id="graphContainer">
+              <div id="graphTooltip" class="tooltip hidden"></div>
+            </div>
+            <!-- Graph legend -->
+            <div
+              class="flex items-center gap-4 px-5 py-2.5 bg-slate-800/50 border-t border-slate-700/50 flex-shrink-0 flex-wrap"
+            >
+              <span class="text-xs text-slate-500">Nodes:</span>
+              <template x-for="c in nodeColors" :key="c.type">
+                <span class="flex items-center gap-1.5 text-xs text-slate-400">
+                  <span class="w-2.5 h-2.5 rounded-full" :style="`background:${c.color}`"></span>
+                  <span x-text="c.label"></span>
+                </span>
+              </template>
+              <span class="text-xs text-slate-500 ml-3">Edges:</span>
+              <template x-for="c in edgeColors" :key="c.type">
+                <span class="flex items-center gap-1.5 text-xs text-slate-400">
+                  <span class="w-4 h-0.5 rounded" :style="`background:${c.color}`"></span>
+                  <span x-text="c.label"></span>
+                </span>
+              </template>
+            </div>
+          </div>
+
+          <!-- ========== PACKAGES ========== -->
+          <div x-show="currentView === 'packages'" class="fade-in space-y-3 max-w-4xl">
+            <div class="flex items-center gap-3 mb-4">
+              <span
+                class="text-sm text-slate-400"
+                x-text="`${filteredPackages.length} packages`"
+              ></span>
+              <select
+                x-model="pkgSort"
+                class="ml-auto bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 text-slate-300 focus:outline-none focus:border-blue-500"
+              >
+                <option value="name">Sort by name</option>
+                <option value="deps">Sort by dependencies</option>
+                <option value="dependents">Sort by dependents</option>
+              </select>
+            </div>
+            <template x-for="pkg in filteredPackages" :key="pkg.spdxId">
+              <div class="card">
+                <div class="flex items-center gap-3 cursor-pointer" @click="togglePkg(pkg.spdxId)">
+                  <div
+                    class="w-8 h-8 rounded-lg bg-blue-500/15 flex items-center justify-center flex-shrink-0"
+                  >
+                    <svg
+                      class="w-4 h-4 text-blue-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                      />
+                    </svg>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div
+                      class="font-medium text-white text-sm"
+                      x-text="cleanName(pkg.spdxId)"
+                    ></div>
+                    <div
+                      class="text-xs text-slate-500"
+                      x-text="pkg.software_primaryPurpose || 'library'"
+                    ></div>
+                  </div>
+                  <div class="flex items-center gap-2 flex-shrink-0">
+                    <span
+                      class="badge bg-blue-500/15 text-blue-400"
+                      x-text="(depsOf(pkg.spdxId)||[]).length + ' deps'"
+                    ></span>
+                    <span
+                      class="badge bg-purple-500/15 text-purple-400"
+                      x-text="(dependentsOf(pkg.spdxId)||[]).length + ' used by'"
+                    ></span>
+                    <svg
+                      class="w-4 h-4 text-slate-500 transition-transform"
+                      :class="expandedPkg === pkg.spdxId && 'rotate-180'"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </div>
+                </div>
+                <!-- Expanded detail -->
+                <div
+                  x-show="expandedPkg === pkg.spdxId"
+                  x-collapse
+                  class="mt-4 pt-4 border-t border-slate-700"
+                >
+                  <div class="grid grid-cols-2 gap-4">
+                    <!-- Dependencies -->
+                    <div>
+                      <div
+                        class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2"
+                      >
+                        Dependencies
+                      </div>
+                      <div class="space-y-1" x-show="(depsOf(pkg.spdxId)||[]).length > 0">
+                        <template x-for="d in (depsOf(pkg.spdxId)||[])" :key="d">
+                          <div
+                            class="text-xs text-blue-400 hover:text-blue-300 cursor-pointer flex items-center gap-1.5"
+                            @click.stop="navigateTo(d)"
+                          >
+                            <span class="w-1.5 h-1.5 rounded-full bg-blue-500/50"></span>
+                            <span x-text="cleanName(d)"></span>
+                          </div>
+                        </template>
+                      </div>
+                      <div
+                        x-show="(depsOf(pkg.spdxId)||[]).length === 0"
+                        class="text-xs text-slate-600 italic"
+                      >
+                        None
+                      </div>
+                    </div>
+                    <!-- Used by -->
+                    <div>
+                      <div
+                        class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2"
+                      >
+                        Used by
+                      </div>
+                      <div class="space-y-1" x-show="(dependentsOf(pkg.spdxId)||[]).length > 0">
+                        <template x-for="d in (dependentsOf(pkg.spdxId)||[])" :key="d">
+                          <div
+                            class="text-xs text-purple-400 hover:text-purple-300 cursor-pointer flex items-center gap-1.5"
+                            @click.stop="navigateTo(d)"
+                          >
+                            <span class="w-1.5 h-1.5 rounded-full bg-purple-500/50"></span>
+                            <span x-text="cleanName(d)"></span>
+                          </div>
+                        </template>
+                      </div>
+                      <div
+                        x-show="(dependentsOf(pkg.spdxId)||[]).length === 0"
+                        class="text-xs text-slate-600 italic"
+                      >
+                        None
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Contained files -->
+                  <div class="mt-4" x-show="(containedFiles(pkg.spdxId)||[]).length > 0">
+                    <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                      Files
+                    </div>
+                    <div class="space-y-1">
+                      <template x-for="f in (containedFiles(pkg.spdxId)||[])" :key="f">
+                        <div
+                          class="text-xs text-emerald-400 hover:text-emerald-300 cursor-pointer flex items-center gap-1.5"
+                          @click.stop="navigateToFile(f)"
+                        >
+                          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500/50"></span>
+                          <span x-text="cleanFileName(f)"></span>
+                        </div>
+                      </template>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </div>
+
+          <!-- ========== FILES ========== -->
+          <div x-show="currentView === 'files'" class="fade-in space-y-3 max-w-5xl">
+            <div class="flex items-center gap-3 mb-4">
+              <span class="text-sm text-slate-400" x-text="`${filteredFiles.length} files`"></span>
+              <div class="ml-auto flex gap-2">
+                <template x-for="ft in fileTypes" :key="ft">
+                  <button
+                    class="text-xs px-2.5 py-1 rounded-md transition-colors"
+                    :class="fileTypeFilter === ft ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-700 text-slate-400 hover:text-white'"
+                    @click="fileTypeFilter = fileTypeFilter === ft ? '' : ft"
+                    x-text="ft"
+                  ></button>
+                </template>
+              </div>
+            </div>
+            <template x-for="f in filteredFiles" :key="f.spdxId">
+              <div class="card cursor-pointer" @click="toggleFile(f.spdxId)">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                    :class="fileExt(f.name) === '.elf' ? 'bg-purple-500/15' : fileExt(f.name) === '.c' || fileExt(f.name) === '.obj' ? 'bg-amber-500/15' : 'bg-emerald-500/15'"
+                  >
+                    <svg
+                      class="w-4 h-4"
+                      :class="fileExt(f.name) === '.elf' ? 'text-purple-400' : fileExt(f.name) === '.c' || fileExt(f.name) === '.obj' ? 'text-amber-400' : 'text-emerald-400'"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
+                    </svg>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="font-medium text-white text-sm truncate" x-text="f.name"></div>
+                    <div class="flex items-center gap-3 mt-0.5">
+                      <span
+                        class="badge text-xs"
+                        :class="fileExt(f.name) === '.elf' ? 'bg-purple-500/15 text-purple-400' : fileExt(f.name) === '.c' || fileExt(f.name) === '.obj' ? 'bg-amber-500/15 text-amber-400' : 'bg-emerald-500/15 text-emerald-400'"
+                        x-text="fileExt(f.name)"
+                      ></span>
+                    </div>
+                  </div>
+                  <svg
+                    class="w-4 h-4 text-slate-500 transition-transform flex-shrink-0"
+                    :class="expandedFile === f.spdxId && 'rotate-180'"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+                <!-- Expanded detail -->
+                <div
+                  x-show="expandedFile === f.spdxId"
+                  x-collapse
+                  class="mt-4 pt-4 border-t border-slate-700 space-y-3"
+                  @click.stop
+                >
+                  <!-- Hashes -->
+                  <template x-for="h in (f.verifiedUsing || [])" :key="h.hashValue">
+                    <div class="flex items-center gap-2">
+                      <span
+                        class="text-xs text-slate-500 w-12 flex-shrink-0 uppercase"
+                        x-text="h.algorithm"
+                      ></span>
+                      <code
+                        class="hash-text text-slate-300 flex-1 truncate"
+                        x-text="h.hashValue"
+                      ></code>
+                      <button
+                        @click.stop="copyHash(h.hashValue)"
+                        class="text-xs px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded text-slate-400 hover:text-white transition-colors flex-shrink-0"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                  </template>
+                  <!-- Parent package -->
+                  <div x-show="parentPackage(f.spdxId)">
+                    <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                      Contained in
+                    </div>
+                    <div
+                      class="text-xs text-blue-400 cursor-pointer hover:text-blue-300"
+                      @click.stop="navigateTo(parentPackage(f.spdxId))"
+                      x-text="cleanName(parentPackage(f.spdxId) || '')"
+                    ></div>
+                  </div>
+                  <!-- Tools used -->
+                  <div x-show="(fileTools(f.spdxId)||[]).length > 0">
+                    <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                      Built with
+                    </div>
+                    <div class="flex flex-wrap gap-1.5">
+                      <template x-for="t in (fileTools(f.spdxId)||[])" :key="t">
+                        <span
+                          class="badge bg-amber-500/15 text-amber-400"
+                          x-text="cleanName(t)"
+                        ></span>
+                      </template>
+                    </div>
+                  </div>
+                  <!-- Build configuration -->
+                  <div x-show="configuredBy(f.spdxId).length > 0">
+                    <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                      Build Configuration
+                    </div>
+                    <template x-for="cfg in configuredBy(f.spdxId)" :key="cfg.configId">
+                      <div
+                        class="text-xs text-teal-400 hover:text-teal-300 cursor-pointer flex items-center gap-1.5"
+                        @click.stop="navigateToConfig(cfg.configId)"
+                      >
+                        <span class="w-1.5 h-1.5 rounded-full bg-teal-500/50"></span>
+                        <span x-text="cleanName(cfg.configId)"></span>
+                        <span
+                          class="text-slate-500"
+                          x-show="cfg.scope"
+                          x-text="'(' + cfg.scope + ')'"
+                        ></span>
+                      </div>
+                    </template>
+                  </div>
+                  <!-- Static links (for .elf files) -->
+                  <div x-show="(staticLinks(f.spdxId)||[]).length > 0">
+                    <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                      Statically linked
+                    </div>
+                    <div class="space-y-1">
+                      <template x-for="l in (staticLinks(f.spdxId)||[])" :key="l">
+                        <div class="text-xs text-cyan-400 flex items-center gap-1.5">
+                          <span class="w-1.5 h-1.5 rounded-full bg-cyan-500/50"></span>
+                          <span x-text="cleanFileName(l)"></span>
+                        </div>
+                      </template>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </div>
+
+          <!-- ========== BUILD CONFIGS ========== -->
+          <div x-show="currentView === 'configs'" class="fade-in space-y-4 max-w-5xl">
+            <div class="flex items-center gap-3 mb-4">
+              <span
+                class="text-sm text-slate-400"
+                x-text="`${filteredConfigs.length} build configurations`"
+              ></span>
+              <div class="ml-auto flex items-center gap-2">
+                <input
+                  type="text"
+                  x-model="configSearch"
+                  placeholder="Search configs..."
+                  class="w-48 px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-teal-500 transition-colors"
+                />
+              </div>
+            </div>
+
+            <template x-for="cfg in filteredConfigs" :key="cfg.spdxId">
+              <div class="card group cursor-pointer" @click="toggleConfig(cfg.spdxId)">
+                <div class="flex items-start gap-3">
+                  <!-- Icon -->
+                  <div
+                    class="w-10 h-10 rounded-xl bg-teal-500/15 flex items-center justify-center flex-shrink-0 mt-0.5"
+                  >
+                    <svg
+                      class="w-5 h-5 text-teal-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
+                      />
+                    </svg>
+                  </div>
+
+                  <!-- Info -->
+                  <div class="flex-1 min-w-0">
+                    <div
+                      class="font-medium text-white text-sm"
+                      x-text="cfg.name || cleanName(cfg.spdxId)"
+                    ></div>
+
+                    <!-- Quick info row -->
+                    <div class="flex flex-wrap items-center gap-2 mt-2">
+                      <template
+                        x-for="lang in parseCompileFlags(cfg).languages.slice(0, 3)"
+                        :key="lang"
+                      >
+                        <span
+                          class="badge bg-blue-500/15 text-blue-400 text-xs"
+                          x-text="lang"
+                        ></span>
+                      </template>
+                      <span
+                        class="badge bg-teal-500/15 text-teal-400 text-xs"
+                        x-text="parseCompileFlags(cfg).flags.length + ' flags'"
+                      ></span>
+                      <span
+                        class="badge bg-amber-500/15 text-amber-400 text-xs"
+                        x-text="parseCompileFlags(cfg).defines.length + ' defines'"
+                      ></span>
+                    </div>
+
+                    <!-- Configured targets preview -->
+                    <div
+                      class="flex flex-wrap items-center gap-1.5 mt-2"
+                      x-show="configuresTargets(cfg.spdxId).length > 0"
+                    >
+                      <span class="text-xs text-slate-500">Configures:</span>
+                      <template x-for="t in configuresTargets(cfg.spdxId).slice(0, 3)" :key="t">
+                        <span
+                          class="text-xs text-emerald-400 hover:text-emerald-300"
+                          x-text="cleanFileName(t)"
+                          @click.stop="navigateToFile(t)"
+                        ></span>
+                      </template>
+                      <span
+                        x-show="configuresTargets(cfg.spdxId).length > 3"
+                        class="text-xs text-slate-500"
+                        x-text="'+' + (configuresTargets(cfg.spdxId).length - 3) + ' more'"
+                      ></span>
+                    </div>
+                  </div>
+
+                  <!-- Expand icon -->
+                  <svg
+                    class="w-4 h-4 text-slate-500 transition-transform flex-shrink-0 mt-1"
+                    :class="expandedConfig === cfg.spdxId && 'rotate-180'"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+
+                <!-- Expanded detail -->
+                <div
+                  x-show="expandedConfig === cfg.spdxId"
+                  x-collapse
+                  class="mt-4 pt-4 border-t border-slate-700"
+                  @click.stop
+                >
+                  <!-- Compiler Flags Section -->
+                  <div class="mb-4" x-show="parseCompileFlags(cfg).flags.length > 0">
+                    <div
+                      class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2"
+                    >
+                      <svg
+                        class="w-3.5 h-3.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+                        />
+                      </svg>
+                      Compiler Flags
+                    </div>
+                    <div class="flex flex-wrap gap-1.5">
+                      <template
+                        x-for="flag in parseCompileFlags(cfg).flags.slice(0, 30)"
+                        :key="flag"
+                      >
+                        <span
+                          class="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono transition-colors"
+                          :class="flag.startsWith('-O') ? 'bg-green-500/15 text-green-400' :
+                                  flag.startsWith('-W') ? 'bg-yellow-500/15 text-yellow-400' :
+                                  flag.startsWith('-f') ? 'bg-blue-500/15 text-blue-400' :
+                                  flag.startsWith('-m') ? 'bg-purple-500/15 text-purple-400' :
+                                  flag.startsWith('-std') ? 'bg-pink-500/15 text-pink-400' :
+                                  flag.startsWith('-g') ? 'bg-orange-500/15 text-orange-400' :
+                                  'bg-slate-700/50 text-slate-300'"
+                          x-text="flag"
+                        ></span>
+                      </template>
+                      <span
+                        x-show="parseCompileFlags(cfg).flags.length > 30"
+                        class="text-xs text-slate-500 self-center ml-1"
+                        x-text="'+' + (parseCompileFlags(cfg).flags.length - 30) + ' more'"
+                      ></span>
+                    </div>
+
+                    <!-- Flag Legend -->
+                    <div class="flex flex-wrap gap-3 mt-3 text-[10px] text-slate-500">
+                      <span class="flex items-center gap-1"
+                        ><span class="w-2 h-2 rounded bg-green-500/40"></span> Optimization</span
+                      >
+                      <span class="flex items-center gap-1"
+                        ><span class="w-2 h-2 rounded bg-yellow-500/40"></span> Warnings</span
+                      >
+                      <span class="flex items-center gap-1"
+                        ><span class="w-2 h-2 rounded bg-blue-500/40"></span> Features</span
+                      >
+                      <span class="flex items-center gap-1"
+                        ><span class="w-2 h-2 rounded bg-purple-500/40"></span> Machine</span
+                      >
+                      <span class="flex items-center gap-1"
+                        ><span class="w-2 h-2 rounded bg-pink-500/40"></span> Standard</span
+                      >
+                      <span class="flex items-center gap-1"
+                        ><span class="w-2 h-2 rounded bg-orange-500/40"></span> Debug</span
+                      >
+                    </div>
+                  </div>
+
+                  <!-- Preprocessor Defines Section -->
+                  <div class="mb-4" x-show="parseCompileFlags(cfg).defines.length > 0">
+                    <div
+                      class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2"
+                    >
+                      <svg
+                        class="w-3.5 h-3.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"
+                        />
+                      </svg>
+                      Preprocessor Defines
+                    </div>
+                    <div class="flex flex-wrap gap-1.5">
+                      <template x-for="def in parseCompileFlags(cfg).defines" :key="def">
+                        <span
+                          class="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono bg-amber-500/15 text-amber-400"
+                          x-text="def"
+                        ></span>
+                      </template>
+                    </div>
+                  </div>
+
+                  <!-- Configured Targets Section -->
+                  <div x-show="configuresTargets(cfg.spdxId).length > 0">
+                    <div
+                      class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2"
+                    >
+                      <svg
+                        class="w-3.5 h-3.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                        />
+                      </svg>
+                      Configured Targets
+                      <span
+                        class="text-slate-500 font-normal"
+                        x-text="'(' + configuresTargets(cfg.spdxId).length + ')'"
+                      ></span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                      <template x-for="t in configuresTargets(cfg.spdxId)" :key="t">
+                        <div
+                          class="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-slate-800/50 hover:bg-slate-700/50 cursor-pointer transition-colors"
+                          @click="navigateToFile(t)"
+                        >
+                          <span class="w-2 h-2 rounded-full bg-emerald-500/50"></span>
+                          <span
+                            class="text-xs text-emerald-400 truncate"
+                            x-text="cleanFileName(t)"
+                          ></span>
+                        </div>
+                      </template>
+                    </div>
+                  </div>
+
+                  <!-- Full command (collapsible) -->
+                  <div class="mt-4" x-show="cfg.comment">
+                    <details class="group/details">
+                      <summary
+                        class="text-xs font-semibold text-slate-400 uppercase tracking-wider cursor-pointer hover:text-slate-300 flex items-center gap-2"
+                      >
+                        <svg
+                          class="w-3 h-3 transition-transform group-open/details:rotate-90"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                        Full Compile Command
+                      </summary>
+                      <div
+                        class="mt-2 p-3 rounded-lg bg-slate-900/70 border border-slate-700/50 overflow-x-auto"
+                      >
+                        <code
+                          class="text-xs text-slate-300 font-mono whitespace-pre-wrap break-all"
+                          x-text="cfg.comment"
+                        ></code>
+                      </div>
+                    </details>
+                  </div>
+                </div>
+              </div>
+            </template>
+
+            <!-- Empty state -->
+            <div x-show="filteredConfigs.length === 0" class="text-center py-12">
+              <div
+                class="w-16 h-16 mx-auto mb-4 rounded-xl bg-slate-800 flex items-center justify-center"
+              >
+                <svg
+                  class="w-8 h-8 text-slate-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
+                  />
+                </svg>
+              </div>
+              <h3 class="text-sm font-medium text-slate-300 mb-1">No build configurations found</h3>
+              <p class="text-xs text-slate-500">
+                Try a different search or load an SPDX file with build info
+              </p>
+            </div>
+          </div>
+
+          <!-- ========== BUILD INFO ========== -->
+          <div x-show="currentView === 'build'" class="fade-in space-y-6 max-w-4xl">
+            <!-- Build overview -->
+            <div class="card" x-show="buildInfo">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-purple-500/15 flex items-center justify-center">
+                  <svg
+                    class="w-5 h-5 text-purple-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="font-semibold text-white">Build Configuration</h3>
+                  <p class="text-xs text-slate-400" x-text="buildInfo?.build_buildType || ''"></p>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span class="text-slate-500">Build ID</span>
+                  <div
+                    class="text-slate-200 text-xs mt-0.5 font-mono"
+                    x-text="buildInfo?.build_buildId || 'N/A'"
+                  ></div>
+                </div>
+                <div>
+                  <span class="text-slate-500">Created</span>
+                  <div class="text-slate-200 text-xs mt-0.5" x-text="formatDate(createdDate)"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Agent -->
+            <div class="card" x-show="agentInfo">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="w-10 h-10 rounded-xl bg-red-500/15 flex items-center justify-center">
+                  <svg
+                    class="w-5 h-5 text-red-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="font-semibold text-white" x-text="agentInfo?.name || 'Agent'"></h3>
+                  <p class="text-xs text-slate-400" x-text="agentInfo?.type || ''"></p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tools grid -->
+            <div>
+              <h3 class="text-sm font-semibold text-white mb-3">Build Tools</h3>
+              <div class="grid grid-cols-2 gap-4">
+                <template x-for="t in tools" :key="t.spdxId">
+                  <div class="card">
+                    <div class="flex items-center gap-3 mb-2">
+                      <div
+                        class="w-8 h-8 rounded-lg bg-amber-500/15 flex items-center justify-center flex-shrink-0"
+                      >
+                        <svg
+                          class="w-4 h-4 text-amber-400"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                          />
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                        </svg>
+                      </div>
+                      <div class="min-w-0">
+                        <div class="text-sm font-medium text-white" x-text="t.name"></div>
+                        <div
+                          class="text-xs text-slate-500"
+                          x-text="toolUsageCount(t.spdxId) + ' uses'"
+                        ></div>
+                      </div>
+                    </div>
+                    <div
+                      x-show="toolPath(t)"
+                      class="text-xs text-slate-400 font-mono truncate mt-2 bg-slate-900/50 rounded px-2 py-1"
+                      x-text="toolPath(t)"
+                    ></div>
+                  </div>
+                </template>
+              </div>
+            </div>
+
+            <!-- Generated artifacts -->
+            <div class="card">
+              <h3 class="text-sm font-semibold text-white mb-3">Generated Artifacts</h3>
+              <div class="space-y-1.5">
+                <template x-for="a in generatedArtifacts" :key="a">
+                  <div
+                    class="text-xs text-emerald-400 flex items-center gap-1.5 cursor-pointer hover:text-emerald-300"
+                    @click="navigateToFile(a)"
+                  >
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500/50"></span>
+                    <span x-text="cleanFileName(a)"></span>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+
+          <!-- ========== DEPENDENCY TREE ========== -->
+          <div x-show="currentView === 'dependencies'" class="fade-in h-full flex flex-col -m-6">
+            <div
+              class="flex items-center gap-3 px-5 py-3 bg-slate-800/50 border-b border-slate-700/50 flex-shrink-0"
+            >
+              <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider"
+                >Root:</span
+              >
+              <select
+                x-model="treeRoot"
+                @change="renderDepTree()"
+                class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 text-slate-300 focus:outline-none focus:border-blue-500"
+              >
+                <template x-for="p in treeRootOptions" :key="p">
+                  <option :value="p" x-text="cleanName(p)"></option>
+                </template>
+              </select>
+              <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider ml-4"
+                >Depth:</span
+              >
+              <select
+                x-model.number="treeDepth"
+                @change="renderDepTree()"
+                class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 text-slate-300 focus:outline-none focus:border-blue-500"
+              >
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="5">5</option>
+                <option value="10">10</option>
+              </select>
+              <button
+                @click="expandAllTree()"
+                class="text-xs px-2.5 py-1 bg-slate-700 hover:bg-slate-600 rounded-md transition-colors text-slate-300 ml-auto"
+              >
+                Expand All
+              </button>
+              <button
+                @click="collapseAllTree()"
+                class="text-xs px-2.5 py-1 bg-slate-700 hover:bg-slate-600 rounded-md transition-colors text-slate-300"
+              >
+                Collapse All
+              </button>
+            </div>
+            <div class="flex-1 dep-tree relative" id="depTreeContainer"></div>
+          </div>
+        </main>
+      </div>
+
+      <!-- DETAIL PANEL (slide-in from right, for graph clicks) -->
+      <div
+        x-show="detailElement"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="translate-x-full"
+        x-transition:enter-end="translate-x-0"
+        x-transition:leave="transition ease-in duration-150"
+        x-transition:leave-start="translate-x-0"
+        x-transition:leave-end="translate-x-full"
+        class="w-96 bg-slate-800 border-l border-slate-700/50 flex-shrink-0 flex flex-col overflow-hidden"
+      >
+        <!-- Header -->
+        <div class="p-4 border-b border-slate-700/50">
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <div class="flex items-center gap-2 mb-1">
+                <span
+                  class="detail-type-dot"
+                  :style="detailElement && `background:${nodeTypeColor(getNodeType(detailElement))}`"
+                ></span>
+                <span
+                  class="text-xs text-slate-400"
+                  x-text="detailElement ? detailElement.type.replace('software_','').replace('build_','') : ''"
+                ></span>
+              </div>
+              <h3
+                class="text-base font-semibold text-white leading-tight"
+                x-text="detailElement ? cleanName(detailElement.spdxId) : ''"
+              ></h3>
+              <div
+                x-show="detailElement?.name"
+                class="text-xs text-slate-500 mt-1 truncate"
+                x-text="detailElement?.name || ''"
+              ></div>
+            </div>
+            <button
+              @click="detailElement = null"
+              class="p-1.5 hover:bg-slate-700 rounded-lg transition-colors text-slate-400 flex-shrink-0 mt-0.5"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Body -->
+        <div class="flex-1 overflow-y-auto p-4 space-y-4" x-show="detailElement">
+          <!-- Purpose / kind -->
+          <div x-show="detailElement?.software_primaryPurpose" class="flex items-center gap-2">
+            <span class="text-xs text-slate-500">Purpose</span>
+            <span
+              class="text-xs px-2 py-0.5 rounded-md bg-slate-700 text-slate-300"
+              x-text="detailElement?.software_primaryPurpose || ''"
+            ></span>
+          </div>
+
+          <!-- Build Config Details (for configuration elements) -->
+          <div
+            x-show="detailElement?.software_primaryPurpose === 'configuration' || detailElement?.spdxId?.includes('build-config')"
+            class="space-y-3"
+          >
+            <!-- Quick stats -->
+            <div class="flex flex-wrap gap-2">
+              <template x-for="lang in parseCompileFlags(detailElement).languages" :key="lang">
+                <span class="badge bg-blue-500/15 text-blue-400 text-xs" x-text="lang"></span>
+              </template>
+              <span
+                class="badge bg-teal-500/15 text-teal-400 text-xs"
+                x-text="parseCompileFlags(detailElement).flags.length + ' flags'"
+              ></span>
+              <span
+                class="badge bg-amber-500/15 text-amber-400 text-xs"
+                x-text="parseCompileFlags(detailElement).defines.length + ' defines'"
+              ></span>
+            </div>
+
+            <!-- Key flags preview -->
+            <div x-show="parseCompileFlags(detailElement).flags.length > 0">
+              <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                Key Flags
+              </div>
+              <div class="flex flex-wrap gap-1">
+                <template
+                  x-for="flag in parseCompileFlags(detailElement).flags.filter(f => f.startsWith('-O') || f.startsWith('-std') || f.startsWith('-mcpu') || f.startsWith('-mthumb') || f.startsWith('-g')).slice(0, 8)"
+                  :key="flag"
+                >
+                  <span
+                    class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono"
+                    :class="flag.startsWith('-O') ? 'bg-green-500/15 text-green-400' :
+                            flag.startsWith('-std') ? 'bg-pink-500/15 text-pink-400' :
+                            flag.startsWith('-g') ? 'bg-orange-500/15 text-orange-400' :
+                            'bg-purple-500/15 text-purple-400'"
+                    x-text="flag"
+                  ></span>
+                </template>
+              </div>
+            </div>
+
+            <!-- Defines preview -->
+            <div x-show="parseCompileFlags(detailElement).defines.length > 0">
+              <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                Defines
+              </div>
+              <div class="flex flex-wrap gap-1">
+                <template
+                  x-for="def in parseCompileFlags(detailElement).defines.slice(0, 5)"
+                  :key="def"
+                >
+                  <span
+                    class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono bg-amber-500/15 text-amber-400"
+                    x-text="def"
+                  ></span>
+                </template>
+                <span
+                  x-show="parseCompileFlags(detailElement).defines.length > 5"
+                  class="text-[10px] text-slate-500 self-center"
+                  x-text="'+' + (parseCompileFlags(detailElement).defines.length - 5) + ' more'"
+                ></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hashes (compact) -->
+          <div
+            x-show="detailElement?.verifiedUsing && detailElement.verifiedUsing.length > 0"
+            class="space-y-2"
+          >
+            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              Verification
+            </div>
+            <template x-for="h in (detailElement?.verifiedUsing || [])" :key="h.hashValue">
+              <div class="flex items-start gap-2 group">
+                <span
+                  class="text-[10px] text-slate-500 uppercase w-10 pt-0.5 flex-shrink-0 text-right"
+                  x-text="h.algorithm"
+                ></span>
+                <code
+                  class="hash-text text-slate-400 break-all flex-1 leading-relaxed"
+                  x-text="h.hashValue"
+                ></code>
+                <button
+                  @click="copyHash(h.hashValue)"
+                  class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity flex-shrink-0 pt-0.5"
+                  title="Copy"
+                >
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </template>
+          </div>
+
+          <!-- Relationships — grouped semantically -->
+          <template x-for="group in detailRelGroups" :key="group.key">
+            <div class="detail-rel-section">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="detail-rel-line" :style="`background: ${group.color}`"></span>
+                <span
+                  class="text-xs font-semibold uppercase tracking-wider"
+                  :style="`color: ${group.color}`"
+                  x-text="group.label"
+                ></span>
+                <span
+                  class="text-[10px] text-slate-500"
+                  x-text="'(' + group.items.length + ')'"
+                ></span>
+              </div>
+              <div class="space-y-1 ml-3">
+                <template x-for="item in group.items" :key="item.id">
+                  <div class="detail-rel-item group" @click="selectGraphNode(item.id)">
+                    <span
+                      class="detail-rel-arrow"
+                      :style="`color: ${group.color}`"
+                      x-text="item.direction === 'out' ? '→' : '←'"
+                    ></span>
+                    <span
+                      class="detail-rel-target-dot"
+                      :style="`background: ${nodeTypeColor(getNodeType(elementMap.get(item.id) || {}))}`"
+                    ></span>
+                    <span class="flex-1 truncate" x-text="item.displayName"></span>
+                    <svg
+                      class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors flex-shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </template>
+
+          <!-- Empty state -->
+          <div
+            x-show="detailElement && detailRelGroups.length === 0"
+            class="text-xs text-slate-500 italic text-center py-4"
+          >
+            No relationships found
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOAST -->
+    <div
+      x-show="toastMsg"
+      x-transition
+      class="fixed bottom-5 right-5 bg-slate-700 text-white text-sm px-4 py-2 rounded-lg shadow-lg z-50"
+      x-text="toastMsg"
+    ></div>
+  </body>
+</html>

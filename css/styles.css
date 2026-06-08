@@ -1,0 +1,352 @@
+/**
+ * SPDX 3.0 SBOM Visualizer - Styles
+ *
+ * Custom styles for the SPDX visualizer application.
+ * Uses Tailwind CSS for utility classes, this file contains
+ * custom components and animations not covered by Tailwind.
+ */
+
+/* ==========================================================================
+   Alpine.js Cloak
+   Hides elements until Alpine.js initializes
+   ========================================================================== */
+
+[x-cloak] {
+  display: none !important;
+}
+
+/* ==========================================================================
+   Scrollbar Styling
+   Custom thin scrollbars for dark theme
+   ========================================================================== */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #475569 transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+/* ==========================================================================
+   Animations
+   Slide-in and fade-in effects for UI transitions
+   ========================================================================== */
+
+.slide-in {
+  animation: slideIn 0.25s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================================================
+   Graph Container
+   Styles for the D3 force-directed graph visualization
+   ========================================================================== */
+
+.graph-container svg {
+  width: 100%;
+  height: 100%;
+}
+
+.graph-container .node {
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.graph-container .link {
+  transition: opacity 0.15s;
+}
+
+.graph-container .dimmed {
+  opacity: 0.08;
+}
+
+.graph-container .highlighted {
+  opacity: 1;
+}
+
+.graph-container text {
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ==========================================================================
+   Dependency Tree
+   Styles for the D3 hierarchical tree visualization
+   ========================================================================== */
+
+.dep-tree .node circle {
+  cursor: pointer;
+  transition: fill 0.2s;
+}
+
+.dep-tree .node text {
+  font-size: 11px;
+}
+
+.dep-tree .link {
+  fill: none;
+  stroke-opacity: 0.4;
+  stroke-width: 1.5px;
+}
+
+/* ==========================================================================
+   Drop Zone
+   File drag-and-drop area styling
+   ========================================================================== */
+
+.drop-zone {
+  border: 2px dashed #475569;
+  transition: all 0.2s;
+}
+
+.drop-zone.drag-over {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.08);
+}
+
+/* ==========================================================================
+   Badge Component
+   Reusable pill/badge for tags and labels
+   ========================================================================== */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   Card Component
+   Reusable card container with hover effects
+   ========================================================================== */
+
+.card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.2s;
+}
+
+.card:hover {
+  border-color: #475569;
+}
+
+/* ==========================================================================
+   Stat Cards
+   Dashboard statistic cards with colored decorative circles
+   ========================================================================== */
+
+.stat-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::after {
+  content: '';
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  opacity: 0.08;
+}
+
+.stat-card.blue::after {
+  background: #3b82f6;
+}
+
+.stat-card.green::after {
+  background: #10b981;
+}
+
+.stat-card.purple::after {
+  background: #8b5cf6;
+}
+
+.stat-card.amber::after {
+  background: #f59e0b;
+}
+
+.stat-card.teal::after {
+  background: #14b8a6;
+}
+
+/* ==========================================================================
+   Navigation Items
+   Sidebar navigation with active states and indicator line
+   ========================================================================== */
+
+.nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  transition: all 0.15s;
+  cursor: pointer;
+  color: #94a3b8;
+}
+
+.nav-item:hover {
+  background: rgba(51, 65, 85, 0.4);
+  color: #e2e8f0;
+}
+
+.nav-item.active {
+  background: rgba(59, 130, 246, 0.1);
+  color: #60a5fa;
+  font-weight: 500;
+}
+
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: #3b82f6;
+}
+
+.nav-item .nav-icon {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.nav-item:hover .nav-icon {
+  opacity: 0.9;
+}
+
+.nav-item.active .nav-icon {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   Hash Text
+   Monospace font for hash values and code
+   ========================================================================== */
+
+.hash-text {
+  font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+  font-size: 0.7rem;
+}
+
+/* ==========================================================================
+   Detail Panel
+   Right-side detail panel styling for element inspection
+   ========================================================================== */
+
+.detail-type-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.detail-rel-line {
+  width: 3px;
+  height: 14px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.detail-rel-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: #cbd5e1;
+  transition: background 0.1s;
+}
+
+.detail-rel-item:hover {
+  background: rgba(51, 65, 85, 0.5);
+  color: #f1f5f9;
+}
+
+.detail-rel-arrow {
+  font-size: 0.7rem;
+  flex-shrink: 0;
+  font-weight: 700;
+  width: 12px;
+  text-align: center;
+}
+
+.detail-rel-target-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Tooltip
+   Floating tooltip for hover information
+   ========================================================================== */
+
+.tooltip {
+  position: absolute;
+  pointer-events: none;
+  z-index: 50;
+  background: #1e293b;
+  border: 1px solid #475569;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #f1f5f9;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  max-width: 250px;
+}
