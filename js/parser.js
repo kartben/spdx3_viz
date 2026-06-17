@@ -231,6 +231,21 @@ export function buildRelationshipIndexes(relationships) {
   const configuresIndex = new Map();
   const configuredByIndex = new Map();
 
+  // Pushes a value into a Map<string, Array> bucket, skipping duplicates.
+  // SPDX producers (e.g. Zephyr) may emit the same logical edge more than once
+  // as distinct Relationship records. These duplicates would otherwise inflate
+  // dependency/dependent counts and, because the UI renders the lists with a
+  // keyed x-for, break rendering entirely on duplicate keys.
+  const pushUnique = (map, key, value) => {
+    if (!map.has(key)) {
+      map.set(key, []);
+    }
+    const bucket = map.get(key);
+    if (!bucket.includes(value)) {
+      bucket.push(value);
+    }
+  };
+
   relationships.forEach((rel) => {
     const from = rel.from;
     const targets = Array.isArray(rel.to) ? rel.to : [rel.to];
@@ -252,62 +267,46 @@ export function buildRelationshipIndexes(relationships) {
     // Build specific indexes based on relationship type
     switch (rel.relationshipType) {
       case RELATIONSHIP_TYPES.DEPENDS_ON:
-        if (!depIndex.has(from)) {
-          depIndex.set(from, []);
-        }
         targets.forEach((target) => {
-          depIndex.get(from).push(target);
-
-          if (!dependentIndex.has(target)) {
-            dependentIndex.set(target, []);
-          }
-          dependentIndex.get(target).push(from);
+          pushUnique(depIndex, from, target);
+          pushUnique(dependentIndex, target, from);
         });
         break;
 
       case RELATIONSHIP_TYPES.CONTAINS:
-        if (!containsIndex.has(from)) {
-          containsIndex.set(from, []);
-        }
         targets.forEach((target) => {
-          containsIndex.get(from).push(target);
+          pushUnique(containsIndex, from, target);
           parentIndex.set(target, from);
         });
         break;
 
       case RELATIONSHIP_TYPES.USES_TOOL:
         targets.forEach((target) => {
-          if (!toolIndex.has(from)) {
-            toolIndex.set(from, []);
-          }
-          toolIndex.get(from).push(target);
+          pushUnique(toolIndex, from, target);
         });
         break;
 
       case RELATIONSHIP_TYPES.HAS_STATIC_LINK:
-        if (!staticLinkIndex.has(from)) {
-          staticLinkIndex.set(from, []);
-        }
         targets.forEach((target) => {
-          staticLinkIndex.get(from).push(target);
+          pushUnique(staticLinkIndex, from, target);
         });
         break;
 
       case RELATIONSHIP_TYPES.CONFIGURES:
-        if (!configuresIndex.has(from)) {
-          configuresIndex.set(from, []);
-        }
         targets.forEach((target) => {
-          configuresIndex.get(from).push(target);
+          pushUnique(configuresIndex, from, target);
 
           if (!configuredByIndex.has(target)) {
             configuredByIndex.set(target, []);
           }
-          configuredByIndex.get(target).push({
-            configId: from,
-            scope: rel.scope,
-            description: rel.description
-          });
+          const cfgBucket = configuredByIndex.get(target);
+          if (!cfgBucket.some((c) => c.configId === from)) {
+            cfgBucket.push({
+              configId: from,
+              scope: rel.scope,
+              description: rel.description
+            });
+          }
         });
         break;
     }
