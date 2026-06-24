@@ -43,7 +43,10 @@ export function spdxApp() {
     expandedPkg: null,
     expandedFile: null,
     expandedConfig: null,
+    expandedBuild: null,
     configSearch: '',
+    buildSearch: '',
+    buildSort: 'output',
     pkgSort: 'name',
     fileTypeFilter: '',
     toastMsg: '',
@@ -56,6 +59,7 @@ export function spdxApp() {
     files: [],
     tools: [],
     relationships: [],
+    builds: [],
     buildInfo: null,
     agentInfo: null,
     docName: '',
@@ -76,6 +80,14 @@ export function spdxApp() {
     staticLinkIndex: new Map(), // elf spdxId -> [linked lib spdxIds]
     configuresIndex: new Map(), // config spdxId -> [target spdxIds]
     configuredByIndex: new Map(), // target spdxId -> [config spdxIds]
+    buildInputIndex: new Map(), // build spdxId -> [input spdxIds]
+    buildOutputIndex: new Map(), // build spdxId -> [output spdxIds]
+    producedByBuildIndex: new Map(), // artifact spdxId -> [producer build spdxIds]
+    consumedByBuildIndex: new Map(), // input spdxId -> [consumer build spdxIds]
+    buildStepIndex: new Map(), // parent/root build spdxId -> [child build spdxIds]
+    parentBuildIndex: new Map(), // child build spdxId -> [parent/root build spdxIds]
+    distributionArtifactIndex: new Map(), // package spdxId -> [artifact spdxIds]
+    distributedByIndex: new Map(), // artifact spdxId -> [package spdxIds]
     buildConfigs: [], // build configuration elements
     generatedArtifacts: [],
 
@@ -149,6 +161,44 @@ export function spdxApp() {
       return [...cfgs].sort((a, b) =>
         (a.name || a.spdxId || '').localeCompare(b.name || b.spdxId || '')
       );
+    },
+
+    get filteredBuilds() {
+      let buildList = this.builds;
+      if (this.buildSearch) {
+        const q = this.buildSearch.toLowerCase();
+        buildList = buildList.filter((build) => {
+          const searchable = [
+            build.spdxId,
+            build.name,
+            build.build_buildId,
+            build.build_buildType,
+            ...this.buildOutputs(build.spdxId).map((id) => this.relTargetDisplayName(id))
+          ]
+            .filter(Boolean)
+            .join(' ')
+            .toLowerCase();
+          return searchable.includes(q);
+        });
+      }
+
+      const sorted = [...buildList];
+      if (this.buildSort === 'inputs') {
+        sorted.sort(
+          (a, b) => this.buildInputs(b.spdxId).length - this.buildInputs(a.spdxId).length
+        );
+      } else if (this.buildSort === 'buildId') {
+        sorted.sort((a, b) =>
+          (a.build_buildId || a.spdxId || '').localeCompare(b.build_buildId || b.spdxId || '')
+        );
+      } else {
+        sorted.sort((a, b) =>
+          this.buildSortName(a).localeCompare(this.buildSortName(b), undefined, {
+            numeric: true
+          })
+        );
+      }
+      return sorted;
     },
 
     get fileTypes() {
@@ -237,6 +287,7 @@ export function spdxApp() {
       this.views.find((v) => v.id === 'packages').count = this.packages.length;
       this.views.find((v) => v.id === 'files').count = this.files.length;
       this.views.find((v) => v.id === 'configs').count = this.buildConfigs.length;
+      this.views.find((v) => v.id === 'build').count = this.builds.length;
       this.treeRoot = findBestTreeRoot(this.packages, this.depIndex);
     },
 
@@ -268,6 +319,30 @@ export function spdxApp() {
     fileTools(spdxId) {
       return this.toolIndex.get(spdxId) || [];
     },
+    buildInputs(spdxId) {
+      return this.buildInputIndex.get(spdxId) || [];
+    },
+    buildOutputs(spdxId) {
+      return this.buildOutputIndex.get(spdxId) || [];
+    },
+    producedByBuilds(spdxId) {
+      return this.producedByBuildIndex.get(spdxId) || [];
+    },
+    consumedByBuilds(spdxId) {
+      return this.consumedByBuildIndex.get(spdxId) || [];
+    },
+    childBuilds(spdxId) {
+      return this.buildStepIndex.get(spdxId) || [];
+    },
+    parentBuilds(spdxId) {
+      return this.parentBuildIndex.get(spdxId) || [];
+    },
+    distributionArtifacts(spdxId) {
+      return this.distributionArtifactIndex.get(spdxId) || [];
+    },
+    distributedBy(spdxId) {
+      return this.distributedByIndex.get(spdxId) || [];
+    },
     staticLinks(spdxId) {
       return this.staticLinkIndex.get(spdxId) || [];
     },
@@ -282,6 +357,29 @@ export function spdxApp() {
     },
     incomingRels(spdxId) {
       return this.relToIndex.get(spdxId) || [];
+    },
+
+    buildSortName(build) {
+      return (
+        this.buildOutputs(build.spdxId)
+          .map((id) => this.relTargetDisplayName(id))
+          .join(' ') ||
+        build.build_buildId ||
+        build.spdxId ||
+        ''
+      );
+    },
+
+    buildDisplayName(build) {
+      const outputs = this.buildOutputs(build.spdxId);
+      if (outputs.length) {
+        return outputs.map((id) => this.relTargetDisplayName(id)).join(', ');
+      }
+      return build.name || build.build_buildId || build.spdxId || 'Build';
+    },
+
+    formatCount(count) {
+      return new Intl.NumberFormat().format(count || 0);
     },
 
     getBuildConfigFor(targetSpdxId) {
@@ -392,9 +490,15 @@ export function spdxApp() {
     toggleConfig(id) {
       this.expandedConfig = this.expandedConfig === id ? null : id;
     },
+    toggleBuild(id) {
+      this.expandedBuild = this.expandedBuild === id ? null : id;
+    },
     navigateTo(spdxId) {
       const el = this.elementMap.get(spdxId);
-      if (!el) return;
+      if (!el) {
+        this.selectGraphNode(spdxId);
+        return;
+      }
       if (el.type === 'software_Package') {
         this.switchView('packages');
         this.expandedPkg = spdxId;
@@ -411,6 +515,8 @@ export function spdxApp() {
         } else {
           this.navigateToFile(spdxId);
         }
+      } else if (el.type === 'build_Build') {
+        this.navigateToBuild(spdxId);
       }
     },
     navigateToConfig(spdxId) {
@@ -421,9 +527,21 @@ export function spdxApp() {
       this.switchView('files');
       this.expandedFile = spdxId;
     },
+    navigateToBuild(spdxId) {
+      this.switchView('build');
+      this.expandedBuild = spdxId;
+    },
+    placeholderElement(spdxId) {
+      return {
+        type: 'ExternalReference',
+        spdxId,
+        name: this.cleanName(spdxId),
+        placeholder: true
+      };
+    },
     selectGraphNode(spdxId) {
       const el = this.elementMap.get(spdxId);
-      if (el) this.detailElement = el;
+      this.detailElement = el || this.placeholderElement(spdxId);
     },
 
     copyHash(h) {

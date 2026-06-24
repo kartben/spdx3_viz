@@ -1,10 +1,73 @@
 import { getRelationshipColor, getNodeType, getNodeTypeColor, cleanName } from './utils.js';
 
+const INPUT_LAYOUT_LINKS_PER_BUILD = 8;
+
+function asTargets(to) {
+  return Array.isArray(to) ? to : [to];
+}
+
+function placeholderFor(spdxId, rel, role) {
+  const buildRelationshipTypes = new Set(['hasInput', 'hasOutput', 'ancestorOf']);
+  const fileRelationshipTypes = new Set([
+    'hasInput',
+    'hasOutput',
+    'hasDistributionArtifact',
+    'contains',
+    'generates'
+  ]);
+
+  let type = 'ExternalReference';
+  if (role === 'source' && buildRelationshipTypes.has(rel.relationshipType)) {
+    type = 'build_Build';
+  } else if (rel.relationshipType === 'ancestorOf') {
+    type = 'build_Build';
+  } else if (role === 'target' && fileRelationshipTypes.has(rel.relationshipType)) {
+    type = 'software_File';
+  }
+
+  return {
+    type,
+    spdxId,
+    name: cleanName(spdxId),
+    placeholder: true
+  };
+}
+
+function createLayoutLinks(links) {
+  const inputLinksByBuild = new Map();
+  const layoutLinks = [];
+
+  links.forEach((link) => {
+    if (link.type === 'hasInput') {
+      const count = inputLinksByBuild.get(link.sourceId) || 0;
+      if (count >= INPUT_LAYOUT_LINKS_PER_BUILD) return;
+      inputLinksByBuild.set(link.sourceId, count + 1);
+    }
+
+    layoutLinks.push({
+      source: link.sourceId,
+      target: link.targetId,
+      type: link.type
+    });
+  });
+
+  return layoutLinks;
+}
+
+function groupLinksByColor(links) {
+  const groups = new Map();
+  links.forEach((link) => {
+    if (!groups.has(link.color)) groups.set(link.color, []);
+    groups.get(link.color).push(link);
+  });
+  return groups;
+}
+
 export function renderGraph(app) {
   const container = document.getElementById('graphContainer');
   if (!container) return;
 
-  container.querySelectorAll('svg').forEach((s) => s.remove());
+  container.querySelectorAll('svg, canvas').forEach((el) => el.remove());
   if (app.graphSim) app.graphSim.stop();
 
   const width = container.clientWidth;
@@ -20,78 +83,185 @@ export function renderGraph(app) {
 
   const nodeIds = new Set();
   const nodes = [];
-  const addNode = (spdxId) => {
-    if (nodeIds.has(spdxId)) return;
-    const el = app.elementMap.get(spdxId);
-    if (!el) return;
+  const nodeById = new Map();
+
+  const addNode = (spdxId, rel = null, role = 'target') => {
+    if (!spdxId) return null;
+    if (nodeIds.has(spdxId)) return nodeById.get(spdxId);
+
+    const el = app.elementMap.get(spdxId) || placeholderFor(spdxId, rel || {}, role);
     const type = getNodeType(el);
-    if (!activeNodeTypes.has(type)) return;
+    if (!activeNodeTypes.has(type)) return null;
+
+    const node = {
+      id: spdxId,
+      name: el.name || cleanName(spdxId),
+      type,
+      data: el
+    };
     nodeIds.add(spdxId);
-    nodes.push({ id: spdxId, name: cleanName(spdxId), type, data: el });
+    nodeById.set(spdxId, node);
+    nodes.push(node);
+    return node;
   };
 
   app.packages.forEach((p) => addNode(p.spdxId));
   app.files.forEach((f) => addNode(f.spdxId));
   app.tools.forEach((t) => addNode(t.spdxId));
   app.buildConfigs.forEach((c) => addNode(c.spdxId));
-  if (app.buildInfo) addNode(app.buildInfo.spdxId);
+  (app.builds || []).forEach((b) => addNode(b.spdxId));
+  if (!app.builds?.length && app.buildInfo) addNode(app.buildInfo.spdxId);
 
   const links = [];
   app.relationships.forEach((rel) => {
     if (rel.relationshipType === 'hasConcludedLicense') return;
     if (!activeRelTypes.has(rel.relationshipType)) return;
-    const targets = Array.isArray(rel.to) ? rel.to : [rel.to];
-    targets.forEach((target) => {
-      if (nodeIds.has(rel.from) && nodeIds.has(target)) {
-        links.push({ source: rel.from, target, type: rel.relationshipType });
-      }
+
+    const sourceNode = addNode(rel.from, rel, 'source');
+    asTargets(rel.to).forEach((target) => {
+      const targetNode = addNode(target, rel, 'target');
+      if (!sourceNode || !targetNode) return;
+      links.push({
+        sourceId: rel.from,
+        targetId: target,
+        sourceNode,
+        targetNode,
+        type: rel.relationshipType,
+        color: getRelationshipColor(rel.relationshipType)
+      });
     });
   });
 
   const connCount = new Map();
-  links.forEach((link) => {
-    connCount.set(link.source, (connCount.get(link.source) || 0) + 1);
-    connCount.set(link.target, (connCount.get(link.target) || 0) + 1);
-  });
+  const connectedIndex = new Map();
+  const linksByNode = new Map();
 
-  const svg = d3.select(container).append('svg').attr('width', width).attr('height', height);
-  const defs = svg.append('defs');
-  [...new Set(app.edgeColors.map((edge) => edge.color))].forEach((color) => {
-    defs
-      .append('marker')
-      .attr('id', `arrow-${color.replace('#', '')}`)
-      .attr('viewBox', '0 -5 10 10')
-      .attr('refX', 20)
-      .attr('refY', 0)
-      .attr('markerWidth', 6)
-      .attr('markerHeight', 6)
-      .attr('orient', 'auto')
-      .append('path')
-      .attr('d', 'M0,-4L10,0L0,4')
-      .attr('fill', color)
-      .attr('opacity', 0.6);
-  });
+  const connect = (sourceId, targetId, link) => {
+    connCount.set(sourceId, (connCount.get(sourceId) || 0) + 1);
+    connCount.set(targetId, (connCount.get(targetId) || 0) + 1);
+
+    if (!connectedIndex.has(sourceId)) connectedIndex.set(sourceId, new Set([sourceId]));
+    if (!connectedIndex.has(targetId)) connectedIndex.set(targetId, new Set([targetId]));
+    connectedIndex.get(sourceId).add(targetId);
+    connectedIndex.get(targetId).add(sourceId);
+
+    if (!linksByNode.has(sourceId)) linksByNode.set(sourceId, []);
+    if (!linksByNode.has(targetId)) linksByNode.set(targetId, []);
+    linksByNode.get(sourceId).push(link);
+    linksByNode.get(targetId).push(link);
+  };
+
+  links.forEach((link) => connect(link.sourceId, link.targetId, link));
+
+  const canvas = document.createElement('canvas');
+  canvas.className = 'graph-edge-canvas';
+  container.appendChild(canvas);
+
+  const dpr = globalThis.devicePixelRatio || 1;
+  canvas.width = width * dpr;
+  canvas.height = height * dpr;
+  canvas.style.width = `${width}px`;
+  canvas.style.height = `${height}px`;
+
+  const ctx = canvas.getContext('2d');
+  const groupedLinks = groupLinksByColor(links);
+  let currentTransform = d3.zoomIdentity;
+  let highlightedNodeId = null;
+  let drawFrame = 0;
+
+  const drawLinkList = (linkList, alpha, lineWidth) => {
+    const grouped = groupLinksByColor(linkList);
+    grouped.forEach((group, color) => {
+      ctx.beginPath();
+      ctx.strokeStyle = color;
+      ctx.globalAlpha = alpha;
+      ctx.lineWidth = lineWidth;
+      group.forEach((link) => {
+        if (
+          link.sourceNode.x == null ||
+          link.sourceNode.y == null ||
+          link.targetNode.x == null ||
+          link.targetNode.y == null
+        ) {
+          return;
+        }
+        ctx.moveTo(link.sourceNode.x, link.sourceNode.y);
+        ctx.lineTo(link.targetNode.x, link.targetNode.y);
+      });
+      ctx.stroke();
+    });
+  };
+
+  const drawGroupedLinks = (groups, alpha, lineWidth) => {
+    groups.forEach((group, color) => {
+      ctx.beginPath();
+      ctx.strokeStyle = color;
+      ctx.globalAlpha = alpha;
+      ctx.lineWidth = lineWidth;
+      group.forEach((link) => {
+        if (
+          link.sourceNode.x == null ||
+          link.sourceNode.y == null ||
+          link.targetNode.x == null ||
+          link.targetNode.y == null
+        ) {
+          return;
+        }
+        ctx.moveTo(link.sourceNode.x, link.sourceNode.y);
+        ctx.lineTo(link.targetNode.x, link.targetNode.y);
+      });
+      ctx.stroke();
+    });
+  };
+
+  const drawCanvas = () => {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, width, height);
+    ctx.save();
+    ctx.translate(currentTransform.x, currentTransform.y);
+    ctx.scale(currentTransform.k, currentTransform.k);
+    ctx.lineCap = 'round';
+
+    if (highlightedNodeId) {
+      drawGroupedLinks(groupedLinks, 0.035, 0.7);
+      drawLinkList(linksByNode.get(highlightedNodeId) || [], 0.75, 1.3);
+    } else {
+      drawGroupedLinks(groupedLinks, 0.22, 0.85);
+    }
+
+    ctx.restore();
+    ctx.globalAlpha = 1;
+  };
+
+  const queueDraw = () => {
+    if (drawFrame) return;
+    drawFrame = requestAnimationFrame(() => {
+      drawFrame = 0;
+      drawCanvas();
+    });
+  };
+
+  const svg = d3
+    .select(container)
+    .append('svg')
+    .attr('class', 'graph-node-layer')
+    .attr('width', width)
+    .attr('height', height);
 
   const g = svg.append('g');
   app.graphZoom = d3
     .zoom()
     .scaleExtent([0.05, 8])
-    .on('zoom', (event) => g.attr('transform', event.transform));
+    .on('zoom', (event) => {
+      currentTransform = event.transform;
+      g.attr('transform', currentTransform);
+      queueDraw();
+    });
   svg.call(app.graphZoom);
 
-  const link = g
-    .append('g')
-    .selectAll('line')
-    .data(links)
-    .enter()
-    .append('line')
-    .attr('class', 'link')
-    .attr('stroke', (d) => getRelationshipColor(d.type))
-    .attr('stroke-opacity', 0.35)
-    .attr('stroke-width', 1.2)
-    .attr('marker-end', (d) => `url(#arrow-${getRelationshipColor(d.type).replace('#', '')})`);
-
   let sim;
+  const radiusFor = (d) => Math.max(5, Math.min(16, 4 + Math.sqrt(connCount.get(d.id) || 0) * 1.2));
+
   const node = g
     .append('g')
     .selectAll('circle')
@@ -99,7 +269,7 @@ export function renderGraph(app) {
     .enter()
     .append('circle')
     .attr('class', 'node')
-    .attr('r', (d) => Math.max(5, Math.min(16, 4 + (connCount.get(d.id) || 0) * 0.8)))
+    .attr('r', radiusFor)
     .attr('fill', (d) => getNodeTypeColor(d.type))
     .attr('stroke', (d) => d3.color(getNodeTypeColor(d.type)).brighter(0.5))
     .attr('stroke-width', 1.5)
@@ -114,6 +284,7 @@ export function renderGraph(app) {
         .on('drag', (event, d) => {
           d.fx = event.x;
           d.fy = event.y;
+          queueDraw();
         })
         .on('end', (event, d) => {
           if (!event.active) sim.alphaTarget(0);
@@ -131,25 +302,16 @@ export function renderGraph(app) {
     .text((d) => d.name)
     .attr('font-size', (d) => (d.type === 'tool' || d.type === 'build' ? 10 : 9))
     .attr('fill', '#94a3b8')
-    .attr('dx', (d) => Math.max(7, 4 + (connCount.get(d.id) || 0) * 0.8) + 3)
+    .attr('dx', (d) => radiusFor(d) + 3)
     .attr('dy', 3);
 
   node.on('mouseover', (event, d) => {
-    const connected = new Set([d.id]);
-    links.forEach((linkData) => {
-      const source = typeof linkData.source === 'object' ? linkData.source.id : linkData.source;
-      const target = typeof linkData.target === 'object' ? linkData.target.id : linkData.target;
-      if (source === d.id) connected.add(target);
-      if (target === d.id) connected.add(source);
-    });
+    highlightedNodeId = d.id;
+    const connected = connectedIndex.get(d.id) || new Set([d.id]);
 
     node.classed('dimmed', (n) => !connected.has(n.id));
-    link.classed('dimmed', (linkData) => {
-      const source = typeof linkData.source === 'object' ? linkData.source.id : linkData.source;
-      const target = typeof linkData.target === 'object' ? linkData.target.id : linkData.target;
-      return source !== d.id && target !== d.id;
-    });
     label.classed('dimmed', (n) => !connected.has(n.id));
+    queueDraw();
 
     const tooltip = document.getElementById('graphTooltip');
     if (!tooltip) return;
@@ -160,9 +322,10 @@ export function renderGraph(app) {
   });
 
   node.on('mouseout', () => {
+    highlightedNodeId = null;
     node.classed('dimmed', false);
-    link.classed('dimmed', false);
     label.classed('dimmed', false);
+    queueDraw();
     document.getElementById('graphTooltip')?.classList.add('hidden');
   });
 
@@ -175,29 +338,27 @@ export function renderGraph(app) {
     .force(
       'link',
       d3
-        .forceLink(links)
+        .forceLink(createLayoutLinks(links))
         .id((d) => d.id)
-        .distance(60)
+        .distance((d) => (d.type === 'hasInput' ? 85 : 60))
+        .strength((d) => (d.type === 'hasInput' ? 0.05 : 0.18))
     )
-    .force('charge', d3.forceManyBody().strength(-180))
+    .force('charge', d3.forceManyBody().strength(-150))
     .force('center', d3.forceCenter(width / 2, height / 2))
     .force(
       'collision',
-      d3.forceCollide().radius((d) => Math.max(7, 4 + (connCount.get(d.id) || 0) * 0.8) + 4)
+      d3.forceCollide().radius((d) => radiusFor(d) + 4)
     )
-    .force('x', d3.forceX(width / 2).strength(0.05))
-    .force('y', d3.forceY(height / 2).strength(0.05));
+    .force('x', d3.forceX(width / 2).strength(0.045))
+    .force('y', d3.forceY(height / 2).strength(0.045));
 
   sim.on('tick', () => {
-    link
-      .attr('x1', (d) => d.source.x)
-      .attr('y1', (d) => d.source.y)
-      .attr('x2', (d) => d.target.x)
-      .attr('y2', (d) => d.target.y);
     node.attr('cx', (d) => d.x).attr('cy', (d) => d.y);
     label.attr('x', (d) => d.x).attr('y', (d) => d.y);
+    queueDraw();
   });
 
+  queueDraw();
   app.graphSim = sim;
   app.graphSvg = svg;
 }

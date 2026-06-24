@@ -20,6 +20,7 @@ import { COLORS, ELEMENT_TYPES, RELATIONSHIP_TYPES } from './config.js';
  * @property {Array<Object>} files - File elements (excluding build configs)
  * @property {Array<Object>} tools - Tool elements
  * @property {Array<Object>} relationships - Relationship elements
+ * @property {Array<Object>} builds - Build elements
  * @property {Array<Object>} buildConfigs - Build configuration elements
  * @property {Object|null} buildInfo - Build information element
  * @property {Object|null} agentInfo - Agent information element
@@ -44,6 +45,14 @@ import { COLORS, ELEMENT_TYPES, RELATIONSHIP_TYPES } from './config.js';
  * @property {Map<string, Array>} staticLinkIndex - Static link relationships
  * @property {Map<string, Array>} configuresIndex - Config to targets mapping
  * @property {Map<string, Array>} configuredByIndex - Target to configs mapping
+ * @property {Map<string, Array>} buildInputIndex - Build to input elements mapping
+ * @property {Map<string, Array>} buildOutputIndex - Build to output elements mapping
+ * @property {Map<string, Array>} producedByBuildIndex - Artifact to producing builds mapping
+ * @property {Map<string, Array>} consumedByBuildIndex - Input to consuming builds mapping
+ * @property {Map<string, Array>} buildStepIndex - Build to child build steps mapping
+ * @property {Map<string, Array>} parentBuildIndex - Build step to parent/root build mapping
+ * @property {Map<string, Array>} distributionArtifactIndex - Package to distribution artifacts mapping
+ * @property {Map<string, Array>} distributedByIndex - Artifact to distributing packages mapping
  */
 
 /* ==========================================================================
@@ -79,6 +88,9 @@ export function parseGraph(graph) {
 
   /** @type {Array<Object>} */
   const relationships = [];
+
+  /** @type {Array<Object>} */
+  const builds = [];
 
   /** @type {Array<string>} */
   const generatedArtifacts = [];
@@ -137,7 +149,7 @@ export function parseGraph(graph) {
         break;
 
       case ELEMENT_TYPES.BUILD:
-        buildInfo = buildInfo || item;
+        builds.push(item);
         break;
 
       case ELEMENT_TYPES.AGENT:
@@ -177,11 +189,37 @@ export function parseGraph(graph) {
       file.software_primaryPurpose !== 'configuration' && !file.spdxId?.includes('build-config')
   );
 
-  // Track generated artifacts
+  const rootBuildIds = new Set();
   relationships.forEach((rel) => {
-    if (rel.relationshipType === RELATIONSHIP_TYPES.GENERATES) {
+    if (
+      rel.relationshipType === RELATIONSHIP_TYPES.ANCESTOR_OF &&
+      elementMap.get(rel.from)?.type === ELEMENT_TYPES.BUILD
+    ) {
+      rootBuildIds.add(rel.from);
+    }
+  });
+  buildInfo =
+    builds.find((build) => rootBuildIds.has(build.spdxId)) ||
+    builds.find(
+      (build) => build.build_environment?.length || build.build_configSourceUri?.length
+    ) ||
+    builds[0] ||
+    null;
+
+  // Track generated artifacts
+  const pushGeneratedArtifact = (target) => {
+    if (target && !generatedArtifacts.includes(target)) {
+      generatedArtifacts.push(target);
+    }
+  };
+
+  relationships.forEach((rel) => {
+    if (
+      rel.relationshipType === RELATIONSHIP_TYPES.GENERATES ||
+      rel.relationshipType === RELATIONSHIP_TYPES.HAS_OUTPUT
+    ) {
       const targets = Array.isArray(rel.to) ? rel.to : [rel.to];
-      targets.forEach((target) => generatedArtifacts.push(target));
+      targets.forEach(pushGeneratedArtifact);
     }
   });
 
@@ -191,6 +229,7 @@ export function parseGraph(graph) {
     files: regularFiles,
     tools,
     relationships,
+    builds,
     buildConfigs,
     buildInfo,
     agentInfo,
@@ -230,6 +269,14 @@ export function buildRelationshipIndexes(relationships) {
   const staticLinkIndex = new Map();
   const configuresIndex = new Map();
   const configuredByIndex = new Map();
+  const buildInputIndex = new Map();
+  const buildOutputIndex = new Map();
+  const producedByBuildIndex = new Map();
+  const consumedByBuildIndex = new Map();
+  const buildStepIndex = new Map();
+  const parentBuildIndex = new Map();
+  const distributionArtifactIndex = new Map();
+  const distributedByIndex = new Map();
 
   // Pushes a value into a Map<string, Array> bucket, skipping duplicates.
   // SPDX producers (e.g. Zephyr) may emit the same logical edge more than once
@@ -286,6 +333,35 @@ export function buildRelationshipIndexes(relationships) {
         });
         break;
 
+      case RELATIONSHIP_TYPES.GENERATES:
+      case RELATIONSHIP_TYPES.HAS_OUTPUT:
+        targets.forEach((target) => {
+          pushUnique(buildOutputIndex, from, target);
+          pushUnique(producedByBuildIndex, target, from);
+        });
+        break;
+
+      case RELATIONSHIP_TYPES.HAS_INPUT:
+        targets.forEach((target) => {
+          pushUnique(buildInputIndex, from, target);
+          pushUnique(consumedByBuildIndex, target, from);
+        });
+        break;
+
+      case RELATIONSHIP_TYPES.HAS_DISTRIBUTION_ARTIFACT:
+        targets.forEach((target) => {
+          pushUnique(distributionArtifactIndex, from, target);
+          pushUnique(distributedByIndex, target, from);
+        });
+        break;
+
+      case RELATIONSHIP_TYPES.ANCESTOR_OF:
+        targets.forEach((target) => {
+          pushUnique(buildStepIndex, from, target);
+          pushUnique(parentBuildIndex, target, from);
+        });
+        break;
+
       case RELATIONSHIP_TYPES.HAS_STATIC_LINK:
         targets.forEach((target) => {
           pushUnique(staticLinkIndex, from, target);
@@ -322,7 +398,15 @@ export function buildRelationshipIndexes(relationships) {
     toolIndex,
     staticLinkIndex,
     configuresIndex,
-    configuredByIndex
+    configuredByIndex,
+    buildInputIndex,
+    buildOutputIndex,
+    producedByBuildIndex,
+    consumedByBuildIndex,
+    buildStepIndex,
+    parentBuildIndex,
+    distributionArtifactIndex,
+    distributedByIndex
   };
 }
 
@@ -374,6 +458,55 @@ export function createIndexAccessors(indexes) {
      * @returns {Array<string>} Array of tool SPDX IDs
      */
     fileTools: (spdxId) => indexes.toolIndex.get(spdxId) || [],
+
+    /**
+     * Gets inputs consumed by a build
+     * @param {string} spdxId - The build's SPDX ID
+     * @returns {Array<string>} Array of input SPDX IDs
+     */
+    buildInputs: (spdxId) => indexes.buildInputIndex.get(spdxId) || [],
+
+    /**
+     * Gets outputs produced by a build
+     * @param {string} spdxId - The build's SPDX ID
+     * @returns {Array<string>} Array of output SPDX IDs
+     */
+    buildOutputs: (spdxId) => indexes.buildOutputIndex.get(spdxId) || [],
+
+    /**
+     * Gets builds that produced an artifact
+     * @param {string} spdxId - The artifact's SPDX ID
+     * @returns {Array<string>} Array of build SPDX IDs
+     */
+    producedByBuilds: (spdxId) => indexes.producedByBuildIndex.get(spdxId) || [],
+
+    /**
+     * Gets builds that consumed an input
+     * @param {string} spdxId - The input's SPDX ID
+     * @returns {Array<string>} Array of build SPDX IDs
+     */
+    consumedByBuilds: (spdxId) => indexes.consumedByBuildIndex.get(spdxId) || [],
+
+    /**
+     * Gets child build steps for a build
+     * @param {string} spdxId - The build's SPDX ID
+     * @returns {Array<string>} Array of child build SPDX IDs
+     */
+    childBuilds: (spdxId) => indexes.buildStepIndex.get(spdxId) || [],
+
+    /**
+     * Gets parent/root builds for a build step
+     * @param {string} spdxId - The build step's SPDX ID
+     * @returns {Array<string>} Array of parent build SPDX IDs
+     */
+    parentBuilds: (spdxId) => indexes.parentBuildIndex.get(spdxId) || [],
+
+    /**
+     * Gets distribution artifacts for a package
+     * @param {string} spdxId - The package's SPDX ID
+     * @returns {Array<string>} Array of artifact SPDX IDs
+     */
+    distributionArtifacts: (spdxId) => indexes.distributionArtifactIndex.get(spdxId) || [],
 
     /**
      * Gets statically linked libraries for an element
@@ -439,6 +572,10 @@ export function computeRelationshipTypeCounts(relationships) {
     [RELATIONSHIP_TYPES.USES_TOOL]: COLORS.tool,
     [RELATIONSHIP_TYPES.HAS_STATIC_LINK]: COLORS.staticLink,
     [RELATIONSHIP_TYPES.GENERATES]: COLORS.build,
+    [RELATIONSHIP_TYPES.HAS_INPUT]: COLORS.buildInput,
+    [RELATIONSHIP_TYPES.HAS_OUTPUT]: COLORS.buildOutput,
+    [RELATIONSHIP_TYPES.HAS_DISTRIBUTION_ARTIFACT]: COLORS.distribution,
+    [RELATIONSHIP_TYPES.ANCESTOR_OF]: COLORS.buildLineage,
     [RELATIONSHIP_TYPES.CONTAINS]: COLORS.file,
     [RELATIONSHIP_TYPES.CONFIGURES]: COLORS.config
   };

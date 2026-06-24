@@ -19,5 +19,18 @@ export default [
     rules: {
       'no-unused-vars': ['error', { argsIgnorePattern: '^_' }]
     }
+  },
+  {
+    files: ['tests/**/*.js'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: {
+        ...globals.node
+      }
+    },
+    rules: {
+      'no-unused-vars': ['error', { argsIgnorePattern: '^_' }]
+    }
   }
 ];

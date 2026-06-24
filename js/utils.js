@@ -102,6 +102,10 @@ export function getRelationshipColor(relType) {
     dependsOn: COLORS.package,
     contains: COLORS.file,
     generates: COLORS.build,
+    hasInput: COLORS.buildInput,
+    hasOutput: COLORS.buildOutput,
+    hasDistributionArtifact: COLORS.distribution,
+    ancestorOf: COLORS.buildLineage,
     usesTool: COLORS.tool,
     hasStaticLink: COLORS.staticLink,
     configures: COLORS.config,
@@ -178,6 +182,7 @@ export function getRelationshipTargetDisplayName(spdxId, elementMap) {
 export function getNodeType(item) {
   if (!item || !item.type) return 'other';
 
+  if (item.type === 'ExternalReference') return 'external';
   if (item.type === 'software_Package') return 'package';
   if (item.type === 'software_File') {
     // Check if it's a build config element
@@ -205,7 +210,8 @@ export function getNodeTypeColor(nodeType) {
     tool: COLORS.tool,
     build: COLORS.build,
     agent: COLORS.agent,
-    config: COLORS.config
+    config: COLORS.config,
+    external: COLORS.external
   };
   return colorMap[nodeType] || COLORS.default;
 }
@@ -222,7 +228,8 @@ export function getElementBadgeClass(type) {
     software_File: 'bg-emerald-500/15 text-emerald-400',
     Tool: 'bg-amber-500/15 text-amber-400',
     build_Build: 'bg-purple-500/15 text-purple-400',
-    SoftwareAgent: 'bg-red-500/15 text-red-400'
+    SoftwareAgent: 'bg-red-500/15 text-red-400',
+    ExternalReference: 'bg-slate-500/15 text-slate-400'
   };
   return classMap[type] || 'bg-slate-600/15 text-slate-400';
 }
