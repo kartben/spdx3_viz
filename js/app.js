@@ -18,6 +18,7 @@ import {
   getNodeTypeColor,
   getElementBadgeClass,
   parseCompileFlags as parseBuildConfigFlags,
+  parseBuildParameters as parseBuildParameterGroups,
   getToolUsageCount,
   getToolPath,
   copyToClipboard
@@ -173,6 +174,9 @@ export function spdxApp() {
             build.name,
             build.build_buildId,
             build.build_buildType,
+            ...this.buildParameters(build).flatMap((group) =>
+              group.entries.flatMap((entry) => [entry.key, entry.value])
+            ),
             ...this.buildOutputs(build.spdxId).map((id) => this.relTargetDisplayName(id))
           ]
             .filter(Boolean)
@@ -390,6 +394,33 @@ export function spdxApp() {
 
     parseCompileFlags(config) {
       return parseBuildConfigFlags(config);
+    },
+    buildParameters(build) {
+      return parseBuildParameterGroups(build);
+    },
+    buildParameterCount(build) {
+      return this.buildParameters(build).reduce((count, group) => count + group.entries.length, 0);
+    },
+    buildParameterPreview(build) {
+      return this.buildParameters(build)
+        .flatMap((group) => group.entries)
+        .slice(0, 3);
+    },
+    parameterTokenId(token) {
+      if (typeof token === 'string') return token;
+      return token?.renderKey || token?.id || this.parameterTokenText(token);
+    },
+    parameterTokenText(token) {
+      if (typeof token === 'string') return token;
+      return token?.display ?? token?.text ?? token?.value ?? '';
+    },
+    parameterTokenKind(token) {
+      if (typeof token === 'string') return 'Value';
+      return token?.kind || 'Value';
+    },
+    parameterTokenClass(token) {
+      if (typeof token === 'string') return 'param-token param-token-value';
+      return token?.className || 'param-token param-token-value';
     },
     toolUsageCount(spdxId) {
       return getToolUsageCount(spdxId, this.relationships);

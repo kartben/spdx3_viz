@@ -298,6 +298,113 @@
 }
 
 /* ==========================================================================
+   Build Parameter Tokens
+   Semantic syntax highlighting for compiler and build parameters
+   ========================================================================== */
+
+.param-token {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 2px 7px;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+  font-size: 0.68rem;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.param-token-define {
+  color: #fcd34d;
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+.param-token-path {
+  color: #67e8f9;
+  background: rgba(6, 182, 212, 0.1);
+  border-color: rgba(6, 182, 212, 0.18);
+}
+
+.param-token-opt {
+  color: #86efac;
+  background: rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.2);
+}
+
+.param-token-standard {
+  color: #f9a8d4;
+  background: rgba(236, 72, 153, 0.12);
+  border-color: rgba(236, 72, 153, 0.2);
+}
+
+.param-token-debug {
+  color: #fdba74;
+  background: rgba(249, 115, 22, 0.12);
+  border-color: rgba(249, 115, 22, 0.2);
+}
+
+.param-token-machine {
+  color: #c4b5fd;
+  background: rgba(139, 92, 246, 0.14);
+  border-color: rgba(139, 92, 246, 0.22);
+}
+
+.param-token-warning {
+  color: #fde68a;
+  background: rgba(234, 179, 8, 0.1);
+  border-color: rgba(234, 179, 8, 0.18);
+}
+
+.param-token-error {
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.22);
+}
+
+.param-token-feature {
+  color: #93c5fd;
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.18);
+}
+
+.param-token-option {
+  color: #d8b4fe;
+  background: rgba(168, 85, 247, 0.1);
+  border-color: rgba(168, 85, 247, 0.18);
+}
+
+.param-token-symbol {
+  color: #fcd34d;
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.18);
+}
+
+.param-token-version {
+  color: #a7f3d0;
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.18);
+}
+
+.param-token-value {
+  color: #cbd5e1;
+  background: rgba(100, 116, 139, 0.16);
+  border-color: rgba(148, 163, 184, 0.16);
+}
+
+.param-raw summary {
+  cursor: pointer;
+  color: #64748b;
+  font-size: 0.68rem;
+  user-select: none;
+}
+
+.param-raw summary:hover {
+  color: #94a3b8;
+}
+
+/* ==========================================================================
    Detail Panel
    Right-side detail panel styling for element inspection
    ========================================================================== */
