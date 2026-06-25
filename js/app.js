@@ -155,7 +155,7 @@ export function spdxApp() {
     graphFilters: createGraphFilters(),
     nodeColors: NODE_COLORS,
     edgeColors: EDGE_COLORS,
-    graphAggregate: true, // collapse files/builds into hierarchical clusters by default
+    graphAggregate: false,
     expandedClusters: new Set(), // cluster keys the user has drilled into
     graphNodeCount: 0, // live readout of rendered nodes/edges
     graphEdgeCount: 0,
