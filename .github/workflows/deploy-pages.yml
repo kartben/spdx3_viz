@@ -42,7 +42,7 @@ jobs:
         run: |
           mkdir -p _site
           cp index.html _site/
-          cp -R css js _site/
+          cp -R css js samples _site/
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
