@@ -102,6 +102,7 @@ export function spdxApp() {
       dependencies: false
     },
     searchQuery: '',
+    sidebarOpen: false, // mobile off-canvas nav drawer (ignored at md+ where the sidebar is static)
     detailElement: null,
     expandedPkg: null,
     expandedFile: null,
@@ -769,6 +770,7 @@ export function spdxApp() {
       if (id in this.mountedViews) this.mountedViews[id] = true;
       this.currentView = id;
       this.detailElement = null;
+      this.sidebarOpen = false; // close the mobile drawer after navigating
     },
     togglePkg(id) {
       this.expandedPkg = this.expandedPkg === id ? null : id;
