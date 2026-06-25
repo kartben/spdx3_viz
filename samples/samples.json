@@ -1,0 +1,18 @@
+[
+  {
+    "id": "zephyr",
+    "name": "Zephyr RTOS",
+    "emoji": "🪁",
+    "description": "Firmware build SBOM — app, modules, and full build graph.",
+    "dir": "samples/zephyr",
+    "files": ["app.jsonld", "modules-deps.jsonld", "zephyr.jsonld", "build.jsonld"]
+  },
+  {
+    "id": "linux",
+    "name": "Linux kernel",
+    "emoji": "🐧",
+    "description": "Linux kernel build — source, build, and output SBOMs.",
+    "dir": "samples/linux",
+    "files": ["sbom-source.spdx.json", "sbom-output.spdx.json", "sbom-build.spdx.json"]
+  }
+]

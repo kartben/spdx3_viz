@@ -2,3 +2,7 @@ node_modules
 .git
 .DS_Store
 .claude
+
+# Bundled demo SBOM data — kept verbatim, not formatted
+samples/zephyr
+samples/linux
