@@ -7,7 +7,12 @@
  * @module utils
  */
 
-import { COLORS, RELATIONSHIP_LABELS, RELATIONSHIP_SORT_ORDER } from './config.js';
+import {
+  COLORS,
+  DETAIL_PROMOTED_FIELDS,
+  RELATIONSHIP_LABELS,
+  RELATIONSHIP_SORT_ORDER
+} from './config.js';
 
 /* ==========================================================================
    Name Cleaning Functions
@@ -185,8 +190,50 @@ export function getRelationshipTargetDisplayName(spdxId, elementMap) {
   }
 
   const element = elementMap.get(spdxId);
+  if (element?.simplelicensing_licenseExpression) {
+    return element.simplelicensing_licenseExpression;
+  }
   if (element?.name) return element.name;
   return cleanName(spdxId);
+}
+
+/**
+ * Human-readable title for an element in the detail panel header
+ *
+ * @param {Object} element - The SPDX element
+ * @returns {string} Display title
+ */
+export function getElementDisplayName(element) {
+  if (!element) return '';
+  if (element.simplelicensing_licenseExpression) {
+    return element.simplelicensing_licenseExpression;
+  }
+  if (element.name) return element.name;
+  return cleanName(element.spdxId);
+}
+
+/**
+ * Promoted fields for the detail panel (see DETAIL_PROMOTED_FIELDS in config)
+ *
+ * @param {Object} element - The SPDX element
+ * @returns {Array<{prop: string, label: string, value: string, variant: string}>}
+ */
+export function getDetailPromotedFields(element) {
+  if (!element) return [];
+
+  return DETAIL_PROMOTED_FIELDS.flatMap((spec) => {
+    const value = element[spec.prop];
+    if (value == null || value === '') return [];
+    if (spec.types && !spec.types.includes(element.type)) return [];
+    return [
+      {
+        prop: spec.prop,
+        label: spec.label,
+        value: String(value),
+        variant: spec.variant || 'badge'
+      }
+    ];
+  });
 }
 
 /* ==========================================================================
@@ -215,6 +262,7 @@ export function getNodeType(item) {
   if (item.type === 'Tool') return 'tool';
   if (item.type === 'build_Build') return 'build';
   if (item.type === 'SoftwareAgent') return 'agent';
+  if (item.type === 'simplelicensing_LicenseExpression') return 'license';
   return 'other';
 }
 
@@ -232,6 +280,7 @@ export function getNodeTypeColor(nodeType) {
     build: COLORS.build,
     agent: COLORS.agent,
     config: COLORS.config,
+    license: COLORS.license,
     external: COLORS.external
   };
   return colorMap[nodeType] || COLORS.default;
@@ -250,7 +299,8 @@ export function getElementBadgeClass(type) {
     Tool: 'bg-amber-500/15 text-amber-400',
     build_Build: 'bg-purple-500/15 text-purple-400',
     SoftwareAgent: 'bg-red-500/15 text-red-400',
-    ExternalReference: 'bg-slate-500/15 text-slate-400'
+    ExternalReference: 'bg-slate-500/15 text-slate-400',
+    simplelicensing_LicenseExpression: 'bg-pink-500/15 text-pink-400'
   };
   return classMap[type] || 'bg-slate-600/15 text-slate-400';
 }

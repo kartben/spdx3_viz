@@ -469,6 +469,31 @@
   flex-shrink: 0;
 }
 
+.detail-promoted-hero {
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(236, 72, 153, 0.1);
+  border: 1px solid rgba(236, 72, 153, 0.25);
+}
+
+.detail-promoted-hero-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #f472b6;
+  margin-bottom: 6px;
+}
+
+.detail-promoted-hero-value {
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #fce7f3;
+  word-break: break-word;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
 /* ==========================================================================
    Tooltip
    Floating tooltip for hover information

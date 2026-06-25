@@ -9,6 +9,8 @@ import {
   getRelationshipGroupLabel,
   getRelationshipSortOrder,
   getRelationshipTargetDisplayName,
+  getElementDisplayName,
+  getDetailPromotedFields,
   getNodeType as resolveNodeType,
   getNodeTypeColor,
   getElementBadgeClass,
@@ -94,6 +96,7 @@ export function spdxApp() {
       graph: false,
       packages: false,
       files: false,
+      licenses: false,
       configs: false,
       build: false,
       dependencies: false
@@ -104,8 +107,11 @@ export function spdxApp() {
     expandedFile: null,
     expandedConfig: null,
     expandedBuild: null,
+    expandedLicense: null,
     configSearch: '',
     buildSearch: '',
+    licenseSearch: '',
+    licenseSort: 'usage',
     buildSort: 'output',
     pkgSort: 'name',
     fileTypeFilter: '',
@@ -122,6 +128,7 @@ export function spdxApp() {
     builds: [],
     buildInfo: null,
     agentInfo: null,
+    licenses: [],
     docName: '',
     docNamespace: '',
     specVersion: '',
@@ -148,6 +155,7 @@ export function spdxApp() {
     parentBuildIndex: new Map(), // child build spdxId -> [parent/root build spdxIds]
     distributionArtifactIndex: new Map(), // package spdxId -> [artifact spdxIds]
     distributedByIndex: new Map(), // artifact spdxId -> [package spdxIds]
+    licenseUsersIndex: new Map(), // license id -> [{from, kind}]
     buildConfigs: [], // build configuration elements
     generatedArtifacts: [],
 
@@ -211,6 +219,22 @@ export function spdxApp() {
         fs = fs.filter((f) => this.fileExt(f.name) === this.fileTypeFilter);
       }
       return [...fs].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    },
+
+    get filteredLicenses() {
+      let lics = this.licenses;
+      if (this.licenseSearch) {
+        const q = this.licenseSearch.toLowerCase();
+        lics = lics.filter(
+          (l) => (l.label || '').toLowerCase().includes(q) || (l.id || '').toLowerCase().includes(q)
+        );
+      }
+      if (this.licenseSort === 'name') {
+        return [...lics].sort((a, b) => (a.label || '').localeCompare(b.label || ''));
+      }
+      return [...lics].sort(
+        (a, b) => b.userCount - a.userCount || (a.label || '').localeCompare(b.label || '')
+      );
     },
 
     get filteredConfigs() {
@@ -487,6 +511,7 @@ export function spdxApp() {
 
         this.views.find((v) => v.id === 'packages').count = this.packages.length;
         this.views.find((v) => v.id === 'files').count = this.files.length;
+        this.views.find((v) => v.id === 'licenses').count = this.licenses.length;
         this.views.find((v) => v.id === 'configs').count = this.buildConfigs.length;
         this.views.find((v) => v.id === 'build').count = this.builds.length;
         this.treeRoot = findBestTreeRoot(this.packages, this.depIndex);
@@ -718,6 +743,12 @@ export function spdxApp() {
     relTargetDisplayName(spdxId) {
       return getRelationshipTargetDisplayName(spdxId, this.elementMap);
     },
+    elementDisplayName(element) {
+      return getElementDisplayName(element);
+    },
+    get detailPromotedFields() {
+      return getDetailPromotedFields(this.detailElement);
+    },
     elementBadgeClass(type) {
       return getElementBadgeClass(type);
     },
@@ -748,6 +779,12 @@ export function spdxApp() {
     toggleBuild(id) {
       this.expandedBuild = this.expandedBuild === id ? null : id;
     },
+    toggleLicense(id) {
+      this.expandedLicense = this.expandedLicense === id ? null : id;
+    },
+    licenseUsers(id) {
+      return this.licenseUsersIndex.get(id) || [];
+    },
     navigateTo(spdxId) {
       const el = this.elementMap.get(spdxId);
       if (!el) {
@@ -772,6 +809,8 @@ export function spdxApp() {
         }
       } else if (el.type === 'build_Build') {
         this.navigateToBuild(spdxId);
+      } else if (el.type === 'simplelicensing_LicenseExpression') {
+        this.navigateToLicense(spdxId);
       }
     },
     navigateToConfig(spdxId) {
@@ -785,6 +824,10 @@ export function spdxApp() {
     navigateToBuild(spdxId) {
       this.switchView('build');
       this.expandedBuild = spdxId;
+    },
+    navigateToLicense(spdxId) {
+      this.switchView('licenses');
+      this.expandedLicense = spdxId;
     },
     placeholderElement(spdxId) {
       return {

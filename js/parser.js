@@ -48,6 +48,7 @@ function makeThrottledReporter(onProgress, total) {
  * @property {Array<Object>} buildConfigs - Build configuration elements
  * @property {Object|null} buildInfo - Build information element
  * @property {Object|null} agentInfo - Agent information element
+ * @property {Array<Object>} licenses - Licenses used, with declaring/concluding elements
  * @property {string} docName - Document name
  * @property {string} docNamespace - Document namespace
  * @property {string} specVersion - SPDX spec version
@@ -77,6 +78,7 @@ function makeThrottledReporter(onProgress, total) {
  * @property {Map<string, Array>} parentBuildIndex - Build step to parent/root build mapping
  * @property {Map<string, Array>} distributionArtifactIndex - Package to distribution artifacts mapping
  * @property {Map<string, Array>} distributedByIndex - Artifact to distributing packages mapping
+ * @property {Map<string, Array>} licenseUsersIndex - License id to [{from, kind}] mapping
  */
 
 /* ==========================================================================
@@ -252,6 +254,10 @@ export function parseGraph(graph, onProgress) {
     }
   });
 
+  // Collect all licenses used across the SBOM, derived from license
+  // relationships so we capture URL-only and NoAssertion targets too.
+  const licenses = collectLicenses(relationships, elementMap);
+
   return {
     elementMap,
     packages,
@@ -262,6 +268,7 @@ export function parseGraph(graph, onProgress) {
     buildConfigs,
     buildInfo,
     agentInfo,
+    licenses,
     docName,
     docNamespace,
     specVersion,
@@ -270,6 +277,86 @@ export function parseGraph(graph, onProgress) {
     profileConformance,
     generatedArtifacts
   };
+}
+
+/* ==========================================================================
+   License Collection
+   ========================================================================== */
+
+/**
+ * Resolves a human-readable label for a license target id.
+ *
+ * @param {string} id - License target id (LicenseExpression spdxId, URL, or NoAssertion)
+ * @param {Map<string, Object>} elementMap - Map of SPDX IDs to elements
+ * @returns {string} Display label
+ */
+function resolveLicenseLabel(id, elementMap) {
+  if (!id) return '';
+  const el = elementMap.get(id);
+  if (el?.simplelicensing_licenseExpression) {
+    return el.simplelicensing_licenseExpression;
+  }
+  if (id.startsWith('https://spdx.org/licenses/')) {
+    return id.replace('https://spdx.org/licenses/', '');
+  }
+  if (id.includes('NoAssertion')) {
+    return 'NoAssertion';
+  }
+  if (el?.name) return el.name;
+  return id;
+}
+
+/**
+ * Builds the list of distinct licenses used, with the elements that declare
+ * or conclude each one. Derived from `hasConcludedLicense` /
+ * `hasDeclaredLicense` relationships.
+ *
+ * @param {Array<Object>} relationships - All relationship objects
+ * @param {Map<string, Object>} elementMap - Map of SPDX IDs to elements
+ * @returns {Array<{id: string, label: string, declaredBy: string[], concludedBy: string[], userCount: number}>}
+ */
+function collectLicenses(relationships, elementMap) {
+  const byId = new Map();
+
+  const ensure = (id) => {
+    if (!byId.has(id)) {
+      byId.set(id, {
+        id,
+        label: resolveLicenseLabel(id, elementMap),
+        declaredBy: [],
+        concludedBy: [],
+        userCount: 0
+      });
+    }
+    return byId.get(id);
+  };
+
+  const addUser = (bucket, from) => {
+    if (from && !bucket.includes(from)) bucket.push(from);
+  };
+
+  relationships.forEach((rel) => {
+    const isDeclared = rel.relationshipType === RELATIONSHIP_TYPES.HAS_DECLARED_LICENSE;
+    const isConcluded = rel.relationshipType === RELATIONSHIP_TYPES.HAS_CONCLUDED_LICENSE;
+    if (!isDeclared && !isConcluded) return;
+
+    const targets = Array.isArray(rel.to) ? rel.to : [rel.to];
+    targets.forEach((target) => {
+      if (!target) return;
+      const entry = ensure(target);
+      addUser(isDeclared ? entry.declaredBy : entry.concludedBy, rel.from);
+    });
+  });
+
+  const licenses = [...byId.values()];
+  licenses.forEach((lic) => {
+    const users = new Set([...lic.declaredBy, ...lic.concludedBy]);
+    lic.userCount = users.size;
+  });
+
+  // Default sort: most used first, then alphabetical by label.
+  licenses.sort((a, b) => b.userCount - a.userCount || a.label.localeCompare(b.label));
+  return licenses;
 }
 
 /* ==========================================================================
@@ -308,6 +395,7 @@ export function buildRelationshipIndexes(relationships, onProgress) {
   const parentBuildIndex = new Map();
   const distributionArtifactIndex = new Map();
   const distributedByIndex = new Map();
+  const licenseUsersIndex = new Map();
 
   // Pushes a value into a Map<string, Array> bucket, skipping duplicates.
   // SPDX producers (e.g. Zephyr) may emit the same logical edge more than once
@@ -417,6 +505,24 @@ export function buildRelationshipIndexes(relationships, onProgress) {
           }
         });
         break;
+
+      case RELATIONSHIP_TYPES.HAS_DECLARED_LICENSE:
+      case RELATIONSHIP_TYPES.HAS_CONCLUDED_LICENSE: {
+        const kind =
+          rel.relationshipType === RELATIONSHIP_TYPES.HAS_DECLARED_LICENSE
+            ? 'declared'
+            : 'concluded';
+        targets.forEach((target) => {
+          if (!licenseUsersIndex.has(target)) {
+            licenseUsersIndex.set(target, []);
+          }
+          const bucket = licenseUsersIndex.get(target);
+          if (!bucket.some((u) => u.from === from && u.kind === kind)) {
+            bucket.push({ from, kind });
+          }
+        });
+        break;
+      }
     }
   });
 
@@ -438,7 +544,8 @@ export function buildRelationshipIndexes(relationships, onProgress) {
     buildStepIndex,
     parentBuildIndex,
     distributionArtifactIndex,
-    distributedByIndex
+    distributedByIndex,
+    licenseUsersIndex
   };
 }
 
