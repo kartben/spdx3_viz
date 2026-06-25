@@ -711,7 +711,10 @@
                 <option value="dependents">Sort by dependents</option>
               </select>
             </div>
-            <template x-for="pkg in (mountedViews.packages ? filteredPackages : [])" :key="pkg.spdxId">
+            <template
+              x-for="pkg in (mountedViews.packages ? filteredPackages : [])"
+              :key="pkg.spdxId"
+            >
               <div class="card">
                 <div class="flex items-center gap-3 cursor-pointer" @click="togglePkg(pkg.spdxId)">
                   <div
@@ -1075,7 +1078,10 @@
               </div>
             </div>
 
-            <template x-for="cfg in (mountedViews.configs ? filteredConfigs : [])" :key="cfg.spdxId">
+            <template
+              x-for="cfg in (mountedViews.configs ? filteredConfigs : [])"
+              :key="cfg.spdxId"
+            >
               <div class="card group cursor-pointer" @click="toggleConfig(cfg.spdxId)">
                 <div class="flex items-start gap-3">
                   <!-- Icon -->
@@ -1572,7 +1578,10 @@
               </div>
 
               <div class="space-y-2">
-                <template x-for="build in (mountedViews.build ? filteredBuilds : [])" :key="build.spdxId">
+                <template
+                  x-for="build in (mountedViews.build ? filteredBuilds : [])"
+                  :key="build.spdxId"
+                >
                   <div class="rounded-lg border border-slate-700 bg-slate-900/30 overflow-hidden">
                     <div
                       class="flex items-start gap-3 p-3 cursor-pointer hover:bg-slate-800/60 transition-colors"
