@@ -1,5 +1,5 @@
 import { createGraphFilters, NODE_COLORS, EDGE_COLORS, createViews } from './config.js';
-import { computeRelationshipTypeCounts, findBestTreeRoot } from './parser.js';
+import { computeRelationshipTypeCounts } from './parser.js';
 import {
   cleanName as formatSpdxName,
   cleanFileName as formatFileName,
@@ -28,11 +28,6 @@ import {
   renderGraph as renderGraphView,
   resetGraphZoom as resetGraphViewZoom
 } from './graph-view.js';
-import {
-  renderDependencyTree,
-  expandAllTree as expandDependencyTree,
-  collapseAllTree as collapseDependencyTree
-} from './dependency-tree.js';
 
 /* ==========================================================================
    Parser worker
@@ -109,8 +104,7 @@ export function spdxApp() {
       files: false,
       licenses: false,
       configs: false,
-      build: false,
-      dependencies: false
+      build: false
     },
     searchQuery: '',
     sidebarOpen: false, // mobile off-canvas nav drawer (ignored at md+ where the sidebar is static)
@@ -131,8 +125,6 @@ export function spdxApp() {
     pkgSort: 'name',
     fileTypeFilter: '',
     toastMsg: '',
-    treeRoot: '',
-    treeDepth: 5,
 
     // Parsed data
     elementMap: new Map(),
@@ -325,18 +317,10 @@ export function spdxApp() {
       return [...exts].sort();
     },
 
-    get treeRootOptions() {
-      return this.packages
-        .map((p) => p.spdxId)
-        .sort((a, b) => (this.dependentsOf(b)?.length || 0) - (this.dependentsOf(a)?.length || 0))
-        .slice(0, 20);
-    },
-
     // Init
     init() {
       this.$watch('currentView', (v) => {
         if (v === 'graph') this.$nextTick(() => this.renderGraph());
-        if (v === 'dependencies') this.$nextTick(() => this.renderDepTree());
       });
       this.loadSampleManifest();
     },
@@ -540,7 +524,6 @@ export function spdxApp() {
         this.views.find((v) => v.id === 'licenses').count = this.licenses.length;
         this.views.find((v) => v.id === 'configs').count = this.buildConfigs.length;
         this.views.find((v) => v.id === 'build').count = this.builds.length;
-        this.treeRoot = findBestTreeRoot(this.packages, this.depIndex);
         this.expandedClusters = new Set(); // fresh data: start fully collapsed
         filteredBuildsCacheKey = null; // invalidate the build sort memo for new data
 
@@ -548,7 +531,6 @@ export function spdxApp() {
         // Alpine reactivity).
         this.$nextTick(() => {
           if (this.currentView === 'graph') this.renderGraph();
-          if (this.currentView === 'dependencies') this.renderDepTree();
         });
       };
 
@@ -936,17 +918,6 @@ export function spdxApp() {
     },
     resetGraphZoom() {
       resetGraphViewZoom(this);
-    },
-
-    // ========== DEPENDENCY TREE ==========
-    renderDepTree() {
-      renderDependencyTree(this);
-    },
-    expandAllTree() {
-      expandDependencyTree(this);
-    },
-    collapseAllTree() {
-      collapseDependencyTree(this);
     }
   };
 }

@@ -728,20 +728,3 @@ export function computeRelationshipTypeCounts(relationships) {
       color: colors[type] || COLORS.default
     }));
 }
-
-/**
- * Finds the best default tree root (package with most dependencies)
- *
- * @param {Array<Object>} packages - Array of package objects
- * @param {Map<string, Array>} depIndex - Dependency index
- * @returns {string} SPDX ID of the best root package
- */
-export function findBestTreeRoot(packages, depIndex) {
-  if (!packages.length) return '';
-
-  const sorted = [...packages].sort(
-    (a, b) => (depIndex.get(b.spdxId)?.length || 0) - (depIndex.get(a.spdxId)?.length || 0)
-  );
-
-  return sorted[0].spdxId;
-}

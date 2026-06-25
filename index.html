@@ -533,7 +533,7 @@
             </div>
 
             <!-- Quick jump -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               <button
                 @click="switchView('graph')"
                 class="card hover:border-blue-500/50 text-left group"
@@ -588,23 +588,6 @@
                 </div>
                 <div class="font-medium text-white text-sm">Build Configs</div>
                 <div class="text-xs text-slate-400 mt-1">Compiler flags, defines, targets</div>
-              </button>
-              <button
-                @click="switchView('dependencies')"
-                class="card hover:border-purple-500/50 text-left group"
-              >
-                <div class="text-purple-400 mb-2">
-                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M4 6h16M4 10h16M4 14h16M4 18h16"
-                    />
-                  </svg>
-                </div>
-                <div class="font-medium text-white text-sm">Dependency Tree</div>
-                <div class="text-xs text-slate-400 mt-1">Hierarchical dependency view</div>
               </button>
             </div>
           </div>
@@ -2178,52 +2161,6 @@
                 </template>
               </div>
             </div>
-          </div>
-
-          <!-- ========== DEPENDENCY TREE ========== -->
-          <div x-show="currentView === 'dependencies'" class="fade-in h-full flex flex-col -m-6">
-            <div
-              class="flex items-center gap-3 px-5 py-3 bg-slate-800/50 border-b border-slate-700/50 flex-shrink-0"
-            >
-              <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider"
-                >Root:</span
-              >
-              <select
-                x-model="treeRoot"
-                @change="renderDepTree()"
-                class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 text-slate-300 focus:outline-none focus:border-blue-500"
-              >
-                <template x-for="p in treeRootOptions" :key="p">
-                  <option :value="p" x-text="cleanName(p)"></option>
-                </template>
-              </select>
-              <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider ml-4"
-                >Depth:</span
-              >
-              <select
-                x-model.number="treeDepth"
-                @change="renderDepTree()"
-                class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 text-slate-300 focus:outline-none focus:border-blue-500"
-              >
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="5">5</option>
-                <option value="10">10</option>
-              </select>
-              <button
-                @click="expandAllTree()"
-                class="text-xs px-2.5 py-1 bg-slate-700 hover:bg-slate-600 rounded-md transition-colors text-slate-300 ml-auto"
-              >
-                Expand All
-              </button>
-              <button
-                @click="collapseAllTree()"
-                class="text-xs px-2.5 py-1 bg-slate-700 hover:bg-slate-600 rounded-md transition-colors text-slate-300"
-              >
-                Collapse All
-              </button>
-            </div>
-            <div class="flex-1 dep-tree relative" id="depTreeContainer"></div>
           </div>
         </main>
       </div>

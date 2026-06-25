@@ -139,26 +139,6 @@
 }
 
 /* ==========================================================================
-   Dependency Tree
-   Styles for the D3 hierarchical tree visualization
-   ========================================================================== */
-
-.dep-tree .node circle {
-  cursor: pointer;
-  transition: fill 0.2s;
-}
-
-.dep-tree .node text {
-  font-size: 11px;
-}
-
-.dep-tree .link {
-  fill: none;
-  stroke-opacity: 0.4;
-  stroke-width: 1.5px;
-}
-
-/* ==========================================================================
    Drop Zone
    File drag-and-drop area styling
    ========================================================================== */
