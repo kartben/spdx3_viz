@@ -631,7 +631,37 @@
                   <span class="text-xs" :style="`color: ${f.color}`" x-text="f.label"></span>
                 </label>
               </template>
-              <div class="ml-auto flex items-center gap-2">
+              <div class="ml-auto flex items-center gap-3">
+                <span
+                  x-show="graphNodeCount"
+                  class="text-xs text-slate-400 whitespace-nowrap"
+                  x-text="`${formatCount(graphNodeCount)} nodes · ${formatCount(graphEdgeCount)} edges`"
+                ></span>
+                <span
+                  x-show="graphTruncated"
+                  class="text-xs text-amber-400 whitespace-nowrap"
+                  title="Too many nodes to show flat — showing the aggregated view. Double-click a cluster to drill in."
+                  >auto-aggregated</span
+                >
+                <label
+                  class="flex items-center gap-1.5 cursor-pointer"
+                  title="Collapse files into their package/directory and build steps into their root build. Double-click a cluster to expand it."
+                >
+                  <input
+                    type="checkbox"
+                    x-model="graphAggregate"
+                    @change="updateGraph()"
+                    class="rounded border-slate-600 bg-slate-700 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5"
+                  />
+                  <span class="text-xs text-slate-300">Aggregate</span>
+                </label>
+                <button
+                  x-show="graphAggregate"
+                  @click="collapseAllClusters()"
+                  class="text-xs px-2.5 py-1 bg-slate-700 hover:bg-slate-600 rounded-md transition-colors text-slate-300"
+                >
+                  Collapse all
+                </button>
                 <button
                   @click="resetGraphZoom()"
                   class="text-xs px-2.5 py-1 bg-slate-700 hover:bg-slate-600 rounded-md transition-colors text-slate-300"
@@ -2245,6 +2275,37 @@
           >
             No relationships found
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PARSING OVERLAY -->
+    <div
+      x-show="parsing"
+      x-transition.opacity
+      class="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/70 backdrop-blur-sm"
+    >
+      <div
+        class="flex items-center gap-3 bg-slate-800 border border-slate-700 rounded-xl px-5 py-4 shadow-2xl"
+      >
+        <svg class="w-5 h-5 text-blue-400 animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle
+            class="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            stroke-width="4"
+          />
+          <path
+            class="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+          />
+        </svg>
+        <div class="text-sm text-slate-200">
+          Parsing SBOM…
+          <span class="block text-xs text-slate-400">Large SBOMs may take a few seconds</span>
         </div>
       </div>
     </div>

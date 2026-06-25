@@ -1,6 +1,23 @@
-import { getRelationshipColor, getNodeType, getNodeTypeColor, cleanName } from './utils.js';
+import {
+  getRelationshipColor,
+  getNodeType,
+  getNodeTypeColor,
+  cleanName,
+  dirPrefix
+} from './utils.js';
 
 const INPUT_LAYOUT_LINKS_PER_BUILD = 8;
+// Above this many underlying nodes we refuse to render a flat graph even if the
+// user turned aggregation off — a multi-thousand-node hairball is unusable and
+// hammers the machine. We force-collapse and surface a hint instead.
+const MAX_FLAT_NODES = 2000;
+// Labels are expensive and become noise when zoomed out; only draw them past
+// this zoom level, and cap how many we draw per frame.
+const LABEL_ZOOM_THRESHOLD = 1.1;
+const MAX_LABELS = 400;
+// World-space padding for viewport culling so nodes/edges near the edge of the
+// screen still draw.
+const CULL_PAD = 80;
 
 function asTargets(to) {
   return Array.isArray(to) ? to : [to];
@@ -63,10 +80,33 @@ function groupLinksByColor(links) {
   return groups;
 }
 
+function dominantType(members) {
+  const counts = new Map();
+  let best = members[0]?.type || 'file';
+  let bestN = 0;
+  members.forEach((m) => {
+    const n = (counts.get(m.type) || 0) + 1;
+    counts.set(m.type, n);
+    if (n > bestN) {
+      bestN = n;
+      best = m.type;
+    }
+  });
+  return best;
+}
+
+function escapeHtml(value) {
+  return String(value).replace(
+    /[&<>"]/g,
+    (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]
+  );
+}
+
 export function renderGraph(app) {
   const container = document.getElementById('graphContainer');
   if (!container) return;
 
+  // Drop any previous canvas/svg but keep the tooltip element.
   container.querySelectorAll('svg, canvas').forEach((el) => el.remove());
   if (app.graphSim) app.graphSim.stop();
 
@@ -81,27 +121,25 @@ export function renderGraph(app) {
     app.graphFilters.filter((f) => f.isRel && f.active).map((f) => f.key)
   );
 
-  const nodeIds = new Set();
-  const nodes = [];
-  const nodeById = new Map();
+  /* ----------------------------------------------------------------------
+     1. Underlying nodes (one per SPDX element that passes the type filters)
+     ---------------------------------------------------------------------- */
+  const uNodeIds = new Set();
+  const uNodes = [];
+  const uNodeById = new Map();
 
   const addNode = (spdxId, rel = null, role = 'target') => {
     if (!spdxId) return null;
-    if (nodeIds.has(spdxId)) return nodeById.get(spdxId);
+    if (uNodeIds.has(spdxId)) return uNodeById.get(spdxId);
 
     const el = app.elementMap.get(spdxId) || placeholderFor(spdxId, rel || {}, role);
     const type = getNodeType(el);
     if (!activeNodeTypes.has(type)) return null;
 
-    const node = {
-      id: spdxId,
-      name: el.name || cleanName(spdxId),
-      type,
-      data: el
-    };
-    nodeIds.add(spdxId);
-    nodeById.set(spdxId, node);
-    nodes.push(node);
+    const node = { id: spdxId, name: el.name || cleanName(spdxId), type, data: el };
+    uNodeIds.add(spdxId);
+    uNodeById.set(spdxId, node);
+    uNodes.push(node);
     return node;
   };
 
@@ -112,7 +150,10 @@ export function renderGraph(app) {
   (app.builds || []).forEach((b) => addNode(b.spdxId));
   if (!app.builds?.length && app.buildInfo) addNode(app.buildInfo.spdxId);
 
-  const links = [];
+  /* ----------------------------------------------------------------------
+     2. Underlying links
+     ---------------------------------------------------------------------- */
+  const uLinks = [];
   app.relationships.forEach((rel) => {
     if (rel.relationshipType === 'hasConcludedLicense') return;
     if (!activeRelTypes.has(rel.relationshipType)) return;
@@ -121,40 +162,152 @@ export function renderGraph(app) {
     asTargets(rel.to).forEach((target) => {
       const targetNode = addNode(target, rel, 'target');
       if (!sourceNode || !targetNode) return;
-      links.push({
-        sourceId: rel.from,
-        targetId: target,
-        sourceNode,
-        targetNode,
-        type: rel.relationshipType,
-        color: getRelationshipColor(rel.relationshipType)
-      });
+      uLinks.push({ sourceId: rel.from, targetId: target, type: rel.relationshipType });
     });
+  });
+
+  /* ----------------------------------------------------------------------
+     3. Hierarchical clustering
+        Group files into their parent package, else their directory; group
+        build steps into their root build; everything else is its own node.
+     ---------------------------------------------------------------------- */
+  let aggregate = app.graphAggregate;
+  app.graphTruncated = false;
+  if (!aggregate && uNodes.length > MAX_FLAT_NODES) {
+    aggregate = true;
+    app.graphTruncated = true;
+  }
+  const expanded = app.expandedClusters instanceof Set ? app.expandedClusters : new Set();
+
+  const clusterKeyFor = (node) => {
+    if (!aggregate) return 'self:' + node.id;
+    if (node.type === 'package') return 'pkg:' + node.id;
+    if (node.type === 'file') {
+      const parent = app.parentIndex.get(node.id);
+      if (parent && uNodeById.has(parent)) return 'pkg:' + parent;
+      const dir = dirPrefix(node.name);
+      if (dir) return 'dir:' + dir;
+      return 'self:' + node.id;
+    }
+    if (node.type === 'build') {
+      const parents = app.parentBuildIndex.get(node.id);
+      if (parents && parents.length) return 'build:' + parents[0];
+      return 'build:' + node.id; // a root build keys on itself
+    }
+    return 'self:' + node.id;
+  };
+
+  const clusters = new Map(); // key -> { key, kind, anchorId, members, primary }
+  uNodes.forEach((node) => {
+    const key = clusterKeyFor(node);
+    const sep = key.indexOf(':');
+    const kind = key.slice(0, sep);
+    const anchorId = key.slice(sep + 1);
+    let c = clusters.get(key);
+    if (!c) {
+      c = { key, kind, anchorId, members: [], primary: null };
+      clusters.set(key, c);
+    }
+    c.members.push(node);
+    if (node.id === anchorId) c.primary = node;
+  });
+
+  const clusterLabel = (c) => {
+    if (c.kind === 'dir') return c.anchorId + '/';
+    if (c.primary) return c.primary.name;
+    return cleanName(c.anchorId);
+  };
+
+  /* ----------------------------------------------------------------------
+     4. Render nodes + map every underlying id to its render id
+     ---------------------------------------------------------------------- */
+  const renderById = new Map();
+  const renderNodes = [];
+  const renderKeyOf = new Map(); // underlying id -> render node id
+
+  clusters.forEach((c) => {
+    const collapsed =
+      aggregate && c.members.length > 1 && c.kind !== 'self' && !expanded.has(c.key);
+
+    if (collapsed) {
+      const node = {
+        id: c.key,
+        isCluster: true,
+        clusterKey: c.key,
+        clusterKind: c.kind,
+        memberCount: c.members.length,
+        name: clusterLabel(c),
+        type: c.primary ? c.primary.type : dominantType(c.members),
+        data: c.primary
+          ? c.primary.data
+          : { type: 'cluster', name: clusterLabel(c), placeholder: true }
+      };
+      renderById.set(node.id, node);
+      renderNodes.push(node);
+      c.members.forEach((m) => renderKeyOf.set(m.id, c.key));
+    } else {
+      c.members.forEach((m) => {
+        renderById.set(m.id, m);
+        renderNodes.push(m);
+        renderKeyOf.set(m.id, m.id);
+      });
+    }
+  });
+
+  /* ----------------------------------------------------------------------
+     5. Remap links onto render nodes, drop self-loops, dedupe, weight
+     ---------------------------------------------------------------------- */
+  const linkMap = new Map();
+  uLinks.forEach((l) => {
+    const s = renderKeyOf.get(l.sourceId);
+    const t = renderKeyOf.get(l.targetId);
+    if (!s || !t || s === t) return;
+    const key = s + ' ' + t + ' ' + l.type;
+    let link = linkMap.get(key);
+    if (!link) {
+      link = {
+        sourceId: s,
+        targetId: t,
+        type: l.type,
+        color: getRelationshipColor(l.type),
+        weight: 0
+      };
+      linkMap.set(key, link);
+    }
+    link.weight++;
+  });
+  const links = [...linkMap.values()];
+  links.forEach((l) => {
+    l.sourceNode = renderById.get(l.sourceId);
+    l.targetNode = renderById.get(l.targetId);
   });
 
   const connCount = new Map();
   const connectedIndex = new Map();
   const linksByNode = new Map();
-
   const connect = (sourceId, targetId, link) => {
     connCount.set(sourceId, (connCount.get(sourceId) || 0) + 1);
     connCount.set(targetId, (connCount.get(targetId) || 0) + 1);
-
     if (!connectedIndex.has(sourceId)) connectedIndex.set(sourceId, new Set([sourceId]));
     if (!connectedIndex.has(targetId)) connectedIndex.set(targetId, new Set([targetId]));
     connectedIndex.get(sourceId).add(targetId);
     connectedIndex.get(targetId).add(sourceId);
-
     if (!linksByNode.has(sourceId)) linksByNode.set(sourceId, []);
     if (!linksByNode.has(targetId)) linksByNode.set(targetId, []);
     linksByNode.get(sourceId).push(link);
     linksByNode.get(targetId).push(link);
   };
-
   links.forEach((link) => connect(link.sourceId, link.targetId, link));
 
+  // Live readout for the controls bar.
+  app.graphNodeCount = renderNodes.length;
+  app.graphEdgeCount = links.length;
+
+  /* ----------------------------------------------------------------------
+     6. Canvas (edges + nodes + labels on one surface)
+     ---------------------------------------------------------------------- */
   const canvas = document.createElement('canvas');
-  canvas.className = 'graph-edge-canvas';
+  canvas.className = 'graph-canvas';
   container.appendChild(canvas);
 
   const dpr = globalThis.devicePixelRatio || 1;
@@ -162,75 +315,118 @@ export function renderGraph(app) {
   canvas.height = height * dpr;
   canvas.style.width = `${width}px`;
   canvas.style.height = `${height}px`;
-
   const ctx = canvas.getContext('2d');
+
+  const radiusFor = (d) =>
+    d.isCluster
+      ? Math.max(9, Math.min(30, 7 + Math.sqrt(d.memberCount) * 1.6))
+      : Math.max(5, Math.min(16, 4 + Math.sqrt(connCount.get(d.id) || 0) * 1.2));
+
+  const strokeFor = (d) => d3.color(getNodeTypeColor(d.type)).brighter(0.5);
+  // Draw bigger nodes' labels first so the MAX_LABELS cap keeps the useful ones.
+  const labelOrder = [...renderNodes].sort((a, b) => radiusFor(b) - radiusFor(a));
+
   const groupedLinks = groupLinksByColor(links);
   let currentTransform = d3.zoomIdentity;
   let highlightedNodeId = null;
   let drawFrame = 0;
+  let view = { x0: 0, y0: 0, x1: width, y1: height };
 
-  const drawLinkList = (linkList, alpha, lineWidth) => {
-    const grouped = groupLinksByColor(linkList);
-    grouped.forEach((group, color) => {
-      ctx.beginPath();
-      ctx.strokeStyle = color;
-      ctx.globalAlpha = alpha;
-      ctx.lineWidth = lineWidth;
-      group.forEach((link) => {
-        if (
-          link.sourceNode.x == null ||
-          link.sourceNode.y == null ||
-          link.targetNode.x == null ||
-          link.targetNode.y == null
-        ) {
-          return;
-        }
-        ctx.moveTo(link.sourceNode.x, link.sourceNode.y);
-        ctx.lineTo(link.targetNode.x, link.targetNode.y);
-      });
-      ctx.stroke();
-    });
-  };
+  const nodeInView = (d) =>
+    d.x >= view.x0 - CULL_PAD &&
+    d.x <= view.x1 + CULL_PAD &&
+    d.y >= view.y0 - CULL_PAD &&
+    d.y <= view.y1 + CULL_PAD;
 
-  const drawGroupedLinks = (groups, alpha, lineWidth) => {
+  const drawLinkGroups = (groups, alpha, lineWidth) => {
     groups.forEach((group, color) => {
       ctx.beginPath();
       ctx.strokeStyle = color;
       ctx.globalAlpha = alpha;
       ctx.lineWidth = lineWidth;
       group.forEach((link) => {
-        if (
-          link.sourceNode.x == null ||
-          link.sourceNode.y == null ||
-          link.targetNode.x == null ||
-          link.targetNode.y == null
-        ) {
-          return;
-        }
-        ctx.moveTo(link.sourceNode.x, link.sourceNode.y);
-        ctx.lineTo(link.targetNode.x, link.targetNode.y);
+        const a = link.sourceNode;
+        const b = link.targetNode;
+        if (!a || !b || a.x == null || b.x == null) return;
+        if (!nodeInView(a) && !nodeInView(b)) return; // viewport culling
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
       });
       ctx.stroke();
     });
   };
 
+  const drawNodes = () => {
+    const connected = highlightedNodeId
+      ? connectedIndex.get(highlightedNodeId) || new Set([highlightedNodeId])
+      : null;
+    renderNodes.forEach((d) => {
+      if (d.x == null || !nodeInView(d)) return;
+      const r = radiusFor(d);
+      ctx.globalAlpha = connected && !connected.has(d.id) ? 0.12 : 1;
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, r, 0, 2 * Math.PI);
+      ctx.fillStyle = getNodeTypeColor(d.type);
+      ctx.fill();
+      ctx.lineWidth = (d.isCluster ? 2.5 : 1.5) / currentTransform.k;
+      ctx.strokeStyle = d.isCluster ? 'rgba(255,255,255,0.85)' : strokeFor(d);
+      ctx.stroke();
+    });
+    ctx.globalAlpha = 1;
+  };
+
+  const drawLabels = () => {
+    if (currentTransform.k < LABEL_ZOOM_THRESHOLD) return;
+    ctx.save();
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // screen space → constant-size text
+    ctx.font = '11px ui-sans-serif, system-ui, -apple-system, sans-serif';
+    ctx.textBaseline = 'middle';
+    const connected = highlightedNodeId
+      ? connectedIndex.get(highlightedNodeId) || new Set([highlightedNodeId])
+      : null;
+    let drawn = 0;
+    for (const d of labelOrder) {
+      if (drawn >= MAX_LABELS) break;
+      if (d.x == null) continue;
+      if (connected && !connected.has(d.id)) continue;
+      const sx = currentTransform.applyX(d.x);
+      const sy = currentTransform.applyY(d.y);
+      if (sx < -60 || sx > width + 60 || sy < -20 || sy > height + 20) continue;
+      const r = radiusFor(d) * currentTransform.k;
+      ctx.fillStyle = d.isCluster ? '#e2e8f0' : '#94a3b8';
+      ctx.fillText(d.isCluster ? `${d.name} · ${d.memberCount}` : d.name, sx + r + 4, sy);
+      drawn++;
+    }
+    ctx.restore();
+  };
+
   const drawCanvas = () => {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, width, height);
+    const k = currentTransform.k;
+    view = {
+      x0: -currentTransform.x / k,
+      y0: -currentTransform.y / k,
+      x1: (width - currentTransform.x) / k,
+      y1: (height - currentTransform.y) / k
+    };
+
     ctx.save();
     ctx.translate(currentTransform.x, currentTransform.y);
-    ctx.scale(currentTransform.k, currentTransform.k);
+    ctx.scale(k, k);
     ctx.lineCap = 'round';
 
     if (highlightedNodeId) {
-      drawGroupedLinks(groupedLinks, 0.035, 0.7);
-      drawLinkList(linksByNode.get(highlightedNodeId) || [], 0.75, 1.3);
+      drawLinkGroups(groupedLinks, 0.04, 0.7 / k);
+      drawLinkGroups(groupLinksByColor(linksByNode.get(highlightedNodeId) || []), 0.85, 1.6 / k);
     } else {
-      drawGroupedLinks(groupedLinks, 0.22, 0.85);
+      drawLinkGroups(groupedLinks, 0.22, 0.85 / k);
     }
+    drawNodes();
 
     ctx.restore();
     ctx.globalAlpha = 1;
+    drawLabels();
   };
 
   const queueDraw = () => {
@@ -241,100 +437,11 @@ export function renderGraph(app) {
     });
   };
 
-  const svg = d3
-    .select(container)
-    .append('svg')
-    .attr('class', 'graph-node-layer')
-    .attr('width', width)
-    .attr('height', height);
-
-  const g = svg.append('g');
-  app.graphZoom = d3
-    .zoom()
-    .scaleExtent([0.05, 8])
-    .on('zoom', (event) => {
-      currentTransform = event.transform;
-      g.attr('transform', currentTransform);
-      queueDraw();
-    });
-  svg.call(app.graphZoom);
-
-  let sim;
-  const radiusFor = (d) => Math.max(5, Math.min(16, 4 + Math.sqrt(connCount.get(d.id) || 0) * 1.2));
-
-  const node = g
-    .append('g')
-    .selectAll('circle')
-    .data(nodes)
-    .enter()
-    .append('circle')
-    .attr('class', 'node')
-    .attr('r', radiusFor)
-    .attr('fill', (d) => getNodeTypeColor(d.type))
-    .attr('stroke', (d) => d3.color(getNodeTypeColor(d.type)).brighter(0.5))
-    .attr('stroke-width', 1.5)
-    .call(
-      d3
-        .drag()
-        .on('start', (event, d) => {
-          if (!event.active) sim.alphaTarget(0.3).restart();
-          d.fx = d.x;
-          d.fy = d.y;
-        })
-        .on('drag', (event, d) => {
-          d.fx = event.x;
-          d.fy = event.y;
-          queueDraw();
-        })
-        .on('end', (event, d) => {
-          if (!event.active) sim.alphaTarget(0);
-          d.fx = null;
-          d.fy = null;
-        })
-    );
-
-  const label = g
-    .append('g')
-    .selectAll('text')
-    .data(nodes)
-    .enter()
-    .append('text')
-    .text((d) => d.name)
-    .attr('font-size', (d) => (d.type === 'tool' || d.type === 'build' ? 10 : 9))
-    .attr('fill', '#94a3b8')
-    .attr('dx', (d) => radiusFor(d) + 3)
-    .attr('dy', 3);
-
-  node.on('mouseover', (event, d) => {
-    highlightedNodeId = d.id;
-    const connected = connectedIndex.get(d.id) || new Set([d.id]);
-
-    node.classed('dimmed', (n) => !connected.has(n.id));
-    label.classed('dimmed', (n) => !connected.has(n.id));
-    queueDraw();
-
-    const tooltip = document.getElementById('graphTooltip');
-    if (!tooltip) return;
-    tooltip.innerHTML = `<div class="font-semibold text-white">${d.name}</div><div class="text-slate-400 text-xs">${d.data.type}</div><div class="text-xs mt-1">${connCount.get(d.id) || 0} connections</div>`;
-    tooltip.classList.remove('hidden');
-    tooltip.style.left = `${event.offsetX + 15}px`;
-    tooltip.style.top = `${event.offsetY - 10}px`;
-  });
-
-  node.on('mouseout', () => {
-    highlightedNodeId = null;
-    node.classed('dimmed', false);
-    label.classed('dimmed', false);
-    queueDraw();
-    document.getElementById('graphTooltip')?.classList.add('hidden');
-  });
-
-  node.on('click', (_event, d) => {
-    app.detailElement = d.data;
-  });
-
-  sim = d3
-    .forceSimulation(nodes)
+  /* ----------------------------------------------------------------------
+     7. Force simulation (main thread; ticks redraw the canvas)
+     ---------------------------------------------------------------------- */
+  const sim = d3
+    .forceSimulation(renderNodes)
     .force(
       'link',
       d3
@@ -352,19 +459,138 @@ export function renderGraph(app) {
     .force('x', d3.forceX(width / 2).strength(0.045))
     .force('y', d3.forceY(height / 2).strength(0.045));
 
-  sim.on('tick', () => {
-    node.attr('cx', (d) => d.x).attr('cy', (d) => d.y);
-    label.attr('x', (d) => d.x).attr('y', (d) => d.y);
+  sim.on('tick', queueDraw);
+
+  /* ----------------------------------------------------------------------
+     8. Interaction: zoom/pan, node drag, hover, click, double-click expand
+        Hit-testing uses the simulation's quadtree via sim.find().
+     ---------------------------------------------------------------------- */
+  const nodeAtCanvas = (px, py) => {
+    const wx = currentTransform.invertX(px);
+    const wy = currentTransform.invertY(py);
+    const found = sim.find(wx, wy, 40 / currentTransform.k);
+    if (!found) return null;
+    const r = radiusFor(found);
+    const dx = found.x - wx;
+    const dy = found.y - wy;
+    return dx * dx + dy * dy <= (r + 4) * (r + 4) ? found : null;
+  };
+  const pointerNode = (event) => {
+    const rect = canvas.getBoundingClientRect();
+    return nodeAtCanvas(event.clientX - rect.left, event.clientY - rect.top);
+  };
+
+  const sel = d3.select(canvas);
+
+  app.graphZoom = d3
+    .zoom()
+    .scaleExtent([0.02, 8])
+    .filter((event) => {
+      if (event.type === 'wheel') return true;
+      if (event.type === 'dblclick') return false; // handled below
+      const [px, py] = d3.pointer(event, canvas);
+      return !nodeAtCanvas(px, py); // pan only when not starting on a node
+    })
+    .on('zoom', (event) => {
+      currentTransform = event.transform;
+      queueDraw();
+    });
+
+  const drag = d3
+    .drag()
+    .subject((event) => {
+      const wx = currentTransform.invertX(event.x);
+      const wy = currentTransform.invertY(event.y);
+      const found = sim.find(wx, wy, 40 / currentTransform.k);
+      if (!found) return null;
+      const r = radiusFor(found);
+      return (found.x - wx) ** 2 + (found.y - wy) ** 2 <= (r + 4) ** 2 ? found : null;
+    })
+    .on('start', (event) => {
+      if (!event.subject) return;
+      if (!event.active) sim.alphaTarget(0.3).restart();
+      event.subject.fx = event.subject.x;
+      event.subject.fy = event.subject.y;
+    })
+    .on('drag', (event) => {
+      if (!event.subject) return;
+      event.subject.fx = currentTransform.invertX(event.x);
+      event.subject.fy = currentTransform.invertY(event.y);
+      queueDraw();
+    })
+    .on('end', (event) => {
+      if (!event.subject) return;
+      if (!event.active) sim.alphaTarget(0);
+      event.subject.fx = null;
+      event.subject.fy = null;
+    });
+
+  sel.call(app.graphZoom).on('dblclick.zoom', null);
+  sel.call(drag);
+
+  canvas.addEventListener('mousemove', (event) => {
+    const found = pointerNode(event);
+    const id = found ? found.id : null;
+    if (id !== highlightedNodeId) {
+      highlightedNodeId = id;
+      queueDraw();
+    }
+    const tooltip = document.getElementById('graphTooltip');
+    if (!tooltip) return;
+    if (found) {
+      const rect = canvas.getBoundingClientRect();
+      const meta = found.isCluster
+        ? `${found.clusterKind} cluster · ${found.memberCount} items`
+        : found.data?.type || found.type;
+      const hint = found.isCluster
+        ? 'double-click to expand'
+        : `${connCount.get(found.id) || 0} connections`;
+      tooltip.innerHTML =
+        `<div class="font-semibold text-white">${escapeHtml(found.name)}</div>` +
+        `<div class="text-slate-400 text-xs">${escapeHtml(meta)}</div>` +
+        `<div class="text-xs mt-1">${escapeHtml(hint)}</div>`;
+      tooltip.classList.remove('hidden');
+      tooltip.style.left = `${event.clientX - rect.left + 15}px`;
+      tooltip.style.top = `${event.clientY - rect.top - 10}px`;
+    } else {
+      tooltip.classList.add('hidden');
+    }
+  });
+
+  canvas.addEventListener('mouseleave', () => {
+    highlightedNodeId = null;
     queueDraw();
+    document.getElementById('graphTooltip')?.classList.add('hidden');
+  });
+
+  // Click selects (suppressed automatically by d3.drag after a real drag).
+  canvas.addEventListener('click', (event) => {
+    const found = pointerNode(event);
+    if (!found) return;
+    if (found.isCluster) {
+      app.detailElement = found.data && !found.data.placeholder ? found.data : null;
+    } else {
+      app.detailElement = found.data;
+    }
+  });
+
+  // Double-click drills into a collapsed cluster.
+  canvas.addEventListener('dblclick', (event) => {
+    const found = pointerNode(event);
+    if (found && found.isCluster) {
+      app.expandedClusters.add(found.clusterKey);
+      app.renderGraph();
+    }
   });
 
   queueDraw();
   app.graphSim = sim;
-  app.graphSvg = svg;
+  app.graphCanvasSel = sel;
+  app.graphSvg = null;
 }
 
 export function resetGraphZoom(app) {
-  if (app.graphSvg && app.graphZoom) {
-    app.graphSvg.transition().duration(500).call(app.graphZoom.transform, d3.zoomIdentity);
+  if (app.graphCanvasSel && app.graphZoom) {
+    app.graphCanvasSel.transition().duration(500).call(app.graphZoom.transform, d3.zoomIdentity);
   }
 }

@@ -102,6 +102,20 @@
   z-index: 1;
 }
 
+/* Single interactive canvas (edges + nodes + labels). Unlike the legacy
+   edge-only canvas it must receive pointer events for zoom/drag/hover. */
+.graph-container .graph-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+}
+
+.graph-container .graph-canvas:active {
+  cursor: grabbing;
+}
+
 .graph-container .node {
   cursor: pointer;
   transition: opacity 0.15s;

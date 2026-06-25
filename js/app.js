@@ -1,10 +1,5 @@
 import { createGraphFilters, NODE_COLORS, EDGE_COLORS, createViews } from './config.js';
-import {
-  parseGraph,
-  buildRelationshipIndexes,
-  computeRelationshipTypeCounts,
-  findBestTreeRoot
-} from './parser.js';
+import { computeRelationshipTypeCounts, findBestTreeRoot } from './parser.js';
 import {
   cleanName as formatSpdxName,
   cleanFileName as formatFileName,
@@ -33,6 +28,24 @@ import {
   collapseAllTree as collapseDependencyTree
 } from './dependency-tree.js';
 
+/* ==========================================================================
+   Parser worker
+   A single long-lived worker, kept off the Alpine reactive state so it is
+   never proxied. Parsing large SBOMs (JSON.parse + index building) runs here
+   so the main thread stays responsive. latestParseReqId lets us ignore stale
+   results when the user loads a second SBOM before the first finishes.
+   ========================================================================== */
+let parserWorker = null;
+let parseReqSeq = 0;
+let latestParseReqId = 0;
+
+function getParserWorker() {
+  if (!parserWorker) {
+    parserWorker = new Worker(new URL('./parser.worker.js', import.meta.url), { type: 'module' });
+  }
+  return parserWorker;
+}
+
 export function spdxApp() {
   return {
     // State
@@ -41,6 +54,8 @@ export function spdxApp() {
     samples: [], // bundled demo sets, loaded from samples/samples.json
     loadingSample: null, // id of the sample currently being fetched
     sampleError: '',
+    parsing: false, // true while the parser worker is crunching a freshly loaded SBOM
+    parseError: '',
     currentView: 'dashboard',
     searchQuery: '',
     detailElement: null,
@@ -98,10 +113,16 @@ export function spdxApp() {
     // Graph state
     graphSim: null,
     graphSvg: null,
+    graphCanvasSel: null,
     graphZoom: null,
     graphFilters: createGraphFilters(),
     nodeColors: NODE_COLORS,
     edgeColors: EDGE_COLORS,
+    graphAggregate: true, // collapse files/builds into hierarchical clusters by default
+    expandedClusters: new Set(), // cluster keys the user has drilled into
+    graphNodeCount: 0, // live readout of rendered nodes/edges
+    graphEdgeCount: 0,
+    graphTruncated: false, // true when the guard rail capped an un-aggregated render
 
     // Views
     views: createViews(),
@@ -246,7 +267,7 @@ export function spdxApp() {
         for (const fname of sample.files) {
           const res = await fetch(`${sample.dir}/${fname}`);
           if (!res.ok) throw new Error(`${fname} (HTTP ${res.status})`);
-          loaded.push({ name: fname, data: await res.json() });
+          loaded.push({ name: fname, text: await res.text() });
         }
         this.loadedFiles = loaded; // replace — the drop zone starts empty
         this.rebuildFromLoadedFiles(); // existing merge + parse path
@@ -274,12 +295,9 @@ export function spdxApp() {
       fileList.forEach((file) => {
         const reader = new FileReader();
         reader.onload = (ev) => {
-          try {
-            const data = JSON.parse(ev.target.result);
-            this.loadedFiles.push({ name: file.name, data });
-          } catch (err) {
-            alert('Error parsing ' + file.name + ': ' + err.message);
-          }
+          // Store the raw text; JSON.parse happens in the worker so the main
+          // thread never blocks on large files.
+          this.loadedFiles.push({ name: file.name, text: ev.target.result });
           remaining--;
           if (remaining === 0) {
             this.rebuildFromLoadedFiles();
@@ -298,34 +316,61 @@ export function spdxApp() {
       this.rebuildFromLoadedFiles();
     },
 
-    // Merge all loaded files and re-parse
+    // Merge all loaded files and re-parse (off the main thread)
     rebuildFromLoadedFiles() {
-      const mergedGraph = [];
-      this.loadedFiles.forEach((f) => {
-        const graph = f.data['@graph'] || [];
-        graph.forEach((item) => mergedGraph.push(item));
-      });
-      this.parseData(mergedGraph);
-      // Re-render D3 views if currently active (they don't auto-update from Alpine reactivity)
-      this.$nextTick(() => {
-        if (this.currentView === 'graph') this.renderGraph();
-        if (this.currentView === 'dependencies') this.renderDepTree();
-      });
+      this.parseData(this.loadedFiles);
     },
 
-    // Data parsing accepts a merged @graph array.
-    parseData(graph) {
-      const parsed = parseGraph(graph);
-      Object.assign(this, parsed);
+    // Parse the loaded files in the worker, then apply the result.
+    // `files` is [{ name, text }]; parsing (JSON.parse + graph + indexes) runs
+    // in parser.worker.js so the UI never freezes on large SBOMs.
+    parseData(files) {
+      const worker = getParserWorker();
+      const reqId = ++parseReqSeq;
+      latestParseReqId = reqId;
+      this.parsing = true;
+      this.parseError = '';
 
-      const indexes = buildRelationshipIndexes(this.relationships);
-      Object.assign(this, indexes);
+      worker.onmessage = (event) => {
+        const { id, ok, parsed, indexes, error } = event.data || {};
+        if (id !== latestParseReqId) return; // a newer load superseded this one
+        this.parsing = false;
 
-      this.views.find((v) => v.id === 'packages').count = this.packages.length;
-      this.views.find((v) => v.id === 'files').count = this.files.length;
-      this.views.find((v) => v.id === 'configs').count = this.buildConfigs.length;
-      this.views.find((v) => v.id === 'build').count = this.builds.length;
-      this.treeRoot = findBestTreeRoot(this.packages, this.depIndex);
+        if (!ok) {
+          this.parseError = error || 'Failed to parse SBOM';
+          alert('Error parsing SBOM: ' + this.parseError);
+          return;
+        }
+
+        Object.assign(this, parsed);
+        Object.assign(this, indexes);
+
+        this.views.find((v) => v.id === 'packages').count = this.packages.length;
+        this.views.find((v) => v.id === 'files').count = this.files.length;
+        this.views.find((v) => v.id === 'configs').count = this.buildConfigs.length;
+        this.views.find((v) => v.id === 'build').count = this.builds.length;
+        this.treeRoot = findBestTreeRoot(this.packages, this.depIndex);
+        this.expandedClusters = new Set(); // fresh data: start fully collapsed
+
+        // Re-render D3 views if currently active (they don't auto-update from
+        // Alpine reactivity).
+        this.$nextTick(() => {
+          if (this.currentView === 'graph') this.renderGraph();
+          if (this.currentView === 'dependencies') this.renderDepTree();
+        });
+      };
+
+      worker.onerror = (err) => {
+        if (latestParseReqId !== reqId) return;
+        this.parsing = false;
+        this.parseError = err.message || 'Worker error';
+        alert('Parser worker error: ' + this.parseError);
+      };
+
+      worker.postMessage({
+        id: reqId,
+        files: files.map((f) => ({ name: f.name, text: f.text }))
+      });
     },
 
     // Helpers
@@ -620,6 +665,10 @@ export function spdxApp() {
       renderGraphView(this);
     },
     updateGraph() {
+      this.renderGraph();
+    },
+    collapseAllClusters() {
+      this.expandedClusters = new Set();
       this.renderGraph();
     },
     resetGraphZoom() {

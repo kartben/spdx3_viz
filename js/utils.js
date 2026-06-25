@@ -63,6 +63,27 @@ export function fileExt(name) {
   return match ? match[1] : '';
 }
 
+/**
+ * Extracts a directory prefix from a path-like file name, used to cluster
+ * large flat file sets in the graph (e.g. the Linux kernel's 3k+ files).
+ *
+ * @param {string} name - The file name / path (e.g. 'arch/x86/boot/a20.c')
+ * @param {number} [depth=2] - How many leading path segments to keep
+ * @returns {string} Directory prefix (e.g. 'arch/x86'), or '' when there is no
+ *   directory component (top-level files are left ungrouped)
+ *
+ * @example
+ * dirPrefix('arch/x86/boot/a20.c') // returns 'arch/x86'
+ * dirPrefix('Makefile')            // returns ''
+ */
+export function dirPrefix(name, depth = 2) {
+  if (!name) return '';
+  const p = name.replace(/^\.?\//, '');
+  const slash = p.lastIndexOf('/');
+  if (slash < 0) return '';
+  return p.slice(0, slash).split('/').filter(Boolean).slice(0, depth).join('/');
+}
+
 /* ==========================================================================
    Date Formatting
    Functions to format dates for display
