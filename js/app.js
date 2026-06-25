@@ -338,7 +338,9 @@ export function spdxApp() {
 
         if (!ok) {
           this.parseError = error || 'Failed to parse SBOM';
-          alert('Error parsing SBOM: ' + this.parseError);
+          console.error('SBOM parse failed:', this.parseError);
+          this.toastMsg = 'Error parsing SBOM: ' + this.parseError;
+          setTimeout(() => (this.toastMsg = ''), 5000);
           return;
         }
 
@@ -364,7 +366,9 @@ export function spdxApp() {
         if (latestParseReqId !== reqId) return;
         this.parsing = false;
         this.parseError = err.message || 'Worker error';
-        alert('Parser worker error: ' + this.parseError);
+        console.error('Parser worker error:', this.parseError);
+        this.toastMsg = 'Parser worker error: ' + this.parseError;
+        setTimeout(() => (this.toastMsg = ''), 5000);
       };
 
       worker.postMessage({

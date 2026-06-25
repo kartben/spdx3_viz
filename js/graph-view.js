@@ -183,8 +183,13 @@ export function renderGraph(app) {
     if (!aggregate) return 'self:' + node.id;
     if (node.type === 'package') return 'pkg:' + node.id;
     if (node.type === 'file') {
+      // Only collapse into a parent that is an actual package. SBOMs (e.g. the
+      // Linux kernel) often use a pseudo-root *file* like `$(src_tree)` as the
+      // `contains` parent of every file — clustering on that would collapse the
+      // whole tree into one node, so we fall through to directory grouping.
       const parent = app.parentIndex.get(node.id);
-      if (parent && uNodeById.has(parent)) return 'pkg:' + parent;
+      const parentNode = parent && uNodeById.get(parent);
+      if (parentNode && parentNode.type === 'package') return 'pkg:' + parent;
       const dir = dirPrefix(node.name);
       if (dir) return 'dir:' + dir;
       return 'self:' + node.id;
