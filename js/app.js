@@ -807,6 +807,43 @@ export function spdxApp() {
     licenseUsers(id) {
       return this.licenseUsersIndex.get(id) || [];
     },
+    licenseLabel(id) {
+      const lic = this.licenses.find((l) => l.id === id);
+      if (lic) return lic.label;
+      const el = this.elementMap.get(id);
+      if (el?.simplelicensing_licenseExpression) return el.simplelicensing_licenseExpression;
+      if (id.startsWith('https://spdx.org/licenses/')) {
+        return id.replace('https://spdx.org/licenses/', '');
+      }
+      if (id.includes('NoAssertion')) return 'NoAssertion';
+      if (el?.name) return el.name;
+      return this.cleanName(id);
+    },
+    elementLicenses(spdxId) {
+      const entries = [];
+      const seen = new Set();
+      for (const rel of this.outgoingRels(spdxId)) {
+        if (
+          rel.relationshipType !== 'hasConcludedLicense' &&
+          rel.relationshipType !== 'hasDeclaredLicense'
+        ) {
+          continue;
+        }
+        const kind = rel.relationshipType === 'hasDeclaredLicense' ? 'declared' : 'concluded';
+        const targets = Array.isArray(rel.to) ? rel.to : [rel.to];
+        for (const id of targets) {
+          if (!id) continue;
+          const key = `${kind}:${id}`;
+          if (seen.has(key)) continue;
+          seen.add(key);
+          entries.push({ id, kind, label: this.licenseLabel(id) });
+        }
+      }
+      return entries.sort((a, b) => {
+        if (a.kind !== b.kind) return a.kind === 'concluded' ? -1 : 1;
+        return a.label.localeCompare(b.label);
+      });
+    },
     isNavTarget(kind, id) {
       return this.focusedNavKind === kind && this.focusedNavId === id;
     },
