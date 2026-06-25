@@ -22,7 +22,14 @@ import {
   getVulnerabilityLookup,
   isMeaningfulValue,
   normalizeUrl,
-  copyToClipboard
+  copyToClipboard,
+  extractSpdxLicenseId,
+  extractLicenseExpressionParts,
+  resolveLicenseExpression,
+  spdxLicenseJsonUrl,
+  spdxLicenseExceptionJsonUrl,
+  spdxLicensePageUrl,
+  spdxLicenseExceptionPageUrl
 } from './utils.js';
 import {
   renderGraph as renderGraphView,
@@ -46,6 +53,7 @@ let latestParseReqId = 0;
 // affect the result; kept off the reactive state so it isn't proxied.
 let filteredBuildsCacheKey = null;
 let filteredBuildsCacheVal = [];
+const licenseTextCache = new Map(); // licenseId -> { name, text }
 
 function getParserWorker() {
   if (!parserWorker) {
@@ -125,6 +133,11 @@ export function spdxApp() {
     pkgSort: 'name',
     fileTypeFilter: '',
     toastMsg: '',
+    licenseModalOpen: false,
+    licenseModalExpression: '',
+    licenseModalParts: [],
+    licenseModalActiveIndex: 0,
+    licenseModalRef: '',
 
     // Parsed data
     elementMap: new Map(),
@@ -921,6 +934,149 @@ export function spdxApp() {
       this.switchView('licenses');
       this.expandedLicense = spdxId;
       this.scrollToNavTarget('license', spdxId);
+    },
+    spdxLicenseIdFor(licenseRef) {
+      return extractSpdxLicenseId(licenseRef, this.elementMap);
+    },
+    licenseExpressionFor(licenseRef) {
+      return resolveLicenseExpression(licenseRef, this.elementMap);
+    },
+    licenseExpressionParts(licenseRef) {
+      return extractLicenseExpressionParts(this.licenseExpressionFor(licenseRef));
+    },
+    spdxLicensePageUrl(licenseId) {
+      return spdxLicensePageUrl(licenseId);
+    },
+    licenseModalActivePart() {
+      return this.licenseModalParts[this.licenseModalActiveIndex] || null;
+    },
+    licenseModalLoading() {
+      return this.licenseModalParts.some((part) => part.loading);
+    },
+    licenseModalError() {
+      const active = this.licenseModalActivePart();
+      return active?.error && !active?.text ? active.error : '';
+    },
+    licenseModalText() {
+      return this.licenseModalActivePart()?.text || '';
+    },
+    canShowLicenseText(licenseRef) {
+      return this.licenseExpressionParts(licenseRef).length > 0;
+    },
+    licenseTextActionLabel(licenseRef) {
+      return this.licenseExpressionParts(licenseRef).length > 1
+        ? 'View licenses text'
+        : 'View license text';
+    },
+    licenseModalHeadingLabel() {
+      return this.licenseModalParts.length > 1 ? 'Licenses text' : 'License text';
+    },
+    licenseModalMainPageUrl() {
+      if (this.licenseModalParts.length !== 1) return '';
+      const part = this.licenseModalParts[0];
+      if (part.kind === 'license') return spdxLicensePageUrl(part.id);
+      if (part.kind === 'exception') return spdxLicenseExceptionPageUrl(part.id);
+      return '';
+    },
+    closeLicenseModal() {
+      this.licenseModalOpen = false;
+      this.licenseModalParts = [];
+      this.licenseModalActiveIndex = 0;
+      this.licenseModalExpression = '';
+    },
+    licensePartCacheKey(part) {
+      return `${part.kind}:${part.id}`;
+    },
+    createLicenseModalPart(part) {
+      const label =
+        part.kind === 'exception' && part.withLicense
+          ? `${part.withLicense} WITH ${part.id}`
+          : part.id;
+      return {
+        id: part.id,
+        kind: part.kind,
+        withLicense: part.withLicense || '',
+        label,
+        name: label,
+        text: '',
+        error: '',
+        loading: false,
+        loaded: false
+      };
+    },
+    async fetchLicensePartText(part) {
+      const cacheKey = this.licensePartCacheKey(part);
+      const cached = licenseTextCache.get(cacheKey);
+      if (cached) {
+        part.name = cached.name;
+        part.text = cached.text;
+        part.loaded = true;
+        part.loading = false;
+        part.error = '';
+        return;
+      }
+
+      part.loading = true;
+      part.error = '';
+
+      try {
+        const url =
+          part.kind === 'exception'
+            ? spdxLicenseExceptionJsonUrl(part.id)
+            : spdxLicenseJsonUrl(part.id);
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`Not found (${res.status})`);
+        const data = await res.json();
+        const text =
+          part.kind === 'exception' ? data.licenseExceptionText || '' : data.licenseText || '';
+        if (!text) throw new Error('No license text in response');
+        const name = data.name || part.label;
+        licenseTextCache.set(cacheKey, { name, text });
+        part.name = name;
+        part.text = text;
+        part.loaded = true;
+      } catch (err) {
+        part.error = err.message || 'Failed to load license text';
+      } finally {
+        part.loading = false;
+      }
+    },
+    async selectLicenseModalPart(index) {
+      if (index < 0 || index >= this.licenseModalParts.length) return;
+      this.licenseModalActiveIndex = index;
+      const part = this.licenseModalParts[index];
+      if (!part.loaded && !part.loading) {
+        await this.fetchLicensePartText(part);
+      }
+    },
+    async showLicenseText(licenseRef) {
+      const expression = this.licenseExpressionFor(licenseRef);
+      const parsedParts = extractLicenseExpressionParts(expression);
+
+      this.licenseModalOpen = true;
+      this.licenseModalRef = licenseRef;
+      this.licenseModalExpression = expression;
+      this.licenseModalActiveIndex = 0;
+      this.licenseModalParts = parsedParts.map((part) => this.createLicenseModalPart(part));
+
+      if (!parsedParts.length) {
+        this.licenseModalParts = [
+          {
+            id: '',
+            kind: 'license',
+            withLicense: '',
+            label: this.licenseLabel(licenseRef),
+            name: this.licenseLabel(licenseRef),
+            text: '',
+            error: 'Could not parse this license expression.',
+            loading: false,
+            loaded: true
+          }
+        ];
+        return;
+      }
+
+      await this.fetchLicensePartText(this.licenseModalParts[0]);
     },
     placeholderElement(spdxId) {
       return {

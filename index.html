@@ -986,8 +986,8 @@
                           type="button"
                           class="badge text-xs hover:opacity-80"
                           :class="lic.kind === 'concluded' ? 'bg-pink-500/15 text-pink-400' : 'bg-purple-500/15 text-purple-400'"
-                          :title="lic.kind === 'concluded' ? 'Concluded license' : 'Declared license'"
-                          @click.stop="navigateToLicense(lic.id)"
+                          :title="licenseTextActionLabel(lic.id) + ' · ' + (lic.kind === 'concluded' ? 'Concluded' : 'Declared')"
+                          @click.stop="showLicenseText(lic.id)"
                           x-text="lic.label"
                         ></button>
                       </template>
@@ -1026,7 +1026,8 @@
                           type="button"
                           class="badge hover:opacity-80"
                           :class="lic.kind === 'concluded' ? 'bg-pink-500/15 text-pink-400' : 'bg-purple-500/15 text-purple-400'"
-                          @click.stop="navigateToLicense(lic.id)"
+                          :title="canShowLicenseText(lic.id) ? licenseTextActionLabel(lic.id) : 'View license'"
+                          @click.stop="showLicenseText(lic.id)"
                           x-text="(lic.kind === 'declared' ? 'Declared: ' : 'Concluded: ') + lic.label"
                         ></button>
                       </template>
@@ -1202,10 +1203,13 @@
                     </svg>
                   </div>
                   <div class="flex-1 min-w-0">
-                    <div
-                      class="font-semibold text-pink-200 text-sm font-mono break-words"
+                    <button
+                      type="button"
+                      class="font-semibold text-pink-200 text-sm font-mono break-words text-left hover:text-pink-100 hover:underline decoration-pink-500/50 underline-offset-2"
+                      :title="canShowLicenseText(lic.id) ? licenseTextActionLabel(lic.id) : lic.label"
+                      @click.stop="showLicenseText(lic.id)"
                       x-text="lic.label"
-                    ></div>
+                    ></button>
                     <div
                       class="text-xs text-slate-500"
                       x-text="lic.userCount + (lic.userCount === 1 ? ' element' : ' elements')"
@@ -1244,6 +1248,29 @@
                   x-collapse
                   class="mt-4 pt-4 border-t border-slate-700"
                 >
+                  <div class="flex flex-wrap items-center gap-2 mb-4 sm:pl-11">
+                    <button
+                      type="button"
+                      x-show="canShowLicenseText(lic.id)"
+                      class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-pink-500/15 text-pink-300 hover:bg-pink-500/25 transition-colors"
+                      @click.stop="showLicenseText(lic.id)"
+                    >
+                      <svg
+                        class="w-3.5 h-3.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                        />
+                      </svg>
+                      <span x-text="licenseTextActionLabel(lic.id)"></span>
+                    </button>
+                  </div>
                   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <!-- Declared by -->
                     <div class="sm:pl-11">
@@ -2717,6 +2744,154 @@
             x-show="progressEta != null"
             x-text="progressEta >= 1 ? `about ${Math.ceil(progressEta)}s remaining` : 'almost done…'"
           ></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- LICENSE TEXT MODAL -->
+    <div
+      x-show="licenseModalOpen"
+      x-transition.opacity
+      @keydown.escape.window="closeLicenseModal()"
+      class="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm"
+      @click.self="closeLicenseModal()"
+    >
+      <div
+        class="w-full max-w-3xl max-h-[85vh] flex flex-col bg-slate-800 border border-slate-700 rounded-xl shadow-2xl"
+        @click.stop
+      >
+        <div class="flex items-start gap-3 px-5 py-4 border-b border-slate-700">
+          <div class="flex-1 min-w-0">
+            <div
+              class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1"
+              x-text="licenseModalHeadingLabel()"
+            ></div>
+            <a
+              x-show="licenseModalMainPageUrl()"
+              :href="licenseModalMainPageUrl()"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="font-semibold text-pink-200 hover:text-pink-100 text-sm break-words font-mono underline decoration-pink-500/40 underline-offset-2"
+              x-text="licenseModalExpression"
+            ></a>
+            <div
+              x-show="!licenseModalMainPageUrl()"
+              class="font-semibold text-white text-sm break-words font-mono"
+              x-text="licenseModalExpression || licenseModalActivePart()?.name"
+            ></div>
+            <div
+              x-show="licenseModalActivePart()?.kind === 'exception'"
+              class="text-xs text-slate-500 mt-0.5"
+            >
+              License exception
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <button
+              type="button"
+              class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
+              @click="closeLicenseModal()"
+              title="Close"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div
+          x-show="licenseModalParts.length > 1"
+          class="flex flex-wrap gap-1.5 px-5 py-2 border-b border-slate-700/70 bg-slate-800/60"
+        >
+          <template
+            x-for="(part, index) in licenseModalParts"
+            :key="part.kind + ':' + part.id + ':' + index"
+          >
+            <button
+              type="button"
+              class="px-2.5 py-1 rounded-md text-xs font-mono transition-colors"
+              :class="licenseModalActiveIndex === index
+                ? 'bg-pink-500/20 text-pink-200 ring-1 ring-pink-500/40'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/60'"
+              @click="selectLicenseModalPart(index)"
+            >
+              <span x-text="part.label"></span>
+              <span
+                x-show="part.kind === 'exception'"
+                class="ml-1 text-[10px] uppercase tracking-wide text-slate-500"
+                >exception</span
+              >
+            </button>
+          </template>
+        </div>
+        <div class="flex-1 min-h-0 overflow-auto px-5 py-4">
+          <div
+            x-show="licenseModalLoading()"
+            class="flex items-center gap-2 text-sm text-slate-400"
+          >
+            <svg class="w-4 h-4 animate-spin text-pink-400" fill="none" viewBox="0 0 24 24">
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              />
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+              />
+            </svg>
+            Loading license text…
+          </div>
+          <div
+            x-show="licenseModalError() && !licenseModalLoading()"
+            class="text-sm text-amber-300/90"
+          >
+            <span x-text="licenseModalError()"></span>
+          </div>
+          <div
+            x-show="licenseModalActivePart()?.name && licenseModalParts.length <= 1 && !licenseModalLoading()"
+            class="text-sm font-medium text-slate-300 mb-2"
+            x-text="licenseModalActivePart()?.name"
+          ></div>
+          <pre
+            x-show="licenseModalText() && !licenseModalLoading()"
+            class="text-xs leading-relaxed text-slate-200 font-mono whitespace-pre-wrap break-words"
+            x-text="licenseModalText()"
+          ></pre>
+        </div>
+        <div class="flex items-center justify-end gap-2 px-5 py-3 border-t border-slate-700">
+          <button
+            type="button"
+            x-show="licenseModalText()"
+            class="px-3 py-1.5 rounded-lg text-xs text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
+            @click="copyHash(licenseModalText())"
+          >
+            Copy text
+          </button>
+          <button
+            type="button"
+            x-show="licenseModalRef"
+            class="px-3 py-1.5 rounded-lg text-xs text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
+            @click="navigateToLicense(licenseModalRef); closeLicenseModal()"
+          >
+            View in list
+          </button>
+          <button
+            type="button"
+            class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-700 hover:bg-slate-600 text-white transition-colors"
+            @click="closeLicenseModal()"
+          >
+            Close
+          </button>
         </div>
       </div>
     </div>

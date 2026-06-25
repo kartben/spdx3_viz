@@ -602,6 +602,284 @@ export function getVulnerabilityLookup(eid) {
 }
 
 /* ==========================================================================
+   SPDX License List Helpers
+   ========================================================================== */
+
+const SPDX_LICENSE_ID_RE = /^[A-Za-z0-9.+-]+$/;
+const SPDX_ID_TOKEN_RE = /^[A-Za-z0-9.+-]+(?::[A-Za-z0-9.+-]+)?/;
+
+/**
+ * True when the string is a single SPDX License List identifier (not a compound expression).
+ *
+ * @param {string} value
+ * @returns {boolean}
+ */
+export function isSimpleSpdxLicenseId(value) {
+  if (!value || typeof value !== 'string') return false;
+  if (/[\s()]/.test(value)) return false;
+  if (/\b(AND|OR|WITH)\b/.test(value)) return false;
+  return SPDX_LICENSE_ID_RE.test(value);
+}
+
+/**
+ * Resolves the SPDX license expression string for a license reference.
+ *
+ * @param {string} id
+ * @param {Map<string, Object>} [elementMap]
+ * @returns {string}
+ */
+export function resolveLicenseExpression(id, elementMap) {
+  if (!id || id.includes('NoAssertion')) return '';
+
+  const el = elementMap?.get(id);
+  if (el?.simplelicensing_licenseExpression) {
+    return String(el.simplelicensing_licenseExpression).trim();
+  }
+
+  const urlMatch = id.match(/^https?:\/\/spdx\.org\/licenses\/([^/?#]+)/i);
+  if (urlMatch) {
+    return urlMatch[1].replace(/\.(json|html)$/i, '');
+  }
+
+  if (typeof id === 'string') return id.trim();
+  return '';
+}
+
+/**
+ * Extracts a single SPDX License List identifier from a license reference.
+ *
+ * @param {string} id - License target id (URL, expression element spdxId, etc.)
+ * @param {Map<string, Object>} [elementMap]
+ * @returns {string|null}
+ */
+export function extractSpdxLicenseId(id, elementMap) {
+  const expr = resolveLicenseExpression(id, elementMap);
+  if (!expr || expr.includes('NoAssertion')) return null;
+  if (isSimpleSpdxLicenseId(expr)) return expr;
+
+  const parts = extractLicenseExpressionParts(expr);
+  const firstLicense = parts.find((part) => part.kind === 'license');
+  return firstLicense?.id || null;
+}
+
+/**
+ * @typedef {{ id: string, kind: 'license' | 'exception', withLicense?: string }} LicenseExpressionPart
+ */
+
+/**
+ * Parses an SPDX license expression and returns the distinct fetchable parts.
+ *
+ * @param {string} expression
+ * @returns {LicenseExpressionPart[]}
+ */
+export function extractLicenseExpressionParts(expression) {
+  const expr = String(expression || '').trim();
+  if (!expr || expr.includes('NoAssertion')) return [];
+
+  try {
+    const tokens = tokenizeLicenseExpression(expr);
+    if (!tokens.length) return [];
+    const parser = new LicenseExpressionParser(tokens);
+    const tree = parser.parseExpression();
+    if (parser.peek()?.type !== 'EOF') return [];
+    return collectLicenseExpressionParts(tree);
+  } catch {
+    return [];
+  }
+}
+
+function tokenizeLicenseExpression(expression) {
+  const tokens = [];
+  let index = 0;
+
+  while (index < expression.length) {
+    if (/\s/.test(expression[index])) {
+      index++;
+      continue;
+    }
+
+    const ch = expression[index];
+    if (ch === '(') {
+      tokens.push({ type: 'LPAREN' });
+      index++;
+      continue;
+    }
+    if (ch === ')') {
+      tokens.push({ type: 'RPAREN' });
+      index++;
+      continue;
+    }
+
+    const keyword = expression.slice(index).match(/^(AND|OR|WITH)\b/);
+    if (keyword) {
+      tokens.push({ type: keyword[1] });
+      index += keyword[1].length;
+      continue;
+    }
+
+    const idMatch = expression.slice(index).match(SPDX_ID_TOKEN_RE);
+    if (idMatch) {
+      tokens.push({ type: 'ID', value: idMatch[0] });
+      index += idMatch[0].length;
+      continue;
+    }
+
+    throw new Error(`Unexpected character at position ${index}`);
+  }
+
+  tokens.push({ type: 'EOF' });
+  return tokens;
+}
+
+class LicenseExpressionParser {
+  constructor(tokens) {
+    this.tokens = tokens;
+    this.pos = 0;
+  }
+
+  peek() {
+    return this.tokens[this.pos];
+  }
+
+  advance() {
+    return this.tokens[this.pos++];
+  }
+
+  match(...types) {
+    const token = this.peek();
+    if (!token || !types.includes(token.type)) return false;
+    this.advance();
+    return true;
+  }
+
+  consume(type) {
+    const token = this.peek();
+    if (!token || token.type !== type) {
+      throw new Error(`Expected ${type}`);
+    }
+    return this.advance();
+  }
+
+  parseExpression() {
+    let node = this.parseWithExpr();
+    while (this.match('AND', 'OR')) {
+      const op = this.tokens[this.pos - 1].type;
+      node = { type: 'compound', op, left: node, right: this.parseWithExpr() };
+    }
+    return node;
+  }
+
+  parseWithExpr() {
+    let node = this.parsePrimary();
+    if (this.match('WITH')) {
+      const exception = this.parsePrimary();
+      const licenseId = node?.type === 'id' ? node.id : null;
+      const exceptionId = exception?.type === 'id' ? exception.id : null;
+      if (!licenseId || !exceptionId) throw new Error('Invalid WITH expression');
+      return { type: 'with', licenseId, exceptionId };
+    }
+    return node;
+  }
+
+  parsePrimary() {
+    if (this.match('LPAREN')) {
+      const node = this.parseExpression();
+      this.consume('RPAREN');
+      return node;
+    }
+
+    const token = this.consume('ID');
+    return { type: 'id', id: token.value };
+  }
+}
+
+/**
+ * @param {object} node
+ * @returns {LicenseExpressionPart[]}
+ */
+function collectLicenseExpressionParts(node) {
+  /** @type {LicenseExpressionPart[]} */
+  const parts = [];
+  const seen = new Set();
+
+  /** @param {object | null | undefined} current */
+  function walk(current) {
+    if (!current) return;
+
+    if (current.type === 'id') {
+      const key = `license:${current.id}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        parts.push({ id: current.id, kind: 'license' });
+      }
+      return;
+    }
+
+    if (current.type === 'with') {
+      walk({ type: 'id', id: current.licenseId });
+      const key = `exception:${current.exceptionId}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        parts.push({
+          id: current.exceptionId,
+          kind: 'exception',
+          withLicense: current.licenseId
+        });
+      }
+      return;
+    }
+
+    if (current.type === 'compound') {
+      walk(current.left);
+      walk(current.right);
+    }
+  }
+
+  walk(node);
+  return parts;
+}
+
+/**
+ * JSON URL for license details (CORS-enabled jsDelivr mirror of license-list-data).
+ *
+ * @param {string} licenseId
+ * @returns {string}
+ */
+export function spdxLicenseJsonUrl(licenseId) {
+  return `https://cdn.jsdelivr.net/gh/spdx/license-list-data@master/json/details/${encodeURIComponent(licenseId)}.json`;
+}
+
+/**
+ * JSON URL for license exception details.
+ *
+ * @param {string} exceptionId
+ * @returns {string}
+ */
+export function spdxLicenseExceptionJsonUrl(exceptionId) {
+  return `https://cdn.jsdelivr.net/gh/spdx/license-list-data@master/json/exceptions/${encodeURIComponent(exceptionId)}.json`;
+}
+
+/**
+ * Canonical SPDX License List page for a license identifier.
+ *
+ * @param {string} licenseId
+ * @returns {string}
+ */
+export function spdxLicensePageUrl(licenseId) {
+  return `https://spdx.org/licenses/${encodeURIComponent(licenseId)}`;
+}
+
+/**
+ * Canonical SPDX License List page for a license exception.
+ *
+ * @param {string} exceptionId
+ * @returns {string}
+ */
+export function spdxLicenseExceptionPageUrl(exceptionId) {
+  return `https://spdx.org/licenses/exceptions/${encodeURIComponent(exceptionId)}`;
+}
+
+/* ==========================================================================
    Clipboard Helper
    Function for copying text to clipboard
    ========================================================================== */

@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 
 import { buildRelationshipIndexes, parseGraph } from '../js/parser.js';
-import { parseBuildParameters } from '../js/utils.js';
+import { parseBuildParameters, extractLicenseExpressionParts } from '../js/utils.js';
 import { spdxApp } from '../js/app.js';
 
 const fixtureGraph = [
@@ -246,3 +246,26 @@ test(
     );
   }
 );
+
+test('extractLicenseExpressionParts parses simple and compound expressions', () => {
+  assert.deepEqual(extractLicenseExpressionParts('MIT'), [{ id: 'MIT', kind: 'license' }]);
+
+  assert.deepEqual(extractLicenseExpressionParts('Apache-2.0 OR MIT'), [
+    { id: 'Apache-2.0', kind: 'license' },
+    { id: 'MIT', kind: 'license' }
+  ]);
+
+  assert.deepEqual(extractLicenseExpressionParts('Apache-2.0 AND (Apache-2.0 OR MIT)'), [
+    { id: 'Apache-2.0', kind: 'license' },
+    { id: 'MIT', kind: 'license' }
+  ]);
+
+  assert.deepEqual(extractLicenseExpressionParts('GPL-2.0-only WITH Classpath-exception-2.0'), [
+    { id: 'GPL-2.0-only', kind: 'license' },
+    {
+      id: 'Classpath-exception-2.0',
+      kind: 'exception',
+      withLicense: 'GPL-2.0-only'
+    }
+  ]);
+});
