@@ -11,8 +11,9 @@
  *
  * Protocol:
  *   main → worker: { id, files: [{ name, text }] }
- *   worker → main: { id, ok: true, parsed, indexes }
- *                  { id, ok: false, error }
+ *   worker → main: { id, type: 'progress', phase, value }   // 0..1 within phase
+ *                  { id, type: 'done', ok: true, parsed, indexes }
+ *                  { id, type: 'done', ok: false, error }
  *
  * @module parser.worker
  */
@@ -21,11 +22,16 @@ import { parseGraph, buildRelationshipIndexes } from './parser.js';
 
 self.onmessage = (event) => {
   const { id, files } = event.data || {};
+  const post = (msg) => self.postMessage({ id, ...msg });
+  const progress = (phase, value) => post({ type: 'progress', phase, value });
 
   try {
     // Merge every file's @graph array into one (same logic as the old
     // main-thread rebuildFromLoadedFiles), JSON-parsing each file here so the
-    // 8 MB+ JSON.parse cost stays off the UI thread too.
+    // 8 MB+ JSON.parse cost stays off the UI thread too. Report JSON progress
+    // weighted by byte size so the bar advances as each file is parsed.
+    const totalBytes = (files || []).reduce((sum, f) => sum + (f.text ? f.text.length : 0), 0) || 1;
+    let bytesDone = 0;
     const mergedGraph = [];
     (files || []).forEach((file) => {
       let data;
@@ -36,13 +42,15 @@ self.onmessage = (event) => {
       }
       const graph = data['@graph'] || [];
       graph.forEach((item) => mergedGraph.push(item));
+      bytesDone += file.text ? file.text.length : 0;
+      progress('json', bytesDone / totalBytes);
     });
 
-    const parsed = parseGraph(mergedGraph);
-    const indexes = buildRelationshipIndexes(parsed.relationships);
+    const parsed = parseGraph(mergedGraph, (p) => progress('graph', p));
+    const indexes = buildRelationshipIndexes(parsed.relationships, (p) => progress('index', p));
 
-    self.postMessage({ id, ok: true, parsed, indexes });
+    post({ type: 'done', ok: true, parsed, indexes });
   } catch (err) {
-    self.postMessage({ id, ok: false, error: err && err.message ? err.message : String(err) });
+    post({ type: 'done', ok: false, error: err && err.message ? err.message : String(err) });
   }
 };

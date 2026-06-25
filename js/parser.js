@@ -9,6 +9,30 @@
 
 import { COLORS, ELEMENT_TYPES, RELATIONSHIP_TYPES } from './config.js';
 
+/**
+ * Builds a throttled progress reporter. Returns a function to call once per
+ * processed item; it invokes `onProgress(fraction)` at most ~50 times so the
+ * parser can drive a progress bar without per-iteration overhead. Returns a
+ * no-op when no callback is supplied (e.g. tests, or the synchronous path).
+ *
+ * @param {((fraction: number) => void)|undefined} onProgress
+ * @param {number} total - Total number of items that will be processed
+ * @returns {() => void}
+ */
+function makeThrottledReporter(onProgress, total) {
+  if (typeof onProgress !== 'function' || !total) return () => {};
+  let processed = 0;
+  let next = 0;
+  const step = Math.max(1, Math.floor(total / 50));
+  return () => {
+    processed++;
+    if (processed >= next) {
+      next = processed + step;
+      onProgress(processed / total);
+    }
+  };
+}
+
 /* ==========================================================================
    Parser Result Type
    ========================================================================== */
@@ -69,10 +93,13 @@ import { COLORS, ELEMENT_TYPES, RELATIONSHIP_TYPES } from './config.js';
  * const spdxData = JSON.parse(jsonString);
  * const parsed = parseGraph(spdxData['@graph']);
  */
-export function parseGraph(graph) {
+export function parseGraph(graph, onProgress) {
   if (!Array.isArray(graph)) {
     graph = [];
   }
+
+  // Reports across the two passes below (2 × graph.length items of work).
+  const report = makeThrottledReporter(onProgress, graph.length * 2);
 
   /** @type {Map<string, Object>} */
   const elementMap = new Map();
@@ -114,6 +141,7 @@ export function parseGraph(graph) {
 
   // First pass: register all elements in the map
   graph.forEach((item) => {
+    report();
     if (item.spdxId) {
       elementMap.set(item.spdxId, item);
     }
@@ -124,6 +152,7 @@ export function parseGraph(graph) {
 
   // Second pass: categorize elements
   graph.forEach((item) => {
+    report();
     // Skip duplicate spdxIds
     if (item.spdxId) {
       if (seen.has(item.spdxId)) return;
@@ -257,7 +286,9 @@ export function parseGraph(graph) {
  * const indexes = buildRelationshipIndexes(parsedData.relationships);
  * const deps = indexes.depIndex.get(packageId) || [];
  */
-export function buildRelationshipIndexes(relationships) {
+export function buildRelationshipIndexes(relationships, onProgress) {
+  const report = makeThrottledReporter(onProgress, relationships.length);
+
   // Initialize all indexes
   const relFromIndex = new Map();
   const relToIndex = new Map();
@@ -294,6 +325,7 @@ export function buildRelationshipIndexes(relationships) {
   };
 
   relationships.forEach((rel) => {
+    report();
     const from = rel.from;
     const targets = Array.isArray(rel.to) ? rel.to : [rel.to];
 
