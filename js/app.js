@@ -108,6 +108,9 @@ export function spdxApp() {
     expandedConfig: null,
     expandedBuild: null,
     expandedLicense: null,
+    focusedNavKind: '',
+    focusedNavId: '',
+    focusedNavTimer: null,
     configSearch: '',
     buildSearch: '',
     licenseSearch: '',
@@ -785,6 +788,32 @@ export function spdxApp() {
     licenseUsers(id) {
       return this.licenseUsersIndex.get(id) || [];
     },
+    isNavTarget(kind, id) {
+      return this.focusedNavKind === kind && this.focusedNavId === id;
+    },
+    focusNavTarget(kind, id) {
+      this.focusedNavKind = kind;
+      this.focusedNavId = id;
+      if (this.focusedNavTimer) clearTimeout(this.focusedNavTimer);
+      this.focusedNavTimer = setTimeout(() => {
+        if (this.focusedNavKind === kind && this.focusedNavId === id) {
+          this.focusedNavKind = '';
+          this.focusedNavId = '';
+        }
+      }, 1800);
+    },
+    scrollToNavTarget(kind, id) {
+      this.$nextTick(() => {
+        requestAnimationFrame(() => {
+          const target = [...document.querySelectorAll(`[data-nav-kind="${kind}"]`)].find(
+            (el) => el.dataset.navId === id && el.offsetParent !== null
+          );
+          if (!target) return;
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          this.focusNavTarget(kind, id);
+        });
+      });
+    },
     navigateTo(spdxId) {
       const el = this.elementMap.get(spdxId);
       if (!el) {
@@ -792,14 +821,7 @@ export function spdxApp() {
         return;
       }
       if (el.type === 'software_Package') {
-        this.switchView('packages');
-        this.expandedPkg = spdxId;
-        this.$nextTick(() => {
-          document
-            .querySelector(`[x-text="cleanName(pkg.spdxId)"]`)
-            ?.closest('.card')
-            ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        });
+        this.navigateToPackage(spdxId);
       } else if (el.type === 'software_File') {
         // Check if it's a build config
         if (el.software_primaryPurpose === 'configuration' || spdxId?.includes('build-config')) {
@@ -813,21 +835,36 @@ export function spdxApp() {
         this.navigateToLicense(spdxId);
       }
     },
+    navigateToPackage(spdxId) {
+      this.searchQuery = '';
+      this.switchView('packages');
+      this.expandedPkg = spdxId;
+      this.scrollToNavTarget('package', spdxId);
+    },
     navigateToConfig(spdxId) {
+      this.configSearch = '';
       this.switchView('configs');
       this.expandedConfig = spdxId;
+      this.scrollToNavTarget('config', spdxId);
     },
     navigateToFile(spdxId) {
+      this.searchQuery = '';
+      this.fileTypeFilter = '';
       this.switchView('files');
       this.expandedFile = spdxId;
+      this.scrollToNavTarget('file', spdxId);
     },
     navigateToBuild(spdxId) {
+      this.buildSearch = '';
       this.switchView('build');
       this.expandedBuild = spdxId;
+      this.scrollToNavTarget('build', spdxId);
     },
     navigateToLicense(spdxId) {
+      this.licenseSearch = '';
       this.switchView('licenses');
       this.expandedLicense = spdxId;
+      this.scrollToNavTarget('license', spdxId);
     },
     placeholderElement(spdxId) {
       return {
