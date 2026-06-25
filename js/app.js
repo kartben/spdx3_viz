@@ -46,6 +46,26 @@ function getParserWorker() {
   return parserWorker;
 }
 
+/* Marks an object so Alpine's (Vue) reactivity leaves it untouched. The parsed
+   SBOM is large (the Linux kernel set is ~8k elements / ~3.9k relationships)
+   and fully immutable after parsing, so deep-proxying it just adds per-access
+   overhead to every render. `__v_skip` is the flag @vue/reactivity checks to
+   skip an object; we set it non-enumerable so it never leaks into iteration. */
+function markRaw(value) {
+  if (value && typeof value === 'object' && !Object.prototype.hasOwnProperty.call(value, '__v_skip')) {
+    Object.defineProperty(value, '__v_skip', { value: true, configurable: true });
+  }
+  return value;
+}
+
+/* Marks every object-valued property of a payload raw, then returns it.
+   Marking the top-level containers (Maps/arrays) is enough: reading them no
+   longer returns a proxy, so their elements aren't proxied on access either. */
+function markPayloadRaw(payload) {
+  Object.keys(payload || {}).forEach((key) => markRaw(payload[key]));
+  return payload;
+}
+
 export function spdxApp() {
   return {
     // State
@@ -54,9 +74,26 @@ export function spdxApp() {
     samples: [], // bundled demo sets, loaded from samples/samples.json
     loadingSample: null, // id of the sample currently being fetched
     sampleError: '',
-    parsing: false, // true while the parser worker is crunching a freshly loaded SBOM
+    parsing: false, // true while loading/parsing a freshly loaded SBOM
     parseError: '',
+    progress: 0, // 0..1 overall load progress (download → JSON → graph → index)
+    progressPhase: '', // human-readable current phase label
+    progressEta: null, // estimated seconds remaining, or null when unknown
     currentView: 'dashboard',
+    // Views render their (potentially huge) item lists lazily: a view's heavy
+    // x-for only builds once the view has been opened. The dashboard is the
+    // landing view so it's mounted from the start. This keeps the initial
+    // load fast — otherwise Alpine would build every hidden view's DOM (e.g.
+    // thousands of file cards) up front, freezing the page right at the end.
+    mountedViews: {
+      dashboard: true,
+      graph: false,
+      packages: false,
+      files: false,
+      configs: false,
+      build: false,
+      dependencies: false
+    },
     searchQuery: '',
     detailElement: null,
     expandedPkg: null,
@@ -262,21 +299,50 @@ export function spdxApp() {
     async loadSample(sample) {
       this.loadingSample = sample.id;
       this.sampleError = '';
+      this._beginParseSession(); // show the overlay during download too
+      this.progressPhase = 'Downloading…';
       try {
         const loaded = [];
-        for (const fname of sample.files) {
+        const total = sample.files.length;
+        for (let i = 0; i < sample.files.length; i++) {
+          const fname = sample.files[i];
           const res = await fetch(`${sample.dir}/${fname}`);
           if (!res.ok) throw new Error(`${fname} (HTTP ${res.status})`);
-          loaded.push({ name: fname, text: await res.text() });
+          const text = await this._readResponseWithProgress(res, i, total);
+          loaded.push({ name: fname, text });
         }
         this.loadedFiles = loaded; // replace — the drop zone starts empty
-        this.rebuildFromLoadedFiles(); // existing merge + parse path
+        this.rebuildFromLoadedFiles(); // existing merge + parse path (session continues)
         this.dataLoaded = true;
       } catch (err) {
+        this.parsing = false;
+        this.progressEta = null;
         this.sampleError = `Could not load ${sample.name}: ${err.message}`;
       } finally {
         this.loadingSample = null;
       }
+    },
+
+    // Streams a fetch response, advancing the download band of the progress bar.
+    // Falls back to a plain read when the body/Content-Length isn't available.
+    async _readResponseWithProgress(res, fileIndex, totalFiles) {
+      const len = Number(res.headers.get('Content-Length'));
+      if (!res.body || !len) {
+        const text = await res.text();
+        this._setProgress('download', (fileIndex + 1) / totalFiles);
+        return text;
+      }
+      const reader = res.body.getReader();
+      const chunks = [];
+      let received = 0;
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        received += value.length;
+        this._setProgress('download', (fileIndex + Math.min(1, received / len)) / totalFiles);
+      }
+      return new Blob(chunks).text();
     },
 
     // File handling — supports multiple files
@@ -291,16 +357,29 @@ export function spdxApp() {
       e.target.value = ''; // reset so same file can be re-added
     },
     readFiles(fileList) {
-      let remaining = fileList.length;
-      fileList.forEach((file) => {
+      this._beginParseSession(); // show the overlay during file reads too
+      this.progressPhase = 'Reading files…';
+      const total = fileList.length;
+      const loaded = new Array(total); // preserve input order
+      const fileProgress = new Array(total).fill(0);
+      let remaining = total;
+      fileList.forEach((file, i) => {
         const reader = new FileReader();
+        reader.onprogress = (ev) => {
+          if (!ev.lengthComputable) return;
+          fileProgress[i] = ev.loaded / ev.total;
+          const sum = fileProgress.reduce((a, b) => a + b, 0);
+          this._setProgress('download', sum / total);
+        };
         reader.onload = (ev) => {
           // Store the raw text; JSON.parse happens in the worker so the main
           // thread never blocks on large files.
-          this.loadedFiles.push({ name: file.name, text: ev.target.result });
+          loaded[i] = { name: file.name, text: ev.target.result };
+          fileProgress[i] = 1;
           remaining--;
           if (remaining === 0) {
-            this.rebuildFromLoadedFiles();
+            loaded.forEach((f) => this.loadedFiles.push(f));
+            this.rebuildFromLoadedFiles(); // session continues into the worker
             this.dataLoaded = true;
           }
         };
@@ -316,6 +395,53 @@ export function spdxApp() {
       this.rebuildFromLoadedFiles();
     },
 
+    // Begins a load/parse session: shows the overlay and resets the progress
+    // bar + ETA timer. Callers (loadSample/readFiles) start this before the
+    // download phase so the bar covers download + parse; parseData only starts
+    // it if a session isn't already running (e.g. removing a file re-parses
+    // from cached text with no download).
+    _beginParseSession() {
+      this.parsing = true;
+      this.parseError = '';
+      this.progress = 0;
+      this.progressPhase = '';
+      this.progressEta = null;
+      this._progressStart = performance.now();
+      this._progressEtaSmoothed = null;
+    },
+
+    // Maps a phase + within-phase fraction (0..1) onto the overall bar and
+    // updates the ETA from elapsed time vs. overall fraction.
+    _setProgress(phase, value) {
+      const bands = {
+        download: [0, 0.3],
+        json: [0.3, 0.5],
+        graph: [0.5, 0.78],
+        index: [0.78, 0.99]
+      };
+      const labels = {
+        download: 'Downloading…',
+        json: 'Reading JSON…',
+        graph: 'Building graph…',
+        index: 'Indexing relationships…'
+      };
+      const [lo, hi] = bands[phase] || [0, 1];
+      const v = Math.max(0, Math.min(1, value));
+      const overall = Math.min(0.99, lo + v * (hi - lo));
+      // Progress only moves forward (phases can briefly overlap across files).
+      if (overall >= this.progress) this.progress = overall;
+      this.progressPhase = labels[phase] || '';
+
+      const elapsed = (performance.now() - (this._progressStart || performance.now())) / 1000;
+      if (this.progress > 0.04 && this.progress < 0.985) {
+        const eta = (elapsed * (1 - this.progress)) / this.progress;
+        // Exponential smoothing so the number doesn't jitter.
+        this._progressEtaSmoothed =
+          this._progressEtaSmoothed == null ? eta : this._progressEtaSmoothed * 0.6 + eta * 0.4;
+        this.progressEta = this._progressEtaSmoothed;
+      }
+    },
+
     // Merge all loaded files and re-parse (off the main thread)
     rebuildFromLoadedFiles() {
       this.parseData(this.loadedFiles);
@@ -328,24 +454,32 @@ export function spdxApp() {
       const worker = getParserWorker();
       const reqId = ++parseReqSeq;
       latestParseReqId = reqId;
-      this.parsing = true;
-      this.parseError = '';
+      if (!this.parsing) this._beginParseSession(); // re-parse path (no download)
 
       worker.onmessage = (event) => {
-        const { id, ok, parsed, indexes, error } = event.data || {};
-        if (id !== latestParseReqId) return; // a newer load superseded this one
-        this.parsing = false;
+        const msg = event.data || {};
+        if (msg.id !== latestParseReqId) return; // a newer load superseded this one
 
-        if (!ok) {
-          this.parseError = error || 'Failed to parse SBOM';
+        if (msg.type === 'progress') {
+          this._setProgress(msg.phase, msg.value);
+          return;
+        }
+
+        // type === 'done'
+        this.parsing = false;
+        this.progress = 1;
+        this.progressEta = null;
+
+        if (!msg.ok) {
+          this.parseError = msg.error || 'Failed to parse SBOM';
           console.error('SBOM parse failed:', this.parseError);
           this.toastMsg = 'Error parsing SBOM: ' + this.parseError;
           setTimeout(() => (this.toastMsg = ''), 5000);
           return;
         }
 
-        Object.assign(this, parsed);
-        Object.assign(this, indexes);
+        Object.assign(this, markPayloadRaw(msg.parsed));
+        Object.assign(this, markPayloadRaw(msg.indexes));
 
         this.views.find((v) => v.id === 'packages').count = this.packages.length;
         this.views.find((v) => v.id === 'files').count = this.files.length;
@@ -365,6 +499,7 @@ export function spdxApp() {
       worker.onerror = (err) => {
         if (latestParseReqId !== reqId) return;
         this.parsing = false;
+        this.progressEta = null;
         this.parseError = err.message || 'Worker error';
         console.error('Parser worker error:', this.parseError);
         this.toastMsg = 'Parser worker error: ' + this.parseError;
@@ -591,6 +726,9 @@ export function spdxApp() {
 
     // Navigation
     switchView(id) {
+      // Mark the target view mounted before switching so its content builds on
+      // first visit (and stays cached for instant re-switching afterwards).
+      if (id in this.mountedViews) this.mountedViews[id] = true;
       this.currentView = id;
       this.detailElement = null;
     },

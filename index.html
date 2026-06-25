@@ -711,7 +711,7 @@
                 <option value="dependents">Sort by dependents</option>
               </select>
             </div>
-            <template x-for="pkg in filteredPackages" :key="pkg.spdxId">
+            <template x-for="pkg in (mountedViews.packages ? filteredPackages : [])" :key="pkg.spdxId">
               <div class="card">
                 <div class="flex items-center gap-3 cursor-pointer" @click="togglePkg(pkg.spdxId)">
                   <div
@@ -881,7 +881,7 @@
                 </template>
               </div>
             </div>
-            <template x-for="f in filteredFiles" :key="f.spdxId">
+            <template x-for="f in (mountedViews.files ? filteredFiles : [])" :key="f.spdxId">
               <div class="card cursor-pointer" @click="toggleFile(f.spdxId)">
                 <div class="flex items-center gap-3">
                   <div
@@ -1075,7 +1075,7 @@
               </div>
             </div>
 
-            <template x-for="cfg in filteredConfigs" :key="cfg.spdxId">
+            <template x-for="cfg in (mountedViews.configs ? filteredConfigs : [])" :key="cfg.spdxId">
               <div class="card group cursor-pointer" @click="toggleConfig(cfg.spdxId)">
                 <div class="flex items-start gap-3">
                   <!-- Icon -->
@@ -1572,7 +1572,7 @@
               </div>
 
               <div class="space-y-2">
-                <template x-for="build in filteredBuilds" :key="build.spdxId">
+                <template x-for="build in (mountedViews.build ? filteredBuilds : [])" :key="build.spdxId">
                   <div class="rounded-lg border border-slate-700 bg-slate-900/30 overflow-hidden">
                     <div
                       class="flex items-start gap-3 p-3 cursor-pointer hover:bg-slate-800/60 transition-colors"
@@ -1845,7 +1845,7 @@
             <div x-show="tools.length > 0">
               <h3 class="text-sm font-semibold text-white mb-3">Build Tools</h3>
               <div class="grid grid-cols-2 gap-4">
-                <template x-for="t in tools" :key="t.spdxId">
+                <template x-for="t in (mountedViews.build ? tools : [])" :key="t.spdxId">
                   <div class="card">
                     <div class="flex items-center gap-3 mb-2">
                       <div
@@ -1893,7 +1893,7 @@
             <div class="card">
               <h3 class="text-sm font-semibold text-white mb-3">Generated Artifacts</h3>
               <div class="space-y-1.5">
-                <template x-for="a in generatedArtifacts" :key="a">
+                <template x-for="a in (mountedViews.build ? generatedArtifacts : [])" :key="a">
                   <div
                     class="text-xs text-emerald-400 flex items-center gap-1.5 cursor-pointer hover:text-emerald-300"
                     @click="navigateTo(a)"
@@ -2285,27 +2285,44 @@
       x-transition.opacity
       class="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/70 backdrop-blur-sm"
     >
-      <div
-        class="flex items-center gap-3 bg-slate-800 border border-slate-700 rounded-xl px-5 py-4 shadow-2xl"
-      >
-        <svg class="w-5 h-5 text-blue-400 animate-spin" fill="none" viewBox="0 0 24 24">
-          <circle
-            class="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            stroke-width="4"
-          />
-          <path
-            class="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-          />
-        </svg>
-        <div class="text-sm text-slate-200">
-          Parsing SBOM…
-          <span class="block text-xs text-slate-400">Large SBOMs may take a few seconds</span>
+      <div class="w-80 bg-slate-800 border border-slate-700 rounded-xl px-5 py-4 shadow-2xl">
+        <div class="flex items-center gap-2.5 mb-3">
+          <svg
+            class="w-5 h-5 text-blue-400 animate-spin flex-shrink-0"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            />
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+            />
+          </svg>
+          <span class="text-sm text-slate-200" x-text="progressPhase || 'Parsing SBOM…'"></span>
+          <span
+            class="ml-auto text-xs font-medium text-slate-400 tabular-nums"
+            x-text="Math.round(progress * 100) + '%'"
+          ></span>
+        </div>
+        <div class="h-2 w-full bg-slate-700 rounded-full overflow-hidden">
+          <div
+            class="h-full bg-blue-500 rounded-full transition-[width] duration-150 ease-out"
+            :style="`width: ${Math.max(2, Math.round(progress * 100))}%`"
+          ></div>
+        </div>
+        <div class="mt-2 text-xs text-slate-400 h-4">
+          <span
+            x-show="progressEta != null"
+            x-text="progressEta >= 1 ? `about ${Math.ceil(progressEta)}s remaining` : 'almost done…'"
+          ></span>
         </div>
       </div>
     </div>
