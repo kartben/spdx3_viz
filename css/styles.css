@@ -254,6 +254,25 @@
   background: #14b8a6;
 }
 
+.stat-card.pink::after {
+  background: #ec4899;
+}
+
+.stat-card-link {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  width: 100%;
+  height: 100%;
+  font: inherit;
+  color: inherit;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: border-color 0.15s ease;
+}
+
 /* ==========================================================================
    Navigation Items
    Sidebar navigation with active states and indicator line
