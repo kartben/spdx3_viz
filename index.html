@@ -719,7 +719,12 @@
               x-for="pkg in (mountedViews.packages ? filteredPackages : [])"
               :key="pkg.spdxId"
             >
-              <div class="card">
+              <div
+                class="card"
+                data-nav-kind="package"
+                :data-nav-id="pkg.spdxId"
+                :class="isNavTarget('package', pkg.spdxId) && 'target-focus'"
+              >
                 <div class="flex items-center gap-3 cursor-pointer" @click="togglePkg(pkg.spdxId)">
                   <div
                     class="w-8 h-8 rounded-lg bg-blue-500/15 flex items-center justify-center flex-shrink-0"
@@ -889,7 +894,13 @@
               </div>
             </div>
             <template x-for="f in (mountedViews.files ? filteredFiles : [])" :key="f.spdxId">
-              <div class="card cursor-pointer" @click="toggleFile(f.spdxId)">
+              <div
+                class="card cursor-pointer"
+                data-nav-kind="file"
+                :data-nav-id="f.spdxId"
+                :class="isNavTarget('file', f.spdxId) && 'target-focus'"
+                @click="toggleFile(f.spdxId)"
+              >
                 <div class="flex items-center gap-3">
                   <div
                     class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
@@ -1087,7 +1098,12 @@
               </select>
             </div>
             <template x-for="lic in (mountedViews.licenses ? filteredLicenses : [])" :key="lic.id">
-              <div class="card">
+              <div
+                class="card"
+                data-nav-kind="license"
+                :data-nav-id="lic.id"
+                :class="isNavTarget('license', lic.id) && 'target-focus'"
+              >
                 <div class="flex items-center gap-3 cursor-pointer" @click="toggleLicense(lic.id)">
                   <div
                     class="w-8 h-8 rounded-lg bg-pink-500/15 flex items-center justify-center flex-shrink-0"
@@ -1233,7 +1249,13 @@
               x-for="cfg in (mountedViews.configs ? filteredConfigs : [])"
               :key="cfg.spdxId"
             >
-              <div class="card group cursor-pointer" @click="toggleConfig(cfg.spdxId)">
+              <div
+                class="card group cursor-pointer"
+                data-nav-kind="config"
+                :data-nav-id="cfg.spdxId"
+                :class="isNavTarget('config', cfg.spdxId) && 'target-focus'"
+                @click="toggleConfig(cfg.spdxId)"
+              >
                 <div class="flex items-start gap-3">
                   <!-- Icon -->
                   <div
@@ -1733,7 +1755,12 @@
                   x-for="build in (mountedViews.build ? filteredBuilds : [])"
                   :key="build.spdxId"
                 >
-                  <div class="rounded-lg border border-slate-700 bg-slate-900/30 overflow-hidden">
+                  <div
+                    class="rounded-lg border border-slate-700 bg-slate-900/30 overflow-hidden"
+                    data-nav-kind="build"
+                    :data-nav-id="build.spdxId"
+                    :class="isNavTarget('build', build.spdxId) && 'target-focus'"
+                  >
                     <div
                       class="flex items-start gap-3 p-3 cursor-pointer hover:bg-slate-800/60 transition-colors"
                       @click="toggleBuild(build.spdxId)"
