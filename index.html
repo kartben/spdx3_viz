@@ -814,6 +814,58 @@
                   x-collapse
                   class="mt-4 pt-4 border-t border-slate-700"
                 >
+                  <!-- Provenance: version, identifiers (PackageURL/CPE), source -->
+                  <div
+                    class="mb-4 sm:pl-11 flex flex-wrap items-center gap-2"
+                    x-show="isMeaningful(pkg.software_packageVersion) ||
+                            downloadUrl(pkg.software_downloadLocation) ||
+                            externalIdentifiers(pkg).length > 0"
+                  >
+                    <span
+                      x-show="isMeaningful(pkg.software_packageVersion)"
+                      class="badge bg-slate-700 text-slate-300 font-mono max-w-[18rem] truncate"
+                      :title="pkg.software_packageVersion"
+                    >
+                      <span class="text-slate-500 mr-1">ver</span
+                      ><span x-text="pkg.software_packageVersion"></span>
+                    </span>
+                    <template
+                      x-for="eid in externalIdentifiers(pkg)"
+                      :key="eid.type + eid.identifier"
+                    >
+                      <span
+                        class="badge bg-indigo-500/15 text-indigo-300 font-mono max-w-[20rem] truncate"
+                        :title="eid.identifier"
+                      >
+                        <span class="text-indigo-400/70 mr-1" x-text="eid.label"></span
+                        ><span x-text="eid.identifier"></span>
+                      </span>
+                    </template>
+                    <a
+                      x-show="downloadUrl(pkg.software_downloadLocation)"
+                      :href="downloadUrl(pkg.software_downloadLocation)"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      @click.stop
+                      class="text-xs text-sky-400 hover:text-sky-300 inline-flex items-center gap-1"
+                      :title="pkg.software_downloadLocation"
+                    >
+                      <svg
+                        class="w-3.5 h-3.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                        />
+                      </svg>
+                      <span>Source</span>
+                    </a>
+                  </div>
                   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <!-- Dependencies -->
                     <div class="sm:pl-11">
@@ -1986,6 +2038,20 @@
                         </div>
                       </div>
 
+                      <!-- Command (e.g. the Linux kernel records each step's
+                           shell command in `comment`) -->
+                      <div class="md:col-span-2 md:pl-11" x-show="isMeaningful(build.comment)">
+                        <div
+                          class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2"
+                        >
+                          Command
+                        </div>
+                        <code
+                          class="block text-xs text-slate-300 font-mono whitespace-pre-wrap break-all bg-slate-900/40 border border-slate-700 rounded-lg p-3 max-h-60 overflow-y-auto"
+                          x-text="build.comment"
+                        ></code>
+                      </div>
+
                       <div class="md:col-span-2 md:pl-11" x-show="buildParameterCount(build) > 0">
                         <div
                           class="text-xs font-semibold text-purple-400 uppercase tracking-wider mb-2"
@@ -2239,6 +2305,104 @@
             </div>
           </template>
 
+          <!-- Provenance & identifiers (packages, tools) -->
+          <div
+            x-show="isMeaningful(detailElement?.software_packageVersion) ||
+                    isMeaningful(detailElement?.software_downloadLocation) ||
+                    externalIdentifiers(detailElement).length > 0 ||
+                    isMeaningful(detailElement?.software_copyrightText) ||
+                    (isMeaningful(detailElement?.comment) && detailElement?.type !== 'build_Build' && detailElement?.software_primaryPurpose !== 'configuration')"
+            class="space-y-3"
+          >
+            <!-- Version -->
+            <div
+              x-show="isMeaningful(detailElement?.software_packageVersion)"
+              class="flex items-center gap-2"
+            >
+              <span class="text-xs text-slate-500 flex-shrink-0">Version</span>
+              <span
+                class="text-xs px-2 py-0.5 rounded-md bg-slate-700 text-slate-300 font-mono break-all"
+                x-text="detailElement?.software_packageVersion"
+              ></span>
+            </div>
+
+            <!-- Download / source location -->
+            <div x-show="isMeaningful(detailElement?.software_downloadLocation)">
+              <div class="text-xs text-slate-500 mb-1">Download location</div>
+              <a
+                x-show="downloadUrl(detailElement?.software_downloadLocation)"
+                :href="downloadUrl(detailElement?.software_downloadLocation)"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-xs text-sky-400 hover:text-sky-300 font-mono break-all"
+                x-text="detailElement?.software_downloadLocation"
+              ></a>
+              <code
+                x-show="!downloadUrl(detailElement?.software_downloadLocation)"
+                class="block text-xs text-slate-300 font-mono break-all"
+                x-text="detailElement?.software_downloadLocation"
+              ></code>
+            </div>
+
+            <!-- External identifiers (PackageURL, CPE, …) -->
+            <div x-show="externalIdentifiers(detailElement).length > 0">
+              <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                Identifiers
+              </div>
+              <div class="space-y-1.5">
+                <template
+                  x-for="eid in externalIdentifiers(detailElement)"
+                  :key="eid.type + eid.identifier"
+                >
+                  <div class="flex items-start gap-2 group">
+                    <span
+                      class="text-[10px] text-slate-500 uppercase tracking-wider w-20 pt-0.5 flex-shrink-0 text-right"
+                      x-text="eid.label"
+                    ></span>
+                    <code
+                      class="hash-text text-slate-300 break-all flex-1 leading-relaxed"
+                      x-text="eid.identifier"
+                    ></code>
+                    <button
+                      @click="copyHash(eid.identifier)"
+                      class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity flex-shrink-0 pt-0.5"
+                      title="Copy"
+                    >
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </template>
+              </div>
+            </div>
+
+            <!-- Copyright -->
+            <div x-show="isMeaningful(detailElement?.software_copyrightText)">
+              <div class="text-xs text-slate-500 mb-1">Copyright</div>
+              <div
+                class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-32 overflow-y-auto bg-slate-900/50 rounded px-2 py-1.5"
+                x-text="detailElement?.software_copyrightText"
+              ></div>
+            </div>
+
+            <!-- Free-form comment / note -->
+            <div
+              x-show="isMeaningful(detailElement?.comment) && detailElement?.type !== 'build_Build' && detailElement?.software_primaryPurpose !== 'configuration'"
+            >
+              <div class="text-xs text-slate-500 mb-1">Note</div>
+              <div
+                class="text-xs text-slate-300 whitespace-pre-wrap break-words bg-slate-900/50 rounded px-2 py-1.5"
+                x-text="detailElement?.comment"
+              ></div>
+            </div>
+          </div>
+
           <!-- Build Config Details (for configuration elements) -->
           <div
             x-show="detailElement?.software_primaryPurpose === 'configuration' || detailElement?.spdxId?.includes('build-config')"
@@ -2322,6 +2486,34 @@
                   x-text="detailElement?.build_buildType || ''"
                 ></div>
               </div>
+            </div>
+
+            <!-- Command (producers like the Linux kernel store the build
+                 command line in `comment`) -->
+            <div x-show="isMeaningful(detailElement?.comment)">
+              <div
+                class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center justify-between gap-2"
+              >
+                <span>Command</span>
+                <button
+                  @click="copyHash(detailElement?.comment)"
+                  class="text-slate-500 hover:text-white transition-colors flex-shrink-0"
+                  title="Copy"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <code
+                class="block text-xs text-slate-300 font-mono whitespace-pre-wrap break-all bg-slate-900/50 rounded px-2 py-1.5 max-h-48 overflow-y-auto"
+                x-text="detailElement?.comment"
+              ></code>
             </div>
 
             <div x-show="(detailElement?.build_environment || []).length > 0">

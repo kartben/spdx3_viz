@@ -18,6 +18,9 @@ import {
   parseBuildParameters as parseBuildParameterGroups,
   getToolUsageCount,
   getToolPath,
+  getExternalIdentifiers,
+  isMeaningfulValue,
+  normalizeUrl,
   copyToClipboard
 } from './utils.js';
 import {
@@ -677,6 +680,15 @@ export function spdxApp() {
     },
     toolPath(tool) {
       return getToolPath(tool);
+    },
+    externalIdentifiers(element) {
+      return getExternalIdentifiers(element);
+    },
+    isMeaningful(value) {
+      return isMeaningfulValue(value);
+    },
+    downloadUrl(value) {
+      return normalizeUrl(value);
     },
     relColor(type) {
       return getRelationshipColor(type);

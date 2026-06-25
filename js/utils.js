@@ -497,6 +497,82 @@ export function getToolPath(tool) {
 }
 
 /* ==========================================================================
+   Provenance / Identifier Helpers
+   Surface package & tool metadata (version, download, PackageURL/CPE, …)
+   that producers like the Linux kernel and Zephyr emit but is easy to hide.
+   ========================================================================== */
+
+// Sentinel values SPDX producers use to mean "no data". Treat them as empty so
+// we don't render "NOASSERTION" rows all over the UI.
+const NO_ASSERTION = /^(noassertion|none)$/i;
+
+/**
+ * True when a value carries real information (not empty, not a NOASSERTION/NONE
+ * sentinel).
+ *
+ * @param {*} value
+ * @returns {boolean}
+ */
+export function isMeaningfulValue(value) {
+  if (value == null) return false;
+  const s = String(value).trim();
+  return s !== '' && !NO_ASSERTION.test(s);
+}
+
+// Human-readable labels for SPDX externalIdentifierType values.
+const EXTERNAL_ID_LABELS = {
+  packageUrl: 'PackageURL',
+  cpe22: 'CPE 2.2',
+  cpe23: 'CPE 2.3',
+  gitoid: 'gitoid',
+  swid: 'SWID',
+  swhid: 'SWHID',
+  urlScheme: 'URL',
+  securityOther: 'Security ref',
+  other: 'Reference'
+};
+
+/**
+ * Normalizes a download/VCS location into an href when it points at the web.
+ * Strips a leading `git+` (SPDX VCS URLs like `git+https://…`) so the link is
+ * directly followable; returns '' for non-web or NOASSERTION locations.
+ *
+ * @param {string} value
+ * @returns {string} An http(s) URL, or '' when not linkable
+ */
+export function normalizeUrl(value) {
+  if (!isMeaningfulValue(value)) return '';
+  const stripped = String(value)
+    .trim()
+    .replace(/^git\+/, '');
+  return /^https?:\/\//i.test(stripped) ? stripped : '';
+}
+
+/**
+ * Extracts displayable external identifiers (PackageURL, CPE, gitoid, …) from a
+ * package or tool element.
+ *
+ * @param {Object} element - The SPDX element
+ * @returns {Array<{type: string, label: string, identifier: string, isUrl: boolean}>}
+ */
+export function getExternalIdentifiers(element) {
+  const ids = element?.externalIdentifier;
+  if (!Array.isArray(ids)) return [];
+  return ids
+    .filter((id) => id && isMeaningfulValue(id.identifier))
+    .map((id) => {
+      const type = id.externalIdentifierType || 'other';
+      const identifier = String(id.identifier).trim();
+      return {
+        type,
+        label: EXTERNAL_ID_LABELS[type] || type,
+        identifier,
+        isUrl: /^https?:\/\//i.test(identifier)
+      };
+    });
+}
+
+/* ==========================================================================
    Clipboard Helper
    Function for copying text to clipboard
    ========================================================================== */
