@@ -779,9 +779,9 @@
                   x-collapse
                   class="mt-4 pt-4 border-t border-slate-700"
                 >
-                  <div class="grid grid-cols-2 gap-4">
+                  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <!-- Dependencies -->
-                    <div>
+                    <div class="sm:pl-11">
                       <div
                         class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2"
                       >
@@ -832,7 +832,7 @@
                     </div>
                   </div>
                   <!-- Contained files -->
-                  <div class="mt-4" x-show="(containedFiles(pkg.spdxId)||[]).length > 0">
+                  <div class="mt-4 sm:pl-11" x-show="(containedFiles(pkg.spdxId)||[]).length > 0">
                     <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
                       Files
                     </div>
@@ -849,7 +849,7 @@
                     </div>
                   </div>
                   <!-- Distribution artifacts -->
-                  <div class="mt-4" x-show="distributionArtifacts(pkg.spdxId).length > 0">
+                  <div class="mt-4 sm:pl-11" x-show="distributionArtifacts(pkg.spdxId).length > 0">
                     <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
                       Distribution Artifacts
                     </div>
@@ -939,7 +939,7 @@
                 <div
                   x-show="expandedFile === f.spdxId"
                   x-collapse
-                  class="mt-4 pt-4 border-t border-slate-700 space-y-3"
+                  class="mt-4 pt-4 border-t border-slate-700 space-y-3 sm:pl-11"
                   @click.stop
                 >
                   <!-- Hashes -->
@@ -1149,9 +1149,9 @@
                   x-collapse
                   class="mt-4 pt-4 border-t border-slate-700"
                 >
-                  <div class="grid grid-cols-2 gap-4">
+                  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <!-- Declared by -->
-                    <div>
+                    <div class="sm:pl-11">
                       <div
                         class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2"
                       >
@@ -1872,9 +1872,36 @@
                     <div
                       x-show="expandedBuild === build.spdxId"
                       x-collapse
-                      class="border-t border-slate-700 p-3 grid grid-cols-2 gap-4"
+                      class="border-t border-slate-700 p-3 grid grid-cols-1 gap-4 md:grid-cols-2"
                       @click.stop
                     >
+                      <div class="md:pl-11">
+                        <div
+                          class="text-xs font-semibold text-orange-400 uppercase tracking-wider mb-2"
+                          x-text="'Inputs (' + formatCount(buildInputs(build.spdxId).length) + ')'"
+                        ></div>
+                        <div
+                          class="space-y-1 max-h-72 overflow-y-auto pr-1"
+                          x-show="buildInputs(build.spdxId).length > 0"
+                        >
+                          <template x-for="input in buildInputs(build.spdxId)" :key="input">
+                            <div
+                              class="text-xs text-orange-400 hover:text-orange-300 cursor-pointer flex items-center gap-1.5"
+                              @click="navigateTo(input)"
+                            >
+                              <span class="w-1.5 h-1.5 rounded-full bg-orange-500/50"></span>
+                              <span class="truncate" x-text="relTargetDisplayName(input)"></span>
+                            </div>
+                          </template>
+                        </div>
+                        <div
+                          x-show="buildInputs(build.spdxId).length === 0"
+                          class="text-xs text-slate-600 italic"
+                        >
+                          None
+                        </div>
+                      </div>
+
                       <div>
                         <div
                           class="text-xs font-semibold text-green-400 uppercase tracking-wider mb-2"
@@ -1902,34 +1929,7 @@
                         </div>
                       </div>
 
-                      <div>
-                        <div
-                          class="text-xs font-semibold text-orange-400 uppercase tracking-wider mb-2"
-                          x-text="'Inputs (' + formatCount(buildInputs(build.spdxId).length) + ')'"
-                        ></div>
-                        <div
-                          class="space-y-1 max-h-72 overflow-y-auto pr-1"
-                          x-show="buildInputs(build.spdxId).length > 0"
-                        >
-                          <template x-for="input in buildInputs(build.spdxId)" :key="input">
-                            <div
-                              class="text-xs text-orange-400 hover:text-orange-300 cursor-pointer flex items-center gap-1.5"
-                              @click="navigateTo(input)"
-                            >
-                              <span class="w-1.5 h-1.5 rounded-full bg-orange-500/50"></span>
-                              <span class="truncate" x-text="relTargetDisplayName(input)"></span>
-                            </div>
-                          </template>
-                        </div>
-                        <div
-                          x-show="buildInputs(build.spdxId).length === 0"
-                          class="text-xs text-slate-600 italic"
-                        >
-                          None
-                        </div>
-                      </div>
-
-                      <div class="col-span-2" x-show="buildParameterCount(build) > 0">
+                      <div class="md:col-span-2 md:pl-11" x-show="buildParameterCount(build) > 0">
                         <div
                           class="text-xs font-semibold text-purple-400 uppercase tracking-wider mb-2"
                           x-text="'Parameters (' + formatCount(buildParameterCount(build)) + ')'"
