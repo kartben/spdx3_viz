@@ -188,6 +188,8 @@ const VIEW_ICONS = {
     '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>',
   files:
     '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>',
+  licenses:
+    '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>',
   configs:
     '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>',
   build:
@@ -206,6 +208,7 @@ export function createViews() {
     { id: 'graph', label: 'Graph', icon: VIEW_ICONS.graph, count: null },
     { id: 'packages', label: 'Packages', icon: VIEW_ICONS.packages, count: null },
     { id: 'files', label: 'Files', icon: VIEW_ICONS.files, count: null },
+    { id: 'licenses', label: 'Licenses', icon: VIEW_ICONS.licenses, count: null },
     { id: 'configs', label: 'Build Configs', icon: VIEW_ICONS.configs, count: null },
     { id: 'build', label: 'Build', icon: VIEW_ICONS.build, count: null },
     { id: 'dependencies', label: 'Dependencies', icon: VIEW_ICONS.dependencies, count: null }
@@ -273,6 +276,27 @@ export const RELATIONSHIP_LABELS = {
   'hasDeclaredLicense:out': 'Declared license',
   'hasDeclaredLicense:in': 'Licensed (declared)'
 };
+
+/**
+ * Fields shown prominently at the top of the detail panel (before relationships).
+ * variant: 'badge' — compact label + pill; 'hero' — large highlighted block
+ *
+ * @constant {Array<{prop: string, label: string, types?: string[], variant?: string}>}
+ */
+export const DETAIL_PROMOTED_FIELDS = [
+  {
+    prop: 'simplelicensing_licenseExpression',
+    label: 'License expression',
+    types: ['simplelicensing_LicenseExpression'],
+    variant: 'hero'
+  },
+  {
+    prop: 'software_primaryPurpose',
+    label: 'Purpose',
+    types: ['software_File', 'software_Package'],
+    variant: 'badge'
+  }
+];
 
 /**
  * Sort order for relationship groups in the detail panel
