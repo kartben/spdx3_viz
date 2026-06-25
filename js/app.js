@@ -45,6 +45,13 @@ let parserWorker = null;
 let parseReqSeq = 0;
 let latestParseReqId = 0;
 
+// Memo for the filteredBuilds getter. Sorting ~1k builds (the default sort
+// derives a display name per item) is wasted work when it re-runs on unrelated
+// reactive changes (e.g. expanding a card). Cached on the inputs that actually
+// affect the result; kept off the reactive state so it isn't proxied.
+let filteredBuildsCacheKey = null;
+let filteredBuildsCacheVal = [];
+
 function getParserWorker() {
   if (!parserWorker) {
     parserWorker = new Worker(new URL('./parser.worker.js', import.meta.url), { type: 'module' });
@@ -262,9 +269,17 @@ export function spdxApp() {
     },
 
     get filteredBuilds() {
-      let buildList = this.builds;
-      if (this.buildSearch) {
-        const q = this.buildSearch.toLowerCase();
+      // Read the reactive inputs up front so Alpine tracks them, then short-
+      // circuit to the cached result when none of them changed.
+      const search = this.buildSearch;
+      const sort = this.buildSort;
+      const builds = this.builds;
+      const key = `${builds.length}|${search}|${sort}`;
+      if (key === filteredBuildsCacheKey) return filteredBuildsCacheVal;
+
+      let buildList = builds;
+      if (search) {
+        const q = search.toLowerCase();
         buildList = buildList.filter((build) => {
           const searchable = [
             build.spdxId,
@@ -284,11 +299,11 @@ export function spdxApp() {
       }
 
       const sorted = [...buildList];
-      if (this.buildSort === 'inputs') {
+      if (sort === 'inputs') {
         sorted.sort(
           (a, b) => this.buildInputs(b.spdxId).length - this.buildInputs(a.spdxId).length
         );
-      } else if (this.buildSort === 'buildId') {
+      } else if (sort === 'buildId') {
         sorted.sort((a, b) =>
           (a.build_buildId || a.spdxId || '').localeCompare(b.build_buildId || b.spdxId || '')
         );
@@ -299,6 +314,9 @@ export function spdxApp() {
           })
         );
       }
+
+      filteredBuildsCacheKey = key;
+      filteredBuildsCacheVal = sorted;
       return sorted;
     },
 
@@ -524,6 +542,7 @@ export function spdxApp() {
         this.views.find((v) => v.id === 'build').count = this.builds.length;
         this.treeRoot = findBestTreeRoot(this.packages, this.depIndex);
         this.expandedClusters = new Set(); // fresh data: start fully collapsed
+        filteredBuildsCacheKey = null; // invalidate the build sort memo for new data
 
         // Re-render D3 views if currently active (they don't auto-update from
         // Alpine reactivity).
