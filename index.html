@@ -97,6 +97,56 @@
             />
           </label>
         </div>
+
+        <!-- BUNDLED DEMO SBOMs -->
+        <div x-show="samples.length" class="mt-8">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="flex-1 h-px bg-slate-700/50"></div>
+            <span class="text-xs text-slate-500 flex-shrink-0">or try a bundled demo 🪁</span>
+            <div class="flex-1 h-px bg-slate-700/50"></div>
+          </div>
+          <div class="grid gap-3" :class="samples.length > 1 ? 'grid-cols-2' : 'grid-cols-1'">
+            <template x-for="s in samples" :key="s.id">
+              <button
+                @click="loadSample(s)"
+                :disabled="loadingSample"
+                class="group text-left p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 hover:border-blue-500/50 hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-wait"
+              >
+                <div class="flex items-center gap-2 mb-1.5">
+                  <span class="text-xl" x-text="s.emoji"></span>
+                  <span class="font-medium text-white text-sm" x-text="s.name"></span>
+                  <svg
+                    x-show="loadingSample === s.id"
+                    class="w-4 h-4 ml-auto animate-spin text-blue-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      class="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-width="4"
+                    ></circle>
+                    <path
+                      class="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    ></path>
+                  </svg>
+                </div>
+                <p class="text-xs text-slate-400 leading-snug" x-text="s.description"></p>
+                <p class="text-[10px] text-slate-500 mt-1.5" x-text="s.files.length + ' files'"></p>
+              </button>
+            </template>
+          </div>
+          <p
+            x-show="sampleError"
+            class="text-xs text-red-400 mt-3 text-center"
+            x-text="sampleError"
+          ></p>
+        </div>
       </div>
     </div>
 

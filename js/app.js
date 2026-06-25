@@ -38,6 +38,9 @@ export function spdxApp() {
     // State
     dataLoaded: false,
     loadedFiles: [], // [{name, data}] — one entry per loaded file
+    samples: [], // bundled demo sets, loaded from samples/samples.json
+    loadingSample: null, // id of the sample currently being fetched
+    sampleError: '',
     currentView: 'dashboard',
     searchQuery: '',
     detailElement: null,
@@ -223,6 +226,36 @@ export function spdxApp() {
         if (v === 'graph') this.$nextTick(() => this.renderGraph());
         if (v === 'dependencies') this.$nextTick(() => this.renderDepTree());
       });
+      this.loadSampleManifest();
+    },
+
+    // Bundled demo SBOMs — listed in samples/samples.json, loaded over fetch
+    async loadSampleManifest() {
+      try {
+        const res = await fetch('samples/samples.json');
+        if (res.ok) this.samples = await res.json();
+      } catch {
+        /* demos just won't show if the manifest is missing */
+      }
+    },
+    async loadSample(sample) {
+      this.loadingSample = sample.id;
+      this.sampleError = '';
+      try {
+        const loaded = [];
+        for (const fname of sample.files) {
+          const res = await fetch(`${sample.dir}/${fname}`);
+          if (!res.ok) throw new Error(`${fname} (HTTP ${res.status})`);
+          loaded.push({ name: fname, data: await res.json() });
+        }
+        this.loadedFiles = loaded; // replace — the drop zone starts empty
+        this.rebuildFromLoadedFiles(); // existing merge + parse path
+        this.dataLoaded = true;
+      } catch (err) {
+        this.sampleError = `Could not load ${sample.name}: ${err.message}`;
+      } finally {
+        this.loadingSample = null;
+      }
     },
 
     // File handling — supports multiple files
