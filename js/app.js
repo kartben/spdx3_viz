@@ -52,7 +52,11 @@ function getParserWorker() {
    overhead to every render. `__v_skip` is the flag @vue/reactivity checks to
    skip an object; we set it non-enumerable so it never leaks into iteration. */
 function markRaw(value) {
-  if (value && typeof value === 'object' && !Object.prototype.hasOwnProperty.call(value, '__v_skip')) {
+  if (
+    value &&
+    typeof value === 'object' &&
+    !Object.prototype.hasOwnProperty.call(value, '__v_skip')
+  ) {
     Object.defineProperty(value, '__v_skip', { value: true, configurable: true });
   }
   return value;
