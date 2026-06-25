@@ -834,11 +834,34 @@
                       :key="eid.type + eid.identifier"
                     >
                       <span
-                        class="badge bg-indigo-500/15 text-indigo-300 font-mono max-w-[20rem] truncate"
+                        class="badge bg-indigo-500/15 text-indigo-300 font-mono max-w-[20rem] inline-flex items-center gap-1"
                         :title="eid.identifier"
                       >
-                        <span class="text-indigo-400/70 mr-1" x-text="eid.label"></span
-                        ><span x-text="eid.identifier"></span>
+                        <span class="text-indigo-400/70 flex-shrink-0" x-text="eid.label"></span>
+                        <span class="truncate" x-text="eid.identifier"></span>
+                        <a
+                          x-show="vulnLookup(eid)"
+                          :href="vulnLookup(eid)?.url"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          @click.stop
+                          :title="vulnLookup(eid)?.label"
+                          class="text-rose-300 hover:text-rose-200 flex-shrink-0"
+                        >
+                          <svg
+                            class="w-3.5 h-3.5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                            />
+                          </svg>
+                        </a>
                       </span>
                     </template>
                     <a
@@ -2363,6 +2386,28 @@
                       class="hash-text text-slate-300 break-all flex-1 leading-relaxed"
                       x-text="eid.identifier"
                     ></code>
+                    <a
+                      x-show="vulnLookup(eid)"
+                      :href="vulnLookup(eid)?.url"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      :title="vulnLookup(eid)?.label"
+                      class="text-rose-400/70 hover:text-rose-300 transition-colors flex-shrink-0 pt-0.5"
+                    >
+                      <svg
+                        class="w-3.5 h-3.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                        />
+                      </svg>
+                    </a>
                     <button
                       @click="copyHash(eid.identifier)"
                       class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity flex-shrink-0 pt-0.5"

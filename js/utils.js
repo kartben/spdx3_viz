@@ -572,6 +572,35 @@ export function getExternalIdentifiers(element) {
     });
 }
 
+/**
+ * Builds a vulnerability-database lookup link for an external identifier, when
+ * one applies. Only CPEs (cpe22/cpe23) are linked — to the NVD vulnerability
+ * search filtered by the CPE name, which lists the matching CVE records.
+ * Returns null for every other identifier type.
+ *
+ * @param {{type: string, identifier: string}} eid
+ * @returns {{url: string, label: string}|null}
+ */
+export function getVulnerabilityLookup(eid) {
+  if (!eid || !isMeaningfulValue(eid.identifier)) return null;
+
+  if (eid.type === 'cpe22' || eid.type === 'cpe23') {
+    // NVD's search is a client-side SPA: the query lives in the URL fragment and
+    // expects the CPE name unescaped (literal colons/asterisks), matching the
+    // links the site itself produces.
+    const cpeName = String(eid.identifier).trim();
+    return {
+      url:
+        'https://nvd.nist.gov/vuln/search#/nvd/home?cpeFilterMode=cpe&cpeName=' +
+        cpeName +
+        '&resultType=records',
+      label: 'Search NVD for CVEs'
+    };
+  }
+
+  return null;
+}
+
 /* ==========================================================================
    Clipboard Helper
    Function for copying text to clipboard

@@ -19,6 +19,7 @@ import {
   getToolUsageCount,
   getToolPath,
   getExternalIdentifiers,
+  getVulnerabilityLookup,
   isMeaningfulValue,
   normalizeUrl,
   copyToClipboard
@@ -683,6 +684,9 @@ export function spdxApp() {
     },
     externalIdentifiers(element) {
       return getExternalIdentifiers(element);
+    },
+    vulnLookup(eid) {
+      return getVulnerabilityLookup(eid);
     },
     isMeaningful(value) {
       return isMeaningfulValue(value);
