@@ -17,7 +17,6 @@ import {
   parseCompileFlags as parseBuildConfigFlags,
   parseBuildParameters as parseBuildParameterGroups,
   getToolUsageCount,
-  getToolPath,
   getExternalIdentifiers,
   getVulnerabilityLookup,
   isMeaningfulValue,
@@ -692,9 +691,6 @@ export function spdxApp() {
     },
     toolUsageCount(spdxId) {
       return getToolUsageCount(spdxId, this.relationships);
-    },
-    toolPath(tool) {
-      return getToolPath(tool);
     },
     externalIdentifiers(element) {
       return getExternalIdentifiers(element);

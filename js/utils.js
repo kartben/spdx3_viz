@@ -483,19 +483,6 @@ export function getToolUsageCount(toolSpdxId, relationships) {
   return count;
 }
 
-/**
- * Gets the file path for a tool from its external identifiers
- *
- * @param {Object} tool - The tool element
- * @returns {string} Tool path or empty string
- */
-export function getToolPath(tool) {
-  if (tool?.externalIdentifier?.length) {
-    return tool.externalIdentifier[0].identifier || '';
-  }
-  return '';
-}
-
 /* ==========================================================================
    Provenance / Identifier Helpers
    Surface package & tool metadata (version, download, PackageURL/CPE, …)
@@ -529,7 +516,7 @@ const EXTERNAL_ID_LABELS = {
   swhid: 'SWHID',
   urlScheme: 'URL',
   securityOther: 'Security ref',
-  other: 'Reference'
+  other: 'Other'
 };
 
 /**
