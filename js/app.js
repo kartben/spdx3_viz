@@ -896,6 +896,8 @@ export function spdxApp() {
         }
       } else if (el.type === 'build_Build') {
         this.navigateToBuild(spdxId);
+      } else if (el.type === 'Tool') {
+        this.navigateToTool(spdxId);
       } else if (el.type === 'simplelicensing_LicenseExpression') {
         this.navigateToLicense(spdxId);
       }
@@ -930,6 +932,11 @@ export function spdxApp() {
       this.switchView('licenses');
       this.expandedLicense = spdxId;
       this.scrollToNavTarget('license', spdxId);
+    },
+    navigateToTool(spdxId) {
+      // Tools live in the Build Tools grid at the bottom of the build view.
+      this.switchView('build');
+      this.scrollToNavTarget('tool', spdxId);
     },
     spdxLicenseIdFor(licenseRef) {
       return extractSpdxLicenseId(licenseRef, this.elementMap);

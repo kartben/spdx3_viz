@@ -1956,6 +1956,11 @@
                             class="badge bg-teal-500/15 text-teal-400"
                             x-text="formatCount((build.build_environment || []).length) + ' env'"
                           ></span>
+                          <span
+                            x-show="fileTools(build.spdxId).length > 0"
+                            class="badge bg-amber-500/15 text-amber-400"
+                            x-text="formatCount(fileTools(build.spdxId).length) + ' tools'"
+                          ></span>
                         </div>
                         <div
                           class="flex flex-wrap items-center gap-1.5 mt-2"
@@ -2017,6 +2022,24 @@
                             x-show="buildParameterCount(build) > 3"
                             class="text-xs text-slate-500"
                             x-text="'+' + formatCount(buildParameterCount(build) - 3) + ' more'"
+                          ></span>
+                        </div>
+                        <div
+                          class="flex flex-wrap items-center gap-1.5 mt-1"
+                          x-show="fileTools(build.spdxId).length > 0"
+                        >
+                          <span class="text-xs text-slate-500">Tools:</span>
+                          <template x-for="tool in fileTools(build.spdxId).slice(0, 4)" :key="tool">
+                            <button
+                              class="text-xs text-amber-400 hover:text-amber-300 truncate max-w-44"
+                              @click.stop="navigateTo(tool)"
+                              x-text="relTargetDisplayName(tool)"
+                            ></button>
+                          </template>
+                          <span
+                            x-show="fileTools(build.spdxId).length > 4"
+                            class="text-xs text-slate-500"
+                            x-text="'+' + formatCount(fileTools(build.spdxId).length - 4) + ' more'"
                           ></span>
                         </div>
                       </div>
@@ -2096,6 +2119,27 @@
                             class="text-xs text-slate-600 italic"
                           >
                             None
+                          </div>
+                        </div>
+
+                        <!-- Tools used (usesTool). Clicking scrolls to the
+                             tool's card in the Build Tools grid below. -->
+                        <div
+                          class="md:col-span-2 md:pl-11"
+                          x-show="fileTools(build.spdxId).length > 0"
+                        >
+                          <div
+                            class="text-xs font-semibold text-amber-400 uppercase tracking-wider mb-2"
+                            x-text="'Tools (' + formatCount(fileTools(build.spdxId).length) + ')'"
+                          ></div>
+                          <div class="flex flex-wrap gap-1.5">
+                            <template x-for="tool in fileTools(build.spdxId)" :key="tool">
+                              <button
+                                class="badge bg-amber-500/15 text-amber-400 hover:bg-amber-500/25"
+                                @click="navigateTo(tool)"
+                                x-text="relTargetDisplayName(tool)"
+                              ></button>
+                            </template>
                           </div>
                         </div>
 
@@ -2222,7 +2266,12 @@
               <h3 class="text-sm font-semibold text-white mb-3">Build Tools</h3>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <template x-for="t in (mountedViews.build ? tools : [])" :key="t.spdxId">
-                  <div class="card">
+                  <div
+                    class="card"
+                    data-nav-kind="tool"
+                    :data-nav-id="t.spdxId"
+                    :class="isNavTarget('tool', t.spdxId) && 'target-focus'"
+                  >
                     <div class="flex items-center gap-3 mb-2">
                       <div
                         class="w-8 h-8 rounded-lg bg-amber-500/15 flex items-center justify-center flex-shrink-0"
