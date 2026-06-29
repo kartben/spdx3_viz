@@ -42,6 +42,8 @@ jobs:
         run: |
           mkdir -p _site
           cp index.html _site/
+          cp social.png _site/
+          cp social@2x.png _site/
           cp -R css js samples _site/
 
       - name: Configure Pages
