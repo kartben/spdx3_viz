@@ -96,6 +96,14 @@ export const accessorsMixin = {
     const ext = getFileExtension(file?.name || '').toLowerCase();
     return ['.c', '.cpp', '.cc', '.cxx', '.s'].includes(ext);
   },
+  isUnlinkedSource(fileId) {
+    const file = this.elementMap.get(fileId);
+    return this.isCompiledSource(file) && this.snippetsOf(fileId).length === 0;
+  },
+  shouldShowFileSource(fileId) {
+    if (this.snippetsOf(fileId).length > 0) return true;
+    return this.isUnlinkedSource(fileId) && !!this.fileSourceIndex.get(fileId);
+  },
   async loadFileSource(fileId) {
     if (this.fileSourceCache[fileId]) return;
     const url = this.fileSourceIndex.get(fileId);
@@ -118,7 +126,7 @@ export const accessorsMixin = {
     const ext = getFileExtension(fileName || '');
     const rawLines = content.split('\n');
     const snippetList = this.snippetsOf(fileId);
-    if (!snippetList.length) return { windows: [] };
+    const unlinked = !snippetList.length;
 
     // Syntax-highlight full content, then split by line
     let highlightedLines;
@@ -141,8 +149,34 @@ export const accessorsMixin = {
       );
     }
 
-    // Build a Set of covered line numbers
     const coveredLines = new Set();
+    const totalLines = rawLines.length;
+    const sliceCtx = { _allHighlightedLines: highlightedLines, _coveredLines: coveredLines };
+
+    if (unlinked) {
+      const PREVIEW = 50;
+      const endLine = Math.min(PREVIEW, totalLines);
+      const windows =
+        endLine > 0
+          ? [
+              {
+                startLine: 1,
+                endLine,
+                gapBefore: false,
+                gapAfter: endLine < totalLines,
+                lines: this._sliceLines(sliceCtx, 1, endLine)
+              }
+            ]
+          : [];
+      return {
+        windows,
+        _allHighlightedLines: highlightedLines,
+        _coveredLines: coveredLines,
+        _totalLines: totalLines,
+        unlinked: true
+      };
+    }
+
     for (const s of snippetList) {
       const lr = s.software_lineRange;
       if (!lr) continue;
@@ -156,7 +190,7 @@ export const accessorsMixin = {
       const lr = s.software_lineRange;
       if (!lr) continue;
       const wStart = Math.max(1, lr.beginIntegerRange - CONTEXT);
-      const wEnd = Math.min(rawLines.length, lr.endIntegerRange + CONTEXT);
+      const wEnd = Math.min(totalLines, lr.endIntegerRange + CONTEXT);
       const last = rawWindows[rawWindows.length - 1];
       if (last && wStart <= last.end + 2) {
         last.end = Math.max(last.end, wEnd);
@@ -165,17 +199,12 @@ export const accessorsMixin = {
       }
     }
 
-    const totalLines = rawLines.length;
     const windows = rawWindows.map((w) => ({
       startLine: w.start,
       endLine: w.end,
       gapBefore: w.start > 1,
       gapAfter: w.end < totalLines,
-      lines: this._sliceLines(
-        { _allHighlightedLines: highlightedLines, _coveredLines: coveredLines },
-        w.start,
-        w.end
-      )
+      lines: this._sliceLines(sliceCtx, w.start, w.end)
     }));
 
     return {
@@ -207,7 +236,9 @@ export const accessorsMixin = {
     const win = cache?.windows?.[wi];
     if (!win) return 0;
     const nextStart =
-      wi < cache.windows.length - 1 ? cache.windows[wi + 1].startLine : (cache._totalLines ?? 0) + 1;
+      wi < cache.windows.length - 1
+        ? cache.windows[wi + 1].startLine
+        : (cache._totalLines ?? 0) + 1;
     return nextStart - win.endLine - 1;
   },
   expandWindow(fileId, wi, direction) {

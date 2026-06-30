@@ -181,7 +181,7 @@ export const navigationMixin = {
   toggleFile(id) {
     this.expandedFile = this.expandedFile === id ? null : id;
     this._scheduleNavPush();
-    if (this.expandedFile === id && this.snippetsOf(id).length > 0) {
+    if (this.expandedFile === id && this.shouldShowFileSource(id)) {
       this.loadFileSource(id);
     }
   },
@@ -279,6 +279,9 @@ export const navigationMixin = {
     this.fileTypeFilter = '';
     this.switchView('files');
     this.expandedFile = spdxId;
+    if (this.shouldShowFileSource(spdxId)) {
+      this.loadFileSource(spdxId);
+    }
     this.scrollToNavTarget('file', spdxId);
   },
   navigateToBuild(spdxId) {

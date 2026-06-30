@@ -547,6 +547,10 @@
   opacity: 0.45;
 }
 
+.source-viewer.unlinked .sv-line {
+  opacity: 0.38;
+}
+
 .source-viewer .sv-line.covered {
   background: rgba(34, 197, 94, 0.09);
   border-left-color: rgba(34, 197, 94, 0.5);
