@@ -29,12 +29,12 @@
         "zephyr:tools/west-spdx",
         "zephyr:packages/app-sources",
         "zephyr:files/File-main.c",
-        "zephyr:relationships/1139",
+        "zephyr:relationships/391",
         "https://spdx.org/licenses/Apache-2.0",
-        "zephyr:relationships/1419",
-        "zephyr:relationships/1420",
-        "zephyr:relationships/1728",
-        "zephyr:relationships/1729",
+        "zephyr:relationships/625",
+        "zephyr:relationships/626",
+        "zephyr:relationships/905",
+        "zephyr:relationships/906",
         "https://spdx.org/licenses/CC0-1.0"
       ],
       "profileConformance": [
@@ -49,7 +49,7 @@
       "namespaceMap": [
         {
           "type": "NamespaceMap",
-          "namespace": "http://spdx.org/spdxdocs/zephyr-f9d80562-859a-4431-81b9-fe7053816f03/",
+          "namespace": "http://spdx.org/spdxdocs/zephyr-5fc46f00-b6e7-4222-992c-73bf887649b4/",
           "prefix": "zephyr"
         }
       ]
@@ -57,7 +57,7 @@
     {
       "type": "CreationInfo",
       "@id": "zephyr:creationinfo",
-      "created": "2026-06-30T13:07:22Z",
+      "created": "2026-06-30T14:03:11Z",
       "createdBy": [
         "zephyr:agents/west-spdx-agent"
       ],
@@ -75,15 +75,15 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "bfe2026bb7a51c6edee0d6cf9eb8571d904b8915"
+          "hashValue": "a8e19244e7e36faafb545c6cc201b082e4ed531c"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "f3298c7defe2a81bec13fa78b89b9b5b16b021b418931f1803873c86cc997ec1"
+          "hashValue": "441f01eaf3bb6fb71614fad7264c5aaab135078ce3a73ae8c9d6889de5271d6b"
         }
       ],
-      "software_copyrightText": "<text>\n * Copyright (c) 2023 Fabian Blatz <fabianblatz@gmail.com>\n</text>",
+      "software_copyrightText": "<text>\n * Copyright (c) 2012-2014 Wind River Systems, Inc.\n</text>",
       "software_primaryPurpose": "file",
       "software_fileKind": "file"
     },
@@ -98,7 +98,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/1139",
+      "spdxId": "zephyr:relationships/391",
       "creationInfo": "zephyr:creationinfo",
       "from": "zephyr:packages/app-sources",
       "relationshipType": "contains",
@@ -108,7 +108,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/1419",
+      "spdxId": "zephyr:relationships/625",
       "creationInfo": "zephyr:creationinfo",
       "from": "zephyr:packages/app-sources",
       "relationshipType": "hasConcludedLicense",
@@ -118,7 +118,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/1420",
+      "spdxId": "zephyr:relationships/626",
       "creationInfo": "zephyr:creationinfo",
       "from": "zephyr:packages/app-sources",
       "relationshipType": "hasDeclaredLicense",
@@ -128,7 +128,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/1728",
+      "spdxId": "zephyr:relationships/905",
       "creationInfo": "zephyr:creationinfo",
       "from": "zephyr:files/File-main.c",
       "relationshipType": "hasConcludedLicense",
@@ -138,7 +138,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/1729",
+      "spdxId": "zephyr:relationships/906",
       "creationInfo": "zephyr:creationinfo",
       "from": "zephyr:files/File-main.c",
       "relationshipType": "hasDeclaredLicense",

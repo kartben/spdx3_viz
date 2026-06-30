@@ -11,6 +11,13 @@ import {
 // code from it survived into the final binary — the linker dead-stripped it.
 // We surface these "not linked" files distinctively in the graph.
 const COMPILED_SOURCE_EXTS = new Set(['.c', '.cpp', '.cc', '.cxx', '.s']);
+// Fraction of their normal alpha that edges touching a "not linked" node keep,
+// so a dead-stripped branch fades out (shafts, arrowheads, and animated flow).
+const WASH_EDGE = 0.3;
+// The animated flow has a high base alpha (0.95), so washing it by WASH_EDGE
+// still reads as bright. Washed flow uses this faint absolute alpha instead, so
+// motion on a dead-stripped branch is barely-there rather than attention-grabbing.
+const WASH_FLOW_ALPHA = 0.14;
 function isUnlinkedSource(el, app) {
   if (!el || getNodeType(el) !== 'file') return false;
   if (!COMPILED_SOURCE_EXTS.has(fileExt(el.name || '').toLowerCase())) return false;
@@ -334,6 +341,10 @@ export function renderGraph(app) {
   links.forEach((l) => {
     l.sourceNode = renderById.get(l.sourceId);
     l.targetNode = renderById.get(l.targetId);
+    // An edge touching a dead-stripped ("not linked") source is washed out too,
+    // so the whole disconnected branch reads as faint — including the animated
+    // flow when such a node is hovered.
+    l.washed = !!(l.sourceNode?.notLinked || l.targetNode?.notLinked);
   });
 
   const connCount = new Map();
@@ -410,45 +421,45 @@ export function renderGraph(app) {
     const headHalf = (ARROW_HALF_WIDTH + lineWidth * k * 0.6) / k;
     const dotPattern = [lineWidth, 4 / k]; // constant on-screen dotted pattern
 
-    groups.forEach((group, color) => {
+    // Draws one batch (all links sharing a colour AND a wash state) at the given
+    // shaft/head alpha. Solid shafts batch into a single path; dashed edges and
+    // arrowheads are collected and drawn after — a path can't mix dashes, and
+    // heads are filled.
+    const drawBatch = (batch, color, a, ha) => {
       ctx.strokeStyle = color;
-      ctx.globalAlpha = alpha;
+      ctx.globalAlpha = a;
       ctx.lineWidth = lineWidth;
-
-      // Solid shafts (plain + directed) batched into one path per colour.
-      // Dashed edges and arrowheads are collected and drawn separately
-      // afterwards — a single path can't mix dashes, and heads are filled.
       let dashed = null;
       let arrows = null;
       ctx.setLineDash([]);
       ctx.beginPath();
-      group.forEach((link) => {
-        const a = link.sourceNode;
-        const b = link.targetNode;
-        if (!a || !b || a.x == null || b.x == null) return;
-        if (!nodeInView(a) && !nodeInView(b)) return; // viewport culling
+      batch.forEach((link) => {
+        const na = link.sourceNode;
+        const nb = link.targetNode;
+        if (!na || !nb || na.x == null || nb.x == null) return;
+        if (!nodeInView(na) && !nodeInView(nb)) return; // viewport culling
 
         if (DASH_REL_TYPES.has(link.type)) {
-          (dashed ||= []).push(a, b);
+          (dashed ||= []).push(na, nb);
           return;
         }
         if (!ARROW_REL_TYPES.has(link.type)) {
-          ctx.moveTo(a.x, a.y);
-          ctx.lineTo(b.x, b.y);
+          ctx.moveTo(na.x, na.y);
+          ctx.lineTo(nb.x, nb.y);
           return;
         }
         // hasInput's head sits on the build (source); hasOutput's on the file
         // (target). Shaft stops at the base of the head so they meet cleanly.
-        const head = link.type === 'hasInput' ? a : b;
-        const tail = link.type === 'hasInput' ? b : a;
+        const head = link.type === 'hasInput' ? na : nb;
+        const tail = link.type === 'hasInput' ? nb : na;
         const dx = head.x - tail.x;
         const dy = head.y - tail.y;
         const dist = Math.hypot(dx, dy);
         const gap = radiusFor(head); // land the tip on the head node's rim
         if (dist <= gap + headLen) {
           // Too short for a head; just draw the bare shaft.
-          ctx.moveTo(a.x, a.y);
-          ctx.lineTo(b.x, b.y);
+          ctx.moveTo(na.x, na.y);
+          ctx.lineTo(nb.x, nb.y);
           return;
         }
         const ux = dx / dist;
@@ -464,7 +475,7 @@ export function renderGraph(app) {
       ctx.stroke();
 
       if (arrows) {
-        ctx.globalAlpha = headAlpha;
+        ctx.globalAlpha = ha;
         ctx.beginPath();
         ctx.fillStyle = color;
         arrows.forEach((ar) => {
@@ -477,7 +488,7 @@ export function renderGraph(app) {
       }
 
       if (dashed) {
-        ctx.globalAlpha = alpha;
+        ctx.globalAlpha = a;
         ctx.setLineDash(dotPattern);
         ctx.beginPath();
         for (let i = 0; i < dashed.length; i += 2) {
@@ -487,6 +498,19 @@ export function renderGraph(app) {
         ctx.stroke();
         ctx.setLineDash([]);
       }
+    };
+
+    groups.forEach((group, color) => {
+      // Split by wash state so edges touching a dead-stripped node render
+      // fainter than the rest of their colour group.
+      let normal = null;
+      let washed = null;
+      group.forEach((l) => {
+        if (l.washed) (washed ||= []).push(l);
+        else (normal ||= []).push(l);
+      });
+      if (normal) drawBatch(normal, color, alpha, headAlpha);
+      if (washed) drawBatch(washed, color, alpha * WASH_EDGE, headAlpha * WASH_EDGE);
     });
   };
 
@@ -674,18 +698,18 @@ export function renderGraph(app) {
     ctx.lineCap = 'round';
     ctx.setLineDash([FLOW_DASH / k, FLOW_GAP / k]);
     ctx.lineDashOffset = -flowPhase / k; // decreasing → dashes move toward head
-    groupLinksByColor(directed).forEach((group, color) => {
+    const strokeFlow = (batch, color, a) => {
       ctx.strokeStyle = color;
-      ctx.globalAlpha = 0.95;
+      ctx.globalAlpha = a;
       ctx.lineWidth = lineWidth;
       ctx.beginPath();
-      group.forEach((link) => {
-        const a = link.sourceNode;
-        const b = link.targetNode;
-        if (!a || !b || a.x == null || b.x == null) return;
-        if (!nodeInView(a) && !nodeInView(b)) return;
-        const head = link.type === 'hasInput' ? a : b;
-        const tail = link.type === 'hasInput' ? b : a;
+      batch.forEach((link) => {
+        const na = link.sourceNode;
+        const nb = link.targetNode;
+        if (!na || !nb || na.x == null || nb.x == null) return;
+        if (!nodeInView(na) && !nodeInView(nb)) return;
+        const head = link.type === 'hasInput' ? na : nb;
+        const tail = link.type === 'hasInput' ? nb : na;
         const dx = head.x - tail.x;
         const dy = head.y - tail.y;
         const dist = Math.hypot(dx, dy);
@@ -698,6 +722,17 @@ export function renderGraph(app) {
         }
       });
       ctx.stroke();
+    };
+    groupLinksByColor(directed).forEach((group, color) => {
+      // Wash the flow on edges touching a dead-stripped node, same as the shaft.
+      let normal = null;
+      let washed = null;
+      group.forEach((l) => {
+        if (l.washed) (washed ||= []).push(l);
+        else (normal ||= []).push(l);
+      });
+      if (normal) strokeFlow(normal, color, 0.95);
+      if (washed) strokeFlow(washed, color, WASH_FLOW_ALPHA);
     });
     ctx.setLineDash([]);
     ctx.lineDashOffset = 0;
