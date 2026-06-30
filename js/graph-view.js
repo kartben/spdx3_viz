@@ -18,6 +18,16 @@ const MAX_LABELS = 400;
 // World-space padding for viewport culling so nodes/edges near the edge of the
 // screen still draw.
 const CULL_PAD = 80;
+// Relationship types drawn with a dotted stroke instead of a solid line.
+const DASH_REL_TYPES = new Set(['usesTool']);
+// Relationship types drawn with an arrowhead at their "head" end. hasInput
+// points at the build (the source), hasOutput points at the output file (the
+// target), so the pair reads as inputs → build → outputs.
+const ARROW_REL_TYPES = new Set(['hasInput', 'hasOutput']);
+// Arrowhead dimensions in screen pixels (divided by the zoom factor to stay a
+// constant on-screen size). Kept deliberately small/light.
+const ARROW_LEN = 7;
+const ARROW_HALF_WIDTH = 3;
 
 function asTargets(to) {
   return Array.isArray(to) ? to : [to];
@@ -267,7 +277,7 @@ export function renderGraph(app) {
     const s = renderKeyOf.get(l.sourceId);
     const t = renderKeyOf.get(l.targetId);
     if (!s || !t || s === t) return;
-    const key = s + ' ' + t + ' ' + l.type;
+    const key = s + ' ' + t + ' ' + l.type;
     let link = linkMap.get(key);
     if (!link) {
       link = {
@@ -344,20 +354,88 @@ export function renderGraph(app) {
     d.y <= view.y1 + CULL_PAD;
 
   const drawLinkGroups = (groups, alpha, lineWidth) => {
+    const k = currentTransform.k;
+    // Arrowheads a constant on-screen size, growing only a touch on emphasised
+    // (thicker) edges so they stay light.
+    const headLen = (ARROW_LEN + lineWidth * k) / k;
+    const headHalf = (ARROW_HALF_WIDTH + lineWidth * k * 0.6) / k;
+    const dotPattern = [lineWidth, 4 / k]; // constant on-screen dotted pattern
+
     groups.forEach((group, color) => {
-      ctx.beginPath();
       ctx.strokeStyle = color;
       ctx.globalAlpha = alpha;
       ctx.lineWidth = lineWidth;
+
+      // Solid shafts (plain + directed) batched into one path per colour.
+      // Dashed edges and arrowheads are collected and drawn separately
+      // afterwards — a single path can't mix dashes, and heads are filled.
+      let dashed = null;
+      let arrows = null;
+      ctx.setLineDash([]);
+      ctx.beginPath();
       group.forEach((link) => {
         const a = link.sourceNode;
         const b = link.targetNode;
         if (!a || !b || a.x == null || b.x == null) return;
         if (!nodeInView(a) && !nodeInView(b)) return; // viewport culling
-        ctx.moveTo(a.x, a.y);
-        ctx.lineTo(b.x, b.y);
+
+        if (DASH_REL_TYPES.has(link.type)) {
+          (dashed ||= []).push(a, b);
+          return;
+        }
+        if (!ARROW_REL_TYPES.has(link.type)) {
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          return;
+        }
+        // hasInput's head sits on the build (source); hasOutput's on the file
+        // (target). Shaft stops at the base of the head so they meet cleanly.
+        const head = link.type === 'hasInput' ? a : b;
+        const tail = link.type === 'hasInput' ? b : a;
+        const dx = head.x - tail.x;
+        const dy = head.y - tail.y;
+        const dist = Math.hypot(dx, dy);
+        const gap = radiusFor(head); // land the tip on the head node's rim
+        if (dist <= gap + headLen) {
+          // Too short for a head; just draw the bare shaft.
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          return;
+        }
+        const ux = dx / dist;
+        const uy = dy / dist;
+        const tipX = head.x - ux * gap;
+        const tipY = head.y - uy * gap;
+        const baseX = tipX - ux * headLen;
+        const baseY = tipY - uy * headLen;
+        ctx.moveTo(tail.x, tail.y);
+        ctx.lineTo(baseX, baseY);
+        (arrows ||= []).push({ tipX, tipY, baseX, baseY, nx: -uy, ny: ux });
       });
       ctx.stroke();
+
+      if (arrows) {
+        ctx.beginPath();
+        ctx.fillStyle = color;
+        arrows.forEach((ar) => {
+          ctx.moveTo(ar.tipX, ar.tipY);
+          ctx.lineTo(ar.baseX + ar.nx * headHalf, ar.baseY + ar.ny * headHalf);
+          ctx.lineTo(ar.baseX - ar.nx * headHalf, ar.baseY - ar.ny * headHalf);
+          ctx.closePath();
+        });
+        ctx.fill();
+      }
+
+      if (dashed) {
+        ctx.setLineDash(dotPattern);
+        ctx.beginPath();
+        for (let i = 0; i < dashed.length; i += 2) {
+          ctx.moveTo(dashed[i].x, dashed[i].y);
+          ctx.lineTo(dashed[i + 1].x, dashed[i + 1].y);
+        }
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
     });
   };
 
