@@ -28,6 +28,14 @@ const ARROW_REL_TYPES = new Set(['hasInput', 'hasOutput']);
 // constant on-screen size). Kept deliberately small/light.
 const ARROW_LEN = 7;
 const ARROW_HALF_WIDTH = 3;
+// Hover "flow" animation: when a node with directed edges is hovered, dashes
+// march along those edges in the flow direction (into the build for inputs, out
+// to the file for outputs). Dash/gap are screen pixels; SPEED is screen px per
+// frame.
+const FLOW_DASH = 5;
+const FLOW_GAP = 12;
+const FLOW_PERIOD = FLOW_DASH + FLOW_GAP;
+const FLOW_SPEED = 0.3;
 
 function asTargets(to) {
   return Array.isArray(to) ? to : [to];
@@ -119,6 +127,10 @@ export function renderGraph(app) {
   // Drop any previous canvas/svg but keep the tooltip element.
   container.querySelectorAll('svg, canvas').forEach((el) => el.remove());
   if (app.graphSim) app.graphSim.stop();
+  if (app.graphFlowRAF) {
+    cancelAnimationFrame(app.graphFlowRAF); // stop a hover-flow loop from the old canvas
+    app.graphFlowRAF = 0;
+  }
 
   const width = container.clientWidth;
   const height = container.clientHeight;
@@ -345,6 +357,7 @@ export function renderGraph(app) {
   let currentTransform = d3.zoomIdentity;
   let highlightedNodeId = null;
   let drawFrame = 0;
+  let flowPhase = 0; // animated dash offset (screen px) for the hover flow
   let view = { x0: 0, y0: 0, x1: width, y1: height };
 
   const nodeInView = (d) =>
@@ -353,7 +366,10 @@ export function renderGraph(app) {
     d.y >= view.y0 - CULL_PAD &&
     d.y <= view.y1 + CULL_PAD;
 
-  const drawLinkGroups = (groups, alpha, lineWidth) => {
+  // headAlpha lets the arrowheads stay opaque while the shaft is dimmed (used by
+  // the hover flow, where the shaft fades behind the moving dashes but the heads
+  // should remain crisp). Defaults to the shaft alpha.
+  const drawLinkGroups = (groups, alpha, lineWidth, headAlpha = alpha) => {
     const k = currentTransform.k;
     // Arrowheads a constant on-screen size, growing only a touch on emphasised
     // (thicker) edges so they stay light.
@@ -415,6 +431,7 @@ export function renderGraph(app) {
       ctx.stroke();
 
       if (arrows) {
+        ctx.globalAlpha = headAlpha;
         ctx.beginPath();
         ctx.fillStyle = color;
         arrows.forEach((ar) => {
@@ -427,6 +444,7 @@ export function renderGraph(app) {
       }
 
       if (dashed) {
+        ctx.globalAlpha = alpha;
         ctx.setLineDash(dotPattern);
         ctx.beginPath();
         for (let i = 0; i < dashed.length; i += 2) {
@@ -560,6 +578,53 @@ export function renderGraph(app) {
     ctx.restore();
   };
 
+  // The hovered node's directed (hasInput/hasOutput) links, or null. Drives both
+  // the flow animation and the dimmed base shaft under it.
+  const highlightedDirectedLinks = () => {
+    if (searchActive || !highlightedNodeId) return null;
+    const hl = linksByNode.get(highlightedNodeId);
+    if (!hl) return null;
+    const directed = hl.filter((l) => ARROW_REL_TYPES.has(l.type));
+    return directed.length ? directed : null;
+  };
+
+  // Marching dashes along the directed edges, animated by flowPhase. Each edge
+  // is drawn tail → head so the dashes travel in the relationship's direction.
+  const drawFlowOverlay = (directed, lineWidth) => {
+    const k = currentTransform.k;
+    const headRoom = (ARROW_LEN + 4) / k; // stop short of the head so it stays clean
+    ctx.lineCap = 'round';
+    ctx.setLineDash([FLOW_DASH / k, FLOW_GAP / k]);
+    ctx.lineDashOffset = -flowPhase / k; // decreasing → dashes move toward head
+    groupLinksByColor(directed).forEach((group, color) => {
+      ctx.strokeStyle = color;
+      ctx.globalAlpha = 0.95;
+      ctx.lineWidth = lineWidth;
+      ctx.beginPath();
+      group.forEach((link) => {
+        const a = link.sourceNode;
+        const b = link.targetNode;
+        if (!a || !b || a.x == null || b.x == null) return;
+        if (!nodeInView(a) && !nodeInView(b)) return;
+        const head = link.type === 'hasInput' ? a : b;
+        const tail = link.type === 'hasInput' ? b : a;
+        const dx = head.x - tail.x;
+        const dy = head.y - tail.y;
+        const dist = Math.hypot(dx, dy);
+        const stop = radiusFor(head) + headRoom;
+        ctx.moveTo(tail.x, tail.y);
+        if (dist <= stop) {
+          ctx.lineTo(head.x, head.y);
+        } else {
+          ctx.lineTo(head.x - (dx / dist) * stop, head.y - (dy / dist) * stop);
+        }
+      });
+      ctx.stroke();
+    });
+    ctx.setLineDash([]);
+    ctx.lineDashOffset = 0;
+  };
+
   const drawCanvas = () => {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, width, height);
@@ -583,7 +648,19 @@ export function renderGraph(app) {
       if (searchHotGroups) drawLinkGroups(searchHotGroups, 0.5, 1.4 / k);
     } else if (highlightedNodeId) {
       drawLinkGroups(groupedLinks, 0.04, 0.7 / k);
-      drawLinkGroups(groupLinksByColor(linksByNode.get(highlightedNodeId) || []), 0.85, 1.6 / k);
+      const hl = linksByNode.get(highlightedNodeId) || [];
+      const directed = highlightedDirectedLinks();
+      if (directed) {
+        // Non-directed edges stay bright/solid; directed edges get a dim base
+        // shaft (with a faint head) so the animated flow on top reads as motion.
+        const others = hl.filter((l) => !ARROW_REL_TYPES.has(l.type));
+        if (others.length) drawLinkGroups(groupLinksByColor(others), 0.85, 1.6 / k);
+        // Dim shaft, but keep the arrowheads opaque so direction stays clear.
+        drawLinkGroups(groupLinksByColor(directed), 0.3, 1 / k, 1);
+        drawFlowOverlay(directed, 1.8 / k);
+      } else {
+        drawLinkGroups(groupLinksByColor(hl), 0.85, 1.6 / k);
+      }
     } else {
       drawLinkGroups(groupedLinks, 0.22, 0.85 / k);
     }
@@ -600,6 +677,27 @@ export function renderGraph(app) {
       drawFrame = 0;
       drawCanvas();
     });
+  };
+
+  // Self-perpetuating loop that advances the flow animation while a node with
+  // directed edges is hovered; it stops itself once the hover no longer applies.
+  // The handle lives on `app` so a graph rebuild can cancel a stale loop.
+  const flowTick = () => {
+    if (!highlightedDirectedLinks()) {
+      app.graphFlowRAF = 0;
+      return;
+    }
+    flowPhase = (flowPhase + FLOW_SPEED) % FLOW_PERIOD;
+    drawCanvas();
+    app.graphFlowRAF = requestAnimationFrame(flowTick);
+  };
+  const setFlow = () => {
+    if (highlightedDirectedLinks()) {
+      if (!app.graphFlowRAF) app.graphFlowRAF = requestAnimationFrame(flowTick);
+    } else if (app.graphFlowRAF) {
+      cancelAnimationFrame(app.graphFlowRAF);
+      app.graphFlowRAF = 0;
+    }
   };
 
   /* ----------------------------------------------------------------------
@@ -795,6 +893,7 @@ export function renderGraph(app) {
     const id = found ? found.id : null;
     if (id !== highlightedNodeId) {
       highlightedNodeId = id;
+      setFlow();
       queueDraw();
     }
     const tooltip = document.getElementById('graphTooltip');
@@ -821,6 +920,7 @@ export function renderGraph(app) {
 
   canvas.addEventListener('mouseleave', () => {
     highlightedNodeId = null;
+    setFlow();
     queueDraw();
     document.getElementById('graphTooltip')?.classList.add('hidden');
   });
