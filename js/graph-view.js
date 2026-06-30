@@ -355,7 +355,13 @@ export function renderGraph(app) {
 
   const groupedLinks = groupLinksByColor(links);
   let currentTransform = d3.zoomIdentity;
-  let highlightedNodeId = null;
+  let hoverNodeId = null;
+  let selectedNodeId = app.graphSelectedNodeId;
+  if (selectedNodeId && !renderById.has(selectedNodeId)) {
+    selectedNodeId = null;
+    app.graphSelectedNodeId = null;
+  }
+  let highlightedNodeId = hoverNodeId ?? selectedNodeId;
   let drawFrame = 0;
   let flowPhase = 0; // animated dash offset (screen px) for the hover flow
   let view = { x0: 0, y0: 0, x1: width, y1: height };
@@ -699,6 +705,13 @@ export function renderGraph(app) {
       app.graphFlowRAF = 0;
     }
   };
+  const syncHighlight = () => {
+    const next = hoverNodeId ?? selectedNodeId;
+    if (next === highlightedNodeId) return;
+    highlightedNodeId = next;
+    setFlow();
+    queueDraw();
+  };
 
   /* ----------------------------------------------------------------------
      6b. Search overlay
@@ -890,12 +903,8 @@ export function renderGraph(app) {
 
   canvas.addEventListener('mousemove', (event) => {
     const found = pointerNode(event);
-    const id = found ? found.id : null;
-    if (id !== highlightedNodeId) {
-      highlightedNodeId = id;
-      setFlow();
-      queueDraw();
-    }
+    hoverNodeId = found ? found.id : null;
+    syncHighlight();
     const tooltip = document.getElementById('graphTooltip');
     if (!tooltip) return;
     if (found) {
@@ -919,16 +928,23 @@ export function renderGraph(app) {
   });
 
   canvas.addEventListener('mouseleave', () => {
-    highlightedNodeId = null;
-    setFlow();
-    queueDraw();
+    hoverNodeId = null;
+    syncHighlight();
     document.getElementById('graphTooltip')?.classList.add('hidden');
   });
 
-  // Click selects (suppressed automatically by d3.drag after a real drag).
+  // Click selects and pins hover-style focus (suppressed by d3.drag after a real drag).
   canvas.addEventListener('click', (event) => {
     const found = pointerNode(event);
-    if (!found) return;
+    if (!found) {
+      selectedNodeId = null;
+      app.graphSelectedNodeId = null;
+      syncHighlight();
+      return;
+    }
+    selectedNodeId = found.id;
+    app.graphSelectedNodeId = found.id;
+    syncHighlight();
     if (found.isCluster) {
       app.detailElement = found.data && !found.data.placeholder ? found.data : null;
     } else {
@@ -949,6 +965,7 @@ export function renderGraph(app) {
   // without rebuilding the graph, and apply any active query to the fresh build.
   app.graphRecomputeSearch = recomputeSearch;
   recomputeSearch();
+  setFlow();
 
   app.graphSim = sim;
   app.graphCanvasSel = sel;

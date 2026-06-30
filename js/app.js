@@ -194,6 +194,7 @@ export function spdxApp() {
     graphSearchMode: 'dim', // 'dim' fades non-matches, 'focus' hides all but neighbours
     graphMatchCount: 0, // live count of matched nodes
     graphRecomputeSearch: null, // set by the graph renderer; updates the overlay only
+    graphSelectedNodeId: null, // render-node id pinned by click (keeps hover-style focus)
 
     // Views
     views: createViews(),
