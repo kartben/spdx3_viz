@@ -362,46 +362,89 @@ export function renderGraph(app) {
   };
 
   const drawNodes = () => {
-    const connected = highlightedNodeId
-      ? connectedIndex.get(highlightedNodeId) || new Set([highlightedNodeId])
-      : null;
+    // Hover emphasis is suppressed while a search overlay is active so the
+    // search visualization stays stable as the pointer moves.
+    const connected =
+      !searchActive && highlightedNodeId
+        ? connectedIndex.get(highlightedNodeId) || new Set([highlightedNodeId])
+        : null;
+    const k = currentTransform.k;
     renderNodes.forEach((d) => {
       if (d.x == null || !nodeInView(d)) return;
+      const ss = nodeSearchStyle(d.id);
+      if (ss.hidden) return; // focus mode hides non-match/non-neighbour nodes
       const r = radiusFor(d);
-      ctx.globalAlpha = connected && !connected.has(d.id) ? 0.12 : 1;
+      let alpha = ss.alpha;
+      if (connected && !connected.has(d.id)) alpha = 0.12;
+      ctx.globalAlpha = alpha;
       ctx.beginPath();
       ctx.arc(d.x, d.y, r, 0, 2 * Math.PI);
       ctx.fillStyle = getNodeTypeColor(d.type);
       ctx.fill();
-      ctx.lineWidth = (d.isCluster ? 2.5 : 1.5) / currentTransform.k;
+      ctx.lineWidth = (d.isCluster ? 2.5 : 1.5) / k;
       ctx.strokeStyle = d.isCluster ? 'rgba(255,255,255,0.85)' : strokeFor(d);
       ctx.stroke();
+      if (searchActive && matchSet.has(d.id)) {
+        // Amber ring so search hits pop regardless of node colour.
+        ctx.globalAlpha = 1;
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, r + 3 / k, 0, 2 * Math.PI);
+        ctx.strokeStyle = '#fbbf24';
+        ctx.lineWidth = 2 / k;
+        ctx.stroke();
+      }
     });
     ctx.globalAlpha = 1;
   };
 
+  const drawLabel = (d, isMatch) => {
+    const sx = currentTransform.applyX(d.x);
+    const sy = currentTransform.applyY(d.y);
+    if (sx < -60 || sx > width + 60 || sy < -20 || sy > height + 20) return false;
+    const r = radiusFor(d) * currentTransform.k;
+    ctx.globalAlpha = isMatch ? 1 : nodeSearchStyle(d.id).alpha;
+    ctx.fillStyle = isMatch ? '#fbbf24' : d.isCluster ? '#e2e8f0' : '#94a3b8';
+    ctx.fillText(d.isCluster ? `${d.name} · ${d.memberCount}` : d.name, sx + r + 4, sy);
+    return true;
+  };
+
   const drawLabels = () => {
-    if (currentTransform.k < LABEL_ZOOM_THRESHOLD) return;
+    const zoomedIn = currentTransform.k >= LABEL_ZOOM_THRESHOLD;
+    if (!searchActive && !zoomedIn) return;
     ctx.save();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // screen space → constant-size text
     ctx.font = '11px ui-sans-serif, system-ui, -apple-system, sans-serif';
     ctx.textBaseline = 'middle';
-    const connected = highlightedNodeId
-      ? connectedIndex.get(highlightedNodeId) || new Set([highlightedNodeId])
-      : null;
     let drawn = 0;
-    for (const d of labelOrder) {
-      if (drawn >= MAX_LABELS) break;
-      if (d.x == null) continue;
-      if (connected && !connected.has(d.id)) continue;
-      const sx = currentTransform.applyX(d.x);
-      const sy = currentTransform.applyY(d.y);
-      if (sx < -60 || sx > width + 60 || sy < -20 || sy > height + 20) continue;
-      const r = radiusFor(d) * currentTransform.k;
-      ctx.fillStyle = d.isCluster ? '#e2e8f0' : '#94a3b8';
-      ctx.fillText(d.isCluster ? `${d.name} · ${d.memberCount}` : d.name, sx + r + 4, sy);
-      drawn++;
+
+    // Search hits always get a label — even zoomed out — so they're findable.
+    if (searchActive) {
+      for (const d of matchLabelList) {
+        if (drawn >= MAX_LABELS) break;
+        if (d.x == null) continue;
+        if (drawLabel(d, true)) drawn++;
+      }
     }
+
+    // Remaining (non-match) labels only once zoomed in, mirroring the old
+    // behaviour and respecting hover focus when not searching.
+    if (zoomedIn) {
+      const connected =
+        !searchActive && highlightedNodeId
+          ? connectedIndex.get(highlightedNodeId) || new Set([highlightedNodeId])
+          : null;
+      for (const d of labelOrder) {
+        if (drawn >= MAX_LABELS) break;
+        if (d.x == null) continue;
+        if (searchActive && matchSet.has(d.id)) continue; // already drawn above
+        const ss = nodeSearchStyle(d.id);
+        if (ss.hidden) continue;
+        if (!searchActive && connected && !connected.has(d.id)) continue;
+        if (drawLabel(d, false)) drawn++;
+      }
+    }
+
+    ctx.globalAlpha = 1;
     ctx.restore();
   };
 
@@ -421,7 +464,12 @@ export function renderGraph(app) {
     ctx.scale(k, k);
     ctx.lineCap = 'round';
 
-    if (highlightedNodeId) {
+    if (searchActive) {
+      // Links touching a match are emphasised; the rest stay faint. In focus
+      // mode, links with a hidden endpoint were dropped during recompute.
+      if (searchDimGroups) drawLinkGroups(searchDimGroups, 0.06, 0.7 / k);
+      if (searchHotGroups) drawLinkGroups(searchHotGroups, 0.5, 1.4 / k);
+    } else if (highlightedNodeId) {
       drawLinkGroups(groupedLinks, 0.04, 0.7 / k);
       drawLinkGroups(groupLinksByColor(linksByNode.get(highlightedNodeId) || []), 0.85, 1.6 / k);
     } else {
@@ -440,6 +488,103 @@ export function renderGraph(app) {
       drawFrame = 0;
       drawCanvas();
     });
+  };
+
+  /* ----------------------------------------------------------------------
+     6b. Search overlay
+         Driven by the controls bar via app.graphRecomputeSearch(). Recomputes
+         the match/neighbour sets and link partitions, then redraws — it never
+         rebuilds the graph or restarts the simulation, so typing doesn't
+         re-layout the whole thing.
+     ---------------------------------------------------------------------- */
+  // Shared style objects (avoid per-node allocation in the draw loop).
+  const SS_VISIBLE = { hidden: false, alpha: 1 };
+  const SS_NEIGHBOR = { hidden: false, alpha: 0.4 };
+  const SS_HIDDEN = { hidden: true, alpha: 0 };
+  const SS_DIM = { hidden: false, alpha: 0.1 };
+
+  let searchActive = false;
+  let searchFocusMode = false; // 'focus' hides non-matches; 'dim' just fades them
+  let matchSet = new Set(); // render-node ids whose underlying element matches
+  let neighborSet = new Set(); // direct neighbours of matches (focus mode only)
+  let matchLabelList = []; // matched render nodes, largest first, for labelling
+  let searchDimGroups = null; // colour-grouped links not touching a match
+  let searchHotGroups = null; // colour-grouped links touching a match
+  const searchTextCache = new Map(); // underlying id -> { name, full|null }
+
+  const searchTextOf = (uNode) => {
+    let entry = searchTextCache.get(uNode.id);
+    if (!entry) {
+      entry = { name: ((uNode.name || '') + ' ' + (uNode.id || '')).toLowerCase(), full: null };
+      searchTextCache.set(uNode.id, entry);
+    }
+    return entry;
+  };
+  // Full-text lazily serialises the whole element once, then caches it.
+  const fullTextOf = (uNode) => {
+    const entry = searchTextOf(uNode);
+    if (entry.full == null) {
+      try {
+        entry.full = (entry.name + ' ' + JSON.stringify(uNode.data || {})).toLowerCase();
+      } catch {
+        entry.full = entry.name;
+      }
+    }
+    return entry.full;
+  };
+
+  const nodeSearchStyle = (id) => {
+    if (!searchActive || matchSet.has(id)) return SS_VISIBLE;
+    if (searchFocusMode) return neighborSet.has(id) ? SS_NEIGHBOR : SS_HIDDEN;
+    return SS_DIM;
+  };
+
+  const recomputeSearch = () => {
+    const raw = (app.graphSearchQuery || '').trim().toLowerCase();
+    const tokens = raw.split(/\s+/).filter(Boolean);
+    searchActive = tokens.length > 0;
+    searchFocusMode = app.graphSearchMode === 'focus';
+    matchSet = new Set();
+    neighborSet = new Set();
+    matchLabelList = [];
+    searchDimGroups = null;
+    searchHotGroups = null;
+
+    if (searchActive) {
+      const fullText = !!app.graphSearchFullText;
+      const matches = (hay) => tokens.every((t) => hay.includes(t));
+      // Match on the underlying elements, then fold each hit up to its render
+      // node so a collapsed cluster lights up when any member matches.
+      uNodes.forEach((u) => {
+        const hay = fullText ? fullTextOf(u) : searchTextOf(u).name;
+        if (matches(hay)) {
+          const rid = renderKeyOf.get(u.id);
+          if (rid) matchSet.add(rid);
+        }
+      });
+      matchSet.forEach((id) => {
+        const conn = connectedIndex.get(id);
+        if (conn) conn.forEach((n) => !matchSet.has(n) && neighborSet.add(n));
+      });
+      matchLabelList = labelOrder.filter((d) => matchSet.has(d.id));
+
+      const dim = [];
+      const hot = [];
+      links.forEach((l) => {
+        if (searchFocusMode) {
+          const sVis = matchSet.has(l.sourceId) || neighborSet.has(l.sourceId);
+          const tVis = matchSet.has(l.targetId) || neighborSet.has(l.targetId);
+          if (!sVis || !tVis) return; // both endpoints must be visible
+        }
+        if (matchSet.has(l.sourceId) || matchSet.has(l.targetId)) hot.push(l);
+        else dim.push(l);
+      });
+      searchDimGroups = groupLinksByColor(dim);
+      searchHotGroups = groupLinksByColor(hot);
+    }
+
+    app.graphMatchCount = matchSet.size;
+    queueDraw();
   };
 
   /* ----------------------------------------------------------------------
@@ -474,7 +619,7 @@ export function renderGraph(app) {
     const wx = currentTransform.invertX(px);
     const wy = currentTransform.invertY(py);
     const found = sim.find(wx, wy, 40 / currentTransform.k);
-    if (!found) return null;
+    if (!found || nodeSearchStyle(found.id).hidden) return null;
     const r = radiusFor(found);
     const dx = found.x - wx;
     const dy = found.y - wy;
@@ -507,7 +652,7 @@ export function renderGraph(app) {
       const wx = currentTransform.invertX(event.x);
       const wy = currentTransform.invertY(event.y);
       const found = sim.find(wx, wy, 40 / currentTransform.k);
-      if (!found) return null;
+      if (!found || nodeSearchStyle(found.id).hidden) return null;
       const r = radiusFor(found);
       return (found.x - wx) ** 2 + (found.y - wy) ** 2 <= (r + 4) ** 2 ? found : null;
     })
@@ -588,7 +733,11 @@ export function renderGraph(app) {
     }
   });
 
-  queueDraw();
+  // Expose the search recompute so the controls bar can update the overlay
+  // without rebuilding the graph, and apply any active query to the fresh build.
+  app.graphRecomputeSearch = recomputeSearch;
+  recomputeSearch();
+
   app.graphSim = sim;
   app.graphCanvasSel = sel;
   app.graphSvg = null;

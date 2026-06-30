@@ -677,6 +677,67 @@
                   <span class="text-xs" :style="`color: ${f.color}`" x-text="f.label"></span>
                 </label>
               </template>
+              <!-- Search -->
+              <div class="flex items-center gap-2 ml-1">
+                <div class="relative">
+                  <svg
+                    class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                  <input
+                    type="text"
+                    x-model="graphSearchQuery"
+                    @input.debounce.150ms="graphSearch()"
+                    placeholder="Search nodes…"
+                    class="w-40 sm:w-52 pl-8 pr-7 py-1 bg-slate-800 border border-slate-700 rounded-md text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
+                  />
+                  <button
+                    x-show="graphSearchQuery"
+                    @click="clearGraphSearch()"
+                    class="absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-200 text-base leading-none"
+                    title="Clear search"
+                  >
+                    &times;
+                  </button>
+                </div>
+                <label
+                  class="flex items-center gap-1.5 cursor-pointer"
+                  title="Search across the whole element (all fields), not just its name"
+                >
+                  <input
+                    type="checkbox"
+                    x-model="graphSearchFullText"
+                    @change="graphSearch()"
+                    class="rounded border-slate-600 bg-slate-700 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5"
+                  />
+                  <span class="text-xs text-slate-300">Full-text</span>
+                </label>
+                <select
+                  x-show="graphSearchQuery"
+                  x-model="graphSearchMode"
+                  @change="graphSearch()"
+                  title="How to treat non-matching nodes"
+                  class="text-xs bg-slate-800 border border-slate-700 rounded-md text-slate-300 px-1.5 py-1 focus:outline-none focus:border-blue-500"
+                >
+                  <option value="dim">Dim others</option>
+                  <option value="focus">Focus matches</option>
+                </select>
+                <span
+                  x-show="graphSearchQuery"
+                  class="text-xs whitespace-nowrap"
+                  :class="graphMatchCount ? 'text-amber-400' : 'text-slate-500'"
+                  x-text="`${formatCount(graphMatchCount)} ${graphMatchCount === 1 ? 'match' : 'matches'}`"
+                ></span>
+              </div>
               <div class="ml-auto flex items-center gap-3">
                 <span
                   x-show="graphNodeCount"

@@ -191,6 +191,11 @@ export function spdxApp() {
     graphNodeCount: 0, // live readout of rendered nodes/edges
     graphEdgeCount: 0,
     graphTruncated: false, // true when the guard rail capped an un-aggregated render
+    graphSearchQuery: '', // search box in the graph controls bar
+    graphSearchFullText: false, // false = name/id only, true = whole element JSON
+    graphSearchMode: 'dim', // 'dim' fades non-matches, 'focus' hides all but neighbours
+    graphMatchCount: 0, // live count of matched nodes
+    graphRecomputeSearch: null, // set by the graph renderer; updates the overlay only
 
     // Views
     views: createViews(),
@@ -1107,6 +1112,16 @@ export function spdxApp() {
     },
     updateGraph() {
       this.renderGraph();
+    },
+    // Search only updates the overlay (match/dim/focus) and redraws — no
+    // re-layout. Falls back to a full render if the graph isn't built yet.
+    graphSearch() {
+      if (this.graphRecomputeSearch) this.graphRecomputeSearch();
+      else this.renderGraph();
+    },
+    clearGraphSearch() {
+      this.graphSearchQuery = '';
+      this.graphSearch();
     },
     collapseAllClusters() {
       this.expandedClusters = new Set();
