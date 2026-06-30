@@ -6,9 +6,11 @@ files, tools, builds, agents, and licenses as an interactive graph.
 
 ## Features
 
-- Drag-and-drop one or more SPDX 3.0 JSON-LD files.
-- Multiple files are merged and cross-references resolved automatically.
-- Interactive D3 force-directed graph with type-based coloring and filtering.
+- Easily load SPDX3 SBOMs by drag-and-drop, file picker, or the bundled samples.
+- Automatically merges multiple files into one model and resolves cross-references between them.
+- Interactive relationship graph, colored by element type and relationship.
+- Dedicated views for packages, files, licenses, build configs, and builds.
+- Runs entirely in the browser; no server or data upload.
 
 ## Usage
 
