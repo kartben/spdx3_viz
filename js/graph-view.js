@@ -515,6 +515,10 @@ export function renderGraph(app) {
         wash.opacity = 0.28;
         ctx.beginPath();
         ctx.arc(d.x, d.y, r, 0, 2 * Math.PI);
+        // Opaque base disc (graph bg) first, so edges drawn underneath don't
+        // bleed through the translucent wash fill. Then the wash on top.
+        ctx.fillStyle = '#0f172a';
+        ctx.fill();
         ctx.fillStyle = wash.toString();
         ctx.fill();
 
