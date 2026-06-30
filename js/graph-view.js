@@ -397,14 +397,47 @@ export function renderGraph(app) {
     ctx.globalAlpha = 1;
   };
 
+  // Screen-space label decluttering: labels are placed greedily in priority
+  // order and any that would overlap one already drawn is skipped. This keeps
+  // dense areas (e.g. lots of search hits packed together) readable without
+  // re-laying out the graph and jolting node positions around as the user types.
+  const LABEL_CELL = 13; // grid cell size in screen px (≈ label line height)
+  let labelCells = null;
+  const reserveLabel = (x0, y0, x1, y1) => {
+    const cx0 = Math.floor(x0 / LABEL_CELL);
+    const cx1 = Math.floor(x1 / LABEL_CELL);
+    const cy0 = Math.floor(y0 / LABEL_CELL);
+    const cy1 = Math.floor(y1 / LABEL_CELL);
+    for (let cy = cy0; cy <= cy1; cy++) {
+      for (let cx = cx0; cx <= cx1; cx++) {
+        if (labelCells.has(cy * 100000 + cx)) return false; // occupied → collide
+      }
+    }
+    for (let cy = cy0; cy <= cy1; cy++) {
+      for (let cx = cx0; cx <= cx1; cx++) labelCells.add(cy * 100000 + cx);
+    }
+    return true;
+  };
+
   const drawLabel = (d, isMatch) => {
     const sx = currentTransform.applyX(d.x);
     const sy = currentTransform.applyY(d.y);
     if (sx < -60 || sx > width + 60 || sy < -20 || sy > height + 20) return false;
     const r = radiusFor(d) * currentTransform.k;
+    const text = d.isCluster ? `${d.name} · ${d.memberCount}` : d.name;
+    const tx = sx + r + 4;
+    const tw = ctx.measureText(text).width;
+    // Reserve the label's box; bail if it would overlap a label already drawn.
+    if (!reserveLabel(tx - 1, sy - 6, tx + tw + 1, sy + 6)) return false;
+    if (isMatch) {
+      // Subtle backdrop so match labels stay legible over the busy edge mesh.
+      ctx.globalAlpha = 0.85;
+      ctx.fillStyle = 'rgba(15,23,42,0.9)';
+      ctx.fillRect(tx - 2, sy - 7, tw + 4, 14);
+    }
     ctx.globalAlpha = isMatch ? 1 : nodeSearchStyle(d.id).alpha;
     ctx.fillStyle = isMatch ? '#fbbf24' : d.isCluster ? '#e2e8f0' : '#94a3b8';
-    ctx.fillText(d.isCluster ? `${d.name} · ${d.memberCount}` : d.name, sx + r + 4, sy);
+    ctx.fillText(text, tx, sy);
     return true;
   };
 
@@ -415,6 +448,7 @@ export function renderGraph(app) {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // screen space → constant-size text
     ctx.font = '11px ui-sans-serif, system-ui, -apple-system, sans-serif';
     ctx.textBaseline = 'middle';
+    labelCells = new Set(); // reset the occupancy grid each frame
     let drawn = 0;
 
     // Search hits always get a label — even zoomed out — so they're findable.
