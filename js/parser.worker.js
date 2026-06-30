@@ -18,7 +18,7 @@
  * @module parser.worker
  */
 
-import { parseGraph, buildRelationshipIndexes } from './parser.js';
+import { parseGraph, buildRelationshipIndexes, buildFileSourceIndex } from './parser.js';
 
 self.onmessage = (event) => {
   const { id, files } = event.data || {};
@@ -48,8 +48,9 @@ self.onmessage = (event) => {
 
     const parsed = parseGraph(mergedGraph, (p) => progress('graph', p));
     const indexes = buildRelationshipIndexes(parsed.relationships, (p) => progress('index', p));
+    const fileSourceIndex = buildFileSourceIndex(parsed, indexes);
 
-    post({ type: 'done', ok: true, parsed, indexes });
+    post({ type: 'done', ok: true, parsed, indexes: { ...indexes, fileSourceIndex } });
   } catch (err) {
     post({ type: 'done', ok: false, error: err && err.message ? err.message : String(err) });
   }

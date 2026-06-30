@@ -78,11 +78,15 @@ export function createState() {
     licenseModalParts: [],
     licenseModalActiveIndex: 0,
     licenseModalRef: '',
+    fileSourceCache: {}, // fileId → {loading, windows, error}
+    fileSourceIndex: new Map(), // fileId → raw GitHub URL (built in worker)
 
     // Parsed data
     elementMap: new Map(),
     packages: [],
     files: [],
+    snippets: [],
+    snippetsByFileIndex: new Map(),
     tools: [],
     relationships: [],
     builds: [],

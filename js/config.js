@@ -19,6 +19,7 @@
 export const ELEMENT_TYPES = {
   PACKAGE: 'software_Package',
   FILE: 'software_File',
+  SNIPPET: 'software_Snippet',
   TOOL: 'Tool',
   RELATIONSHIP: 'Relationship',
   LIFECYCLE_RELATIONSHIP: 'LifecycleScopedRelationship',

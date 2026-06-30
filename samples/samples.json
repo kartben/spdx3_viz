@@ -5,7 +5,7 @@
     "emoji": "🪁",
     "description": "A Zephyr application targeting an ESP32 board, and using LVGL for the GUI.",
     "dir": "samples/zephyr",
-    "files": ["app.jsonld", "modules-deps.jsonld", "zephyr.jsonld", "build.jsonld"]
+    "files": ["app.jsonld", "modules-deps.jsonld", "zephyr.jsonld", "build.jsonld", "snippets.jsonld"]
   },
   {
     "id": "linux",

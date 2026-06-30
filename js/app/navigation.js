@@ -181,6 +181,9 @@ export const navigationMixin = {
   toggleFile(id) {
     this.expandedFile = this.expandedFile === id ? null : id;
     this._scheduleNavPush();
+    if (this.expandedFile === id && this.snippetsOf(id).length > 0) {
+      this.loadFileSource(id);
+    }
   },
   toggleConfig(id) {
     this.expandedConfig = this.expandedConfig === id ? null : id;

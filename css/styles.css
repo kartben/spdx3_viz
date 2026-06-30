@@ -520,3 +520,104 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
   max-width: 250px;
 }
+
+/* ==========================================================================
+   Source Viewer
+   Syntax-highlighted code viewer with snippet line highlighting
+   ========================================================================== */
+
+.source-viewer {
+  background: #0d1117;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Menlo', 'Monaco', 'Consolas', monospace;
+  font-size: 12.5px;
+  line-height: 1.6;
+  max-height: 520px;
+  overflow-y: auto;
+}
+
+.source-viewer .sv-line {
+  display: flex;
+  align-items: stretch;
+  min-height: 20px;
+  border-left: 2px solid transparent;
+  transition: background 0.1s, opacity 0.1s;
+}
+
+.source-viewer .sv-line:not(.covered) {
+  opacity: 0.45;
+}
+
+.source-viewer .sv-line.covered {
+  background: rgba(34, 197, 94, 0.09);
+  border-left-color: rgba(34, 197, 94, 0.5);
+}
+
+.source-viewer .sv-line .sv-lnum {
+  flex-shrink: 0;
+  width: 3rem;
+  padding: 1px 8px 1px 0;
+  text-align: right;
+  color: #3d4f63;
+  user-select: none;
+}
+
+.source-viewer .sv-line.covered .sv-lnum {
+  color: #2d7a4a;
+}
+
+.source-viewer .sv-line .sv-code {
+  flex: 1;
+  padding: 1px 12px;
+  white-space: pre;
+  overflow: hidden;
+  color: #adbac7;
+}
+
+/* Reset hljs container styles so our per-line backgrounds show through */
+.source-viewer .hljs {
+  background: transparent;
+  padding: 0;
+}
+
+.source-viewer .sv-gap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  font-size: 11px;
+  color: #3d4f63;
+  background: #0a0e13;
+  border-top: 1px solid #1c2533;
+  border-bottom: 1px solid #1c2533;
+}
+
+.source-viewer .sv-gap .sv-gap-line {
+  flex: 1;
+  height: 1px;
+  background: #1c2533;
+}
+
+.source-viewer .sv-gap-btn {
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+
+.source-viewer .sv-gap-btn:hover {
+  background: #111822;
+  color: #5b7a99;
+}
+
+/* highlight.js token overrides for our dark background */
+.source-viewer .hljs-keyword    { color: #f47067; }
+.source-viewer .hljs-built_in   { color: #f69d50; }
+.source-viewer .hljs-type       { color: #56d4dd; }
+.source-viewer .hljs-literal    { color: #6cb6ff; }
+.source-viewer .hljs-number     { color: #6cb6ff; }
+.source-viewer .hljs-string     { color: #96d0ff; }
+.source-viewer .hljs-comment    { color: #545d68; font-style: italic; }
+.source-viewer .hljs-meta       { color: #e3b341; }
+.source-viewer .hljs-variable   { color: #adbac7; }
+.source-viewer .hljs-title      { color: #dcbdfb; }
+.source-viewer .hljs-params     { color: #adbac7; }
+.source-viewer .hljs-attr       { color: #6cb6ff; }
+.source-viewer .hljs-punctuation { color: #adbac7; }
