@@ -3,8 +3,19 @@ import {
   getNodeType,
   getNodeTypeColor,
   cleanName,
-  dirPrefix
+  dirPrefix,
+  fileExt
 } from './utils.js';
+
+// A compiled source file (.c/.cpp/.s …) with zero snippets in the SBOM means no
+// code from it survived into the final binary — the linker dead-stripped it.
+// We surface these "not linked" files distinctively in the graph.
+const COMPILED_SOURCE_EXTS = new Set(['.c', '.cpp', '.cc', '.cxx', '.s']);
+function isUnlinkedSource(el, app) {
+  if (!el || getNodeType(el) !== 'file') return false;
+  if (!COMPILED_SOURCE_EXTS.has(fileExt(el.name || '').toLowerCase())) return false;
+  return (app.snippetsByFileIndex.get(el.spdxId)?.length || 0) === 0;
+}
 
 const INPUT_LAYOUT_LINKS_PER_BUILD = 8;
 // Above this many underlying nodes we refuse to render a flat graph even if the
@@ -168,6 +179,7 @@ export function renderGraph(app) {
     if (!activeNodeTypes.has(type)) return null;
 
     const node = { id: spdxId, name: el.name || cleanName(spdxId), type, data: el };
+    if (isUnlinkedSource(el, app)) node.notLinked = true;
     uNodeIds.add(spdxId);
     uNodeById.set(spdxId, node);
     uNodes.push(node);
@@ -494,13 +506,54 @@ export function renderGraph(app) {
       let alpha = ss.alpha;
       if (connected && !connected.has(d.id)) alpha = 0.12;
       ctx.globalAlpha = alpha;
-      ctx.beginPath();
-      ctx.arc(d.x, d.y, r, 0, 2 * Math.PI);
-      ctx.fillStyle = getNodeTypeColor(d.type);
-      ctx.fill();
-      ctx.lineWidth = (d.isCluster ? 2.5 : 1.5) / k;
-      ctx.strokeStyle = d.isCluster ? 'rgba(255,255,255,0.85)' : strokeFor(d);
-      ctx.stroke();
+      const baseColor = getNodeTypeColor(d.type);
+
+      if (d.notLinked) {
+        // Dead-stripped source: washed-out fill + diagonal hatch + dashed ring
+        // so it reads as "present but not in the binary" at a glance.
+        const wash = d3.color(baseColor);
+        wash.opacity = 0.28;
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, r, 0, 2 * Math.PI);
+        ctx.fillStyle = wash.toString();
+        ctx.fill();
+
+        // Washed-out shade shared by the stripes and the dashed ring.
+        const faded = d3.color(baseColor);
+        faded.opacity = 0.5;
+        const fadedStr = faded.toString();
+
+        // Diagonal stripes, clipped to the circle.
+        ctx.save();
+        ctx.clip(); // clips to the arc path above
+        ctx.strokeStyle = fadedStr;
+        ctx.lineWidth = Math.max(0.6, r * 0.13);
+        const gap = Math.max(2.4, r * 0.46);
+        ctx.beginPath();
+        for (let o = -2 * r; o <= 2 * r; o += gap) {
+          ctx.moveTo(d.x - r + o, d.y - r);
+          ctx.lineTo(d.x + r + o, d.y + r);
+        }
+        ctx.stroke();
+        ctx.restore();
+
+        // Dashed outline in the same lighter shade.
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, r, 0, 2 * Math.PI);
+        ctx.setLineDash([2.5 / k, 2 / k]);
+        ctx.lineWidth = 1.5 / k;
+        ctx.strokeStyle = fadedStr;
+        ctx.stroke();
+        ctx.setLineDash([]);
+      } else {
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, r, 0, 2 * Math.PI);
+        ctx.fillStyle = baseColor;
+        ctx.fill();
+        ctx.lineWidth = (d.isCluster ? 2.5 : 1.5) / k;
+        ctx.strokeStyle = d.isCluster ? 'rgba(255,255,255,0.85)' : strokeFor(d);
+        ctx.stroke();
+      }
       if (searchActive && matchSet.has(d.id)) {
         // Amber ring so search hits pop regardless of node colour.
         ctx.globalAlpha = 1;
