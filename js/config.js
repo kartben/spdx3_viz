@@ -72,40 +72,6 @@ export const COLORS = {
   default: '#6b7280'
 };
 
-/**
- * Node color configurations for graph legend
- * @constant {Array<{type: string, label: string, color: string}>}
- */
-export const NODE_COLORS = [
-  { type: 'package', label: 'Package', color: COLORS.package },
-  { type: 'file', label: 'File', color: COLORS.file },
-  { type: 'tool', label: 'Tool', color: COLORS.tool },
-  { type: 'build', label: 'Build', color: COLORS.build },
-  { type: 'config', label: 'Config', color: COLORS.config },
-  { type: 'external', label: 'External', color: COLORS.external }
-];
-
-/**
- * Edge color configurations for graph legend
- * @constant {Array<{type: string, label: string, color: string}>}
- */
-export const EDGE_COLORS = [
-  { type: 'dependsOn', label: 'dependsOn', color: COLORS.package },
-  { type: 'contains', label: 'contains', color: COLORS.file },
-  { type: 'generates', label: 'generates', color: COLORS.build },
-  { type: 'hasInput', label: 'hasInput', color: COLORS.buildInput },
-  { type: 'hasOutput', label: 'hasOutput', color: COLORS.buildOutput },
-  {
-    type: 'hasDistributionArtifact',
-    label: 'hasDistributionArtifact',
-    color: COLORS.distribution
-  },
-  { type: 'ancestorOf', label: 'ancestorOf', color: COLORS.buildLineage },
-  { type: 'usesTool', label: 'usesTool', color: COLORS.tool },
-  { type: 'hasStaticLink', label: 'hasStaticLink', color: COLORS.staticLink },
-  { type: 'configures', label: 'configures', color: COLORS.config }
-];
-
 /* ==========================================================================
    Graph Filters
    Filter configurations for the force-directed graph

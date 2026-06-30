@@ -1,4 +1,4 @@
-import { createGraphFilters, NODE_COLORS, EDGE_COLORS, createViews } from './config.js';
+import { createGraphFilters, createViews } from './config.js';
 import { computeRelationshipTypeCounts } from './parser.js';
 import {
   cleanName as formatSpdxName,
@@ -184,8 +184,6 @@ export function spdxApp() {
     graphCanvasSel: null,
     graphZoom: null,
     graphFilters: createGraphFilters(),
-    nodeColors: NODE_COLORS,
-    edgeColors: EDGE_COLORS,
     graphAggregate: false,
     expandedClusters: new Set(), // cluster keys the user has drilled into
     graphNodeCount: 0, // live readout of rendered nodes/edges

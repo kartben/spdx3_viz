@@ -663,22 +663,8 @@
             <div
               class="flex items-center gap-3 px-5 py-3 bg-slate-800/50 border-b border-slate-700/50 flex-shrink-0 flex-wrap"
             >
-              <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider"
-                >Show:</span
-              >
-              <template x-for="f in graphFilters" :key="f.key">
-                <label class="flex items-center gap-1.5 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    x-model="f.active"
-                    @change="updateGraph()"
-                    class="rounded border-slate-600 bg-slate-700 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5"
-                  />
-                  <span class="text-xs" :style="`color: ${f.color}`" x-text="f.label"></span>
-                </label>
-              </template>
               <!-- Search -->
-              <div class="flex items-center gap-2 ml-1">
+              <div class="flex items-center gap-2">
                 <div class="relative">
                   <svg
                     class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500"
@@ -781,23 +767,60 @@
             <div class="flex-1 relative graph-container" id="graphContainer">
               <div id="graphTooltip" class="tooltip hidden"></div>
             </div>
-            <!-- Graph legend -->
+            <!-- Graph legend (click an entry to toggle that type on/off) -->
             <div
-              class="flex items-center gap-4 px-5 py-2.5 bg-slate-800/50 border-t border-slate-700/50 flex-shrink-0 flex-wrap"
+              class="flex items-center gap-x-4 gap-y-1.5 px-5 py-2.5 bg-slate-800/50 border-t border-slate-700/50 flex-shrink-0 flex-wrap"
             >
-              <span class="text-xs text-slate-500">Nodes:</span>
-              <template x-for="c in nodeColors" :key="c.type">
-                <span class="flex items-center gap-1.5 text-xs text-slate-400">
-                  <span class="w-2.5 h-2.5 rounded-full" :style="`background:${c.color}`"></span>
-                  <span x-text="c.label"></span>
-                </span>
+              <span
+                class="flex items-center gap-1 text-[11px] text-slate-500 italic mr-1 select-none"
+                title="Click any entry below to show or hide that type"
+              >
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"
+                  />
+                </svg>
+                <span>click to show/hide</span>
+              </span>
+              <div class="basis-full h-0"></div>
+              <span class="text-xs text-slate-500" title="Click an entry to toggle it">Nodes:</span>
+              <template x-for="f in graphFilters.filter((x) => !x.isRel)" :key="f.key">
+                <button
+                  type="button"
+                  @click="f.active = !f.active; updateGraph()"
+                  :title="f.active ? `Hide ${f.label}` : `Show ${f.label}`"
+                  class="flex items-center gap-1.5 text-xs cursor-pointer transition-colors hover:text-white"
+                  :class="f.active ? 'text-slate-300' : 'text-slate-500 line-through'"
+                >
+                  <span
+                    class="w-2.5 h-2.5 rounded-full border transition-colors"
+                    :style="f.active
+                      ? `background:${f.color}; border-color:${f.color}`
+                      : `background:transparent; border-color:${f.color}`"
+                  ></span>
+                  <span x-text="f.label"></span>
+                </button>
               </template>
-              <span class="text-xs text-slate-500 ml-3">Edges:</span>
-              <template x-for="c in edgeColors" :key="c.type">
-                <span class="flex items-center gap-1.5 text-xs text-slate-400">
-                  <span class="w-4 h-0.5 rounded" :style="`background:${c.color}`"></span>
-                  <span x-text="c.label"></span>
-                </span>
+              <div class="basis-full h-0"></div>
+              <span class="text-xs text-slate-500" title="Click an entry to toggle it">Edges:</span>
+              <template x-for="f in graphFilters.filter((x) => x.isRel)" :key="f.key">
+                <button
+                  type="button"
+                  @click="f.active = !f.active; updateGraph()"
+                  :title="f.active ? `Hide ${f.label}` : `Show ${f.label}`"
+                  class="flex items-center gap-1.5 text-xs cursor-pointer transition-colors hover:text-white"
+                  :class="f.active ? 'text-slate-300' : 'text-slate-500 line-through'"
+                >
+                  <span
+                    class="w-4 h-0.5 rounded transition-opacity"
+                    :style="`background:${f.color}`"
+                    :class="f.active ? 'opacity-100' : 'opacity-30'"
+                  ></span>
+                  <span x-text="f.label"></span>
+                </button>
               </template>
             </div>
           </div>
