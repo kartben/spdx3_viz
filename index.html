@@ -3043,16 +3043,19 @@
         <div class="flex-1 overflow-y-auto p-4 space-y-4" x-show="detailElement">
           <!-- Promoted properties (type-specific highlights) -->
           <template x-for="field in detailPromotedFields" :key="field.prop">
-            <div x-show="field.variant === 'hero'" class="detail-promoted-hero">
-              <div class="detail-promoted-hero-label" x-text="field.label"></div>
-              <div class="detail-promoted-hero-value" x-text="field.value"></div>
-            </div>
-            <div x-show="field.variant === 'badge'" class="flex items-center gap-2">
-              <span class="text-xs text-slate-500" x-text="field.label"></span>
-              <span
-                class="text-xs px-2 py-0.5 rounded-md bg-slate-700 text-slate-300"
-                x-text="field.value"
-              ></span>
+            <!-- x-for needs a single root; hero/badge variants toggle inside it -->
+            <div>
+              <div x-show="field.variant === 'hero'" class="detail-promoted-hero">
+                <div class="detail-promoted-hero-label" x-text="field.label"></div>
+                <div class="detail-promoted-hero-value" x-text="field.value"></div>
+              </div>
+              <div x-show="field.variant === 'badge'" class="flex items-center gap-2">
+                <span class="text-xs text-slate-500" x-text="field.label"></span>
+                <span
+                  class="text-xs px-2 py-0.5 rounded-md bg-slate-700 text-slate-300"
+                  x-text="field.value"
+                ></span>
+              </div>
             </div>
           </template>
 
