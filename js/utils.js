@@ -178,6 +178,34 @@ export function getRelationshipSortOrder(relType, direction) {
 }
 
 /**
+ * Display form of a license expression: substitutes custom `LicenseRef-…` ids
+ * with the name of the element they map to via simplelicensing_customIdToUri
+ * (SPDX 3 SimpleLicensing profile), so viewers see e.g.
+ * "GPL-2.0-only AND bzip2-1.0.4" instead of the opaque LicenseRef token.
+ * The raw expression (needed for parsing/fetching) is left untouched on the
+ * element itself.
+ *
+ * @param {Object} element - simplelicensing_LicenseExpression element
+ * @param {Map} [elementMap] - Map of SPDX IDs to elements
+ * @returns {string} Resolved expression, or '' when the element has none
+ */
+export function displayLicenseExpression(element, elementMap) {
+  const expr = element?.simplelicensing_licenseExpression;
+  if (!expr) return '';
+  const map = element.simplelicensing_customIdToUri;
+  if (!Array.isArray(map) || !map.length) return String(expr);
+  // Longest key first so one custom id can't clobber another's prefix.
+  return map
+    .filter((entry) => entry?.key)
+    .sort((a, b) => b.key.length - a.key.length)
+    .reduce((out, entry) => {
+      const name =
+        elementMap?.get(entry.value)?.name || entry.key.replace(/^LicenseRef-/, '');
+      return out.split(entry.key).join(name);
+    }, String(expr));
+}
+
+/**
  * Gets the display name for a relationship target
  * Handles license URLs specially, otherwise uses element name or cleaned ID
  *
@@ -198,7 +226,7 @@ export function getRelationshipTargetDisplayName(spdxId, elementMap) {
   // raw-URL fallback below — otherwise every target would render as a long URL.
   const element = elementMap.get(spdxId);
   if (element?.simplelicensing_licenseExpression) {
-    return element.simplelicensing_licenseExpression;
+    return displayLicenseExpression(element, elementMap);
   }
   if (element?.type === 'security_Vulnerability') return getVulnerabilityId(element);
   if (element?.name) return element.name;
@@ -212,12 +240,13 @@ export function getRelationshipTargetDisplayName(spdxId, elementMap) {
  * Human-readable title for an element in the detail panel header
  *
  * @param {Object} element - The SPDX element
+ * @param {Map} [elementMap] - Map of SPDX IDs to elements (resolves custom license ids)
  * @returns {string} Display title
  */
-export function getElementDisplayName(element) {
+export function getElementDisplayName(element, elementMap) {
   if (!element) return '';
   if (element.simplelicensing_licenseExpression) {
-    return element.simplelicensing_licenseExpression;
+    return displayLicenseExpression(element, elementMap);
   }
   if (element.type === 'security_Vulnerability') return getVulnerabilityId(element);
   if (element.name) return element.name;
@@ -228,9 +257,10 @@ export function getElementDisplayName(element) {
  * Promoted fields for the detail panel (see DETAIL_PROMOTED_FIELDS in config)
  *
  * @param {Object} element - The SPDX element
+ * @param {Map} [elementMap] - Map of SPDX IDs to elements (resolves custom license ids)
  * @returns {Array<{prop: string, label: string, value: string, variant: string}>}
  */
-export function getDetailPromotedFields(element) {
+export function getDetailPromotedFields(element, elementMap) {
   if (!element) return [];
 
   return DETAIL_PROMOTED_FIELDS.flatMap((spec) => {
@@ -241,7 +271,10 @@ export function getDetailPromotedFields(element) {
       {
         prop: spec.prop,
         label: spec.label,
-        value: String(value),
+        value:
+          spec.prop === 'simplelicensing_licenseExpression'
+            ? displayLicenseExpression(element, elementMap)
+            : String(value),
         variant: spec.variant || 'badge'
       }
     ];

@@ -8,7 +8,12 @@
  */
 
 import { COLORS, ELEMENT_TYPES, RELATIONSHIP_TYPES, VEX_TYPES } from './config.js';
-import { getVulnerabilityId, getVulnerabilityLocators, vexStatusForRel } from './utils.js';
+import {
+  displayLicenseExpression,
+  getVulnerabilityId,
+  getVulnerabilityLocators,
+  vexStatusForRel
+} from './utils.js';
 
 /**
  * Builds a throttled progress reporter. Returns a function to call once per
@@ -630,7 +635,7 @@ function resolveLicenseLabel(id, elementMap) {
   if (!id) return '';
   const el = elementMap.get(id);
   if (el?.simplelicensing_licenseExpression) {
-    return el.simplelicensing_licenseExpression;
+    return displayLicenseExpression(el, elementMap);
   }
   if (id.startsWith('https://spdx.org/licenses/')) {
     return id.replace('https://spdx.org/licenses/', '');

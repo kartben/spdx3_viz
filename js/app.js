@@ -9,6 +9,7 @@ import {
   getRelationshipGroupLabel,
   getRelationshipSortOrder,
   getRelationshipTargetDisplayName,
+  displayLicenseExpression,
   getElementDisplayName,
   getDetailPromotedFields,
   getNodeType as resolveNodeType,
@@ -1041,10 +1042,10 @@ export function spdxApp() {
       return getRelationshipTargetDisplayName(spdxId, this.elementMap);
     },
     elementDisplayName(element) {
-      return getElementDisplayName(element);
+      return getElementDisplayName(element, this.elementMap);
     },
     get detailPromotedFields() {
-      return getDetailPromotedFields(this.detailElement);
+      return getDetailPromotedFields(this.detailElement, this.elementMap);
     },
     elementBadgeClass(type) {
       return getElementBadgeClass(type);
@@ -1223,7 +1224,9 @@ export function spdxApp() {
       const lic = this.licenses.find((l) => l.id === id);
       if (lic) return lic.label;
       const el = this.elementMap.get(id);
-      if (el?.simplelicensing_licenseExpression) return el.simplelicensing_licenseExpression;
+      if (el?.simplelicensing_licenseExpression) {
+        return displayLicenseExpression(el, this.elementMap);
+      }
       if (id.startsWith('https://spdx.org/licenses/')) {
         return id.replace('https://spdx.org/licenses/', '');
       }
@@ -1517,7 +1520,10 @@ export function spdxApp() {
 
       this.licenseModalOpen = true;
       this.licenseModalRef = licenseRef;
-      this.licenseModalExpression = expression;
+      // Show the display form (custom LicenseRef ids resolved to names); the
+      // raw expression is still what gets parsed into parts above.
+      this.licenseModalExpression =
+        displayLicenseExpression(this.elementMap.get(licenseRef), this.elementMap) || expression;
       this.licenseModalActiveIndex = 0;
       this.licenseModalParts = parsedParts.map((part) => this.createLicenseModalPart(part));
 
@@ -1532,6 +1538,7 @@ export function spdxApp() {
         if (textEl?.simplelicensing_licenseText) {
           part.kind = 'inline';
           part.name = textEl.name || part.label;
+          part.label = textEl.name || part.label;
           part.text = textEl.simplelicensing_licenseText;
           part.loaded = true;
         }
