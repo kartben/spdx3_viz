@@ -940,6 +940,7 @@ export function renderGraph(app) {
       selectedNodeId = null;
       app.graphSelectedNodeId = null;
       syncHighlight();
+      app._scheduleNavPush();
       return;
     }
     selectedNodeId = found.id;
@@ -950,6 +951,7 @@ export function renderGraph(app) {
     } else {
       app.detailElement = found.data;
     }
+    app._scheduleNavPush();
   });
 
   // Double-click drills into a collapsed cluster.
@@ -966,6 +968,14 @@ export function renderGraph(app) {
   app.graphRecomputeSearch = recomputeSearch;
   recomputeSearch();
   setFlow();
+
+  // Lets nav-history restoration (browser back/forward) re-pin a node's
+  // highlight on the already-rendered canvas without a full graph rebuild.
+  app.graphSyncSelection = (id) => {
+    selectedNodeId = renderById.has(id) ? id : null;
+    app.graphSelectedNodeId = selectedNodeId;
+    syncHighlight();
+  };
 
   app.graphSim = sim;
   app.graphCanvasSel = sel;

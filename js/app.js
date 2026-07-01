@@ -121,6 +121,8 @@ export function spdxApp() {
     expandedConfig: null,
     expandedBuild: null,
     expandedLicense: null,
+    _navPushQueued: false, // batches same-tick nav-state changes into one history entry
+    _lastNavKey: null, // JSON of the last pushed/replaced nav state, to skip no-op pushes
     focusedNavKind: '',
     focusedNavId: '',
     focusedNavTimer: null,
@@ -195,6 +197,7 @@ export function spdxApp() {
     graphMatchCount: 0, // live count of matched nodes
     graphRecomputeSearch: null, // set by the graph renderer; updates the overlay only
     graphSelectedNodeId: null, // render-node id pinned by click (keeps hover-style focus)
+    graphSyncSelection: null, // set by the graph renderer; re-pins the highlight without a rebuild
 
     // Views
     views: createViews(),
@@ -338,6 +341,10 @@ export function spdxApp() {
       this.$watch('currentView', (v) => {
         if (v === 'graph') this.$nextTick(() => this.renderGraph());
       });
+      this.$watch('dataLoaded', (loaded) => {
+        if (loaded) this._initNavHistory();
+      });
+      window.addEventListener('popstate', (e) => this._applyNavState(e.state));
       this.loadSampleManifest();
     },
 
@@ -794,6 +801,72 @@ export function spdxApp() {
     },
 
     // Navigation
+    // Browser back/forward: every view switch or element drill-down (expanded
+    // card / graph detail panel) is captured as one history entry. Pushes are
+    // batched via microtask so a single action that touches several of these
+    // fields at once (e.g. navigateToPackage, which sets currentView then
+    // expandedPkg) still only produces one entry.
+    _navSnapshot() {
+      return {
+        view: this.currentView,
+        expandedPkg: this.expandedPkg,
+        expandedFile: this.expandedFile,
+        expandedConfig: this.expandedConfig,
+        expandedBuild: this.expandedBuild,
+        expandedLicense: this.expandedLicense,
+        detail: this.detailElement?.spdxId || null,
+        graphSelected: this.graphSelectedNodeId
+      };
+    },
+    _initNavHistory() {
+      const state = this._navSnapshot();
+      this._lastNavKey = JSON.stringify(state);
+      history.replaceState(state, '');
+    },
+    _scheduleNavPush() {
+      if (!this.dataLoaded || this._navPushQueued) return;
+      this._navPushQueued = true;
+      queueMicrotask(() => {
+        this._navPushQueued = false;
+        const state = this._navSnapshot();
+        const key = JSON.stringify(state);
+        if (key === this._lastNavKey) return;
+        this._lastNavKey = key;
+        history.pushState(state, '');
+      });
+    },
+    _applyNavState(state) {
+      if (!state) return;
+      const wasGraphView = this.currentView === 'graph';
+      this._lastNavKey = JSON.stringify(state);
+      if (state.view in this.mountedViews) this.mountedViews[state.view] = true;
+      this.currentView = state.view;
+      this.sidebarOpen = false;
+      this.expandedPkg = state.expandedPkg;
+      this.expandedFile = state.expandedFile;
+      this.expandedConfig = state.expandedConfig;
+      this.expandedBuild = state.expandedBuild;
+      this.expandedLicense = state.expandedLicense;
+      this.detailElement = state.detail
+        ? this.elementMap.get(state.detail) || this.placeholderElement(state.detail)
+        : null;
+      this.graphSelectedNodeId = state.graphSelected || null;
+      // Switching into 'graph' triggers a full rebuild (see the currentView
+      // $watch in init) which already reads graphSelectedNodeId fresh; only
+      // nudge the live canvas here if it was already showing (no rebuild
+      // coming) and needs its pinned highlight moved to match.
+      if (wasGraphView && state.view === 'graph') this.graphSyncSelection?.(state.graphSelected);
+      // Mirror navigateToX's scroll-into-view for whichever list the restored
+      // view tracks an expanded card for.
+      const expandedNavTarget = {
+        packages: ['package', this.expandedPkg],
+        files: ['file', this.expandedFile],
+        configs: ['config', this.expandedConfig],
+        build: ['build', this.expandedBuild],
+        licenses: ['license', this.expandedLicense]
+      }[state.view];
+      if (expandedNavTarget?.[1]) this.scrollToNavTarget(...expandedNavTarget);
+    },
     switchView(id) {
       // Mark the target view mounted before switching so its content builds on
       // first visit (and stays cached for instant re-switching afterwards).
@@ -801,21 +874,31 @@ export function spdxApp() {
       this.currentView = id;
       this.detailElement = null;
       this.sidebarOpen = false; // close the mobile drawer after navigating
+      this._scheduleNavPush();
+    },
+    closeDetailPanel() {
+      this.detailElement = null;
+      this._scheduleNavPush();
     },
     togglePkg(id) {
       this.expandedPkg = this.expandedPkg === id ? null : id;
+      this._scheduleNavPush();
     },
     toggleFile(id) {
       this.expandedFile = this.expandedFile === id ? null : id;
+      this._scheduleNavPush();
     },
     toggleConfig(id) {
       this.expandedConfig = this.expandedConfig === id ? null : id;
+      this._scheduleNavPush();
     },
     toggleBuild(id) {
       this.expandedBuild = this.expandedBuild === id ? null : id;
+      this._scheduleNavPush();
     },
     toggleLicense(id) {
       this.expandedLicense = this.expandedLicense === id ? null : id;
+      this._scheduleNavPush();
     },
     licenseUsers(id) {
       return this.licenseUsersIndex.get(id) || [];
@@ -1096,6 +1179,7 @@ export function spdxApp() {
     selectGraphNode(spdxId) {
       const el = this.elementMap.get(spdxId);
       this.detailElement = el || this.placeholderElement(spdxId);
+      this._scheduleNavPush();
     },
 
     copyHash(h) {
