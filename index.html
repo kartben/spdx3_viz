@@ -407,6 +407,48 @@
 
         <!-- VIEW CONTENT -->
         <main class="flex-1 overflow-y-auto p-4 sm:p-6" id="mainContent">
+          <!-- Chunked-render progress: large lists stream into the DOM a few
+               hundred cards per frame (see _ensureViewRendered) so the page
+               never freezes; this strip shows how far along the stream is. -->
+          <div
+            x-show="viewRender.active && viewRender.view === currentView"
+            class="sticky top-0 z-30 -mx-4 sm:-mx-6 -mt-4 sm:-mt-6 mb-4 px-4 sm:px-6 py-2.5 bg-slate-900/90 backdrop-blur border-b border-slate-700/50"
+          >
+            <div class="flex items-center gap-3 max-w-4xl">
+              <svg
+                class="w-4 h-4 text-blue-400 animate-spin flex-shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                />
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                />
+              </svg>
+              <span class="text-xs text-slate-300 flex-shrink-0 tabular-nums">
+                Rendering
+                <span
+                  x-text="`${formatCount(viewRender.done)} of ${formatCount(viewRender.total)}`"
+                ></span
+                >…
+              </span>
+              <div class="flex-1 h-1.5 bg-slate-700 rounded-full overflow-hidden max-w-xs">
+                <div
+                  class="h-full bg-blue-500 rounded-full transition-[width] duration-150 ease-out"
+                  :style="`width:${viewRender.total ? Math.max(2, Math.round((viewRender.done / viewRender.total) * 100)) : 0}%`"
+                ></div>
+              </div>
+            </div>
+          </div>
           <!-- ========== DASHBOARD ========== -->
           <div x-show="currentView === 'dashboard'" class="fade-in space-y-6 max-w-6xl">
             <!-- Document metadata -->
@@ -644,7 +686,7 @@
               <div class="flex flex-wrap gap-2">
                 <template x-for="s in securityStatusOrder" :key="s">
                   <button
-                    @click="securityStatusFilter = s; securitySearch = ''; switchView('security')"
+                    @click="securityStatusFilter = s; securitySearch = ''; restreamView('security'); switchView('security')"
                     class="badge hover:brightness-125 transition"
                     :class="vexStatusMeta(s).badgeClass"
                     :title="`Show ${vexStatusMeta(s).label} vulnerabilities`"
@@ -924,6 +966,7 @@
               ></span>
               <select
                 x-model="pkgSort"
+                @change="restreamView('packages')"
                 class="ml-auto bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 text-slate-300 focus:outline-none focus:border-blue-500"
               >
                 <option value="name">Sort by name</option>
@@ -932,7 +975,7 @@
               </select>
             </div>
             <template
-              x-for="pkg in (mountedViews.packages ? filteredPackages : [])"
+              x-for="pkg in (mountedViews.packages ? renderSlice('packages', filteredPackages) : [])"
               :key="pkg.spdxId"
             >
               <div
@@ -1201,13 +1244,16 @@
                   <button
                     class="text-xs px-2.5 py-1 rounded-md transition-colors"
                     :class="fileTypeFilter === ft ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-700 text-slate-400 hover:text-white'"
-                    @click="fileTypeFilter = fileTypeFilter === ft ? '' : ft"
+                    @click="fileTypeFilter = fileTypeFilter === ft ? '' : ft; restreamView('files')"
                     x-text="ft"
                   ></button>
                 </template>
               </div>
             </div>
-            <template x-for="f in (mountedViews.files ? filteredFiles : [])" :key="f.spdxId">
+            <template
+              x-for="f in (mountedViews.files ? renderSlice('files', filteredFiles) : [])"
+              :key="f.spdxId"
+            >
               <div
                 class="card cursor-pointer"
                 data-nav-kind="file"
@@ -1433,13 +1479,17 @@
               />
               <select
                 x-model="licenseSort"
+                @change="restreamView('licenses')"
                 class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 text-slate-300 focus:outline-none focus:border-pink-500"
               >
                 <option value="usage">Sort by usage</option>
                 <option value="name">Sort by name</option>
               </select>
             </div>
-            <template x-for="lic in (mountedViews.licenses ? filteredLicenses : [])" :key="lic.id">
+            <template
+              x-for="lic in (mountedViews.licenses ? renderSlice('licenses', filteredLicenses) : [])"
+              :key="lic.id"
+            >
               <div
                 class="card"
                 data-nav-kind="license"
@@ -1612,6 +1662,7 @@
               />
               <select
                 x-model="securitySort"
+                @change="restreamView('security')"
                 class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 text-slate-300 focus:outline-none focus:border-rose-500"
               >
                 <option value="severity">Sort by status</option>
@@ -1623,7 +1674,7 @@
             <!-- Status filter chips -->
             <div class="flex flex-wrap items-center gap-2">
               <button
-                @click="securityStatusFilter = ''"
+                @click="securityStatusFilter = ''; restreamView('security')"
                 class="badge transition"
                 :class="securityStatusFilter === '' ? 'bg-slate-600/40 text-white ring-1 ring-slate-400/40' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
               >
@@ -1635,7 +1686,7 @@
               </button>
               <template x-for="s in securityStatusOrder" :key="s">
                 <button
-                  @click="securityStatusFilter = (securityStatusFilter === s ? '' : s)"
+                  @click="securityStatusFilter = (securityStatusFilter === s ? '' : s); restreamView('security')"
                   class="badge transition"
                   :class="securityStatusFilter === s ? vexStatusMeta(s).badgeClass + ' brightness-125' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
                   :title="`Show ${vexStatusMeta(s).label} vulnerabilities`"
@@ -1655,7 +1706,7 @@
 
             <!-- Vulnerability cards -->
             <template
-              x-for="vuln in (mountedViews.security ? filteredVulnerabilities : [])"
+              x-for="vuln in (mountedViews.security ? renderSlice('security', filteredVulnerabilities) : [])"
               :key="vuln.spdxId"
             >
               <div
@@ -1950,7 +2001,7 @@
             </div>
 
             <template
-              x-for="cfg in (mountedViews.configs ? filteredConfigs : [])"
+              x-for="cfg in (mountedViews.configs ? renderSlice('configs', filteredConfigs) : [])"
               :key="cfg.spdxId"
             >
               <div
@@ -2445,6 +2496,7 @@
                   />
                   <select
                     x-model="buildSort"
+                    @change="restreamView('build')"
                     class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 text-slate-300 focus:outline-none focus:border-purple-500"
                   >
                     <option value="output">Sort by output</option>
@@ -2456,7 +2508,7 @@
 
               <div class="space-y-2">
                 <template
-                  x-for="build in (mountedViews.build ? filteredBuilds : [])"
+                  x-for="build in (mountedViews.build ? renderSlice('build', filteredBuilds) : [])"
                   :key="build.spdxId"
                 >
                   <div

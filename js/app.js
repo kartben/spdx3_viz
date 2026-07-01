@@ -66,6 +66,28 @@ let filteredVulnsCacheKey = null;
 let filteredVulnsCacheVal = [];
 const licenseTextCache = new Map(); // licenseId -> { name, text }
 
+/* Chunked list rendering (see renderSlice/_ensureViewRendered). Building
+   thousands of cards in one synchronous x-for pass freezes the page for
+   seconds on large SBOMs (the Yocto sample has ~3k CVEs), so the heavy list
+   views stream in RENDER_CHUNK cards per frame behind a progress bar instead.
+   The whole list still ends up in the DOM — no virtualization — so deep links
+   to any card keep working. Bookkeeping lives off the reactive state:
+   shownCounts tracks how many items each view's x-for actually emitted last
+   evaluation, and viewRenderSeq cancels a streaming loop when a newer one (or
+   freshly parsed data) supersedes it. */
+const RENDER_CHUNK = 200; // max new cards added to the DOM per frame
+let viewRenderSeq = 0;
+const shownCounts = {};
+// View id -> the filtered list its main x-for renders, for the streaming loop.
+const viewListProps = {
+  packages: 'filteredPackages',
+  files: 'filteredFiles',
+  licenses: 'filteredLicenses',
+  security: 'filteredVulnerabilities',
+  configs: 'filteredConfigs',
+  build: 'filteredBuilds'
+};
+
 function getParserWorker() {
   if (!parserWorker) {
     parserWorker = new Worker(new URL('./parser.worker.js', import.meta.url), { type: 'module' });
@@ -126,6 +148,18 @@ export function spdxApp() {
       configs: false,
       build: false
     },
+    // How many items of each heavy view's filtered list the DOM may show.
+    // Grows chunk-by-chunk (see _ensureViewRendered) so opening e.g. a 3k-CVE
+    // Security view streams in behind a progress bar instead of freezing.
+    renderLimits: {
+      packages: 0,
+      files: 0,
+      licenses: 0,
+      security: 0,
+      configs: 0,
+      build: 0
+    },
+    viewRender: { active: false, view: '', done: 0, total: 0 }, // streaming progress readout
     searchQuery: '',
     sidebarOpen: false, // mobile off-canvas nav drawer (ignored at md+ where the sidebar is static)
     detailElement: null,
@@ -140,6 +174,7 @@ export function spdxApp() {
     focusedNavKind: '',
     focusedNavId: '',
     focusedNavTimer: null,
+    _scrollNavSeq: 0, // invalidates pending scrollToNavTarget retries
     configSearch: '',
     buildSearch: '',
     licenseSearch: '',
@@ -657,6 +692,15 @@ export function spdxApp() {
         this.cveDetails = {}; // drop cached CVE fetches from the previous SBOM
         filteredBuildsCacheKey = null; // invalidate the build sort memo for new data
         filteredVulnsCacheKey = null; // invalidate the vulnerability sort memo for new data
+        // Fresh data: reset the streaming cursors so every list view streams
+        // its (new) content on next visit, and kick the one currently shown.
+        viewRenderSeq++; // cancel any in-flight chunked render of the old data
+        this.viewRender.active = false;
+        Object.keys(this.renderLimits).forEach((k) => {
+          this.renderLimits[k] = 0;
+          shownCounts[k] = 0;
+        });
+        this._ensureViewRendered(this.currentView);
 
         // Re-render D3 views if currently active (they don't auto-update from
         // Alpine reactivity).
@@ -1050,6 +1094,7 @@ export function spdxApp() {
       this._lastNavKey = JSON.stringify(state);
       if (state.view in this.mountedViews) this.mountedViews[state.view] = true;
       this.currentView = state.view;
+      this._ensureViewRendered(state.view);
       this.sidebarOpen = false;
       this.expandedPkg = state.expandedPkg;
       this.expandedFile = state.expandedFile;
@@ -1086,7 +1131,66 @@ export function spdxApp() {
       this.currentView = id;
       this.detailElement = null;
       this.sidebarOpen = false; // close the mobile drawer after navigating
+      this._ensureViewRendered(id);
       this._scheduleNavPush();
+    },
+
+    // Every heavy list x-for renders through this. It returns at most
+    // renderLimits[view] items, and hard-caps how many NEW cards a single
+    // synchronous evaluation may add — so no filter/search change (e.g.
+    // clearing a search over 3k CVEs) can balloon the DOM in one blocking
+    // pass. Anything past the cap is streamed in by _ensureViewRendered.
+    renderSlice(view, list) {
+      let limit = this.renderLimits[view];
+      const allowed = (shownCounts[view] || 0) + RENDER_CHUNK;
+      if (limit > allowed && list.length > allowed) {
+        limit = allowed;
+        this.renderLimits[view] = allowed;
+        queueMicrotask(() => this._ensureViewRendered(view));
+      }
+      shownCounts[view] = Math.min(limit, list.length);
+      return list.length <= limit ? list : list.slice(0, limit);
+    },
+
+    // Streams the current view's list into the DOM one chunk per frame,
+    // driving the viewRender progress bar. Resumable and safe to call any
+    // time: it no-ops when the view is hidden or fully rendered, and a newer
+    // call (or freshly parsed data) cancels an in-flight one.
+    async _ensureViewRendered(view) {
+      const listProp = viewListProps[view];
+      if (!listProp || this.currentView !== view) return;
+      if (this.renderLimits[view] >= this[listProp].length) return;
+      const token = ++viewRenderSeq;
+      for (;;) {
+        const total = this[listProp].length;
+        const done = Math.min(this.renderLimits[view] + RENDER_CHUNK, total);
+        this.renderLimits[view] = done;
+        Object.assign(this.viewRender, { active: done < total, view, done, total });
+        if (done >= total) return;
+        // Let Alpine build this chunk, then yield so the page (and the
+        // progress bar) stays responsive between chunks. Plain setTimeout,
+        // not requestAnimationFrame — rAF callbacks are paused in background/
+        // inactive tabs, which would stall the stream indefinitely if the
+        // user switches away mid-render.
+        await this.$nextTick();
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        if (token !== viewRenderSeq) return; // superseded — the newer run owns viewRender
+        if (this.currentView !== view) {
+          // User switched away mid-stream: pause; the next visit resumes.
+          this.viewRender.active = false;
+          return;
+        }
+      }
+    },
+
+    // Re-streams a view from a fresh first page. Used when its sort order or
+    // a filter chip changes: re-sorting swaps/reorders thousands of existing
+    // cards, which is as expensive as building them from scratch.
+    restreamView(view) {
+      if (!(view in this.renderLimits)) return;
+      shownCounts[view] = 0;
+      this.renderLimits[view] = Math.min(this.renderLimits[view], RENDER_CHUNK);
+      this._ensureViewRendered(view);
     },
     closeDetailPanel() {
       this.detailElement = null;
@@ -1171,17 +1275,26 @@ export function spdxApp() {
         }
       }, 1800);
     },
+    // Scrolls the list card for (kind, id) into view. The card may not exist
+    // yet while its view's list is still streaming in (_ensureViewRendered),
+    // so this retries until it appears or the stream settles without it.
     scrollToNavTarget(kind, id) {
-      this.$nextTick(() => {
-        requestAnimationFrame(() => {
-          const target = [...document.querySelectorAll(`[data-nav-kind="${kind}"]`)].find(
-            (el) => el.dataset.navId === id && el.offsetParent !== null
-          );
-          if (!target) return;
+      const seq = ++this._scrollNavSeq;
+      const attempt = (retriesLeft) => {
+        if (seq !== this._scrollNavSeq) return; // superseded by a newer navigation
+        const target = [...document.querySelectorAll(`[data-nav-kind="${kind}"]`)].find(
+          (el) => el.dataset.navId === id && el.offsetParent !== null
+        );
+        if (target) {
           target.scrollIntoView({ behavior: 'smooth', block: 'start' });
           this.focusNavTarget(kind, id);
-        });
-      });
+        } else if (this.viewRender.active) {
+          setTimeout(() => attempt(retriesLeft), 200); // list still streaming — wait
+        } else if (retriesLeft > 0) {
+          setTimeout(() => attempt(retriesLeft - 1), 200);
+        }
+      };
+      this.$nextTick(() => requestAnimationFrame(() => attempt(2)));
     },
     navigateTo(spdxId) {
       const el = this.elementMap.get(spdxId);
