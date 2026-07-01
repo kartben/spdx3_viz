@@ -999,7 +999,9 @@ export function spdxApp() {
             groups.get(key).items.push({
               id: t,
               displayName: this.relTargetDisplayName(t),
-              direction: 'out'
+              direction: 'out',
+              // LifecycleScopedRelationship scope (build / runtime / test / …)
+              scope: rel.scope || ''
             });
           }
         });
@@ -1022,7 +1024,8 @@ export function spdxApp() {
           groups.get(key).items.push({
             id: rel.from,
             displayName: this.relTargetDisplayName(rel.from),
-            direction: 'in'
+            direction: 'in',
+            scope: rel.scope || ''
           });
         }
       });

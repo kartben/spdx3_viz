@@ -382,6 +382,12 @@ export const DETAIL_PROMOTED_FIELDS = [
     label: 'Purpose',
     types: ['software_File', 'software_Package'],
     variant: 'badge'
+  },
+  {
+    prop: 'software_fileKind',
+    label: 'Kind',
+    types: ['software_File'],
+    variant: 'badge'
   }
 ];
 
