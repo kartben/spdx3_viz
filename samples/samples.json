@@ -3,7 +3,7 @@
     "id": "zephyr",
     "name": "Zephyr RTOS",
     "emoji": "🪁",
-    "description": "Firmware build SBOM — app, modules, and full build graph.",
+    "description": "A Zephyr application targeting an ESP32 board, and using LVGL for the GUI.",
     "dir": "samples/zephyr",
     "files": ["app.jsonld", "modules-deps.jsonld", "zephyr.jsonld", "build.jsonld"]
   },
@@ -11,8 +11,16 @@
     "id": "linux",
     "name": "Linux kernel",
     "emoji": "🐧",
-    "description": "Linux kernel build — source, build, and output SBOMs.",
+    "description": "Linux kernel build: source tree, build environment, and bzImage output.",
     "dir": "samples/linux",
     "files": ["sbom-source.spdx.json", "sbom-output.spdx.json", "sbom-build.spdx.json"]
+  },
+  {
+    "id": "yocto",
+    "name": "Yocto",
+    "icon": "favicon.png",
+    "description": "Yocto core-image-minimal build: rootfs, packages, build graph, and vulnerability (VEX) data.",
+    "dir": "samples/yocto",
+    "files": ["core-image-minimal-1-0-0-0-20260321-1540.spdx.json"]
   }
 ]

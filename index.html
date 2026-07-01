@@ -153,7 +153,15 @@
                 class="group text-left p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 hover:border-blue-500/50 hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-wait"
               >
                 <div class="flex items-center gap-2 mb-1.5">
-                  <span class="text-xl" x-text="s.emoji"></span>
+                  <span class="w-5 h-5 flex-shrink-0 flex items-center justify-center">
+                    <img
+                      x-show="s.icon"
+                      :src="`${s.dir}/${s.icon}`"
+                      :alt="s.name"
+                      class="w-5 h-5 rounded-sm object-contain"
+                    />
+                    <span x-show="!s.icon" class="text-xl leading-none" x-text="s.emoji"></span>
+                  </span>
                   <span class="font-medium text-white text-sm" x-text="s.name"></span>
                   <svg
                     x-show="loadingSample === s.id"
