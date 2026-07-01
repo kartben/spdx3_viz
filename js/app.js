@@ -19,6 +19,11 @@ import {
   getToolUsageCount,
   getExternalIdentifiers,
   getVulnerabilityLookup,
+  getVulnerabilityId,
+  getVulnerabilityLocators,
+  getVulnerabilityUrl,
+  getVexStatusMeta,
+  getVexJustificationLabel,
   isMeaningfulValue,
   normalizeUrl,
   copyToClipboard,
@@ -52,6 +57,11 @@ let latestParseReqId = 0;
 // affect the result; kept off the reactive state so it isn't proxied.
 let filteredBuildsCacheKey = null;
 let filteredBuildsCacheVal = [];
+// Same idea for the security view: sorting/filtering ~3k vulnerabilities is
+// wasted work when it re-runs on unrelated reactive changes (e.g. expanding a
+// card). Cached on the inputs that actually affect the result.
+let filteredVulnsCacheKey = null;
+let filteredVulnsCacheVal = [];
 const licenseTextCache = new Map(); // licenseId -> { name, text }
 
 function getParserWorker() {
@@ -110,6 +120,7 @@ export function spdxApp() {
       packages: false,
       files: false,
       licenses: false,
+      security: false,
       configs: false,
       build: false
     },
@@ -121,6 +132,7 @@ export function spdxApp() {
     expandedConfig: null,
     expandedBuild: null,
     expandedLicense: null,
+    expandedVuln: null,
     _navPushQueued: false, // batches same-tick nav-state changes into one history entry
     _lastNavKey: null, // JSON of the last pushed/replaced nav state, to skip no-op pushes
     focusedNavKind: '',
@@ -129,6 +141,9 @@ export function spdxApp() {
     configSearch: '',
     buildSearch: '',
     licenseSearch: '',
+    securitySearch: '',
+    securitySort: 'severity',
+    securityStatusFilter: '',
     licenseSort: 'usage',
     buildSort: 'output',
     pkgSort: 'name',
@@ -150,6 +165,10 @@ export function spdxApp() {
     buildInfo: null,
     agentInfo: null,
     licenses: [],
+    vulnerabilities: [], // enriched CVEs with VEX assessments
+    vexRelationships: [], // raw VEX assessment relationship elements (for the graph)
+    presentNodeTypes: [], // graph node types present in the data (trims the legend)
+    presentRelTypes: [], // relationship types present in the data (trims the legend)
     docName: '',
     docNamespace: '',
     specVersion: '',
@@ -177,6 +196,8 @@ export function spdxApp() {
     distributionArtifactIndex: new Map(), // package spdxId -> [artifact spdxIds]
     distributedByIndex: new Map(), // artifact spdxId -> [package spdxIds]
     licenseUsersIndex: new Map(), // license id -> [{from, kind}]
+    vexByVuln: new Map(), // vulnerability spdxId -> [VexAssessment]
+    vexByPackage: new Map(), // package spdxId -> [VexAssessment]
     buildConfigs: [], // build configuration elements
     generatedArtifacts: [],
 
@@ -230,7 +251,7 @@ export function spdxApp() {
         );
       else
         pkgs = [...pkgs].sort((a, b) =>
-          this.cleanName(a.spdxId).localeCompare(this.cleanName(b.spdxId))
+          (a.name || this.cleanName(a.spdxId)).localeCompare(b.name || this.cleanName(b.spdxId))
         );
       return pkgs;
     },
@@ -260,6 +281,86 @@ export function spdxApp() {
       }
       return [...lics].sort(
         (a, b) => b.userCount - a.userCount || (a.label || '').localeCompare(b.label || '')
+      );
+    },
+
+    // Vulnerabilities filtered by the search box + status filter, then sorted.
+    // Memoized on those inputs (see filteredVulnsCache*) so unrelated reactive
+    // changes don't re-sort ~3k CVEs.
+    get filteredVulnerabilities() {
+      const search = this.securitySearch;
+      const sort = this.securitySort;
+      const statusFilter = this.securityStatusFilter;
+      const vulns = this.vulnerabilities;
+      const key = `${vulns.length}|${search}|${sort}|${statusFilter}`;
+      if (key === filteredVulnsCacheKey) return filteredVulnsCacheVal;
+
+      let list = vulns;
+      if (search) {
+        const q = search.toLowerCase();
+        list = list.filter((v) => {
+          if (v.name.toLowerCase().includes(q)) return true;
+          return v.assessments.some(
+            (a) =>
+              this.relTargetDisplayName(a.packageId).toLowerCase().includes(q) ||
+              (a.impactStatement || '').toLowerCase().includes(q) ||
+              (a.actionStatement || '').toLowerCase().includes(q)
+          );
+        });
+      }
+      if (statusFilter) {
+        list = list.filter((v) =>
+          statusFilter === 'unknown' ? v.overallStatus === 'unknown' : v.statusCounts[statusFilter]
+        );
+      }
+
+      const sev = { affected: 4, under_investigation: 3, not_affected: 2, fixed: 1, unknown: 0 };
+      const sorted = [...list];
+      if (sort === 'cve') {
+        sorted.sort((a, b) => b.name.localeCompare(a.name, undefined, { numeric: true }));
+      } else if (sort === 'packages') {
+        sorted.sort((a, b) => b.packageCount - a.packageCount || a.name.localeCompare(b.name));
+      } else {
+        // severity: most concerning first, then most-affected, then CVE id
+        sorted.sort(
+          (a, b) =>
+            (sev[b.overallStatus] || 0) - (sev[a.overallStatus] || 0) ||
+            b.packageCount - a.packageCount ||
+            b.name.localeCompare(a.name, undefined, { numeric: true })
+        );
+      }
+
+      filteredVulnsCacheKey = key;
+      filteredVulnsCacheVal = sorted;
+      return sorted;
+    },
+
+    // Status breakdown across all vulnerabilities, for the dashboard + security
+    // header. Counts each vulnerability once by its overall (most severe) status.
+    get securitySummary() {
+      const counts = { fixed: 0, not_affected: 0, affected: 0, under_investigation: 0, unknown: 0 };
+      this.vulnerabilities.forEach((v) => {
+        counts[v.overallStatus] = (counts[v.overallStatus] || 0) + 1;
+      });
+      return { total: this.vulnerabilities.length, counts };
+    },
+
+    // Ordered list of statuses that actually occur, for rendering summary chips
+    // and the status filter without showing empty buckets.
+    get securityStatusOrder() {
+      const order = ['affected', 'under_investigation', 'not_affected', 'fixed', 'unknown'];
+      const counts = this.securitySummary.counts;
+      return order.filter((s) => counts[s] > 0);
+    },
+
+    // The subset of graph legend entries whose type is actually present in the
+    // loaded data — so an SBOM without VEX/tools/builds/etc. doesn't show a long
+    // legend full of toggles that would draw nothing.
+    get visibleGraphFilters() {
+      const nodeTypes = new Set(this.presentNodeTypes);
+      const relTypes = new Set(this.presentRelTypes);
+      return this.graphFilters.filter((f) =>
+        f.isRel ? relTypes.has(f.key) : nodeTypes.has(f.key)
       );
     },
 
@@ -545,10 +646,12 @@ export function spdxApp() {
         this.views.find((v) => v.id === 'packages').count = this.packages.length;
         this.views.find((v) => v.id === 'files').count = this.files.length;
         this.views.find((v) => v.id === 'licenses').count = this.licenses.length;
+        this.views.find((v) => v.id === 'security').count = this.vulnerabilities.length;
         this.views.find((v) => v.id === 'configs').count = this.buildConfigs.length;
         this.views.find((v) => v.id === 'build').count = this.builds.length;
         this.expandedClusters = new Set(); // fresh data: start fully collapsed
         filteredBuildsCacheKey = null; // invalidate the build sort memo for new data
+        filteredVulnsCacheKey = null; // invalidate the vulnerability sort memo for new data
 
         // Re-render D3 views if currently active (they don't auto-update from
         // Alpine reactivity).
@@ -709,6 +812,63 @@ export function spdxApp() {
     vulnLookup(eid) {
       return getVulnerabilityLookup(eid);
     },
+
+    // ========== SECURITY / VEX ==========
+    vexStatusMeta(status) {
+      return getVexStatusMeta(status);
+    },
+    vexJustificationLabel(type) {
+      return getVexJustificationLabel(type);
+    },
+    vulnId(el) {
+      return getVulnerabilityId(el);
+    },
+    vulnUrl(el) {
+      return getVulnerabilityUrl(el);
+    },
+    vulnLocators(el) {
+      return getVulnerabilityLocators(el);
+    },
+    // VEX assessments for a package (its associated vulnerabilities + statuses).
+    vulnsForPackage(spdxId) {
+      return this.vexByPackage.get(spdxId) || [];
+    },
+    // Distinct-status counts for a package's vulnerabilities, ordered by severity.
+    packageVulnSummary(spdxId) {
+      const assessments = this.vulnsForPackage(spdxId);
+      const byStatus = {};
+      const seen = new Set(); // de-dupe (vuln, status) so one CVE counts once
+      assessments.forEach((a) => {
+        const k = a.vulnId + '|' + a.status;
+        if (seen.has(k)) return;
+        seen.add(k);
+        (byStatus[a.status] ||= new Set()).add(a.vulnId);
+      });
+      const order = ['affected', 'under_investigation', 'not_affected', 'fixed', 'unknown'];
+      const total = new Set(assessments.map((a) => a.vulnId)).size;
+      return {
+        total,
+        statuses: order
+          .filter((s) => byStatus[s])
+          .map((s) => ({ status: s, count: byStatus[s].size, meta: getVexStatusMeta(s) }))
+      };
+    },
+    // The full enriched vulnerability record for a vuln spdxId (or null).
+    vulnRecord(spdxId) {
+      return this.vulnerabilities.find((v) => v.spdxId === spdxId) || null;
+    },
+    // Deduplicated, severity-sorted assessments for a vulnerability detail view.
+    assessmentsForVuln(spdxId) {
+      const list = this.vexByVuln.get(spdxId) || [];
+      const sev = { affected: 4, under_investigation: 3, not_affected: 2, fixed: 1, unknown: 0 };
+      return [...list].sort(
+        (a, b) =>
+          (sev[b.status] || 0) - (sev[a.status] || 0) ||
+          this.relTargetDisplayName(a.packageId).localeCompare(
+            this.relTargetDisplayName(b.packageId)
+          )
+      );
+    },
     isMeaningful(value) {
       return isMeaningfulValue(value);
     },
@@ -728,8 +888,14 @@ export function spdxApp() {
       const id = this.detailElement.spdxId;
       const groups = new Map(); // key → { label, color, items:[] }
 
+      // Vulnerability associations are surfaced in the dedicated security
+      // section, not the generic relationship list (a single package can carry
+      // thousands of them).
+      const skip = (rel) => rel.relationshipType === 'hasAssociatedVulnerability';
+
       // Outgoing: this element → targets
       (this.relFromIndex.get(id) || []).forEach((rel) => {
+        if (skip(rel)) return;
         const key = rel.relationshipType + ':out';
         if (!groups.has(key)) {
           groups.set(key, {
@@ -755,6 +921,7 @@ export function spdxApp() {
 
       // Incoming: sources → this element
       (this.relToIndex.get(id) || []).forEach((rel) => {
+        if (skip(rel)) return;
         const key = rel.relationshipType + ':in';
         if (!groups.has(key)) {
           groups.set(key, {
@@ -814,6 +981,7 @@ export function spdxApp() {
         expandedConfig: this.expandedConfig,
         expandedBuild: this.expandedBuild,
         expandedLicense: this.expandedLicense,
+        expandedVuln: this.expandedVuln,
         detail: this.detailElement?.spdxId || null,
         graphSelected: this.graphSelectedNodeId
       };
@@ -847,6 +1015,7 @@ export function spdxApp() {
       this.expandedConfig = state.expandedConfig;
       this.expandedBuild = state.expandedBuild;
       this.expandedLicense = state.expandedLicense;
+      this.expandedVuln = state.expandedVuln;
       this.detailElement = state.detail
         ? this.elementMap.get(state.detail) || this.placeholderElement(state.detail)
         : null;
@@ -863,7 +1032,8 @@ export function spdxApp() {
         files: ['file', this.expandedFile],
         configs: ['config', this.expandedConfig],
         build: ['build', this.expandedBuild],
-        licenses: ['license', this.expandedLicense]
+        licenses: ['license', this.expandedLicense],
+        security: ['vuln', this.expandedVuln]
       }[state.view];
       if (expandedNavTarget?.[1]) this.scrollToNavTarget(...expandedNavTarget);
     },
@@ -898,6 +1068,10 @@ export function spdxApp() {
     },
     toggleLicense(id) {
       this.expandedLicense = this.expandedLicense === id ? null : id;
+      this._scheduleNavPush();
+    },
+    toggleVuln(id) {
+      this.expandedVuln = this.expandedVuln === id ? null : id;
       this._scheduleNavPush();
     },
     licenseUsers(id) {
@@ -987,6 +1161,8 @@ export function spdxApp() {
         this.navigateToTool(spdxId);
       } else if (el.type === 'simplelicensing_LicenseExpression') {
         this.navigateToLicense(spdxId);
+      } else if (el.type === 'security_Vulnerability') {
+        this.navigateToVuln(spdxId);
       }
     },
     navigateToPackage(spdxId) {
@@ -1019,6 +1195,19 @@ export function spdxApp() {
       this.switchView('licenses');
       this.expandedLicense = spdxId;
       this.scrollToNavTarget('license', spdxId);
+    },
+    navigateToVuln(spdxId) {
+      this.securitySearch = '';
+      this.securityStatusFilter = '';
+      this.switchView('security');
+      this.expandedVuln = spdxId;
+      this.scrollToNavTarget('vuln', spdxId);
+    },
+    // Jump to the Security view pre-filtered to a package's vulnerabilities.
+    navigateToPackageSecurity(pkgSpdxId) {
+      this.securityStatusFilter = '';
+      this.securitySearch = this.relTargetDisplayName(pkgSpdxId);
+      this.switchView('security');
     },
     navigateToTool(spdxId) {
       // Tools live in the Build Tools grid at the bottom of the build view.

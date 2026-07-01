@@ -11,7 +11,10 @@ import {
   COLORS,
   DETAIL_PROMOTED_FIELDS,
   RELATIONSHIP_LABELS,
-  RELATIONSHIP_SORT_ORDER
+  RELATIONSHIP_SORT_ORDER,
+  VEX_STATUSES,
+  VEX_STATUS_BY_REL,
+  VEX_JUSTIFICATION_LABELS
 } from './config.js';
 
 /* ==========================================================================
@@ -136,7 +139,11 @@ export function getRelationshipColor(relType) {
     hasStaticLink: COLORS.staticLink,
     configures: COLORS.config,
     hasConcludedLicense: COLORS.license,
-    hasDeclaredLicense: COLORS.license
+    hasDeclaredLicense: COLORS.license,
+    fixedIn: COLORS.vexFixed,
+    doesNotAffect: COLORS.vexNotAffected,
+    affects: COLORS.vexAffected,
+    underInvestigation: COLORS.vexUnderInvestigation
   };
   return colorMap[relType] || COLORS.default;
 }
@@ -185,15 +192,19 @@ export function getRelationshipTargetDisplayName(spdxId, elementMap) {
   if (spdxId.startsWith('https://spdx.org/licenses/')) {
     return spdxId.replace('https://spdx.org/licenses/', '');
   }
-  if (spdxId.startsWith('http')) {
-    return spdxId;
-  }
 
+  // Prefer a resolved element's own name/expression. Producers such as Yocto/
+  // OpenEmbedded use full http(s) URLs as spdxIds, so this must run before the
+  // raw-URL fallback below — otherwise every target would render as a long URL.
   const element = elementMap.get(spdxId);
   if (element?.simplelicensing_licenseExpression) {
     return element.simplelicensing_licenseExpression;
   }
+  if (element?.type === 'security_Vulnerability') return getVulnerabilityId(element);
   if (element?.name) return element.name;
+
+  // Unresolved external http(s) reference: show the raw URL.
+  if (spdxId.startsWith('http')) return spdxId;
   return cleanName(spdxId);
 }
 
@@ -208,6 +219,7 @@ export function getElementDisplayName(element) {
   if (element.simplelicensing_licenseExpression) {
     return element.simplelicensing_licenseExpression;
   }
+  if (element.type === 'security_Vulnerability') return getVulnerabilityId(element);
   if (element.name) return element.name;
   return cleanName(element.spdxId);
 }
@@ -263,6 +275,7 @@ export function getNodeType(item) {
   if (item.type === 'build_Build') return 'build';
   if (item.type === 'SoftwareAgent') return 'agent';
   if (item.type === 'simplelicensing_LicenseExpression') return 'license';
+  if (item.type === 'security_Vulnerability') return 'vulnerability';
   return 'other';
 }
 
@@ -281,7 +294,8 @@ export function getNodeTypeColor(nodeType) {
     agent: COLORS.agent,
     config: COLORS.config,
     license: COLORS.license,
-    external: COLORS.external
+    external: COLORS.external,
+    vulnerability: COLORS.vulnerability
   };
   return colorMap[nodeType] || COLORS.default;
 }
@@ -300,7 +314,8 @@ export function getElementBadgeClass(type) {
     build_Build: 'bg-purple-500/15 text-purple-400',
     SoftwareAgent: 'bg-red-500/15 text-red-400',
     ExternalReference: 'bg-slate-500/15 text-slate-400',
-    simplelicensing_LicenseExpression: 'bg-pink-500/15 text-pink-400'
+    simplelicensing_LicenseExpression: 'bg-pink-500/15 text-pink-400',
+    security_Vulnerability: 'bg-rose-500/15 text-rose-400'
   };
   return classMap[type] || 'bg-slate-600/15 text-slate-400';
 }
@@ -508,6 +523,7 @@ export function isMeaningfulValue(value) {
 
 // Human-readable labels for SPDX externalIdentifierType values.
 const EXTERNAL_ID_LABELS = {
+  cve: 'CVE',
   packageUrl: 'PackageURL',
   cpe22: 'CPE 2.2',
   cpe23: 'CPE 2.3',
@@ -586,6 +602,115 @@ export function getVulnerabilityLookup(eid) {
   }
 
   return null;
+}
+
+/* ==========================================================================
+   Security / VEX Helpers
+   Surface SPDX 3 Security-profile vulnerabilities (CVEs) and the VEX
+   assessment relationships (fixed / not affected / affected / under
+   investigation) that connect them to packages.
+   ========================================================================== */
+
+/**
+ * Extracts the display id (preferring a CVE identifier) for a security_Vulnerability.
+ *
+ * @param {Object} el - The security_Vulnerability element
+ * @returns {string} e.g. 'CVE-2023-25584', or the cleaned spdxId tail as a fallback
+ */
+export function getVulnerabilityId(el) {
+  const ids = el?.externalIdentifier;
+  if (Array.isArray(ids)) {
+    const cve = ids.find(
+      (i) => i && /cve/i.test(i.externalIdentifierType || '') && isMeaningfulValue(i.identifier)
+    );
+    if (cve) return String(cve.identifier).trim();
+    const any = ids.find((i) => i && isMeaningfulValue(i.identifier));
+    if (any) return String(any.identifier).trim();
+  }
+  const tail = String(el?.spdxId || '')
+    .split('/')
+    .pop();
+  return tail || cleanName(el?.spdxId);
+}
+
+/**
+ * Collects followable reference URLs for a vulnerability from its
+ * externalIdentifier[].identifierLocator entries, adding a cve.org record link
+ * when the id is a CVE and no authoritative link is present.
+ *
+ * @param {Object} el - The security_Vulnerability element
+ * @returns {string[]} De-duplicated http(s) URLs
+ */
+export function getVulnerabilityLocators(el) {
+  const out = [];
+  const seen = new Set();
+  const push = (url) => {
+    if (typeof url === 'string' && /^https?:\/\//i.test(url) && !seen.has(url)) {
+      seen.add(url);
+      out.push(url);
+    }
+  };
+  (el?.externalIdentifier || []).forEach((eid) => {
+    (eid?.identifierLocator || []).forEach(push);
+  });
+  const cve = getVulnerabilityId(el);
+  if (/^CVE-\d{4}-\d+$/i.test(cve) && !out.some((u) => /cve\.org|nvd\.nist\.gov/i.test(u))) {
+    push(`https://www.cve.org/CVERecord?id=${cve}`);
+  }
+  return out;
+}
+
+/**
+ * Best single "canonical" reference URL for a vulnerability (prefers cve.org /
+ * NVD), or '' when none is available.
+ *
+ * @param {Object} el - The security_Vulnerability element
+ * @returns {string}
+ */
+export function getVulnerabilityUrl(el) {
+  const locs = getVulnerabilityLocators(el);
+  return locs.find((u) => /cve\.org|nvd\.nist\.gov/i.test(u)) || locs[0] || '';
+}
+
+/**
+ * Presentation metadata (label, colors, severity) for a normalized VEX status.
+ * Falls back to a neutral descriptor for unknown statuses.
+ *
+ * @param {string} status - 'fixed' | 'not_affected' | 'affected' | 'under_investigation'
+ * @returns {{key: string, label: string, color: string, badgeClass: string, dotClass: string, severity: number}}
+ */
+export function getVexStatusMeta(status) {
+  return (
+    VEX_STATUSES[status] || {
+      key: status || 'unknown',
+      label: 'No VEX status',
+      color: COLORS.default,
+      badgeClass: 'bg-slate-600/20 text-slate-300 ring-1 ring-slate-500/30',
+      dotClass: 'bg-slate-500',
+      severity: 0
+    }
+  );
+}
+
+/**
+ * Maps a VEX assessment relationship's relationshipType to a normalized status key.
+ *
+ * @param {string} relationshipType - e.g. 'fixedIn'
+ * @returns {string|null}
+ */
+export function vexStatusForRel(relationshipType) {
+  return VEX_STATUS_BY_REL[relationshipType] || null;
+}
+
+/**
+ * Human-readable label for a VexJustificationType value.
+ *
+ * @param {string} type
+ * @returns {string}
+ */
+export function getVexJustificationLabel(type) {
+  if (!type) return '';
+  return VEX_JUSTIFICATION_LABELS[type] || type;
 }
 
 /* ==========================================================================

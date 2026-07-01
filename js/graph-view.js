@@ -51,8 +51,17 @@ function placeholderFor(spdxId, rel, role) {
     'generates'
   ]);
 
+  const vexRelationshipTypes = new Set([
+    'fixedIn',
+    'doesNotAffect',
+    'affects',
+    'underInvestigation'
+  ]);
+
   let type = 'ExternalReference';
-  if (role === 'source' && buildRelationshipTypes.has(rel.relationshipType)) {
+  if (role === 'source' && vexRelationshipTypes.has(rel.relationshipType)) {
+    type = 'security_Vulnerability';
+  } else if (role === 'source' && buildRelationshipTypes.has(rel.relationshipType)) {
     type = 'build_Build';
   } else if (rel.relationshipType === 'ancestorOf') {
     type = 'build_Build';
@@ -176,7 +185,7 @@ export function renderGraph(app) {
      2. Underlying links
      ---------------------------------------------------------------------- */
   const uLinks = [];
-  app.relationships.forEach((rel) => {
+  const addRelLinks = (rel) => {
     if (rel.relationshipType === 'hasConcludedLicense') return;
     if (!activeRelTypes.has(rel.relationshipType)) return;
 
@@ -186,7 +195,13 @@ export function renderGraph(app) {
       if (!sourceNode || !targetNode) return;
       uLinks.push({ sourceId: rel.from, targetId: target, type: rel.relationshipType });
     });
-  });
+  };
+  app.relationships.forEach(addRelLinks);
+  // VEX assessment relationships (vulnerability → package) live outside the
+  // generic relationships array. They only become nodes/edges when the user
+  // enables the Vulnerabilities node type and a VEX edge type (both off by
+  // default), so by default this adds nothing.
+  (app.vexRelationships || []).forEach(addRelLinks);
 
   /* ----------------------------------------------------------------------
      3. Hierarchical clustering

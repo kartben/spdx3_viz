@@ -276,6 +276,7 @@
           <template x-for="v in views" :key="v.id">
             <div
               class="nav-item"
+              x-show="v.id !== 'security' || vulnerabilities.length > 0"
               :class="currentView === v.id && 'active'"
               @click="switchView(v.id)"
             >
@@ -285,6 +286,7 @@
                 x-show="v.count"
                 x-text="v.count"
                 class="text-[10px] bg-slate-700/60 px-1.5 py-0.5 rounded text-slate-400"
+                :class="v.id === 'security' && 'bg-rose-500/15 text-rose-300'"
               ></span>
             </div>
           </template>
@@ -588,6 +590,79 @@
               </button>
             </div>
 
+            <!-- Security / VEX summary -->
+            <div x-show="vulnerabilities.length > 0" class="card">
+              <div class="flex items-center gap-2 mb-4">
+                <div
+                  class="w-8 h-8 rounded-lg bg-rose-500/15 flex items-center justify-center flex-shrink-0"
+                >
+                  <svg
+                    class="w-4 h-4 text-rose-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 9v2m0 4h.01M12 3l7 4v5c0 4.418-3 8.418-7 9.5C8 20.418 5 16.418 5 12V7l7-4z"
+                    />
+                  </svg>
+                </div>
+                <h3 class="text-sm font-semibold text-white">Security &amp; VEX</h3>
+                <span
+                  class="text-xs text-slate-400"
+                  x-text="`${formatCount(securitySummary.total)} vulnerabilities`"
+                ></span>
+                <button
+                  @click="switchView('security')"
+                  class="ml-auto text-xs text-rose-300 hover:text-rose-200 inline-flex items-center gap-1"
+                >
+                  View all
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <!-- Stacked status bar -->
+              <div class="flex h-2.5 w-full rounded-full overflow-hidden bg-slate-700 mb-3">
+                <template x-for="s in securityStatusOrder" :key="s">
+                  <div
+                    class="h-full first:rounded-l-full last:rounded-r-full"
+                    :style="`width:${(securitySummary.counts[s] / securitySummary.total) * 100}%; background:${vexStatusMeta(s).color}`"
+                    :title="`${vexStatusMeta(s).label}: ${securitySummary.counts[s]}`"
+                  ></div>
+                </template>
+              </div>
+              <!-- Status chips (click to open the security view filtered by status) -->
+              <div class="flex flex-wrap gap-2">
+                <template x-for="s in securityStatusOrder" :key="s">
+                  <button
+                    @click="securityStatusFilter = s; securitySearch = ''; switchView('security')"
+                    class="badge hover:brightness-125 transition"
+                    :class="vexStatusMeta(s).badgeClass"
+                    :title="`Show ${vexStatusMeta(s).label} vulnerabilities`"
+                  >
+                    <span
+                      class="w-1.5 h-1.5 rounded-full mr-1.5"
+                      :class="vexStatusMeta(s).dotClass"
+                    ></span>
+                    <span x-text="vexStatusMeta(s).label"></span>
+                    <span
+                      class="ml-1.5 font-semibold"
+                      x-text="formatCount(securitySummary.counts[s])"
+                    ></span>
+                  </button>
+                </template>
+              </div>
+            </div>
+
             <!-- Relationship breakdown -->
             <div class="card">
               <h3 class="text-sm font-semibold text-white mb-4">Relationship Types</h3>
@@ -802,7 +877,7 @@
               </span>
               <div class="basis-full h-0"></div>
               <span class="text-xs text-slate-500" title="Click an entry to toggle it">Nodes:</span>
-              <template x-for="f in graphFilters.filter((x) => !x.isRel)" :key="f.key">
+              <template x-for="f in visibleGraphFilters.filter((x) => !x.isRel)" :key="f.key">
                 <button
                   type="button"
                   @click="f.active = !f.active; updateGraph()"
@@ -821,7 +896,7 @@
               </template>
               <div class="basis-full h-0"></div>
               <span class="text-xs text-slate-500" title="Click an entry to toggle it">Edges:</span>
-              <template x-for="f in graphFilters.filter((x) => x.isRel)" :key="f.key">
+              <template x-for="f in visibleGraphFilters.filter((x) => x.isRel)" :key="f.key">
                 <button
                   type="button"
                   @click="f.active = !f.active; updateGraph()"
@@ -886,8 +961,8 @@
                   </div>
                   <div class="flex-1 min-w-0">
                     <div
-                      class="font-medium text-white text-sm"
-                      x-text="cleanName(pkg.spdxId)"
+                      class="font-medium text-white text-sm break-words"
+                      x-text="pkg.name || cleanName(pkg.spdxId)"
                     ></div>
                     <div
                       class="text-xs text-slate-500"
@@ -903,6 +978,29 @@
                       class="badge bg-purple-500/15 text-purple-400"
                       x-text="(dependentsOf(pkg.spdxId)||[]).length + ' used by'"
                     ></span>
+                    <button
+                      x-show="packageVulnSummary(pkg.spdxId).total > 0"
+                      @click.stop="navigateToPackageSecurity(pkg.spdxId)"
+                      class="badge bg-rose-500/15 text-rose-300 hover:brightness-125 inline-flex items-center"
+                      :title="`${packageVulnSummary(pkg.spdxId).total} associated vulnerabilities — view in Security`"
+                    >
+                      <svg
+                        class="w-3 h-3 mr-1"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 9v2m0 4h.01M12 3l7 4v5c0 4.418-3 8.418-7 9.5C8 20.418 5 16.418 5 12V7l7-4z"
+                        />
+                      </svg>
+                      <span
+                        x-text="formatCount(packageVulnSummary(pkg.spdxId).total) + ' CVEs'"
+                      ></span>
+                    </button>
                     <svg
                       class="w-4 h-4 text-slate-500 transition-transform"
                       :class="expandedPkg === pkg.spdxId && 'rotate-180'"
@@ -1495,6 +1593,240 @@
               class="text-sm text-slate-500 italic text-center py-8"
             >
               No licenses found
+            </div>
+          </div>
+
+          <!-- ========== SECURITY / VEX ========== -->
+          <div x-show="currentView === 'security'" class="fade-in space-y-3 max-w-4xl">
+            <!-- Controls: count + search + sort -->
+            <div class="flex flex-wrap items-center gap-3">
+              <span
+                class="text-sm text-slate-400"
+                x-text="`${formatCount(filteredVulnerabilities.length)} of ${formatCount(vulnerabilities.length)} vulnerabilities`"
+              ></span>
+              <input
+                x-model.debounce.200ms="securitySearch"
+                type="text"
+                placeholder="Search CVE, package, statement…"
+                class="ml-auto bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-rose-500 w-56"
+              />
+              <select
+                x-model="securitySort"
+                class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 text-slate-300 focus:outline-none focus:border-rose-500"
+              >
+                <option value="severity">Sort by status</option>
+                <option value="packages">Sort by affected packages</option>
+                <option value="cve">Sort by CVE id</option>
+              </select>
+            </div>
+
+            <!-- Status filter chips -->
+            <div class="flex flex-wrap items-center gap-2">
+              <button
+                @click="securityStatusFilter = ''"
+                class="badge transition"
+                :class="securityStatusFilter === '' ? 'bg-slate-600/40 text-white ring-1 ring-slate-400/40' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
+              >
+                All
+                <span
+                  class="ml-1.5 font-semibold"
+                  x-text="formatCount(securitySummary.total)"
+                ></span>
+              </button>
+              <template x-for="s in securityStatusOrder" :key="s">
+                <button
+                  @click="securityStatusFilter = (securityStatusFilter === s ? '' : s)"
+                  class="badge transition"
+                  :class="securityStatusFilter === s ? vexStatusMeta(s).badgeClass + ' brightness-125' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
+                  :title="`Show ${vexStatusMeta(s).label} vulnerabilities`"
+                >
+                  <span
+                    class="w-1.5 h-1.5 rounded-full mr-1.5"
+                    :class="vexStatusMeta(s).dotClass"
+                  ></span>
+                  <span x-text="vexStatusMeta(s).label"></span>
+                  <span
+                    class="ml-1.5 font-semibold"
+                    x-text="formatCount(securitySummary.counts[s])"
+                  ></span>
+                </button>
+              </template>
+            </div>
+
+            <!-- Vulnerability cards -->
+            <template
+              x-for="vuln in (mountedViews.security ? filteredVulnerabilities : [])"
+              :key="vuln.spdxId"
+            >
+              <div
+                class="card"
+                data-nav-kind="vuln"
+                :data-nav-id="vuln.spdxId"
+                :class="isNavTarget('vuln', vuln.spdxId) && 'target-focus'"
+              >
+                <div
+                  class="flex items-center gap-3 cursor-pointer"
+                  @click="toggleVuln(vuln.spdxId)"
+                >
+                  <div
+                    class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                    :class="vexStatusMeta(vuln.overallStatus).badgeClass"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 9v2m0 4h.01M12 3l7 4v5c0 4.418-3 8.418-7 9.5C8 20.418 5 16.418 5 12V7l7-4z"
+                      />
+                    </svg>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2">
+                      <span
+                        class="font-semibold text-white text-sm font-mono"
+                        x-text="vuln.name"
+                      ></span>
+                      <a
+                        x-show="vulnUrl(vuln.el)"
+                        :href="vulnUrl(vuln.el)"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        @click.stop
+                        class="text-slate-500 hover:text-rose-300 flex-shrink-0"
+                        title="Open vulnerability record"
+                      >
+                        <svg
+                          class="w-3.5 h-3.5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                          />
+                        </svg>
+                      </a>
+                    </div>
+                    <div
+                      class="text-xs text-slate-500"
+                      x-text="vuln.packageCount === 0 ? 'Not linked to a package' : `${formatCount(vuln.packageCount)} ${vuln.packageCount === 1 ? 'package' : 'packages'}`"
+                    ></div>
+                  </div>
+                  <div class="flex items-center gap-2 flex-shrink-0">
+                    <span class="badge" :class="vexStatusMeta(vuln.overallStatus).badgeClass">
+                      <span
+                        class="w-1.5 h-1.5 rounded-full mr-1.5"
+                        :class="vexStatusMeta(vuln.overallStatus).dotClass"
+                      ></span>
+                      <span x-text="vexStatusMeta(vuln.overallStatus).label"></span>
+                    </span>
+                    <svg
+                      class="w-4 h-4 text-slate-500 transition-transform"
+                      :class="expandedVuln === vuln.spdxId && 'rotate-180'"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </div>
+                </div>
+
+                <!-- Expanded: per-package VEX assessments -->
+                <div
+                  x-show="expandedVuln === vuln.spdxId"
+                  x-collapse
+                  class="mt-4 pt-4 border-t border-slate-700 sm:pl-11 space-y-3"
+                >
+                  <!-- Reference links -->
+                  <div x-show="vuln.locators.length > 0" class="flex flex-wrap gap-2">
+                    <template x-for="url in vuln.locators" :key="url">
+                      <a
+                        :href="url"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="badge bg-slate-700/60 text-sky-300 hover:text-sky-200 font-mono max-w-full truncate"
+                        :title="url"
+                        x-text="url.replace(/^https?:\/\//,'')"
+                      ></a>
+                    </template>
+                  </div>
+
+                  <!-- Assessments -->
+                  <div x-show="assessmentsForVuln(vuln.spdxId).length > 0" class="space-y-2">
+                    <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                      VEX assessments
+                    </div>
+                    <template x-for="a in assessmentsForVuln(vuln.spdxId)" :key="a.spdxId">
+                      <div class="rounded-lg bg-slate-900/50 border border-slate-700/50 p-3">
+                        <div class="flex items-center gap-2 flex-wrap">
+                          <span class="badge" :class="vexStatusMeta(a.status).badgeClass">
+                            <span
+                              class="w-1.5 h-1.5 rounded-full mr-1.5"
+                              :class="vexStatusMeta(a.status).dotClass"
+                            ></span>
+                            <span x-text="vexStatusMeta(a.status).label"></span>
+                          </span>
+                          <button
+                            @click="navigateTo(a.packageId)"
+                            class="text-sm text-slate-200 hover:text-white hover:underline decoration-slate-500 underline-offset-2 font-medium truncate"
+                            x-text="relTargetDisplayName(a.packageId)"
+                          ></button>
+                          <span
+                            x-show="a.justification"
+                            class="badge bg-sky-500/10 text-sky-300 ml-auto"
+                            :title="a.justification"
+                            x-text="vexJustificationLabel(a.justification)"
+                          ></span>
+                        </div>
+                        <p
+                          x-show="a.impactStatement"
+                          class="text-xs text-slate-400 mt-2 leading-relaxed"
+                          x-text="a.impactStatement"
+                        ></p>
+                        <p
+                          x-show="a.actionStatement"
+                          class="text-xs text-amber-300/90 mt-2 leading-relaxed"
+                          x-text="'Action: ' + a.actionStatement"
+                        ></p>
+                        <p
+                          x-show="a.statusNotes"
+                          class="text-xs text-slate-500 mt-1 leading-relaxed"
+                          x-text="a.statusNotes"
+                        ></p>
+                        <div
+                          x-show="a.vexVersion"
+                          class="text-[10px] text-slate-600 mt-2"
+                          x-text="'VEX ' + a.vexVersion"
+                        ></div>
+                      </div>
+                    </template>
+                  </div>
+
+                  <div
+                    x-show="assessmentsForVuln(vuln.spdxId).length === 0"
+                    class="text-xs text-slate-500 italic"
+                  >
+                    No VEX status recorded for this vulnerability.
+                  </div>
+                </div>
+              </div>
+            </template>
+
+            <div
+              x-show="mountedViews.security && filteredVulnerabilities.length === 0"
+              class="text-sm text-slate-500 italic text-center py-8"
+            >
+              No vulnerabilities match your filters
             </div>
           </div>
 
@@ -2521,7 +2853,7 @@
                 ></span>
                 <span
                   class="text-xs text-slate-400"
-                  x-text="detailElement ? detailElement.type.replace('software_','').replace('build_','').replace('simplelicensing_','') : ''"
+                  x-text="detailElement ? detailElement.type.replace('software_','').replace('build_','').replace('simplelicensing_','').replace('security_','') : ''"
                 ></span>
               </div>
               <h3
@@ -2920,6 +3252,110 @@
             </template>
           </div>
 
+          <!-- Vulnerability (CVE) detail: VEX assessments -->
+          <div x-show="detailElement?.type === 'security_Vulnerability'" class="space-y-3">
+            <div class="flex flex-wrap gap-2" x-show="detailElement">
+              <template x-for="url in vulnLocators(detailElement || {})" :key="url">
+                <a
+                  :href="url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="badge bg-slate-700/60 text-sky-300 hover:text-sky-200 font-mono max-w-full truncate"
+                  :title="url"
+                  x-text="url.replace(/^https?:\/\//,'')"
+                ></a>
+              </template>
+            </div>
+            <div x-show="detailElement && assessmentsForVuln(detailElement.spdxId).length > 0">
+              <div class="text-xs font-semibold text-rose-400 uppercase tracking-wider mb-2">
+                VEX assessments
+              </div>
+              <div class="space-y-2">
+                <template
+                  x-for="a in (detailElement ? assessmentsForVuln(detailElement.spdxId) : [])"
+                  :key="a.spdxId"
+                >
+                  <div class="rounded-lg bg-slate-900/50 border border-slate-700/50 p-2.5">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <span class="badge" :class="vexStatusMeta(a.status).badgeClass">
+                        <span
+                          class="w-1.5 h-1.5 rounded-full mr-1.5"
+                          :class="vexStatusMeta(a.status).dotClass"
+                        ></span>
+                        <span x-text="vexStatusMeta(a.status).label"></span>
+                      </span>
+                      <button
+                        @click="navigateTo(a.packageId)"
+                        class="text-xs text-slate-200 hover:text-white hover:underline decoration-slate-500 underline-offset-2 truncate"
+                        x-text="relTargetDisplayName(a.packageId)"
+                      ></button>
+                      <span
+                        x-show="a.justification"
+                        class="badge bg-sky-500/10 text-sky-300 ml-auto"
+                        :title="a.justification"
+                        x-text="vexJustificationLabel(a.justification)"
+                      ></span>
+                    </div>
+                    <p
+                      x-show="a.impactStatement"
+                      class="text-xs text-slate-400 mt-1.5 leading-relaxed"
+                      x-text="a.impactStatement"
+                    ></p>
+                    <p
+                      x-show="a.actionStatement"
+                      class="text-xs text-amber-300/90 mt-1.5 leading-relaxed"
+                      x-text="'Action: ' + a.actionStatement"
+                    ></p>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+
+          <!-- Element security: associated vulnerabilities (VEX) -->
+          <div
+            x-show="detailElement && detailElement.type !== 'security_Vulnerability' && vulnsForPackage(detailElement.spdxId).length > 0"
+            class="space-y-2"
+          >
+            <div class="flex items-center gap-2">
+              <span class="detail-rel-line" style="background: #f43f5e"></span>
+              <span class="text-xs font-semibold uppercase tracking-wider text-rose-400"
+                >Vulnerabilities (VEX)</span
+              >
+              <span
+                class="text-[10px] text-slate-500"
+                x-text="detailElement ? '(' + formatCount(packageVulnSummary(detailElement.spdxId).total) + ')' : ''"
+              ></span>
+            </div>
+            <!-- Status summary chips -->
+            <div class="flex flex-wrap gap-1.5 ml-3">
+              <template
+                x-for="st in (detailElement ? packageVulnSummary(detailElement.spdxId).statuses : [])"
+                :key="st.status"
+              >
+                <span class="badge" :class="st.meta.badgeClass">
+                  <span class="w-1.5 h-1.5 rounded-full mr-1.5" :class="st.meta.dotClass"></span>
+                  <span x-text="st.meta.label"></span>
+                  <span class="ml-1.5 font-semibold" x-text="formatCount(st.count)"></span>
+                </span>
+              </template>
+            </div>
+            <button
+              @click="navigateToPackageSecurity(detailElement.spdxId)"
+              class="ml-3 text-xs text-rose-300 hover:text-rose-200 inline-flex items-center gap-1"
+            >
+              View all in Security
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
+          </div>
+
           <!-- Relationships — grouped semantically -->
           <template x-for="group in detailRelGroups" :key="group.key">
             <div class="detail-rel-section">
@@ -2969,7 +3405,9 @@
 
           <!-- Empty state -->
           <div
-            x-show="detailElement && detailRelGroups.length === 0"
+            x-show="detailElement && detailRelGroups.length === 0
+                    && detailElement.type !== 'security_Vulnerability'
+                    && vulnsForPackage(detailElement.spdxId).length === 0"
             class="text-xs text-slate-500 italic text-center py-4"
           >
             No relationships found

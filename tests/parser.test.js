@@ -3,7 +3,13 @@ import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 
 import { buildRelationshipIndexes, parseGraph } from '../js/parser.js';
-import { parseBuildParameters, extractLicenseExpressionParts } from '../js/utils.js';
+import {
+  parseBuildParameters,
+  extractLicenseExpressionParts,
+  getVulnerabilityId,
+  getVexStatusMeta,
+  getVexJustificationLabel
+} from '../js/utils.js';
 import { spdxApp } from '../js/app.js';
 
 const fixtureGraph = [
@@ -246,6 +252,131 @@ test(
     );
   }
 );
+
+const vexGraph = [
+  { type: 'software_Package', spdxId: 'pkg:busybox', name: 'busybox' },
+  {
+    type: 'security_Vulnerability',
+    spdxId: 'vuln:cve-1',
+    externalIdentifier: [
+      {
+        type: 'ExternalIdentifier',
+        externalIdentifierType: 'cve',
+        identifier: 'CVE-2023-0001',
+        identifierLocator: ['https://www.cve.org/CVERecord?id=CVE-2023-0001']
+      }
+    ]
+  },
+  {
+    type: 'security_Vulnerability',
+    spdxId: 'vuln:cve-2',
+    externalIdentifier: [
+      { type: 'ExternalIdentifier', externalIdentifierType: 'cve', identifier: 'CVE-2023-0002' }
+    ]
+  },
+  {
+    // Orphan: present in the SBOM but not connected to any package by VEX.
+    type: 'security_Vulnerability',
+    spdxId: 'vuln:orphan',
+    externalIdentifier: [
+      { type: 'ExternalIdentifier', externalIdentifierType: 'cve', identifier: 'CVE-2023-9999' }
+    ]
+  },
+  {
+    type: 'security_VexFixedVulnAssessmentRelationship',
+    spdxId: 'vex:fixed-1',
+    relationshipType: 'fixedIn',
+    from: 'vuln:cve-1',
+    to: ['pkg:busybox'],
+    security_vexVersion: '1.0.0'
+  },
+  {
+    type: 'security_VexNotAffectedVulnAssessmentRelationship',
+    spdxId: 'vex:na-1',
+    relationshipType: 'doesNotAffect',
+    from: 'vuln:cve-2',
+    to: ['pkg:busybox'],
+    security_justificationType: 'vulnerableCodeNotPresent',
+    security_impactStatement: 'Not built with the affected component.',
+    security_vexVersion: '1.0.0'
+  },
+  {
+    type: 'Relationship',
+    spdxId: 'rel:assoc',
+    relationshipType: 'hasAssociatedVulnerability',
+    from: 'pkg:busybox',
+    to: ['vuln:cve-1', 'vuln:cve-2']
+  }
+];
+
+test('parseGraph builds the VEX model from vulnerabilities and assessment relationships', () => {
+  const parsed = parseGraph(vexGraph);
+
+  assert.equal(parsed.vulnerabilities.length, 3);
+  assert.equal(parsed.vexRelationships.length, 2);
+
+  const byId = Object.fromEntries(parsed.vulnerabilities.map((v) => [v.spdxId, v]));
+
+  // Fixed vulnerability
+  const fixed = byId['vuln:cve-1'];
+  assert.equal(fixed.name, 'CVE-2023-0001');
+  assert.equal(fixed.overallStatus, 'fixed');
+  assert.equal(fixed.packageCount, 1);
+  assert.deepEqual(fixed.statusCounts, { fixed: 1 });
+  assert.ok(fixed.locators.includes('https://www.cve.org/CVERecord?id=CVE-2023-0001'));
+
+  // Not-affected vulnerability carries justification + impact statement
+  const na = byId['vuln:cve-2'];
+  assert.equal(na.overallStatus, 'not_affected');
+  assert.equal(na.assessments[0].justification, 'vulnerableCodeNotPresent');
+  assert.equal(na.assessments[0].impactStatement, 'Not built with the affected component.');
+  // A CVE with no locator still synthesizes a cve.org link
+  assert.ok(na.locators.some((u) => u.includes('CVE-2023-0002')));
+
+  // Orphan vulnerability: no assessments, status is "unknown", never "fixed"
+  const orphan = byId['vuln:orphan'];
+  assert.equal(orphan.overallStatus, 'unknown');
+  assert.equal(orphan.packageCount, 0);
+  assert.deepEqual(orphan.assessments, []);
+
+  // Indexes
+  assert.equal(parsed.vexByPackage.get('pkg:busybox').length, 2);
+  assert.equal(parsed.vexByVuln.get('vuln:cve-1')[0].status, 'fixed');
+
+  // Present-types drive the legend trimming
+  assert.ok(parsed.presentNodeTypes.includes('vulnerability'));
+  assert.ok(parsed.presentNodeTypes.includes('package'));
+  assert.ok(parsed.presentRelTypes.includes('fixedIn'));
+  assert.ok(parsed.presentRelTypes.includes('doesNotAffect'));
+  assert.ok(parsed.presentRelTypes.includes('hasAssociatedVulnerability'));
+
+  // VEX assessment relationships are NOT mixed into the generic relationships
+  assert.ok(!parsed.relationships.some((r) => r.type?.startsWith('security_Vex')));
+});
+
+test('VEX assessment elements are excluded from the generic relationship indexes', () => {
+  const parsed = parseGraph(vexGraph);
+  const indexes = buildRelationshipIndexes(parsed.relationships);
+  // The vulnerability id must not appear as a relationship "from" (that would
+  // mean a VEX element leaked into the generic relationships array).
+  assert.equal(indexes.relFromIndex.has('vuln:cve-1'), false);
+});
+
+test('VEX utility helpers resolve status, justification, and vulnerability ids', () => {
+  assert.equal(getVexStatusMeta('fixed').label, 'Fixed');
+  assert.equal(getVexStatusMeta('not_affected').label, 'Not affected');
+  assert.equal(getVexStatusMeta('unknown').label, 'No VEX status');
+  assert.equal(getVexJustificationLabel('vulnerableCodeNotPresent'), 'Vulnerable code not present');
+  assert.equal(getVexJustificationLabel('somethingNew'), 'somethingNew');
+  assert.equal(
+    getVulnerabilityId({
+      type: 'security_Vulnerability',
+      spdxId: 'x/CVE-2020-1',
+      externalIdentifier: [{ externalIdentifierType: 'cve', identifier: 'CVE-2020-1' }]
+    }),
+    'CVE-2020-1'
+  );
+});
 
 test('extractLicenseExpressionParts parses simple and compound expressions', () => {
   assert.deepEqual(extractLicenseExpressionParts('MIT'), [{ id: 'MIT', kind: 'license' }]);

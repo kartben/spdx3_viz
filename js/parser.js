@@ -7,7 +7,8 @@
  * @module parser
  */
 
-import { COLORS, ELEMENT_TYPES, RELATIONSHIP_TYPES } from './config.js';
+import { COLORS, ELEMENT_TYPES, RELATIONSHIP_TYPES, VEX_TYPES } from './config.js';
+import { getVulnerabilityId, getVulnerabilityLocators, vexStatusForRel } from './utils.js';
 
 /**
  * Builds a throttled progress reporter. Returns a function to call once per
@@ -49,6 +50,12 @@ function makeThrottledReporter(onProgress, total) {
  * @property {Object|null} buildInfo - Build information element
  * @property {Object|null} agentInfo - Agent information element
  * @property {Array<Object>} licenses - Licenses used, with declaring/concluding elements
+ * @property {Array<Object>} vulnerabilities - Enriched vulnerabilities (CVEs) with VEX assessments
+ * @property {Array<Object>} vexRelationships - Raw VEX assessment relationship elements
+ * @property {Map<string, Array>} vexByVuln - Vulnerability spdxId -> [VexAssessment]
+ * @property {Map<string, Array>} vexByPackage - Package spdxId -> [VexAssessment]
+ * @property {Array<string>} presentNodeTypes - Graph node types present in the data
+ * @property {Array<string>} presentRelTypes - Relationship types present in the data
  * @property {string} docName - Document name
  * @property {string} docNamespace - Document namespace
  * @property {string} specVersion - SPDX spec version
@@ -121,6 +128,12 @@ export function parseGraph(graph, onProgress) {
   /** @type {Array<Object>} */
   const builds = [];
 
+  /** @type {Array<Object>} */
+  const vulnerabilities = [];
+
+  /** @type {Array<Object>} */
+  const vexRelationships = [];
+
   /** @type {Array<string>} */
   const generatedArtifacts = [];
 
@@ -181,6 +194,17 @@ export function parseGraph(graph, onProgress) {
 
       case ELEMENT_TYPES.BUILD:
         builds.push(item);
+        break;
+
+      case ELEMENT_TYPES.VULNERABILITY:
+        vulnerabilities.push(item);
+        break;
+
+      case VEX_TYPES.FIXED:
+      case VEX_TYPES.NOT_AFFECTED:
+      case VEX_TYPES.AFFECTED:
+      case VEX_TYPES.UNDER_INVESTIGATION:
+        vexRelationships.push(item);
         break;
 
       case ELEMENT_TYPES.AGENT:
@@ -258,6 +282,24 @@ export function parseGraph(graph, onProgress) {
   // relationships so we capture URL-only and NoAssertion targets too.
   const licenses = collectLicenses(relationships, elementMap);
 
+  // Build the VEX model: enriched vulnerabilities + vuln↔package indexes.
+  const vex = buildVexModel(vulnerabilities, vexRelationships, elementMap);
+
+  // Which node/relationship types actually occur in this dataset. The graph
+  // legend uses these to hide entries for types the SBOM doesn't contain, so it
+  // doesn't grow a long list of irrelevant toggles.
+  const { presentNodeTypes, presentRelTypes } = computePresentTypes({
+    packages,
+    regularFiles,
+    tools,
+    builds,
+    buildConfigs,
+    vulnerabilities,
+    relationships,
+    vexRelationships,
+    elementMap
+  });
+
   return {
     elementMap,
     packages,
@@ -269,6 +311,12 @@ export function parseGraph(graph, onProgress) {
     buildInfo,
     agentInfo,
     licenses,
+    vulnerabilities: vex.vulnerabilities,
+    vexRelationships,
+    vexByVuln: vex.vexByVuln,
+    vexByPackage: vex.vexByPackage,
+    presentNodeTypes,
+    presentRelTypes,
     docName,
     docNamespace,
     specVersion,
@@ -277,6 +325,175 @@ export function parseGraph(graph, onProgress) {
     profileConformance,
     generatedArtifacts
   };
+}
+
+/* ==========================================================================
+   VEX Model
+   ========================================================================== */
+
+/**
+ * @typedef {Object} VexAssessment
+ * @property {string} status - Normalized status: fixed | not_affected | affected | under_investigation
+ * @property {string} vulnId - spdxId of the security_Vulnerability
+ * @property {string} vulnName - Display id of the vulnerability (e.g. a CVE id)
+ * @property {string} packageId - spdxId of the assessed package/element
+ * @property {string} justification - VexJustificationType (not-affected only)
+ * @property {string} impactStatement - Free-text impact statement (not-affected)
+ * @property {string} actionStatement - Recommended action (affected)
+ * @property {string} statusNotes - Free-text status notes
+ * @property {string} vexVersion - security_vexVersion, when present
+ * @property {string} spdxId - spdxId of the VEX relationship element
+ */
+
+/**
+ * @typedef {Object} EnrichedVulnerability
+ * @property {Object} el - The raw security_Vulnerability element
+ * @property {string} spdxId
+ * @property {string} name - Display id (CVE id when available)
+ * @property {string} cveId
+ * @property {string[]} locators - Reference URLs
+ * @property {VexAssessment[]} assessments
+ * @property {Object<string, number>} statusCounts - status -> distinct package count
+ * @property {string} overallStatus - Most severe status across all assessments
+ * @property {number} packageCount - Distinct assessed packages
+ */
+
+/**
+ * Builds the enriched vulnerability list and the vuln↔package assessment
+ * indexes from the raw vulnerabilities and VEX assessment relationships.
+ *
+ * @param {Array<Object>} vulnerabilities - Raw security_Vulnerability elements
+ * @param {Array<Object>} vexRelationships - Raw VEX assessment relationship elements
+ * @param {Map<string, Object>} elementMap
+ * @returns {{vulnerabilities: EnrichedVulnerability[], vexByVuln: Map<string, VexAssessment[]>, vexByPackage: Map<string, VexAssessment[]>}}
+ */
+function buildVexModel(vulnerabilities, vexRelationships, elementMap) {
+  /** @type {Map<string, VexAssessment[]>} */
+  const vexByVuln = new Map();
+  /** @type {Map<string, VexAssessment[]>} */
+  const vexByPackage = new Map();
+
+  const push = (map, key, value) => {
+    if (!map.has(key)) map.set(key, []);
+    map.get(key).push(value);
+  };
+
+  const vulnNameOf = (vulnId) => {
+    const el = elementMap.get(vulnId);
+    return el ? getVulnerabilityId(el) : vulnId?.split('/').pop() || vulnId;
+  };
+
+  vexRelationships.forEach((rel) => {
+    // Prefer the explicit relationshipType; fall back to the element class.
+    const status =
+      vexStatusForRel(rel.relationshipType) ||
+      {
+        [VEX_TYPES.FIXED]: 'fixed',
+        [VEX_TYPES.NOT_AFFECTED]: 'not_affected',
+        [VEX_TYPES.AFFECTED]: 'affected',
+        [VEX_TYPES.UNDER_INVESTIGATION]: 'under_investigation'
+      }[rel.type];
+    if (!status) return;
+
+    const vulnId = rel.from;
+    if (!vulnId) return;
+    const vulnName = vulnNameOf(vulnId);
+    const targets = Array.isArray(rel.to) ? rel.to : [rel.to];
+    targets.forEach((packageId) => {
+      if (!packageId) return;
+      /** @type {VexAssessment} */
+      const assessment = {
+        status,
+        vulnId,
+        vulnName,
+        packageId,
+        justification: rel.security_justificationType || '',
+        impactStatement: rel.security_impactStatement || '',
+        actionStatement: rel.security_actionStatement || '',
+        statusNotes: rel.security_statusNotes || '',
+        vexVersion: rel.security_vexVersion || '',
+        spdxId: rel.spdxId
+      };
+      push(vexByVuln, vulnId, assessment);
+      push(vexByPackage, packageId, assessment);
+    });
+  });
+
+  const SEVERITY = { affected: 4, under_investigation: 3, not_affected: 2, fixed: 1 };
+
+  const enriched = vulnerabilities.map((el) => {
+    const assessments = vexByVuln.get(el.spdxId) || [];
+    const cveId = getVulnerabilityId(el);
+
+    // Count distinct packages per status (a vuln can hit the same package via
+    // more than one VEX record; don't double-count).
+    const pkgsByStatus = {};
+    let overallStatus = null;
+    assessments.forEach((a) => {
+      (pkgsByStatus[a.status] ||= new Set()).add(a.packageId);
+      if (!overallStatus || SEVERITY[a.status] > SEVERITY[overallStatus]) {
+        overallStatus = a.status;
+      }
+    });
+    const statusCounts = {};
+    Object.keys(pkgsByStatus).forEach((s) => (statusCounts[s] = pkgsByStatus[s].size));
+    const packageCount = new Set(assessments.map((a) => a.packageId)).size;
+
+    return {
+      el,
+      spdxId: el.spdxId,
+      name: cveId,
+      cveId,
+      locators: getVulnerabilityLocators(el),
+      assessments,
+      statusCounts,
+      // A vulnerability with no VEX assessment is "unknown" (present in the SBOM
+      // but not connected to a package by a VEX status) — never assume "fixed".
+      overallStatus: overallStatus || 'unknown',
+      packageCount
+    };
+  });
+
+  return { vulnerabilities: enriched, vexByVuln, vexByPackage };
+}
+
+/**
+ * Determines which node and relationship types are actually present in the
+ * parsed dataset. Used to trim the graph legend.
+ *
+ * @returns {{presentNodeTypes: string[], presentRelTypes: string[]}}
+ */
+function computePresentTypes(data) {
+  const nodeTypes = new Set();
+  if (data.packages.length) nodeTypes.add('package');
+  if (data.regularFiles.length) nodeTypes.add('file');
+  if (data.tools.length) nodeTypes.add('tool');
+  if (data.builds.length) nodeTypes.add('build');
+  if (data.buildConfigs.length) nodeTypes.add('config');
+  if (data.vulnerabilities.length) nodeTypes.add('vulnerability');
+
+  const relTypes = new Set();
+  data.relationships.forEach((r) => r.relationshipType && relTypes.add(r.relationshipType));
+  data.vexRelationships.forEach((r) => r.relationshipType && relTypes.add(r.relationshipType));
+
+  // "External" nodes are placeholders the graph creates for drawn relationship
+  // endpoints that resolve to nothing in the element map (and aren't license
+  // URLs / NoAssertion). Detect whether any such endpoint exists.
+  const isExternal = (id) =>
+    id && !data.elementMap.has(id) && !/^https?:\/\//i.test(id) && !id.includes('NoAssertion');
+  const hasExternal = data.relationships.some((rel) => {
+    if (
+      rel.relationshipType === 'hasConcludedLicense' ||
+      rel.relationshipType === 'hasDeclaredLicense'
+    ) {
+      return false;
+    }
+    const ends = [rel.from, ...(Array.isArray(rel.to) ? rel.to : [rel.to])];
+    return ends.some(isExternal);
+  });
+  if (hasExternal) nodeTypes.add('external');
+
+  return { presentNodeTypes: [...nodeTypes], presentRelTypes: [...relTypes] };
 }
 
 /* ==========================================================================
