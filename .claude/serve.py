@@ -7,6 +7,7 @@ every response so the preview always reflects the latest source.
 Usage: python3 .claude/serve.py [port]
 """
 
+import os
 import sys
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
@@ -20,5 +21,5 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    port = int(sys.argv[1]) if len(sys.argv) > 1 else 8753
+    port = int(sys.argv[1] if len(sys.argv) > 1 else os.environ.get("PORT", 8753))
     ThreadingHTTPServer(("", port), NoCacheHandler).serve_forever()
