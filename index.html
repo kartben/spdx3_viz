@@ -1156,7 +1156,7 @@
                             @click.stop="navigateTo(d)"
                           >
                             <span class="w-1.5 h-1.5 rounded-full bg-blue-500/50"></span>
-                            <span x-text="cleanName(d)"></span>
+                            <span x-text="relTargetDisplayName(d)"></span>
                           </div>
                         </template>
                       </div>
@@ -1181,7 +1181,7 @@
                             @click.stop="navigateTo(d)"
                           >
                             <span class="w-1.5 h-1.5 rounded-full bg-purple-500/50"></span>
-                            <span x-text="cleanName(d)"></span>
+                            <span x-text="relTargetDisplayName(d)"></span>
                           </div>
                         </template>
                       </div>
@@ -1371,7 +1371,7 @@
                     <div
                       class="text-xs text-blue-400 cursor-pointer hover:text-blue-300"
                       @click.stop="navigateTo(parentPackage(f.spdxId))"
-                      x-text="cleanName(parentPackage(f.spdxId) || '')"
+                      x-text="relTargetDisplayName(parentPackage(f.spdxId) || '')"
                     ></div>
                   </div>
                   <!-- Tools used -->
@@ -1383,7 +1383,7 @@
                       <template x-for="t in (fileTools(f.spdxId)||[])" :key="t">
                         <span
                           class="badge bg-amber-500/15 text-amber-400"
-                          x-text="cleanName(t)"
+                          x-text="relTargetDisplayName(t)"
                         ></span>
                       </template>
                     </div>
@@ -1399,7 +1399,7 @@
                         @click.stop="navigateToConfig(cfg.configId)"
                       >
                         <span class="w-1.5 h-1.5 rounded-full bg-teal-500/50"></span>
-                        <span x-text="cleanName(cfg.configId)"></span>
+                        <span x-text="relTargetDisplayName(cfg.configId)"></span>
                         <span
                           class="text-slate-500"
                           x-show="cfg.scope"
@@ -1420,7 +1420,7 @@
                           @click.stop="navigateToBuild(build)"
                         >
                           <span class="w-1.5 h-1.5 rounded-full bg-green-500/50"></span>
-                          <span x-text="cleanName(build)"></span>
+                          <span x-text="relTargetDisplayName(build)"></span>
                         </div>
                       </template>
                     </div>
@@ -1438,7 +1438,7 @@
                         <button
                           class="badge bg-orange-500/15 text-orange-400 hover:bg-orange-500/25"
                           @click.stop="navigateToBuild(build)"
-                          x-text="cleanName(build)"
+                          x-text="relTargetDisplayName(build)"
                         ></button>
                       </template>
                       <span
