@@ -201,6 +201,10 @@ export function spdxApp() {
     builds: [],
     buildInfo: null,
     agentInfo: null,
+    sboms: [], // software_Sbom elements
+    sbomTypes: [], // distinct software_sbomType values (source, build, …)
+    creators: [], // document creators (createdBy → SoftwareAgent/Organization/Person)
+    creatorTools: [], // tools the documents were created with (createdUsing)
     licenses: [],
     vulnerabilities: [], // enriched CVEs with VEX assessments
     vexRelationships: [], // raw VEX assessment relationship elements (for the graph)

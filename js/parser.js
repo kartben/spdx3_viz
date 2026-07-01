@@ -48,7 +48,11 @@ function makeThrottledReporter(onProgress, total) {
  * @property {Array<Object>} builds - Build elements
  * @property {Array<Object>} buildConfigs - Build configuration elements
  * @property {Object|null} buildInfo - Build information element
- * @property {Object|null} agentInfo - Agent information element
+ * @property {Object|null} agentInfo - Agent information element (SoftwareAgent, Organization or Person)
+ * @property {Array<Object>} sboms - software_Sbom elements
+ * @property {Array<string>} sbomTypes - Distinct software_sbomType values (source, build, …)
+ * @property {Array<{id: string, name: string, type: string}>} creators - Document creators (createdBy)
+ * @property {Array<{id: string, name: string, type: string}>} creatorTools - Tools the documents were created with (createdUsing)
  * @property {Array<Object>} licenses - Licenses used, with declaring/concluding elements
  * @property {Array<Object>} vulnerabilities - Enriched vulnerabilities (CVEs) with VEX assessments
  * @property {Array<Object>} vexRelationships - Raw VEX assessment relationship elements
@@ -134,6 +138,9 @@ export function parseGraph(graph, onProgress) {
   /** @type {Array<Object>} */
   const vexRelationships = [];
 
+  /** @type {Array<Object>} */
+  const sboms = [];
+
   /** @type {Array<string>} */
   const generatedArtifacts = [];
 
@@ -143,6 +150,9 @@ export function parseGraph(graph, onProgress) {
   /** @type {Object|null} */
   let agentInfo = null;
 
+  /** @type {Object|null} */
+  let orgInfo = null; // first Organization/Person, used when no SoftwareAgent exists
+
   // Document metadata
   let docName = '';
   let docNamespace = '';
@@ -151,8 +161,23 @@ export function parseGraph(graph, onProgress) {
   let dataLicenseLabel = '';
   const profileConformance = [];
 
+  /** @type {Array<Object>} - Resolved CreationInfo of each SpdxDocument */
+  const docCreationInfos = [];
+
+  /** @type {Object|null} - Any CreationInfo seen, as a metadata fallback */
+  let anyCreationInfo = null;
+
   // Track seen IDs to deduplicate
   const seen = new Set();
+
+  // `creationInfo` is either an inline object or a string reference to a
+  // standalone CreationInfo element (identified by `@id`, e.g. `_:creationinfo`
+  // — the form the Linux kernel and Yocto producers emit).
+  const resolveCreationInfo = (el) => {
+    const ci = el?.creationInfo;
+    if (typeof ci === 'string') return elementMap.get(ci) || null;
+    return ci || null;
+  };
 
   // First pass: register all elements in the map
   graph.forEach((item) => {
@@ -211,6 +236,19 @@ export function parseGraph(graph, onProgress) {
         agentInfo = agentInfo || item;
         break;
 
+      case ELEMENT_TYPES.ORGANIZATION:
+      case ELEMENT_TYPES.PERSON:
+        orgInfo = orgInfo || item;
+        break;
+
+      case ELEMENT_TYPES.SBOM:
+        sboms.push(item);
+        break;
+
+      case ELEMENT_TYPES.CREATION_INFO:
+        anyCreationInfo = anyCreationInfo || item;
+        break;
+
       case ELEMENT_TYPES.DOCUMENT: {
         // Merge document metadata: accumulate profiles, keep first values
         if (!docName) docName = item.name || '';
@@ -223,8 +261,10 @@ export function parseGraph(graph, onProgress) {
           }
         });
 
-        if (!createdDate) createdDate = item.creationInfo?.created || '';
-        if (!specVersion) specVersion = item.creationInfo?.specVersion || '';
+        const ci = resolveCreationInfo(item);
+        if (ci) docCreationInfos.push(ci);
+        if (!createdDate) createdDate = ci?.created || '';
+        if (!specVersion) specVersion = ci?.specVersion || '';
         if (!dataLicenseLabel) {
           dataLicenseLabel = item.dataLicense ? item.dataLicense.split('/').pop() : '';
         }
@@ -232,6 +272,47 @@ export function parseGraph(graph, onProgress) {
       }
     }
   });
+
+  // Fallbacks when no SpdxDocument carried the metadata (or its creationInfo
+  // could not be resolved): use any CreationInfo present in the graph.
+  if (!createdDate) createdDate = anyCreationInfo?.created || '';
+  if (!specVersion) specVersion = anyCreationInfo?.specVersion || '';
+
+  // Documents without a name (e.g. the Linux kernel SBOMs): fall back to the
+  // name of an SBOM element or of one of the SBOMs' root elements, preferring a
+  // root Package (e.g. "Linux Kernel (bzImage)") over a root source-tree File.
+  if (!docName) {
+    const named = sboms.find((sbom) => sbom.name);
+    const roots = sboms
+      .flatMap((sbom) => (Array.isArray(sbom.rootElement) ? sbom.rootElement : []))
+      .map((id) => elementMap.get(id))
+      .filter((el) => el?.name);
+    docName =
+      named?.name ||
+      roots.find((el) => el.type === ELEMENT_TYPES.PACKAGE)?.name ||
+      roots[0]?.name ||
+      '';
+  }
+
+  // SBOM lifecycle types declared by software_Sbom elements (source / build /
+  // deployed / …) — surfaced as chips next to the profile conformance list.
+  const sbomTypes = [];
+  sboms.forEach((sbom) => {
+    (sbom.software_sbomType || []).forEach((type) => {
+      if (!sbomTypes.includes(type)) sbomTypes.push(type);
+    });
+  });
+
+  // Who/what produced the documents, resolved from the documents' CreationInfo
+  // (falls back to every CreationInfo when documents carry none).
+  const { creators, creatorTools } = collectCreators(
+    docCreationInfos.length ? docCreationInfos : anyCreationInfo ? [anyCreationInfo] : [],
+    elementMap
+  );
+
+  // Prefer a SoftwareAgent, but surface an Organization/Person creator
+  // (e.g. Yocto's "OpenEmbedded") when that is all the SBOM declares.
+  agentInfo = agentInfo || orgInfo;
 
   // Separate build configs from regular files
   const buildConfigs = files.filter(
@@ -310,6 +391,10 @@ export function parseGraph(graph, onProgress) {
     buildConfigs,
     buildInfo,
     agentInfo,
+    sboms,
+    sbomTypes,
+    creators,
+    creatorTools,
     licenses,
     vulnerabilities: vex.vulnerabilities,
     vexRelationships,
@@ -325,6 +410,40 @@ export function parseGraph(graph, onProgress) {
     profileConformance,
     generatedArtifacts
   };
+}
+
+/* ==========================================================================
+   Creator Collection
+   ========================================================================== */
+
+/**
+ * Resolves the agents (createdBy) and tools (createdUsing) referenced by the
+ * documents' CreationInfo records into displayable {id, name, type} entries.
+ *
+ * @param {Array<Object>} creationInfos - Resolved CreationInfo objects
+ * @param {Map<string, Object>} elementMap
+ * @returns {{creators: Array<{id: string, name: string, type: string}>, creatorTools: Array<{id: string, name: string, type: string}>}}
+ */
+function collectCreators(creationInfos, elementMap) {
+  const collect = (prop) => {
+    const out = [];
+    const seenIds = new Set();
+    creationInfos.forEach((ci) => {
+      (ci?.[prop] || []).forEach((ref) => {
+        if (!ref || seenIds.has(ref)) return;
+        seenIds.add(ref);
+        const el = elementMap.get(ref);
+        out.push({
+          id: ref,
+          name: el?.name || ref.split('/').pop() || ref,
+          type: el?.type || ''
+        });
+      });
+    });
+    return out;
+  };
+
+  return { creators: collect('createdBy'), creatorTools: collect('createdUsing') };
 }
 
 /* ==========================================================================

@@ -465,6 +465,11 @@
                   </p>
                   <p x-show="loadedFiles.length <= 1" class="mb-3"></p>
                   <div class="flex flex-wrap gap-2">
+                    <template x-for="t in sbomTypes" :key="t">
+                      <span class="badge bg-indigo-500/15 text-indigo-400">
+                        <span x-text="t + ' SBOM'"></span>
+                      </span>
+                    </template>
                     <template x-for="p in profileConformance" :key="p">
                       <span class="badge bg-emerald-500/15 text-emerald-400">
                         <svg
@@ -493,7 +498,21 @@
                     Created
                     <span class="text-white font-medium" x-text="formatDate(createdDate)"></span>
                   </div>
-                  <div class="mt-2">
+                  <div class="text-slate-400 mt-1" x-show="creators.length">
+                    By
+                    <span
+                      class="text-white font-medium"
+                      x-text="creators.map(c => c.name).join(', ')"
+                    ></span>
+                  </div>
+                  <div class="text-slate-400 mt-1" x-show="creatorTools.length">
+                    Using
+                    <span
+                      class="text-white font-medium"
+                      x-text="creatorTools.map(t => t.name).join(', ')"
+                    ></span>
+                  </div>
+                  <div class="mt-2" x-show="dataLicenseLabel">
                     <span
                       class="badge bg-pink-500/15 text-pink-400"
                       x-text="dataLicenseLabel"

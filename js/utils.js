@@ -273,8 +273,15 @@ export function getNodeType(item) {
   }
   if (item.type === 'Tool') return 'tool';
   if (item.type === 'build_Build') return 'build';
-  if (item.type === 'SoftwareAgent') return 'agent';
-  if (item.type === 'simplelicensing_LicenseExpression') return 'license';
+  if (item.type === 'SoftwareAgent' || item.type === 'Organization' || item.type === 'Person') {
+    return 'agent';
+  }
+  if (
+    item.type === 'simplelicensing_LicenseExpression' ||
+    item.type === 'simplelicensing_SimpleLicensingText'
+  ) {
+    return 'license';
+  }
   if (item.type === 'security_Vulnerability') return 'vulnerability';
   return 'other';
 }
@@ -313,8 +320,12 @@ export function getElementBadgeClass(type) {
     Tool: 'bg-amber-500/15 text-amber-400',
     build_Build: 'bg-purple-500/15 text-purple-400',
     SoftwareAgent: 'bg-red-500/15 text-red-400',
+    Organization: 'bg-red-500/15 text-red-400',
+    Person: 'bg-red-500/15 text-red-400',
     ExternalReference: 'bg-slate-500/15 text-slate-400',
     simplelicensing_LicenseExpression: 'bg-pink-500/15 text-pink-400',
+    simplelicensing_SimpleLicensingText: 'bg-pink-500/15 text-pink-400',
+    software_Sbom: 'bg-indigo-500/15 text-indigo-400',
     security_Vulnerability: 'bg-rose-500/15 text-rose-400'
   };
   return classMap[type] || 'bg-slate-600/15 text-slate-400';

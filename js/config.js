@@ -24,8 +24,13 @@ export const ELEMENT_TYPES = {
   LIFECYCLE_RELATIONSHIP: 'LifecycleScopedRelationship',
   BUILD: 'build_Build',
   AGENT: 'SoftwareAgent',
+  ORGANIZATION: 'Organization',
+  PERSON: 'Person',
   DOCUMENT: 'SpdxDocument',
-  VULNERABILITY: 'security_Vulnerability'
+  SBOM: 'software_Sbom',
+  CREATION_INFO: 'CreationInfo',
+  VULNERABILITY: 'security_Vulnerability',
+  LICENSE_TEXT: 'simplelicensing_SimpleLicensingText'
 };
 
 /**
