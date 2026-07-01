@@ -1237,9 +1237,12 @@
 
           <!-- ========== FILES ========== -->
           <div x-show="currentView === 'files'" class="fade-in space-y-3 max-w-5xl">
-            <div class="flex items-center gap-3 mb-4">
-              <span class="text-sm text-slate-400" x-text="`${filteredFiles.length} files`"></span>
-              <div class="ml-auto flex gap-2">
+            <div class="flex flex-wrap items-center gap-2 mb-4">
+              <span
+                class="text-sm text-slate-400 flex-shrink-0"
+                x-text="`${filteredFiles.length} files`"
+              ></span>
+              <div class="flex flex-wrap gap-1.5">
                 <template x-for="ft in fileTypes" :key="ft">
                   <button
                     class="text-xs px-2.5 py-1 rounded-md transition-colors"
