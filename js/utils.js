@@ -199,8 +199,7 @@ export function displayLicenseExpression(element, elementMap) {
     .filter((entry) => entry?.key)
     .sort((a, b) => b.key.length - a.key.length)
     .reduce((out, entry) => {
-      const name =
-        elementMap?.get(entry.value)?.name || entry.key.replace(/^LicenseRef-/, '');
+      const name = elementMap?.get(entry.value)?.name || entry.key.replace(/^LicenseRef-/, '');
       return out.split(entry.key).join(name);
     }, String(expr));
 }

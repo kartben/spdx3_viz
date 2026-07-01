@@ -3105,10 +3105,7 @@
             <!-- Summary / description -->
             <div x-show="isMeaningful(detailElement?.summary)">
               <div class="text-xs text-slate-500 mb-1">Summary</div>
-              <div
-                class="text-xs text-slate-300 break-words"
-                x-text="detailElement?.summary"
-              ></div>
+              <div class="text-xs text-slate-300 break-words" x-text="detailElement?.summary"></div>
             </div>
             <div
               x-show="isMeaningful(detailElement?.description) && detailElement?.description !== detailElement?.summary"
