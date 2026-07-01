@@ -1747,8 +1747,110 @@
                   x-collapse
                   class="mt-4 pt-4 border-t border-slate-700 sm:pl-11 space-y-3"
                 >
-                  <!-- Reference links -->
-                  <div x-show="vuln.locators.length > 0" class="flex flex-wrap gap-2">
+                  <!-- CVE details, fetched on demand from cve.org -->
+                  <div
+                    class="rounded-lg bg-slate-900/40 border border-slate-700/50 p-3"
+                    x-show="cveDetail(vuln.cveId)"
+                  >
+                    <div
+                      x-show="cveDetail(vuln.cveId)?.loading"
+                      class="flex items-center gap-2 text-xs text-slate-400"
+                    >
+                      <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle
+                          class="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          stroke-width="4"
+                        />
+                        <path
+                          class="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                        />
+                      </svg>
+                      Loading CVE details…
+                    </div>
+                    <div
+                      x-show="cveDetail(vuln.cveId)?.error"
+                      class="text-xs text-slate-500 italic"
+                      x-text="'CVE details unavailable — ' + (cveDetail(vuln.cveId)?.error || '')"
+                    ></div>
+                    <div x-show="cveDetail(vuln.cveId)?.data" class="space-y-2.5">
+                      <div class="flex flex-wrap items-center gap-2">
+                        <span
+                          x-show="cveDetail(vuln.cveId)?.data?.cvss"
+                          class="badge"
+                          :class="cvssSeverityMeta(cveDetail(vuln.cveId)?.data?.cvss?.severity).badgeClass"
+                          :title="cveDetail(vuln.cveId)?.data?.cvss?.vector"
+                        >
+                          <span
+                            x-text="cvssSeverityMeta(cveDetail(vuln.cveId)?.data?.cvss?.severity).label"
+                          ></span>
+                          <span
+                            class="ml-1.5 font-semibold"
+                            x-text="cveDetail(vuln.cveId)?.data?.cvss?.score"
+                          ></span>
+                        </span>
+                        <span
+                          x-show="cveDetail(vuln.cveId)?.data?.cvss?.version"
+                          class="text-[10px] text-slate-500"
+                          x-text="'CVSS v' + cveDetail(vuln.cveId)?.data?.cvss?.version"
+                        ></span>
+                        <template x-for="cwe in cveDetail(vuln.cveId)?.data?.cwes || []" :key="cwe">
+                          <span class="badge bg-slate-700/60 text-slate-300" x-text="cwe"></span>
+                        </template>
+                      </div>
+                      <p
+                        class="text-sm text-slate-300 leading-relaxed"
+                        x-text="cveDetail(vuln.cveId)?.data?.description"
+                      ></p>
+                      <div class="text-[10px] text-slate-500 flex flex-wrap gap-x-3 gap-y-1">
+                        <span
+                          x-show="cveDetail(vuln.cveId)?.data?.published"
+                          x-text="'Published ' + formatDate(cveDetail(vuln.cveId)?.data?.published)"
+                        ></span>
+                        <span
+                          x-show="cveDetail(vuln.cveId)?.data?.assigner"
+                          x-text="'Assigner: ' + cveDetail(vuln.cveId)?.data?.assigner"
+                        ></span>
+                      </div>
+                      <details
+                        x-show="(cveDetail(vuln.cveId)?.data?.references || []).length > 0"
+                        class="group"
+                      >
+                        <summary class="cursor-pointer text-xs text-slate-400 hover:text-slate-200">
+                          <span
+                            x-text="(cveDetail(vuln.cveId)?.data?.references || []).length + ' references'"
+                          ></span>
+                        </summary>
+                        <div class="mt-2 space-y-1">
+                          <template
+                            x-for="ref in cveDetail(vuln.cveId)?.data?.references || []"
+                            :key="ref.url"
+                          >
+                            <a
+                              :href="ref.url"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              class="block text-xs text-sky-400 hover:text-sky-300 truncate"
+                              :title="ref.url"
+                              x-text="ref.name || ref.url.replace(/^https?:\/\//,'')"
+                            ></a>
+                          </template>
+                        </div>
+                      </details>
+                      <div class="text-[10px] text-slate-600">Source: CVE Program · cve.org</div>
+                    </div>
+                  </div>
+
+                  <!-- Fallback reference links (until the rich record loads) -->
+                  <div
+                    x-show="vuln.locators.length > 0 && !cveDetail(vuln.cveId)?.data"
+                    class="flex flex-wrap gap-2"
+                  >
                     <template x-for="url in vuln.locators" :key="url">
                       <a
                         :href="url"
@@ -3252,9 +3354,106 @@
             </template>
           </div>
 
-          <!-- Vulnerability (CVE) detail: VEX assessments -->
-          <div x-show="detailElement?.type === 'security_Vulnerability'" class="space-y-3">
-            <div class="flex flex-wrap gap-2" x-show="detailElement">
+          <!-- Vulnerability (CVE) detail: fetched CVE record + VEX assessments -->
+          <div
+            x-show="detailElement?.type === 'security_Vulnerability'"
+            x-effect="detailElement?.type === 'security_Vulnerability' && ensureCveDetails(vulnId(detailElement))"
+            class="space-y-3"
+          >
+            <!-- CVE details (severity, CWE, description), fetched from cve.org -->
+            <div
+              class="rounded-lg bg-slate-900/40 border border-slate-700/50 p-3"
+              x-show="detailElement && cveDetail(vulnId(detailElement))"
+            >
+              <div
+                x-show="detailElement && cveDetail(vulnId(detailElement))?.loading"
+                class="flex items-center gap-2 text-xs text-slate-400"
+              >
+                <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"
+                  />
+                  <path
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                  />
+                </svg>
+                Loading CVE details…
+              </div>
+              <div
+                x-show="detailElement && cveDetail(vulnId(detailElement))?.error"
+                class="text-xs text-slate-500 italic"
+                x-text="'CVE details unavailable — ' + (detailElement ? (cveDetail(vulnId(detailElement))?.error || '') : '')"
+              ></div>
+              <div
+                x-show="detailElement && cveDetail(vulnId(detailElement))?.data"
+                class="space-y-2"
+              >
+                <div class="flex flex-wrap items-center gap-2">
+                  <span
+                    x-show="detailElement && cveDetail(vulnId(detailElement))?.data?.cvss"
+                    class="badge"
+                    :class="detailElement ? cvssSeverityMeta(cveDetail(vulnId(detailElement))?.data?.cvss?.severity).badgeClass : ''"
+                    :title="detailElement ? cveDetail(vulnId(detailElement))?.data?.cvss?.vector : ''"
+                  >
+                    <span
+                      x-text="detailElement ? cvssSeverityMeta(cveDetail(vulnId(detailElement))?.data?.cvss?.severity).label : ''"
+                    ></span>
+                    <span
+                      class="ml-1.5 font-semibold"
+                      x-text="detailElement ? cveDetail(vulnId(detailElement))?.data?.cvss?.score : ''"
+                    ></span>
+                  </span>
+                  <template
+                    x-for="cwe in (detailElement ? (cveDetail(vulnId(detailElement))?.data?.cwes || []) : [])"
+                    :key="cwe"
+                  >
+                    <span class="badge bg-slate-700/60 text-slate-300" x-text="cwe"></span>
+                  </template>
+                </div>
+                <p
+                  class="text-xs text-slate-300 leading-relaxed"
+                  x-text="detailElement ? cveDetail(vulnId(detailElement))?.data?.description : ''"
+                ></p>
+                <details
+                  x-show="detailElement && (cveDetail(vulnId(detailElement))?.data?.references || []).length > 0"
+                >
+                  <summary class="cursor-pointer text-xs text-slate-400 hover:text-slate-200">
+                    <span
+                      x-text="detailElement ? ((cveDetail(vulnId(detailElement))?.data?.references || []).length + ' references') : ''"
+                    ></span>
+                  </summary>
+                  <div class="mt-2 space-y-1">
+                    <template
+                      x-for="ref in (detailElement ? (cveDetail(vulnId(detailElement))?.data?.references || []) : [])"
+                      :key="ref.url"
+                    >
+                      <a
+                        :href="ref.url"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="block text-xs text-sky-400 hover:text-sky-300 truncate"
+                        :title="ref.url"
+                        x-text="ref.name || ref.url.replace(/^https?:\/\//,'')"
+                      ></a>
+                    </template>
+                  </div>
+                </details>
+                <div class="text-[10px] text-slate-600">Source: CVE Program · cve.org</div>
+              </div>
+            </div>
+
+            <!-- Fallback reference links (until the rich record loads) -->
+            <div
+              class="flex flex-wrap gap-2"
+              x-show="detailElement && !cveDetail(vulnId(detailElement))?.data"
+            >
               <template x-for="url in vulnLocators(detailElement || {})" :key="url">
                 <a
                   :href="url"

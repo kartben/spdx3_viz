@@ -8,7 +8,11 @@ import {
   extractLicenseExpressionParts,
   getVulnerabilityId,
   getVexStatusMeta,
-  getVexJustificationLabel
+  getVexJustificationLabel,
+  parseCpe,
+  getVulnerabilityLookup,
+  summarizeCveRecord,
+  getCvssSeverityMeta
 } from '../js/utils.js';
 import { spdxApp } from '../js/app.js';
 
@@ -376,6 +380,114 @@ test('VEX utility helpers resolve status, justification, and vulnerability ids',
     }),
     'CVE-2020-1'
   );
+});
+
+test('parseCpe handles CPE 2.3 and 2.2, normalizing wildcards', () => {
+  assert.deepEqual(parseCpe('cpe:2.3:*:*:glibc:2.39:*:*:*:*:*:*:*'), {
+    part: '',
+    vendor: '',
+    product: 'glibc',
+    version: '2.39'
+  });
+  assert.deepEqual(parseCpe('cpe:2.3:o:linux:linux_kernel:6.6:*:*:*:*:*:*:*'), {
+    part: 'o',
+    vendor: 'linux',
+    product: 'linux_kernel',
+    version: '6.6'
+  });
+  assert.deepEqual(parseCpe('cpe:/a:openssl:openssl:3.0.0'), {
+    part: 'a',
+    vendor: 'openssl',
+    product: 'openssl',
+    version: '3.0.0'
+  });
+  assert.equal(parseCpe('not-a-cpe'), null);
+});
+
+test('getVulnerabilityLookup routes wildcard CPEs to a cve.org product search', () => {
+  // Yocto-style wildcard part/vendor — NVD would reject this, so use cve.org
+  const glibc = getVulnerabilityLookup({
+    type: 'cpe23',
+    identifier: 'cpe:2.3:*:*:glibc:2.39:*:*:*:*:*:*:*'
+  });
+  assert.equal(glibc.url, 'https://www.cve.org/CVERecord/SearchResults?query=glibc');
+
+  // Underscores in the product become spaces in the query
+  const kernel = getVulnerabilityLookup({
+    type: 'cpe23',
+    identifier: 'cpe:2.3:o:linux:linux_kernel:6.6:*:*:*:*:*:*:*'
+  });
+  assert.equal(kernel.url, 'https://www.cve.org/CVERecord/SearchResults?query=linux%20kernel');
+
+  // Non-CPE identifiers are not linked
+  assert.equal(getVulnerabilityLookup({ type: 'packageUrl', identifier: 'pkg:deb/glibc' }), null);
+});
+
+test('summarizeCveRecord distills a CVE 5.x record', () => {
+  const record = {
+    cveMetadata: {
+      cveId: 'CVE-2023-0001',
+      state: 'PUBLISHED',
+      datePublished: '2023-01-02T00:00:00Z',
+      assignerShortName: 'redhat'
+    },
+    containers: {
+      cna: {
+        descriptions: [
+          { lang: 'es', value: 'hola' },
+          { lang: 'en', value: 'An out-of-bounds read flaw.' }
+        ],
+        problemTypes: [
+          { descriptions: [{ cweId: 'CWE-125', description: 'CWE-125 Out-of-bounds Read' }] }
+        ],
+        references: [{ url: 'https://example.com/a', name: 'Advisory' }],
+        metrics: [{ cvssV3_0: { version: '3.0', baseScore: 5, baseSeverity: 'medium' } }]
+      },
+      adp: [
+        {
+          metrics: [
+            {
+              cvssV3_1: {
+                version: '3.1',
+                baseScore: 8.1,
+                baseSeverity: 'HIGH',
+                vectorString: 'CVSS:3.1/AV:N'
+              }
+            }
+          ],
+          references: [{ url: 'https://example.com/a' }, { url: 'https://example.com/b' }]
+        }
+      ]
+    }
+  };
+
+  const s = summarizeCveRecord(record);
+  assert.equal(s.description, 'An out-of-bounds read flaw.');
+  // Highest CVSS version wins (3.1 over 3.0), severity uppercased
+  assert.deepEqual(s.cvss, {
+    version: '3.1',
+    score: 8.1,
+    severity: 'HIGH',
+    vector: 'CVSS:3.1/AV:N'
+  });
+  assert.deepEqual(s.cwes, ['CWE-125: Out-of-bounds Read']);
+  // References de-duplicated by URL across CNA + ADP
+  assert.deepEqual(
+    s.references.map((r) => r.url),
+    ['https://example.com/a', 'https://example.com/b']
+  );
+  assert.equal(getCvssSeverityMeta(s.cvss.severity).label, 'High');
+});
+
+test('summarizeCveRecord tolerates a minimal record with no metrics or CWE', () => {
+  const s = summarizeCveRecord({
+    cveMetadata: { cveId: 'CVE-1999-0001', state: 'PUBLISHED' },
+    containers: { cna: { descriptions: [{ lang: 'en', value: 'Old issue.' }] } }
+  });
+  assert.equal(s.description, 'Old issue.');
+  assert.equal(s.cvss, null);
+  assert.deepEqual(s.cwes, []);
+  assert.deepEqual(s.references, []);
 });
 
 test('extractLicenseExpressionParts parses simple and compound expressions', () => {

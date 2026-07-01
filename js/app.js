@@ -24,6 +24,8 @@ import {
   getVulnerabilityUrl,
   getVexStatusMeta,
   getVexJustificationLabel,
+  getCvssSeverityMeta,
+  summarizeCveRecord,
   isMeaningfulValue,
   normalizeUrl,
   copyToClipboard,
@@ -144,6 +146,8 @@ export function spdxApp() {
     securitySearch: '',
     securitySort: 'severity',
     securityStatusFilter: '',
+    // CVE id -> { loading, error, data } fetched on demand from cve.org
+    cveDetails: {},
     licenseSort: 'usage',
     buildSort: 'output',
     pkgSort: 'name',
@@ -650,6 +654,7 @@ export function spdxApp() {
         this.views.find((v) => v.id === 'configs').count = this.buildConfigs.length;
         this.views.find((v) => v.id === 'build').count = this.builds.length;
         this.expandedClusters = new Set(); // fresh data: start fully collapsed
+        this.cveDetails = {}; // drop cached CVE fetches from the previous SBOM
         filteredBuildsCacheKey = null; // invalidate the build sort memo for new data
         filteredVulnsCacheKey = null; // invalidate the vulnerability sort memo for new data
 
@@ -857,6 +862,42 @@ export function spdxApp() {
     vulnRecord(spdxId) {
       return this.vulnerabilities.find((v) => v.spdxId === spdxId) || null;
     },
+    cvssSeverityMeta(severity) {
+      return getCvssSeverityMeta(severity);
+    },
+    // Reactive fetch-state for a CVE's enriched details ({} until requested).
+    cveDetail(cveId) {
+      return this.cveDetails[cveId] || null;
+    },
+    // Lazily fetch a CVE's public record the first time it's viewed (mirrors the
+    // on-demand license-text fetch). Cached in this.cveDetails so re-opening a
+    // card is instant and we never re-request. Data & terms: the CVE Program's
+    // records are free to use and the SBOM already lists these API URLs as the
+    // vulnerabilities' identifierLocators.
+    ensureCveDetails(cveId) {
+      if (!cveId || !/^CVE-\d{4}-\d+$/i.test(cveId)) return;
+      if (this.cveDetails[cveId]) return; // cached or already in flight
+      this.fetchCveDetails(cveId);
+    },
+    async fetchCveDetails(cveId) {
+      this.cveDetails[cveId] = { loading: true, error: '', data: null };
+      try {
+        const res = await fetch(`https://cveawg.mitre.org/api/cve/${encodeURIComponent(cveId)}`);
+        if (!res.ok) {
+          throw new Error(
+            res.status === 404 ? 'Not found in the CVE database' : `Request failed (${res.status})`
+          );
+        }
+        const record = await res.json();
+        this.cveDetails[cveId] = { loading: false, error: '', data: summarizeCveRecord(record) };
+      } catch (err) {
+        this.cveDetails[cveId] = {
+          loading: false,
+          error: err?.message || 'Could not load CVE details',
+          data: null
+        };
+      }
+    },
     // Deduplicated, severity-sorted assessments for a vulnerability detail view.
     assessmentsForVuln(spdxId) {
       const list = this.vexByVuln.get(spdxId) || [];
@@ -1016,6 +1057,7 @@ export function spdxApp() {
       this.expandedBuild = state.expandedBuild;
       this.expandedLicense = state.expandedLicense;
       this.expandedVuln = state.expandedVuln;
+      if (this.expandedVuln) this.ensureCveDetails(this.vulnRecord(this.expandedVuln)?.cveId);
       this.detailElement = state.detail
         ? this.elementMap.get(state.detail) || this.placeholderElement(state.detail)
         : null;
@@ -1072,6 +1114,7 @@ export function spdxApp() {
     },
     toggleVuln(id) {
       this.expandedVuln = this.expandedVuln === id ? null : id;
+      if (this.expandedVuln) this.ensureCveDetails(this.vulnRecord(id)?.cveId);
       this._scheduleNavPush();
     },
     licenseUsers(id) {

@@ -576,32 +576,93 @@ export function getExternalIdentifiers(element) {
 }
 
 /**
- * Builds a vulnerability-database lookup link for an external identifier, when
- * one applies. Only CPEs (cpe22/cpe23) are linked — to the NVD vulnerability
- * search filtered by the CPE name, which lists the matching CVE records.
- * Returns null for every other identifier type.
+ * Splits a string on an unescaped separator (CPE 2.3 escapes special chars with
+ * a backslash, e.g. `foo\:bar`).
+ *
+ * @param {string} str
+ * @param {string} sep - single character separator
+ * @returns {string[]}
+ */
+function splitUnescaped(str, sep) {
+  const out = [];
+  let cur = '';
+  for (let i = 0; i < str.length; i++) {
+    const ch = str[i];
+    if (ch === '\\' && i + 1 < str.length) {
+      cur += ch + str[i + 1];
+      i++;
+      continue;
+    }
+    if (ch === sep) {
+      out.push(cur);
+      cur = '';
+      continue;
+    }
+    cur += ch;
+  }
+  out.push(cur);
+  return out;
+}
+
+/**
+ * Parses a CPE 2.2 URI (`cpe:/a:vendor:product:version`) or CPE 2.3 formatted
+ * string (`cpe:2.3:part:vendor:product:version:…`) into its leading fields.
+ * `*` / `-` / empty are normalized to '' (ANY / N-A).
+ *
+ * @param {string} identifier
+ * @returns {{part: string, vendor: string, product: string, version: string}|null}
+ */
+export function parseCpe(identifier) {
+  const raw = String(identifier || '').trim();
+  if (!raw) return null;
+
+  let fields;
+  if (/^cpe:2\.3:/i.test(raw)) {
+    fields = splitUnescaped(raw.slice('cpe:2.3:'.length), ':');
+  } else if (/^cpe:\//i.test(raw)) {
+    fields = raw.slice('cpe:/'.length).split(':');
+  } else {
+    return null;
+  }
+
+  const clean = (v) => {
+    if (v == null) return '';
+    const s = v.replace(/\\(.)/g, '$1').trim();
+    return s === '*' || s === '-' ? '' : s;
+  };
+
+  return {
+    part: clean(fields[0]),
+    vendor: clean(fields[1]),
+    product: clean(fields[2]),
+    version: clean(fields[3])
+  };
+}
+
+/**
+ * Builds a vulnerability-database lookup link for a package/tool external
+ * identifier. Only CPEs (cpe22/cpe23) are linked. Producers such as Yocto emit
+ * CPEs with wildcard part/vendor (e.g. `cpe:2.3:*:*:glibc:2.39:…`); NVD's
+ * exact-CPE search rejects those ("Invalid Part received / Vendor must contain a
+ * value"), so we search cve.org — the same authority the SBOM's CVE locators
+ * point at — by the CPE's product name (the one field always populated).
  *
  * @param {{type: string, identifier: string}} eid
  * @returns {{url: string, label: string}|null}
  */
 export function getVulnerabilityLookup(eid) {
   if (!eid || !isMeaningfulValue(eid.identifier)) return null;
+  if (eid.type !== 'cpe22' && eid.type !== 'cpe23') return null;
 
-  if (eid.type === 'cpe22' || eid.type === 'cpe23') {
-    // NVD's search is a client-side SPA: the query lives in the URL fragment and
-    // expects the CPE name unescaped (literal colons/asterisks), matching the
-    // links the site itself produces.
-    const cpeName = String(eid.identifier).trim();
-    return {
-      url:
-        'https://nvd.nist.gov/vuln/search#/nvd/home?cpeFilterMode=cpe&cpeName=' +
-        cpeName +
-        '&resultType=records',
-      label: 'Search NVD for CVEs'
-    };
-  }
+  const cpe = parseCpe(eid.identifier);
+  if (!cpe || !cpe.product) return null;
 
-  return null;
+  // CPE products use '_' for spaces (e.g. linux_kernel → "linux kernel").
+  const product = cpe.product.replace(/_/g, ' ');
+  return {
+    url: 'https://www.cve.org/CVERecord/SearchResults?query=' + encodeURIComponent(product),
+    label: `Search cve.org for "${product}" CVEs`
+  };
 }
 
 /* ==========================================================================
@@ -711,6 +772,142 @@ export function vexStatusForRel(relationshipType) {
 export function getVexJustificationLabel(type) {
   if (!type) return '';
   return VEX_JUSTIFICATION_LABELS[type] || type;
+}
+
+/**
+ * Presentation metadata for a CVSS qualitative severity rating.
+ *
+ * @param {string} severity - CRITICAL | HIGH | MEDIUM | LOW | NONE
+ * @returns {{label: string, badgeClass: string}}
+ */
+export function getCvssSeverityMeta(severity) {
+  const map = {
+    CRITICAL: {
+      label: 'Critical',
+      badgeClass: 'bg-rose-500/15 text-rose-300 ring-1 ring-rose-500/40'
+    },
+    HIGH: {
+      label: 'High',
+      badgeClass: 'bg-orange-500/15 text-orange-300 ring-1 ring-orange-500/40'
+    },
+    MEDIUM: {
+      label: 'Medium',
+      badgeClass: 'bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/40'
+    },
+    LOW: { label: 'Low', badgeClass: 'bg-sky-500/15 text-sky-300 ring-1 ring-sky-500/40' },
+    NONE: { label: 'None', badgeClass: 'bg-slate-600/20 text-slate-300 ring-1 ring-slate-500/30' }
+  };
+  return (
+    map[String(severity || '').toUpperCase()] || {
+      label: severity || 'Unknown',
+      badgeClass: 'bg-slate-600/20 text-slate-300 ring-1 ring-slate-500/30'
+    }
+  );
+}
+
+/**
+ * @typedef {Object} CveSummary
+ * @property {string} id
+ * @property {string} state - PUBLISHED | REJECTED | …
+ * @property {string} description
+ * @property {{version: string, score: number, severity: string, vector: string}|null} cvss
+ * @property {string[]} cwes
+ * @property {Array<{url: string, name: string, tags: string[]}>} references
+ * @property {string} published
+ * @property {string} assigner
+ */
+
+/**
+ * Distills a CVE 5.x record (as returned by cveawg.mitre.org / cve.org) into the
+ * handful of fields the UI shows. Looks in both the CNA and ADP containers, and
+ * picks the highest-version CVSS metric available.
+ *
+ * @param {Object} record - Parsed CVE JSON record
+ * @returns {CveSummary}
+ */
+export function summarizeCveRecord(record) {
+  const meta = record?.cveMetadata || {};
+  const cna = record?.containers?.cna || {};
+  const adp = Array.isArray(record?.containers?.adp) ? record.containers.adp : [];
+
+  const englishDescription = (container) => {
+    const list = container?.descriptions || [];
+    const en = list.find((x) => (x.lang || '').toLowerCase().startsWith('en'));
+    return (en || list[0])?.value || '';
+  };
+  let description = englishDescription(cna) || adp.map(englishDescription).find(Boolean) || '';
+  if (!description && Array.isArray(cna.rejectedReasons)) {
+    description = cna.rejectedReasons.find((r) => r.value)?.value || '';
+  }
+
+  // CVSS: collect every baseScore-bearing metric from CNA + ADP, keep the
+  // highest CVSS version (v4 > v3.1 > v3.0 > v2).
+  const collectMetrics = (container) => {
+    const out = [];
+    (container?.metrics || []).forEach((m) => {
+      Object.entries(m).forEach(([key, value]) => {
+        if (/^cvssV/i.test(key) && value && typeof value === 'object' && value.baseScore != null) {
+          out.push({
+            version: value.version || key.replace(/^cvssV/i, '').replace(/_/g, '.'),
+            score: value.baseScore,
+            severity: String(value.baseSeverity || '').toUpperCase(),
+            vector: value.vectorString || ''
+          });
+        }
+      });
+    });
+    return out;
+  };
+  const metrics = [...collectMetrics(cna), ...adp.flatMap(collectMetrics)];
+  metrics.sort((a, b) => (parseFloat(b.version) || 0) - (parseFloat(a.version) || 0));
+  const cvss = metrics[0] || null;
+
+  // CWE identifiers, de-duplicated, formatted as "CWE-125: Out-of-bounds Read"
+  const cwes = [];
+  const addCwes = (container) => {
+    (container?.problemTypes || []).forEach((pt) => {
+      (pt.descriptions || []).forEach((d) => {
+        const id = d.cweId || '';
+        const text = (d.description || '').trim();
+        if (id && !/^n\/?a$/i.test(id)) {
+          let label = id;
+          const rest = text.replace(new RegExp(`^${id}[:\\s-]*`, 'i'), '').trim();
+          if (rest && !/^n\/?a$/i.test(rest)) label = `${id}: ${rest}`;
+          if (!cwes.some((c) => c.startsWith(id))) cwes.push(label);
+        } else if (/CWE-\d+/i.test(text) && !cwes.includes(text)) {
+          cwes.push(text);
+        }
+      });
+    });
+  };
+  addCwes(cna);
+  adp.forEach(addCwes);
+
+  // References (CNA + ADP), de-duplicated by URL.
+  const references = [];
+  const seen = new Set();
+  const addRefs = (container) => {
+    (container?.references || []).forEach((r) => {
+      const url = r?.url;
+      if (typeof url === 'string' && /^https?:\/\//i.test(url) && !seen.has(url)) {
+        seen.add(url);
+        references.push({ url, name: r.name || '', tags: Array.isArray(r.tags) ? r.tags : [] });
+      }
+    });
+  };
+  addRefs(cna);
+  adp.forEach(addRefs);
+
+  return {
+    id: meta.cveId || '',
+    state: meta.state || '',
+    description,
+    cvss,
+    cwes,
+    references,
+    published: meta.datePublished || '',
+    assigner: meta.assignerShortName || ''
+  };
 }
 
 /* ==========================================================================
