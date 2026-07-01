@@ -1390,8 +1390,15 @@ export function spdxApp() {
     licenseModalText() {
       return this.licenseModalActivePart()?.text || '';
     },
+    // Full license text embedded in the SBOM itself (simplelicensing_SimpleLicensingText
+    // elements, e.g. Yocto's custom/CLOSED licenses) — no fetch needed.
+    inlineLicenseText(licenseRef) {
+      return this.elementMap.get(licenseRef)?.simplelicensing_licenseText || '';
+    },
     canShowLicenseText(licenseRef) {
-      return this.licenseExpressionParts(licenseRef).length > 0;
+      return (
+        !!this.inlineLicenseText(licenseRef) || this.licenseExpressionParts(licenseRef).length > 0
+      );
     },
     licenseTextActionLabel(licenseRef) {
       return this.licenseExpressionParts(licenseRef).length > 1
@@ -1435,6 +1442,7 @@ export function spdxApp() {
       };
     },
     async fetchLicensePartText(part) {
+      if (part.loaded) return; // text already resolved from the SBOM itself
       const cacheKey = this.licensePartCacheKey(part);
       const cached = licenseTextCache.get(cacheKey);
       if (cached) {
@@ -1480,6 +1488,30 @@ export function spdxApp() {
       }
     },
     async showLicenseText(licenseRef) {
+      // Text embedded in the SBOM: show it directly, no expression parsing/fetching.
+      const inlineText = this.inlineLicenseText(licenseRef);
+      if (inlineText) {
+        const label = this.licenseLabel(licenseRef);
+        this.licenseModalOpen = true;
+        this.licenseModalRef = licenseRef;
+        this.licenseModalExpression = label;
+        this.licenseModalActiveIndex = 0;
+        this.licenseModalParts = [
+          {
+            id: '',
+            kind: 'inline',
+            withLicense: '',
+            label,
+            name: label,
+            text: inlineText,
+            error: '',
+            loading: false,
+            loaded: true
+          }
+        ];
+        return;
+      }
+
       const expression = this.licenseExpressionFor(licenseRef);
       const parsedParts = extractLicenseExpressionParts(expression);
 
@@ -1488,6 +1520,22 @@ export function spdxApp() {
       this.licenseModalExpression = expression;
       this.licenseModalActiveIndex = 0;
       this.licenseModalParts = parsedParts.map((part) => this.createLicenseModalPart(part));
+
+      // Custom LicenseRef-… parts: the expression element's customIdToUri map
+      // points at simplelicensing_SimpleLicensingText elements carrying the full
+      // text inside the SBOM (e.g. Yocto's LicenseRef-PD) — use that instead of
+      // fetching from the SPDX License List (where custom refs don't exist).
+      const customIdMap = this.elementMap.get(licenseRef)?.simplelicensing_customIdToUri || [];
+      this.licenseModalParts.forEach((part) => {
+        const entry = customIdMap.find((e) => e?.key === part.id);
+        const textEl = entry && this.elementMap.get(entry.value);
+        if (textEl?.simplelicensing_licenseText) {
+          part.kind = 'inline';
+          part.name = textEl.name || part.label;
+          part.text = textEl.simplelicensing_licenseText;
+          part.loaded = true;
+        }
+      });
 
       if (!parsedParts.length) {
         this.licenseModalParts = [
