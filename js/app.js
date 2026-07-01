@@ -71,13 +71,11 @@ const licenseTextCache = new Map(); // licenseId -> { name, text }
    seconds on large SBOMs (the Yocto sample has ~3k CVEs), so the heavy list
    views stream in RENDER_CHUNK cards per frame behind a progress bar instead.
    The whole list still ends up in the DOM — no virtualization — so deep links
-   to any card keep working. Bookkeeping lives off the reactive state:
-   shownCounts tracks how many items each view's x-for actually emitted last
-   evaluation, and viewRenderSeq cancels a streaming loop when a newer one (or
-   freshly parsed data) supersedes it. */
+   to any card keep working. viewRenderSeq cancels a streaming loop when a
+   newer one (or freshly parsed data) supersedes it, kept off the reactive
+   state since it's pure bookkeeping. */
 const RENDER_CHUNK = 200; // max new cards added to the DOM per frame
 let viewRenderSeq = 0;
-const shownCounts = {};
 // View id -> the filtered list its main x-for renders, for the streaming loop.
 const viewListProps = {
   packages: 'filteredPackages',
@@ -698,7 +696,6 @@ export function spdxApp() {
         this.viewRender.active = false;
         Object.keys(this.renderLimits).forEach((k) => {
           this.renderLimits[k] = 0;
-          shownCounts[k] = 0;
         });
         this._ensureViewRendered(this.currentView);
 
@@ -1135,20 +1132,12 @@ export function spdxApp() {
       this._scheduleNavPush();
     },
 
-    // Every heavy list x-for renders through this. It returns at most
-    // renderLimits[view] items, and hard-caps how many NEW cards a single
-    // synchronous evaluation may add — so no filter/search change (e.g.
-    // clearing a search over 3k CVEs) can balloon the DOM in one blocking
-    // pass. Anything past the cap is streamed in by _ensureViewRendered.
+    // Every heavy list x-for renders through this. It's a pure clamp to
+    // renderLimits[view] — the actual chunk-by-chunk growth of that limit is
+    // driven solely by _ensureViewRendered, so there's one source of truth
+    // for how much of the list is in the DOM.
     renderSlice(view, list) {
-      let limit = this.renderLimits[view];
-      const allowed = (shownCounts[view] || 0) + RENDER_CHUNK;
-      if (limit > allowed && list.length > allowed) {
-        limit = allowed;
-        this.renderLimits[view] = allowed;
-        queueMicrotask(() => this._ensureViewRendered(view));
-      }
-      shownCounts[view] = Math.min(limit, list.length);
+      const limit = this.renderLimits[view];
       return list.length <= limit ? list : list.slice(0, limit);
     },
 
@@ -1188,7 +1177,6 @@ export function spdxApp() {
     // cards, which is as expensive as building them from scratch.
     restreamView(view) {
       if (!(view in this.renderLimits)) return;
-      shownCounts[view] = 0;
       this.renderLimits[view] = Math.min(this.renderLimits[view], RENDER_CHUNK);
       this._ensureViewRendered(view);
     },
