@@ -13,7 +13,8 @@ import {
   parseCpe,
   getVulnerabilityLookup,
   summarizeCveRecord,
-  getCvssSeverityMeta
+  getCvssSeverityMeta,
+  getCdxProperties
 } from '../js/utils.js';
 import { spdxApp } from '../js/app.js';
 
@@ -579,4 +580,67 @@ test('renderLicenseExpression renders SPDX 3 ExpandedLicensing operators', () =>
   // Non-operator elements return '' so callers keep their own name handling.
   assert.equal(renderLicenseExpression(map.get('lic:custom'), map), '');
   assert.equal(renderLicenseExpression(undefined, map), '');
+});
+
+test('getCdxProperties flattens the SPDX 3 CdxPropertiesExtension', () => {
+  const pkg = {
+    type: 'software_Package',
+    spdxId: 'pkg:pinia',
+    extension: [
+      {
+        type: 'extension_CdxPropertiesExtension',
+        extension_cdxProperty: [
+          {
+            type: 'extension_CdxPropertyEntry',
+            extension_cdxPropName: 'scope',
+            extension_cdxPropValue: 'required'
+          },
+          {
+            type: 'extension_CdxPropertyEntry',
+            extension_cdxPropName: 'group',
+            extension_cdxPropValue: ''
+          },
+          {
+            type: 'extension_CdxPropertyEntry',
+            extension_cdxPropName: 'tags',
+            extension_cdxPropValue: '["framework"]'
+          },
+          {
+            type: 'extension_CdxPropertyEntry',
+            extension_cdxPropName: 'properties.cdx:npm:package:development',
+            extension_cdxPropValue: 'true'
+          },
+          {
+            type: 'extension_CdxPropertyEntry',
+            extension_cdxPropName: 'licenses',
+            extension_cdxPropValue: '[{"license":{"id":"MIT"}}]'
+          }
+        ]
+      }
+    ]
+  };
+
+  const props = getCdxProperties(pkg);
+  const byName = new Map(props.map((p) => [p.name, p]));
+
+  // Empty values (group) are dropped.
+  assert.equal(byName.has('group'), false);
+  assert.equal(props.length, 4);
+
+  // Scalars keep their raw name and string value; no JSON parse.
+  assert.equal(byName.get('scope').value, 'required');
+  assert.equal(byName.get('scope').json, null);
+  assert.equal(byName.has('properties.cdx:npm:package:development'), true);
+
+  // JSON blobs are parsed and pretty-printed.
+  const licenses = byName.get('licenses');
+  assert.deepEqual(licenses.json, [{ license: { id: 'MIT' } }]);
+  assert.equal(licenses.pretty, JSON.stringify([{ license: { id: 'MIT' } }], null, 2));
+
+  // Verbose JSON properties sort after concise scalars.
+  assert.equal(props[props.length - 1].name, 'licenses');
+
+  // Elements without the extension yield an empty list.
+  assert.deepEqual(getCdxProperties({ type: 'software_Package' }), []);
+  assert.deepEqual(getCdxProperties(undefined), []);
 });

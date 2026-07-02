@@ -16,6 +16,7 @@ import {
   parseBuildParameters as parseBuildParameterGroups,
   getToolUsageCount,
   getExternalIdentifiers,
+  getCdxProperties,
   isMeaningfulValue,
   normalizeUrl,
   copyToClipboard
@@ -160,6 +161,9 @@ export const accessorsMixin = {
   },
   externalIdentifiers(element) {
     return getExternalIdentifiers(element);
+  },
+  cdxProperties(element) {
+    return getCdxProperties(element);
   },
   isMeaningful(value) {
     return isMeaningfulValue(value);

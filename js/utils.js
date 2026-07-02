@@ -741,6 +741,78 @@ export function getExternalIdentifiers(element) {
     });
 }
 
+// Verbose CycloneDX properties whose values (serialized JSON blobs) mostly
+// duplicate data SPDX already models natively — sorted after the concise scalar
+// properties so the useful bits stay at the top of the list.
+const CDX_VERBOSE_PROPERTIES = new Set([
+  'hashes',
+  'licenses',
+  'evidence',
+  'externalReferences',
+  'metadataTools',
+  'metadataAuthors'
+]);
+
+/**
+ * Parses a CycloneDX property value that carries serialized JSON (cdxgen encodes
+ * arrays/objects such as `hashes` or `evidence` as strings). Returns the parsed
+ * object/array, or null when the value is a plain scalar string.
+ *
+ * @param {string} value
+ * @returns {Object|Array|null}
+ */
+function parseCdxJsonValue(value) {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  if (!(trimmed.startsWith('{') || trimmed.startsWith('['))) return null;
+  try {
+    const parsed = JSON.parse(trimmed);
+    return parsed && typeof parsed === 'object' ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Flattens the CycloneDX properties an element carries via the SPDX 3
+ * CdxPropertiesExtension (Extension → CdxPropertiesExtension → CdxPropertyEntry).
+ * Each entry keeps its raw property name, the string value, and (when the value
+ * is serialized JSON) a pretty-printed form for display.
+ *
+ * @see https://spdx.github.io/spdx-spec/v3.0.1/model/Extension/Classes/CdxPropertiesExtension/
+ * @param {Object} element - The SPDX element
+ * @returns {Array<{name: string, value: string, json: (Object|Array|null), pretty: string}>}
+ */
+export function getCdxProperties(element) {
+  const raw = element?.extension;
+  if (!raw) return [];
+  const extensions = Array.isArray(raw) ? raw : [raw];
+  const entries = [];
+  for (const ext of extensions) {
+    const props = ext?.extension_cdxProperty;
+    if (!Array.isArray(props)) continue;
+    for (const prop of props) {
+      const name = prop?.extension_cdxPropName;
+      if (name == null) continue;
+      const value = prop?.extension_cdxPropValue;
+      // Drop entries with no meaningful value (e.g. an empty `group`).
+      if (!isMeaningfulValue(value)) continue;
+      const json = parseCdxJsonValue(String(value));
+      entries.push({
+        name,
+        value: String(value).trim(),
+        json,
+        pretty: json ? JSON.stringify(json, null, 2) : ''
+      });
+    }
+  }
+  // Concise scalar properties first; verbose JSON blobs last.
+  return entries.sort(
+    (a, b) =>
+      Number(CDX_VERBOSE_PROPERTIES.has(a.name)) - Number(CDX_VERBOSE_PROPERTIES.has(b.name))
+  );
+}
+
 /**
  * Splits a string on an unescaped separator (CPE 2.3 escapes special chars with
  * a backslash, e.g. `foo\:bar`).
