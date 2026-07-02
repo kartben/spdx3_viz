@@ -40,6 +40,14 @@
     "files": ["ubuntu-24.04-linux-amd64.spdx3.jsonld"]
   },
   {
+    "id": "kubernetes",
+    "name": "Kubernetes",
+    "icon": "favicon.svg",
+    "description": "Kubernetes v1.35.3 release SBOM.",
+    "dir": "samples/kubernetes",
+    "files": ["kubernetes_1_35_3_spdx.jsonld"]
+  },
+  {
     "id": "windows",
     "name": "Windows 11",
     "icon": "favicon.svg",
