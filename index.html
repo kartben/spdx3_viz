@@ -72,7 +72,7 @@
   <body class="bg-slate-900 text-slate-200 h-screen overflow-hidden" x-data="spdxApp()" x-cloak>
     <!-- FILE DROP ZONE (shown before data loaded) -->
     <div x-show="!dataLoaded" class="flex h-screen overflow-y-auto no-scrollbar">
-      <div class="text-center max-w-lg mx-auto my-auto px-6 py-10">
+      <div class="text-center max-w-xl mx-auto my-auto px-6 py-10">
         <div class="mb-8">
           <div
             class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center"
@@ -145,7 +145,10 @@
             <span class="text-xs text-slate-500 flex-shrink-0">or explore sample SBOMs</span>
             <div class="flex-1 h-px bg-slate-700/50"></div>
           </div>
-          <div class="grid gap-3" :class="samples.length > 1 ? 'grid-cols-2' : 'grid-cols-1'">
+          <div
+            class="grid gap-3"
+            :class="samples.length > 1 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'"
+          >
             <template x-for="s in samples" :key="s.id">
               <button
                 @click="loadSample(s)"
@@ -184,7 +187,10 @@
                     ></path>
                   </svg>
                 </div>
-                <p class="text-xs text-slate-400 leading-snug" x-text="s.description"></p>
+                <p
+                  class="text-xs text-slate-400 leading-snug [&_code]:font-mono [&_code]:text-slate-300 [&_code]:bg-slate-700/50 [&_code]:rounded [&_code]:px-1 [&_code]:py-0.5 [&_code]:text-[11px]"
+                  x-html="s.description"
+                ></p>
                 <p class="text-[10px] text-slate-500 mt-1.5" x-text="s.files.length + ' files'"></p>
               </button>
             </template>
