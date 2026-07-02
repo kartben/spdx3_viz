@@ -17,6 +17,13 @@ let filteredBuildsCacheVal = [];
 // card). Cached on the inputs that actually affect the result.
 let filteredVulnsCacheKey = null;
 let filteredVulnsCacheVal = [];
+// Same idea for the files view — critical here because the list can be huge
+// (~28k files in the Kubernetes SBOM) and the view streams into the DOM one
+// chunk per frame: without this memo the getter re-ran a full 28k-item
+// locale-aware sort on every chunk (~dozens of times), which is what made the
+// Files tab slow to open.
+let filteredFilesCacheKey = null;
+let filteredFilesCacheVal = [];
 
 export const derivedMixin = {
   // Clears the build + vulnerability sort memos. Called when fresh data is
@@ -24,6 +31,7 @@ export const derivedMixin = {
   _resetListMemos() {
     filteredBuildsCacheKey = null;
     filteredVulnsCacheKey = null;
+    filteredFilesCacheKey = null;
   },
 
   get currentViewLabel() {
@@ -60,15 +68,28 @@ export const derivedMixin = {
   },
 
   get filteredFiles() {
-    let fs = this.files;
-    if (this.searchQuery) {
-      const q = this.searchQuery.toLowerCase();
+    // Memoized on the only inputs that affect the result (see the cache note
+    // above): the file list, the search box, and the type-filter chip. Keeps the
+    // streaming render from re-sorting all ~28k files on every chunk.
+    const search = this.searchQuery;
+    const typeFilter = this.fileTypeFilter;
+    const files = this.files;
+    const key = `${files.length}|${search}|${typeFilter}`;
+    if (key === filteredFilesCacheKey) return filteredFilesCacheVal;
+
+    let fs = files;
+    if (search) {
+      const q = search.toLowerCase();
       fs = fs.filter((f) => f.name?.toLowerCase().includes(q));
     }
-    if (this.fileTypeFilter) {
-      fs = fs.filter((f) => this.fileExt(f.name) === this.fileTypeFilter);
+    if (typeFilter) {
+      fs = fs.filter((f) => this.fileExt(f.name) === typeFilter);
     }
-    return [...fs].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    const sorted = [...fs].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+
+    filteredFilesCacheKey = key;
+    filteredFilesCacheVal = sorted;
+    return sorted;
   },
 
   get filteredLicenses() {
