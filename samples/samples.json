@@ -24,6 +24,14 @@
     "files": ["core-image-minimal-1-0-0-0-20260321-1540.spdx.json"]
   },
   {
+    "id": "android",
+    "name": "Android (AOSP)",
+    "icon": "favicon.svg",
+    "description": "AOSP <a href=\"https://source.android.com/docs/setup/create/create-sbom?hl=en#obtain\" target=\"_blank\" rel=\"noopener\" onclick=\"event.stopPropagation()\">release build SBOM</a>, converted from SPDX 2.x to 3.0.",
+    "dir": "samples/android",
+    "files": ["aosp-android-latest-release.jsonld"]
+  },
+  {
     "id": "docker",
     "name": "Docker image",
     "icon": "favicon.svg",
