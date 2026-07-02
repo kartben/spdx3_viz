@@ -1,5 +1,6 @@
 import {
   displayLicenseExpression,
+  renderLicenseExpression,
   extractSpdxLicenseId,
   resolveLicenseExpression,
   extractLicenseExpressionParts,
@@ -29,6 +30,8 @@ export const licensesMixin = {
     if (el?.simplelicensing_licenseExpression) {
       return displayLicenseExpression(el, this.elementMap);
     }
+    const expandedExpr = renderLicenseExpression(el, this.elementMap);
+    if (expandedExpr) return expandedExpr;
     if (id.startsWith('https://spdx.org/licenses/')) {
       return id.replace('https://spdx.org/licenses/', '');
     }

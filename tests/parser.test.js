@@ -6,6 +6,7 @@ import { buildRelationshipIndexes, parseGraph } from '../js/parser.js';
 import {
   parseBuildParameters,
   extractLicenseExpressionParts,
+  renderLicenseExpression,
   getVulnerabilityId,
   getVexStatusMeta,
   getVexJustificationLabel,
@@ -511,4 +512,71 @@ test('extractLicenseExpressionParts parses simple and compound expressions', () 
       withLicense: 'GPL-2.0-only'
     }
   ]);
+});
+
+test('renderLicenseExpression renders SPDX 3 ExpandedLicensing operators', () => {
+  // A Syft-style ConjunctiveLicenseSet: listed licenses as http(s) URLs plus a
+  // CustomLicense member resolved by its name.
+  const graph = [
+    {
+      type: 'expandedlicensing_ConjunctiveLicenseSet',
+      spdxId: 'lic:and',
+      expandedlicensing_member: [
+        'http://spdx.org/licenses/GPL-2.0-only',
+        'https://spdx.org/licenses/BSD-3-Clause',
+        'lic:custom'
+      ]
+    },
+    { type: 'expandedlicensing_CustomLicense', spdxId: 'lic:custom', name: 'public-domain' },
+    {
+      type: 'expandedlicensing_DisjunctiveLicenseSet',
+      spdxId: 'lic:or',
+      expandedlicensing_member: [
+        'http://spdx.org/licenses/MIT',
+        'http://spdx.org/licenses/Apache-2.0'
+      ]
+    },
+    // OR nested inside AND must be parenthesised (AND binds tighter than OR).
+    {
+      type: 'expandedlicensing_ConjunctiveLicenseSet',
+      spdxId: 'lic:nested',
+      expandedlicensing_member: ['http://spdx.org/licenses/GPL-2.0-only', 'lic:or']
+    },
+    {
+      type: 'expandedlicensing_OrLaterOperator',
+      spdxId: 'lic:orlater',
+      expandedlicensing_subjectLicense: 'http://spdx.org/licenses/GPL-2.0-only'
+    },
+    {
+      type: 'expandedlicensing_WithAdditionOperator',
+      spdxId: 'lic:with',
+      expandedlicensing_subjectExtendableLicense: 'http://spdx.org/licenses/GPL-2.0-only',
+      expandedlicensing_subjectAddition: 'lic:exc'
+    },
+    {
+      type: 'expandedlicensing_ListedLicenseException',
+      spdxId: 'lic:exc',
+      name: 'Classpath-exception-2.0'
+    }
+  ];
+  const map = new Map(graph.map((el) => [el.spdxId, el]));
+
+  assert.equal(
+    renderLicenseExpression(map.get('lic:and'), map),
+    'GPL-2.0-only AND BSD-3-Clause AND public-domain'
+  );
+  assert.equal(renderLicenseExpression(map.get('lic:or'), map), 'MIT OR Apache-2.0');
+  assert.equal(
+    renderLicenseExpression(map.get('lic:nested'), map),
+    'GPL-2.0-only AND (MIT OR Apache-2.0)'
+  );
+  assert.equal(renderLicenseExpression(map.get('lic:orlater'), map), 'GPL-2.0-only+');
+  assert.equal(
+    renderLicenseExpression(map.get('lic:with'), map),
+    'GPL-2.0-only WITH Classpath-exception-2.0'
+  );
+
+  // Non-operator elements return '' so callers keep their own name handling.
+  assert.equal(renderLicenseExpression(map.get('lic:custom'), map), '');
+  assert.equal(renderLicenseExpression(undefined, map), '');
 });

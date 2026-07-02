@@ -10,6 +10,7 @@
 import { COLORS, ELEMENT_TYPES, RELATIONSHIP_TYPES, VEX_TYPES } from './config.js';
 import {
   displayLicenseExpression,
+  renderLicenseExpression,
   getVulnerabilityId,
   getVulnerabilityLocators,
   vexStatusForRel
@@ -637,6 +638,8 @@ function resolveLicenseLabel(id, elementMap) {
   if (el?.simplelicensing_licenseExpression) {
     return displayLicenseExpression(el, elementMap);
   }
+  const expandedExpr = renderLicenseExpression(el, elementMap);
+  if (expandedExpr) return expandedExpr;
   const spdxLicenseMatch = id.match(/^https?:\/\/spdx\.org\/licenses\/(.+)$/);
   if (spdxLicenseMatch) {
     return spdxLicenseMatch[1];

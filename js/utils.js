@@ -204,6 +204,125 @@ export function displayLicenseExpression(element, elementMap) {
     }, String(expr));
 }
 
+/* ==========================================================================
+   SPDX 3 ExpandedLicensing rendering
+   Renders the ExpandedLicensing operator classes (license sets and operators)
+   as SPDX license expression strings. Grounded in the SPDX 3.0.1 model:
+   https://spdx.github.io/spdx-spec/v3.0.1/model/ExpandedLicensing/
+     ConjunctiveLicenseSet  → `member` joined by AND
+     DisjunctiveLicenseSet  → `member` joined by OR
+     OrLaterOperator        → `subjectLicense` + trailing `+`
+     WithAdditionOperator   → `subjectExtendableLicense` WITH `subjectAddition`
+   Element type / property names are the underscore serialization the parser
+   already normalises to (e.g. `expandedlicensing_member`).
+   ========================================================================== */
+
+// Set operators and the license-expression keyword they render to.
+const LICENSE_SET_OPERATOR = {
+  expandedlicensing_ConjunctiveLicenseSet: ' AND ',
+  expandedlicensing_DisjunctiveLicenseSet: ' OR '
+};
+
+// Binding strength of the set operators per the SPDX license expression
+// grammar: OR is looser than AND. A member that binds looser than its parent
+// must be parenthesised — i.e. an OR set nested inside an AND set. Everything
+// else (an AND set inside OR, WITH, +, and leaf licenses) needs no parentheses.
+const LICENSE_OPERATOR_PRECEDENCE = {
+  expandedlicensing_DisjunctiveLicenseSet: 1,
+  expandedlicensing_ConjunctiveLicenseSet: 2
+};
+
+function licensePrecedence(ref, elementMap) {
+  const el = ref && typeof ref === 'object' ? ref : elementMap?.get(ref);
+  return (el && LICENSE_OPERATOR_PRECEDENCE[el.type]) || 3;
+}
+
+// Extracts the bare SPDX License List id from a listed-license URL, or '' if
+// the string isn't one (SPDX 3 producers use both http and https forms).
+function listedLicenseId(str) {
+  const m = typeof str === 'string' && str.match(/^https?:\/\/spdx\.org\/licenses\/([^/?#]+)/i);
+  return m ? m[1].replace(/\.(json|html)$/i, '') : '';
+}
+
+// Renders one AnyLicenseInfo reference — a set member, an operator subject, or
+// a top-level target — which may be an inline object, a listed-license URL, a
+// NoneLicense/NoAssertionLicense, or an spdxId pointing at a graph element.
+// Returns '' when nothing resolves so callers can fall back.
+function renderLicenseRef(ref, elementMap, seen) {
+  if (ref == null) return '';
+  if (typeof ref === 'object') return renderLicenseNode(ref, elementMap, seen);
+  const listed = listedLicenseId(ref);
+  if (listed) return listed;
+  const str = String(ref);
+  if (/NoneLicense$/.test(str)) return 'NONE';
+  if (str.includes('NoAssertion')) return 'NoAssertion';
+  const el = elementMap?.get(str);
+  return el ? renderLicenseNode(el, elementMap, seen) : '';
+}
+
+function renderLicenseNode(el, elementMap, seen) {
+  if (!el || typeof el !== 'object') return '';
+  const id = el.spdxId || el['@id'];
+  if (id) {
+    if (seen.has(id)) return el.name || ''; // guard against pathological cycles
+    seen.add(id);
+  }
+
+  // A pre-composed SPDX expression string (SimpleLicensing profile) wins.
+  if (el.simplelicensing_licenseExpression) return displayLicenseExpression(el, elementMap);
+
+  const joiner = LICENSE_SET_OPERATOR[el.type];
+  if (joiner) {
+    const parent = LICENSE_OPERATOR_PRECEDENCE[el.type];
+    const parts = (el.expandedlicensing_member || [])
+      .map((member) => {
+        const text = renderLicenseRef(member, elementMap, seen);
+        if (!text) return '';
+        return licensePrecedence(member, elementMap) < parent ? `(${text})` : text;
+      })
+      .filter(Boolean);
+    return parts.join(joiner);
+  }
+
+  if (el.type === 'expandedlicensing_OrLaterOperator') {
+    const base = renderLicenseRef(el.expandedlicensing_subjectLicense, elementMap, seen);
+    return base ? `${base}+` : '';
+  }
+
+  if (el.type === 'expandedlicensing_WithAdditionOperator') {
+    const base = renderLicenseRef(el.expandedlicensing_subjectExtendableLicense, elementMap, seen);
+    const addition = renderLicenseRef(el.expandedlicensing_subjectAddition, elementMap, seen);
+    if (base && addition) return `${base} WITH ${addition}`;
+    return base || addition;
+  }
+
+  // Leaf license (listed, custom, or an addition): identity is the listed id
+  // from its spdxId URL, or its name.
+  return listedLicenseId(id) || el.name || '';
+}
+
+/**
+ * Renders an SPDX 3 ExpandedLicensing set/operator element as a license
+ * expression string (e.g. "GPL-2.0-only AND BSD-3-Clause"), resolving nested
+ * members recursively. Returns '' for elements that are not one of the
+ * ExpandedLicensing operator classes, so callers keep their existing handling
+ * for plain listed/custom licenses.
+ *
+ * @see https://spdx.github.io/spdx-spec/v3.0.1/model/ExpandedLicensing/
+ * @param {Object} element - The candidate license element
+ * @param {Map<string, Object>} [elementMap] - Map of SPDX IDs to elements
+ * @returns {string} The license expression, or '' when not an operator element
+ */
+export function renderLicenseExpression(element, elementMap) {
+  if (!element || typeof element !== 'object') return '';
+  const type = element.type;
+  const isOperator =
+    !!LICENSE_SET_OPERATOR[type] ||
+    type === 'expandedlicensing_OrLaterOperator' ||
+    type === 'expandedlicensing_WithAdditionOperator';
+  return isOperator ? renderLicenseNode(element, elementMap, new Set()) : '';
+}
+
 /**
  * Gets the display name for a relationship target
  * Handles license URLs specially, otherwise uses element name or cleaned ID
@@ -227,6 +346,8 @@ export function getRelationshipTargetDisplayName(spdxId, elementMap) {
   if (element?.simplelicensing_licenseExpression) {
     return displayLicenseExpression(element, elementMap);
   }
+  const licenseExpr = renderLicenseExpression(element, elementMap);
+  if (licenseExpr) return licenseExpr;
   if (element?.type === 'security_Vulnerability') return getVulnerabilityId(element);
   if (element?.name) return element.name;
 
@@ -247,6 +368,8 @@ export function getElementDisplayName(element, elementMap) {
   if (element.simplelicensing_licenseExpression) {
     return displayLicenseExpression(element, elementMap);
   }
+  const licenseExpr = renderLicenseExpression(element, elementMap);
+  if (licenseExpr) return licenseExpr;
   if (element.type === 'security_Vulnerability') return getVulnerabilityId(element);
   if (element.name) return element.name;
   return cleanName(element.spdxId);
@@ -987,6 +1110,9 @@ export function resolveLicenseExpression(id, elementMap) {
   if (el?.simplelicensing_licenseExpression) {
     return String(el.simplelicensing_licenseExpression).trim();
   }
+
+  const expandedExpr = renderLicenseExpression(el, elementMap);
+  if (expandedExpr) return expandedExpr;
 
   const urlMatch = id.match(/^https?:\/\/spdx\.org\/licenses\/([^/?#]+)/i);
   if (urlMatch) {
