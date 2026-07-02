@@ -11,7 +11,7 @@
     "id": "linux",
     "name": "Linux kernel",
     "emoji": "🐧",
-    "description": "Linux kernel build: source tree, build environment, and bzImage output.",
+    "description": "Linux kernel build: source tree, build environment, and <code>bzImage</code> output.",
     "dir": "samples/linux",
     "files": ["sbom-source.spdx.json", "sbom-output.spdx.json", "sbom-build.spdx.json"]
   },
@@ -19,7 +19,7 @@
     "id": "yocto",
     "name": "Yocto",
     "icon": "favicon.png",
-    "description": "Yocto core-image-minimal build: rootfs, packages, build graph, and vulnerability (VEX) data.",
+    "description": "Yocto <code>core-image-minimal</code> build: rootfs, packages, build graph, and vulnerability (VEX) data.",
     "dir": "samples/yocto",
     "files": ["core-image-minimal-1-0-0-0-20260321-1540.spdx.json"]
   },
@@ -35,8 +35,16 @@
     "id": "windows",
     "name": "Windows 11",
     "icon": "favicon.svg",
-    "description": "Windows 11 install media manifest (as found in sources/_manifest), converted from SPDX 2.2 to SPDX 3.0.",
+    "description": "Windows 11 install media manifest (as found in <code>sources/_manifest</code>), converted from SPDX 2.2 to SPDX 3.0.",
     "dir": "samples/windows",
     "files": ["windows-11.spdx3.json"]
+  },
+  {
+    "id": "vuejs",
+    "name": "Vue.js",
+    "icon": "favicon.svg",
+    "description": "A demo Vue.js app scaffolded with <code>npm create vue@latest</code>, SBOM obtained with <code>cdxgen</code>.",
+    "dir": "samples/vuejs",
+    "files": ["vuej-demo-sbom.spdx3.jsonld"]
   }
 ]
