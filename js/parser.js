@@ -664,21 +664,21 @@ function resolveLicenseLabel(id, elementMap) {
 function collectLicenses(relationships, elementMap) {
   const byId = new Map();
 
+  // declaredBy/concludedBy are accumulated as Sets (a popular license can be
+  // declared by tens of thousands of files, so an includes()-based dedup would
+  // be O(n²)); they're converted back to arrays once at the end so callers keep
+  // seeing plain arrays. Set iteration preserves insertion order.
   const ensure = (id) => {
     if (!byId.has(id)) {
       byId.set(id, {
         id,
         label: resolveLicenseLabel(id, elementMap),
-        declaredBy: [],
-        concludedBy: [],
+        declaredBy: new Set(),
+        concludedBy: new Set(),
         userCount: 0
       });
     }
     return byId.get(id);
-  };
-
-  const addUser = (bucket, from) => {
-    if (from && !bucket.includes(from)) bucket.push(from);
   };
 
   relationships.forEach((rel) => {
@@ -690,14 +690,15 @@ function collectLicenses(relationships, elementMap) {
     targets.forEach((target) => {
       if (!target) return;
       const entry = ensure(target);
-      addUser(isDeclared ? entry.declaredBy : entry.concludedBy, rel.from);
+      if (rel.from) (isDeclared ? entry.declaredBy : entry.concludedBy).add(rel.from);
     });
   });
 
   const licenses = [...byId.values()];
   licenses.forEach((lic) => {
-    const users = new Set([...lic.declaredBy, ...lic.concludedBy]);
-    lic.userCount = users.size;
+    lic.userCount = new Set([...lic.declaredBy, ...lic.concludedBy]).size;
+    lic.declaredBy = [...lic.declaredBy];
+    lic.concludedBy = [...lic.concludedBy];
   });
 
   // Default sort: most used first, then alphabetical by label.
@@ -743,18 +744,39 @@ export function buildRelationshipIndexes(relationships, onProgress) {
   const distributedByIndex = new Map();
   const licenseUsersIndex = new Map();
 
+  // Companion Sets for the two object-valued indexes above, so their dedup is
+  // O(1) per insert instead of an O(n) .some() scan (see pushUnique's note).
+  const configuredBySeen = new Map(); // target -> Set<configId>
+  const licenseUsersSeen = new Map(); // target -> Set<'from\tkind'>
+
   // Pushes a value into a Map<string, Array> bucket, skipping duplicates.
   // SPDX producers (e.g. Zephyr) may emit the same logical edge more than once
   // as distinct Relationship records. These duplicates would otherwise inflate
   // dependency/dependent counts and, because the UI renders the lists with a
   // keyed x-for, break rendering entirely on duplicate keys.
+  //
+  // Dedup is backed by a companion Set per (map, key) rather than
+  // `bucket.includes()`: a single hub can fan out to tens of thousands of edges
+  // (e.g. one package that `contains` every file in a large SBOM), which turns
+  // an includes()-scan-per-insert into O(n²) — the dominant cost when indexing
+  // big SBOMs. The Set keeps each insert O(1) while preserving insertion order
+  // and the array-valued output the rest of the app consumes.
+  const seenByMap = new Map(); // index map -> (key -> Set<value>)
   const pushUnique = (map, key, value) => {
-    if (!map.has(key)) {
+    let perKey = seenByMap.get(map);
+    if (!perKey) {
+      perKey = new Map();
+      seenByMap.set(map, perKey);
+    }
+    let set = perKey.get(key);
+    if (!set) {
+      set = new Set();
+      perKey.set(key, set);
       map.set(key, []);
     }
-    const bucket = map.get(key);
-    if (!bucket.includes(value)) {
-      bucket.push(value);
+    if (!set.has(value)) {
+      set.add(value);
+      map.get(key).push(value);
     }
   };
 
@@ -838,12 +860,15 @@ export function buildRelationshipIndexes(relationships, onProgress) {
         targets.forEach((target) => {
           pushUnique(configuresIndex, from, target);
 
-          if (!configuredByIndex.has(target)) {
+          let cfgSet = configuredBySeen.get(target);
+          if (!cfgSet) {
+            cfgSet = new Set();
+            configuredBySeen.set(target, cfgSet);
             configuredByIndex.set(target, []);
           }
-          const cfgBucket = configuredByIndex.get(target);
-          if (!cfgBucket.some((c) => c.configId === from)) {
-            cfgBucket.push({
+          if (!cfgSet.has(from)) {
+            cfgSet.add(from);
+            configuredByIndex.get(target).push({
               configId: from,
               scope: rel.scope,
               description: rel.description
@@ -859,12 +884,19 @@ export function buildRelationshipIndexes(relationships, onProgress) {
             ? 'declared'
             : 'concluded';
         targets.forEach((target) => {
-          if (!licenseUsersIndex.has(target)) {
+          let licSet = licenseUsersSeen.get(target);
+          if (!licSet) {
+            licSet = new Set();
+            licenseUsersSeen.set(target, licSet);
             licenseUsersIndex.set(target, []);
           }
-          const bucket = licenseUsersIndex.get(target);
-          if (!bucket.some((u) => u.from === from && u.kind === kind)) {
-            bucket.push({ from, kind });
+          // A single license can be declared/concluded by tens of thousands of
+          // files; dedup on a Set (keyed by from+kind) instead of .some() so a
+          // popular license doesn't turn this into an O(n²) scan.
+          const seenKey = from + '\t' + kind;
+          if (!licSet.has(seenKey)) {
+            licSet.add(seenKey);
+            licenseUsersIndex.get(target).push({ from, kind });
           }
         });
         break;

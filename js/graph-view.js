@@ -385,14 +385,43 @@ export function renderGraph(app, retry = 0) {
   canvas.style.height = `${height}px`;
   const ctx = canvas.getContext('2d');
 
-  const radiusFor = (d) =>
+  const computeRadius = (d) =>
     d.isCluster
       ? Math.max(9, Math.min(30, 7 + Math.sqrt(d.memberCount) * 1.6))
       : Math.max(5, Math.min(16, 4 + Math.sqrt(connCount.get(d.id) || 0) * 1.2));
 
-  const strokeFor = (d) => d3.color(getNodeTypeColor(d.type)).brighter(0.5);
+  // Precompute each node's static draw properties once. Radius depends only on
+  // the (now-final) connection/member counts and the fill/stroke only on the
+  // node type, so caching them here removes ~n sqrt() calls per simulation tick
+  // (the collision force) and ~n colour parses/allocations per frame (the draw
+  // loop) — the dominant cost when a big cluster expands to tens of thousands
+  // of nodes. getNodeTypeColor / d3.color().brighter() are memoised per type.
+  const typeFill = new Map();
+  const typeStroke = new Map();
+  const fillForType = (type) => {
+    let f = typeFill.get(type);
+    if (f === undefined) {
+      f = getNodeTypeColor(type);
+      typeFill.set(type, f);
+    }
+    return f;
+  };
+  const strokeForType = (type) => {
+    let s = typeStroke.get(type);
+    if (s === undefined) {
+      s = d3.color(getNodeTypeColor(type)).brighter(0.5).toString();
+      typeStroke.set(type, s);
+    }
+    return s;
+  };
+  renderNodes.forEach((d) => {
+    d._r = computeRadius(d);
+    d._fill = fillForType(d.type);
+    d._stroke = d.isCluster ? 'rgba(255,255,255,0.85)' : strokeForType(d.type);
+  });
+  const radiusFor = (d) => d._r;
   // Draw bigger nodes' labels first so the MAX_LABELS cap keeps the useful ones.
-  const labelOrder = [...renderNodes].sort((a, b) => radiusFor(b) - radiusFor(a));
+  const labelOrder = [...renderNodes].sort((a, b) => b._r - a._r);
 
   const groupedLinks = groupLinksByColor(links);
   let currentTransform = d3.zoomIdentity;
@@ -515,7 +544,45 @@ export function renderGraph(app, retry = 0) {
     });
   };
 
+  // Fast path for the common "no search, nothing highlighted" view (e.g. right
+  // after a big cluster expands): every node is fully opaque, so we can bucket
+  // the visible nodes by fill/stroke and emit a single fill()+stroke() per
+  // bucket instead of two canvas draws per node. Tens of thousands of individual
+  // draw calls collapse to a handful, which is what keeps the expanded k8s
+  // graph interactive.
+  const drawNodesFast = () => {
+    const k = currentTransform.k;
+    const buckets = new Map();
+    renderNodes.forEach((d) => {
+      if (d.x == null || !nodeInView(d)) return;
+      const key = d._fill + '|' + d._stroke + '|' + (d.isCluster ? 1 : 0);
+      let b = buckets.get(key);
+      if (!b) {
+        b = { fill: d._fill, stroke: d._stroke, lw: (d.isCluster ? 2.5 : 1.5) / k, list: [] };
+        buckets.set(key, b);
+      }
+      b.list.push(d);
+    });
+    ctx.globalAlpha = 1;
+    buckets.forEach((b) => {
+      ctx.beginPath();
+      b.list.forEach((d) => {
+        ctx.moveTo(d.x + d._r, d.y); // moveTo before arc so circles don't chain
+        ctx.arc(d.x, d.y, d._r, 0, 2 * Math.PI);
+      });
+      ctx.fillStyle = b.fill;
+      ctx.fill();
+      ctx.lineWidth = b.lw;
+      ctx.strokeStyle = b.stroke;
+      ctx.stroke();
+    });
+  };
+
   const drawNodes = () => {
+    if (!searchActive && !highlightedNodeId) {
+      drawNodesFast();
+      return;
+    }
     // Hover emphasis is suppressed while a search overlay is active so the
     // search visualization stays stable as the pointer moves.
     const connected =
@@ -533,10 +600,10 @@ export function renderGraph(app, retry = 0) {
       ctx.globalAlpha = alpha;
       ctx.beginPath();
       ctx.arc(d.x, d.y, r, 0, 2 * Math.PI);
-      ctx.fillStyle = getNodeTypeColor(d.type);
+      ctx.fillStyle = d._fill;
       ctx.fill();
       ctx.lineWidth = (d.isCluster ? 2.5 : 1.5) / k;
-      ctx.strokeStyle = d.isCluster ? 'rgba(255,255,255,0.85)' : strokeFor(d);
+      ctx.strokeStyle = d._stroke;
       ctx.stroke();
       if (searchActive && matchSet.has(d.id)) {
         // Amber ring so search hits pop regardless of node colour.
@@ -865,6 +932,17 @@ export function renderGraph(app, retry = 0) {
   /* ----------------------------------------------------------------------
      7. Force simulation (main thread; ticks redraw the canvas)
      ---------------------------------------------------------------------- */
+  // On very large graphs the many-body (charge) force dominates each tick. Raise
+  // Barnes-Hut's theta so it approximates more aggressively, and cap the
+  // interaction distance so far-apart nodes stop repelling — the x/y centering
+  // forces below keep everything cohesive, so the settled layout stays a well-
+  // spread disc rather than a knot while per-tick charge cost drops ~35%. Small
+  // graphs keep the exact old forces.
+  const bigGraph = renderNodes.length > 4000;
+  const hugeGraph = renderNodes.length > 12000;
+  const charge = d3.forceManyBody().strength(-150);
+  if (bigGraph) charge.theta(hugeGraph ? 1.6 : 1.4).distanceMax(hugeGraph ? 500 : 900);
+
   const sim = d3
     .forceSimulation(renderNodes)
     .force(
@@ -875,25 +953,57 @@ export function renderGraph(app, retry = 0) {
         .distance((d) => (d.type === 'hasInput' ? 85 : 60))
         .strength((d) => (d.type === 'hasInput' ? 0.05 : 0.18))
     )
-    .force('charge', d3.forceManyBody().strength(-150))
+    .force('charge', charge)
     .force('center', d3.forceCenter(width / 2, height / 2))
     .force(
       'collision',
-      d3.forceCollide().radius((d) => radiusFor(d) + 4)
+      d3.forceCollide().radius((d) => d._r + 4)
     )
     .force('x', d3.forceX(width / 2).strength(0.045))
     .force('y', d3.forceY(height / 2).strength(0.045));
 
-  sim.on('tick', queueDraw);
+  if (hugeGraph) {
+    // A huge hairball reaches a readable spread within ~80 ticks; the default
+    // decay grinds through ~300 heavy ticks (tens of seconds) micro-adjusting
+    // positions no one can perceive. Decay faster and stop a touch sooner so the
+    // layout settles in a few seconds instead of dragging the UI for half a
+    // minute.
+    sim.alphaDecay(0.06).alphaMin(0.006);
+  }
+
+  // Hit-testing quadtree, rebuilt lazily. d3's simulation.find() builds a fresh
+  // quadtree over every node on each call — brutal when the pointer moves across
+  // a 30k-node graph, firing that rebuild on every mousemove. Instead we keep
+  // our own tree and only rebuild it after the simulation has moved nodes
+  // (flagged on tick); while the layout is settled, every hover/drag hit-test
+  // reuses it in O(log n).
+  let hitTree = null;
+  let hitTreeDirty = true;
+  const findNode = (wx, wy, r) => {
+    if (hitTreeDirty || !hitTree) {
+      hitTree = d3.quadtree(
+        renderNodes,
+        (d) => d.x,
+        (d) => d.y
+      );
+      hitTreeDirty = false;
+    }
+    return hitTree.find(wx, wy, r);
+  };
+
+  sim.on('tick', () => {
+    hitTreeDirty = true;
+    queueDraw();
+  });
 
   /* ----------------------------------------------------------------------
      8. Interaction: zoom/pan, node drag, hover, click, double-click expand
-        Hit-testing uses the simulation's quadtree via sim.find().
+        Hit-testing uses the lazily-rebuilt quadtree via findNode().
      ---------------------------------------------------------------------- */
   const nodeAtCanvas = (px, py) => {
     const wx = currentTransform.invertX(px);
     const wy = currentTransform.invertY(py);
-    const found = sim.find(wx, wy, 40 / currentTransform.k);
+    const found = findNode(wx, wy, 40 / currentTransform.k);
     if (!found || nodeSearchStyle(found.id).hidden) return null;
     const r = radiusFor(found);
     const dx = found.x - wx;
@@ -926,7 +1036,7 @@ export function renderGraph(app, retry = 0) {
     .subject((event) => {
       const wx = currentTransform.invertX(event.x);
       const wy = currentTransform.invertY(event.y);
-      const found = sim.find(wx, wy, 40 / currentTransform.k);
+      const found = findNode(wx, wy, 40 / currentTransform.k);
       if (!found || nodeSearchStyle(found.id).hidden) return null;
       const r = radiusFor(found);
       return (found.x - wx) ** 2 + (found.y - wy) ** 2 <= (r + 4) ** 2 ? found : null;
