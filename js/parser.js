@@ -7,10 +7,11 @@
  * @module parser
  */
 
-import { COLORS, ELEMENT_TYPES, RELATIONSHIP_TYPES, VEX_TYPES } from './config.js';
+import { ELEMENT_TYPES, RELATIONSHIP_TYPES, VEX_TYPES } from './config.js';
 import {
   displayLicenseExpression,
   renderLicenseExpression,
+  getRelationshipColor,
   getVulnerabilityId,
   getVulnerabilityLocators,
   vexStatusForRel
@@ -1049,27 +1050,14 @@ export function computeRelationshipTypeCounts(relationships) {
 
   const total = relationships.length;
 
-  const colors = {
-    [RELATIONSHIP_TYPES.DEPENDS_ON]: COLORS.package,
-    [RELATIONSHIP_TYPES.HAS_CONCLUDED_LICENSE]: COLORS.license,
-    [RELATIONSHIP_TYPES.HAS_DECLARED_LICENSE]: COLORS.license,
-    [RELATIONSHIP_TYPES.USES_TOOL]: COLORS.tool,
-    [RELATIONSHIP_TYPES.HAS_STATIC_LINK]: COLORS.staticLink,
-    [RELATIONSHIP_TYPES.GENERATES]: COLORS.build,
-    [RELATIONSHIP_TYPES.HAS_INPUT]: COLORS.buildInput,
-    [RELATIONSHIP_TYPES.HAS_OUTPUT]: COLORS.buildOutput,
-    [RELATIONSHIP_TYPES.HAS_DISTRIBUTION_ARTIFACT]: COLORS.distribution,
-    [RELATIONSHIP_TYPES.ANCESTOR_OF]: COLORS.buildLineage,
-    [RELATIONSHIP_TYPES.CONTAINS]: COLORS.file,
-    [RELATIONSHIP_TYPES.CONFIGURES]: COLORS.config
-  };
-
   return Object.entries(counts)
     .sort((a, b) => b[1] - a[1])
     .map(([type, count]) => ({
       type,
       count,
       pct: total ? ((count / total) * 100).toFixed(1) : '0.0',
-      color: colors[type] || COLORS.default
+      // Single source of truth for edge colours (shared with the graph + detail
+      // panel) so every surface agrees on a relationship type's colour.
+      color: getRelationshipColor(type)
     }));
 }

@@ -61,6 +61,8 @@ export const RELATIONSHIP_TYPES = {
   ANCESTOR_OF: 'ancestorOf',
   USES_TOOL: 'usesTool',
   HAS_STATIC_LINK: 'hasStaticLink',
+  HAS_DYNAMIC_LINK: 'hasDynamicLink',
+  HAS_OPTIONAL_COMPONENT: 'hasOptionalComponent',
   CONFIGURES: 'configures',
   HAS_CONCLUDED_LICENSE: 'hasConcludedLicense',
   HAS_DECLARED_LICENSE: 'hasDeclaredLicense',
@@ -165,6 +167,8 @@ export const COLORS = {
   distribution: '#38bdf8',
   external: '#94a3b8',
   staticLink: '#06b6d4',
+  dynamicLink: '#0ea5e9',
+  optionalComponent: '#d946ef',
   vulnerability: '#f43f5e',
   // VEX edge colors — mirror the VEX_STATUSES palette so an edge reads as its status
   vexFixed: '#10b981',
@@ -221,13 +225,36 @@ export function createGraphFilters() {
       active: true,
       isRel: true
     },
-    { key: 'usesTool', label: 'usesTool', color: COLORS.tool, active: true, isRel: true },
+    {
+      key: 'usesTool',
+      label: 'usesTool',
+      color: COLORS.tool,
+      active: true,
+      isRel: true,
+      lineStyle: 'dotted'
+    },
     {
       key: 'hasStaticLink',
       label: 'hasStaticLink',
       color: COLORS.staticLink,
       active: true,
       isRel: true
+    },
+    {
+      key: 'hasDynamicLink',
+      label: 'hasDynamicLink',
+      color: COLORS.dynamicLink,
+      active: true,
+      isRel: true,
+      lineStyle: 'dashed'
+    },
+    {
+      key: 'hasOptionalComponent',
+      label: 'hasOptionalComponent',
+      color: COLORS.optionalComponent,
+      active: true,
+      isRel: true,
+      lineStyle: 'dashdot'
     },
     { key: 'configures', label: 'configures', color: COLORS.config, active: true, isRel: true },
     // VEX assessment edges (vulnerability → package). Off by default; enabling
@@ -356,6 +383,10 @@ export const RELATIONSHIP_LABELS = {
   'usesTool:in': 'Used as tool by',
   'hasStaticLink:out': 'Statically links',
   'hasStaticLink:in': 'Statically linked by',
+  'hasDynamicLink:out': 'Dynamically links',
+  'hasDynamicLink:in': 'Dynamically linked by',
+  'hasOptionalComponent:out': 'Optional components',
+  'hasOptionalComponent:in': 'Optional component of',
   'configures:out': 'Configures',
   'configures:in': 'Configured by',
   'hasConcludedLicense:out': 'Concluded license',
@@ -415,10 +446,14 @@ export const RELATIONSHIP_SORT_ORDER = {
   'generates:in': 16,
   'hasStaticLink:out': 17,
   'hasStaticLink:in': 18,
-  'usesTool:out': 19,
-  'usesTool:in': 20,
-  'hasConcludedLicense:out': 21,
-  'hasDeclaredLicense:out': 22,
-  'hasConcludedLicense:in': 23,
-  'hasDeclaredLicense:in': 24
+  'hasDynamicLink:out': 19,
+  'hasDynamicLink:in': 20,
+  'hasOptionalComponent:out': 21,
+  'hasOptionalComponent:in': 22,
+  'usesTool:out': 23,
+  'usesTool:in': 24,
+  'hasConcludedLicense:out': 25,
+  'hasDeclaredLicense:out': 26,
+  'hasConcludedLicense:in': 27,
+  'hasDeclaredLicense:in': 28
 };

@@ -14,7 +14,9 @@ import {
   getVulnerabilityLookup,
   summarizeCveRecord,
   getCvssSeverityMeta,
-  getCdxProperties
+  getCdxProperties,
+  getRelationshipColor,
+  getRelationshipGroupLabel
 } from '../js/utils.js';
 import { spdxApp } from '../js/app.js';
 
@@ -643,4 +645,74 @@ test('getCdxProperties flattens the SPDX 3 CdxPropertiesExtension', () => {
   // Elements without the extension yield an empty list.
   assert.deepEqual(getCdxProperties({ type: 'software_Package' }), []);
   assert.deepEqual(getCdxProperties(undefined), []);
+});
+
+test('parseGraph supports LifecycleScopedRelationship dynamic-link / optional-component edges', () => {
+  const graph = [
+    { type: 'software_Package', spdxId: 'pkg:app', name: 'app' },
+    { type: 'software_Package', spdxId: 'pkg:lib', name: 'lib' },
+    { type: 'software_Package', spdxId: 'pkg:plugin', name: 'plugin' },
+    {
+      type: 'LifecycleScopedRelationship',
+      spdxId: 'rel:dyn',
+      relationshipType: 'hasDynamicLink',
+      scope: 'runtime',
+      from: 'pkg:app',
+      to: ['pkg:lib']
+    },
+    {
+      type: 'LifecycleScopedRelationship',
+      spdxId: 'rel:opt',
+      relationshipType: 'hasOptionalComponent',
+      scope: 'runtime',
+      from: 'pkg:app',
+      to: ['pkg:plugin']
+    }
+  ];
+
+  const parsed = parseGraph(graph);
+
+  // Lifecycle-scoped relationships are collected like generic relationships…
+  assert.equal(parsed.relationships.length, 2);
+  // …and surface in the legend's present relationship types.
+  assert.ok(parsed.presentRelTypes.includes('hasDynamicLink'));
+  assert.ok(parsed.presentRelTypes.includes('hasOptionalComponent'));
+
+  // Each type has a distinct, non-default colour and a directional label.
+  const dyn = getRelationshipColor('hasDynamicLink');
+  const opt = getRelationshipColor('hasOptionalComponent');
+  const fallback = getRelationshipColor('nonexistentRel');
+  assert.notEqual(dyn, opt);
+  assert.notEqual(dyn, fallback);
+  assert.notEqual(opt, fallback);
+  assert.equal(getRelationshipGroupLabel('hasDynamicLink', 'out'), 'Dynamically links');
+  assert.equal(getRelationshipGroupLabel('hasOptionalComponent', 'in'), 'Optional component of');
+});
+
+test('detailRelGroupsFor surfaces lifecycle-scoped relationships with their scope', () => {
+  const app = spdxApp();
+  const graph = [
+    { type: 'software_Package', spdxId: 'pkg:app', name: 'app' },
+    { type: 'software_Package', spdxId: 'pkg:lib', name: 'lib' },
+    {
+      type: 'LifecycleScopedRelationship',
+      spdxId: 'rel:dyn',
+      relationshipType: 'hasDynamicLink',
+      scope: 'runtime',
+      from: 'pkg:app',
+      to: ['pkg:lib']
+    }
+  ];
+  const parsed = parseGraph(graph);
+  const indexes = buildRelationshipIndexes(parsed.relationships);
+  app.elementMap = parsed.elementMap;
+  app.relFromIndex = indexes.relFromIndex;
+  app.relToIndex = indexes.relToIndex;
+
+  const groups = app.detailRelGroupsFor({ spdxId: 'pkg:app' });
+  const dyn = groups.find((g) => g.key === 'hasDynamicLink:out');
+  assert.ok(dyn, 'expected a hasDynamicLink:out group');
+  assert.equal(dyn.label, 'Dynamically links');
+  assert.equal(dyn.items[0].id, 'pkg:lib');
+  assert.equal(dyn.items[0].scope, 'runtime');
 });

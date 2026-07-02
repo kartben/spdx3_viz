@@ -174,6 +174,22 @@ export const accessorsMixin = {
   relColor(type) {
     return getRelationshipColor(type);
   },
+  // CSS background for a graph edge-legend swatch, mirroring the line style the
+  // edge is drawn with (solid / dotted / dashed / dash-dot) so the legend reads
+  // the same as the graph.
+  relEdgeSwatchStyle(filter) {
+    const c = filter.color;
+    switch (filter.lineStyle) {
+      case 'dotted':
+        return `background-image: repeating-linear-gradient(to right, ${c} 0 2px, transparent 2px 4px)`;
+      case 'dashed':
+        return `background-image: repeating-linear-gradient(to right, ${c} 0 5px, transparent 5px 8px)`;
+      case 'dashdot':
+        return `background-image: repeating-linear-gradient(to right, ${c} 0 5px, transparent 5px 7px, ${c} 7px 8px, transparent 8px 10px)`;
+      default:
+        return `background:${c}`;
+    }
+  },
   relGroupLabel(relType, direction) {
     return getRelationshipGroupLabel(relType, direction);
   },

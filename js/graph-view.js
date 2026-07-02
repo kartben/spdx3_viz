@@ -18,8 +18,25 @@ const MAX_LABELS = 400;
 // World-space padding for viewport culling so nodes/edges near the edge of the
 // screen still draw.
 const CULL_PAD = 80;
-// Relationship types drawn with a dotted stroke instead of a solid line.
-const DASH_REL_TYPES = new Set(['usesTool']);
+// Relationship types drawn with a non-solid stroke, each with its own dash
+// signature so the link's semantics read from the line style, not just colour:
+//   usesTool             ·· dotted
+//   hasDynamicLink       -- dashed          (runtime dynamic linking)
+//   hasOptionalComponent -·- dash-dot       (optional component)
+// Patterns are expressed in screen pixels (divided by the zoom factor k) so they
+// stay a constant on-screen size. Returns null for solid (default) edges.
+function dashPatternFor(type, lineWidth, k) {
+  switch (type) {
+    case 'usesTool':
+      return [lineWidth, 4 / k];
+    case 'hasDynamicLink':
+      return [7 / k, 5 / k];
+    case 'hasOptionalComponent':
+      return [8 / k, 4 / k, lineWidth, 4 / k];
+    default:
+      return null;
+  }
+}
 // Relationship types drawn with an arrowhead at their "head" end. hasInput
 // points at the build (the source), hasOutput points at the output file (the
 // target), so the pair reads as inputs → build → outputs.
@@ -405,7 +422,6 @@ export function renderGraph(app, retry = 0) {
     // (thicker) edges so they stay light.
     const headLen = (ARROW_LEN + lineWidth * k) / k;
     const headHalf = (ARROW_HALF_WIDTH + lineWidth * k * 0.6) / k;
-    const dotPattern = [lineWidth, 4 / k]; // constant on-screen dotted pattern
 
     groups.forEach((group, color) => {
       ctx.strokeStyle = color;
@@ -415,7 +431,9 @@ export function renderGraph(app, retry = 0) {
       // Solid shafts (plain + directed) batched into one path per colour.
       // Dashed edges and arrowheads are collected and drawn separately
       // afterwards — a single path can't mix dashes, and heads are filled.
-      let dashed = null;
+      // Dashed edges are bucketed by their pattern so each dash signature is a
+      // single stroke pass.
+      let dashedBuckets = null; // Map<patternKey, { pattern, pts:[a,b,…] }>
       let arrows = null;
       ctx.setLineDash([]);
       ctx.beginPath();
@@ -425,8 +443,16 @@ export function renderGraph(app, retry = 0) {
         if (!a || !b || a.x == null || b.x == null) return;
         if (!nodeInView(a) && !nodeInView(b)) return; // viewport culling
 
-        if (DASH_REL_TYPES.has(link.type)) {
-          (dashed ||= []).push(a, b);
+        const dash = dashPatternFor(link.type, lineWidth, k);
+        if (dash) {
+          const key = dash.join(',');
+          dashedBuckets ||= new Map();
+          let bucket = dashedBuckets.get(key);
+          if (!bucket) {
+            bucket = { pattern: dash, pts: [] };
+            dashedBuckets.set(key, bucket);
+          }
+          bucket.pts.push(a, b);
           return;
         }
         if (!ARROW_REL_TYPES.has(link.type)) {
@@ -473,15 +499,17 @@ export function renderGraph(app, retry = 0) {
         ctx.fill();
       }
 
-      if (dashed) {
+      if (dashedBuckets) {
         ctx.globalAlpha = alpha;
-        ctx.setLineDash(dotPattern);
-        ctx.beginPath();
-        for (let i = 0; i < dashed.length; i += 2) {
-          ctx.moveTo(dashed[i].x, dashed[i].y);
-          ctx.lineTo(dashed[i + 1].x, dashed[i + 1].y);
-        }
-        ctx.stroke();
+        dashedBuckets.forEach(({ pattern, pts }) => {
+          ctx.setLineDash(pattern);
+          ctx.beginPath();
+          for (let i = 0; i < pts.length; i += 2) {
+            ctx.moveTo(pts[i].x, pts[i].y);
+            ctx.lineTo(pts[i + 1].x, pts[i + 1].y);
+          }
+          ctx.stroke();
+        });
         ctx.setLineDash([]);
       }
     });
