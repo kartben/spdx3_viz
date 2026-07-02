@@ -174,10 +174,12 @@ export const accessorsMixin = {
     return getRelationshipGroupLabel(relType, direction);
   },
 
-  // Grouped relationship data for the detail panel
-  get detailRelGroups() {
-    if (!this.detailElement) return [];
-    const id = this.detailElement.spdxId;
+  // Grouped relationship data for the detail panel. Parameterized on the
+  // element so both the graph detail panel (this.detailElement) and the
+  // expanded package card (its pkg) render the same grouped relationships.
+  detailRelGroupsFor(element) {
+    if (!element) return [];
+    const id = element.spdxId;
     const groups = new Map(); // key → { label, color, items:[] }
 
     // Vulnerability associations are surfaced in the dedicated security
@@ -239,6 +241,11 @@ export const accessorsMixin = {
     return [...groups.values()].sort((a, b) => a.sortOrder - b.sortOrder);
   },
 
+  // Grouped relationships for the currently graph-selected element.
+  get detailRelGroups() {
+    return this.detailRelGroupsFor(this.detailElement);
+  },
+
   // Sort order for relationship groups (most relevant first)
   relSortOrder(type, dir) {
     return getRelationshipSortOrder(type, dir);
@@ -249,8 +256,11 @@ export const accessorsMixin = {
   elementDisplayName(element) {
     return getElementDisplayName(element, this.elementMap);
   },
+  detailPromotedFieldsFor(element) {
+    return getDetailPromotedFields(element, this.elementMap);
+  },
   get detailPromotedFields() {
-    return getDetailPromotedFields(this.detailElement, this.elementMap);
+    return this.detailPromotedFieldsFor(this.detailElement);
   },
   elementBadgeClass(type) {
     return getElementBadgeClass(type);

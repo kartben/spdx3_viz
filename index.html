@@ -1100,212 +1100,362 @@
                     </svg>
                   </div>
                 </div>
-                <!-- Expanded detail -->
+                <!-- Expanded detail — mirrors the graph detail panel so a card
+                     shows the same rich provenance, verification, security and
+                     grouped-relationship sections as clicking the node in the graph. -->
                 <div
                   x-show="expandedPkg === pkg.spdxId"
                   x-collapse
                   class="mt-4 pt-4 border-t border-slate-700"
                 >
-                  <!-- Provenance: version, identifiers (PackageURL/CPE), source -->
-                  <div
-                    class="mb-4 sm:pl-11 flex flex-wrap items-center gap-2"
-                    x-show="isMeaningful(pkg.software_packageVersion) ||
-                            downloadUrl(pkg.software_downloadLocation) ||
-                            externalIdentifiers(pkg).length > 0"
-                  >
-                    <span
-                      x-show="isMeaningful(pkg.software_packageVersion)"
-                      class="badge bg-slate-700 text-slate-300 font-mono max-w-[18rem] truncate"
-                      :title="pkg.software_packageVersion"
+                  <div class="sm:pl-11 space-y-4">
+                    <!-- Provenance & identifiers -->
+                    <div
+                      x-show="isMeaningful(pkg.software_packageVersion) ||
+                              isMeaningful(pkg.software_downloadLocation) ||
+                              isMeaningful(pkg.software_homePage) ||
+                              isMeaningful(pkg.summary) ||
+                              isMeaningful(pkg.description) ||
+                              externalIdentifiers(pkg).length > 0 ||
+                              isMeaningful(pkg.software_copyrightText) ||
+                              isMeaningful(pkg.comment)"
+                      class="space-y-3"
                     >
-                      <span class="text-slate-500 mr-1">ver</span
-                      ><span x-text="pkg.software_packageVersion"></span>
-                    </span>
-                    <template
-                      x-for="eid in externalIdentifiers(pkg)"
-                      :key="eid.type + eid.identifier"
-                    >
-                      <span
-                        class="badge bg-indigo-500/15 text-indigo-300 font-mono max-w-[20rem] inline-flex items-center gap-1"
-                        :title="eid.identifier"
+                      <!-- Version -->
+                      <div
+                        x-show="isMeaningful(pkg.software_packageVersion)"
+                        class="flex items-center gap-2"
                       >
-                        <span class="text-indigo-400/70 flex-shrink-0" x-text="eid.label"></span>
-                        <span class="truncate" x-text="eid.identifier"></span>
+                        <span class="text-xs text-slate-500 flex-shrink-0">Version</span>
+                        <span
+                          class="text-xs px-2 py-0.5 rounded-md bg-slate-700 text-slate-300 font-mono break-all"
+                          x-text="pkg.software_packageVersion"
+                        ></span>
+                      </div>
+
+                      <!-- Summary / description -->
+                      <div x-show="isMeaningful(pkg.summary)">
+                        <div class="text-xs text-slate-500 mb-1">Summary</div>
+                        <div class="text-xs text-slate-300 break-words" x-text="pkg.summary"></div>
+                      </div>
+                      <div
+                        x-show="isMeaningful(pkg.description) && pkg.description !== pkg.summary"
+                      >
+                        <div class="text-xs text-slate-500 mb-1">Description</div>
+                        <div
+                          class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-32 overflow-y-auto"
+                          x-text="pkg.description"
+                        ></div>
+                      </div>
+
+                      <!-- Homepage -->
+                      <div x-show="isMeaningful(pkg.software_homePage)">
+                        <div class="text-xs text-slate-500 mb-1">Homepage</div>
                         <a
-                          x-show="vulnLookup(eid)"
-                          :href="vulnLookup(eid)?.url"
+                          x-show="downloadUrl(pkg.software_homePage)"
+                          :href="downloadUrl(pkg.software_homePage)"
                           target="_blank"
                           rel="noopener noreferrer"
                           @click.stop
-                          :title="vulnLookup(eid)?.label"
-                          class="text-rose-300 hover:text-rose-200 flex-shrink-0"
+                          class="text-xs text-sky-400 hover:text-sky-300 break-all"
+                          x-text="pkg.software_homePage"
+                        ></a>
+                        <span
+                          x-show="!downloadUrl(pkg.software_homePage)"
+                          class="block text-xs text-slate-300 break-all"
+                          x-text="pkg.software_homePage"
+                        ></span>
+                      </div>
+
+                      <!-- Download / source location -->
+                      <div x-show="isMeaningful(pkg.software_downloadLocation)">
+                        <div class="text-xs text-slate-500 mb-1">Download location</div>
+                        <a
+                          x-show="downloadUrl(pkg.software_downloadLocation)"
+                          :href="downloadUrl(pkg.software_downloadLocation)"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          @click.stop
+                          class="text-xs text-sky-400 hover:text-sky-300 font-mono break-all"
+                          x-text="pkg.software_downloadLocation"
+                        ></a>
+                        <code
+                          x-show="!downloadUrl(pkg.software_downloadLocation)"
+                          class="block text-xs text-slate-300 font-mono break-all"
+                          x-text="pkg.software_downloadLocation"
+                        ></code>
+                      </div>
+
+                      <!-- External identifiers (PackageURL, CPE, …) -->
+                      <div x-show="externalIdentifiers(pkg).length > 0">
+                        <div
+                          class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2"
                         >
-                          <svg
-                            class="w-3.5 h-3.5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
+                          Identifiers
+                        </div>
+                        <div class="space-y-1.5">
+                          <template
+                            x-for="eid in externalIdentifiers(pkg)"
+                            :key="eid.type + eid.identifier"
                           >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                            />
-                          </svg>
-                        </a>
-                      </span>
-                    </template>
-                    <a
-                      x-show="downloadUrl(pkg.software_downloadLocation)"
-                      :href="downloadUrl(pkg.software_downloadLocation)"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      @click.stop
-                      class="text-xs text-sky-400 hover:text-sky-300 inline-flex items-center gap-1"
-                      :title="pkg.software_downloadLocation"
+                            <div class="flex items-start gap-2 group">
+                              <span
+                                class="text-[10px] text-slate-500 uppercase tracking-wider w-20 pt-0.5 flex-shrink-0 text-right"
+                                x-text="eid.label"
+                              ></span>
+                              <code
+                                class="hash-text text-slate-300 break-all flex-1 leading-relaxed"
+                                x-text="eid.identifier"
+                              ></code>
+                              <a
+                                x-show="vulnLookup(eid)"
+                                :href="vulnLookup(eid)?.url"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                @click.stop
+                                :title="vulnLookup(eid)?.label"
+                                class="text-rose-400/70 hover:text-rose-300 transition-colors flex-shrink-0 pt-0.5"
+                              >
+                                <svg
+                                  class="w-3.5 h-3.5"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                                  />
+                                </svg>
+                              </a>
+                              <button
+                                @click.stop="copyHash(eid.identifier)"
+                                class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity flex-shrink-0 pt-0.5"
+                                title="Copy"
+                              >
+                                <svg
+                                  class="w-3 h-3"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                                  />
+                                </svg>
+                              </button>
+                            </div>
+                          </template>
+                        </div>
+                      </div>
+
+                      <!-- Copyright -->
+                      <div x-show="isMeaningful(pkg.software_copyrightText)">
+                        <div class="text-xs text-slate-500 mb-1">Copyright</div>
+                        <div
+                          class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-32 overflow-y-auto bg-slate-900/50 rounded px-2 py-1.5"
+                          x-text="pkg.software_copyrightText"
+                        ></div>
+                      </div>
+
+                      <!-- Free-form comment / note -->
+                      <div x-show="isMeaningful(pkg.comment)">
+                        <div class="text-xs text-slate-500 mb-1">Note</div>
+                        <div
+                          class="text-xs text-slate-300 whitespace-pre-wrap break-words bg-slate-900/50 rounded px-2 py-1.5"
+                          x-text="pkg.comment"
+                        ></div>
+                      </div>
+                    </div>
+
+                    <!-- Verification (hashes + content identifiers) -->
+                    <div
+                      x-show="(pkg.verifiedUsing || []).length > 0 || (pkg.software_contentIdentifier || []).length > 0"
+                      class="space-y-2"
                     >
-                      <svg
-                        class="w-3.5 h-3.5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-                        />
-                      </svg>
-                      <span>Source</span>
-                    </a>
-                  </div>
-                  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <!-- Dependencies -->
-                    <div class="sm:pl-11">
-                      <div
-                        class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2"
-                      >
-                        Dependencies
+                      <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                        Verification
                       </div>
-                      <div class="space-y-1" x-show="(depsOf(pkg.spdxId)||[]).length > 0">
-                        <template x-for="d in (depsOf(pkg.spdxId)||[])" :key="d">
-                          <div
-                            class="text-xs text-blue-400 hover:text-blue-300 cursor-pointer flex items-center gap-1.5"
-                            @click.stop="navigateTo(d)"
+                      <template x-for="h in (pkg.verifiedUsing || [])" :key="h.hashValue">
+                        <div class="flex items-start gap-2 group">
+                          <span
+                            class="text-[10px] text-slate-500 uppercase w-10 pt-0.5 flex-shrink-0 text-right"
+                            x-text="h.algorithm"
+                          ></span>
+                          <code
+                            class="hash-text text-slate-400 break-all flex-1 leading-relaxed"
+                            x-text="h.hashValue"
+                          ></code>
+                          <button
+                            @click.stop="copyHash(h.hashValue)"
+                            class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity flex-shrink-0 pt-0.5"
+                            title="Copy"
                           >
-                            <span class="w-1.5 h-1.5 rounded-full bg-blue-500/50"></span>
-                            <span x-text="relTargetDisplayName(d)"></span>
-                          </div>
-                        </template>
-                      </div>
-                      <div
-                        x-show="(depsOf(pkg.spdxId)||[]).length === 0"
-                        class="text-xs text-slate-600 italic"
-                      >
-                        None
-                      </div>
-                    </div>
-                    <!-- Used by -->
-                    <div>
-                      <div
-                        class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2"
-                      >
-                        Used by
-                      </div>
-                      <div class="space-y-1" x-show="(dependentsOf(pkg.spdxId)||[]).length > 0">
-                        <template x-for="d in (dependentsOf(pkg.spdxId)||[])" :key="d">
-                          <div
-                            class="text-xs text-purple-400 hover:text-purple-300 cursor-pointer flex items-center gap-1.5"
-                            @click.stop="navigateTo(d)"
-                          >
-                            <span class="w-1.5 h-1.5 rounded-full bg-purple-500/50"></span>
-                            <span x-text="relTargetDisplayName(d)"></span>
-                          </div>
-                        </template>
-                      </div>
-                      <div
-                        x-show="(dependentsOf(pkg.spdxId)||[]).length === 0"
-                        class="text-xs text-slate-600 italic"
-                      >
-                        None
-                      </div>
-                    </div>
-                    <!-- Input to builds (hasInput) -->
-                    <div class="sm:pl-11" x-show="consumedByBuilds(pkg.spdxId).length > 0">
-                      <div
-                        class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2"
-                      >
-                        Input to Builds
-                      </div>
-                      <div class="space-y-1">
-                        <template x-for="b in consumedByBuilds(pkg.spdxId)" :key="b">
-                          <div
-                            class="text-xs text-orange-400 hover:text-orange-300 cursor-pointer flex items-center gap-1.5"
-                            @click.stop="navigateTo(b)"
-                          >
-                            <span class="w-1.5 h-1.5 rounded-full bg-orange-500/50"></span>
-                            <span x-text="relTargetDisplayName(b)"></span>
-                          </div>
-                        </template>
-                      </div>
-                    </div>
-                    <!-- Produced by builds (hasOutput) -->
-                    <div x-show="producedByBuilds(pkg.spdxId).length > 0">
-                      <div
-                        class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2"
-                      >
-                        Produced by
-                      </div>
-                      <div class="space-y-1">
-                        <template x-for="b in producedByBuilds(pkg.spdxId)" :key="b">
-                          <div
-                            class="text-xs text-green-400 hover:text-green-300 cursor-pointer flex items-center gap-1.5"
-                            @click.stop="navigateTo(b)"
-                          >
-                            <span class="w-1.5 h-1.5 rounded-full bg-green-500/50"></span>
-                            <span x-text="relTargetDisplayName(b)"></span>
-                          </div>
-                        </template>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- Contained files -->
-                  <div class="mt-4 sm:pl-11" x-show="(containedFiles(pkg.spdxId)||[]).length > 0">
-                    <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-                      Files
-                    </div>
-                    <div class="space-y-1">
-                      <template x-for="f in (containedFiles(pkg.spdxId)||[])" :key="f">
-                        <div
-                          class="text-xs text-emerald-400 hover:text-emerald-300 cursor-pointer flex items-center gap-1.5"
-                          @click.stop="navigateToFile(f)"
-                        >
-                          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500/50"></span>
-                          <span x-text="cleanFileName(f)"></span>
+                            <svg
+                              class="w-3 h-3"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                              />
+                            </svg>
+                          </button>
                         </div>
                       </template>
-                    </div>
-                  </div>
-                  <!-- Distribution artifacts -->
-                  <div class="mt-4 sm:pl-11" x-show="distributionArtifacts(pkg.spdxId).length > 0">
-                    <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-                      Distribution Artifacts
-                    </div>
-                    <div class="space-y-1">
                       <template
-                        x-for="artifact in distributionArtifacts(pkg.spdxId)"
-                        :key="artifact"
+                        x-for="ci in (pkg.software_contentIdentifier || [])"
+                        :key="ci.software_contentIdentifierValue"
                       >
-                        <div
-                          class="text-xs text-sky-400 hover:text-sky-300 cursor-pointer flex items-center gap-1.5"
-                          @click.stop="navigateTo(artifact)"
-                        >
-                          <span class="w-1.5 h-1.5 rounded-full bg-sky-500/50"></span>
-                          <span x-text="relTargetDisplayName(artifact)"></span>
+                        <div class="flex items-start gap-2 group">
+                          <span
+                            class="text-[10px] text-slate-500 uppercase w-10 pt-0.5 flex-shrink-0 text-right"
+                            x-text="ci.software_contentIdentifierType"
+                          ></span>
+                          <code
+                            class="hash-text text-slate-400 break-all flex-1 leading-relaxed"
+                            x-text="ci.software_contentIdentifierValue"
+                          ></code>
+                          <button
+                            @click.stop="copyHash(ci.software_contentIdentifierValue)"
+                            class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity flex-shrink-0 pt-0.5"
+                            title="Copy"
+                          >
+                            <svg
+                              class="w-3 h-3"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                              />
+                            </svg>
+                          </button>
                         </div>
                       </template>
+                    </div>
+
+                    <!-- Associated vulnerabilities (VEX) -->
+                    <div x-show="vulnsForPackage(pkg.spdxId).length > 0" class="space-y-2">
+                      <div class="flex items-center gap-2">
+                        <span class="detail-rel-line" style="background: #f43f5e"></span>
+                        <span class="text-xs font-semibold uppercase tracking-wider text-rose-400"
+                          >Vulnerabilities (VEX)</span
+                        >
+                        <span
+                          class="text-[10px] text-slate-500"
+                          x-text="'(' + formatCount(packageVulnSummary(pkg.spdxId).total) + ')'"
+                        ></span>
+                      </div>
+                      <div class="flex flex-wrap gap-1.5 ml-3">
+                        <template
+                          x-for="st in packageVulnSummary(pkg.spdxId).statuses"
+                          :key="st.status"
+                        >
+                          <span class="badge" :class="st.meta.badgeClass">
+                            <span
+                              class="w-1.5 h-1.5 rounded-full mr-1.5"
+                              :class="st.meta.dotClass"
+                            ></span>
+                            <span x-text="st.meta.label"></span>
+                            <span
+                              class="ml-1.5 font-semibold"
+                              x-text="formatCount(st.count)"
+                            ></span>
+                          </span>
+                        </template>
+                      </div>
+                      <button
+                        @click.stop="navigateToPackageSecurity(pkg.spdxId)"
+                        class="ml-3 text-xs text-rose-300 hover:text-rose-200 inline-flex items-center gap-1"
+                      >
+                        View all in Security
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+
+                    <!-- Relationships — grouped semantically -->
+                    <template x-for="group in detailRelGroupsFor(pkg)" :key="group.key">
+                      <div class="detail-rel-section">
+                        <div class="flex items-center gap-2 mb-2">
+                          <span
+                            class="detail-rel-line"
+                            :style="`background: ${group.color}`"
+                          ></span>
+                          <span
+                            class="text-xs font-semibold uppercase tracking-wider"
+                            :style="`color: ${group.color}`"
+                            x-text="group.label"
+                          ></span>
+                          <span
+                            class="text-[10px] text-slate-500"
+                            x-text="'(' + group.items.length + ')'"
+                          ></span>
+                        </div>
+                        <div class="space-y-1 ml-3">
+                          <template x-for="item in group.items" :key="item.id">
+                            <div class="detail-rel-item group" @click.stop="navigateTo(item.id)">
+                              <span
+                                class="detail-rel-arrow"
+                                :style="`color: ${group.color}`"
+                                x-text="item.direction === 'out' ? '→' : '←'"
+                              ></span>
+                              <span
+                                class="detail-rel-target-dot"
+                                :style="`background: ${nodeTypeColor(getNodeType(elementMap.get(item.id) || {}))}`"
+                              ></span>
+                              <span class="flex-1 truncate" x-text="item.displayName"></span>
+                              <span
+                                x-show="item.scope"
+                                class="text-[10px] px-1.5 py-0.5 rounded bg-slate-700/60 text-slate-400 flex-shrink-0"
+                                :title="'Lifecycle scope: ' + item.scope"
+                                x-text="item.scope"
+                              ></span>
+                              <svg
+                                class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors flex-shrink-0"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M9 5l7 7-7 7"
+                                />
+                              </svg>
+                            </div>
+                          </template>
+                        </div>
+                      </div>
+                    </template>
+
+                    <!-- Empty state -->
+                    <div
+                      x-show="detailRelGroupsFor(pkg).length === 0 && vulnsForPackage(pkg.spdxId).length === 0"
+                      class="text-xs text-slate-500 italic text-center py-4"
+                    >
+                      No relationships found
                     </div>
                   </div>
                 </div>
@@ -3119,6 +3269,31 @@
 
         <!-- Body -->
         <div class="flex-1 overflow-y-auto p-4 space-y-4" x-show="detailElement">
+          <!-- Jump to this element's card in its list view -->
+          <button
+            x-show="listTargetFor(detailElement)"
+            @click="navigateTo(detailElement.spdxId)"
+            class="inline-flex items-center gap-1.5 text-xs text-sky-400 hover:text-sky-300 transition-colors"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 10h16M4 14h16M4 18h16"
+              />
+            </svg>
+            <span>View in <span x-text="listTargetFor(detailElement)?.label"></span></span>
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </button>
+
           <!-- Promoted properties (type-specific highlights) -->
           <template x-for="field in detailPromotedFields" :key="field.prop">
             <!-- x-for needs a single root; hero/badge variants toggle inside it -->

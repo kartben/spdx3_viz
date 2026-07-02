@@ -234,6 +234,30 @@ export const navigationMixin = {
     };
     this.$nextTick(() => requestAnimationFrame(() => attempt(2)));
   },
+  // The list view (if any) that navigateTo would land an element in, used by
+  // the graph detail panel's "View in <list>" link. Returns null for elements
+  // with no dedicated list (placeholders / external references / agents).
+  listTargetFor(el) {
+    if (!el || el.placeholder) return null;
+    switch (el.type) {
+      case 'software_Package':
+        return { label: 'Packages' };
+      case 'software_File':
+        return el.software_primaryPurpose === 'configuration' || el.spdxId?.includes('build-config')
+          ? { label: 'Build Configs' }
+          : { label: 'Files' };
+      case 'build_Build':
+        return { label: 'Builds' };
+      case 'Tool':
+        return { label: 'Build Tools' };
+      case 'simplelicensing_LicenseExpression':
+        return { label: 'Licenses' };
+      case 'security_Vulnerability':
+        return { label: 'Security' };
+      default:
+        return null;
+    }
+  },
   navigateTo(spdxId) {
     const el = this.elementMap.get(spdxId);
     if (!el) {
