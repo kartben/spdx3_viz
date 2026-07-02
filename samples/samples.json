@@ -30,5 +30,13 @@
     "description": "Ubuntu 24.04 container image scanned by Syft: Debian packages, files, and dependency graph.",
     "dir": "samples/docker",
     "files": ["ubuntu-24.04-linux-amd64.spdx3.jsonld"]
+  },
+  {
+    "id": "windows",
+    "name": "Windows 11",
+    "icon": "favicon.svg",
+    "description": "Windows 11 install media manifest (as found in sources/_manifest), converted from SPDX 2.2 to SPDX 3.0.",
+    "dir": "samples/windows",
+    "files": ["windows-11.spdx3.json"]
   }
 ]
