@@ -7,10 +7,11 @@ import {
 } from './utils.js';
 
 const INPUT_LAYOUT_LINKS_PER_BUILD = 8;
-// Above this many underlying nodes we refuse to render a flat graph even if the
-// user turned aggregation off — a multi-thousand-node hairball is unusable and
-// hammers the machine. We force-collapse and surface a hint instead.
-const MAX_FLAT_NODES = 2000;
+// Above this many underlying nodes we auto-collapse into clusters even when the
+// user hasn't turned aggregation on. Rendering is fast now, so the binding limit
+// here is readability, not performance: a flat graph of many thousands of nodes
+// is an unreadable hairball. We force-collapse and surface a hint instead.
+const MAX_FLAT_NODES = 4000;
 // Labels are expensive and become noise when zoomed out; only draw them past
 // this zoom level, and cap how many we draw per frame.
 const LABEL_ZOOM_THRESHOLD = 1.1;
@@ -962,12 +963,12 @@ export function renderGraph(app, retry = 0) {
     .force('x', d3.forceX(width / 2).strength(0.045))
     .force('y', d3.forceY(height / 2).strength(0.045));
 
-  if (hugeGraph) {
-    // A huge hairball reaches a readable spread within ~80 ticks; the default
-    // decay grinds through ~300 heavy ticks (tens of seconds) micro-adjusting
-    // positions no one can perceive. Decay faster and stop a touch sooner so the
-    // layout settles in a few seconds instead of dragging the UI for half a
-    // minute.
+  if (bigGraph) {
+    // A big graph reaches a readable spread within ~80 ticks; d3's default decay
+    // grinds through ~300 ticks micro-adjusting positions no one can perceive.
+    // Decay faster and stop a touch sooner so mid-size graphs settle in ~2-3s
+    // and the huge ones in a few seconds, rather than dragging the UI for much
+    // longer.
     sim.alphaDecay(0.06).alphaMin(0.006);
   }
 
