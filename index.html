@@ -1043,31 +1043,31 @@
                     <span
                       x-show="(depsOf(pkg.spdxId)||[]).length > 0"
                       class="badge bg-blue-500/15 text-blue-400"
-                      :title="'Depends on ' + (depsOf(pkg.spdxId)||[]).length + ' package(s) — SPDX dependsOn'"
+                      :title="'Depends on ' + (depsOf(pkg.spdxId)||[]).length + ' package(s) (SPDX dependsOn)'"
                       x-text="'depends on ' + (depsOf(pkg.spdxId)||[]).length"
                     ></span>
                     <span
                       x-show="(dependentsOf(pkg.spdxId)||[]).length > 0"
                       class="badge bg-purple-500/15 text-purple-400"
-                      :title="(dependentsOf(pkg.spdxId)||[]).length + ' package(s) depend on this one — SPDX dependsOn'"
+                      :title="(dependentsOf(pkg.spdxId)||[]).length + ' package(s) depend on this one (SPDX dependsOn)'"
                       x-text="'required by ' + (dependentsOf(pkg.spdxId)||[]).length"
                     ></span>
                     <span
                       x-show="consumedByBuilds(pkg.spdxId).length > 0"
                       class="badge bg-orange-500/15 text-orange-400"
-                      :title="'Consumed as input by ' + consumedByBuilds(pkg.spdxId).length + ' build(s) — SPDX hasInput'"
+                      :title="'Consumed as input by ' + consumedByBuilds(pkg.spdxId).length + ' build(s) (SPDX hasInput)'"
                       x-text="'input to ' + consumedByBuilds(pkg.spdxId).length + (consumedByBuilds(pkg.spdxId).length === 1 ? ' build' : ' builds')"
                     ></span>
                     <span
                       x-show="producedByBuilds(pkg.spdxId).length > 0"
                       class="badge bg-green-500/15 text-green-400"
-                      :title="'Produced by ' + producedByBuilds(pkg.spdxId).length + ' build(s) — SPDX hasOutput'"
+                      :title="'Produced by ' + producedByBuilds(pkg.spdxId).length + ' build(s) (SPDX hasOutput)'"
                       x-text="'built'"
                     ></span>
                     <span
                       x-show="distributionArtifacts(pkg.spdxId).length > 0"
                       class="badge bg-sky-500/15 text-sky-400"
-                      :title="distributionArtifacts(pkg.spdxId).length + ' distribution artifact(s) — SPDX hasDistributionArtifact'"
+                      :title="distributionArtifacts(pkg.spdxId).length + ' distribution artifact(s) (SPDX hasDistributionArtifact)'"
                       x-text="distributionArtifacts(pkg.spdxId).length + (distributionArtifacts(pkg.spdxId).length === 1 ? ' artifact' : ' artifacts')"
                     ></span>
                     <button
