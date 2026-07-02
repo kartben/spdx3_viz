@@ -637,8 +637,9 @@ function resolveLicenseLabel(id, elementMap) {
   if (el?.simplelicensing_licenseExpression) {
     return displayLicenseExpression(el, elementMap);
   }
-  if (id.startsWith('https://spdx.org/licenses/')) {
-    return id.replace('https://spdx.org/licenses/', '');
+  const spdxLicenseMatch = id.match(/^https?:\/\/spdx\.org\/licenses\/(.+)$/);
+  if (spdxLicenseMatch) {
+    return spdxLicenseMatch[1];
   }
   if (id.includes('NoAssertion')) {
     return 'NoAssertion';
