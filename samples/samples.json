@@ -22,13 +22,5 @@
     "description": "Yocto core-image-minimal build: rootfs, packages, build graph, and vulnerability (VEX) data.",
     "dir": "samples/yocto",
     "files": ["core-image-minimal-1-0-0-0-20260321-1540.spdx.json"]
-  },
-  {
-    "id": "docker",
-    "name": "Docker image",
-    "icon": "favicon.svg",
-    "description": "Ubuntu 24.04 container image scanned by Syft: Debian packages, files, and dependency graph.",
-    "dir": "samples/docker",
-    "files": ["ubuntu-24.04-linux-amd64.spdx3.jsonld"]
   }
 ]
