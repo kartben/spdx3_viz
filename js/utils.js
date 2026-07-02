@@ -157,7 +157,7 @@ export function getRelationshipColor(relType) {
  *
  * @example
  * getRelationshipGroupLabel('dependsOn', 'out') // returns 'Depends on'
- * getRelationshipGroupLabel('dependsOn', 'in') // returns 'Depended on by'
+ * getRelationshipGroupLabel('dependsOn', 'in') // returns 'Required by'
  */
 export function getRelationshipGroupLabel(relType, direction) {
   const key = `${relType}:${direction}`;

@@ -340,7 +340,7 @@ export const TAILWIND_CONFIG = {
  */
 export const RELATIONSHIP_LABELS = {
   'dependsOn:out': 'Depends on',
-  'dependsOn:in': 'Depended on by',
+  'dependsOn:in': 'Required by',
   'contains:out': 'Contains',
   'contains:in': 'Contained in',
   'generates:out': 'Generates',

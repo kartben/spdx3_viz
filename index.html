@@ -1043,29 +1043,31 @@
                     <span
                       x-show="(depsOf(pkg.spdxId)||[]).length > 0"
                       class="badge bg-blue-500/15 text-blue-400"
-                      x-text="(depsOf(pkg.spdxId)||[]).length + ' deps'"
+                      :title="'Depends on ' + (depsOf(pkg.spdxId)||[]).length + ' package(s) — SPDX dependsOn'"
+                      x-text="'depends on ' + (depsOf(pkg.spdxId)||[]).length"
                     ></span>
                     <span
                       x-show="(dependentsOf(pkg.spdxId)||[]).length > 0"
                       class="badge bg-purple-500/15 text-purple-400"
-                      x-text="(dependentsOf(pkg.spdxId)||[]).length + ' used by'"
+                      :title="(dependentsOf(pkg.spdxId)||[]).length + ' package(s) depend on this one — SPDX dependsOn'"
+                      x-text="'required by ' + (dependentsOf(pkg.spdxId)||[]).length"
                     ></span>
                     <span
                       x-show="consumedByBuilds(pkg.spdxId).length > 0"
                       class="badge bg-orange-500/15 text-orange-400"
-                      :title="'Used as input by ' + consumedByBuilds(pkg.spdxId).length + ' build(s)'"
+                      :title="'Consumed as input by ' + consumedByBuilds(pkg.spdxId).length + ' build(s) — SPDX hasInput'"
                       x-text="'input to ' + consumedByBuilds(pkg.spdxId).length + (consumedByBuilds(pkg.spdxId).length === 1 ? ' build' : ' builds')"
                     ></span>
                     <span
                       x-show="producedByBuilds(pkg.spdxId).length > 0"
                       class="badge bg-green-500/15 text-green-400"
-                      :title="'Produced by ' + producedByBuilds(pkg.spdxId).length + ' build(s)'"
+                      :title="'Produced by ' + producedByBuilds(pkg.spdxId).length + ' build(s) — SPDX hasOutput'"
                       x-text="'built'"
                     ></span>
                     <span
                       x-show="distributionArtifacts(pkg.spdxId).length > 0"
                       class="badge bg-sky-500/15 text-sky-400"
-                      :title="distributionArtifacts(pkg.spdxId).length + ' distribution artifact(s)'"
+                      :title="distributionArtifacts(pkg.spdxId).length + ' distribution artifact(s) — SPDX hasDistributionArtifact'"
                       x-text="distributionArtifacts(pkg.spdxId).length + (distributionArtifacts(pkg.spdxId).length === 1 ? ' artifact' : ' artifacts')"
                     ></span>
                     <button
@@ -1189,12 +1191,13 @@
                     </a>
                   </div>
                   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <!-- Dependencies -->
+                    <!-- Dependencies (dependsOn, outgoing) -->
                     <div class="sm:pl-11">
                       <div
                         class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2"
+                        title="Packages this package declares an SPDX dependsOn relationship to"
                       >
-                        Dependencies
+                        Depends On
                       </div>
                       <div class="space-y-1" x-show="(depsOf(pkg.spdxId)||[]).length > 0">
                         <template x-for="d in (depsOf(pkg.spdxId)||[])" :key="d">
@@ -1214,12 +1217,13 @@
                         None
                       </div>
                     </div>
-                    <!-- Used by -->
+                    <!-- Required by (dependsOn, incoming) -->
                     <div>
                       <div
                         class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2"
+                        title="Packages that declare an SPDX dependsOn relationship to this one"
                       >
-                        Used by
+                        Required By
                       </div>
                       <div class="space-y-1" x-show="(dependentsOf(pkg.spdxId)||[]).length > 0">
                         <template x-for="d in (dependentsOf(pkg.spdxId)||[])" :key="d">
@@ -1243,6 +1247,7 @@
                     <div class="sm:pl-11" x-show="consumedByBuilds(pkg.spdxId).length > 0">
                       <div
                         class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2"
+                        title="Builds that consumed this package as an input (SPDX hasInput)"
                       >
                         Input to Builds
                       </div>
@@ -1262,8 +1267,9 @@
                     <div x-show="producedByBuilds(pkg.spdxId).length > 0">
                       <div
                         class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2"
+                        title="Builds that produced this package (SPDX hasOutput)"
                       >
-                        Produced by
+                        Produced by Build
                       </div>
                       <div class="space-y-1">
                         <template x-for="b in producedByBuilds(pkg.spdxId)" :key="b">
@@ -1381,15 +1387,31 @@
                         x-show="snippetsOf(f.spdxId).length > 0"
                         class="badge text-xs bg-green-400/10 text-green-400 flex items-center gap-1"
                       >
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
-                        <span x-text="snippetsOf(f.spdxId).length + ' snippet' + (snippetsOf(f.spdxId).length !== 1 ? 's' : '')"></span>
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+                          />
+                        </svg>
+                        <span
+                          x-text="snippetsOf(f.spdxId).length + ' snippet' + (snippetsOf(f.spdxId).length !== 1 ? 's' : '')"
+                        ></span>
                       </span>
                       <span
                         x-show="isCompiledSource(f) && snippetsOf(f.spdxId).length === 0"
                         class="badge text-xs bg-slate-700/40 text-slate-500 flex items-center gap-1"
                         title="Compiled but no code from this file appears in the final binary — dead-stripped by the linker"
                       >
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
+                          />
+                        </svg>
                         not linked
                       </span>
                       <template x-for="lic in elementLicenses(f.spdxId)" :key="lic.id + lic.kind">
@@ -1573,15 +1595,31 @@
                         x-show="snippetsOf(f.spdxId).length > 0"
                         class="badge bg-green-400/10 text-green-400 text-xs flex items-center gap-1"
                       >
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
-                        <span x-text="snippetsOf(f.spdxId).length + ' snippet' + (snippetsOf(f.spdxId).length !== 1 ? 's' : '') + ' covered'"></span>
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+                          />
+                        </svg>
+                        <span
+                          x-text="snippetsOf(f.spdxId).length + ' snippet' + (snippetsOf(f.spdxId).length !== 1 ? 's' : '') + ' covered'"
+                        ></span>
                       </span>
                       <span
                         x-show="isUnlinkedSource(f.spdxId)"
                         class="badge bg-slate-700/40 text-slate-500 text-xs flex items-center gap-1"
                         title="No code from this file appears in the final binary — source shown for reference only"
                       >
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
+                          />
+                        </svg>
                         not linked
                       </span>
                       <a
@@ -1596,13 +1634,33 @@
                     </div>
 
                     <!-- Loading -->
-                    <div x-show="fileSourceCache[f.spdxId]?.loading" class="flex items-center gap-2 text-xs text-slate-500 py-2">
-                      <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                    <div
+                      x-show="fileSourceCache[f.spdxId]?.loading"
+                      class="flex items-center gap-2 text-xs text-slate-500 py-2"
+                    >
+                      <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle
+                          class="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          stroke-width="4"
+                        ></circle>
+                        <path
+                          class="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                        ></path>
+                      </svg>
                       Loading source…
                     </div>
 
                     <!-- Error -->
-                    <div x-show="fileSourceCache[f.spdxId]?.error" class="text-xs text-red-400/80 py-1">
+                    <div
+                      x-show="fileSourceCache[f.spdxId]?.error"
+                      class="text-xs text-red-400/80 py-1"
+                    >
                       Could not load source: <span x-text="fileSourceCache[f.spdxId]?.error"></span>
                     </div>
 
@@ -1617,37 +1675,74 @@
                     <!-- Source windows -->
                     <template x-if="fileSourceCache[f.spdxId]?.windows?.length">
                       <div class="rounded-lg border border-slate-700/60 overflow-hidden mt-1">
-                      <div class="source-viewer" :class="isUnlinkedSource(f.spdxId) && 'unlinked'" @click.stop>
-                        <template x-for="(win, wi) in fileSourceCache[f.spdxId].windows" :key="wi">
-                          <div>
-                            <!-- Gap before (clickable to expand) -->
-                            <div x-show="win.gapBefore" class="sv-gap sv-gap-btn"
-                                 @click.stop="expandWindow(f.spdxId, wi, 'before')"
-                                 :title="'Show up to 50 more lines'">
-                              <div class="sv-gap-line"></div>
-                              <svg class="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg>
-                              <span x-text="gapBeforeCount(f.spdxId, wi) + ' lines above'"></span>
-                              <div class="sv-gap-line"></div>
-                            </div>
-                            <!-- Code lines -->
-                            <template x-for="line in win.lines" :key="line.lineNum">
-                              <div class="sv-line" :class="line.covered && 'covered'">
-                                <span class="sv-lnum" x-text="line.lineNum"></span>
-                                <span class="sv-code" x-html="line.html || '​'"></span>
+                        <div
+                          class="source-viewer"
+                          :class="isUnlinkedSource(f.spdxId) && 'unlinked'"
+                          @click.stop
+                        >
+                          <template
+                            x-for="(win, wi) in fileSourceCache[f.spdxId].windows"
+                            :key="wi"
+                          >
+                            <div>
+                              <!-- Gap before (clickable to expand) -->
+                              <div
+                                x-show="win.gapBefore"
+                                class="sv-gap sv-gap-btn"
+                                @click.stop="expandWindow(f.spdxId, wi, 'before')"
+                                :title="'Show up to 50 more lines'"
+                              >
+                                <div class="sv-gap-line"></div>
+                                <svg
+                                  class="w-3 h-3 flex-shrink-0"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                  stroke-width="2"
+                                >
+                                  <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M5 15l7-7 7 7"
+                                  />
+                                </svg>
+                                <span x-text="gapBeforeCount(f.spdxId, wi) + ' lines above'"></span>
+                                <div class="sv-gap-line"></div>
                               </div>
-                            </template>
-                            <!-- Gap after (clickable to expand) -->
-                            <div x-show="win.gapAfter" class="sv-gap sv-gap-btn"
-                                 @click.stop="expandWindow(f.spdxId, wi, 'after')"
-                                 :title="'Show up to 50 more lines'">
-                              <div class="sv-gap-line"></div>
-                              <svg class="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-                              <span x-text="gapAfterCount(f.spdxId, wi) + ' lines below'"></span>
-                              <div class="sv-gap-line"></div>
+                              <!-- Code lines -->
+                              <template x-for="line in win.lines" :key="line.lineNum">
+                                <div class="sv-line" :class="line.covered && 'covered'">
+                                  <span class="sv-lnum" x-text="line.lineNum"></span>
+                                  <span class="sv-code" x-html="line.html || '​'"></span>
+                                </div>
+                              </template>
+                              <!-- Gap after (clickable to expand) -->
+                              <div
+                                x-show="win.gapAfter"
+                                class="sv-gap sv-gap-btn"
+                                @click.stop="expandWindow(f.spdxId, wi, 'after')"
+                                :title="'Show up to 50 more lines'"
+                              >
+                                <div class="sv-gap-line"></div>
+                                <svg
+                                  class="w-3 h-3 flex-shrink-0"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                  stroke-width="2"
+                                >
+                                  <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M19 9l-7 7-7-7"
+                                  />
+                                </svg>
+                                <span x-text="gapAfterCount(f.spdxId, wi) + ' lines below'"></span>
+                                <div class="sv-gap-line"></div>
+                              </div>
                             </div>
-                          </div>
-                        </template>
-                      </div>
+                          </template>
+                        </div>
                       </div>
                     </template>
                   </div>
