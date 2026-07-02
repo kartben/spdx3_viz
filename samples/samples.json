@@ -79,5 +79,14 @@
     "dir": "samples/jenkins",
     "files": ["org.jenkins-ci.main_jenkins-parent-2.572-SNAPSHOT.spdx3.json-ld.json"],
     "size": 364039
+  },
+  {
+    "id": "ai",
+    "name": "AI / ML model",
+    "emoji": "🤖",
+    "description": "AI-BOM for the SimpleHTR handwriting model, using the SPDX AI and Dataset profiles.",
+    "dir": "samples/ai",
+    "files": ["simplehtr-example.spdx3.json"],
+    "size": 73134
   }
 ]
