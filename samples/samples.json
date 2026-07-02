@@ -5,7 +5,8 @@
     "emoji": "🪁",
     "description": "A Zephyr application targeting an ESP32 board, and using LVGL for the GUI.",
     "dir": "samples/zephyr",
-    "files": ["app.jsonld", "modules-deps.jsonld", "zephyr.jsonld", "build.jsonld"]
+    "files": ["app.jsonld", "modules-deps.jsonld", "zephyr.jsonld", "build.jsonld"],
+    "size": 2200897
   },
   {
     "id": "linux",
@@ -13,7 +14,8 @@
     "emoji": "🐧",
     "description": "Linux kernel build: source tree, build environment, and <code>bzImage</code> output.",
     "dir": "samples/linux",
-    "files": ["sbom-source.spdx.json", "sbom-output.spdx.json", "sbom-build.spdx.json"]
+    "files": ["sbom-source.spdx.json", "sbom-output.spdx.json", "sbom-build.spdx.json"],
+    "size": 8577509
   },
   {
     "id": "yocto",
@@ -21,7 +23,8 @@
     "icon": "favicon.png",
     "description": "Yocto <code>core-image-minimal</code> build: rootfs, packages, build graph, and vulnerability (VEX) data.",
     "dir": "samples/yocto",
-    "files": ["core-image-minimal-1-0-0-0-20260321-1540.spdx.json"]
+    "files": ["core-image-minimal-1-0-0-0-20260321-1540.spdx.json"],
+    "size": 15914617
   },
   {
     "id": "android",
@@ -29,7 +32,8 @@
     "icon": "favicon.svg",
     "description": "AOSP <a href=\"https://source.android.com/docs/setup/create/create-sbom?hl=en#obtain\" target=\"_blank\" rel=\"noopener\" onclick=\"event.stopPropagation()\">release build SBOM</a>, converted from SPDX 2.x to 3.0.",
     "dir": "samples/android",
-    "files": ["aosp-android-latest-release.jsonld"]
+    "files": ["aosp-android-latest-release.jsonld"],
+    "size": 51353598
   },
   {
     "id": "docker",
@@ -37,7 +41,8 @@
     "icon": "favicon.svg",
     "description": "Ubuntu 24.04 container image scanned by Syft: Debian packages, files, and dependency graph.",
     "dir": "samples/docker",
-    "files": ["ubuntu-24.04-linux-amd64.spdx3.jsonld"]
+    "files": ["ubuntu-24.04-linux-amd64.spdx3.jsonld"],
+    "size": 5429000
   },
   {
     "id": "kubernetes",
@@ -45,7 +50,8 @@
     "icon": "favicon.svg",
     "description": "Kubernetes v1.35.3 release SBOM.",
     "dir": "samples/kubernetes",
-    "files": ["kubernetes_1_35_3_spdx.jsonld"]
+    "files": ["kubernetes_1_35_3_spdx.jsonld"],
+    "size": 61680870
   },
   {
     "id": "windows",
@@ -53,7 +59,8 @@
     "icon": "favicon.svg",
     "description": "Windows 11 install media manifest (as found in <code>sources/_manifest</code>), converted from SPDX 2.2 to SPDX 3.0.",
     "dir": "samples/windows",
-    "files": ["windows-11.spdx3.json"]
+    "files": ["windows-11.spdx3.json"],
+    "size": 2010114
   },
   {
     "id": "vuejs",
@@ -61,7 +68,8 @@
     "icon": "favicon.svg",
     "description": "A demo Vue.js app scaffolded with <code>npm create vue@latest</code>, SBOM obtained with <code>cdxgen</code>.",
     "dir": "samples/vuejs",
-    "files": ["vuej-demo-sbom.spdx3.jsonld"]
+    "files": ["vuej-demo-sbom.spdx3.jsonld"],
+    "size": 1466809
   },
   {
     "id": "jenkins",
@@ -69,6 +77,7 @@
     "icon": "favicon.svg",
     "description": "Jenkins core Maven build. SBOM captured with the <code>spdx-maven-plugin</code>.",
     "dir": "samples/jenkins",
-    "files": ["org.jenkins-ci.main_jenkins-parent-2.572-SNAPSHOT.spdx3.json-ld.json"]
+    "files": ["org.jenkins-ci.main_jenkins-parent-2.572-SNAPSHOT.spdx3.json-ld.json"],
+    "size": 364039
   }
 ]
