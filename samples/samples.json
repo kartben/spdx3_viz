@@ -46,5 +46,13 @@
     "description": "A demo Vue.js app scaffolded with <code>npm create vue@latest</code>, SBOM obtained with <code>cdxgen</code>.",
     "dir": "samples/vuejs",
     "files": ["vuej-demo-sbom.spdx3.jsonld"]
+  },
+  {
+    "id": "jenkins",
+    "name": "Jenkins",
+    "icon": "favicon.svg",
+    "description": "Jenkins core Maven build. SBOM captured with the <code>spdx-maven-plugin</code>.",
+    "dir": "samples/jenkins",
+    "files": ["org.jenkins-ci.main_jenkins-parent-2.572-SNAPSHOT.spdx3.json-ld.json"]
   }
 ]
