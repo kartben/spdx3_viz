@@ -129,7 +129,7 @@ function escapeHtml(value) {
   );
 }
 
-export function renderGraph(app) {
+export function renderGraph(app, retry = 0) {
   const container = document.getElementById('graphContainer');
   if (!container) return;
 
@@ -141,9 +141,18 @@ export function renderGraph(app) {
     app.graphFlowRAF = 0;
   }
 
-  const width = container.clientWidth;
-  const height = container.clientHeight;
-  if (!width || !height || !globalThis.d3) return;
+  if (!globalThis.d3) return;
+  // Measure the container. clientWidth/Height can momentarily read 0 — notably
+  // on Safari/WebKit, which lays out a just-shown flex view a frame later than
+  // Chrome — so fall back to getBoundingClientRect and, if still unsized, retry
+  // on the next frame (bounded so a genuinely hidden view never loops forever).
+  const rect = container.getBoundingClientRect();
+  const width = container.clientWidth || Math.round(rect.width);
+  const height = container.clientHeight || Math.round(rect.height);
+  if (!width || !height) {
+    if (retry < 20) requestAnimationFrame(() => renderGraph(app, retry + 1));
+    return;
+  }
 
   const activeNodeTypes = new Set(
     app.graphFilters.filter((f) => !f.isRel && f.active).map((f) => f.key)
