@@ -187,6 +187,7 @@ export function spdxApp() {
     pkgSort: 'name',
     fileTypeFilter: '',
     toastMsg: '',
+    helpOpen: false,
     licenseModalOpen: false,
     licenseModalExpression: '',
     licenseModalParts: [],
@@ -1417,6 +1418,18 @@ export function spdxApp() {
       if (part.kind === 'license') return spdxLicensePageUrl(part.id);
       if (part.kind === 'exception') return spdxLicenseExceptionPageUrl(part.id);
       return '';
+    },
+    openHelp() {
+      this.helpOpen = true;
+    },
+    closeHelp() {
+      this.helpOpen = false;
+    },
+    handleGlobalHelpKey(event) {
+      if (event.key !== '?') return;
+      if (event.target.closest?.('input, textarea, select, [contenteditable]')) return;
+      event.preventDefault();
+      this.helpOpen = !this.helpOpen;
     },
     closeLicenseModal() {
       this.licenseModalOpen = false;
