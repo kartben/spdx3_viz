@@ -63,6 +63,7 @@ export const RELATIONSHIP_TYPES = {
   HAS_STATIC_LINK: 'hasStaticLink',
   HAS_DYNAMIC_LINK: 'hasDynamicLink',
   HAS_OPTIONAL_COMPONENT: 'hasOptionalComponent',
+  HAS_VARIANT: 'hasVariant',
   CONFIGURES: 'configures',
   HAS_CONCLUDED_LICENSE: 'hasConcludedLicense',
   HAS_DECLARED_LICENSE: 'hasDeclaredLicense',
@@ -169,6 +170,7 @@ export const COLORS = {
   staticLink: '#06b6d4',
   dynamicLink: '#0ea5e9',
   optionalComponent: '#d946ef',
+  variant: '#eab308',
   vulnerability: '#f43f5e',
   // VEX edge colors — mirror the VEX_STATUSES palette so an edge reads as its status
   vexFixed: '#10b981',
@@ -256,6 +258,7 @@ export function createGraphFilters() {
       isRel: true,
       lineStyle: 'dashdot'
     },
+    { key: 'hasVariant', label: 'hasVariant', color: COLORS.variant, active: true, isRel: true },
     { key: 'configures', label: 'configures', color: COLORS.config, active: true, isRel: true },
     // VEX assessment edges (vulnerability → package). Off by default; enabling
     // the Vulnerabilities node type + one of these surfaces VEX in the graph.
@@ -387,6 +390,8 @@ export const RELATIONSHIP_LABELS = {
   'hasDynamicLink:in': 'Dynamically linked by',
   'hasOptionalComponent:out': 'Optional components',
   'hasOptionalComponent:in': 'Optional component of',
+  'hasVariant:out': 'Variants',
+  'hasVariant:in': 'Variant of',
   'configures:out': 'Configures',
   'configures:in': 'Configured by',
   'hasConcludedLicense:out': 'Concluded license',
@@ -450,10 +455,12 @@ export const RELATIONSHIP_SORT_ORDER = {
   'hasDynamicLink:in': 20,
   'hasOptionalComponent:out': 21,
   'hasOptionalComponent:in': 22,
-  'usesTool:out': 23,
-  'usesTool:in': 24,
-  'hasConcludedLicense:out': 25,
-  'hasDeclaredLicense:out': 26,
-  'hasConcludedLicense:in': 27,
-  'hasDeclaredLicense:in': 28
+  'hasVariant:out': 23,
+  'hasVariant:in': 24,
+  'usesTool:out': 25,
+  'usesTool:in': 26,
+  'hasConcludedLicense:out': 27,
+  'hasDeclaredLicense:out': 28,
+  'hasConcludedLicense:in': 29,
+  'hasDeclaredLicense:in': 30
 };

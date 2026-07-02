@@ -689,6 +689,47 @@ test('parseGraph supports LifecycleScopedRelationship dynamic-link / optional-co
   assert.equal(getRelationshipGroupLabel('hasOptionalComponent', 'in'), 'Optional component of');
 });
 
+test('parseGraph supports hasVariant relationships (as emitted by the AOSP SBOM)', () => {
+  const app = spdxApp();
+  const graph = [
+    { type: 'software_Package', spdxId: 'pkg:toybox', name: 'toybox' },
+    { type: 'software_Package', spdxId: 'pkg:toybox-variant', name: 'toybox' },
+    {
+      type: 'Relationship',
+      spdxId: 'rel:variant',
+      relationshipType: 'hasVariant',
+      from: 'pkg:toybox',
+      to: ['pkg:toybox-variant']
+    }
+  ];
+
+  const parsed = parseGraph(graph);
+
+  // The plain Relationship is collected and surfaces in the legend's present types.
+  assert.equal(parsed.relationships.length, 1);
+  assert.ok(parsed.presentRelTypes.includes('hasVariant'));
+
+  // hasVariant has a distinct, non-default colour and directional labels.
+  const variant = getRelationshipColor('hasVariant');
+  assert.notEqual(variant, getRelationshipColor('nonexistentRel'));
+  assert.notEqual(variant, getRelationshipColor('hasStaticLink'));
+  assert.equal(getRelationshipGroupLabel('hasVariant', 'out'), 'Variants');
+  assert.equal(getRelationshipGroupLabel('hasVariant', 'in'), 'Variant of');
+
+  // It surfaces in the detail panel's relationship groups, both directions.
+  const indexes = buildRelationshipIndexes(parsed.relationships);
+  app.elementMap = parsed.elementMap;
+  app.relFromIndex = indexes.relFromIndex;
+  app.relToIndex = indexes.relToIndex;
+  const outGroups = app.detailRelGroupsFor({ spdxId: 'pkg:toybox' });
+  assert.equal(
+    outGroups.find((g) => g.key === 'hasVariant:out')?.items[0].id,
+    'pkg:toybox-variant'
+  );
+  const inGroups = app.detailRelGroupsFor({ spdxId: 'pkg:toybox-variant' });
+  assert.equal(inGroups.find((g) => g.key === 'hasVariant:in')?.items[0].id, 'pkg:toybox');
+});
+
 test('detailRelGroupsFor surfaces lifecycle-scoped relationships with their scope', () => {
   const app = spdxApp();
   const graph = [

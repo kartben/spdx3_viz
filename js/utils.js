@@ -139,6 +139,7 @@ export function getRelationshipColor(relType) {
     hasStaticLink: COLORS.staticLink,
     hasDynamicLink: COLORS.dynamicLink,
     hasOptionalComponent: COLORS.optionalComponent,
+    hasVariant: COLORS.variant,
     configures: COLORS.config,
     hasConcludedLicense: COLORS.license,
     hasDeclaredLicense: COLORS.license,
