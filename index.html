@@ -1637,150 +1637,166 @@
                     />
                   </svg>
                 </div>
-                <!-- Expanded detail -->
-                <div
-                  x-show="expandedFile === f.spdxId"
-                  x-collapse
-                  class="mt-4 pt-4 border-t border-slate-700 space-y-3 sm:pl-11"
-                  @click.stop
-                >
-                  <!-- Licenses -->
-                  <div x-show="elementLicenses(f.spdxId).length > 0">
-                    <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
-                      License
-                    </div>
-                    <div class="flex flex-wrap gap-1.5">
-                      <template x-for="lic in elementLicenses(f.spdxId)" :key="lic.id + lic.kind">
-                        <button
-                          type="button"
-                          class="badge hover:opacity-80"
-                          :class="lic.kind === 'concluded' ? 'bg-pink-500/15 text-pink-400' : 'bg-purple-500/15 text-purple-400'"
-                          :title="canShowLicenseText(lic.id) ? licenseTextActionLabel(lic.id) : 'View license'"
-                          @click.stop="showLicenseText(lic.id)"
-                          x-text="(lic.kind === 'declared' ? 'Declared: ' : 'Concluded: ') + lic.label"
-                        ></button>
-                      </template>
-                    </div>
-                  </div>
-                  <!-- Hashes -->
-                  <template x-for="h in (f.verifiedUsing || [])" :key="h.hashValue">
-                    <div class="flex items-center gap-2">
-                      <span
-                        class="text-xs text-slate-500 w-12 flex-shrink-0 uppercase"
-                        x-text="h.algorithm"
-                      ></span>
-                      <code
-                        class="hash-text text-slate-300 flex-1 truncate"
-                        x-text="h.hashValue"
-                      ></code>
-                      <button
-                        @click.stop="copyHash(h.hashValue)"
-                        class="text-xs px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded text-slate-400 hover:text-white transition-colors flex-shrink-0"
-                      >
-                        Copy
-                      </button>
-                    </div>
-                  </template>
-                  <!-- Parent package -->
-                  <div x-show="parentPackage(f.spdxId)">
-                    <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
-                      Contained in
-                    </div>
-                    <div
-                      class="text-xs text-blue-400 cursor-pointer hover:text-blue-300"
-                      @click.stop="navigateTo(parentPackage(f.spdxId))"
-                      x-text="relTargetDisplayName(parentPackage(f.spdxId) || '')"
-                    ></div>
-                  </div>
-                  <!-- Tools used -->
-                  <div x-show="(fileTools(f.spdxId)||[]).length > 0">
-                    <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
-                      Built with
-                    </div>
-                    <div class="flex flex-wrap gap-1.5">
-                      <template x-for="t in (fileTools(f.spdxId)||[])" :key="t">
-                        <span
-                          class="badge bg-amber-500/15 text-amber-400"
-                          x-text="relTargetDisplayName(t)"
-                        ></span>
-                      </template>
-                    </div>
-                  </div>
-                  <!-- Build configuration -->
-                  <div x-show="configuredBy(f.spdxId).length > 0">
-                    <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
-                      Build Configuration
-                    </div>
-                    <template x-for="cfg in configuredBy(f.spdxId)" :key="cfg.configId">
+                <!-- Expanded detail — built lazily via x-if (only for the one
+                     expanded card) instead of x-show, so a 28k-file list doesn't
+                     put every card's full detail subtree in the DOM. -->
+                <template x-if="expandedFile === f.spdxId">
+                  <div
+                    class="mt-4 pt-4 border-t border-slate-700 space-y-3 sm:pl-11 fade-in"
+                    @click.stop
+                  >
+                    <!-- Licenses -->
+                    <div x-show="elementLicenses(f.spdxId).length > 0">
                       <div
-                        class="text-xs text-teal-400 hover:text-teal-300 cursor-pointer flex items-center gap-1.5"
-                        @click.stop="navigateToConfig(cfg.configId)"
+                        class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1"
                       >
-                        <span class="w-1.5 h-1.5 rounded-full bg-teal-500/50"></span>
-                        <span x-text="relTargetDisplayName(cfg.configId)"></span>
+                        License
+                      </div>
+                      <div class="flex flex-wrap gap-1.5">
+                        <template x-for="lic in elementLicenses(f.spdxId)" :key="lic.id + lic.kind">
+                          <button
+                            type="button"
+                            class="badge hover:opacity-80"
+                            :class="lic.kind === 'concluded' ? 'bg-pink-500/15 text-pink-400' : 'bg-purple-500/15 text-purple-400'"
+                            :title="canShowLicenseText(lic.id) ? licenseTextActionLabel(lic.id) : 'View license'"
+                            @click.stop="showLicenseText(lic.id)"
+                            x-text="(lic.kind === 'declared' ? 'Declared: ' : 'Concluded: ') + lic.label"
+                          ></button>
+                        </template>
+                      </div>
+                    </div>
+                    <!-- Hashes -->
+                    <template x-for="h in (f.verifiedUsing || [])" :key="h.hashValue">
+                      <div class="flex items-center gap-2">
                         <span
-                          class="text-slate-500"
-                          x-show="cfg.scope"
-                          x-text="'(' + cfg.scope + ')'"
+                          class="text-xs text-slate-500 w-12 flex-shrink-0 uppercase"
+                          x-text="h.algorithm"
                         ></span>
+                        <code
+                          class="hash-text text-slate-300 flex-1 truncate"
+                          x-text="h.hashValue"
+                        ></code>
+                        <button
+                          @click.stop="copyHash(h.hashValue)"
+                          class="text-xs px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded text-slate-400 hover:text-white transition-colors flex-shrink-0"
+                        >
+                          Copy
+                        </button>
                       </div>
                     </template>
-                  </div>
-                  <!-- Producing builds -->
-                  <div x-show="producedByBuilds(f.spdxId).length > 0">
-                    <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
-                      Produced by build
-                    </div>
-                    <div class="space-y-1">
-                      <template x-for="build in producedByBuilds(f.spdxId)" :key="build">
-                        <div
-                          class="text-xs text-green-400 hover:text-green-300 cursor-pointer flex items-center gap-1.5"
-                          @click.stop="navigateToBuild(build)"
-                        >
-                          <span class="w-1.5 h-1.5 rounded-full bg-green-500/50"></span>
-                          <span x-text="relTargetDisplayName(build)"></span>
-                        </div>
-                      </template>
-                    </div>
-                  </div>
-                  <!-- Consuming builds -->
-                  <div x-show="consumedByBuilds(f.spdxId).length > 0">
-                    <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
-                      Consumed by builds
-                    </div>
-                    <div class="flex flex-wrap gap-1.5">
-                      <template
-                        x-for="build in consumedByBuilds(f.spdxId).slice(0, 12)"
-                        :key="build"
+                    <!-- Parent package -->
+                    <div x-show="parentPackage(f.spdxId)">
+                      <div
+                        class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1"
                       >
-                        <button
-                          class="badge bg-orange-500/15 text-orange-400 hover:bg-orange-500/25"
-                          @click.stop="navigateToBuild(build)"
-                          x-text="relTargetDisplayName(build)"
-                        ></button>
-                      </template>
-                      <span
-                        x-show="consumedByBuilds(f.spdxId).length > 12"
-                        class="text-xs text-slate-500 self-center"
-                        x-text="'+' + formatCount(consumedByBuilds(f.spdxId).length - 12) + ' more'"
-                      ></span>
+                        Contained in
+                      </div>
+                      <div
+                        class="text-xs text-blue-400 cursor-pointer hover:text-blue-300"
+                        @click.stop="navigateTo(parentPackage(f.spdxId))"
+                        x-text="relTargetDisplayName(parentPackage(f.spdxId) || '')"
+                      ></div>
                     </div>
-                  </div>
-                  <!-- Static links (for .elf files) -->
-                  <div x-show="(staticLinks(f.spdxId)||[]).length > 0">
-                    <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
-                      Statically linked
+                    <!-- Tools used -->
+                    <div x-show="(fileTools(f.spdxId)||[]).length > 0">
+                      <div
+                        class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1"
+                      >
+                        Built with
+                      </div>
+                      <div class="flex flex-wrap gap-1.5">
+                        <template x-for="t in (fileTools(f.spdxId)||[])" :key="t">
+                          <span
+                            class="badge bg-amber-500/15 text-amber-400"
+                            x-text="relTargetDisplayName(t)"
+                          ></span>
+                        </template>
+                      </div>
                     </div>
-                    <div class="space-y-1">
-                      <template x-for="l in (staticLinks(f.spdxId)||[])" :key="l">
-                        <div class="text-xs text-cyan-400 flex items-center gap-1.5">
-                          <span class="w-1.5 h-1.5 rounded-full bg-cyan-500/50"></span>
-                          <span x-text="cleanFileName(l)"></span>
+                    <!-- Build configuration -->
+                    <div x-show="configuredBy(f.spdxId).length > 0">
+                      <div
+                        class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1"
+                      >
+                        Build Configuration
+                      </div>
+                      <template x-for="cfg in configuredBy(f.spdxId)" :key="cfg.configId">
+                        <div
+                          class="text-xs text-teal-400 hover:text-teal-300 cursor-pointer flex items-center gap-1.5"
+                          @click.stop="navigateToConfig(cfg.configId)"
+                        >
+                          <span class="w-1.5 h-1.5 rounded-full bg-teal-500/50"></span>
+                          <span x-text="relTargetDisplayName(cfg.configId)"></span>
+                          <span
+                            class="text-slate-500"
+                            x-show="cfg.scope"
+                            x-text="'(' + cfg.scope + ')'"
+                          ></span>
                         </div>
                       </template>
                     </div>
+                    <!-- Producing builds -->
+                    <div x-show="producedByBuilds(f.spdxId).length > 0">
+                      <div
+                        class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1"
+                      >
+                        Produced by build
+                      </div>
+                      <div class="space-y-1">
+                        <template x-for="build in producedByBuilds(f.spdxId)" :key="build">
+                          <div
+                            class="text-xs text-green-400 hover:text-green-300 cursor-pointer flex items-center gap-1.5"
+                            @click.stop="navigateToBuild(build)"
+                          >
+                            <span class="w-1.5 h-1.5 rounded-full bg-green-500/50"></span>
+                            <span x-text="relTargetDisplayName(build)"></span>
+                          </div>
+                        </template>
+                      </div>
+                    </div>
+                    <!-- Consuming builds -->
+                    <div x-show="consumedByBuilds(f.spdxId).length > 0">
+                      <div
+                        class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1"
+                      >
+                        Consumed by builds
+                      </div>
+                      <div class="flex flex-wrap gap-1.5">
+                        <template
+                          x-for="build in consumedByBuilds(f.spdxId).slice(0, 12)"
+                          :key="build"
+                        >
+                          <button
+                            class="badge bg-orange-500/15 text-orange-400 hover:bg-orange-500/25"
+                            @click.stop="navigateToBuild(build)"
+                            x-text="relTargetDisplayName(build)"
+                          ></button>
+                        </template>
+                        <span
+                          x-show="consumedByBuilds(f.spdxId).length > 12"
+                          class="text-xs text-slate-500 self-center"
+                          x-text="'+' + formatCount(consumedByBuilds(f.spdxId).length - 12) + ' more'"
+                        ></span>
+                      </div>
+                    </div>
+                    <!-- Static links (for .elf files) -->
+                    <div x-show="(staticLinks(f.spdxId)||[]).length > 0">
+                      <div
+                        class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1"
+                      >
+                        Statically linked
+                      </div>
+                      <div class="space-y-1">
+                        <template x-for="l in (staticLinks(f.spdxId)||[])" :key="l">
+                          <div class="text-xs text-cyan-400 flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-cyan-500/50"></span>
+                            <span x-text="cleanFileName(l)"></span>
+                          </div>
+                        </template>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                </template>
               </div>
             </template>
           </div>
