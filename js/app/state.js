@@ -34,8 +34,9 @@ export function createState() {
       build: false
     },
     // How many items of each heavy view's filtered list the DOM may show.
-    // Grows chunk-by-chunk (see _ensureViewRendered) so opening e.g. a 3k-CVE
-    // Security view streams in behind a progress bar instead of freezing.
+    // Starts at one page and grows as the user scrolls (see loadMoreForView /
+    // _ensureScrollLoader), so opening e.g. the 28k-file Kubernetes list renders
+    // instantly instead of building every card up front.
     renderLimits: {
       packages: 0,
       files: 0,

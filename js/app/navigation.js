@@ -5,17 +5,22 @@
    the navigateToX drill-downs (with scroll-into-view).
    ========================================================================== */
 
-/* Chunked list rendering (see renderSlice/_ensureViewRendered). Building
-   thousands of cards in one synchronous x-for pass freezes the page for
-   seconds on large SBOMs (the Yocto sample has ~3k CVEs), so the heavy list
-   views stream in RENDER_CHUNK cards per frame behind a progress bar instead.
-   The whole list still ends up in the DOM — no virtualization — so deep links
-   to any card keep working. viewRenderSeq cancels a streaming loop when a
-   newer one (or freshly parsed data) supersedes it, kept off the reactive
-   state since it's pure bookkeeping. */
-const RENDER_CHUNK = 200; // max new cards added to the DOM per frame
+/* Load-on-scroll list rendering (see renderSlice/_ensureViewRendered).
+   Building thousands of cards up front freezes the page (the Kubernetes sample
+   has ~28k files), so heavy list views render only an initial page and then
+   grow by RENDER_CHUNK as the user scrolls near the bottom — driven by an
+   IntersectionObserver on a single sentinel at the foot of the scroll area.
+   The whole list is NOT proactively built (no more multi-second "Rendering N
+   of M" streaming), but cards still accumulate in the DOM as you scroll, and a
+   deep link streams the list just far enough to reveal its target (see
+   _streamToNavTarget), so deep links keep working. viewRenderSeq cancels a
+   deep-link stream when a newer navigation supersedes it; scrollObserver is the
+   shared observer — both kept off the reactive state as pure bookkeeping. */
+const INITIAL_RENDER = 200; // cards rendered when a list view first opens
+const RENDER_CHUNK = 200; // cards added per scroll step / deep-link stream frame
 let viewRenderSeq = 0;
-// View id -> the filtered list its main x-for renders, for the streaming loop.
+let scrollObserver = null;
+// View id -> the filtered list its main x-for renders.
 const viewListProps = {
   packages: 'filteredPackages',
   files: 'filteredFiles',
@@ -23,6 +28,16 @@ const viewListProps = {
   security: 'filteredVulnerabilities',
   configs: 'filteredConfigs',
   build: 'filteredBuilds'
+};
+// Nav-target kind -> how to locate its card in the corresponding list, so a
+// deep link can grow that list far enough to render the target before scrolling.
+const navKindListInfo = {
+  package: { view: 'packages', list: 'filteredPackages', idField: 'spdxId' },
+  file: { view: 'files', list: 'filteredFiles', idField: 'spdxId' },
+  license: { view: 'licenses', list: 'filteredLicenses', idField: 'id' },
+  vuln: { view: 'security', list: 'filteredVulnerabilities', idField: 'spdxId' },
+  config: { view: 'configs', list: 'filteredConfigs', idField: 'spdxId' },
+  build: { view: 'build', list: 'filteredBuilds', idField: 'spdxId' }
 };
 
 export const navigationMixin = {
@@ -110,59 +125,124 @@ export const navigationMixin = {
   },
 
   // Every heavy list x-for renders through this. It's a pure clamp to
-  // renderLimits[view] — the actual chunk-by-chunk growth of that limit is
-  // driven solely by _ensureViewRendered, so there's one source of truth
-  // for how much of the list is in the DOM.
+  // renderLimits[view] — the growth of that limit is driven by the scroll
+  // observer (loadMoreForView) and, for deep links, _streamToNavTarget, so
+  // there's one source of truth for how much of the list is in the DOM.
   renderSlice(view, list) {
     const limit = this.renderLimits[view];
     return list.length <= limit ? list : list.slice(0, limit);
   },
 
-  // Streams the current view's list into the DOM one chunk per frame,
-  // driving the viewRender progress bar. Resumable and safe to call any
-  // time: it no-ops when the view is hidden or fully rendered, and a newer
-  // call (or freshly parsed data) cancels an in-flight one.
-  async _ensureViewRendered(view) {
+  // Ensures a view has at least its first page rendered, then makes sure the
+  // scroll loader is wired up. Preserves an already-larger limit so returning
+  // to a view you'd scrolled through (or deep-linked into) doesn't collapse it
+  // back to the first page.
+  _ensureViewRendered(view) {
     const listProp = viewListProps[view];
-    if (!listProp || this.currentView !== view) return;
-    if (this.renderLimits[view] >= this[listProp].length) return;
+    if (!listProp) return;
+    const total = this[listProp].length;
+    this.renderLimits[view] = Math.min(
+      Math.max(this.renderLimits[view] || 0, INITIAL_RENDER),
+      total
+    );
+    this.viewRender.active = false;
+    this.$nextTick(() => this._ensureScrollLoader());
+  },
+
+  // Grows the current view's rendered slice by one chunk. Called by the scroll
+  // observer as its sentinel nears the viewport; no-ops once the whole list is
+  // in the DOM or for non-list views.
+  loadMoreForView(view) {
+    const listProp = viewListProps[view];
+    if (!listProp) return;
+    const total = this[listProp].length;
+    if (this.renderLimits[view] >= total) return;
+    this.renderLimits[view] = Math.min(this.renderLimits[view] + RENDER_CHUNK, total);
+  },
+
+  // Lazily creates the shared IntersectionObserver + a single sentinel at the
+  // foot of the scroll area (#mainContent). Only the active view contributes
+  // height, so one sentinel tracks whichever list is showing; when it nears the
+  // viewport we load the next chunk of the current view.
+  _ensureScrollLoader() {
+    const root = document.getElementById('mainContent');
+    if (!root) return;
+    if (!scrollObserver) {
+      const app = this;
+      scrollObserver = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) if (e.isIntersecting) app.loadMoreForView(app.currentView);
+        },
+        // Pre-load before the sentinel is actually on screen so scrolling stays
+        // seamless rather than revealing a blank gap then filling it.
+        { root, rootMargin: '1000px 0px' }
+      );
+    }
+    if (!root.querySelector(':scope > [data-stream-sentinel]')) {
+      const sentinel = document.createElement('div');
+      sentinel.setAttribute('data-stream-sentinel', '');
+      sentinel.setAttribute('aria-hidden', 'true');
+      root.appendChild(sentinel);
+      scrollObserver.observe(sentinel);
+    }
+  },
+
+  // Grows a view's rendered slice up to `targetLimit`, a chunk per frame behind
+  // the progress bar. Used only for deep links that land beyond the currently
+  // rendered rows (see _streamToNavTarget) — normal browsing never triggers it.
+  async _streamTo(view, targetLimit) {
+    const listProp = viewListProps[view];
+    if (!listProp) return;
+    const goal = Math.min(targetLimit, this[listProp].length);
+    if (this.renderLimits[view] >= goal) return;
     const token = ++viewRenderSeq;
-    for (;;) {
-      const total = this[listProp].length;
-      const done = Math.min(this.renderLimits[view] + RENDER_CHUNK, total);
-      this.renderLimits[view] = done;
-      Object.assign(this.viewRender, { active: done < total, view, done, total });
-      if (done >= total) return;
-      // Let Alpine build this chunk, then yield so the page (and the
-      // progress bar) stays responsive between chunks. Plain setTimeout,
-      // not requestAnimationFrame — rAF callbacks are paused in background/
-      // inactive tabs, which would stall the stream indefinitely if the
-      // user switches away mid-render.
+    while (this.renderLimits[view] < goal) {
+      this.renderLimits[view] = Math.min(this.renderLimits[view] + RENDER_CHUNK, goal);
+      const active = this.renderLimits[view] < goal;
+      Object.assign(this.viewRender, { active, view, done: this.renderLimits[view], total: goal });
+      if (!active) break;
       await this.$nextTick();
       await new Promise((resolve) => setTimeout(resolve, 0));
-      if (token !== viewRenderSeq) return; // superseded — the newer run owns viewRender
-      if (this.currentView !== view) {
-        // User switched away mid-stream: pause; the next visit resumes.
+      if (token !== viewRenderSeq || this.currentView !== view) {
         this.viewRender.active = false;
         return;
       }
     }
+    this.viewRender.active = false;
   },
 
-  // Re-streams a view from a fresh first page. Used when its sort order or
-  // a filter chip changes: re-sorting swaps/reorders thousands of existing
-  // cards, which is as expensive as building them from scratch.
+  // Reveals a deep-link target: grows its list far enough that the card exists
+  // in the DOM (plus a small buffer) so scrollToNavTarget can find and scroll
+  // to it. No-ops when the target is already rendered or has no streamed list.
+  _streamToNavTarget(kind, id) {
+    const info = navKindListInfo[kind];
+    if (!info) return;
+    const list = this[info.list];
+    if (!list) return;
+    const idx = list.findIndex((item) => item[info.idField] === id);
+    if (idx < 0) return;
+    this._streamTo(info.view, idx + 1 + RENDER_CHUNK);
+  },
+
+  // Re-renders a view from its first page. Used when its sort order or a filter
+  // chip changes: the list content/order changes wholesale, so drop back to the
+  // first page and scroll to the top rather than keeping a deep slice of the
+  // old ordering mounted.
   restreamView(view) {
     if (!(view in this.renderLimits)) return;
-    this.renderLimits[view] = Math.min(this.renderLimits[view], RENDER_CHUNK);
-    this._ensureViewRendered(view);
+    const total = this[viewListProps[view]]?.length ?? 0;
+    this.renderLimits[view] = Math.min(INITIAL_RENDER, total);
+    this.$nextTick(() => {
+      document.getElementById('mainContent')?.scrollTo({ top: 0 });
+      this._ensureScrollLoader();
+    });
   },
 
-  // Resets the streaming cursors after fresh data is applied: cancels any
-  // in-flight chunked render, drops every view back to zero rendered cards,
-  // and kicks the one currently shown. Called from parseData.
+  // Resets the render cursors after fresh data is applied: drops every view
+  // back to zero and re-renders the first page of the one currently shown.
+  // Called from parseData.
   _resetStreaming() {
-    viewRenderSeq++; // cancel any in-flight chunked render of the old data
+    viewRenderSeq++; // cancel any in-flight deep-link stream of the old data
     this.viewRender.active = false;
     Object.keys(this.renderLimits).forEach((k) => {
       this.renderLimits[k] = 0;
@@ -213,10 +293,12 @@ export const navigationMixin = {
       }
     }, 1800);
   },
-  // Scrolls the list card for (kind, id) into view. The card may not exist
-  // yet while its view's list is still streaming in (_ensureViewRendered),
-  // so this retries until it appears or the stream settles without it.
+  // Scrolls the list card for (kind, id) into view. With load-on-scroll the
+  // card may be beyond the rendered slice, so first grow the list far enough to
+  // include it (a no-op when it's already rendered); the retry loop then waits
+  // out that stream (viewRender.active) before it appears.
   scrollToNavTarget(kind, id) {
+    this._streamToNavTarget(kind, id);
     const seq = ++this._scrollNavSeq;
     const attempt = (retriesLeft) => {
       if (seq !== this._scrollNavSeq) return; // superseded by a newer navigation
