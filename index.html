@@ -188,10 +188,13 @@
                   </svg>
                 </div>
                 <p
-                  class="text-xs text-slate-400 leading-snug [&_code]:font-mono [&_code]:text-slate-300 [&_code]:bg-slate-700/50 [&_code]:rounded [&_code]:px-1 [&_code]:py-0.5 [&_code]:text-[11px]"
+                  class="text-xs text-slate-400 leading-snug [&_code]:font-mono [&_code]:text-slate-300 [&_code]:bg-slate-700/50 [&_code]:rounded [&_code]:px-1 [&_code]:py-0.5 [&_code]:text-[11px] [&_a]:text-blue-400 [&_a]:underline [&_a:hover]:text-blue-300"
                   x-html="s.description"
                 ></p>
-                <p class="text-[10px] text-slate-500 mt-1.5" x-text="s.files.length + ' files'"></p>
+                <p class="text-[10px] text-slate-500 mt-1.5">
+                  <span x-text="s.files.length + ' files'"></span
+                  ><span x-show="s.sizeLabel" x-text="' · ' + s.sizeLabel"></span>
+                </p>
               </button>
             </template>
           </div>

@@ -44,15 +44,58 @@ function markPayloadRaw(payload) {
   return payload;
 }
 
+// Human-readable size for a byte count (e.g. 1536 → "1.5 KB"). Returns '' for
+// anything that isn't a positive, finite number so callers can skip the label.
+function formatBytes(bytes) {
+  if (!Number.isFinite(bytes) || bytes <= 0) return '';
+  const units = ['B', 'KB', 'MB', 'GB'];
+  let n = bytes;
+  let i = 0;
+  while (n >= 1024 && i < units.length - 1) {
+    n /= 1024;
+    i++;
+  }
+  const rounded = i === 0 ? n : n >= 100 ? Math.round(n) : Math.round(n * 10) / 10;
+  return `${rounded} ${units[i]}`;
+}
+
 export const loadingMixin = {
   // Bundled demo SBOMs — listed in samples/samples.json, loaded over fetch
   async loadSampleManifest() {
     try {
       const res = await fetch('samples/samples.json');
-      if (res.ok) this.samples = await res.json();
+      if (res.ok) {
+        this.samples = await res.json();
+        this._fetchSampleSizes(); // fill in each card's download size in the background
+      }
     } catch {
       /* demos just won't show if the manifest is missing */
     }
+  },
+
+  // HEAD each sample's file(s) to sum their download size, then surface a
+  // human-readable label on the card. Runs after the manifest loads; a failed
+  // request (or a server that omits Content-Length) just leaves the size unset.
+  async _fetchSampleSizes() {
+    await Promise.all(
+      this.samples.map(async (sample) => {
+        try {
+          const sizes = await Promise.all(
+            sample.files.map(async (fname) => {
+              const res = await fetch(`${sample.dir}/${fname}`, { method: 'HEAD' });
+              return res.ok ? Number(res.headers.get('Content-Length')) : NaN;
+            })
+          );
+          const total = sizes.reduce((sum, n) => sum + n, 0);
+          if (Number.isFinite(total) && total > 0) {
+            sample.size = total;
+            sample.sizeLabel = formatBytes(total);
+          }
+        } catch {
+          /* leave the size unset if a HEAD request fails */
+        }
+      })
+    );
   },
   async loadSample(sample) {
     this.loadingSample = sample.id;
