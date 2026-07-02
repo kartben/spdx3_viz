@@ -71,8 +71,8 @@
 
   <body class="bg-slate-900 text-slate-200 h-screen overflow-hidden" x-data="spdxApp()" x-cloak>
     <!-- FILE DROP ZONE (shown before data loaded) -->
-    <div x-show="!dataLoaded" class="flex items-center justify-center h-screen">
-      <div class="text-center max-w-lg mx-auto px-6">
+    <div x-show="!dataLoaded" class="flex h-screen overflow-y-auto no-scrollbar">
+      <div class="text-center max-w-lg mx-auto my-auto px-6 py-10">
         <div class="mb-8">
           <div
             class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center"

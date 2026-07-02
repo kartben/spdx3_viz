@@ -39,6 +39,16 @@
   border-radius: 3px;
 }
 
+/* Scrollable but with no visible scrollbar (used by the landing page, which
+   still needs to scroll when its content is taller than the viewport). */
+.no-scrollbar {
+  scrollbar-width: none; /* Firefox */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* WebKit */
+}
+
 /* ==========================================================================
    Animations
    Slide-in and fade-in effects for UI transitions
