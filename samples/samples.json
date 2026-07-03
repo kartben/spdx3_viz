@@ -37,12 +37,21 @@
   },
   {
     "id": "docker",
-    "name": "Docker image",
+    "name": "Syft (Ubuntu 24.04)",
     "icon": "favicon.svg",
     "description": "Ubuntu 24.04 container image scanned by Syft: Debian packages, files, and dependency graph.",
     "dir": "samples/docker",
     "files": ["ubuntu-24.04-linux-amd64.spdx3.jsonld"],
     "size": 5429000
+  },
+  {
+    "id": "trivy",
+    "name": "Trivy (Ubuntu 26.04)",
+    "icon": "favicon.png",
+    "description": "Ubuntu 26.04 image scanned by Trivy for vulnerabilities (<code>trivy image --format cyclonedx --scanners vuln</code>), converted from CycloneDX to SPDX 3.0.",
+    "dir": "samples/trivy",
+    "files": ["trivy-ubuntu-26-bom.spdx3.json"],
+    "size": 793302
   },
   {
     "id": "kubernetes",
