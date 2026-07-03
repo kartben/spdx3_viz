@@ -146,6 +146,7 @@ export const navigationMixin = {
     this.expandedBuild = null;
     this.expandedLicense = null;
     this.expandedVuln = null;
+    this.rawActiveFile = 0;
     this.sampleError = '';
     this.sidebarOpen = false;
   },

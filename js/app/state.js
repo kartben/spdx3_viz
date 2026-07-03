@@ -33,7 +33,8 @@ export function createState() {
       licenses: false,
       security: false,
       configs: false,
-      build: false
+      build: false,
+      raw: false
     },
     // How many items of each heavy view's filtered list the DOM may show.
     // Starts at one page and grows as the user scrolls (see loadMoreForView /
@@ -81,6 +82,8 @@ export function createState() {
     buildSort: 'output',
     pkgSort: 'name',
     fileTypeFilter: '',
+    rawActiveFile: 0, // index into loadedFiles of the file shown in the Raw JSON-LD view
+    rawPretty: true, // Raw view: true = pretty-printed, false = file as loaded
     toastMsg: '',
     licenseModalOpen: false,
     licenseModalExpression: '',

@@ -189,6 +189,8 @@ export const loadingMixin = {
       this.dataLoaded = false;
       return;
     }
+    // Keep the Raw view's selected file in range after a removal.
+    if (this.rawActiveFile >= this.loadedFiles.length) this.rawActiveFile = 0;
     this.rebuildFromLoadedFiles();
   },
 

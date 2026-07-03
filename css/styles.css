@@ -466,6 +466,64 @@
 }
 
 /* ==========================================================================
+   Raw JSON-LD View
+   Monospace code block + lightweight JSON syntax highlighting (see raw.js).
+   ========================================================================== */
+
+.jsonld-code {
+  margin: 0;
+  font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', ui-monospace, monospace;
+  font-size: 0.75rem;
+  line-height: 1.55;
+  color: #cbd5e1;
+  white-space: pre;
+  tab-size: 2;
+}
+
+.jsonld-key {
+  color: #7dd3fc; /* sky-300 */
+}
+
+.jsonld-string {
+  color: #86efac; /* green-300 */
+}
+
+.jsonld-num {
+  color: #fca5a5; /* red-300 */
+}
+
+.jsonld-bool {
+  color: #c4b5fd; /* violet-300 */
+}
+
+.jsonld-null {
+  color: #94a3b8; /* slate-400 */
+  font-style: italic;
+}
+
+/* String value that is the spdxId of a known element — a link to its view. */
+.jsonld-link {
+  color: #86efac; /* keep the string colour so it still reads as a value */
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: rgba(134, 239, 172, 0.5);
+  text-underline-offset: 3px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.jsonld-link:hover {
+  color: #bbf7d0;
+  text-decoration-style: solid;
+  background: rgba(52, 211, 153, 0.14);
+}
+
+.jsonld-link:focus-visible {
+  outline: 2px solid rgba(52, 211, 153, 0.6);
+  outline-offset: 1px;
+}
+
+/* ==========================================================================
    Detail Panel
    Right-side detail panel styling for element inspection
    ========================================================================== */

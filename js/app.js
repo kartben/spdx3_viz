@@ -7,6 +7,7 @@ import { searchMixin } from './app/search.js';
 import { securityMixin } from './app/security.js';
 import { licensesMixin } from './app/licenses.js';
 import { graphMixin } from './app/graph.js';
+import { rawMixin } from './app/raw.js';
 
 /* ==========================================================================
    spdxApp — the Alpine component (x-data="spdxApp()")
@@ -44,7 +45,8 @@ const mixins = [
   searchMixin,
   securityMixin,
   licensesMixin,
-  graphMixin
+  graphMixin,
+  rawMixin
 ];
 
 export function spdxApp() {
