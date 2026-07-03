@@ -1,0 +1,2285 @@
+{
+  "@context": "https://spdx.org/rdf/3.1/spdx-context.jsonld",
+  "@graph": [
+    {
+      "type": "simplelicensing_LicenseExpression",
+      "spdxId": "https://spdx.org/licenses/BSD-2-Clause-FreeBSD",
+      "simplelicensing_licenseExpression": "BSD-2-Clause-FreeBSD",
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "simplelicensing_LicenseExpression",
+      "spdxId": "https://spdx.org/licenses/BSD-3-Clause",
+      "simplelicensing_licenseExpression": "BSD-3-Clause",
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "simplelicensing_LicenseExpression",
+      "spdxId": "https://spdx.org/licenses/CC0-1.0",
+      "simplelicensing_licenseExpression": "CC0-1.0",
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "SoftwareAgent",
+      "spdxId": "zephyr:agents/west-spdx-agent",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "West SPDX Generator"
+    },
+    {
+      "type": "CreationInfo",
+      "@id": "zephyr:creationinfo",
+      "created": "2026-07-03T22:00:43Z",
+      "createdBy": [
+        "zephyr:agents/west-spdx-agent"
+      ],
+      "createdUsing": [
+        "zephyr:tools/west-spdx"
+      ],
+      "specVersion": "3.1.0"
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File--default-types.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 8756,
+      "software_copyrightText": "<text>\n *  Copyright (c) 2007 Patrick Mansfield <patmans@us.ibm.com>\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/machine/_default_types.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "46e66f006bc503df85579302909c621093c14cac"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "27f8a718fc89397117254832c4ac2ab2dabd8e0dc7847b76460b0c0cdb2fa04f"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File--endian.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 718,
+      "software_copyrightText": "<text>\n/* Copyright (c) 2016 Sebastian Huber <sebastian.huber@embedded-brains.de> \n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/machine/_endian.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "abfd95127a9fdb664055a020560b8442a359a26e"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "af37cb904d1f4035c327830f2852f10447f343b45146a449001f8ec02f4ba110"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File--intsup.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 5805,
+      "software_copyrightText": "<text>\n * Copyright (c) 2004, 2005 by\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/sys/_intsup.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "63614245a8c7321a734b7701c1f6c9b66f1e1f88"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "acca8771a05e2effaaf7019cd1c1fefe2426f8255f0b5a1eec59f05c7c9321a4"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File--locale.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 232,
+      "software_copyrightText": "<text>\n/* Copyright (c) 2016 Corinna Vinschen <corinna@vinschen.de> \n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/sys/_locale.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "03df72d3a04da374eed3f26e863f5ae359a1cae8"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "9c33916e9c0deb89f68a9babf700502cf2cf6c6fb4b7d7b0fadd93c7fc6c8a29"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File--select.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 3216,
+      "software_copyrightText": "<text>\nCopyright (c) 1982, 1986, 1993\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/sys/_select.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "bc29099cae4954153d84de5b26fab2ebd1dd9ce6"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "b2c6b20abaa8ba9734a85fb9fa1435d1e5cc40c900a280567d9060cda9b2e6e3"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File--stdint.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 1781,
+      "software_copyrightText": "<text>\n * Copyright (c) 2004, 2005 by\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/sys/_stdint.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "8997b2f3d36fb5e719f062d5cb0628d8f75256e6"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "06480c0354947c53153841fcfc7f93f79d5459d9d8072eec7ae663ea9def60af"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File--time.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 169,
+      "software_copyrightText": "<text>\n/* Copyright (c) 2016 Sebastian Huber <sebastian.huber@embedded-brains.de> \n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/machine/_time.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "319a572916655febce62dfe64ecc2bd22bf3d991"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "2b4b0a4b5f1acdeb060d79878436d9bf30808b047ee0a1ec78a75f943431fad7"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File--timespec.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 2087,
+      "software_copyrightText": "<text>\n * Copyright (c) 1982, 1986, 1993\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/sys/_timespec.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "efdf8a6de694d476d78fb805c83e256acdc79101"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "8286b93e24409cada66cd9ad21d6cb8b993cff00a47c668c65439ec9914a6168"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File--timeval.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 1953,
+      "software_copyrightText": "<text>\n * Copyright (c) 2002 Mike Barcroft <mike@FreeBSD.org>\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/sys/_timeval.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "f59c62289aa9f766fd4f697f454379b3b385713a"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "0d4ddbcb87df55f97d53f5b949bcd9629f32da15a20b4416dab437f9c4b20d06"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File--types.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 170,
+      "software_copyrightText": "<text>\n *  Copyright (c) 2005 Ralf Corsepious  <ralf.corsepius@rtems.org>\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/machine/_types.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "36581deeedab3b2161f43e6cadf1844014e4b764"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "31f3742d445b0e7607c8ca270d4c84c1a4897c39ad2a3b04adc00a8364fbad8d"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File--types.h-2",
+      "software_fileKind": "file",
+      "software_artifactSize": 7005,
+      "software_copyrightText": "<text>\nCopyright (c) 1982, 1986, 1993\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/sys/_types.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "dc00728bb7974bb94181fb3da3ab3e1d4725a3dc"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "947d8a55d20d7f0eb56091cb94b2e9caba55305b6a03cd2eb26faf35c1be6ff1"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File--wait.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 2222,
+      "software_copyrightText": "<text>\nCopyright (c) 1982, 1986, 1993\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/sys/_wait.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "aeedfc1c85fe2146c9a95b8a8720b05ba254c4e8"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "34ea7550f9f53458dcfda21a87ed97a88735ab3b06a1a442b12322b6519bf8f4"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-assert.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 3025,
+      "software_copyrightText": "<text>\nCopyright (c) 1991, 1993\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/assert.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "3db4fc61b2243a6987b254199af66aa8d8d5847f"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "b77dea645f2c12a0ab75d9bbd32182ef3873f4559e2e29e9c1ca638206633e97"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-cdefs.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 19742,
+      "software_copyrightText": "<text>\n * Copyright (c) 1991, 1993\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/sys/cdefs.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "d5347e7219d2dd9cfe1232391b59c0c68c2a8805"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "c9bf4fd409ed28a7b0f61a00193b62164c1a11dddbbfad1370ca2c60bb57d27d"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-config.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 8125,
+      "software_copyrightText": "<text>\n  Copyright (c) 1982, 1986, 1993\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/sys/config.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "6048fb672ee73a2c70ef05cc77f20a468d24c61d"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "bd471750ae043a6e7417cd4b41a6e48a33dc699e3376501f574fb24cabe0ff00"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-ctype.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 10514,
+      "software_copyrightText": "<text>\nCopyright (c) 1991, 1993\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/ctype.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "207f6a829a21e4bac571234d746d3a728aa64026"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "e5d8dcc5c97f65f5c203fc8d60b3c2717294d206f236d767dd9a3b9ae07d6704"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-endian.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 2318,
+      "software_copyrightText": "<text>\n/* Copyright (c) 2004 Jeff Johnston  <jjohnstn@redhat.com> \n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/machine/endian.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "a44f1ea6a43f75a0788a9d6a7746cd9105a304a4"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "a0a584152b2305f32f77ffb8c2ec278f4222d065d41473e799f0e3eaa3a436e6"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-errno.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 2056,
+      "software_copyrightText": "<text>\nCopyright (c) 1991, 1993\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/errno.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "b1458eb3aa640944fdef9bab8f865fd0bfa284e6"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "27a509fbaa29fd6c381fe94017e8bd161f1950c600e4280fc52cb73e9d1c695b"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-errno.h-2",
+      "software_fileKind": "file",
+      "software_artifactSize": 8757,
+      "software_copyrightText": "<text>\nCopyright (c) 1982, 1986, 1993\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/sys/errno.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "6c50b559a1b146fe1dbb66e1fbebbf7232cf4d6e"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "cf3b9af03e3d2da9e0abacae831324d4883cd0d9630d15ce0a6249da3e094292"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-features.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 13858,
+      "software_copyrightText": "NOASSERTION",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/sys/features.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "7dc8da2e747ad378d364c802d7538f8aa1ed5b60"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "e436459c71f66e9ecb23f6670fa00ed7c693266ba94becc2b8d092a55aa886b9"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-ieeefp.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 14961,
+      "software_copyrightText": "<text>\nCopyright (C) 1991 DJ Delorie\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/machine/ieeefp.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "40b735ea077f0cf78f13a292fffa31ea18c47427"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "7ee7a565c4158658ebd7da2f63e6b5d3147ed94ca68860d62563d421d0ea4cc9"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-inttypes.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 9318,
+      "software_copyrightText": "<text>\n * Copyright (c) 2004, 2005 by\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/inttypes.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "8243a6107321d57a2872f4f58da2fac19911a590"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "74e0f12b13faa0950367815b1d8640ec4482e2b8ecee367660d76ae79136ef21"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-limits.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 6507,
+      "software_copyrightText": "<text>\n/* Copyright (C) 1991-2024 Free Software Foundation, Inc.\n/* Copyright (C) 1992-2024 Free Software Foundation, Inc.\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/lib/gcc/xtensa-espressif_esp32s3_zephyr-elf/14.3.0/include/limits.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "764da9e338c454d97d858f7fe71eb3f74d0beb34"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "bc572350077d8caa24f82d5439119aa2dc184e72cc4ea325b4cd0137db51580f"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-limits.h-2",
+      "software_fileKind": "file",
+      "software_artifactSize": 3918,
+      "software_copyrightText": "<text>\n/* Copyright (c) 2002 Jeff Johnston  <jjohnstn@redhat.com> \n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/limits.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "d757171c4f1cc7bbf5140ca4140600fa34849222"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "300fdce5c01169b6ce3ba182f74a9c068036a4e5fd29dae2eb481209c60116ba"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-lock.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 2052,
+      "software_copyrightText": "<text>\n/* Copyright (c) 2002 Jeff Johnston  <jjohnstn@redhat.com> \n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/sys/lock.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "90eec2ca5d17d0e145d71e6a2c26aa5d4713b053"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "2f7ff3de05941dd0c910a16d8a565efaa30b3c44b783c9c942066e436c022815"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-math.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 1678,
+      "software_copyrightText": "<text>\n * Copyright \u00a9 2020 Keith Packard\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/machine/math.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "8752827162b4b86ca640196f468503c02f4c1707"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "383af15c81f85a3794f0b2894fc9006fe412b907db7e822b1f57d8d470614d34"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-math.h-2",
+      "software_fileKind": "file",
+      "software_artifactSize": 25843,
+      "software_copyrightText": "<text>\nCopyright (c) 1991, 1993\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/math.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "8e96c7ea7fa1c36e2630c79b4f2f85191af18ff4"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "0312a76cc224a08255c247d16db274072281ba0b73745aa8d499b8e1332fd8eb"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-param.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 112,
+      "software_copyrightText": "<text>\n/* Copyright (c) 2004 Jeff Johnston  <jjohnstn@redhat.com> \n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/machine/param.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "fc62c9e54c0bc67f11f0045ea2bc8c5cbfc323a8"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "ae1067859fb628e4b0fd437d950ed255f945e529d3cccfb5d34bfd6ee456fbcd"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-param.h-2",
+      "software_fileKind": "file",
+      "software_artifactSize": 2211,
+      "software_copyrightText": "<text>\nCopyright (c) 1982, 1986, 1993\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/sys/param.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "b7482f32cf66b06f3d7b13af0856caaac33d8193"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "fae1727dfac3916b7643f61b60637fec645b5776772e29abbfcc5a3893b920fa"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-picolibc.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 3616,
+      "software_copyrightText": "NOASSERTION",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/picolibc.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "c8a12d9897051f81cf9a3514a2ab3387f7192199"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "9a33d8e0bf0c8f7f3dfe3274a8c58c460912d56afcbd344cfa3c95b0bed36c73"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-queue.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 30288,
+      "software_copyrightText": "<text>\n * Copyright (c) 1991, 1993\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/sys/queue.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "4909124586e1b03a7bf10b105ffd0d2e0dbc3d9e"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "c622d82410a368e1c437d38473b71fd796b538f9bc322f0a1ef45deb016d6e8b"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-stdarg.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 4303,
+      "software_copyrightText": "<text>\n/* Copyright (C) 1989-2024 Free Software Foundation, Inc.\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/lib/gcc/xtensa-espressif_esp32s3_zephyr-elf/14.3.0/include/stdarg.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "57e40b8fdf3ea4250526739e7810b42211bfcd74"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "7ead4a2428691baf94bec3fd2db8984dbb1c5f597edf0f9bc3068fb43dad22f7"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-stdbool.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 1490,
+      "software_copyrightText": "<text>\n/* Copyright (C) 1998-2024 Free Software Foundation, Inc.\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/lib/gcc/xtensa-espressif_esp32s3_zephyr-elf/14.3.0/include/stdbool.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "74302f8f299be2729b0f33977f015b37af87da39"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "7b9c438a5b2f082a560a72da8d752da51062cc6f84d1c4acec45ff0a68e8d037"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-stddef.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 14135,
+      "software_copyrightText": "<text>\n/* Copyright (C) 1989-2024 Free Software Foundation, Inc.\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/lib/gcc/xtensa-espressif_esp32s3_zephyr-elf/14.3.0/include/stddef.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "8e8217dac069f943412dc74d9743512133be730f"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "bac7ab773a3e3d9568d5cbe61632cfb96292ef5039df54a7ffaf15ba54af0ba0"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-stdint.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 12540,
+      "software_copyrightText": "<text>\n * Copyright (c) 2004, 2005 by\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/stdint.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "0f34159fac578cf811c812bafee6f2a03fef4e1a"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "3363e43f95fb6f9340f1cb90e58eec71bbea8146252d6482e0a88d2a2dd9dba6"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-stdio.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 18290,
+      "software_copyrightText": "<text>\n/* Copyright (c) 2002, 2005, 2007 Joerg Wunsch\n   Portions of documentation Copyright (c) 1990, 1991, 1993\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/stdio.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "093564a65910dafef08dd79e395e6224bd3167ab"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "1cbcd940ab58a8a51b78de13badbf54e9db882f31d81c5fd1fca5af69a6599f2"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-stdlib.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 200,
+      "software_copyrightText": "<text>\n/* Copyright (c) 2002 Jeff Johnston  <jjohnstn@redhat.com> \n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/machine/stdlib.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "1a49a539b91f97650c6ead1f66ed5af91daf9467"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "ca6afd3778d215889f9bf4e18e4ed5670f9481cd47e6025d44ab78c8b660f098"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-stdlib.h-2",
+      "software_fileKind": "file",
+      "software_artifactSize": 14024,
+      "software_copyrightText": "<text>\nCopyright (c) 1991, 1993\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/stdlib.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "6bc76af454abd75fcb01d0f494fdfa79f42dda34"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "e86d335cbf4495010f926a082297b5aebd745983a7487cb2d1abd99ce1f80b17"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-string.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 8340,
+      "software_copyrightText": "<text>\nCopyright (c) 1991, 1993\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/string.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "bc965311df87e755349b6412f5415bef2bbf0170"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "2e198a6dda9c77f15b7f8143185c1f2f8e39a84fe2779653397a6cb75196f0b2"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-string.h-2",
+      "software_fileKind": "file",
+      "software_artifactSize": 178,
+      "software_copyrightText": "<text>\n/* Copyright (c) 2005 Jeff Johnston  <jjohnstn@redhat.com> \n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/sys/string.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "6cd7d480f789e6c3378b09b3e6528274c6332770"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "c1891d16631f057d16b09dc3927bd3eb675fb7ca39fce4d4612db056685757d2"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-strings.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 2971,
+      "software_copyrightText": "<text>\n * Copyright (c) 2002 Mike Barcroft <mike@FreeBSD.org>\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/strings.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "881d050d230e8630ab140bab325e3e048b4deb7e"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "36b5cab31f6ed0b6951458c6b3eb32f4d907362b4346c79289eef19d38b9d022"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-syslimits.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 330,
+      "software_copyrightText": "NOASSERTION",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/lib/gcc/xtensa-espressif_esp32s3_zephyr-elf/14.3.0/include/syslimits.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "238c8a1b9ec309de5bac212baf0a655a56da3a28"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "22dd0ab81baadd5a8d455b445855f341d419c7b0267beca235de00b7ec78e529"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-syslimits.h-2",
+      "software_fileKind": "file",
+      "software_artifactSize": 4679,
+      "software_copyrightText": "<text>\n * Copyright (c) 1988, 1993\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/sys/syslimits.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "e30e766cf856693c1be6c5d6b4db3f8b095005de"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "6fb8da6f30f9c6fca1da684518734608cde2b44791f68bdf5dca54ad8d760c06"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-time.h",
+      "software_fileKind": "file",
+      "software_artifactSize": 7881,
+      "software_copyrightText": "<text>\nCopyright (c) 1991, 1993\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/time.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "0b6fb8a6efc5e9b3515ac901979ffcb8b467c25e"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "c26d4f2c388c5f0a4c7419428b830d8829aba4615c9c3d3c273f46ca2631df76"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-time.h-3",
+      "software_fileKind": "file",
+      "software_artifactSize": 11567,
+      "software_copyrightText": "<text>\n * Copyright (c) 1982, 1986, 1993\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/sys/time.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "402af8e38f54c806b80c2bcfb3e08ce23668f91f"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "fac11d60299feec432f7bf01941b44779ce1f684079be0d879f8b46e43ec9675"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-types.h-2",
+      "software_fileKind": "file",
+      "software_artifactSize": 746,
+      "software_copyrightText": "<text>\nCopyright (C) 1991 DJ Delorie\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/machine/types.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "5a1db4a24c07500396f647ee98499b2959b0adde"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "2e3cfd448092c5a86bd3f96bcdb8023c3e9c089e8128daae0adb83c87188aa20"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-types.h-3",
+      "software_fileKind": "file",
+      "software_artifactSize": 6780,
+      "software_copyrightText": "<text>\nCopyright (c) 1982, 1986, 1993\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/sys/types.h",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "d46edf6232d7c9cdde4c6f595b83e1c411f172e3"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "2d7bb9a17ee3bd56c5fdf8986974b1c7b0a7f923a7ba4c3726bad17bf1db09c5"
+        }
+      ]
+    },
+    {
+      "type": "simplelicensing_LicenseExpression",
+      "spdxId": "zephyr:licenses/BSD-2-Clause-FreeBSD-AND-BSD-3-Clause",
+      "simplelicensing_licenseExpression": "BSD-2-Clause-FreeBSD AND BSD-3-Clause",
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "software_Package",
+      "spdxId": "zephyr:packages/sdk-sources",
+      "software_downloadLocation": "NOASSERTION",
+      "software_copyrightText": "NOASSERTION",
+      "software_primaryPurpose": "source",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "sdk-sources"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2288",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-limits.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2289",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-stdarg.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2290",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-stdbool.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2291",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-stddef.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2292",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-syslimits.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2293",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-assert.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2294",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-errno.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2295",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-inttypes.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2296",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-limits.h-2"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2297",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File--default-types.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2298",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File--types.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2299",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-ieeefp.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2300",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-stdlib.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2301",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-picolibc.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2302",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-stdint.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2303",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-stdio.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2304",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-stdlib.h-2"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2305",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-string.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2306",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File--intsup.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2307",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File--stdint.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2308",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File--types.h-2"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2309",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File--wait.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2310",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-cdefs.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2311",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-config.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2312",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-errno.h-2"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2313",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-features.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2314",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-lock.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2315",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-string.h-2"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2316",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-syslimits.h-2"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2317",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-ctype.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2318",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-types.h-2"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2319",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-types.h-3"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2320",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File--timespec.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2321",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-time.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2322",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File--time.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2323",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File--select.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2324",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File--timeval.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2325",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-time.h-3"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2326",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File--locale.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2327",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File--endian.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2328",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-endian.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2329",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-math.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2330",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-param.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2331",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-math.h-2"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2332",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-strings.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2333",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-param.h-2"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2334",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-queue.h"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2683",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "zephyr:licenses/BSD-2-Clause-FreeBSD-AND-BSD-3-Clause"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2684",
+      "from": "zephyr:packages/sdk-sources",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/3042",
+      "from": "zephyr:files/File-limits.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/3043",
+      "from": "zephyr:files/File-stdarg.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/3044",
+      "from": "zephyr:files/File-stdbool.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/3045",
+      "from": "zephyr:files/File-stddef.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/3046",
+      "from": "zephyr:files/File-syslimits.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/3047",
+      "from": "zephyr:files/File-assert.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/3048",
+      "from": "zephyr:files/File-errno.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/3049",
+      "from": "zephyr:files/File-inttypes.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/3050",
+      "from": "zephyr:files/File-limits.h-2",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/3051",
+      "from": "zephyr:files/File--default-types.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/3052",
+      "from": "zephyr:files/File--types.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/3053",
+      "from": "zephyr:files/File-ieeefp.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/3054",
+      "from": "zephyr:files/File-stdlib.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/3055",
+      "from": "zephyr:files/File-picolibc.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/3056",
+      "from": "zephyr:files/File-stdint.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/3057",
+      "from": "zephyr:files/File-stdio.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/3058",
+      "from": "zephyr:files/File-stdlib.h-2",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/3059",
+      "from": "zephyr:files/File-string.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/3060",
+      "from": "zephyr:files/File--intsup.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/3061",
+      "from": "zephyr:files/File--stdint.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/3062",
+      "from": "zephyr:files/File--types.h-2",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/3063",
+      "from": "zephyr:files/File--wait.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/3064",
+      "from": "zephyr:files/File-cdefs.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://spdx.org/licenses/BSD-3-Clause"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/3065",
+      "from": "zephyr:files/File-cdefs.h",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://spdx.org/licenses/BSD-3-Clause"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/3066",
+      "from": "zephyr:files/File-config.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/3067",
+      "from": "zephyr:files/File-errno.h-2",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/3068",
+      "from": "zephyr:files/File-features.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/3069",
+      "from": "zephyr:files/File-lock.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/3070",
+      "from": "zephyr:files/File-string.h-2",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/3071",
+      "from": "zephyr:files/File-syslimits.h-2",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/4015",
+      "from": "zephyr:files/File-ctype.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/4366",
+      "from": "zephyr:files/File-types.h-2",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/4367",
+      "from": "zephyr:files/File-types.h-3",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/4422",
+      "from": "zephyr:files/File--timespec.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://spdx.org/licenses/BSD-3-Clause"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/4423",
+      "from": "zephyr:files/File--timespec.h",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://spdx.org/licenses/BSD-3-Clause"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/4424",
+      "from": "zephyr:files/File-time.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/4445",
+      "from": "zephyr:files/File--time.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/4446",
+      "from": "zephyr:files/File--select.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/4447",
+      "from": "zephyr:files/File--timeval.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://spdx.org/licenses/BSD-2-Clause-FreeBSD"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/4448",
+      "from": "zephyr:files/File--timeval.h",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://spdx.org/licenses/BSD-2-Clause-FreeBSD"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/4449",
+      "from": "zephyr:files/File-time.h-3",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://spdx.org/licenses/BSD-3-Clause"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/4450",
+      "from": "zephyr:files/File-time.h-3",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://spdx.org/licenses/BSD-3-Clause"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/4871",
+      "from": "zephyr:files/File--locale.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/5311",
+      "from": "zephyr:files/File--endian.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/5312",
+      "from": "zephyr:files/File-endian.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/5313",
+      "from": "zephyr:files/File-math.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://spdx.org/licenses/BSD-3-Clause"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/5314",
+      "from": "zephyr:files/File-math.h",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://spdx.org/licenses/BSD-3-Clause"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/5315",
+      "from": "zephyr:files/File-param.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/5316",
+      "from": "zephyr:files/File-math.h-2",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/5317",
+      "from": "zephyr:files/File-strings.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/5318",
+      "from": "zephyr:files/File-param.h-2",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/5319",
+      "from": "zephyr:files/File-queue.h",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "SpdxDocument",
+      "spdxId": "zephyr:sdk/documents/sdk",
+      "dataLicense": "https://spdx.org/licenses/CC0-1.0",
+      "namespaceMap": [
+        {
+          "type": "NamespaceMap",
+          "namespace": "http://spdx.org/spdxdocs/zephyr-eda53cc4-e302-4d78-ac16-f551bcb0be52/",
+          "prefix": "zephyr"
+        }
+      ],
+      "element": [
+        "zephyr:agents/west-spdx-agent",
+        "zephyr:tools/west-spdx",
+        "zephyr:packages/sdk-sources",
+        "zephyr:files/File-limits.h",
+        "zephyr:files/File-stdarg.h",
+        "zephyr:files/File-stdbool.h",
+        "zephyr:files/File-stddef.h",
+        "zephyr:files/File-syslimits.h",
+        "zephyr:files/File-assert.h",
+        "zephyr:files/File-errno.h",
+        "zephyr:files/File-inttypes.h",
+        "zephyr:files/File-limits.h-2",
+        "zephyr:files/File--default-types.h",
+        "zephyr:files/File--types.h",
+        "zephyr:files/File-ieeefp.h",
+        "zephyr:files/File-stdlib.h",
+        "zephyr:files/File-picolibc.h",
+        "zephyr:files/File-stdint.h",
+        "zephyr:files/File-stdio.h",
+        "zephyr:files/File-stdlib.h-2",
+        "zephyr:files/File-string.h",
+        "zephyr:files/File--intsup.h",
+        "zephyr:files/File--stdint.h",
+        "zephyr:files/File--types.h-2",
+        "zephyr:files/File--wait.h",
+        "zephyr:files/File-cdefs.h",
+        "zephyr:files/File-config.h",
+        "zephyr:files/File-errno.h-2",
+        "zephyr:files/File-features.h",
+        "zephyr:files/File-lock.h",
+        "zephyr:files/File-string.h-2",
+        "zephyr:files/File-syslimits.h-2",
+        "zephyr:files/File-ctype.h",
+        "zephyr:files/File-types.h-2",
+        "zephyr:files/File-types.h-3",
+        "zephyr:files/File--timespec.h",
+        "zephyr:files/File-time.h",
+        "zephyr:files/File--time.h",
+        "zephyr:files/File--select.h",
+        "zephyr:files/File--timeval.h",
+        "zephyr:files/File-time.h-3",
+        "zephyr:files/File--locale.h",
+        "zephyr:files/File--endian.h",
+        "zephyr:files/File-endian.h",
+        "zephyr:files/File-math.h",
+        "zephyr:files/File-param.h",
+        "zephyr:files/File-math.h-2",
+        "zephyr:files/File-strings.h",
+        "zephyr:files/File-param.h-2",
+        "zephyr:files/File-queue.h",
+        "zephyr:relationships/2288",
+        "zephyr:relationships/2289",
+        "zephyr:relationships/2290",
+        "zephyr:relationships/2291",
+        "zephyr:relationships/2292",
+        "zephyr:relationships/2293",
+        "zephyr:relationships/2294",
+        "zephyr:relationships/2295",
+        "zephyr:relationships/2296",
+        "zephyr:relationships/2297",
+        "zephyr:relationships/2298",
+        "zephyr:relationships/2299",
+        "zephyr:relationships/2300",
+        "zephyr:relationships/2301",
+        "zephyr:relationships/2302",
+        "zephyr:relationships/2303",
+        "zephyr:relationships/2304",
+        "zephyr:relationships/2305",
+        "zephyr:relationships/2306",
+        "zephyr:relationships/2307",
+        "zephyr:relationships/2308",
+        "zephyr:relationships/2309",
+        "zephyr:relationships/2310",
+        "zephyr:relationships/2311",
+        "zephyr:relationships/2312",
+        "zephyr:relationships/2313",
+        "zephyr:relationships/2314",
+        "zephyr:relationships/2315",
+        "zephyr:relationships/2316",
+        "zephyr:relationships/2317",
+        "zephyr:relationships/2318",
+        "zephyr:relationships/2319",
+        "zephyr:relationships/2320",
+        "zephyr:relationships/2321",
+        "zephyr:relationships/2322",
+        "zephyr:relationships/2323",
+        "zephyr:relationships/2324",
+        "zephyr:relationships/2325",
+        "zephyr:relationships/2326",
+        "zephyr:relationships/2327",
+        "zephyr:relationships/2328",
+        "zephyr:relationships/2329",
+        "zephyr:relationships/2330",
+        "zephyr:relationships/2331",
+        "zephyr:relationships/2332",
+        "zephyr:relationships/2333",
+        "zephyr:relationships/2334",
+        "zephyr:licenses/BSD-2-Clause-FreeBSD-AND-BSD-3-Clause",
+        "zephyr:relationships/2683",
+        "zephyr:relationships/2684",
+        "zephyr:relationships/3042",
+        "zephyr:relationships/3043",
+        "zephyr:relationships/3044",
+        "zephyr:relationships/3045",
+        "zephyr:relationships/3046",
+        "zephyr:relationships/3047",
+        "zephyr:relationships/3048",
+        "zephyr:relationships/3049",
+        "zephyr:relationships/3050",
+        "zephyr:relationships/3051",
+        "zephyr:relationships/3052",
+        "zephyr:relationships/3053",
+        "zephyr:relationships/3054",
+        "zephyr:relationships/3055",
+        "zephyr:relationships/3056",
+        "zephyr:relationships/3057",
+        "zephyr:relationships/3058",
+        "zephyr:relationships/3059",
+        "zephyr:relationships/3060",
+        "zephyr:relationships/3061",
+        "zephyr:relationships/3062",
+        "zephyr:relationships/3063",
+        "https://spdx.org/licenses/BSD-3-Clause",
+        "zephyr:relationships/3064",
+        "zephyr:relationships/3065",
+        "zephyr:relationships/3066",
+        "zephyr:relationships/3067",
+        "zephyr:relationships/3068",
+        "zephyr:relationships/3069",
+        "zephyr:relationships/3070",
+        "zephyr:relationships/3071",
+        "zephyr:relationships/4015",
+        "zephyr:relationships/4366",
+        "zephyr:relationships/4367",
+        "zephyr:relationships/4422",
+        "zephyr:relationships/4423",
+        "zephyr:relationships/4424",
+        "zephyr:relationships/4445",
+        "zephyr:relationships/4446",
+        "https://spdx.org/licenses/BSD-2-Clause-FreeBSD",
+        "zephyr:relationships/4447",
+        "zephyr:relationships/4448",
+        "zephyr:relationships/4449",
+        "zephyr:relationships/4450",
+        "zephyr:relationships/4871",
+        "zephyr:relationships/5311",
+        "zephyr:relationships/5312",
+        "zephyr:relationships/5313",
+        "zephyr:relationships/5314",
+        "zephyr:relationships/5315",
+        "zephyr:relationships/5316",
+        "zephyr:relationships/5317",
+        "zephyr:relationships/5318",
+        "zephyr:relationships/5319",
+        "https://spdx.org/licenses/CC0-1.0"
+      ],
+      "profileConformance": [
+        "core",
+        "software",
+        "simpleLicensing"
+      ],
+      "rootElement": [
+        "zephyr:packages/sdk-sources"
+      ],
+      "creationInfo": "zephyr:creationinfo",
+      "name": "Zephyr SDK"
+    },
+    {
+      "type": "Tool",
+      "spdxId": "zephyr:tools/west-spdx",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "West SPDX Tool"
+    }
+  ]
+}
