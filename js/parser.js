@@ -74,6 +74,21 @@ function makeThrottledReporter(onProgress, total) {
  * @property {string} dataLicenseLabel - Data license label
  * @property {Array<string>} profileConformance - Profile conformance list
  * @property {Array<string>} generatedArtifacts - Generated artifact IDs
+ * @property {Map<string, ExternalMapEntry>} externalMap - Imported elements (SpdxDocument.import), keyed by externalSpdxId
+ * @property {{total: number, resolved: number, unresolved: number}} externalRefStats - Import resolution summary
+ */
+
+/**
+ * A single SPDX 3.0 ExternalMap entry (an element used by an SpdxDocument but
+ * defined outside of it), merged across every document that imports the same id.
+ * See https://spdx.github.io/spdx-spec/v3.0.1/model/Core/Classes/ExternalMap/
+ *
+ * @typedef {Object} ExternalMapEntry
+ * @property {string} externalSpdxId - Id of the element defined outside the document
+ * @property {string} locationHint - Where the external element can be retrieved (URL or relative path)
+ * @property {string} definingArtifact - Artifact spdxId where the element is defined, when given
+ * @property {Array<Object>} verifiedUsing - IntegrityMethod (e.g. Hash) entries asserting the external element's integrity
+ * @property {Array<string>} importedBy - Display labels of the documents that import this id
  */
 
 /**
@@ -150,6 +165,14 @@ export function parseGraph(graph, onProgress) {
 
   /** @type {Array<string>} */
   const generatedArtifacts = [];
+
+  // SPDX 3.0 ExternalMap: elements an SpdxDocument references but defines
+  // elsewhere (its `import` array). Keyed by externalSpdxId and merged across
+  // documents, so loading a single file (e.g. Zephyr's build.jsonld) still
+  // resolves where its dangling references live, and loading the whole set
+  // records the cross-document provenance of each shared element.
+  /** @type {Map<string, ExternalMapEntry>} */
+  const externalMap = new Map();
 
   /** @type {Object|null} */
   let buildInfo = null;
@@ -266,6 +289,37 @@ export function parseGraph(graph, onProgress) {
         if (!docName) docName = item.name || '';
         if (!docNamespace) docNamespace = item.namespaceMap?.[0]?.namespace || '';
 
+        // Record the document's imported (external) elements. The first entry
+        // seen for an id keeps its location hint / defining artifact / integrity
+        // hashes; later documents importing the same id just add themselves to
+        // `importedBy`.
+        const docLabel = item.name || item.spdxId || '';
+        (item.import || []).forEach((em) => {
+          const id = em?.externalSpdxId;
+          if (!id) return;
+          const existing = externalMap.get(id);
+          if (existing) {
+            if (docLabel && !existing.importedBy.includes(docLabel)) {
+              existing.importedBy.push(docLabel);
+            }
+            if (!existing.locationHint && em.locationHint) existing.locationHint = em.locationHint;
+            if (!existing.definingArtifact && em.definingArtifact) {
+              existing.definingArtifact = em.definingArtifact;
+            }
+            if (!existing.verifiedUsing.length && Array.isArray(em.verifiedUsing)) {
+              existing.verifiedUsing = em.verifiedUsing;
+            }
+          } else {
+            externalMap.set(id, {
+              externalSpdxId: id,
+              locationHint: em.locationHint || '',
+              definingArtifact: em.definingArtifact || '',
+              verifiedUsing: Array.isArray(em.verifiedUsing) ? em.verifiedUsing : [],
+              importedBy: docLabel ? [docLabel] : []
+            });
+          }
+        });
+
         const profiles = item.profileConformance || [];
         profiles.forEach((profile) => {
           if (!profileConformance.includes(profile)) {
@@ -371,6 +425,20 @@ export function parseGraph(graph, onProgress) {
     }
   });
 
+  // Summarize how many imported (ExternalMap) elements are actually present in
+  // the loaded graph vs. still external. When the whole document set is loaded
+  // most resolve; loading a single file leaves them unresolved but now carrying
+  // a location hint to where they're defined.
+  let externalResolved = 0;
+  externalMap.forEach((_, id) => {
+    if (elementMap.has(id)) externalResolved++;
+  });
+  const externalRefStats = {
+    total: externalMap.size,
+    resolved: externalResolved,
+    unresolved: externalMap.size - externalResolved
+  };
+
   // Collect all licenses used across the SBOM, derived from license
   // relationships so we capture URL-only and NoAssertion targets too.
   const licenses = collectLicenses(relationships, elementMap);
@@ -420,7 +488,9 @@ export function parseGraph(graph, onProgress) {
     createdDate,
     dataLicenseLabel,
     profileConformance,
-    generatedArtifacts
+    generatedArtifacts,
+    externalMap,
+    externalRefStats
   };
 }
 

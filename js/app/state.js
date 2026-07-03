@@ -115,6 +115,8 @@ export function createState() {
     createdDate: '',
     dataLicenseLabel: '',
     profileConformance: [],
+    externalMap: new Map(), // externalSpdxId -> ExternalMapEntry (SpdxDocument.import)
+    externalRefStats: { total: 0, resolved: 0, unresolved: 0 }, // import resolution summary
 
     // Relationship indexes
     relFromIndex: new Map(),

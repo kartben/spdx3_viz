@@ -757,3 +757,89 @@ test('detailRelGroupsFor surfaces lifecycle-scoped relationships with their scop
   assert.equal(dyn.items[0].id, 'pkg:lib');
   assert.equal(dyn.items[0].scope, 'runtime');
 });
+
+test('parseGraph collects SpdxDocument.import ExternalMap entries and resolution stats', () => {
+  const graph = [
+    // ext:file1 is defined here (so it resolves); ext:file2 is not.
+    { type: 'software_File', spdxId: 'ext:file1', name: 'shared.c' },
+    {
+      type: 'SpdxDocument',
+      spdxId: 'doc:build',
+      name: 'Build Document',
+      import: [
+        {
+          type: 'ExternalMap',
+          externalSpdxId: 'ext:file1',
+          locationHint: './zephyr.jsonld'
+        },
+        {
+          type: 'ExternalMap',
+          externalSpdxId: 'ext:file2',
+          locationHint: './zephyr.jsonld',
+          definingArtifact: 'pkg:zephyr',
+          verifiedUsing: [{ type: 'Hash', algorithm: 'sha256', hashValue: 'abc123' }]
+        }
+      ]
+    }
+  ];
+
+  const parsed = parseGraph(graph);
+
+  assert.equal(parsed.externalMap.size, 2);
+  assert.deepEqual(parsed.externalRefStats, { total: 2, resolved: 1, unresolved: 1 });
+
+  const f1 = parsed.externalMap.get('ext:file1');
+  assert.equal(f1.locationHint, './zephyr.jsonld');
+  assert.deepEqual(f1.importedBy, ['Build Document']);
+
+  const f2 = parsed.externalMap.get('ext:file2');
+  assert.equal(f2.definingArtifact, 'pkg:zephyr');
+  assert.equal(f2.verifiedUsing[0].hashValue, 'abc123');
+});
+
+test('parseGraph merges ExternalMap importers across documents', () => {
+  const graph = [
+    {
+      type: 'SpdxDocument',
+      spdxId: 'doc:a',
+      name: 'Doc A',
+      import: [{ type: 'ExternalMap', externalSpdxId: 'ext:shared', locationHint: './a.jsonld' }]
+    },
+    {
+      type: 'SpdxDocument',
+      spdxId: 'doc:b',
+      name: 'Doc B',
+      // Same id, no location hint here — the first entry's hint must survive.
+      import: [{ type: 'ExternalMap', externalSpdxId: 'ext:shared' }]
+    }
+  ];
+
+  const parsed = parseGraph(graph);
+  const entry = parsed.externalMap.get('ext:shared');
+
+  assert.equal(parsed.externalMap.size, 1);
+  assert.deepEqual(entry.importedBy, ['Doc A', 'Doc B']);
+  assert.equal(entry.locationHint, './a.jsonld');
+  assert.deepEqual(parsed.externalRefStats, { total: 1, resolved: 0, unresolved: 1 });
+});
+
+test('externalRefFor resolves an element to its ExternalMap import entry', () => {
+  const app = spdxApp();
+  const graph = [
+    { type: 'software_File', spdxId: 'ext:file1', name: 'shared.c' },
+    {
+      type: 'SpdxDocument',
+      spdxId: 'doc:build',
+      name: 'Build Document',
+      import: [
+        { type: 'ExternalMap', externalSpdxId: 'ext:file1', locationHint: './zephyr.jsonld' }
+      ]
+    }
+  ];
+  const parsed = parseGraph(graph);
+  app.externalMap = parsed.externalMap;
+
+  assert.equal(app.externalRefFor({ spdxId: 'ext:file1' })?.locationHint, './zephyr.jsonld');
+  assert.equal(app.externalRefFor({ spdxId: 'ext:absent' }), null);
+  assert.equal(app.externalRefFor(null), null);
+});

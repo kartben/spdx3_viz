@@ -190,7 +190,21 @@ export function renderGraph(app, retry = 0) {
     if (!spdxId) return null;
     if (uNodeIds.has(spdxId)) return uNodeById.get(spdxId);
 
-    const el = app.elementMap.get(spdxId) || placeholderFor(spdxId, rel || {}, role);
+    let el = app.elementMap.get(spdxId);
+    if (!el) {
+      el = placeholderFor(spdxId, rel || {}, role);
+      // Unresolved reference: if the document declared it as an ExternalMap
+      // import, attach where it's defined so the node (and its detail panel)
+      // can point at the external location instead of being a bare unknown.
+      const ext = app.externalMap?.get(spdxId);
+      if (ext) {
+        el.external = true;
+        el.locationHint = ext.locationHint;
+        el.definingArtifact = ext.definingArtifact;
+        el.importedBy = ext.importedBy;
+        if (ext.verifiedUsing?.length) el.verifiedUsing = ext.verifiedUsing;
+      }
+    }
     const type = getNodeType(el);
     if (!activeNodeTypes.has(type)) return null;
 
@@ -421,6 +435,13 @@ export function renderGraph(app, retry = 0) {
     d._stroke = d.isCluster ? 'rgba(255,255,255,0.85)' : strokeForType(d.type);
   });
   const radiusFor = (d) => d._r;
+
+  // Nodes standing in for an unresolved ExternalMap import: drawn with a dashed
+  // grey ring so cross-document references are visible at a glance. Usually few
+  // (often none), so a small dedicated draw pass is cheaper than special-casing
+  // the batched node loop.
+  const externalRenderNodes = renderNodes.filter((d) => !d.isCluster && d.data?.external);
+  const EXTERNAL_RING_COLOR = getNodeTypeColor('external');
   // Draw bigger nodes' labels first so the MAX_LABELS cap keeps the useful ones.
   const labelOrder = [...renderNodes].sort((a, b) => b._r - a._r);
 
@@ -579,9 +600,35 @@ export function renderGraph(app, retry = 0) {
     });
   };
 
+  // Dashed grey outline around unresolved external references. Runs after the
+  // node fills so the ring sits on top; nodes faded out by search/hover are
+  // skipped so the ring tracks the same emphasis.
+  const drawExternalRings = () => {
+    if (!externalRenderNodes.length) return;
+    const k = currentTransform.k;
+    ctx.save();
+    ctx.setLineDash([3 / k, 3 / k]);
+    ctx.lineWidth = 1.5 / k;
+    ctx.strokeStyle = EXTERNAL_RING_COLOR;
+    externalRenderNodes.forEach((d) => {
+      if (d.x == null || !nodeInView(d)) return;
+      const ss = nodeSearchStyle(d.id);
+      if (ss.hidden) return;
+      ctx.globalAlpha = ss.alpha;
+      const r = radiusFor(d) + 2.5 / k;
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, r, 0, 2 * Math.PI);
+      ctx.stroke();
+    });
+    ctx.setLineDash([]);
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  };
+
   const drawNodes = () => {
     if (!searchActive && !highlightedNodeId) {
       drawNodesFast();
+      drawExternalRings();
       return;
     }
     // Hover emphasis is suppressed while a search overlay is active so the
@@ -617,6 +664,7 @@ export function renderGraph(app, retry = 0) {
       }
     });
     ctx.globalAlpha = 1;
+    drawExternalRings();
   };
 
   // Screen-space label decluttering: labels are placed greedily in priority
@@ -1072,12 +1120,17 @@ export function renderGraph(app, retry = 0) {
     if (!tooltip) return;
     if (found) {
       const rect = canvas.getBoundingClientRect();
+      const isExternal = !found.isCluster && found.data?.external;
       const meta = found.isCluster
         ? `${found.clusterKind} cluster · ${found.memberCount} items`
-        : found.data?.type || found.type;
+        : isExternal
+          ? `external · ${found.data?.type || found.type}`
+          : found.data?.type || found.type;
       const hint = found.isCluster
         ? 'double-click to expand'
-        : `${connCount.get(found.id) || 0} connections`;
+        : isExternal && found.data?.locationHint
+          ? `defined in ${found.data.locationHint}`
+          : `${connCount.get(found.id) || 0} connections`;
       tooltip.innerHTML =
         `<div class="font-semibold text-white">${escapeHtml(found.name)}</div>` +
         `<div class="text-slate-400 text-xs">${escapeHtml(meta)}</div>` +

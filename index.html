@@ -623,6 +623,22 @@
                       x-text="creatorTools.map(t => t.name).join(', ')"
                     ></span>
                   </div>
+                  <div
+                    class="text-slate-400 mt-1"
+                    x-show="externalRefStats.total"
+                    title="Elements referenced via SPDX 3 ExternalMap imports (defined outside this document)"
+                  >
+                    Imports
+                    <span
+                      class="text-white font-medium"
+                      x-text="formatCount(externalRefStats.total)"
+                    ></span>
+                    <span
+                      x-show="externalRefStats.unresolved"
+                      class="text-amber-400/80"
+                      x-text="'(' + formatCount(externalRefStats.unresolved) + ' unresolved)'"
+                    ></span>
+                  </div>
                   <div class="mt-2" x-show="dataLicenseLabel">
                     <span
                       class="badge bg-pink-500/15 text-pink-400"
@@ -3736,6 +3752,123 @@
               />
             </svg>
           </button>
+
+          <!-- External reference (SPDX 3 ExternalMap import): where a
+               referenced element is defined outside the document that uses it. -->
+          <div
+            x-show="externalRefFor(detailElement)"
+            class="rounded-lg bg-slate-900/40 border border-slate-700/50 p-3 space-y-2.5"
+          >
+            <div class="flex items-center gap-2">
+              <svg
+                class="w-3.5 h-3.5 text-slate-400 flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                />
+              </svg>
+              <span class="text-xs font-semibold uppercase tracking-wider text-slate-300"
+                >External reference</span
+              >
+              <span
+                x-show="detailElement?.placeholder"
+                class="badge bg-slate-600/20 text-slate-400 text-[10px] uppercase tracking-wider"
+                >not loaded</span
+              >
+            </div>
+            <p x-show="detailElement?.placeholder" class="text-xs text-slate-400 leading-relaxed">
+              This element is defined outside the loaded document(s). Load the source below to
+              resolve its full details.
+            </p>
+
+            <!-- Location hint -->
+            <div x-show="isMeaningful(externalRefFor(detailElement)?.locationHint)">
+              <div class="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5">
+                Location hint
+              </div>
+              <a
+                x-show="downloadUrl(externalRefFor(detailElement)?.locationHint)"
+                :href="downloadUrl(externalRefFor(detailElement)?.locationHint)"
+                target="_blank"
+                rel="noopener"
+                class="text-xs text-sky-400 hover:text-sky-300 break-all font-mono"
+                x-text="externalRefFor(detailElement)?.locationHint"
+              ></a>
+              <code
+                x-show="!downloadUrl(externalRefFor(detailElement)?.locationHint)"
+                class="text-xs text-slate-300 break-all font-mono"
+                x-text="externalRefFor(detailElement)?.locationHint"
+              ></code>
+            </div>
+
+            <!-- Defining artifact -->
+            <div x-show="isMeaningful(externalRefFor(detailElement)?.definingArtifact)">
+              <div class="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5">
+                Defining artifact
+              </div>
+              <code
+                class="text-xs text-slate-300 break-all font-mono"
+                x-text="cleanName(externalRefFor(detailElement)?.definingArtifact)"
+              ></code>
+            </div>
+
+            <!-- Which loaded document(s) import this element -->
+            <div x-show="(externalRefFor(detailElement)?.importedBy || []).length">
+              <div class="text-[10px] text-slate-500 uppercase tracking-wider mb-1">
+                Imported by
+              </div>
+              <div class="flex flex-wrap gap-1">
+                <template x-for="d in (externalRefFor(detailElement)?.importedBy || [])" :key="d">
+                  <span class="badge bg-slate-700/60 text-slate-300 text-[10px]" x-text="d"></span>
+                </template>
+              </div>
+            </div>
+
+            <!-- Integrity the importing document asserts for the external element -->
+            <div
+              x-show="(externalRefFor(detailElement)?.verifiedUsing || []).length"
+              class="space-y-1.5"
+            >
+              <div class="text-[10px] text-slate-500 uppercase tracking-wider">
+                Asserted integrity
+              </div>
+              <template
+                x-for="h in (externalRefFor(detailElement)?.verifiedUsing || [])"
+                :key="h.hashValue"
+              >
+                <div class="flex items-start gap-2 group">
+                  <span
+                    class="text-[10px] text-slate-500 uppercase w-10 pt-0.5 flex-shrink-0 text-right"
+                    x-text="h.algorithm"
+                  ></span>
+                  <code
+                    class="hash-text text-slate-400 break-all flex-1 leading-relaxed"
+                    x-text="h.hashValue"
+                  ></code>
+                  <button
+                    @click="copyHash(h.hashValue)"
+                    class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity flex-shrink-0 pt-0.5"
+                    title="Copy"
+                  >
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </template>
+            </div>
+          </div>
 
           <!-- Promoted properties (type-specific highlights) -->
           <template x-for="field in detailPromotedFields" :key="field.prop">

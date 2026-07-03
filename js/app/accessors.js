@@ -172,6 +172,14 @@ export const accessorsMixin = {
   downloadUrl(value) {
     return normalizeUrl(value);
   },
+  // The SPDX 3.0 ExternalMap entry for an element, when a loaded SpdxDocument
+  // imports it (i.e. references it but defines it elsewhere). Returns the merged
+  // entry {locationHint, definingArtifact, verifiedUsing, importedBy} or null.
+  // Works for both unresolved placeholders and resolved cross-document elements.
+  externalRefFor(element) {
+    if (!element?.spdxId) return null;
+    return this.externalMap?.get(element.spdxId) || null;
+  },
   relColor(type) {
     return getRelationshipColor(type);
   },
