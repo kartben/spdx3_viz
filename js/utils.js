@@ -143,6 +143,8 @@ export function getRelationshipColor(relType) {
     configures: COLORS.config,
     hasConcludedLicense: COLORS.license,
     hasDeclaredLicense: COLORS.license,
+    trainedOn: COLORS.ai,
+    testedOn: COLORS.dataset,
     fixedIn: COLORS.vexFixed,
     doesNotAffect: COLORS.vexNotAffected,
     affects: COLORS.vexAffected,
@@ -421,6 +423,10 @@ export function getNodeType(item) {
   if (!item || !item.type) return 'other';
 
   if (item.type === 'ExternalReference') return 'external';
+  // AI profile package subclasses, surfaced as their own node types so the
+  // graph legend can style/toggle AI models and datasets independently.
+  if (item.type === 'ai_AIPackage') return 'ai';
+  if (item.type === 'dataset_DatasetPackage') return 'dataset';
   if (item.type === 'software_Package') return 'package';
   if (item.type === 'software_File') {
     // Check if it's a build config element
@@ -453,6 +459,8 @@ export function getNodeType(item) {
 export function getNodeTypeColor(nodeType) {
   const colorMap = {
     package: COLORS.package,
+    ai: COLORS.ai,
+    dataset: COLORS.dataset,
     file: COLORS.file,
     tool: COLORS.tool,
     build: COLORS.build,
@@ -688,6 +696,27 @@ export function isMeaningfulValue(value) {
   if (value == null) return false;
   const s = String(value).trim();
   return s !== '' && !NO_ASSERTION.test(s);
+}
+
+/**
+ * Formats a byte count as a human-readable size using 1000-based (SI) units,
+ * matching how download prompts and Finder report file sizes. Returns '' for
+ * anything that isn't a positive, finite number.
+ *
+ * @param {number} bytes
+ * @returns {string}
+ */
+export function formatByteSize(bytes) {
+  if (!Number.isFinite(bytes) || bytes <= 0) return '';
+  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+  let n = bytes;
+  let i = 0;
+  while (n >= 1000 && i < units.length - 1) {
+    n /= 1000;
+    i++;
+  }
+  const rounded = i === 0 ? n : n >= 100 ? Math.round(n) : Math.round(n * 10) / 10;
+  return `${rounded} ${units[i]}`;
 }
 
 // Human-readable labels for SPDX externalIdentifierType values.

@@ -18,6 +18,11 @@
  */
 export const ELEMENT_TYPES = {
   PACKAGE: 'software_Package',
+  // AI profile subclasses of software_Package: an AI model package and a
+  // dataset package (dataset_DatasetPackage extends ai_AIPackage). Both are
+  // treated as packages, with their own node type/color for the graph legend.
+  AI_PACKAGE: 'ai_AIPackage',
+  DATASET_PACKAGE: 'dataset_DatasetPackage',
   FILE: 'software_File',
   TOOL: 'Tool',
   RELATIONSHIP: 'Relationship',
@@ -67,6 +72,9 @@ export const RELATIONSHIP_TYPES = {
   CONFIGURES: 'configures',
   HAS_CONCLUDED_LICENSE: 'hasConcludedLicense',
   HAS_DECLARED_LICENSE: 'hasDeclaredLicense',
+  // AI profile relationship types (AI model ↔ training/test dataset)
+  TRAINED_ON: 'trainedOn',
+  TESTED_ON: 'testedOn',
   // VEX relationship types (SPDX Security profile)
   FIXED_IN: 'fixedIn',
   DOES_NOT_AFFECT: 'doesNotAffect',
@@ -156,6 +164,9 @@ export const VEX_JUSTIFICATION_LABELS = {
  */
 export const COLORS = {
   package: '#3b82f6',
+  // AI profile node types (AI model package / dataset package)
+  ai: '#e879f9',
+  dataset: '#22d3ee',
   file: '#10b981',
   tool: '#f59e0b',
   build: '#8b5cf6',
@@ -193,6 +204,8 @@ export function createGraphFilters() {
   return [
     // Node type filters
     { key: 'package', label: 'Packages', color: COLORS.package, active: true },
+    { key: 'ai', label: 'AI models', color: COLORS.ai, active: true },
+    { key: 'dataset', label: 'Datasets', color: COLORS.dataset, active: true },
     { key: 'file', label: 'Files', color: COLORS.file, active: true },
     { key: 'tool', label: 'Tools', color: COLORS.tool, active: true },
     { key: 'build', label: 'Build', color: COLORS.build, active: true },
@@ -260,6 +273,15 @@ export function createGraphFilters() {
     },
     { key: 'hasVariant', label: 'hasVariant', color: COLORS.variant, active: true, isRel: true },
     { key: 'configures', label: 'configures', color: COLORS.config, active: true, isRel: true },
+    { key: 'trainedOn', label: 'trainedOn', color: COLORS.ai, active: true, isRel: true },
+    {
+      key: 'testedOn',
+      label: 'testedOn',
+      color: COLORS.dataset,
+      active: true,
+      isRel: true,
+      lineStyle: 'dashed'
+    },
     // VEX assessment edges (vulnerability → package). Off by default; enabling
     // the Vulnerabilities node type + one of these surfaces VEX in the graph.
     { key: 'fixedIn', label: 'fixedIn (VEX)', color: COLORS.vexFixed, active: false, isRel: true },
@@ -303,6 +325,9 @@ const VIEW_ICONS = {
     '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"/></svg>',
   packages:
     '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>',
+  ai: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 2v2M15 2v2M9 20v2M15 20v2M2 9h2M2 15h2M20 9h2M20 15h2"/></svg>',
+  dataset:
+    '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg>',
   files:
     '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>',
   licenses:
@@ -324,6 +349,8 @@ export function createViews() {
     { id: 'dashboard', label: 'Overview', icon: VIEW_ICONS.dashboard, count: null },
     { id: 'graph', label: 'Graph', icon: VIEW_ICONS.graph, count: null },
     { id: 'packages', label: 'Packages', icon: VIEW_ICONS.packages, count: null },
+    { id: 'ai', label: 'AI Models', icon: VIEW_ICONS.ai, count: null },
+    { id: 'dataset', label: 'Datasets', icon: VIEW_ICONS.dataset, count: null },
     { id: 'files', label: 'Files', icon: VIEW_ICONS.files, count: null },
     { id: 'licenses', label: 'Licenses', icon: VIEW_ICONS.licenses, count: null },
     { id: 'security', label: 'Security', icon: VIEW_ICONS.security, count: null },
@@ -394,6 +421,10 @@ export const RELATIONSHIP_LABELS = {
   'hasVariant:in': 'Variant of',
   'configures:out': 'Configures',
   'configures:in': 'Configured by',
+  'trainedOn:out': 'Trained on',
+  'trainedOn:in': 'Training dataset for',
+  'testedOn:out': 'Tested on',
+  'testedOn:in': 'Test dataset for',
   'hasConcludedLicense:out': 'Concluded license',
   'hasConcludedLicense:in': 'Licensed (concluded)',
   'hasDeclaredLicense:out': 'Declared license',
@@ -459,6 +490,10 @@ export const RELATIONSHIP_SORT_ORDER = {
   'hasVariant:in': 24,
   'usesTool:out': 25,
   'usesTool:in': 26,
+  'trainedOn:out': 31,
+  'trainedOn:in': 32,
+  'testedOn:out': 33,
+  'testedOn:in': 34,
   'hasConcludedLicense:out': 27,
   'hasDeclaredLicense:out': 28,
   'hasConcludedLicense:in': 29,

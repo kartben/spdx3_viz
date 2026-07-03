@@ -1,4 +1,5 @@
 import { computeRelationshipTypeCounts } from '../parser.js';
+import { ELEMENT_TYPES } from '../config.js';
 
 /* ==========================================================================
    Derived data
@@ -42,8 +43,25 @@ export const derivedMixin = {
     return computeRelationshipTypeCounts(this.relationships);
   },
 
-  get filteredPackages() {
-    let pkgs = this.packages;
+  // AI models and dataset packages are software_Package subclasses (AI profile)
+  // and get their own tabs, so the Packages tab lists only plain packages. All
+  // three read the same search box + sort control (see _filterSortPackages).
+  get aiPackages() {
+    return this.packages.filter((p) => p.type === ELEMENT_TYPES.AI_PACKAGE);
+  },
+  get datasetPackages() {
+    return this.packages.filter((p) => p.type === ELEMENT_TYPES.DATASET_PACKAGE);
+  },
+  get plainPackages() {
+    return this.packages.filter(
+      (p) => p.type !== ELEMENT_TYPES.AI_PACKAGE && p.type !== ELEMENT_TYPES.DATASET_PACKAGE
+    );
+  },
+
+  // Applies the shared package search box + sort control to a base list. Used by
+  // the Packages / AI Models / Datasets tabs so they behave identically.
+  _filterSortPackages(base) {
+    let pkgs = base;
     if (this.searchQuery) {
       const q = this.searchQuery.toLowerCase();
       pkgs = pkgs.filter(
@@ -52,19 +70,53 @@ export const derivedMixin = {
       );
     }
     if (this.pkgSort === 'deps')
-      pkgs = [...pkgs].sort(
+      return [...pkgs].sort(
         (a, b) => (this.depsOf(b.spdxId)?.length || 0) - (this.depsOf(a.spdxId)?.length || 0)
       );
-    else if (this.pkgSort === 'dependents')
-      pkgs = [...pkgs].sort(
+    if (this.pkgSort === 'dependents')
+      return [...pkgs].sort(
         (a, b) =>
           (this.dependentsOf(b.spdxId)?.length || 0) - (this.dependentsOf(a.spdxId)?.length || 0)
       );
-    else
-      pkgs = [...pkgs].sort((a, b) =>
-        (a.name || this.cleanName(a.spdxId)).localeCompare(b.name || this.cleanName(b.spdxId))
-      );
-    return pkgs;
+    return [...pkgs].sort((a, b) =>
+      (a.name || this.cleanName(a.spdxId)).localeCompare(b.name || this.cleanName(b.spdxId))
+    );
+  },
+
+  get filteredPackages() {
+    return this._filterSortPackages(this.plainPackages);
+  },
+
+  get filteredAiPackages() {
+    return this._filterSortPackages(this.aiPackages);
+  },
+
+  get filteredDatasetPackages() {
+    return this._filterSortPackages(this.datasetPackages);
+  },
+
+  // The package list backing whichever of the three package-style tabs is
+  // showing (packages / ai / dataset); [] elsewhere so the shared list template
+  // renders nothing when another view is active.
+  get currentPackageList() {
+    switch (this.currentView) {
+      case 'ai':
+        return this.filteredAiPackages;
+      case 'dataset':
+        return this.filteredDatasetPackages;
+      case 'packages':
+        return this.filteredPackages;
+      default:
+        return [];
+    }
+  },
+
+  get currentPackageNoun() {
+    return this.currentView === 'ai'
+      ? 'AI models'
+      : this.currentView === 'dataset'
+        ? 'datasets'
+        : 'packages';
   },
 
   get filteredFiles() {

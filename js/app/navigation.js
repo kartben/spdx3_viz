@@ -23,6 +23,8 @@ let scrollObserver = null;
 // View id -> the filtered list its main x-for renders.
 const viewListProps = {
   packages: 'filteredPackages',
+  ai: 'filteredAiPackages',
+  dataset: 'filteredDatasetPackages',
   files: 'filteredFiles',
   licenses: 'filteredLicenses',
   security: 'filteredVulnerabilities',
@@ -33,6 +35,8 @@ const viewListProps = {
 // deep link can grow that list far enough to render the target before scrolling.
 const navKindListInfo = {
   package: { view: 'packages', list: 'filteredPackages', idField: 'spdxId' },
+  ai: { view: 'ai', list: 'filteredAiPackages', idField: 'spdxId' },
+  dataset: { view: 'dataset', list: 'filteredDatasetPackages', idField: 'spdxId' },
   file: { view: 'files', list: 'filteredFiles', idField: 'spdxId' },
   license: { view: 'licenses', list: 'filteredLicenses', idField: 'id' },
   vuln: { view: 'security', list: 'filteredVulnerabilities', idField: 'spdxId' },
@@ -105,6 +109,8 @@ export const navigationMixin = {
     // view tracks an expanded card for.
     const expandedNavTarget = {
       packages: ['package', this.expandedPkg],
+      ai: ['ai', this.expandedPkg],
+      dataset: ['dataset', this.expandedPkg],
       files: ['file', this.expandedFile],
       configs: ['config', this.expandedConfig],
       build: ['build', this.expandedBuild],
@@ -319,11 +325,22 @@ export const navigationMixin = {
   // The list view (if any) that navigateTo would land an element in, used by
   // the graph detail panel's "View in <list>" link. Returns null for elements
   // with no dedicated list (placeholders / external references / agents).
+  // Nav-target kind for a package card, so the shared list template can live in
+  // the Packages / AI Models / Datasets tabs and still scroll to the right card.
+  pkgNavKind(pkg) {
+    if (pkg?.type === 'ai_AIPackage') return 'ai';
+    if (pkg?.type === 'dataset_DatasetPackage') return 'dataset';
+    return 'package';
+  },
   listTargetFor(el) {
     if (!el || el.placeholder) return null;
     switch (el.type) {
       case 'software_Package':
         return { label: 'Packages' };
+      case 'ai_AIPackage':
+        return { label: 'AI Models' };
+      case 'dataset_DatasetPackage':
+        return { label: 'Datasets' };
       case 'software_File':
         return el.software_primaryPurpose === 'configuration' || el.spdxId?.includes('build-config')
           ? { label: 'Build Configs' }
@@ -348,6 +365,10 @@ export const navigationMixin = {
     }
     if (el.type === 'software_Package') {
       this.navigateToPackage(spdxId);
+    } else if (el.type === 'ai_AIPackage') {
+      this.navigateToAiPackage(spdxId);
+    } else if (el.type === 'dataset_DatasetPackage') {
+      this.navigateToDataset(spdxId);
     } else if (el.type === 'software_File') {
       // Check if it's a build config
       if (el.software_primaryPurpose === 'configuration' || spdxId?.includes('build-config')) {
@@ -370,6 +391,18 @@ export const navigationMixin = {
     this.switchView('packages');
     this.expandedPkg = spdxId;
     this.scrollToNavTarget('package', spdxId);
+  },
+  navigateToAiPackage(spdxId) {
+    this.searchQuery = '';
+    this.switchView('ai');
+    this.expandedPkg = spdxId;
+    this.scrollToNavTarget('ai', spdxId);
+  },
+  navigateToDataset(spdxId) {
+    this.searchQuery = '';
+    this.switchView('dataset');
+    this.expandedPkg = spdxId;
+    this.scrollToNavTarget('dataset', spdxId);
   },
   navigateToConfig(spdxId) {
     this.configSearch = '';

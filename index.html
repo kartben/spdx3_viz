@@ -285,7 +285,9 @@
           <template x-for="v in views" :key="v.id">
             <div
               class="nav-item"
-              x-show="v.id !== 'security' || vulnerabilities.length > 0"
+              x-show="(v.id !== 'security' || vulnerabilities.length > 0) &&
+                      (v.id !== 'ai' || aiPackages.length > 0) &&
+                      (v.id !== 'dataset' || datasetPackages.length > 0)"
               :class="currentView === v.id && 'active'"
               @click="switchView(v.id)"
             >
@@ -986,16 +988,22 @@
             </div>
           </div>
 
-          <!-- ========== PACKAGES ========== -->
-          <div x-show="currentView === 'packages'" class="fade-in space-y-3 max-w-4xl">
+          <!-- ========== PACKAGES / AI MODELS / DATASETS ==========
+               One list template shared by the three package-style tabs (AI models
+               and datasets are software_Package subclasses); currentPackageList
+               swaps in the right filtered list. -->
+          <div
+            x-show="currentView === 'packages' || currentView === 'ai' || currentView === 'dataset'"
+            class="fade-in space-y-3 max-w-4xl"
+          >
             <div class="flex items-center gap-3 mb-4">
               <span
                 class="text-sm text-slate-400"
-                x-text="`${filteredPackages.length} packages`"
+                x-text="`${currentPackageList.length} ${currentPackageNoun}`"
               ></span>
               <select
                 x-model="pkgSort"
-                @change="restreamView('packages')"
+                @change="restreamView(currentView)"
                 class="ml-auto bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 text-slate-300 focus:outline-none focus:border-blue-500"
               >
                 <option value="name">Sort by name</option>
@@ -1004,21 +1012,23 @@
               </select>
             </div>
             <template
-              x-for="pkg in (mountedViews.packages ? renderSlice('packages', filteredPackages) : [])"
+              x-for="pkg in (mountedViews[currentView] ? renderSlice(currentView, currentPackageList) : [])"
               :key="pkg.spdxId"
             >
               <div
                 class="card"
-                data-nav-kind="package"
+                :data-nav-kind="pkgNavKind(pkg)"
                 :data-nav-id="pkg.spdxId"
-                :class="isNavTarget('package', pkg.spdxId) && 'target-focus'"
+                :class="isNavTarget(pkgNavKind(pkg), pkg.spdxId) && 'target-focus'"
               >
                 <div class="flex items-center gap-3 cursor-pointer" @click="togglePkg(pkg.spdxId)">
                   <div
-                    class="w-8 h-8 rounded-lg bg-blue-500/15 flex items-center justify-center flex-shrink-0"
+                    class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                    :style="`background:${nodeTypeColor(getNodeType(pkg))}26`"
                   >
                     <svg
-                      class="w-4 h-4 text-blue-400"
+                      class="w-4 h-4"
+                      :style="`color:${nodeTypeColor(getNodeType(pkg))}`"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -1280,6 +1290,71 @@
                           x-text="pkg.comment"
                         ></div>
                       </div>
+                    </div>
+
+                    <!-- AI / Dataset profile (ai_AIPackage, dataset_DatasetPackage) -->
+                    <div x-show="profileFields(pkg).length > 0" class="space-y-3">
+                      <div
+                        class="text-xs font-semibold uppercase tracking-wider"
+                        :style="`color:${nodeTypeColor(getNodeType(pkg))}`"
+                        x-text="pkg.type === 'dataset_DatasetPackage' ? 'Dataset' : 'AI model'"
+                      ></div>
+                      <template x-for="f in profileFields(pkg)" :key="f.label">
+                        <div>
+                          <div class="text-xs text-slate-500 mb-1" x-text="f.label"></div>
+                          <span
+                            x-show="f.kind === 'badge'"
+                            class="text-xs px-2 py-0.5 rounded-md bg-slate-700 text-slate-300"
+                            x-text="f.kind === 'badge' ? f.value : ''"
+                          ></span>
+                          <div
+                            x-show="f.kind === 'text'"
+                            class="text-xs text-slate-300 break-words"
+                            x-text="f.kind === 'text' ? f.value : ''"
+                          ></div>
+                          <div
+                            x-show="f.kind === 'longtext'"
+                            class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-40 overflow-y-auto"
+                            x-text="f.kind === 'longtext' ? f.value : ''"
+                          ></div>
+                          <div x-show="f.kind === 'chips'" class="flex flex-wrap gap-1">
+                            <template x-for="c in (f.kind === 'chips' ? f.value : [])" :key="c">
+                              <span
+                                class="text-xs px-2 py-0.5 rounded-md bg-slate-700 text-slate-300"
+                                x-text="c"
+                              ></span>
+                            </template>
+                          </div>
+                          <ul
+                            x-show="f.kind === 'list'"
+                            class="list-disc list-inside space-y-1 text-xs text-slate-300"
+                          >
+                            <template
+                              x-for="(item, i) in (f.kind === 'list' ? f.value : [])"
+                              :key="i"
+                            >
+                              <li class="break-words" x-text="item"></li>
+                            </template>
+                          </ul>
+                          <div x-show="f.kind === 'dict'" class="space-y-1">
+                            <template
+                              x-for="(entry, i) in (f.kind === 'dict' ? f.value : [])"
+                              :key="i"
+                            >
+                              <div class="rounded bg-slate-900/50 px-2 py-1">
+                                <div
+                                  class="text-[10px] uppercase tracking-wider text-slate-500"
+                                  x-text="entry.key"
+                                ></div>
+                                <div
+                                  class="text-xs text-slate-300 font-mono break-all max-h-24 overflow-y-auto"
+                                  x-text="entry.value"
+                                ></div>
+                              </div>
+                            </template>
+                          </div>
+                        </div>
+                      </template>
                     </div>
 
                     <!-- Verification (hashes + content identifiers) -->
@@ -3344,7 +3419,7 @@
                 ></span>
                 <span
                   class="text-xs text-slate-400"
-                  x-text="detailElement ? detailElement.type.replace('software_','').replace('build_','').replace('simplelicensing_','').replace('security_','') : ''"
+                  x-text="detailElement ? detailElement.type.replace('software_','').replace('build_','').replace('simplelicensing_','').replace('security_','').replace('ai_','').replace('dataset_','') : ''"
                 ></span>
               </div>
               <h3
@@ -3769,6 +3844,65 @@
                 </template>
               </div>
             </div>
+          </div>
+
+          <!-- AI / Dataset profile (ai_AIPackage, dataset_DatasetPackage) -->
+          <div x-show="profileFields(detailElement).length > 0" class="space-y-3">
+            <div
+              class="text-xs font-semibold uppercase tracking-wider"
+              :style="`color:${nodeTypeColor(getNodeType(detailElement))}`"
+              x-text="detailElement?.type === 'dataset_DatasetPackage' ? 'Dataset' : 'AI model'"
+            ></div>
+            <template x-for="f in profileFields(detailElement)" :key="f.label">
+              <div>
+                <div class="text-xs text-slate-500 mb-1" x-text="f.label"></div>
+                <span
+                  x-show="f.kind === 'badge'"
+                  class="text-xs px-2 py-0.5 rounded-md bg-slate-700 text-slate-300"
+                  x-text="f.kind === 'badge' ? f.value : ''"
+                ></span>
+                <div
+                  x-show="f.kind === 'text'"
+                  class="text-xs text-slate-300 break-words"
+                  x-text="f.kind === 'text' ? f.value : ''"
+                ></div>
+                <div
+                  x-show="f.kind === 'longtext'"
+                  class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-40 overflow-y-auto"
+                  x-text="f.kind === 'longtext' ? f.value : ''"
+                ></div>
+                <div x-show="f.kind === 'chips'" class="flex flex-wrap gap-1">
+                  <template x-for="c in (f.kind === 'chips' ? f.value : [])" :key="c">
+                    <span
+                      class="text-xs px-2 py-0.5 rounded-md bg-slate-700 text-slate-300"
+                      x-text="c"
+                    ></span>
+                  </template>
+                </div>
+                <ul
+                  x-show="f.kind === 'list'"
+                  class="list-disc list-inside space-y-1 text-xs text-slate-300"
+                >
+                  <template x-for="(item, i) in (f.kind === 'list' ? f.value : [])" :key="i">
+                    <li class="break-words" x-text="item"></li>
+                  </template>
+                </ul>
+                <div x-show="f.kind === 'dict'" class="space-y-1">
+                  <template x-for="(entry, i) in (f.kind === 'dict' ? f.value : [])" :key="i">
+                    <div class="rounded bg-slate-900/50 px-2 py-1">
+                      <div
+                        class="text-[10px] uppercase tracking-wider text-slate-500"
+                        x-text="entry.key"
+                      ></div>
+                      <div
+                        class="text-xs text-slate-300 font-mono break-all max-h-24 overflow-y-auto"
+                        x-text="entry.value"
+                      ></div>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </template>
           </div>
 
           <!-- Hashes (compact) -->

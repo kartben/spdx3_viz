@@ -264,7 +264,9 @@ export const loadingMixin = {
       Object.assign(this, markPayloadRaw(msg.parsed));
       Object.assign(this, markPayloadRaw(msg.indexes));
 
-      this.views.find((v) => v.id === 'packages').count = this.packages.length;
+      this.views.find((v) => v.id === 'packages').count = this.plainPackages.length;
+      this.views.find((v) => v.id === 'ai').count = this.aiPackages.length;
+      this.views.find((v) => v.id === 'dataset').count = this.datasetPackages.length;
       this.views.find((v) => v.id === 'files').count = this.files.length;
       this.views.find((v) => v.id === 'licenses').count = this.licenses.length;
       this.views.find((v) => v.id === 'security').count = this.vulnerabilities.length;

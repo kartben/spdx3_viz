@@ -18,6 +18,7 @@ import {
   getExternalIdentifiers,
   getCdxProperties,
   isMeaningfulValue,
+  formatByteSize,
   normalizeUrl,
   copyToClipboard
 } from '../utils.js';
@@ -290,6 +291,60 @@ export const accessorsMixin = {
   },
   nodeTypeColor(type) {
     return getNodeTypeColor(type);
+  },
+
+  // Flattened AI-profile / Dataset-profile fields for an element (ai_AIPackage
+  // or dataset_DatasetPackage), as {label, kind, value} descriptors the detail
+  // panel and expanded package card render with a single data-driven template.
+  // kind ∈ 'badge' | 'text' | 'longtext' | 'chips' | 'list' | 'dict'.
+  profileFields(el) {
+    if (!el) return [];
+    const out = [];
+    const push = (label, kind, value) => {
+      if (kind === 'chips' || kind === 'list' || kind === 'dict') {
+        if (Array.isArray(value) && value.length) out.push({ label, kind, value });
+      } else if (kind === 'bytes') {
+        if (Number.isFinite(value) && value > 0) {
+          out.push({ label, kind: 'badge', value: formatByteSize(value) });
+        }
+      } else if (isMeaningfulValue(value)) {
+        out.push({ label, kind, value });
+      }
+    };
+
+    // AI profile (ai_AIPackage; dataset_DatasetPackage inherits these too)
+    push('Type of model', 'chips', el.ai_typeOfModel);
+    push('Domain', 'chips', el.ai_domain);
+    push('Autonomy', 'badge', el.ai_autonomyType);
+    push('Safety risk assessment', 'badge', el.ai_safetyRiskAssessment);
+    push('Sensitive personal information', 'badge', el.ai_sensitivePersonalInformation);
+    push('Standards compliance', 'chips', el.ai_standardCompliance);
+    push('Model explainability', 'chips', el.ai_modelExplainability);
+    push('Energy consumption', 'text', el.ai_energyConsumption);
+    push('Limitations', 'longtext', el.ai_limitation);
+    push('About the application', 'longtext', el.ai_informationAboutApplication);
+    push('About training', 'longtext', el.ai_informationAboutTraining);
+    push('Data preprocessing', 'list', el.ai_modelDataPreprocessing);
+    push('Hyperparameters', 'dict', el.ai_hyperparameter);
+    push('Metrics', 'dict', el.ai_metric);
+    push('Metric decision thresholds', 'dict', el.ai_metricDecisionThreshold);
+
+    // Dataset profile (dataset_DatasetPackage)
+    push('Dataset type', 'chips', el.dataset_datasetType);
+    push('Intended use', 'text', el.dataset_intendedUse);
+    push('Availability', 'badge', el.dataset_datasetAvailability);
+    push('Confidentiality', 'badge', el.dataset_confidentialityLevel);
+    push('Sensitive personal information', 'badge', el.dataset_hasSensitivePersonalInformation);
+    push('Dataset size', 'bytes', el.dataset_datasetSize);
+    push('Anonymization methods', 'chips', el.dataset_anonymizationMethodUsed);
+    push('Known biases', 'list', el.dataset_knownBias);
+    push('Data collection process', 'longtext', el.dataset_dataCollectionProcess);
+    push('Data preprocessing', 'list', el.dataset_dataPreprocessing);
+    push('Dataset noise', 'longtext', el.dataset_datasetNoise);
+    push('Dataset update mechanism', 'text', el.dataset_datasetUpdateMechanism);
+    push('Sensors', 'dict', el.dataset_sensor);
+
+    return out;
   },
 
   placeholderElement(spdxId) {

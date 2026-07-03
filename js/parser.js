@@ -207,7 +207,12 @@ export function parseGraph(graph, onProgress) {
     }
 
     switch (item.type) {
+      // AI model / dataset packages are software_Package subclasses (AI profile);
+      // categorize them as packages so they flow through the packages view and
+      // graph, keeping their own type for AI/dataset-specific styling.
       case ELEMENT_TYPES.PACKAGE:
+      case ELEMENT_TYPES.AI_PACKAGE:
+      case ELEMENT_TYPES.DATASET_PACKAGE:
         packages.push(item);
         break;
 
@@ -591,7 +596,13 @@ function buildVexModel(vulnerabilities, vexRelationships, elementMap) {
  */
 function computePresentTypes(data) {
   const nodeTypes = new Set();
-  if (data.packages.length) nodeTypes.add('package');
+  // packages holds plain software_Package plus its AI/dataset subclasses; split
+  // them so the legend only lists the node types actually present.
+  data.packages.forEach((p) => {
+    if (p.type === ELEMENT_TYPES.AI_PACKAGE) nodeTypes.add('ai');
+    else if (p.type === ELEMENT_TYPES.DATASET_PACKAGE) nodeTypes.add('dataset');
+    else nodeTypes.add('package');
+  });
   if (data.regularFiles.length) nodeTypes.add('file');
   if (data.tools.length) nodeTypes.add('tool');
   if (data.builds.length) nodeTypes.add('build');

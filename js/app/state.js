@@ -27,6 +27,8 @@ export function createState() {
       dashboard: true,
       graph: false,
       packages: false,
+      ai: false,
+      dataset: false,
       files: false,
       licenses: false,
       security: false,
@@ -39,6 +41,8 @@ export function createState() {
     // instantly instead of building every card up front.
     renderLimits: {
       packages: 0,
+      ai: 0,
+      dataset: 0,
       files: 0,
       licenses: 0,
       security: 0,
