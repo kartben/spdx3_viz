@@ -3783,8 +3783,11 @@
               >
             </div>
             <p x-show="detailElement?.placeholder" class="text-xs text-slate-400 leading-relaxed">
-              This element is defined outside the loaded document(s). Load the source below to
-              resolve its full details.
+              This element is defined outside the loaded document(s).<span
+                x-show="isMeaningful(externalRefFor(detailElement)?.locationHint)"
+              >
+                Load the source below to resolve its full details.</span
+              >
             </p>
 
             <!-- Location hint -->
