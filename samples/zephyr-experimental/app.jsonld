@@ -26,7 +26,7 @@
       "namespaceMap": [
         {
           "type": "NamespaceMap",
-          "namespace": "http://spdx.org/spdxdocs/zephyr-eda53cc4-e302-4d78-ac16-f551bcb0be52/",
+          "namespace": "http://spdx.org/spdxdocs/zephyr-e40dc478-a3c3-40e4-ae12-8eccaa0ed43f/",
           "prefix": "zephyr"
         }
       ],
@@ -35,12 +35,12 @@
         "zephyr:tools/west-spdx",
         "zephyr:packages/app-sources",
         "zephyr:files/File-main.c",
-        "zephyr:relationships/2287",
+        "zephyr:relationships/2435",
         "https://spdx.org/licenses/Apache-2.0",
-        "zephyr:relationships/2681",
-        "zephyr:relationships/2682",
-        "zephyr:relationships/2992",
-        "zephyr:relationships/2993",
+        "zephyr:relationships/2829",
+        "zephyr:relationships/2830",
+        "zephyr:relationships/3140",
+        "zephyr:relationships/3141",
         "https://spdx.org/licenses/CC0-1.0"
       ],
       "profileConformance": [
@@ -57,7 +57,7 @@
     {
       "type": "CreationInfo",
       "@id": "zephyr:creationinfo",
-      "created": "2026-07-03T22:00:43Z",
+      "created": "2026-07-03T22:47:53Z",
       "createdBy": [
         "zephyr:agents/west-spdx-agent"
       ],
@@ -99,7 +99,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2287",
+      "spdxId": "zephyr:relationships/2435",
       "from": "zephyr:packages/app-sources",
       "relationshipType": "contains",
       "to": [
@@ -109,7 +109,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2681",
+      "spdxId": "zephyr:relationships/2829",
       "from": "zephyr:packages/app-sources",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -119,7 +119,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2682",
+      "spdxId": "zephyr:relationships/2830",
       "from": "zephyr:packages/app-sources",
       "relationshipType": "hasDeclaredLicense",
       "to": [
@@ -129,7 +129,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2992",
+      "spdxId": "zephyr:relationships/3140",
       "from": "zephyr:files/File-main.c",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -139,7 +139,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2993",
+      "spdxId": "zephyr:relationships/3141",
       "from": "zephyr:files/File-main.c",
       "relationshipType": "hasDeclaredLicense",
       "to": [

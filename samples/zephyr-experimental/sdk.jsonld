@@ -28,7 +28,7 @@
     {
       "type": "CreationInfo",
       "@id": "zephyr:creationinfo",
-      "created": "2026-07-03T22:00:43Z",
+      "created": "2026-07-03T22:47:53Z",
       "createdBy": [
         "zephyr:agents/west-spdx-agent"
       ],
@@ -812,7 +812,7 @@
       "spdxId": "zephyr:files/File-stdio.h",
       "software_fileKind": "file",
       "software_artifactSize": 18290,
-      "software_copyrightText": "<text>\n/* Copyright (c) 2002, 2005, 2007 Joerg Wunsch\n   Portions of documentation Copyright (c) 1990, 1991, 1993\n</text>",
+      "software_copyrightText": "<text>\n   Portions of documentation Copyright (c) 1990, 1991, 1993\n/* Copyright (c) 2002, 2005, 2007 Joerg Wunsch\n</text>",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
       "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/stdio.h",
@@ -1088,7 +1088,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2288",
+      "spdxId": "zephyr:relationships/2436",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1098,7 +1098,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2289",
+      "spdxId": "zephyr:relationships/2437",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1108,7 +1108,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2290",
+      "spdxId": "zephyr:relationships/2438",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1118,7 +1118,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2291",
+      "spdxId": "zephyr:relationships/2439",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1128,7 +1128,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2292",
+      "spdxId": "zephyr:relationships/2440",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1138,7 +1138,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2293",
+      "spdxId": "zephyr:relationships/2441",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1148,7 +1148,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2294",
+      "spdxId": "zephyr:relationships/2442",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1158,7 +1158,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2295",
+      "spdxId": "zephyr:relationships/2443",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1168,7 +1168,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2296",
+      "spdxId": "zephyr:relationships/2444",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1178,7 +1178,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2297",
+      "spdxId": "zephyr:relationships/2445",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1188,7 +1188,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2298",
+      "spdxId": "zephyr:relationships/2446",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1198,7 +1198,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2299",
+      "spdxId": "zephyr:relationships/2447",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1208,7 +1208,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2300",
+      "spdxId": "zephyr:relationships/2448",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1218,7 +1218,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2301",
+      "spdxId": "zephyr:relationships/2449",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1228,7 +1228,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2302",
+      "spdxId": "zephyr:relationships/2450",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1238,7 +1238,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2303",
+      "spdxId": "zephyr:relationships/2451",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1248,7 +1248,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2304",
+      "spdxId": "zephyr:relationships/2452",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1258,7 +1258,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2305",
+      "spdxId": "zephyr:relationships/2453",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1268,7 +1268,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2306",
+      "spdxId": "zephyr:relationships/2454",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1278,7 +1278,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2307",
+      "spdxId": "zephyr:relationships/2455",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1288,7 +1288,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2308",
+      "spdxId": "zephyr:relationships/2456",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1298,7 +1298,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2309",
+      "spdxId": "zephyr:relationships/2457",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1308,7 +1308,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2310",
+      "spdxId": "zephyr:relationships/2458",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1318,7 +1318,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2311",
+      "spdxId": "zephyr:relationships/2459",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1328,7 +1328,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2312",
+      "spdxId": "zephyr:relationships/2460",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1338,7 +1338,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2313",
+      "spdxId": "zephyr:relationships/2461",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1348,7 +1348,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2314",
+      "spdxId": "zephyr:relationships/2462",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1358,7 +1358,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2315",
+      "spdxId": "zephyr:relationships/2463",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1368,7 +1368,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2316",
+      "spdxId": "zephyr:relationships/2464",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1378,7 +1378,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2317",
+      "spdxId": "zephyr:relationships/2465",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1388,7 +1388,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2318",
+      "spdxId": "zephyr:relationships/2466",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1398,7 +1398,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2319",
+      "spdxId": "zephyr:relationships/2467",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1408,7 +1408,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2320",
+      "spdxId": "zephyr:relationships/2468",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1418,7 +1418,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2321",
+      "spdxId": "zephyr:relationships/2469",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1428,7 +1428,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2322",
+      "spdxId": "zephyr:relationships/2470",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1438,7 +1438,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2323",
+      "spdxId": "zephyr:relationships/2471",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1448,7 +1448,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2324",
+      "spdxId": "zephyr:relationships/2472",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1458,7 +1458,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2325",
+      "spdxId": "zephyr:relationships/2473",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1468,7 +1468,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2326",
+      "spdxId": "zephyr:relationships/2474",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1478,7 +1478,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2327",
+      "spdxId": "zephyr:relationships/2475",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1488,7 +1488,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2328",
+      "spdxId": "zephyr:relationships/2476",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1498,7 +1498,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2329",
+      "spdxId": "zephyr:relationships/2477",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1508,7 +1508,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2330",
+      "spdxId": "zephyr:relationships/2478",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1518,7 +1518,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2331",
+      "spdxId": "zephyr:relationships/2479",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1528,7 +1528,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2332",
+      "spdxId": "zephyr:relationships/2480",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1538,7 +1538,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2333",
+      "spdxId": "zephyr:relationships/2481",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1548,7 +1548,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2334",
+      "spdxId": "zephyr:relationships/2482",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "contains",
       "to": [
@@ -1558,7 +1558,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2683",
+      "spdxId": "zephyr:relationships/2831",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1568,7 +1568,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2684",
+      "spdxId": "zephyr:relationships/2832",
       "from": "zephyr:packages/sdk-sources",
       "relationshipType": "hasDeclaredLicense",
       "to": [
@@ -1578,7 +1578,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/3042",
+      "spdxId": "zephyr:relationships/3190",
       "from": "zephyr:files/File-limits.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1588,7 +1588,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/3043",
+      "spdxId": "zephyr:relationships/3191",
       "from": "zephyr:files/File-stdarg.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1598,7 +1598,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/3044",
+      "spdxId": "zephyr:relationships/3192",
       "from": "zephyr:files/File-stdbool.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1608,7 +1608,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/3045",
+      "spdxId": "zephyr:relationships/3193",
       "from": "zephyr:files/File-stddef.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1618,7 +1618,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/3046",
+      "spdxId": "zephyr:relationships/3194",
       "from": "zephyr:files/File-syslimits.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1628,7 +1628,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/3047",
+      "spdxId": "zephyr:relationships/3195",
       "from": "zephyr:files/File-assert.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1638,7 +1638,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/3048",
+      "spdxId": "zephyr:relationships/3196",
       "from": "zephyr:files/File-errno.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1648,7 +1648,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/3049",
+      "spdxId": "zephyr:relationships/3197",
       "from": "zephyr:files/File-inttypes.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1658,7 +1658,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/3050",
+      "spdxId": "zephyr:relationships/3198",
       "from": "zephyr:files/File-limits.h-2",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1668,7 +1668,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/3051",
+      "spdxId": "zephyr:relationships/3199",
       "from": "zephyr:files/File--default-types.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1678,7 +1678,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/3052",
+      "spdxId": "zephyr:relationships/3200",
       "from": "zephyr:files/File--types.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1688,7 +1688,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/3053",
+      "spdxId": "zephyr:relationships/3201",
       "from": "zephyr:files/File-ieeefp.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1698,7 +1698,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/3054",
+      "spdxId": "zephyr:relationships/3202",
       "from": "zephyr:files/File-stdlib.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1708,7 +1708,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/3055",
+      "spdxId": "zephyr:relationships/3203",
       "from": "zephyr:files/File-picolibc.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1718,7 +1718,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/3056",
+      "spdxId": "zephyr:relationships/3204",
       "from": "zephyr:files/File-stdint.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1728,7 +1728,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/3057",
+      "spdxId": "zephyr:relationships/3205",
       "from": "zephyr:files/File-stdio.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1738,7 +1738,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/3058",
+      "spdxId": "zephyr:relationships/3206",
       "from": "zephyr:files/File-stdlib.h-2",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1748,7 +1748,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/3059",
+      "spdxId": "zephyr:relationships/3207",
       "from": "zephyr:files/File-string.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1758,7 +1758,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/3060",
+      "spdxId": "zephyr:relationships/3208",
       "from": "zephyr:files/File--intsup.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1768,7 +1768,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/3061",
+      "spdxId": "zephyr:relationships/3209",
       "from": "zephyr:files/File--stdint.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1778,7 +1778,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/3062",
+      "spdxId": "zephyr:relationships/3210",
       "from": "zephyr:files/File--types.h-2",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1788,7 +1788,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/3063",
+      "spdxId": "zephyr:relationships/3211",
       "from": "zephyr:files/File--wait.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1798,7 +1798,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/3064",
+      "spdxId": "zephyr:relationships/3212",
       "from": "zephyr:files/File-cdefs.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1808,7 +1808,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/3065",
+      "spdxId": "zephyr:relationships/3213",
       "from": "zephyr:files/File-cdefs.h",
       "relationshipType": "hasDeclaredLicense",
       "to": [
@@ -1818,7 +1818,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/3066",
+      "spdxId": "zephyr:relationships/3214",
       "from": "zephyr:files/File-config.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1828,7 +1828,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/3067",
+      "spdxId": "zephyr:relationships/3215",
       "from": "zephyr:files/File-errno.h-2",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1838,7 +1838,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/3068",
+      "spdxId": "zephyr:relationships/3216",
       "from": "zephyr:files/File-features.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1848,7 +1848,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/3069",
+      "spdxId": "zephyr:relationships/3217",
       "from": "zephyr:files/File-lock.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1858,7 +1858,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/3070",
+      "spdxId": "zephyr:relationships/3218",
       "from": "zephyr:files/File-string.h-2",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1868,7 +1868,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/3071",
+      "spdxId": "zephyr:relationships/3219",
       "from": "zephyr:files/File-syslimits.h-2",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1878,7 +1878,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/4015",
+      "spdxId": "zephyr:relationships/4163",
       "from": "zephyr:files/File-ctype.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1888,7 +1888,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/4366",
+      "spdxId": "zephyr:relationships/4514",
       "from": "zephyr:files/File-types.h-2",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1898,7 +1898,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/4367",
+      "spdxId": "zephyr:relationships/4515",
       "from": "zephyr:files/File-types.h-3",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1908,7 +1908,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/4422",
+      "spdxId": "zephyr:relationships/4570",
       "from": "zephyr:files/File--timespec.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1918,7 +1918,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/4423",
+      "spdxId": "zephyr:relationships/4571",
       "from": "zephyr:files/File--timespec.h",
       "relationshipType": "hasDeclaredLicense",
       "to": [
@@ -1928,7 +1928,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/4424",
+      "spdxId": "zephyr:relationships/4572",
       "from": "zephyr:files/File-time.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1938,7 +1938,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/4445",
+      "spdxId": "zephyr:relationships/4593",
       "from": "zephyr:files/File--time.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1948,7 +1948,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/4446",
+      "spdxId": "zephyr:relationships/4594",
       "from": "zephyr:files/File--select.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1958,7 +1958,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/4447",
+      "spdxId": "zephyr:relationships/4595",
       "from": "zephyr:files/File--timeval.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1968,7 +1968,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/4448",
+      "spdxId": "zephyr:relationships/4596",
       "from": "zephyr:files/File--timeval.h",
       "relationshipType": "hasDeclaredLicense",
       "to": [
@@ -1978,7 +1978,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/4449",
+      "spdxId": "zephyr:relationships/4597",
       "from": "zephyr:files/File-time.h-3",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -1988,7 +1988,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/4450",
+      "spdxId": "zephyr:relationships/4598",
       "from": "zephyr:files/File-time.h-3",
       "relationshipType": "hasDeclaredLicense",
       "to": [
@@ -1998,7 +1998,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/4871",
+      "spdxId": "zephyr:relationships/5019",
       "from": "zephyr:files/File--locale.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -2008,7 +2008,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/5311",
+      "spdxId": "zephyr:relationships/5459",
       "from": "zephyr:files/File--endian.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -2018,7 +2018,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/5312",
+      "spdxId": "zephyr:relationships/5460",
       "from": "zephyr:files/File-endian.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -2028,7 +2028,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/5313",
+      "spdxId": "zephyr:relationships/5461",
       "from": "zephyr:files/File-math.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -2038,7 +2038,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/5314",
+      "spdxId": "zephyr:relationships/5462",
       "from": "zephyr:files/File-math.h",
       "relationshipType": "hasDeclaredLicense",
       "to": [
@@ -2048,7 +2048,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/5315",
+      "spdxId": "zephyr:relationships/5463",
       "from": "zephyr:files/File-param.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -2058,7 +2058,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/5316",
+      "spdxId": "zephyr:relationships/5464",
       "from": "zephyr:files/File-math.h-2",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -2068,7 +2068,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/5317",
+      "spdxId": "zephyr:relationships/5465",
       "from": "zephyr:files/File-strings.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -2078,7 +2078,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/5318",
+      "spdxId": "zephyr:relationships/5466",
       "from": "zephyr:files/File-param.h-2",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -2088,7 +2088,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/5319",
+      "spdxId": "zephyr:relationships/5467",
       "from": "zephyr:files/File-queue.h",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -2103,7 +2103,7 @@
       "namespaceMap": [
         {
           "type": "NamespaceMap",
-          "namespace": "http://spdx.org/spdxdocs/zephyr-eda53cc4-e302-4d78-ac16-f551bcb0be52/",
+          "namespace": "http://spdx.org/spdxdocs/zephyr-e40dc478-a3c3-40e4-ae12-8eccaa0ed43f/",
           "prefix": "zephyr"
         }
       ],
@@ -2158,110 +2158,110 @@
         "zephyr:files/File-strings.h",
         "zephyr:files/File-param.h-2",
         "zephyr:files/File-queue.h",
-        "zephyr:relationships/2288",
-        "zephyr:relationships/2289",
-        "zephyr:relationships/2290",
-        "zephyr:relationships/2291",
-        "zephyr:relationships/2292",
-        "zephyr:relationships/2293",
-        "zephyr:relationships/2294",
-        "zephyr:relationships/2295",
-        "zephyr:relationships/2296",
-        "zephyr:relationships/2297",
-        "zephyr:relationships/2298",
-        "zephyr:relationships/2299",
-        "zephyr:relationships/2300",
-        "zephyr:relationships/2301",
-        "zephyr:relationships/2302",
-        "zephyr:relationships/2303",
-        "zephyr:relationships/2304",
-        "zephyr:relationships/2305",
-        "zephyr:relationships/2306",
-        "zephyr:relationships/2307",
-        "zephyr:relationships/2308",
-        "zephyr:relationships/2309",
-        "zephyr:relationships/2310",
-        "zephyr:relationships/2311",
-        "zephyr:relationships/2312",
-        "zephyr:relationships/2313",
-        "zephyr:relationships/2314",
-        "zephyr:relationships/2315",
-        "zephyr:relationships/2316",
-        "zephyr:relationships/2317",
-        "zephyr:relationships/2318",
-        "zephyr:relationships/2319",
-        "zephyr:relationships/2320",
-        "zephyr:relationships/2321",
-        "zephyr:relationships/2322",
-        "zephyr:relationships/2323",
-        "zephyr:relationships/2324",
-        "zephyr:relationships/2325",
-        "zephyr:relationships/2326",
-        "zephyr:relationships/2327",
-        "zephyr:relationships/2328",
-        "zephyr:relationships/2329",
-        "zephyr:relationships/2330",
-        "zephyr:relationships/2331",
-        "zephyr:relationships/2332",
-        "zephyr:relationships/2333",
-        "zephyr:relationships/2334",
+        "zephyr:relationships/2436",
+        "zephyr:relationships/2437",
+        "zephyr:relationships/2438",
+        "zephyr:relationships/2439",
+        "zephyr:relationships/2440",
+        "zephyr:relationships/2441",
+        "zephyr:relationships/2442",
+        "zephyr:relationships/2443",
+        "zephyr:relationships/2444",
+        "zephyr:relationships/2445",
+        "zephyr:relationships/2446",
+        "zephyr:relationships/2447",
+        "zephyr:relationships/2448",
+        "zephyr:relationships/2449",
+        "zephyr:relationships/2450",
+        "zephyr:relationships/2451",
+        "zephyr:relationships/2452",
+        "zephyr:relationships/2453",
+        "zephyr:relationships/2454",
+        "zephyr:relationships/2455",
+        "zephyr:relationships/2456",
+        "zephyr:relationships/2457",
+        "zephyr:relationships/2458",
+        "zephyr:relationships/2459",
+        "zephyr:relationships/2460",
+        "zephyr:relationships/2461",
+        "zephyr:relationships/2462",
+        "zephyr:relationships/2463",
+        "zephyr:relationships/2464",
+        "zephyr:relationships/2465",
+        "zephyr:relationships/2466",
+        "zephyr:relationships/2467",
+        "zephyr:relationships/2468",
+        "zephyr:relationships/2469",
+        "zephyr:relationships/2470",
+        "zephyr:relationships/2471",
+        "zephyr:relationships/2472",
+        "zephyr:relationships/2473",
+        "zephyr:relationships/2474",
+        "zephyr:relationships/2475",
+        "zephyr:relationships/2476",
+        "zephyr:relationships/2477",
+        "zephyr:relationships/2478",
+        "zephyr:relationships/2479",
+        "zephyr:relationships/2480",
+        "zephyr:relationships/2481",
+        "zephyr:relationships/2482",
         "zephyr:licenses/BSD-2-Clause-FreeBSD-AND-BSD-3-Clause",
-        "zephyr:relationships/2683",
-        "zephyr:relationships/2684",
-        "zephyr:relationships/3042",
-        "zephyr:relationships/3043",
-        "zephyr:relationships/3044",
-        "zephyr:relationships/3045",
-        "zephyr:relationships/3046",
-        "zephyr:relationships/3047",
-        "zephyr:relationships/3048",
-        "zephyr:relationships/3049",
-        "zephyr:relationships/3050",
-        "zephyr:relationships/3051",
-        "zephyr:relationships/3052",
-        "zephyr:relationships/3053",
-        "zephyr:relationships/3054",
-        "zephyr:relationships/3055",
-        "zephyr:relationships/3056",
-        "zephyr:relationships/3057",
-        "zephyr:relationships/3058",
-        "zephyr:relationships/3059",
-        "zephyr:relationships/3060",
-        "zephyr:relationships/3061",
-        "zephyr:relationships/3062",
-        "zephyr:relationships/3063",
+        "zephyr:relationships/2831",
+        "zephyr:relationships/2832",
+        "zephyr:relationships/3190",
+        "zephyr:relationships/3191",
+        "zephyr:relationships/3192",
+        "zephyr:relationships/3193",
+        "zephyr:relationships/3194",
+        "zephyr:relationships/3195",
+        "zephyr:relationships/3196",
+        "zephyr:relationships/3197",
+        "zephyr:relationships/3198",
+        "zephyr:relationships/3199",
+        "zephyr:relationships/3200",
+        "zephyr:relationships/3201",
+        "zephyr:relationships/3202",
+        "zephyr:relationships/3203",
+        "zephyr:relationships/3204",
+        "zephyr:relationships/3205",
+        "zephyr:relationships/3206",
+        "zephyr:relationships/3207",
+        "zephyr:relationships/3208",
+        "zephyr:relationships/3209",
+        "zephyr:relationships/3210",
+        "zephyr:relationships/3211",
         "https://spdx.org/licenses/BSD-3-Clause",
-        "zephyr:relationships/3064",
-        "zephyr:relationships/3065",
-        "zephyr:relationships/3066",
-        "zephyr:relationships/3067",
-        "zephyr:relationships/3068",
-        "zephyr:relationships/3069",
-        "zephyr:relationships/3070",
-        "zephyr:relationships/3071",
-        "zephyr:relationships/4015",
-        "zephyr:relationships/4366",
-        "zephyr:relationships/4367",
-        "zephyr:relationships/4422",
-        "zephyr:relationships/4423",
-        "zephyr:relationships/4424",
-        "zephyr:relationships/4445",
-        "zephyr:relationships/4446",
+        "zephyr:relationships/3212",
+        "zephyr:relationships/3213",
+        "zephyr:relationships/3214",
+        "zephyr:relationships/3215",
+        "zephyr:relationships/3216",
+        "zephyr:relationships/3217",
+        "zephyr:relationships/3218",
+        "zephyr:relationships/3219",
+        "zephyr:relationships/4163",
+        "zephyr:relationships/4514",
+        "zephyr:relationships/4515",
+        "zephyr:relationships/4570",
+        "zephyr:relationships/4571",
+        "zephyr:relationships/4572",
+        "zephyr:relationships/4593",
+        "zephyr:relationships/4594",
         "https://spdx.org/licenses/BSD-2-Clause-FreeBSD",
-        "zephyr:relationships/4447",
-        "zephyr:relationships/4448",
-        "zephyr:relationships/4449",
-        "zephyr:relationships/4450",
-        "zephyr:relationships/4871",
-        "zephyr:relationships/5311",
-        "zephyr:relationships/5312",
-        "zephyr:relationships/5313",
-        "zephyr:relationships/5314",
-        "zephyr:relationships/5315",
-        "zephyr:relationships/5316",
-        "zephyr:relationships/5317",
-        "zephyr:relationships/5318",
-        "zephyr:relationships/5319",
+        "zephyr:relationships/4595",
+        "zephyr:relationships/4596",
+        "zephyr:relationships/4597",
+        "zephyr:relationships/4598",
+        "zephyr:relationships/5019",
+        "zephyr:relationships/5459",
+        "zephyr:relationships/5460",
+        "zephyr:relationships/5461",
+        "zephyr:relationships/5462",
+        "zephyr:relationships/5463",
+        "zephyr:relationships/5464",
+        "zephyr:relationships/5465",
+        "zephyr:relationships/5466",
+        "zephyr:relationships/5467",
         "https://spdx.org/licenses/CC0-1.0"
       ],
       "profileConformance": [

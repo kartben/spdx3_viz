@@ -6,7 +6,7 @@
     <title>SPDX 3 SBOM Visualizer</title>
     <meta
       name="description"
-      content="Explore SPDX 3 SBOMs as an interactive graph: packages, source files, hardware, builds, tools and licenses, and every link between them. Zero-build, runs entirely in your browser."
+      content="Explore SPDX 3 SBOMs as an interactive graph: packages, source files, hardware, requirements, builds, tools and licenses, and every link between them. Zero-build, runs entirely in your browser."
     />
 
     <!-- Open Graph / Facebook / LinkedIn / Slack -->
@@ -4257,7 +4257,7 @@
                 ></span>
                 <span
                   class="text-xs text-slate-400"
-                  x-text="detailElement ? detailElement.type.replace('software_','').replace('build_','').replace('simplelicensing_','').replace('security_','').replace('ai_','').replace('dataset_','') : ''"
+                  x-text="detailElement ? detailElement.type.replace('software_','').replace('build_','').replace('simplelicensing_','').replace('security_','').replace('ai_','').replace('dataset_','').replace('hardware_','').replace('functionalsafety_','') : ''"
                 ></span>
               </div>
               <h3

@@ -16,7 +16,7 @@
     {
       "type": "CreationInfo",
       "@id": "zephyr:creationinfo",
-      "created": "2026-07-03T22:00:43Z",
+      "created": "2026-07-03T22:47:53Z",
       "createdBy": [
         "zephyr:agents/west-spdx-agent"
       ],
@@ -32,7 +32,7 @@
       "namespaceMap": [
         {
           "type": "NamespaceMap",
-          "namespace": "http://spdx.org/spdxdocs/zephyr-eda53cc4-e302-4d78-ac16-f551bcb0be52/",
+          "namespace": "http://spdx.org/spdxdocs/zephyr-e40dc478-a3c3-40e4-ae12-8eccaa0ed43f/",
           "prefix": "zephyr"
         }
       ],
@@ -168,136 +168,136 @@
         "zephyr:relationships/61",
         "zephyr:relationships/62",
         "zephyr:relationships/63",
-        "zephyr:relationships/2685",
-        "zephyr:relationships/2686",
-        "zephyr:relationships/2687",
-        "zephyr:relationships/2688",
-        "zephyr:relationships/2689",
-        "zephyr:relationships/2690",
-        "zephyr:relationships/2691",
-        "zephyr:relationships/2692",
-        "zephyr:relationships/2693",
-        "zephyr:relationships/2694",
-        "zephyr:relationships/2695",
-        "zephyr:relationships/2696",
-        "zephyr:relationships/2697",
-        "zephyr:relationships/2698",
-        "zephyr:relationships/2699",
-        "zephyr:relationships/2700",
-        "zephyr:relationships/2701",
-        "zephyr:relationships/2702",
-        "zephyr:relationships/2703",
-        "zephyr:relationships/2704",
-        "zephyr:relationships/2705",
-        "zephyr:relationships/2706",
-        "zephyr:relationships/2707",
-        "zephyr:relationships/2708",
-        "zephyr:relationships/2709",
-        "zephyr:relationships/2710",
-        "zephyr:relationships/2711",
-        "zephyr:relationships/2712",
-        "zephyr:relationships/2713",
-        "zephyr:relationships/2714",
-        "zephyr:relationships/2715",
-        "zephyr:relationships/2716",
-        "zephyr:relationships/2717",
-        "zephyr:relationships/2718",
-        "zephyr:relationships/2719",
-        "zephyr:relationships/2720",
-        "zephyr:relationships/2721",
-        "zephyr:relationships/2722",
-        "zephyr:relationships/2723",
-        "zephyr:relationships/2724",
-        "zephyr:relationships/2725",
-        "zephyr:relationships/2726",
-        "zephyr:relationships/2727",
-        "zephyr:relationships/2728",
-        "zephyr:relationships/2729",
-        "zephyr:relationships/2730",
-        "zephyr:relationships/2731",
-        "zephyr:relationships/2732",
-        "zephyr:relationships/2733",
-        "zephyr:relationships/2734",
-        "zephyr:relationships/2735",
-        "zephyr:relationships/2736",
-        "zephyr:relationships/2737",
-        "zephyr:relationships/2738",
-        "zephyr:relationships/2739",
-        "zephyr:relationships/2740",
-        "zephyr:relationships/2741",
-        "zephyr:relationships/2742",
-        "zephyr:relationships/2743",
-        "zephyr:relationships/2744",
-        "zephyr:relationships/2745",
-        "zephyr:relationships/2746",
-        "zephyr:relationships/2747",
-        "zephyr:relationships/2748",
-        "zephyr:relationships/2749",
-        "zephyr:relationships/2750",
-        "zephyr:relationships/2751",
-        "zephyr:relationships/2752",
-        "zephyr:relationships/2753",
-        "zephyr:relationships/2754",
-        "zephyr:relationships/2755",
-        "zephyr:relationships/2756",
-        "zephyr:relationships/2757",
-        "zephyr:relationships/2758",
-        "zephyr:relationships/2759",
-        "zephyr:relationships/2760",
-        "zephyr:relationships/2761",
-        "zephyr:relationships/2762",
-        "zephyr:relationships/2763",
-        "zephyr:relationships/2764",
-        "zephyr:relationships/2765",
-        "zephyr:relationships/2766",
-        "zephyr:relationships/2767",
-        "zephyr:relationships/2768",
-        "zephyr:relationships/2769",
-        "zephyr:relationships/2770",
-        "zephyr:relationships/2771",
-        "zephyr:relationships/2772",
-        "zephyr:relationships/2773",
-        "zephyr:relationships/2774",
-        "zephyr:relationships/2775",
-        "zephyr:relationships/2776",
-        "zephyr:relationships/2777",
-        "zephyr:relationships/2778",
-        "zephyr:relationships/2779",
-        "zephyr:relationships/2780",
-        "zephyr:relationships/2781",
-        "zephyr:relationships/2782",
-        "zephyr:relationships/2783",
-        "zephyr:relationships/2784",
-        "zephyr:relationships/2785",
-        "zephyr:relationships/2786",
-        "zephyr:relationships/2787",
-        "zephyr:relationships/2788",
-        "zephyr:relationships/2789",
-        "zephyr:relationships/2790",
-        "zephyr:relationships/2791",
-        "zephyr:relationships/2792",
-        "zephyr:relationships/2793",
-        "zephyr:relationships/2794",
-        "zephyr:relationships/2795",
-        "zephyr:relationships/2796",
-        "zephyr:relationships/2797",
-        "zephyr:relationships/2798",
-        "zephyr:relationships/2799",
-        "zephyr:relationships/2800",
-        "zephyr:relationships/2801",
-        "zephyr:relationships/2802",
-        "zephyr:relationships/2803",
-        "zephyr:relationships/2804",
-        "zephyr:relationships/2805",
-        "zephyr:relationships/2806",
-        "zephyr:relationships/2807",
-        "zephyr:relationships/2808",
-        "zephyr:relationships/2809",
-        "zephyr:relationships/2810",
-        "zephyr:relationships/2811",
-        "zephyr:relationships/2812",
-        "zephyr:relationships/2813",
-        "zephyr:relationships/2814",
+        "zephyr:relationships/2833",
+        "zephyr:relationships/2834",
+        "zephyr:relationships/2835",
+        "zephyr:relationships/2836",
+        "zephyr:relationships/2837",
+        "zephyr:relationships/2838",
+        "zephyr:relationships/2839",
+        "zephyr:relationships/2840",
+        "zephyr:relationships/2841",
+        "zephyr:relationships/2842",
+        "zephyr:relationships/2843",
+        "zephyr:relationships/2844",
+        "zephyr:relationships/2845",
+        "zephyr:relationships/2846",
+        "zephyr:relationships/2847",
+        "zephyr:relationships/2848",
+        "zephyr:relationships/2849",
+        "zephyr:relationships/2850",
+        "zephyr:relationships/2851",
+        "zephyr:relationships/2852",
+        "zephyr:relationships/2853",
+        "zephyr:relationships/2854",
+        "zephyr:relationships/2855",
+        "zephyr:relationships/2856",
+        "zephyr:relationships/2857",
+        "zephyr:relationships/2858",
+        "zephyr:relationships/2859",
+        "zephyr:relationships/2860",
+        "zephyr:relationships/2861",
+        "zephyr:relationships/2862",
+        "zephyr:relationships/2863",
+        "zephyr:relationships/2864",
+        "zephyr:relationships/2865",
+        "zephyr:relationships/2866",
+        "zephyr:relationships/2867",
+        "zephyr:relationships/2868",
+        "zephyr:relationships/2869",
+        "zephyr:relationships/2870",
+        "zephyr:relationships/2871",
+        "zephyr:relationships/2872",
+        "zephyr:relationships/2873",
+        "zephyr:relationships/2874",
+        "zephyr:relationships/2875",
+        "zephyr:relationships/2876",
+        "zephyr:relationships/2877",
+        "zephyr:relationships/2878",
+        "zephyr:relationships/2879",
+        "zephyr:relationships/2880",
+        "zephyr:relationships/2881",
+        "zephyr:relationships/2882",
+        "zephyr:relationships/2883",
+        "zephyr:relationships/2884",
+        "zephyr:relationships/2885",
+        "zephyr:relationships/2886",
+        "zephyr:relationships/2887",
+        "zephyr:relationships/2888",
+        "zephyr:relationships/2889",
+        "zephyr:relationships/2890",
+        "zephyr:relationships/2891",
+        "zephyr:relationships/2892",
+        "zephyr:relationships/2893",
+        "zephyr:relationships/2894",
+        "zephyr:relationships/2895",
+        "zephyr:relationships/2896",
+        "zephyr:relationships/2897",
+        "zephyr:relationships/2898",
+        "zephyr:relationships/2899",
+        "zephyr:relationships/2900",
+        "zephyr:relationships/2901",
+        "zephyr:relationships/2902",
+        "zephyr:relationships/2903",
+        "zephyr:relationships/2904",
+        "zephyr:relationships/2905",
+        "zephyr:relationships/2906",
+        "zephyr:relationships/2907",
+        "zephyr:relationships/2908",
+        "zephyr:relationships/2909",
+        "zephyr:relationships/2910",
+        "zephyr:relationships/2911",
+        "zephyr:relationships/2912",
+        "zephyr:relationships/2913",
+        "zephyr:relationships/2914",
+        "zephyr:relationships/2915",
+        "zephyr:relationships/2916",
+        "zephyr:relationships/2917",
+        "zephyr:relationships/2918",
+        "zephyr:relationships/2919",
+        "zephyr:relationships/2920",
+        "zephyr:relationships/2921",
+        "zephyr:relationships/2922",
+        "zephyr:relationships/2923",
+        "zephyr:relationships/2924",
+        "zephyr:relationships/2925",
+        "zephyr:relationships/2926",
+        "zephyr:relationships/2927",
+        "zephyr:relationships/2928",
+        "zephyr:relationships/2929",
+        "zephyr:relationships/2930",
+        "zephyr:relationships/2931",
+        "zephyr:relationships/2932",
+        "zephyr:relationships/2933",
+        "zephyr:relationships/2934",
+        "zephyr:relationships/2935",
+        "zephyr:relationships/2936",
+        "zephyr:relationships/2937",
+        "zephyr:relationships/2938",
+        "zephyr:relationships/2939",
+        "zephyr:relationships/2940",
+        "zephyr:relationships/2941",
+        "zephyr:relationships/2942",
+        "zephyr:relationships/2943",
+        "zephyr:relationships/2944",
+        "zephyr:relationships/2945",
+        "zephyr:relationships/2946",
+        "zephyr:relationships/2947",
+        "zephyr:relationships/2948",
+        "zephyr:relationships/2949",
+        "zephyr:relationships/2950",
+        "zephyr:relationships/2951",
+        "zephyr:relationships/2952",
+        "zephyr:relationships/2953",
+        "zephyr:relationships/2954",
+        "zephyr:relationships/2955",
+        "zephyr:relationships/2956",
+        "zephyr:relationships/2957",
+        "zephyr:relationships/2958",
+        "zephyr:relationships/2959",
+        "zephyr:relationships/2960",
+        "zephyr:relationships/2961",
+        "zephyr:relationships/2962",
         "https://spdx.org/licenses/CC0-1.0"
       ],
       "profileConformance": [
@@ -1223,1161 +1223,11 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2685",
-      "from": "zephyr:packages/zephyr-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2686",
-      "from": "zephyr:packages/zephyr-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2687",
-      "from": "zephyr:packages/acpica-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2688",
-      "from": "zephyr:packages/acpica-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2689",
-      "from": "zephyr:packages/cmsis-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2690",
-      "from": "zephyr:packages/cmsis-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2691",
-      "from": "zephyr:packages/cmsis-dsp-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2692",
-      "from": "zephyr:packages/cmsis-dsp-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2693",
-      "from": "zephyr:packages/cmsis-nn-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2694",
-      "from": "zephyr:packages/cmsis-nn-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2695",
-      "from": "zephyr:packages/cmsis-6-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2696",
-      "from": "zephyr:packages/cmsis-6-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2697",
-      "from": "zephyr:packages/dhara-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2698",
-      "from": "zephyr:packages/dhara-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2699",
-      "from": "zephyr:packages/fatfs-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
       "spdxId": "zephyr:relationships/27",
       "from": "zephyr:packages/hal-silabs-deps",
       "relationshipType": "other",
       "to": [
         "zephyr:packages/zephyr-deps"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2700",
-      "from": "zephyr:packages/fatfs-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2701",
-      "from": "zephyr:packages/adi-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2702",
-      "from": "zephyr:packages/adi-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2703",
-      "from": "zephyr:packages/hal-afbr-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2704",
-      "from": "zephyr:packages/hal-afbr-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2705",
-      "from": "zephyr:packages/hal-ambiq-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2706",
-      "from": "zephyr:packages/hal-ambiq-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2707",
-      "from": "zephyr:packages/atmel-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2708",
-      "from": "zephyr:packages/atmel-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2709",
-      "from": "zephyr:packages/hal-bouffalolab-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2710",
-      "from": "zephyr:packages/hal-bouffalolab-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2711",
-      "from": "zephyr:packages/hal-espressif-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2712",
-      "from": "zephyr:packages/hal-espressif-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2713",
-      "from": "zephyr:packages/hal-ethos-u-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2714",
-      "from": "zephyr:packages/hal-ethos-u-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2715",
-      "from": "zephyr:packages/hal-gigadevice-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2716",
-      "from": "zephyr:packages/hal-gigadevice-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2717",
-      "from": "zephyr:packages/hal-infineon-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2718",
-      "from": "zephyr:packages/hal-infineon-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2719",
-      "from": "zephyr:packages/hal-intel-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2720",
-      "from": "zephyr:packages/hal-intel-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2721",
-      "from": "zephyr:packages/microchip-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2722",
-      "from": "zephyr:packages/microchip-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2723",
-      "from": "zephyr:packages/hal-nordic-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2724",
-      "from": "zephyr:packages/hal-nordic-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2725",
-      "from": "zephyr:packages/nuvoton-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2726",
-      "from": "zephyr:packages/nuvoton-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2727",
-      "from": "zephyr:packages/hal-nxp-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2728",
-      "from": "zephyr:packages/hal-nxp-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2729",
-      "from": "zephyr:packages/openisa-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2730",
-      "from": "zephyr:packages/openisa-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2731",
-      "from": "zephyr:packages/quicklogic-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2732",
-      "from": "zephyr:packages/quicklogic-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2733",
-      "from": "zephyr:packages/hal-realtek-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2734",
-      "from": "zephyr:packages/hal-realtek-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2735",
-      "from": "zephyr:packages/hal-renesas-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2736",
-      "from": "zephyr:packages/hal-renesas-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2737",
-      "from": "zephyr:packages/hal-rpi-pico-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2738",
-      "from": "zephyr:packages/hal-rpi-pico-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2739",
-      "from": "zephyr:packages/hal-sifli-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2740",
-      "from": "zephyr:packages/hal-sifli-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2741",
-      "from": "zephyr:packages/hal-silabs-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2742",
-      "from": "zephyr:packages/hal-silabs-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2743",
-      "from": "zephyr:packages/hal-st-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2744",
-      "from": "zephyr:packages/hal-st-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2745",
-      "from": "zephyr:packages/hal-stm32-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2746",
-      "from": "zephyr:packages/hal-stm32-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2747",
-      "from": "zephyr:packages/hal-tdk-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2748",
-      "from": "zephyr:packages/hal-tdk-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2749",
-      "from": "zephyr:packages/hal-telink-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2750",
-      "from": "zephyr:packages/hal-telink-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2751",
-      "from": "zephyr:packages/ti-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2752",
-      "from": "zephyr:packages/ti-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2753",
-      "from": "zephyr:packages/hal-wch-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2754",
-      "from": "zephyr:packages/hal-wch-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2755",
-      "from": "zephyr:packages/hal-wurthelektronik-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2756",
-      "from": "zephyr:packages/hal-wurthelektronik-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2757",
-      "from": "zephyr:packages/xtensa-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2758",
-      "from": "zephyr:packages/xtensa-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2759",
-      "from": "zephyr:packages/hostap-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2760",
-      "from": "zephyr:packages/hostap-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2761",
-      "from": "zephyr:packages/liblc3-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2762",
-      "from": "zephyr:packages/liblc3-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2763",
-      "from": "zephyr:packages/libmctp-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2764",
-      "from": "zephyr:packages/libmctp-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2765",
-      "from": "zephyr:packages/libmetal-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2766",
-      "from": "zephyr:packages/libmetal-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2767",
-      "from": "zephyr:packages/libsbc-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2768",
-      "from": "zephyr:packages/libsbc-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2769",
-      "from": "zephyr:packages/littlefs-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2770",
-      "from": "zephyr:packages/littlefs-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2771",
-      "from": "zephyr:packages/lora-basics-modem-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2772",
-      "from": "zephyr:packages/lora-basics-modem-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2773",
-      "from": "zephyr:packages/loramac-node-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2774",
-      "from": "zephyr:packages/loramac-node-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2775",
-      "from": "zephyr:packages/lvgl-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2776",
-      "from": "zephyr:packages/lvgl-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2777",
-      "from": "zephyr:packages/mbedtls-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2778",
-      "from": "zephyr:packages/mbedtls-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2779",
-      "from": "zephyr:packages/mcuboot-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2780",
-      "from": "zephyr:packages/mcuboot-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2781",
-      "from": "zephyr:packages/mipi-sys-t-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2782",
-      "from": "zephyr:packages/mipi-sys-t-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2783",
-      "from": "zephyr:packages/mldsa-native-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2784",
-      "from": "zephyr:packages/mldsa-native-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2785",
-      "from": "zephyr:packages/nanopb-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2786",
-      "from": "zephyr:packages/nanopb-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2787",
-      "from": "zephyr:packages/nrf-wifi-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2788",
-      "from": "zephyr:packages/nrf-wifi-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2789",
-      "from": "zephyr:packages/open-amp-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2790",
-      "from": "zephyr:packages/open-amp-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2791",
-      "from": "zephyr:packages/openthread-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2792",
-      "from": "zephyr:packages/openthread-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2793",
-      "from": "zephyr:packages/percepio-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2794",
-      "from": "zephyr:packages/percepio-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2795",
-      "from": "zephyr:packages/picolibc-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2796",
-      "from": "zephyr:packages/picolibc-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2797",
-      "from": "zephyr:packages/psa-arch-tests-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2798",
-      "from": "zephyr:packages/psa-arch-tests-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2799",
-      "from": "zephyr:packages/segger-deps",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -2393,18 +1243,8 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2800",
-      "from": "zephyr:packages/segger-deps",
-      "relationshipType": "hasDeclaredLicense",
-      "to": [
-        "expandedlicensing_NoAssertionLicense"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/2801",
-      "from": "zephyr:packages/tf-m-tests-deps",
+      "spdxId": "zephyr:relationships/2833",
+      "from": "zephyr:packages/zephyr-deps",
       "relationshipType": "hasConcludedLicense",
       "to": [
         "expandedlicensing_NoAssertionLicense"
@@ -2413,8 +1253,8 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2802",
-      "from": "zephyr:packages/tf-m-tests-deps",
+      "spdxId": "zephyr:relationships/2834",
+      "from": "zephyr:packages/zephyr-deps",
       "relationshipType": "hasDeclaredLicense",
       "to": [
         "expandedlicensing_NoAssertionLicense"
@@ -2423,8 +1263,8 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2803",
-      "from": "zephyr:packages/tf-psa-crypto-deps",
+      "spdxId": "zephyr:relationships/2835",
+      "from": "zephyr:packages/acpica-deps",
       "relationshipType": "hasConcludedLicense",
       "to": [
         "expandedlicensing_NoAssertionLicense"
@@ -2433,8 +1273,8 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2804",
-      "from": "zephyr:packages/tf-psa-crypto-deps",
+      "spdxId": "zephyr:relationships/2836",
+      "from": "zephyr:packages/acpica-deps",
       "relationshipType": "hasDeclaredLicense",
       "to": [
         "expandedlicensing_NoAssertionLicense"
@@ -2443,8 +1283,8 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2805",
-      "from": "zephyr:packages/trusted-firmware-a-deps",
+      "spdxId": "zephyr:relationships/2837",
+      "from": "zephyr:packages/cmsis-deps",
       "relationshipType": "hasConcludedLicense",
       "to": [
         "expandedlicensing_NoAssertionLicense"
@@ -2453,8 +1293,8 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2806",
-      "from": "zephyr:packages/trusted-firmware-a-deps",
+      "spdxId": "zephyr:relationships/2838",
+      "from": "zephyr:packages/cmsis-deps",
       "relationshipType": "hasDeclaredLicense",
       "to": [
         "expandedlicensing_NoAssertionLicense"
@@ -2463,8 +1303,8 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2807",
-      "from": "zephyr:packages/trusted-firmware-m-deps",
+      "spdxId": "zephyr:relationships/2839",
+      "from": "zephyr:packages/cmsis-dsp-deps",
       "relationshipType": "hasConcludedLicense",
       "to": [
         "expandedlicensing_NoAssertionLicense"
@@ -2473,8 +1313,8 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2808",
-      "from": "zephyr:packages/trusted-firmware-m-deps",
+      "spdxId": "zephyr:relationships/2840",
+      "from": "zephyr:packages/cmsis-dsp-deps",
       "relationshipType": "hasDeclaredLicense",
       "to": [
         "expandedlicensing_NoAssertionLicense"
@@ -2483,8 +1323,8 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2809",
-      "from": "zephyr:packages/uoscore-uedhoc-deps",
+      "spdxId": "zephyr:relationships/2841",
+      "from": "zephyr:packages/cmsis-nn-deps",
       "relationshipType": "hasConcludedLicense",
       "to": [
         "expandedlicensing_NoAssertionLicense"
@@ -2493,8 +1333,8 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2810",
-      "from": "zephyr:packages/uoscore-uedhoc-deps",
+      "spdxId": "zephyr:relationships/2842",
+      "from": "zephyr:packages/cmsis-nn-deps",
       "relationshipType": "hasDeclaredLicense",
       "to": [
         "expandedlicensing_NoAssertionLicense"
@@ -2503,8 +1343,8 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2811",
-      "from": "zephyr:packages/zcbor-deps",
+      "spdxId": "zephyr:relationships/2843",
+      "from": "zephyr:packages/cmsis-6-deps",
       "relationshipType": "hasConcludedLicense",
       "to": [
         "expandedlicensing_NoAssertionLicense"
@@ -2513,8 +1353,8 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2812",
-      "from": "zephyr:packages/zcbor-deps",
+      "spdxId": "zephyr:relationships/2844",
+      "from": "zephyr:packages/cmsis-6-deps",
       "relationshipType": "hasDeclaredLicense",
       "to": [
         "expandedlicensing_NoAssertionLicense"
@@ -2523,8 +1363,8 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2813",
-      "from": "zephyr:packages/nrf-hw-models-deps",
+      "spdxId": "zephyr:relationships/2845",
+      "from": "zephyr:packages/dhara-deps",
       "relationshipType": "hasConcludedLicense",
       "to": [
         "expandedlicensing_NoAssertionLicense"
@@ -2533,9 +1373,539 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2814",
-      "from": "zephyr:packages/nrf-hw-models-deps",
+      "spdxId": "zephyr:relationships/2846",
+      "from": "zephyr:packages/dhara-deps",
       "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2847",
+      "from": "zephyr:packages/fatfs-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2848",
+      "from": "zephyr:packages/fatfs-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2849",
+      "from": "zephyr:packages/adi-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2850",
+      "from": "zephyr:packages/adi-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2851",
+      "from": "zephyr:packages/hal-afbr-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2852",
+      "from": "zephyr:packages/hal-afbr-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2853",
+      "from": "zephyr:packages/hal-ambiq-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2854",
+      "from": "zephyr:packages/hal-ambiq-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2855",
+      "from": "zephyr:packages/atmel-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2856",
+      "from": "zephyr:packages/atmel-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2857",
+      "from": "zephyr:packages/hal-bouffalolab-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2858",
+      "from": "zephyr:packages/hal-bouffalolab-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2859",
+      "from": "zephyr:packages/hal-espressif-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2860",
+      "from": "zephyr:packages/hal-espressif-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2861",
+      "from": "zephyr:packages/hal-ethos-u-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2862",
+      "from": "zephyr:packages/hal-ethos-u-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2863",
+      "from": "zephyr:packages/hal-gigadevice-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2864",
+      "from": "zephyr:packages/hal-gigadevice-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2865",
+      "from": "zephyr:packages/hal-infineon-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2866",
+      "from": "zephyr:packages/hal-infineon-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2867",
+      "from": "zephyr:packages/hal-intel-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2868",
+      "from": "zephyr:packages/hal-intel-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2869",
+      "from": "zephyr:packages/microchip-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2870",
+      "from": "zephyr:packages/microchip-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2871",
+      "from": "zephyr:packages/hal-nordic-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2872",
+      "from": "zephyr:packages/hal-nordic-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2873",
+      "from": "zephyr:packages/nuvoton-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2874",
+      "from": "zephyr:packages/nuvoton-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2875",
+      "from": "zephyr:packages/hal-nxp-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2876",
+      "from": "zephyr:packages/hal-nxp-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2877",
+      "from": "zephyr:packages/openisa-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2878",
+      "from": "zephyr:packages/openisa-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2879",
+      "from": "zephyr:packages/quicklogic-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2880",
+      "from": "zephyr:packages/quicklogic-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2881",
+      "from": "zephyr:packages/hal-realtek-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2882",
+      "from": "zephyr:packages/hal-realtek-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2883",
+      "from": "zephyr:packages/hal-renesas-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2884",
+      "from": "zephyr:packages/hal-renesas-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2885",
+      "from": "zephyr:packages/hal-rpi-pico-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2886",
+      "from": "zephyr:packages/hal-rpi-pico-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2887",
+      "from": "zephyr:packages/hal-sifli-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2888",
+      "from": "zephyr:packages/hal-sifli-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2889",
+      "from": "zephyr:packages/hal-silabs-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2890",
+      "from": "zephyr:packages/hal-silabs-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2891",
+      "from": "zephyr:packages/hal-st-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2892",
+      "from": "zephyr:packages/hal-st-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2893",
+      "from": "zephyr:packages/hal-stm32-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2894",
+      "from": "zephyr:packages/hal-stm32-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2895",
+      "from": "zephyr:packages/hal-tdk-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2896",
+      "from": "zephyr:packages/hal-tdk-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2897",
+      "from": "zephyr:packages/hal-telink-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2898",
+      "from": "zephyr:packages/hal-telink-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2899",
+      "from": "zephyr:packages/ti-deps",
+      "relationshipType": "hasConcludedLicense",
       "to": [
         "expandedlicensing_NoAssertionLicense"
       ],
@@ -2548,6 +1918,636 @@
       "relationshipType": "other",
       "to": [
         "zephyr:packages/zephyr-deps"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2900",
+      "from": "zephyr:packages/ti-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2901",
+      "from": "zephyr:packages/hal-wch-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2902",
+      "from": "zephyr:packages/hal-wch-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2903",
+      "from": "zephyr:packages/hal-wurthelektronik-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2904",
+      "from": "zephyr:packages/hal-wurthelektronik-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2905",
+      "from": "zephyr:packages/xtensa-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2906",
+      "from": "zephyr:packages/xtensa-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2907",
+      "from": "zephyr:packages/hostap-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2908",
+      "from": "zephyr:packages/hostap-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2909",
+      "from": "zephyr:packages/liblc3-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2910",
+      "from": "zephyr:packages/liblc3-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2911",
+      "from": "zephyr:packages/libmctp-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2912",
+      "from": "zephyr:packages/libmctp-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2913",
+      "from": "zephyr:packages/libmetal-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2914",
+      "from": "zephyr:packages/libmetal-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2915",
+      "from": "zephyr:packages/libsbc-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2916",
+      "from": "zephyr:packages/libsbc-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2917",
+      "from": "zephyr:packages/littlefs-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2918",
+      "from": "zephyr:packages/littlefs-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2919",
+      "from": "zephyr:packages/lora-basics-modem-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2920",
+      "from": "zephyr:packages/lora-basics-modem-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2921",
+      "from": "zephyr:packages/loramac-node-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2922",
+      "from": "zephyr:packages/loramac-node-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2923",
+      "from": "zephyr:packages/lvgl-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2924",
+      "from": "zephyr:packages/lvgl-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2925",
+      "from": "zephyr:packages/mbedtls-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2926",
+      "from": "zephyr:packages/mbedtls-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2927",
+      "from": "zephyr:packages/mcuboot-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2928",
+      "from": "zephyr:packages/mcuboot-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2929",
+      "from": "zephyr:packages/mipi-sys-t-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2930",
+      "from": "zephyr:packages/mipi-sys-t-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2931",
+      "from": "zephyr:packages/mldsa-native-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2932",
+      "from": "zephyr:packages/mldsa-native-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2933",
+      "from": "zephyr:packages/nanopb-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2934",
+      "from": "zephyr:packages/nanopb-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2935",
+      "from": "zephyr:packages/nrf-wifi-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2936",
+      "from": "zephyr:packages/nrf-wifi-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2937",
+      "from": "zephyr:packages/open-amp-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2938",
+      "from": "zephyr:packages/open-amp-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2939",
+      "from": "zephyr:packages/openthread-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2940",
+      "from": "zephyr:packages/openthread-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2941",
+      "from": "zephyr:packages/percepio-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2942",
+      "from": "zephyr:packages/percepio-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2943",
+      "from": "zephyr:packages/picolibc-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2944",
+      "from": "zephyr:packages/picolibc-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2945",
+      "from": "zephyr:packages/psa-arch-tests-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2946",
+      "from": "zephyr:packages/psa-arch-tests-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2947",
+      "from": "zephyr:packages/segger-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2948",
+      "from": "zephyr:packages/segger-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2949",
+      "from": "zephyr:packages/tf-m-tests-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2950",
+      "from": "zephyr:packages/tf-m-tests-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2951",
+      "from": "zephyr:packages/tf-psa-crypto-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2952",
+      "from": "zephyr:packages/tf-psa-crypto-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2953",
+      "from": "zephyr:packages/trusted-firmware-a-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2954",
+      "from": "zephyr:packages/trusted-firmware-a-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2955",
+      "from": "zephyr:packages/trusted-firmware-m-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2956",
+      "from": "zephyr:packages/trusted-firmware-m-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2957",
+      "from": "zephyr:packages/uoscore-uedhoc-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2958",
+      "from": "zephyr:packages/uoscore-uedhoc-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2959",
+      "from": "zephyr:packages/zcbor-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2960",
+      "from": "zephyr:packages/zcbor-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2961",
+      "from": "zephyr:packages/nrf-hw-models-deps",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2962",
+      "from": "zephyr:packages/nrf-hw-models-deps",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
