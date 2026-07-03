@@ -422,7 +422,13 @@ export function getDetailPromotedFields(element, elementMap) {
 export function getNodeType(item) {
   if (!item || !item.type) return 'other';
 
-  if (item.type === 'ExternalReference') return 'external';
+  // Placeholder nodes stand in for references that don't resolve to a loaded
+  // element — SPDX ExternalMap imports, or otherwise dangling endpoints. They
+  // carry a guessed concrete `type` (software_File, build_Build, …) so the
+  // detail panel can still label them, but in the graph they're all one thing:
+  // an external reference. Classifying them as 'external' here is what lets the
+  // "External" legend toggle actually show/hide them as a group.
+  if (item.placeholder || item.type === 'ExternalReference') return 'external';
   // AI profile package subclasses, surfaced as their own node types so the
   // graph legend can style/toggle AI models and datasets independently.
   if (item.type === 'ai_AIPackage') return 'ai';
