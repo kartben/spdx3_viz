@@ -73,7 +73,7 @@ function placeholderFor(spdxId, rel, role) {
     'fixedIn',
     'doesNotAffect',
     'affects',
-    'underInvestigation'
+    'underInvestigationFor'
   ]);
 
   let type = 'ExternalReference';

@@ -8,6 +8,7 @@
  */
 
 import { ELEMENT_TYPES, RELATIONSHIP_TYPES, VEX_TYPES } from './config.js';
+import { isSubclassOf } from './spdx-model.js';
 import {
   displayLicenseExpression,
   renderLicenseExpression,
@@ -206,16 +207,17 @@ export function parseGraph(graph, onProgress) {
       seen.add(item.spdxId);
     }
 
-    switch (item.type) {
-      // AI model / dataset packages are software_Package subclasses (AI profile);
-      // categorize them as packages so they flow through the packages view and
-      // graph, keeping their own type for AI/dataset-specific styling.
-      case ELEMENT_TYPES.PACKAGE:
-      case ELEMENT_TYPES.AI_PACKAGE:
-      case ELEMENT_TYPES.DATASET_PACKAGE:
-        packages.push(item);
-        break;
+    // Packages (plain software_Package plus AI/dataset subclasses like
+    // ai_AIPackage and dataset_DatasetPackage, and any future subclass) are
+    // identified via the model's class hierarchy rather than a hardcoded list,
+    // so new subclasses flow through automatically. They keep their own `type`
+    // for AI/dataset-specific styling downstream.
+    if (isSubclassOf(item.type, ELEMENT_TYPES.PACKAGE)) {
+      packages.push(item);
+      return;
+    }
 
+    switch (item.type) {
       case ELEMENT_TYPES.FILE:
         files.push(item);
         break;

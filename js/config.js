@@ -7,6 +7,8 @@
  * @module config
  */
 
+import { VOCABULARIES } from './spdx-model.js';
+
 /* ==========================================================================
    Type Constants
    String constants for SPDX element types
@@ -19,8 +21,8 @@
 export const ELEMENT_TYPES = {
   PACKAGE: 'software_Package',
   // AI profile subclasses of software_Package: an AI model package and a
-  // dataset package (dataset_DatasetPackage extends ai_AIPackage). Both are
-  // treated as packages, with their own node type/color for the graph legend.
+  // dataset package (both are direct subclasses of software_Package in the SPDX
+  // model). Treated as packages, with their own node type/color for the legend.
   AI_PACKAGE: 'ai_AIPackage',
   DATASET_PACKAGE: 'dataset_DatasetPackage',
   FILE: 'software_File',
@@ -79,7 +81,7 @@ export const RELATIONSHIP_TYPES = {
   FIXED_IN: 'fixedIn',
   DOES_NOT_AFFECT: 'doesNotAffect',
   AFFECTS: 'affects',
-  UNDER_INVESTIGATION: 'underInvestigation'
+  UNDER_INVESTIGATION: 'underInvestigationFor'
 };
 
 /* ==========================================================================
@@ -96,7 +98,7 @@ export const VEX_STATUS_BY_REL = {
   fixedIn: 'fixed',
   doesNotAffect: 'not_affected',
   affects: 'affected',
-  underInvestigation: 'under_investigation'
+  underInvestigationFor: 'under_investigation'
 };
 
 /**
@@ -191,6 +193,64 @@ export const COLORS = {
   default: '#6b7280'
 };
 
+/**
+ * Curated edge/badge colors for the relationship types the app styles specially.
+ * Any other model-defined type falls back to a deterministic derived color.
+ * @constant {Object}
+ */
+const RELATIONSHIP_COLORS = {
+  dependsOn: COLORS.package,
+  contains: COLORS.file,
+  generates: COLORS.build,
+  hasInput: COLORS.buildInput,
+  hasOutput: COLORS.buildOutput,
+  hasDistributionArtifact: COLORS.distribution,
+  ancestorOf: COLORS.buildLineage,
+  usesTool: COLORS.tool,
+  hasStaticLink: COLORS.staticLink,
+  hasDynamicLink: COLORS.dynamicLink,
+  hasOptionalComponent: COLORS.optionalComponent,
+  hasVariant: COLORS.variant,
+  configures: COLORS.config,
+  hasConcludedLicense: COLORS.license,
+  hasDeclaredLicense: COLORS.license,
+  trainedOn: COLORS.ai,
+  testedOn: COLORS.dataset,
+  fixedIn: COLORS.vexFixed,
+  doesNotAffect: COLORS.vexNotAffected,
+  affects: COLORS.vexAffected,
+  underInvestigationFor: COLORS.vexUnderInvestigation
+};
+
+/**
+ * Deterministic, evenly-spread color for a relationship type without a curated
+ * color, derived from the type name so it is stable across renders and distinct
+ * per type. Lets every SPDX-defined relationship read clearly without needing a
+ * hand-picked color for all ~60 of them.
+ * @param {string} relType
+ * @returns {string} An `hsl(...)` color string
+ */
+function derivedRelationshipColor(relType) {
+  let hash = 0;
+  for (let i = 0; i < relType.length; i++) {
+    hash = (hash * 31 + relType.charCodeAt(i)) >>> 0;
+  }
+  return `hsl(${hash % 360}, 55%, 62%)`;
+}
+
+/**
+ * Edge/badge color for a relationship type: curated where the app styles the
+ * type specially, otherwise a deterministic derived color. Single source of
+ * truth shared by the graph edges, the legend swatches, and the relationship
+ * breakdown so they always agree.
+ * @param {string} relType
+ * @returns {string}
+ */
+export function getRelationshipColor(relType) {
+  if (!relType) return COLORS.default;
+  return RELATIONSHIP_COLORS[relType] || derivedRelationshipColor(relType);
+}
+
 /* ==========================================================================
    Graph Filters
    Filter configurations for the force-directed graph
@@ -201,7 +261,7 @@ export const COLORS = {
  * @returns {Array<Object>} Array of filter objects
  */
 export function createGraphFilters() {
-  return [
+  const filters = [
     // Node type filters
     { key: 'package', label: 'Packages', color: COLORS.package, active: true },
     { key: 'ai', label: 'AI models', color: COLORS.ai, active: true },
@@ -300,13 +360,33 @@ export function createGraphFilters() {
       isRel: true
     },
     {
-      key: 'underInvestigation',
-      label: 'underInvestigation (VEX)',
+      key: 'underInvestigationFor',
+      label: 'underInvestigationFor (VEX)',
       color: COLORS.vexUnderInvestigation,
       active: false,
       isRel: true
     }
   ];
+
+  // Model-driven: give every SPDX relationship type the model defines a filter,
+  // not just the curated ones above, so a less common type (e.g. patchedBy,
+  // amendedBy, describes) still gets a legend chip, a distinct color, and is
+  // drawn when it appears — and new types in a future spec version work without
+  // a code change. The legend still hides types absent from the loaded data (see
+  // presentRelTypes). Curated entries keep their color/label/line style/default.
+  const curated = new Set(filters.filter((f) => f.isRel).map((f) => f.key));
+  for (const relType of VOCABULARIES.RelationshipType) {
+    if (curated.has(relType)) continue;
+    filters.push({
+      key: relType,
+      label: relType,
+      color: getRelationshipColor(relType),
+      active: true,
+      isRel: true
+    });
+  }
+
+  return filters;
 }
 
 /* ==========================================================================

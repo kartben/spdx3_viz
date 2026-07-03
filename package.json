@@ -7,12 +7,15 @@
     "test": "node --test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "gen:model": "node scripts/gen-model.mjs",
+    "gen:model:check": "node scripts/gen-model.mjs --check"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
     "eslint": "^9.0.0",
     "globals": "^16.0.0",
+    "n3": "^2.1.0",
     "prettier": "^3.8.4"
   }
 }

@@ -3,7 +3,8 @@ import globals from 'globals';
 
 export default [
   {
-    ignores: ['node_modules/**']
+    // js/generated/** is produced from the SPDX model by scripts/gen-model.mjs.
+    ignores: ['node_modules/**', 'js/generated/**']
   },
   js.configs.recommended,
   {
@@ -22,6 +23,19 @@ export default [
   },
   {
     files: ['tests/**/*.js'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: {
+        ...globals.node
+      }
+    },
+    rules: {
+      'no-unused-vars': ['error', { argsIgnorePattern: '^_' }]
+    }
+  },
+  {
+    files: ['scripts/**/*.mjs'],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',

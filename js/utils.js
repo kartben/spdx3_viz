@@ -120,37 +120,22 @@ export function formatDate(dateStr) {
    Functions for relationship color coding and labels
    ========================================================================== */
 
+// Relationship edge/badge colors live in config.js (next to the color palette
+// and the graph filters, which must agree on the same color per type) and are
+// re-exported here so the existing utils import sites keep working.
+export { getRelationshipColor } from './config.js';
+
 /**
- * Gets the color for a relationship type
+ * Turns a camelCase relationship type into a readable phrase, used as a fallback
+ * label for model-defined types the app doesn't curate (e.g. `hasAddedFile` ->
+ * "Has added file").
  *
  * @param {string} relType - The relationship type
- * @returns {string} Hex color code
+ * @returns {string} Humanized label
  */
-export function getRelationshipColor(relType) {
-  const colorMap = {
-    dependsOn: COLORS.package,
-    contains: COLORS.file,
-    generates: COLORS.build,
-    hasInput: COLORS.buildInput,
-    hasOutput: COLORS.buildOutput,
-    hasDistributionArtifact: COLORS.distribution,
-    ancestorOf: COLORS.buildLineage,
-    usesTool: COLORS.tool,
-    hasStaticLink: COLORS.staticLink,
-    hasDynamicLink: COLORS.dynamicLink,
-    hasOptionalComponent: COLORS.optionalComponent,
-    hasVariant: COLORS.variant,
-    configures: COLORS.config,
-    hasConcludedLicense: COLORS.license,
-    hasDeclaredLicense: COLORS.license,
-    trainedOn: COLORS.ai,
-    testedOn: COLORS.dataset,
-    fixedIn: COLORS.vexFixed,
-    doesNotAffect: COLORS.vexNotAffected,
-    affects: COLORS.vexAffected,
-    underInvestigation: COLORS.vexUnderInvestigation
-  };
-  return colorMap[relType] || COLORS.default;
+function humanizeRelationshipType(relType) {
+  const spaced = relType.replace(/([a-z0-9])([A-Z])/g, '$1 $2').toLowerCase();
+  return spaced.charAt(0).toUpperCase() + spaced.slice(1);
 }
 
 /**
@@ -166,7 +151,9 @@ export function getRelationshipColor(relType) {
  */
 export function getRelationshipGroupLabel(relType, direction) {
   const key = `${relType}:${direction}`;
-  return RELATIONSHIP_LABELS[key] || (direction === 'out' ? relType : `${relType} (from)`);
+  if (RELATIONSHIP_LABELS[key]) return RELATIONSHIP_LABELS[key];
+  const label = humanizeRelationshipType(relType);
+  return direction === 'out' ? label : `${label} (inbound)`;
 }
 
 /**

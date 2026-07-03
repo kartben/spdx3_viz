@@ -6,3 +6,7 @@ node_modules
 # Bundled demo SBOM data — kept verbatim, not formatted
 samples/zephyr
 samples/linux
+
+# Generated from the SPDX model by scripts/gen-model.mjs (npm run gen:model);
+# formatted by the generator, so keep Prettier out to avoid drift-check churn.
+js/generated
