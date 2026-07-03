@@ -130,6 +130,26 @@ export const navigationMixin = {
     this._scheduleNavPush();
   },
 
+  // Unloads the current document and returns to the landing screen (file drop
+  // zone + sample SBOMs). Clears loadedFiles so a subsequent drop/pick starts
+  // fresh rather than appending to the old document, and resets currentView so
+  // the next load opens on the overview. Nav history is gated by dataLoaded,
+  // so flipping it back to false leaves no dangling in-document entries.
+  goHome() {
+    this.loadedFiles = [];
+    this.dataLoaded = false;
+    this.currentView = 'dashboard';
+    this.detailElement = null;
+    this.expandedPkg = null;
+    this.expandedFile = null;
+    this.expandedConfig = null;
+    this.expandedBuild = null;
+    this.expandedLicense = null;
+    this.expandedVuln = null;
+    this.sampleError = '';
+    this.sidebarOpen = false;
+  },
+
   // Every heavy list x-for renders through this. It's a pure clamp to
   // renderLimits[view] — the growth of that limit is driven by the scroll
   // observer (loadMoreForView) and, for deep links, _streamToNavTarget, so
