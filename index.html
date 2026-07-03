@@ -377,10 +377,11 @@
             </div>
           </div>
           <div class="flex items-center gap-2 md:gap-3 flex-shrink-0">
-            <!-- Search -->
-            <div class="relative" x-show="currentView !== 'graph'">
+            <!-- Global search: fuzzy jump-to-anything across every element in
+                 the document. Per-view filtering lives inside each list view. -->
+            <div class="relative" x-show="currentView !== 'graph'" @click.outside="closeSearch()">
               <svg
-                class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
+                class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -395,9 +396,100 @@
               <input
                 type="text"
                 x-model="searchQuery"
-                placeholder="Search..."
-                class="w-36 sm:w-48 md:w-56 pl-9 pr-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
+                @focus="openSearch()"
+                @input="openSearch()"
+                @keydown="searchKeydown($event)"
+                placeholder="Search anything…"
+                role="combobox"
+                aria-autocomplete="list"
+                aria-label="Search all elements"
+                :aria-expanded="searchOpen"
+                class="w-40 sm:w-56 md:w-72 pl-9 pr-8 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
               />
+              <!-- Clear -->
+              <button
+                x-show="searchQuery"
+                @click="clearSearch()"
+                type="button"
+                title="Clear search"
+                class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-200 transition-colors"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+
+              <!-- Results dropdown -->
+              <div
+                x-show="searchOpen && searchQuery.trim().length > 0"
+                x-cloak
+                class="search-dropdown absolute right-0 mt-2 z-50 w-[20rem] sm:w-[24rem] max-w-[calc(100vw-2rem)] max-h-[70vh] overflow-y-auto bg-slate-800 border border-slate-700 rounded-xl shadow-2xl shadow-black/50 py-1"
+              >
+                <!-- No matches -->
+                <div
+                  x-show="searchResults.length === 0"
+                  class="px-4 py-6 text-center text-sm text-slate-500"
+                >
+                  No matches for “<span class="text-slate-300" x-text="searchQuery.trim()"></span>”
+                </div>
+                <!-- Result rows -->
+                <template x-for="(r, i) in searchResults" :key="r.nodeType + ':' + r.id">
+                  <button
+                    type="button"
+                    @click="selectSearchResult(r)"
+                    @mousemove="searchActiveIndex = i"
+                    :class="i === searchActiveIndex ? 'bg-slate-700/70' : 'hover:bg-slate-700/40'"
+                    class="w-full flex items-center gap-3 px-3 py-2 text-left transition-colors"
+                  >
+                    <span
+                      class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                      :style="`background:${nodeTypeColor(r.nodeType)}26`"
+                    >
+                      <svg
+                        class="w-4 h-4"
+                        :style="`color:${nodeTypeColor(r.nodeType)}`"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        x-html="searchIconSvg(r.nodeType)"
+                      ></svg>
+                    </span>
+                    <span class="min-w-0 flex-1">
+                      <span
+                        class="block text-sm text-slate-200 truncate"
+                        x-html="searchHighlight(r.name, searchQuery)"
+                      ></span>
+                      <span
+                        x-show="r.sub"
+                        class="block text-xs text-slate-500 truncate"
+                        x-text="r.sub"
+                      ></span>
+                    </span>
+                    <span
+                      class="text-[10px] font-medium px-1.5 py-0.5 rounded-full flex-shrink-0"
+                      :style="`background:${nodeTypeColor(r.nodeType)}1f;color:${nodeTypeColor(r.nodeType)}`"
+                      x-text="r.typeLabel"
+                    ></span>
+                  </button>
+                </template>
+                <!-- Footer hint -->
+                <div
+                  x-show="searchResults.length > 0"
+                  class="px-3 pt-1.5 mt-1 text-[11px] text-slate-500 border-t border-slate-700/60"
+                >
+                  Top <span x-text="searchResults.length"></span> match<span
+                    x-show="searchResults.length !== 1"
+                    >es</span
+                  >
+                  · <span class="text-slate-400">↵</span> opens the first ·
+                  <span class="text-slate-400">↑↓</span> to navigate
+                </div>
+              </div>
             </div>
             <!-- Add more files -->
             <label
@@ -1004,15 +1096,22 @@
             x-show="currentView === 'packages' || currentView === 'ai' || currentView === 'dataset'"
             class="fade-in space-y-3 max-w-4xl"
           >
-            <div class="flex items-center gap-3 mb-4">
+            <div class="flex flex-wrap items-center gap-3 mb-4">
               <span
-                class="text-sm text-slate-400"
+                class="text-sm text-slate-400 flex-shrink-0"
                 x-text="`${currentPackageList.length} ${currentPackageNoun}`"
               ></span>
+              <input
+                x-model="packageSearch"
+                @input.debounce.150ms="restreamView(currentView)"
+                type="text"
+                :placeholder="`Filter ${currentPackageNoun}…`"
+                class="ml-auto bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-blue-500 w-44 sm:w-56"
+              />
               <select
                 x-model="pkgSort"
                 @change="restreamView(currentView)"
-                class="ml-auto bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 text-slate-300 focus:outline-none focus:border-blue-500"
+                class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 text-slate-300 focus:outline-none focus:border-blue-500"
               >
                 <option value="name">Sort by name</option>
                 <option value="deps">Sort by dependencies</option>
@@ -1638,21 +1737,28 @@
 
           <!-- ========== FILES ========== -->
           <div x-show="currentView === 'files'" class="fade-in space-y-3 max-w-5xl">
-            <div class="flex flex-wrap items-center gap-2 mb-4">
+            <div class="flex flex-wrap items-center gap-3 mb-3">
               <span
                 class="text-sm text-slate-400 flex-shrink-0"
                 x-text="`${filteredFiles.length} files`"
               ></span>
-              <div class="flex flex-wrap gap-1.5">
-                <template x-for="ft in fileTypes" :key="ft">
-                  <button
-                    class="text-xs px-2.5 py-1 rounded-md transition-colors"
-                    :class="fileTypeFilter === ft ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-700 text-slate-400 hover:text-white'"
-                    @click="fileTypeFilter = fileTypeFilter === ft ? '' : ft; restreamView('files')"
-                    x-text="ft"
-                  ></button>
-                </template>
-              </div>
+              <input
+                x-model="fileSearch"
+                @input.debounce.150ms="restreamView('files')"
+                type="text"
+                placeholder="Filter files…"
+                class="ml-auto bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-emerald-500 w-44 sm:w-56"
+              />
+            </div>
+            <div x-show="fileTypes.length" class="flex flex-wrap gap-1.5 mb-4">
+              <template x-for="ft in fileTypes" :key="ft">
+                <button
+                  class="text-xs px-2.5 py-1 rounded-md transition-colors"
+                  :class="fileTypeFilter === ft ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-700 text-slate-400 hover:text-white'"
+                  @click="fileTypeFilter = fileTypeFilter === ft ? '' : ft; restreamView('files')"
+                  x-text="ft"
+                ></button>
+              </template>
             </div>
             <template
               x-for="f in (mountedViews.files ? renderSlice('files', filteredFiles) : [])"

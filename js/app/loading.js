@@ -275,6 +275,7 @@ export const loadingMixin = {
       this.expandedClusters = new Set(); // fresh data: start fully collapsed
       this.cveDetails = {}; // drop cached CVE fetches from the previous SBOM
       this._resetListMemos(); // invalidate the build + vulnerability sort memos for new data
+      this._resetSearchMemos(); // and the global-search corpus / results memos
       // Fresh data: reset the streaming cursors so every list view streams its
       // (new) content on next visit, and kick the one currently shown.
       this._resetStreaming();

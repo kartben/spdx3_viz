@@ -204,6 +204,35 @@
 }
 
 /* ==========================================================================
+   Global Search
+   The header search box's results dropdown + matched-substring highlight.
+   ========================================================================== */
+
+/* Highlights the run of text the query matched inside a result's name. */
+.search-hl {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  border-radius: 3px;
+  padding: 0 1px;
+}
+
+.search-dropdown {
+  animation: searchPop 0.12s ease-out;
+}
+
+@keyframes searchPop {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================================================
    Stat Cards
    Dashboard statistic cards with colored decorative circles
    ========================================================================== */

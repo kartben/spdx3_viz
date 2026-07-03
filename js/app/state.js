@@ -50,7 +50,11 @@ export function createState() {
       build: 0
     },
     viewRender: { active: false, view: '', done: 0, total: 0 }, // streaming progress readout
-    searchQuery: '',
+    searchQuery: '', // header global-search box (cross-cutting jump-to-anything)
+    searchOpen: false, // whether the global-search results dropdown is showing
+    searchActiveIndex: 0, // keyboard-highlighted result row in the dropdown
+    packageSearch: '', // in-view filter for the Packages / AI / Datasets lists
+    fileSearch: '', // in-view filter for the Files list
     sidebarOpen: false, // mobile off-canvas nav drawer (ignored at md+ where the sidebar is static)
     detailElement: null,
     expandedPkg: null,

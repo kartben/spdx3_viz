@@ -407,19 +407,19 @@ export const navigationMixin = {
     }
   },
   navigateToPackage(spdxId) {
-    this.searchQuery = '';
+    this.packageSearch = '';
     this.switchView('packages');
     this.expandedPkg = spdxId;
     this.scrollToNavTarget('package', spdxId);
   },
   navigateToAiPackage(spdxId) {
-    this.searchQuery = '';
+    this.packageSearch = '';
     this.switchView('ai');
     this.expandedPkg = spdxId;
     this.scrollToNavTarget('ai', spdxId);
   },
   navigateToDataset(spdxId) {
-    this.searchQuery = '';
+    this.packageSearch = '';
     this.switchView('dataset');
     this.expandedPkg = spdxId;
     this.scrollToNavTarget('dataset', spdxId);
@@ -431,7 +431,7 @@ export const navigationMixin = {
     this.scrollToNavTarget('config', spdxId);
   },
   navigateToFile(spdxId) {
-    this.searchQuery = '';
+    this.fileSearch = '';
     this.fileTypeFilter = '';
     this.switchView('files');
     this.expandedFile = spdxId;

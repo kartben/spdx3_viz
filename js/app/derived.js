@@ -62,8 +62,8 @@ export const derivedMixin = {
   // the Packages / AI Models / Datasets tabs so they behave identically.
   _filterSortPackages(base) {
     let pkgs = base;
-    if (this.searchQuery) {
-      const q = this.searchQuery.toLowerCase();
+    if (this.packageSearch) {
+      const q = this.packageSearch.toLowerCase();
       pkgs = pkgs.filter(
         (p) =>
           this.cleanName(p.spdxId).toLowerCase().includes(q) || p.name?.toLowerCase().includes(q)
@@ -123,7 +123,7 @@ export const derivedMixin = {
     // Memoized on the only inputs that affect the result (see the cache note
     // above): the file list, the search box, and the type-filter chip. Keeps the
     // streaming render from re-sorting all ~28k files on every chunk.
-    const search = this.searchQuery;
+    const search = this.fileSearch;
     const typeFilter = this.fileTypeFilter;
     const files = this.files;
     const key = `${files.length}|${search}|${typeFilter}`;

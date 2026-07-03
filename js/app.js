@@ -3,6 +3,7 @@ import { loadingMixin } from './app/loading.js';
 import { derivedMixin } from './app/derived.js';
 import { accessorsMixin } from './app/accessors.js';
 import { navigationMixin } from './app/navigation.js';
+import { searchMixin } from './app/search.js';
 import { securityMixin } from './app/security.js';
 import { licensesMixin } from './app/licenses.js';
 import { graphMixin } from './app/graph.js';
@@ -40,6 +41,7 @@ const mixins = [
   derivedMixin,
   accessorsMixin,
   navigationMixin,
+  searchMixin,
   securityMixin,
   licensesMixin,
   graphMixin
