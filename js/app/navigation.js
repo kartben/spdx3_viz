@@ -490,6 +490,11 @@ export const navigationMixin = {
   },
   navigateToRequirement(spdxId) {
     this.requirementSearch = '';
+    // Clear the kind filter too: without this, jumping from (say) an Assumption
+    // card to a Requirement it's linked to would leave the "Assumptions" filter
+    // active, so the target isn't in filteredRequirements and nothing scrolls
+    // into view.
+    this.requirementKindFilter = '';
     this.switchView('requirements');
     this.expandedRequirement = spdxId;
     this.scrollToNavTarget('requirement', spdxId);
