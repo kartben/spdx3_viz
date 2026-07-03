@@ -3,20 +3,20 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SPDX 3.0 SBOM Visualizer</title>
+    <title>SPDX 3 SBOM Visualizer</title>
     <meta
       name="description"
-      content="Explore SPDX 3.0 SBOMs as an interactive graph — packages, source files, builds, tools and licenses, and every link between them. Zero-build, runs entirely in your browser."
+      content="Explore SPDX 3 SBOMs as an interactive graph: packages, source files, hardware, builds, tools and licenses, and every link between them. Zero-build, runs entirely in your browser."
     />
 
     <!-- Open Graph / Facebook / LinkedIn / Slack -->
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="SPDX 3.0 SBOM Visualizer" />
+    <meta property="og:site_name" content="SPDX 3 SBOM Visualizer" />
     <meta property="og:url" content="https://kartben.github.io/spdx3_viz/" />
-    <meta property="og:title" content="SPDX 3.0 SBOM Visualizer" />
+    <meta property="og:title" content="SPDX 3 SBOM Visualizer" />
     <meta
       property="og:description"
-      content="Explore SPDX 3.0 SBOMs as an interactive graph. Packages, source files, builds, tools, licenses... and every link between them."
+      content="Explore SPDX 3 SBOMs as an interactive graph. Packages, source files, builds, tools, licenses... and every link between them."
     />
     <meta property="og:image" content="https://kartben.github.io/spdx3_viz/social.png" />
     <meta property="og:image:type" content="image/png" />
@@ -24,20 +24,20 @@
     <meta property="og:image:height" content="640" />
     <meta
       property="og:image:alt"
-      content="SPDX3 Visualization Tool: an interactive force-directed graph of an SPDX 3.0 SBOM"
+      content="SPDX3 Visualization Tool: an interactive force-directed graph of an SPDX 3 SBOM"
     />
 
     <!-- Twitter / X -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="SPDX 3.0 SBOM Visualizer" />
+    <meta name="twitter:title" content="SPDX 3 SBOM Visualizer" />
     <meta
       name="twitter:description"
-      content="Explore SPDX 3.0 SBOMs as an interactive graph. Packages, source files, builds, tools, licenses... and every link between them."
+      content="Explore SPDX 3 SBOMs as an interactive graph. Packages, source files, builds, tools, licenses... and every link between them."
     />
     <meta name="twitter:image" content="https://kartben.github.io/spdx3_viz/social.png" />
     <meta
       name="twitter:image:alt"
-      content="SPDX3 Visualization Tool: an interactive force-directed graph of an SPDX 3.0 SBOM"
+      content="SPDX3 Visualization Tool: an interactive force-directed graph of an SPDX 3 SBOM"
     />
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -86,8 +86,8 @@
               />
             </svg>
           </div>
-          <h1 class="text-3xl font-bold text-white mb-2">SPDX 3.0 SBOM Visualizer</h1>
-          <p class="text-slate-400">Drop one or more SPDX 3.0 JSON-LD files to explore</p>
+          <h1 class="text-3xl font-bold text-white mb-2">SPDX 3 SBOM Visualizer</h1>
+          <p class="text-slate-400">Drop one or more SPDX 3 (3.0 / 3.1) JSON-LD files to explore</p>
           <p class="text-slate-500 text-xs mt-1">
             Multiple files will be merged &mdash; cross-references resolved automatically
           </p>
@@ -210,7 +210,7 @@
           target="_blank"
           rel="noopener noreferrer"
           class="group mt-8 inline-flex items-center gap-2 text-sm text-slate-500 transition-colors hover:text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 rounded-md"
-          aria-label="View and fork SPDX 3.0 SBOM Visualizer on GitHub (opens in a new tab)"
+          aria-label="View and fork SPDX 3 SBOM Visualizer on GitHub (opens in a new tab)"
         >
           <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path
@@ -278,8 +278,8 @@
               </svg>
             </div>
             <div class="min-w-0">
-              <div class="text-sm font-semibold text-white truncate">SPDX Visualizer</div>
-              <div class="text-xs text-slate-400">v3.0.1</div>
+              <div class="text-sm font-semibold text-white truncate">SPDX 3 Visualizer</div>
+              <div class="text-xs text-slate-400">SPDX 3.0 &amp; 3.1</div>
             </div>
           </div>
         </div>
@@ -295,7 +295,8 @@
               class="nav-item"
               x-show="(v.id !== 'security' || vulnerabilities.length > 0) &&
                       (v.id !== 'ai' || aiPackages.length > 0) &&
-                      (v.id !== 'dataset' || datasetPackages.length > 0)"
+                      (v.id !== 'dataset' || datasetPackages.length > 0) &&
+                      (v.id !== 'hardware' || hardware.length > 0)"
               :class="currentView === v.id && 'active'"
               @click="switchView(v.id)"
             >
@@ -697,6 +698,33 @@
                       stroke-linejoin="round"
                       stroke-width="2"
                       d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                </div>
+              </button>
+              <button
+                type="button"
+                x-show="hardware.length > 0"
+                @click="switchView('hardware')"
+                class="card stat-card stat-card-link lime hover:border-lime-500/50"
+              >
+                <div class="text-2xl font-bold text-white" x-text="hardware.length"></div>
+                <div class="text-sm text-slate-400 mt-1">Hardware</div>
+                <div
+                  class="w-8 h-8 mt-2 rounded-lg bg-lime-500/15 flex items-center justify-center"
+                >
+                  <svg
+                    class="w-4 h-4 text-lime-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <rect x="7" y="7" width="10" height="10" rx="1" stroke-width="2" />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"
                     />
                   </svg>
                 </div>
@@ -1254,6 +1282,7 @@
                     <!-- Provenance & identifiers -->
                     <div
                       x-show="isMeaningful(pkg.software_packageVersion) ||
+                              artifactSize(pkg) ||
                               isMeaningful(pkg.software_downloadLocation) ||
                               isMeaningful(pkg.software_homePage) ||
                               isMeaningful(pkg.summary) ||
@@ -1272,6 +1301,15 @@
                         <span
                           class="text-xs px-2 py-0.5 rounded-md bg-slate-700 text-slate-300 font-mono break-all"
                           x-text="pkg.software_packageVersion"
+                        ></span>
+                      </div>
+
+                      <!-- Size (software_artifactSize) -->
+                      <div x-show="artifactSize(pkg)" class="flex items-center gap-2">
+                        <span class="text-xs text-slate-500 flex-shrink-0">Size</span>
+                        <span
+                          class="text-xs px-2 py-0.5 rounded-md bg-slate-700 text-slate-300 tabular-nums"
+                          x-text="artifactSize(pkg)"
                         ></span>
                       </div>
 
@@ -1825,6 +1863,11 @@
                           x-text="lic.label"
                         ></button>
                       </template>
+                      <span
+                        x-show="artifactSize(f)"
+                        class="text-[11px] text-slate-500 tabular-nums"
+                        x-text="artifactSize(f)"
+                      ></span>
                     </div>
                   </div>
                   <svg
@@ -2000,6 +2043,247 @@
                         </template>
                       </div>
                     </div>
+                  </div>
+                </template>
+              </div>
+            </template>
+          </div>
+
+          <!-- ========== HARDWARE (SPDX 3.1) ========== -->
+          <div x-show="currentView === 'hardware'" class="fade-in space-y-3 max-w-5xl">
+            <div class="flex flex-wrap items-center gap-3 mb-3">
+              <span
+                class="text-sm text-slate-400 flex-shrink-0"
+                x-text="`${filteredHardware.length} hardware ${filteredHardware.length === 1 ? 'component' : 'components'}`"
+              ></span>
+              <input
+                x-model="hardwareSearch"
+                @input.debounce.150ms="restreamView('hardware')"
+                type="text"
+                placeholder="Filter hardware…"
+                class="ml-auto bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-lime-500 w-44 sm:w-56"
+              />
+            </div>
+            <template
+              x-for="hw in (mountedViews.hardware ? renderSlice('hardware', filteredHardware) : [])"
+              :key="hw.spdxId"
+            >
+              <div
+                class="card cursor-pointer"
+                data-nav-kind="hardware"
+                :data-nav-id="hw.spdxId"
+                :class="isNavTarget('hardware', hw.spdxId) && 'target-focus'"
+                @click="toggleHardware(hw.spdxId)"
+              >
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-8 h-8 rounded-lg bg-lime-500/15 flex items-center justify-center flex-shrink-0"
+                  >
+                    <svg
+                      class="w-4 h-4 text-lime-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <rect x="7" y="7" width="10" height="10" rx="1" stroke-width="2" />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"
+                      />
+                    </svg>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div
+                      class="font-medium text-white text-sm truncate"
+                      x-text="hw.name || cleanName(hw.spdxId)"
+                    ></div>
+                    <div class="flex items-center gap-2 mt-0.5 flex-wrap">
+                      <span
+                        class="badge text-xs bg-lime-500/15 text-lime-400"
+                        x-text="hw.type.replace('hardware_', '')"
+                      ></span>
+                      <span
+                        x-show="isMeaningful(hw.hardware_partNumber)"
+                        class="badge text-xs bg-slate-700 text-slate-300 font-mono"
+                        x-text="hw.hardware_partNumber"
+                      ></span>
+                      <span
+                        x-show="hardwareManufacturer(hw)"
+                        class="badge text-xs bg-red-500/15 text-red-400"
+                        x-text="hardwareManufacturer(hw)?.name"
+                      ></span>
+                    </div>
+                  </div>
+                  <svg
+                    class="w-4 h-4 text-slate-500 transition-transform flex-shrink-0"
+                    :class="expandedHardware === hw.spdxId && 'rotate-180'"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+                <!-- Expanded detail (built lazily via x-if for only the open card) -->
+                <template x-if="expandedHardware === hw.spdxId">
+                  <div
+                    class="mt-4 pt-4 border-t border-slate-700 space-y-3 sm:pl-11 fade-in"
+                    @click.stop
+                  >
+                    <!-- Summary -->
+                    <div x-show="isMeaningful(hw.summary)">
+                      <div class="text-xs text-slate-500 mb-1">Summary</div>
+                      <div class="text-xs text-slate-300 break-words" x-text="hw.summary"></div>
+                    </div>
+
+                    <!-- Spec sheet -->
+                    <div class="grid grid-cols-2 gap-x-4 gap-y-2">
+                      <div x-show="isMeaningful(hw.hardware_partNumber)">
+                        <div class="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5">
+                          Part number
+                        </div>
+                        <code
+                          class="text-xs text-slate-300 break-all"
+                          x-text="hw.hardware_partNumber"
+                        ></code>
+                      </div>
+                      <div x-show="isMeaningful(hw.hardware_category)">
+                        <div class="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5">
+                          Category
+                        </div>
+                        <span class="text-xs text-slate-300" x-text="hw.hardware_category"></span>
+                      </div>
+                      <div x-show="hardwareManufacturer(hw)">
+                        <div class="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5">
+                          Manufacturer
+                        </div>
+                        <span
+                          class="text-xs text-red-400"
+                          x-text="hardwareManufacturer(hw)?.name"
+                        ></span>
+                      </div>
+                      <template x-for="spec in hardwareSpecs(hw)" :key="spec.label">
+                        <div>
+                          <div
+                            class="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5"
+                            x-text="spec.label"
+                          ></div>
+                          <span
+                            class="text-xs text-slate-300 break-words"
+                            :class="spec.mono && 'font-mono break-all'"
+                            x-text="spec.value"
+                          ></span>
+                        </div>
+                      </template>
+                    </div>
+
+                    <!-- External identifiers (e.g. devicetree compatible / path) -->
+                    <div x-show="externalIdentifiers(hw).length > 0">
+                      <div
+                        class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2"
+                      >
+                        Identifiers
+                      </div>
+                      <div class="space-y-1.5">
+                        <template
+                          x-for="eid in externalIdentifiers(hw)"
+                          :key="eid.type + eid.identifier"
+                        >
+                          <div class="flex items-start gap-2 group">
+                            <span
+                              class="text-[10px] text-slate-500 uppercase tracking-wider w-20 pt-0.5 flex-shrink-0 text-right"
+                              x-text="eid.label"
+                            ></span>
+                            <code
+                              class="hash-text text-slate-300 break-all flex-1 leading-relaxed"
+                              x-text="eid.identifier"
+                            ></code>
+                            <button
+                              @click.stop="copyHash(eid.identifier)"
+                              class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity flex-shrink-0 pt-0.5"
+                              title="Copy"
+                            >
+                              <svg
+                                class="w-3 h-3"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                                />
+                              </svg>
+                            </button>
+                          </div>
+                        </template>
+                      </div>
+                    </div>
+
+                    <!-- Relationships — grouped semantically (contains, runsOn, …) -->
+                    <template x-for="group in detailRelGroupsFor(hw)" :key="group.key">
+                      <div class="detail-rel-section">
+                        <div class="flex items-center gap-2 mb-2">
+                          <span
+                            class="detail-rel-line"
+                            :style="`background: ${group.color}`"
+                          ></span>
+                          <span
+                            class="text-xs font-semibold uppercase tracking-wider"
+                            :style="`color: ${group.color}`"
+                            x-text="group.label"
+                          ></span>
+                          <span
+                            class="text-[10px] text-slate-500"
+                            x-text="'(' + group.items.length + ')'"
+                          ></span>
+                        </div>
+                        <div class="space-y-1 ml-3">
+                          <template x-for="item in group.items" :key="item.id">
+                            <div class="detail-rel-item group" @click.stop="navigateTo(item.id)">
+                              <span
+                                class="detail-rel-arrow"
+                                :style="`color: ${group.color}`"
+                                x-text="item.direction === 'out' ? '→' : '←'"
+                              ></span>
+                              <span
+                                class="detail-rel-target-dot"
+                                :style="`background: ${nodeTypeColor(getNodeType(elementMap.get(item.id) || {}))}`"
+                              ></span>
+                              <span class="flex-1 truncate" x-text="item.displayName"></span>
+                              <span
+                                x-show="item.scope"
+                                class="text-[10px] px-1.5 py-0.5 rounded bg-slate-700/60 text-slate-400 flex-shrink-0"
+                                :title="'Lifecycle scope: ' + item.scope"
+                                x-text="item.scope"
+                              ></span>
+                              <svg
+                                class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors flex-shrink-0"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M9 5l7 7-7 7"
+                                />
+                              </svg>
+                            </div>
+                          </template>
+                        </div>
+                      </div>
+                    </template>
                   </div>
                 </template>
               </div>
@@ -3891,9 +4175,34 @@
             </div>
           </template>
 
+          <!-- Hardware profile (SPDX 3.1): manufacturer + spec-sheet fields -->
+          <div
+            x-show="hardwareManufacturer(detailElement) || hardwareSpecs(detailElement).length > 0"
+            class="space-y-3"
+          >
+            <div class="flex items-center gap-2" x-show="hardwareManufacturer(detailElement)">
+              <span class="text-xs text-slate-500 flex-shrink-0">Manufacturer</span>
+              <span
+                class="text-xs px-2 py-0.5 rounded-md bg-red-500/15 text-red-400"
+                x-text="hardwareManufacturer(detailElement)?.name"
+              ></span>
+            </div>
+            <template x-for="spec in hardwareSpecs(detailElement)" :key="spec.label">
+              <div>
+                <div class="text-xs text-slate-500 mb-1" x-text="spec.label"></div>
+                <span
+                  class="text-xs text-slate-300 break-words"
+                  :class="spec.mono && 'font-mono break-all'"
+                  x-text="spec.value"
+                ></span>
+              </div>
+            </template>
+          </div>
+
           <!-- Provenance & identifiers (packages, tools) -->
           <div
             x-show="isMeaningful(detailElement?.software_packageVersion) ||
+                    artifactSize(detailElement) ||
                     isMeaningful(detailElement?.software_downloadLocation) ||
                     isMeaningful(detailElement?.software_homePage) ||
                     isMeaningful(detailElement?.summary) ||
@@ -3912,6 +4221,15 @@
               <span
                 class="text-xs px-2 py-0.5 rounded-md bg-slate-700 text-slate-300 font-mono break-all"
                 x-text="detailElement?.software_packageVersion"
+              ></span>
+            </div>
+
+            <!-- Size (software_artifactSize) -->
+            <div x-show="artifactSize(detailElement)" class="flex items-center gap-2">
+              <span class="text-xs text-slate-500 flex-shrink-0">Size</span>
+              <span
+                class="text-xs px-2 py-0.5 rounded-md bg-slate-700 text-slate-300 tabular-nums"
+                x-text="artifactSize(detailElement)"
               ></span>
             </div>
 

@@ -144,6 +144,26 @@ export const derivedMixin = {
     return sorted;
   },
 
+  // Hardware profile elements (SPDX 3.1), filtered by the in-view search box and
+  // sorted by name. Matches on name, part number and summary so a component is
+  // findable by any of those.
+  get filteredHardware() {
+    let hw = this.hardware;
+    if (this.hardwareSearch) {
+      const q = this.hardwareSearch.toLowerCase();
+      hw = hw.filter(
+        (h) =>
+          (h.name || '').toLowerCase().includes(q) ||
+          this.cleanName(h.spdxId).toLowerCase().includes(q) ||
+          (h.hardware_partNumber || '').toLowerCase().includes(q) ||
+          (h.summary || '').toLowerCase().includes(q)
+      );
+    }
+    return [...hw].sort((a, b) =>
+      (a.name || this.cleanName(a.spdxId)).localeCompare(b.name || this.cleanName(b.spdxId))
+    );
+  },
+
   get filteredLicenses() {
     let lics = this.licenses;
     if (this.licenseSearch) {

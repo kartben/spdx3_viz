@@ -140,6 +140,7 @@ export function getRelationshipColor(relType) {
     hasDynamicLink: COLORS.dynamicLink,
     hasOptionalComponent: COLORS.optionalComponent,
     hasVariant: COLORS.variant,
+    runsOn: COLORS.hardware,
     configures: COLORS.config,
     hasConcludedLicense: COLORS.license,
     hasDeclaredLicense: COLORS.license,
@@ -434,6 +435,16 @@ export function getNodeType(item) {
   if (item.type === 'ai_AIPackage') return 'ai';
   if (item.type === 'dataset_DatasetPackage') return 'dataset';
   if (item.type === 'software_Package') return 'package';
+  // Hardware profile (SPDX 3.1): every Hardware subclass shares one node type so
+  // the legend can style/toggle hardware as a group.
+  if (
+    item.type === 'hardware_Hardware' ||
+    item.type === 'hardware_PhysicalHardware' ||
+    item.type === 'hardware_BulkHardware' ||
+    item.type === 'hardware_VirtualHardware'
+  ) {
+    return 'hardware';
+  }
   if (item.type === 'software_File') {
     // Check if it's a build config element
     if (item.software_primaryPurpose === 'configuration' || item.spdxId?.includes('build-config')) {
@@ -468,6 +479,7 @@ export function getNodeTypeColor(nodeType) {
     ai: COLORS.ai,
     dataset: COLORS.dataset,
     file: COLORS.file,
+    hardware: COLORS.hardware,
     tool: COLORS.tool,
     build: COLORS.build,
     agent: COLORS.agent,
@@ -489,6 +501,10 @@ export function getElementBadgeClass(type) {
   const classMap = {
     software_Package: 'bg-blue-500/15 text-blue-400',
     software_File: 'bg-emerald-500/15 text-emerald-400',
+    hardware_Hardware: 'bg-lime-500/15 text-lime-400',
+    hardware_PhysicalHardware: 'bg-lime-500/15 text-lime-400',
+    hardware_BulkHardware: 'bg-lime-500/15 text-lime-400',
+    hardware_VirtualHardware: 'bg-lime-500/15 text-lime-400',
     Tool: 'bg-amber-500/15 text-amber-400',
     build_Build: 'bg-purple-500/15 text-purple-400',
     SoftwareAgent: 'bg-red-500/15 text-red-400',

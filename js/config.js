@@ -24,6 +24,13 @@ export const ELEMENT_TYPES = {
   AI_PACKAGE: 'ai_AIPackage',
   DATASET_PACKAGE: 'dataset_DatasetPackage',
   FILE: 'software_File',
+  // Hardware profile (SPDX 3.1). Hardware is the abstract base; PhysicalHardware,
+  // BulkHardware and VirtualHardware are its concrete subclasses. All are treated
+  // as one 'hardware' node type in the graph/legend, with their own tab + colour.
+  HARDWARE: 'hardware_Hardware',
+  HARDWARE_PHYSICAL: 'hardware_PhysicalHardware',
+  HARDWARE_BULK: 'hardware_BulkHardware',
+  HARDWARE_VIRTUAL: 'hardware_VirtualHardware',
   TOOL: 'Tool',
   RELATIONSHIP: 'Relationship',
   LIFECYCLE_RELATIONSHIP: 'LifecycleScopedRelationship',
@@ -72,6 +79,9 @@ export const RELATIONSHIP_TYPES = {
   CONFIGURES: 'configures',
   HAS_CONCLUDED_LICENSE: 'hasConcludedLicense',
   HAS_DECLARED_LICENSE: 'hasDeclaredLicense',
+  // Hardware profile (SPDX 3.1): the `from` software element (the instructions)
+  // runs on each `to` Hardware processing element.
+  RUNS_ON: 'runsOn',
   // AI profile relationship types (AI model ↔ training/test dataset)
   TRAINED_ON: 'trainedOn',
   TESTED_ON: 'testedOn',
@@ -168,6 +178,9 @@ export const COLORS = {
   ai: '#e879f9',
   dataset: '#22d3ee',
   file: '#10b981',
+  // Hardware profile node type + runsOn edges (SPDX 3.1): lime, distinct from
+  // file green / tool amber so hardware reads as its own kind at a glance.
+  hardware: '#a3e635',
   tool: '#f59e0b',
   build: '#8b5cf6',
   buildInput: '#f97316',
@@ -207,6 +220,7 @@ export function createGraphFilters() {
     { key: 'ai', label: 'AI models', color: COLORS.ai, active: true },
     { key: 'dataset', label: 'Datasets', color: COLORS.dataset, active: true },
     { key: 'file', label: 'Files', color: COLORS.file, active: true },
+    { key: 'hardware', label: 'Hardware', color: COLORS.hardware, active: true },
     { key: 'tool', label: 'Tools', color: COLORS.tool, active: true },
     { key: 'build', label: 'Build', color: COLORS.build, active: true },
     { key: 'config', label: 'Configs', color: COLORS.config, active: true },
@@ -274,6 +288,14 @@ export function createGraphFilters() {
       lineStyle: 'dashdot'
     },
     { key: 'hasVariant', label: 'hasVariant', color: COLORS.variant, active: true, isRel: true },
+    {
+      key: 'runsOn',
+      label: 'runsOn',
+      color: COLORS.hardware,
+      active: true,
+      isRel: true,
+      lineStyle: 'dashed'
+    },
     { key: 'configures', label: 'configures', color: COLORS.config, active: true, isRel: true },
     { key: 'trainedOn', label: 'trainedOn', color: COLORS.ai, active: true, isRel: true },
     {
@@ -333,6 +355,8 @@ const VIEW_ICONS = {
     '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg>',
   files:
     '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>',
+  hardware:
+    '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="1" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></svg>',
   licenses:
     '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>',
   security:
@@ -356,6 +380,7 @@ export function createViews() {
     { id: 'ai', label: 'AI Models', icon: VIEW_ICONS.ai, count: null },
     { id: 'dataset', label: 'Datasets', icon: VIEW_ICONS.dataset, count: null },
     { id: 'files', label: 'Files', icon: VIEW_ICONS.files, count: null },
+    { id: 'hardware', label: 'Hardware', icon: VIEW_ICONS.hardware, count: null },
     { id: 'licenses', label: 'Licenses', icon: VIEW_ICONS.licenses, count: null },
     { id: 'security', label: 'Security', icon: VIEW_ICONS.security, count: null },
     { id: 'configs', label: 'Build Configs', icon: VIEW_ICONS.configs, count: null },
@@ -426,6 +451,8 @@ export const RELATIONSHIP_LABELS = {
   'hasVariant:in': 'Variant of',
   'configures:out': 'Configures',
   'configures:in': 'Configured by',
+  'runsOn:out': 'Runs on',
+  'runsOn:in': 'Runs',
   'trainedOn:out': 'Trained on',
   'trainedOn:in': 'Training dataset for',
   'testedOn:out': 'Tested on',
@@ -459,6 +486,29 @@ export const DETAIL_PROMOTED_FIELDS = [
     prop: 'software_fileKind',
     label: 'Kind',
     types: ['software_File'],
+    variant: 'badge'
+  },
+  // Hardware profile (SPDX 3.1)
+  {
+    prop: 'hardware_partNumber',
+    label: 'Part number',
+    types: [
+      'hardware_Hardware',
+      'hardware_PhysicalHardware',
+      'hardware_BulkHardware',
+      'hardware_VirtualHardware'
+    ],
+    variant: 'badge'
+  },
+  {
+    prop: 'hardware_category',
+    label: 'Category',
+    types: [
+      'hardware_Hardware',
+      'hardware_PhysicalHardware',
+      'hardware_BulkHardware',
+      'hardware_VirtualHardware'
+    ],
     variant: 'badge'
   }
 ];
@@ -495,6 +545,8 @@ export const RELATIONSHIP_SORT_ORDER = {
   'hasVariant:in': 24,
   'usesTool:out': 25,
   'usesTool:in': 26,
+  'runsOn:out': 35,
+  'runsOn:in': 36,
   'trainedOn:out': 31,
   'trainedOn:in': 32,
   'testedOn:out': 33,

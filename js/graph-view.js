@@ -217,6 +217,7 @@ export function renderGraph(app, retry = 0) {
 
   app.packages.forEach((p) => addNode(p.spdxId));
   app.files.forEach((f) => addNode(f.spdxId));
+  (app.hardware || []).forEach((h) => addNode(h.spdxId));
   app.tools.forEach((t) => addNode(t.spdxId));
   app.buildConfigs.forEach((c) => addNode(c.spdxId));
   (app.builds || []).forEach((b) => addNode(b.spdxId));

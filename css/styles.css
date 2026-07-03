@@ -277,6 +277,10 @@
   background: #ec4899;
 }
 
+.stat-card.lime::after {
+  background: #a3e635;
+}
+
 .stat-card-link {
   cursor: pointer;
   display: flex;

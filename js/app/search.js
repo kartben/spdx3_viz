@@ -20,6 +20,8 @@ const SEARCH_ICONS = {
   dataset:
     '<ellipse cx="12" cy="5" rx="8" ry="3" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/>',
   file: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>',
+  hardware:
+    '<rect x="7" y="7" width="10" height="10" rx="1" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/>',
   config:
     '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>',
   build:
@@ -37,6 +39,7 @@ const SEARCH_TYPE_LABELS = {
   ai: 'AI model',
   dataset: 'Dataset',
   file: 'File',
+  hardware: 'Hardware',
   config: 'Build config',
   build: 'Build',
   tool: 'Tool',
@@ -68,6 +71,7 @@ export const searchMixin = {
     const key = [
       this.packages.length,
       this.files.length,
+      this.hardware.length,
       this.buildConfigs.length,
       this.builds.length,
       this.tools.length,
@@ -100,6 +104,15 @@ export const searchMixin = {
     }
     for (const f of this.files) {
       add(f.spdxId, 'file', f.name || this.cleanName(f.spdxId), '', f.spdxId);
+    }
+    for (const h of this.hardware) {
+      add(
+        h.spdxId,
+        'hardware',
+        h.name || this.cleanName(h.spdxId),
+        h.hardware_partNumber || '',
+        h.hardware_partNumber + ' ' + h.spdxId
+      );
     }
     for (const c of this.buildConfigs) {
       add(c.spdxId, 'config', c.name || this.cleanName(c.spdxId), '', c.spdxId);

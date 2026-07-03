@@ -53,6 +53,7 @@ function makeThrottledReporter(onProgress, total) {
  * @property {Array<Object>} tools - Tool elements
  * @property {Array<Object>} relationships - Relationship elements
  * @property {Array<Object>} builds - Build elements
+ * @property {Array<Object>} hardware - Hardware profile elements (SPDX 3.1)
  * @property {Array<Object>} buildConfigs - Build configuration elements
  * @property {Object|null} buildInfo - Build information element
  * @property {Object|null} agentInfo - Agent information element (SoftwareAgent, Organization or Person)
@@ -154,6 +155,9 @@ export function parseGraph(graph, onProgress) {
   /** @type {Array<Object>} */
   const builds = [];
 
+  /** @type {Array<Object>} - Hardware profile elements (SPDX 3.1) */
+  const hardware = [];
+
   /** @type {Array<Object>} */
   const vulnerabilities = [];
 
@@ -241,6 +245,16 @@ export function parseGraph(graph, onProgress) {
 
       case ELEMENT_TYPES.FILE:
         files.push(item);
+        break;
+
+      // Hardware profile (SPDX 3.1): PhysicalHardware / BulkHardware /
+      // VirtualHardware (and the abstract Hardware base) are their own category,
+      // surfaced in the Hardware tab and graph.
+      case ELEMENT_TYPES.HARDWARE:
+      case ELEMENT_TYPES.HARDWARE_PHYSICAL:
+      case ELEMENT_TYPES.HARDWARE_BULK:
+      case ELEMENT_TYPES.HARDWARE_VIRTUAL:
+        hardware.push(item);
         break;
 
       case ELEMENT_TYPES.TOOL:
@@ -452,6 +466,7 @@ export function parseGraph(graph, onProgress) {
   const { presentNodeTypes, presentRelTypes } = computePresentTypes({
     packages,
     regularFiles,
+    hardware,
     tools,
     builds,
     buildConfigs,
@@ -466,6 +481,7 @@ export function parseGraph(graph, onProgress) {
     packages,
     files: regularFiles,
     tools,
+    hardware,
     relationships,
     builds,
     buildConfigs,
@@ -674,6 +690,7 @@ function computePresentTypes(data) {
     else nodeTypes.add('package');
   });
   if (data.regularFiles.length) nodeTypes.add('file');
+  if (data.hardware.length) nodeTypes.add('hardware');
   if (data.tools.length) nodeTypes.add('tool');
   if (data.builds.length) nodeTypes.add('build');
   if (data.buildConfigs.length) nodeTypes.add('config');

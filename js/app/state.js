@@ -30,6 +30,7 @@ export function createState() {
       ai: false,
       dataset: false,
       files: false,
+      hardware: false,
       licenses: false,
       security: false,
       configs: false,
@@ -45,6 +46,7 @@ export function createState() {
       ai: 0,
       dataset: 0,
       files: 0,
+      hardware: 0,
       licenses: 0,
       security: 0,
       configs: 0,
@@ -56,10 +58,12 @@ export function createState() {
     searchActiveIndex: 0, // keyboard-highlighted result row in the dropdown
     packageSearch: '', // in-view filter for the Packages / AI / Datasets lists
     fileSearch: '', // in-view filter for the Files list
+    hardwareSearch: '', // in-view filter for the Hardware list
     sidebarOpen: false, // mobile off-canvas nav drawer (ignored at md+ where the sidebar is static)
     detailElement: null,
     expandedPkg: null,
     expandedFile: null,
+    expandedHardware: null,
     expandedConfig: null,
     expandedBuild: null,
     expandedLicense: null,
@@ -96,6 +100,7 @@ export function createState() {
     packages: [],
     files: [],
     tools: [],
+    hardware: [], // hardware profile elements (SPDX 3.1)
     relationships: [],
     builds: [],
     buildInfo: null,

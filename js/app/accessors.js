@@ -355,6 +355,44 @@ export const accessorsMixin = {
     return out;
   },
 
+  // Human-readable size of a software artifact (File or Package), from the
+  // SPDX Software profile's software_artifactSize (bytes). Returns '' when the
+  // element carries no meaningful size, so templates can gate on truthiness.
+  artifactSize(el) {
+    return formatByteSize(Number(el?.software_artifactSize));
+  },
+
+  // Hardware profile (SPDX 3.1): the manufacturer/producer of a hardware
+  // element, resolved from its hardware_productAgent reference (→ Organization /
+  // Person / SoftwareAgent). Returns { id, name } or null.
+  hardwareManufacturer(el) {
+    const id = el?.hardware_productAgent;
+    // Skip missing and NoAssertion sentinels (e.g. Core/NoAssertionElement) so a
+    // "no manufacturer stated" hardware element doesn't render a bare URL.
+    if (!id || id.includes('NoAssertion')) return null;
+    const agent = this.elementMap.get(id);
+    return { id, name: agent?.name || this.cleanName(id) };
+  },
+
+  // Spec-sheet fields for a hardware element beyond the headline part number /
+  // category (which the detail panel promotes as badges). Returned as
+  // {label, value, mono} descriptors so the card and detail panel render the
+  // same set with one template.
+  hardwareSpecs(el) {
+    if (!el) return [];
+    const out = [];
+    const push = (label, value, mono = false) => {
+      if (isMeaningfulValue(value)) out.push({ label, value: String(value), mono });
+    };
+    push('Serial number', el.hardware_serialNumber, true);
+    push('Batch number', el.hardware_batchNumber, true);
+    push('Release date', el.hardware_releaseDate && this.formatDate(el.hardware_releaseDate));
+    push('Mass', el.hardware_mass);
+    push('Bulk quantity', el.hardware_bulkQuantity);
+    push('Additional information', el.hardware_additionalInformation);
+    return out;
+  },
+
   placeholderElement(spdxId) {
     return {
       type: 'ExternalReference',

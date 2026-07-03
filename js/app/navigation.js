@@ -26,6 +26,7 @@ const viewListProps = {
   ai: 'filteredAiPackages',
   dataset: 'filteredDatasetPackages',
   files: 'filteredFiles',
+  hardware: 'filteredHardware',
   licenses: 'filteredLicenses',
   security: 'filteredVulnerabilities',
   configs: 'filteredConfigs',
@@ -38,6 +39,7 @@ const navKindListInfo = {
   ai: { view: 'ai', list: 'filteredAiPackages', idField: 'spdxId' },
   dataset: { view: 'dataset', list: 'filteredDatasetPackages', idField: 'spdxId' },
   file: { view: 'files', list: 'filteredFiles', idField: 'spdxId' },
+  hardware: { view: 'hardware', list: 'filteredHardware', idField: 'spdxId' },
   license: { view: 'licenses', list: 'filteredLicenses', idField: 'id' },
   vuln: { view: 'security', list: 'filteredVulnerabilities', idField: 'spdxId' },
   config: { view: 'configs', list: 'filteredConfigs', idField: 'spdxId' },
@@ -56,6 +58,7 @@ export const navigationMixin = {
       view: this.currentView,
       expandedPkg: this.expandedPkg,
       expandedFile: this.expandedFile,
+      expandedHardware: this.expandedHardware,
       expandedConfig: this.expandedConfig,
       expandedBuild: this.expandedBuild,
       expandedLicense: this.expandedLicense,
@@ -91,6 +94,7 @@ export const navigationMixin = {
     this.sidebarOpen = false;
     this.expandedPkg = state.expandedPkg;
     this.expandedFile = state.expandedFile;
+    this.expandedHardware = state.expandedHardware;
     this.expandedConfig = state.expandedConfig;
     this.expandedBuild = state.expandedBuild;
     this.expandedLicense = state.expandedLicense;
@@ -112,6 +116,7 @@ export const navigationMixin = {
       ai: ['ai', this.expandedPkg],
       dataset: ['dataset', this.expandedPkg],
       files: ['file', this.expandedFile],
+      hardware: ['hardware', this.expandedHardware],
       configs: ['config', this.expandedConfig],
       build: ['build', this.expandedBuild],
       licenses: ['license', this.expandedLicense],
@@ -142,6 +147,7 @@ export const navigationMixin = {
     this.detailElement = null;
     this.expandedPkg = null;
     this.expandedFile = null;
+    this.expandedHardware = null;
     this.expandedConfig = null;
     this.expandedBuild = null;
     this.expandedLicense = null;
@@ -289,6 +295,10 @@ export const navigationMixin = {
     this.expandedFile = this.expandedFile === id ? null : id;
     this._scheduleNavPush();
   },
+  toggleHardware(id) {
+    this.expandedHardware = this.expandedHardware === id ? null : id;
+    this._scheduleNavPush();
+  },
   toggleConfig(id) {
     this.expandedConfig = this.expandedConfig === id ? null : id;
     this._scheduleNavPush();
@@ -366,6 +376,11 @@ export const navigationMixin = {
         return el.software_primaryPurpose === 'configuration' || el.spdxId?.includes('build-config')
           ? { label: 'Build Configs' }
           : { label: 'Files' };
+      case 'hardware_Hardware':
+      case 'hardware_PhysicalHardware':
+      case 'hardware_BulkHardware':
+      case 'hardware_VirtualHardware':
+        return { label: 'Hardware' };
       case 'build_Build':
         return { label: 'Builds' };
       case 'Tool':
@@ -397,6 +412,13 @@ export const navigationMixin = {
       } else {
         this.navigateToFile(spdxId);
       }
+    } else if (
+      el.type === 'hardware_Hardware' ||
+      el.type === 'hardware_PhysicalHardware' ||
+      el.type === 'hardware_BulkHardware' ||
+      el.type === 'hardware_VirtualHardware'
+    ) {
+      this.navigateToHardware(spdxId);
     } else if (el.type === 'build_Build') {
       this.navigateToBuild(spdxId);
     } else if (el.type === 'Tool') {
@@ -437,6 +459,12 @@ export const navigationMixin = {
     this.switchView('files');
     this.expandedFile = spdxId;
     this.scrollToNavTarget('file', spdxId);
+  },
+  navigateToHardware(spdxId) {
+    this.hardwareSearch = '';
+    this.switchView('hardware');
+    this.expandedHardware = spdxId;
+    this.scrollToNavTarget('hardware', spdxId);
   },
   navigateToBuild(spdxId) {
     this.buildSearch = '';
