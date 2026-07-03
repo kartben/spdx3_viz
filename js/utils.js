@@ -141,6 +141,12 @@ export function getRelationshipColor(relType) {
     hasOptionalComponent: COLORS.optionalComponent,
     hasVariant: COLORS.variant,
     runsOn: COLORS.hardware,
+    implementedBy: COLORS.requirement,
+    verifiedBy: COLORS.requirement,
+    hasRequirement: COLORS.requirement,
+    hasEvidence: COLORS.requirement,
+    assumes: COLORS.requirement,
+    conformsTo: COLORS.requirement,
     configures: COLORS.config,
     hasConcludedLicense: COLORS.license,
     hasDeclaredLicense: COLORS.license,
@@ -445,6 +451,17 @@ export function getNodeType(item) {
   ) {
     return 'hardware';
   }
+  // FunctionalSafety profile (SPDX 3.1): the Core Requirement and the safety
+  // lifecycle artifacts around it (verification / assumption / evaluation) share
+  // one node type so the legend can style/toggle them as a group.
+  if (
+    item.type === 'Requirement' ||
+    item.type === 'functionalsafety_RequirementVerification' ||
+    item.type === 'functionalsafety_Assumption' ||
+    item.type === 'functionalsafety_EvaluationResult'
+  ) {
+    return 'requirement';
+  }
   if (item.type === 'software_File') {
     // Check if it's a build config element
     if (item.software_primaryPurpose === 'configuration' || item.spdxId?.includes('build-config')) {
@@ -480,6 +497,7 @@ export function getNodeTypeColor(nodeType) {
     dataset: COLORS.dataset,
     file: COLORS.file,
     hardware: COLORS.hardware,
+    requirement: COLORS.requirement,
     tool: COLORS.tool,
     build: COLORS.build,
     agent: COLORS.agent,
@@ -505,6 +523,10 @@ export function getElementBadgeClass(type) {
     hardware_PhysicalHardware: 'bg-lime-500/15 text-lime-400',
     hardware_BulkHardware: 'bg-lime-500/15 text-lime-400',
     hardware_VirtualHardware: 'bg-lime-500/15 text-lime-400',
+    Requirement: 'bg-yellow-500/15 text-yellow-400',
+    functionalsafety_RequirementVerification: 'bg-yellow-500/15 text-yellow-400',
+    functionalsafety_Assumption: 'bg-yellow-500/15 text-yellow-400',
+    functionalsafety_EvaluationResult: 'bg-yellow-500/15 text-yellow-400',
     Tool: 'bg-amber-500/15 text-amber-400',
     build_Build: 'bg-purple-500/15 text-purple-400',
     SoftwareAgent: 'bg-red-500/15 text-red-400',

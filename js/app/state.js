@@ -31,6 +31,7 @@ export function createState() {
       dataset: false,
       files: false,
       hardware: false,
+      requirements: false,
       licenses: false,
       security: false,
       configs: false,
@@ -47,6 +48,7 @@ export function createState() {
       dataset: 0,
       files: 0,
       hardware: 0,
+      requirements: 0,
       licenses: 0,
       security: 0,
       configs: 0,
@@ -59,11 +61,13 @@ export function createState() {
     packageSearch: '', // in-view filter for the Packages / AI / Datasets lists
     fileSearch: '', // in-view filter for the Files list
     hardwareSearch: '', // in-view filter for the Hardware list
+    requirementSearch: '', // in-view filter for the Requirements list
     sidebarOpen: false, // mobile off-canvas nav drawer (ignored at md+ where the sidebar is static)
     detailElement: null,
     expandedPkg: null,
     expandedFile: null,
     expandedHardware: null,
+    expandedRequirement: null,
     expandedConfig: null,
     expandedBuild: null,
     expandedLicense: null,
@@ -101,6 +105,7 @@ export function createState() {
     files: [],
     tools: [],
     hardware: [], // hardware profile elements (SPDX 3.1)
+    requirements: [], // requirements + FunctionalSafety artifacts (SPDX 3.1)
     relationships: [],
     builds: [],
     buildInfo: null,

@@ -31,6 +31,19 @@ export const ELEMENT_TYPES = {
   HARDWARE_PHYSICAL: 'hardware_PhysicalHardware',
   HARDWARE_BULK: 'hardware_BulkHardware',
   HARDWARE_VIRTUAL: 'hardware_VirtualHardware',
+  // FunctionalSafety profile (SPDX 3.1). Requirement is the Core class that
+  // states a "shall" (its own tab + node type — a first-class citizen). The
+  // functionalsafety_* classes are the safety lifecycle artifacts around it:
+  // RequirementVerification (how a requirement was verified), Assumption
+  // (assumption of use), and EvaluationResult (pass/fail of a verification).
+  // All four share the 'requirement' node type/colour so they read as one group.
+  REQUIREMENT: 'Requirement',
+  FS_VERIFICATION: 'functionalsafety_RequirementVerification',
+  FS_ASSUMPTION: 'functionalsafety_Assumption',
+  FS_EVALUATION: 'functionalsafety_EvaluationResult',
+  // EvidenceRelationship is a Relationship subclass (carries from/to/
+  // relationshipType), handled alongside the generic relationships.
+  FS_EVIDENCE_RELATIONSHIP: 'functionalsafety_EvidenceRelationship',
   TOOL: 'Tool',
   RELATIONSHIP: 'Relationship',
   LIFECYCLE_RELATIONSHIP: 'LifecycleScopedRelationship',
@@ -82,6 +95,15 @@ export const RELATIONSHIP_TYPES = {
   // Hardware profile (SPDX 3.1): the `from` software element (the instructions)
   // runs on each `to` Hardware processing element.
   RUNS_ON: 'runsOn',
+  // FunctionalSafety profile (SPDX 3.1) relationship types (Core RelationshipType
+  // vocabulary): they tie a Requirement to what implements it, how it is
+  // verified, its evidence, and its assumptions.
+  IMPLEMENTED_BY: 'implementedBy', // `from` Requirement is implemented by each `to` Element
+  VERIFIED_BY: 'verifiedBy', // `from` Requirement is verified by each `to` RequirementVerification
+  HAS_REQUIREMENT: 'hasRequirement', // `from` Element has a requirement on each `to` Element
+  HAS_EVIDENCE: 'hasEvidence', // each `to` Element is evidence for the `from` Element
+  ASSUMES: 'assumes', // `from` Element assumes each `to` Assumption
+  CONFORMS_TO: 'conformsTo', // `from` Element conforms to each `to` Assumption/Specification
   // AI profile relationship types (AI model ↔ training/test dataset)
   TRAINED_ON: 'trainedOn',
   TESTED_ON: 'testedOn',
@@ -181,6 +203,10 @@ export const COLORS = {
   // Hardware profile node type + runsOn edges (SPDX 3.1): lime, distinct from
   // file green / tool amber so hardware reads as its own kind at a glance.
   hardware: '#a3e635',
+  // FunctionalSafety profile (SPDX 3.1): Requirement node type + its safety
+  // relationship edges (implementedBy, verifiedBy, …). Gold reads as a
+  // spec/seal/compliance colour and stays clear of the blues and purples.
+  requirement: '#eab308',
   tool: '#f59e0b',
   build: '#8b5cf6',
   buildInput: '#f97316',
@@ -221,6 +247,7 @@ export function createGraphFilters() {
     { key: 'dataset', label: 'Datasets', color: COLORS.dataset, active: true },
     { key: 'file', label: 'Files', color: COLORS.file, active: true },
     { key: 'hardware', label: 'Hardware', color: COLORS.hardware, active: true },
+    { key: 'requirement', label: 'Requirements', color: COLORS.requirement, active: true },
     { key: 'tool', label: 'Tools', color: COLORS.tool, active: true },
     { key: 'build', label: 'Build', color: COLORS.build, active: true },
     { key: 'config', label: 'Configs', color: COLORS.config, active: true },
@@ -297,6 +324,53 @@ export function createGraphFilters() {
       lineStyle: 'dashed'
     },
     { key: 'configures', label: 'configures', color: COLORS.config, active: true, isRel: true },
+    // FunctionalSafety profile (SPDX 3.1) relationship edges
+    {
+      key: 'implementedBy',
+      label: 'implementedBy',
+      color: COLORS.requirement,
+      active: true,
+      isRel: true
+    },
+    {
+      key: 'verifiedBy',
+      label: 'verifiedBy',
+      color: COLORS.requirement,
+      active: true,
+      isRel: true,
+      lineStyle: 'dashed'
+    },
+    {
+      key: 'hasRequirement',
+      label: 'hasRequirement',
+      color: COLORS.requirement,
+      active: true,
+      isRel: true
+    },
+    {
+      key: 'hasEvidence',
+      label: 'hasEvidence',
+      color: COLORS.requirement,
+      active: true,
+      isRel: true,
+      lineStyle: 'dotted'
+    },
+    {
+      key: 'assumes',
+      label: 'assumes',
+      color: COLORS.requirement,
+      active: true,
+      isRel: true,
+      lineStyle: 'dashdot'
+    },
+    {
+      key: 'conformsTo',
+      label: 'conformsTo',
+      color: COLORS.requirement,
+      active: true,
+      isRel: true,
+      lineStyle: 'dashed'
+    },
     { key: 'trainedOn', label: 'trainedOn', color: COLORS.ai, active: true, isRel: true },
     {
       key: 'testedOn',
@@ -357,6 +431,8 @@ const VIEW_ICONS = {
     '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>',
   hardware:
     '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="1" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></svg>',
+  requirements:
+    '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>',
   licenses:
     '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>',
   security:
@@ -381,6 +457,7 @@ export function createViews() {
     { id: 'dataset', label: 'Datasets', icon: VIEW_ICONS.dataset, count: null },
     { id: 'files', label: 'Files', icon: VIEW_ICONS.files, count: null },
     { id: 'hardware', label: 'Hardware', icon: VIEW_ICONS.hardware, count: null },
+    { id: 'requirements', label: 'Requirements', icon: VIEW_ICONS.requirements, count: null },
     { id: 'licenses', label: 'Licenses', icon: VIEW_ICONS.licenses, count: null },
     { id: 'security', label: 'Security', icon: VIEW_ICONS.security, count: null },
     { id: 'configs', label: 'Build Configs', icon: VIEW_ICONS.configs, count: null },
@@ -453,6 +530,19 @@ export const RELATIONSHIP_LABELS = {
   'configures:in': 'Configured by',
   'runsOn:out': 'Runs on',
   'runsOn:in': 'Runs',
+  // FunctionalSafety profile (SPDX 3.1)
+  'implementedBy:out': 'Implemented by',
+  'implementedBy:in': 'Implements',
+  'verifiedBy:out': 'Verified by',
+  'verifiedBy:in': 'Verifies',
+  'hasRequirement:out': 'Has requirement',
+  'hasRequirement:in': 'Required by',
+  'hasEvidence:out': 'Has evidence',
+  'hasEvidence:in': 'Evidence for',
+  'assumes:out': 'Assumes',
+  'assumes:in': 'Assumed by',
+  'conformsTo:out': 'Conforms to',
+  'conformsTo:in': 'Conformed to by',
   'trainedOn:out': 'Trained on',
   'trainedOn:in': 'Training dataset for',
   'testedOn:out': 'Tested on',
@@ -510,6 +600,20 @@ export const DETAIL_PROMOTED_FIELDS = [
       'hardware_VirtualHardware'
     ],
     variant: 'badge'
+  },
+  // FunctionalSafety profile (SPDX 3.1): the "shall" statement is the headline of
+  // a Requirement; the assumption statement plays the same role for an Assumption.
+  {
+    prop: 'requirementStatement',
+    label: 'Requirement',
+    types: ['Requirement'],
+    variant: 'hero'
+  },
+  {
+    prop: 'functionalsafety_assumptionStatement',
+    label: 'Assumption',
+    types: ['functionalsafety_Assumption'],
+    variant: 'hero'
   }
 ];
 
@@ -547,6 +651,20 @@ export const RELATIONSHIP_SORT_ORDER = {
   'usesTool:in': 26,
   'runsOn:out': 35,
   'runsOn:in': 36,
+  // FunctionalSafety profile (SPDX 3.1): keep a requirement's implementation,
+  // verification, evidence and assumptions grouped together, in that order.
+  'implementedBy:out': 37,
+  'implementedBy:in': 38,
+  'verifiedBy:out': 39,
+  'verifiedBy:in': 40,
+  'hasRequirement:out': 41,
+  'hasRequirement:in': 42,
+  'hasEvidence:out': 43,
+  'hasEvidence:in': 44,
+  'assumes:out': 45,
+  'assumes:in': 46,
+  'conformsTo:out': 47,
+  'conformsTo:in': 48,
   'trainedOn:out': 31,
   'trainedOn:in': 32,
   'testedOn:out': 33,

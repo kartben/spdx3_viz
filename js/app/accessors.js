@@ -393,6 +393,60 @@ export const accessorsMixin = {
     return out;
   },
 
+  // FunctionalSafety profile (SPDX 3.1): spec-sheet fields for a requirement or a
+  // safety artifact (verification / assumption / evaluation) beyond the headline
+  // statement (which the detail panel promotes as a hero). Returned as
+  // {label, value, mono} descriptors so the card and detail panel render the same
+  // set with one template. Array-valued fields (rationale, verificationMethod, …)
+  // are joined for display.
+  safetyFields(el) {
+    if (!el) return [];
+    const out = [];
+    const join = (v) => (Array.isArray(v) ? v.filter(isMeaningfulValue).join(', ') : v);
+    const push = (label, value, mono = false) => {
+      const v = join(value);
+      if (isMeaningfulValue(v)) out.push({ label, value: String(v), mono });
+    };
+    // Requirement (Core)
+    push('Lifecycle stage', el.devLifecycleStage);
+    // RequirementVerification (functionalsafety)
+    push('Verification method', el.functionalsafety_verificationMethod);
+    push('Precondition', el.functionalsafety_verificationPrecondition);
+    push('Postcondition', el.functionalsafety_verificationPostcondition);
+    // EvaluationResult (functionalsafety)
+    push('Evaluation', el.functionalsafety_evaluation);
+    // Shared: the reasoning behind the requirement / verification / evaluation
+    push('Rationale', el.rationale || el.functionalsafety_rationale);
+    return out;
+  },
+
+  // Number of elements a requirement is implemented by (distinct `to` targets of
+  // its outgoing `implementedBy` relationships) — the headline traceability
+  // count shown on a requirement card.
+  implementedByCount(spdxId) {
+    const targets = new Set();
+    (this.outgoingRels(spdxId) || []).forEach((rel) => {
+      if (rel.relationshipType !== 'implementedBy') return;
+      (Array.isArray(rel.to) ? rel.to : [rel.to]).forEach((t) => t && targets.add(t));
+    });
+    return targets.size;
+  },
+
+  // Presentation for a FunctionalSafety EvaluationResult's pass/fail/inconclusive
+  // outcome, so it can render as a status badge. Returns null for elements that
+  // carry no evaluation result.
+  evaluationResultMeta(el) {
+    const v = el?.functionalsafety_evaluation;
+    if (!isMeaningfulValue(v)) return null;
+    const key = String(v).toLowerCase();
+    const map = {
+      pass: { label: 'Pass', badgeClass: 'bg-emerald-500/15 text-emerald-400' },
+      fail: { label: 'Fail', badgeClass: 'bg-rose-500/15 text-rose-400' },
+      inconclusive: { label: 'Inconclusive', badgeClass: 'bg-amber-500/15 text-amber-400' }
+    };
+    return map[key] || { label: String(v), badgeClass: 'bg-slate-600/20 text-slate-300' };
+  },
+
   placeholderElement(spdxId) {
     return {
       type: 'ExternalReference',

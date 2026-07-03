@@ -27,6 +27,7 @@ const viewListProps = {
   dataset: 'filteredDatasetPackages',
   files: 'filteredFiles',
   hardware: 'filteredHardware',
+  requirements: 'filteredRequirements',
   licenses: 'filteredLicenses',
   security: 'filteredVulnerabilities',
   configs: 'filteredConfigs',
@@ -40,6 +41,7 @@ const navKindListInfo = {
   dataset: { view: 'dataset', list: 'filteredDatasetPackages', idField: 'spdxId' },
   file: { view: 'files', list: 'filteredFiles', idField: 'spdxId' },
   hardware: { view: 'hardware', list: 'filteredHardware', idField: 'spdxId' },
+  requirement: { view: 'requirements', list: 'filteredRequirements', idField: 'spdxId' },
   license: { view: 'licenses', list: 'filteredLicenses', idField: 'id' },
   vuln: { view: 'security', list: 'filteredVulnerabilities', idField: 'spdxId' },
   config: { view: 'configs', list: 'filteredConfigs', idField: 'spdxId' },
@@ -59,6 +61,7 @@ export const navigationMixin = {
       expandedPkg: this.expandedPkg,
       expandedFile: this.expandedFile,
       expandedHardware: this.expandedHardware,
+      expandedRequirement: this.expandedRequirement,
       expandedConfig: this.expandedConfig,
       expandedBuild: this.expandedBuild,
       expandedLicense: this.expandedLicense,
@@ -95,6 +98,7 @@ export const navigationMixin = {
     this.expandedPkg = state.expandedPkg;
     this.expandedFile = state.expandedFile;
     this.expandedHardware = state.expandedHardware;
+    this.expandedRequirement = state.expandedRequirement;
     this.expandedConfig = state.expandedConfig;
     this.expandedBuild = state.expandedBuild;
     this.expandedLicense = state.expandedLicense;
@@ -117,6 +121,7 @@ export const navigationMixin = {
       dataset: ['dataset', this.expandedPkg],
       files: ['file', this.expandedFile],
       hardware: ['hardware', this.expandedHardware],
+      requirements: ['requirement', this.expandedRequirement],
       configs: ['config', this.expandedConfig],
       build: ['build', this.expandedBuild],
       licenses: ['license', this.expandedLicense],
@@ -148,6 +153,7 @@ export const navigationMixin = {
     this.expandedPkg = null;
     this.expandedFile = null;
     this.expandedHardware = null;
+    this.expandedRequirement = null;
     this.expandedConfig = null;
     this.expandedBuild = null;
     this.expandedLicense = null;
@@ -299,6 +305,10 @@ export const navigationMixin = {
     this.expandedHardware = this.expandedHardware === id ? null : id;
     this._scheduleNavPush();
   },
+  toggleRequirement(id) {
+    this.expandedRequirement = this.expandedRequirement === id ? null : id;
+    this._scheduleNavPush();
+  },
   toggleConfig(id) {
     this.expandedConfig = this.expandedConfig === id ? null : id;
     this._scheduleNavPush();
@@ -381,6 +391,11 @@ export const navigationMixin = {
       case 'hardware_BulkHardware':
       case 'hardware_VirtualHardware':
         return { label: 'Hardware' };
+      case 'Requirement':
+      case 'functionalsafety_RequirementVerification':
+      case 'functionalsafety_Assumption':
+      case 'functionalsafety_EvaluationResult':
+        return { label: 'Requirements' };
       case 'build_Build':
         return { label: 'Builds' };
       case 'Tool':
@@ -419,6 +434,13 @@ export const navigationMixin = {
       el.type === 'hardware_VirtualHardware'
     ) {
       this.navigateToHardware(spdxId);
+    } else if (
+      el.type === 'Requirement' ||
+      el.type === 'functionalsafety_RequirementVerification' ||
+      el.type === 'functionalsafety_Assumption' ||
+      el.type === 'functionalsafety_EvaluationResult'
+    ) {
+      this.navigateToRequirement(spdxId);
     } else if (el.type === 'build_Build') {
       this.navigateToBuild(spdxId);
     } else if (el.type === 'Tool') {
@@ -465,6 +487,12 @@ export const navigationMixin = {
     this.switchView('hardware');
     this.expandedHardware = spdxId;
     this.scrollToNavTarget('hardware', spdxId);
+  },
+  navigateToRequirement(spdxId) {
+    this.requirementSearch = '';
+    this.switchView('requirements');
+    this.expandedRequirement = spdxId;
+    this.scrollToNavTarget('requirement', spdxId);
   },
   navigateToBuild(spdxId) {
     this.buildSearch = '';

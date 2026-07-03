@@ -281,6 +281,10 @@
   background: #a3e635;
 }
 
+.stat-card.gold::after {
+  background: #eab308;
+}
+
 .stat-card-link {
   cursor: pointer;
   display: flex;

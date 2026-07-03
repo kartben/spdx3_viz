@@ -294,6 +294,7 @@ export const loadingMixin = {
       this.views.find((v) => v.id === 'dataset').count = this.datasetPackages.length;
       this.views.find((v) => v.id === 'files').count = this.files.length;
       this.views.find((v) => v.id === 'hardware').count = this.hardware.length;
+      this.views.find((v) => v.id === 'requirements').count = this.requirements.length;
       this.views.find((v) => v.id === 'licenses').count = this.licenses.length;
       this.views.find((v) => v.id === 'security').count = this.vulnerabilities.length;
       this.views.find((v) => v.id === 'configs').count = this.buildConfigs.length;

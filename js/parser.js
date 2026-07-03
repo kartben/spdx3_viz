@@ -54,6 +54,7 @@ function makeThrottledReporter(onProgress, total) {
  * @property {Array<Object>} relationships - Relationship elements
  * @property {Array<Object>} builds - Build elements
  * @property {Array<Object>} hardware - Hardware profile elements (SPDX 3.1)
+ * @property {Array<Object>} requirements - Requirements + FunctionalSafety artifacts (SPDX 3.1)
  * @property {Array<Object>} buildConfigs - Build configuration elements
  * @property {Object|null} buildInfo - Build information element
  * @property {Object|null} agentInfo - Agent information element (SoftwareAgent, Organization or Person)
@@ -158,6 +159,9 @@ export function parseGraph(graph, onProgress) {
   /** @type {Array<Object>} - Hardware profile elements (SPDX 3.1) */
   const hardware = [];
 
+  /** @type {Array<Object>} - Requirements + FunctionalSafety artifacts (SPDX 3.1) */
+  const requirements = [];
+
   /** @type {Array<Object>} */
   const vulnerabilities = [];
 
@@ -257,12 +261,26 @@ export function parseGraph(graph, onProgress) {
         hardware.push(item);
         break;
 
+      // FunctionalSafety profile (SPDX 3.1): the Core Requirement ("shall"
+      // statements) and the safety lifecycle artifacts around it, all surfaced in
+      // the Requirements tab and graph.
+      case ELEMENT_TYPES.REQUIREMENT:
+      case ELEMENT_TYPES.FS_VERIFICATION:
+      case ELEMENT_TYPES.FS_ASSUMPTION:
+      case ELEMENT_TYPES.FS_EVALUATION:
+        requirements.push(item);
+        break;
+
       case ELEMENT_TYPES.TOOL:
         tools.push(item);
         break;
 
+      // EvidenceRelationship (FunctionalSafety) is a Relationship subclass
+      // (from/to/relationshipType), so it flows through the generic relationship
+      // handling + graph edges alongside the Core relationship classes.
       case ELEMENT_TYPES.RELATIONSHIP:
       case ELEMENT_TYPES.LIFECYCLE_RELATIONSHIP:
+      case ELEMENT_TYPES.FS_EVIDENCE_RELATIONSHIP:
         relationships.push(item);
         break;
 
@@ -467,6 +485,7 @@ export function parseGraph(graph, onProgress) {
     packages,
     regularFiles,
     hardware,
+    requirements,
     tools,
     builds,
     buildConfigs,
@@ -482,6 +501,7 @@ export function parseGraph(graph, onProgress) {
     files: regularFiles,
     tools,
     hardware,
+    requirements,
     relationships,
     builds,
     buildConfigs,
@@ -691,6 +711,7 @@ function computePresentTypes(data) {
   });
   if (data.regularFiles.length) nodeTypes.add('file');
   if (data.hardware.length) nodeTypes.add('hardware');
+  if (data.requirements.length) nodeTypes.add('requirement');
   if (data.tools.length) nodeTypes.add('tool');
   if (data.builds.length) nodeTypes.add('build');
   if (data.buildConfigs.length) nodeTypes.add('config');

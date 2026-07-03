@@ -22,6 +22,8 @@ const SEARCH_ICONS = {
   file: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>',
   hardware:
     '<rect x="7" y="7" width="10" height="10" rx="1" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/>',
+  requirement:
+    '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>',
   config:
     '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>',
   build:
@@ -40,6 +42,7 @@ const SEARCH_TYPE_LABELS = {
   dataset: 'Dataset',
   file: 'File',
   hardware: 'Hardware',
+  requirement: 'Requirement',
   config: 'Build config',
   build: 'Build',
   tool: 'Tool',
@@ -72,6 +75,7 @@ export const searchMixin = {
       this.packages.length,
       this.files.length,
       this.hardware.length,
+      this.requirements.length,
       this.buildConfigs.length,
       this.builds.length,
       this.tools.length,
@@ -112,6 +116,20 @@ export const searchMixin = {
         h.name || this.cleanName(h.spdxId),
         h.hardware_partNumber || '',
         h.hardware_partNumber + ' ' + h.spdxId
+      );
+    }
+    for (const r of this.requirements) {
+      // Prefer the requirement UID (e.g. a StrictDoc id) as the subtitle, else
+      // the "shall" statement so a requirement is recognizable and findable by
+      // either its id or its text.
+      const uid = this.externalIdentifiers(r)[0]?.identifier || '';
+      const statement = r.requirementStatement || r.functionalsafety_assumptionStatement || '';
+      add(
+        r.spdxId,
+        'requirement',
+        r.name || this.cleanName(r.spdxId),
+        uid || statement,
+        `${uid} ${statement} ${r.spdxId}`
       );
     }
     for (const c of this.buildConfigs) {

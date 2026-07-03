@@ -297,6 +297,7 @@
                       (v.id !== 'ai' || aiPackages.length > 0) &&
                       (v.id !== 'dataset' || datasetPackages.length > 0) &&
                       (v.id !== 'hardware' || hardware.length > 0) &&
+                      (v.id !== 'requirements' || requirements.length > 0) &&
                       (v.id !== 'configs' || buildConfigs.length > 0)"
               :class="currentView === v.id && 'active'"
               @click="switchView(v.id)"
@@ -726,6 +727,32 @@
                       stroke-linejoin="round"
                       stroke-width="2"
                       d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"
+                    />
+                  </svg>
+                </div>
+              </button>
+              <button
+                type="button"
+                x-show="requirements.length > 0"
+                @click="switchView('requirements')"
+                class="card stat-card stat-card-link gold hover:border-yellow-500/50"
+              >
+                <div class="text-2xl font-bold text-white" x-text="requirements.length"></div>
+                <div class="text-sm text-slate-400 mt-1">Requirements</div>
+                <div
+                  class="w-8 h-8 mt-2 rounded-lg bg-yellow-500/15 flex items-center justify-center"
+                >
+                  <svg
+                    class="w-4 h-4 text-yellow-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
                     />
                   </svg>
                 </div>
@@ -2269,6 +2296,252 @@
                                 :title="'Lifecycle scope: ' + item.scope"
                                 x-text="item.scope"
                               ></span>
+                              <svg
+                                class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors flex-shrink-0"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M9 5l7 7-7 7"
+                                />
+                              </svg>
+                            </div>
+                          </template>
+                        </div>
+                      </div>
+                    </template>
+                  </div>
+                </template>
+              </div>
+            </template>
+          </div>
+
+          <!-- ========== REQUIREMENTS (SPDX 3.1 FunctionalSafety) ========== -->
+          <div x-show="currentView === 'requirements'" class="fade-in space-y-3 max-w-4xl">
+            <div class="flex flex-wrap items-center gap-3 mb-3">
+              <span
+                class="text-sm text-slate-400 flex-shrink-0"
+                x-text="`${filteredRequirements.length} ${filteredRequirements.length === 1 ? 'requirement' : 'requirements'}`"
+              ></span>
+              <input
+                x-model="requirementSearch"
+                @input.debounce.150ms="restreamView('requirements')"
+                type="text"
+                placeholder="Filter requirements…"
+                class="ml-auto bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-yellow-500 w-44 sm:w-56"
+              />
+            </div>
+            <template
+              x-for="req in (mountedViews.requirements ? renderSlice('requirements', filteredRequirements) : [])"
+              :key="req.spdxId"
+            >
+              <div
+                class="card cursor-pointer"
+                data-nav-kind="requirement"
+                :data-nav-id="req.spdxId"
+                :class="isNavTarget('requirement', req.spdxId) && 'target-focus'"
+                @click="toggleRequirement(req.spdxId)"
+              >
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-8 h-8 rounded-lg bg-yellow-500/15 flex items-center justify-center flex-shrink-0"
+                  >
+                    <svg
+                      class="w-4 h-4 text-yellow-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+                      />
+                    </svg>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div
+                      class="font-medium text-white text-sm break-words"
+                      x-text="req.name || cleanName(req.spdxId)"
+                    ></div>
+                    <!-- The "shall" statement (or assumption statement) — the heart
+                         of a requirement, shown as a one-line preview on the card. -->
+                    <div
+                      x-show="isMeaningful(req.requirementStatement || req.functionalsafety_assumptionStatement)"
+                      class="text-xs text-slate-400 mt-0.5 line-clamp-1"
+                      x-text="req.requirementStatement || req.functionalsafety_assumptionStatement"
+                    ></div>
+                    <div class="flex items-center gap-2 mt-1 flex-wrap">
+                      <span
+                        x-show="req.type !== 'Requirement'"
+                        class="badge text-xs bg-yellow-500/15 text-yellow-400"
+                        x-text="req.type.replace('functionalsafety_', '')"
+                      ></span>
+                      <template
+                        x-for="eid in externalIdentifiers(req).slice(0, 1)"
+                        :key="eid.identifier"
+                      >
+                        <span
+                          class="badge text-xs bg-slate-700 text-slate-300 font-mono"
+                          x-text="eid.identifier"
+                        ></span>
+                      </template>
+                      <span
+                        x-show="evaluationResultMeta(req)"
+                        class="badge text-xs"
+                        :class="evaluationResultMeta(req)?.badgeClass"
+                        x-text="evaluationResultMeta(req)?.label"
+                      ></span>
+                      <span
+                        x-show="(outgoingRels(req.spdxId)||[]).some(r => r.relationshipType === 'implementedBy')"
+                        class="badge text-xs bg-emerald-500/15 text-emerald-400"
+                        x-text="`implemented by ${implementedByCount(req.spdxId)}`"
+                      ></span>
+                    </div>
+                  </div>
+                  <svg
+                    class="w-4 h-4 text-slate-500 transition-transform flex-shrink-0"
+                    :class="expandedRequirement === req.spdxId && 'rotate-180'"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+                <!-- Expanded detail (built lazily via x-if for only the open card) -->
+                <template x-if="expandedRequirement === req.spdxId">
+                  <div
+                    class="mt-4 pt-4 border-t border-slate-700 space-y-3 sm:pl-11 fade-in"
+                    @click.stop
+                  >
+                    <!-- Requirement / assumption statement -->
+                    <div
+                      x-show="isMeaningful(req.requirementStatement || req.functionalsafety_assumptionStatement)"
+                    >
+                      <div class="text-[10px] text-slate-500 uppercase tracking-wider mb-1">
+                        <span
+                          x-text="req.type === 'Requirement' ? 'Requirement' : 'Statement'"
+                        ></span>
+                      </div>
+                      <div
+                        class="text-sm text-slate-200 break-words leading-relaxed"
+                        x-text="req.requirementStatement || req.functionalsafety_assumptionStatement"
+                      ></div>
+                    </div>
+
+                    <!-- Summary -->
+                    <div x-show="isMeaningful(req.summary) && req.summary !== req.name">
+                      <div class="text-xs text-slate-500 mb-1">Summary</div>
+                      <div class="text-xs text-slate-300 break-words" x-text="req.summary"></div>
+                    </div>
+
+                    <!-- Safety fields (lifecycle stage, verification method, rationale, …) -->
+                    <div
+                      x-show="safetyFields(req).length > 0"
+                      class="grid grid-cols-2 gap-x-4 gap-y-2"
+                    >
+                      <template x-for="field in safetyFields(req)" :key="field.label">
+                        <div>
+                          <div
+                            class="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5"
+                            x-text="field.label"
+                          ></div>
+                          <span
+                            class="text-xs text-slate-300 break-words"
+                            :class="field.mono && 'font-mono break-all'"
+                            x-text="field.value"
+                          ></span>
+                        </div>
+                      </template>
+                    </div>
+
+                    <!-- Identifiers (e.g. StrictDoc requirement UID) -->
+                    <div x-show="externalIdentifiers(req).length > 0">
+                      <div
+                        class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2"
+                      >
+                        Identifiers
+                      </div>
+                      <div class="space-y-1.5">
+                        <template
+                          x-for="eid in externalIdentifiers(req)"
+                          :key="eid.type + eid.identifier"
+                        >
+                          <div class="flex items-start gap-2 group">
+                            <span
+                              class="text-[10px] text-slate-500 uppercase tracking-wider w-20 pt-0.5 flex-shrink-0 text-right"
+                              x-text="eid.label"
+                            ></span>
+                            <code
+                              class="hash-text text-slate-300 break-all flex-1 leading-relaxed"
+                              x-text="eid.identifier"
+                            ></code>
+                            <button
+                              @click.stop="copyHash(eid.identifier)"
+                              class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity flex-shrink-0 pt-0.5"
+                              title="Copy"
+                            >
+                              <svg
+                                class="w-3 h-3"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                                />
+                              </svg>
+                            </button>
+                          </div>
+                        </template>
+                      </div>
+                    </div>
+
+                    <!-- Relationships — grouped semantically (implementedBy, verifiedBy, …) -->
+                    <template x-for="group in detailRelGroupsFor(req)" :key="group.key">
+                      <div class="detail-rel-section">
+                        <div class="flex items-center gap-2 mb-2">
+                          <span
+                            class="detail-rel-line"
+                            :style="`background: ${group.color}`"
+                          ></span>
+                          <span
+                            class="text-xs font-semibold uppercase tracking-wider"
+                            :style="`color: ${group.color}`"
+                            x-text="group.label"
+                          ></span>
+                          <span
+                            class="text-[10px] text-slate-500"
+                            x-text="'(' + group.items.length + ')'"
+                          ></span>
+                        </div>
+                        <div class="space-y-1 ml-3">
+                          <template x-for="item in group.items" :key="item.id">
+                            <div class="detail-rel-item group" @click.stop="navigateTo(item.id)">
+                              <span
+                                class="detail-rel-arrow"
+                                :style="`color: ${group.color}`"
+                                x-text="item.direction === 'out' ? '→' : '←'"
+                              ></span>
+                              <span
+                                class="detail-rel-target-dot"
+                                :style="`background: ${nodeTypeColor(getNodeType(elementMap.get(item.id) || {}))}`"
+                              ></span>
+                              <span class="flex-1 truncate" x-text="item.displayName"></span>
                               <svg
                                 class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors flex-shrink-0"
                                 fill="none"
@@ -4197,6 +4470,33 @@
                   class="text-xs text-slate-300 break-words"
                   :class="spec.mono && 'font-mono break-all'"
                   x-text="spec.value"
+                ></span>
+              </div>
+            </template>
+          </div>
+
+          <!-- FunctionalSafety profile (SPDX 3.1): evaluation outcome + spec-sheet
+               fields (verification method, lifecycle stage, rationale, …). The
+               requirement/assumption statement itself renders as a promoted hero. -->
+          <div
+            x-show="evaluationResultMeta(detailElement) || safetyFields(detailElement).length > 0"
+            class="space-y-3"
+          >
+            <div class="flex items-center gap-2" x-show="evaluationResultMeta(detailElement)">
+              <span class="text-xs text-slate-500 flex-shrink-0">Evaluation</span>
+              <span
+                class="text-xs px-2 py-0.5 rounded-md"
+                :class="evaluationResultMeta(detailElement)?.badgeClass"
+                x-text="evaluationResultMeta(detailElement)?.label"
+              ></span>
+            </div>
+            <template x-for="field in safetyFields(detailElement)" :key="field.label">
+              <div>
+                <div class="text-xs text-slate-500 mb-1" x-text="field.label"></div>
+                <span
+                  class="text-xs text-slate-300 break-words"
+                  :class="field.mono && 'font-mono break-all'"
+                  x-text="field.value"
                 ></span>
               </div>
             </template>

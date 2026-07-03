@@ -164,6 +164,32 @@ export const derivedMixin = {
     );
   },
 
+  // Requirements + FunctionalSafety artifacts (SPDX 3.1), filtered by the in-view
+  // search box and sorted by name. Matches on name, statement, summary and the
+  // requirement UID so a requirement is findable by any of those. Requirements
+  // (the first-class "shall" statements) sort ahead of the safety artifacts.
+  get filteredRequirements() {
+    let reqs = this.requirements;
+    if (this.requirementSearch) {
+      const q = this.requirementSearch.toLowerCase();
+      reqs = reqs.filter(
+        (r) =>
+          (r.name || '').toLowerCase().includes(q) ||
+          this.cleanName(r.spdxId).toLowerCase().includes(q) ||
+          (r.requirementStatement || '').toLowerCase().includes(q) ||
+          (r.functionalsafety_assumptionStatement || '').toLowerCase().includes(q) ||
+          (r.summary || '').toLowerCase().includes(q) ||
+          this.externalIdentifiers(r).some((eid) => eid.identifier.toLowerCase().includes(q))
+      );
+    }
+    const rank = (r) => (r.type === 'Requirement' ? 0 : 1);
+    return [...reqs].sort(
+      (a, b) =>
+        rank(a) - rank(b) ||
+        (a.name || this.cleanName(a.spdxId)).localeCompare(b.name || this.cleanName(b.spdxId))
+    );
+  },
+
   get filteredLicenses() {
     let lics = this.licenses;
     if (this.licenseSearch) {
