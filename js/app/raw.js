@@ -87,12 +87,13 @@ export const rawMixin = {
     return this.loadedFiles[this.rawIndex] || null;
   },
 
-  // True when `id` is a known element that has somewhere to navigate to, so
-  // only meaningful ids become links (agents, creation info, etc. stay plain).
-  _rawIsNavigable(id) {
+  // True when `id` resolves to a real element, so every id reference (spdxId,
+  // from, to, element, creationInfo, …) becomes a link. Elements with a
+  // dedicated list open there; the rest open in the detail panel (see
+  // rawNavigate). Placeholders / NoAssertion sentinels stay plain.
+  _rawLinkable(id) {
     const el = this.elementMap.get(id);
-    if (!el || el.placeholder) return false;
-    return !!this.listTargetFor(el);
+    return !!el && !el.placeholder;
   },
 
   // The exact string shown in the code block: pretty-printed when the Formatted
@@ -112,7 +113,7 @@ export const rawMixin = {
     if (!f) return '';
     const src = this._rawSource(index);
     if (f.text.length > HIGHLIGHT_MAX_CHARS) return escapeHtml(src);
-    return renderJsonLd(src, (id) => this._rawIsNavigable(id));
+    return renderJsonLd(src, (id) => this._rawLinkable(id));
   },
 
   rawSizeLabel(index) {
@@ -152,14 +153,18 @@ export const rawMixin = {
     }, 0);
   },
 
-  // Delegated handler on the code block: a click (or Enter) on a linkified
-  // spdxId jumps to that element's view.
+  // Delegated handler on the code block: a click (or Enter) on a linkified id
+  // takes you to that element — its dedicated list view when it has one,
+  // otherwise its detail panel (agents, the SBOM doc, relationships, …).
   rawNavigate(e) {
     const target = e.target.closest?.('[data-spdxid]');
     if (!target) return;
     e.preventDefault();
     const id = target.getAttribute('data-spdxid');
-    if (id) this.navigateTo(id);
+    if (!id) return;
+    const el = this.elementMap.get(id);
+    if (el && this.listTargetFor(el)) this.navigateTo(id);
+    else this.selectGraphNode(id);
   },
 
   copyRaw(index) {
