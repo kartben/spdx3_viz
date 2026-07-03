@@ -211,9 +211,11 @@ export function createGraphFilters() {
     { key: 'build', label: 'Build', color: COLORS.build, active: true },
     { key: 'config', label: 'Configs', color: COLORS.config, active: true },
     { key: 'external', label: 'External', color: COLORS.external, active: true },
-    // Vulnerabilities are off by default: an SBOM with VEX can carry tens of
-    // thousands of vuln→package edges, which would swamp the graph. The user
-    // opts in from the legend.
+    // Vulnerabilities start off here: an SBOM with VEX can carry tens of
+    // thousands of vuln→package edges, which would swamp the graph. On load,
+    // loadingMixin auto-enables this (and the VEX edge types below) for small
+    // VEX sets (see VEX_AUTO_SHOW_MAX); otherwise the user opts in from the
+    // legend.
     {
       key: 'vulnerability',
       label: 'Vulnerabilities',
@@ -282,7 +284,8 @@ export function createGraphFilters() {
       isRel: true,
       lineStyle: 'dashed'
     },
-    // VEX assessment edges (vulnerability → package). Off by default; enabling
+    // VEX assessment edges (vulnerability → package). Start off, but auto-enabled
+    // on load for small VEX sets (see the Vulnerabilities note above). Enabling
     // the Vulnerabilities node type + one of these surfaces VEX in the graph.
     { key: 'fixedIn', label: 'fixedIn (VEX)', color: COLORS.vexFixed, active: false, isRel: true },
     {

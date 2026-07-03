@@ -13,6 +13,20 @@ let parserWorker = null;
 let parseReqSeq = 0;
 let latestParseReqId = 0;
 
+// VEX (vulnerability → package) edges and the Vulnerabilities node type default
+// to off, because an SBOM with full VEX can carry tens of thousands of edges
+// that swamp the graph. But for a modest VEX set it's more useful to surface
+// them by default — so when there are fewer than this many VEX edges we turn
+// the vuln node type and all four VEX edge types on at load time.
+const VEX_AUTO_SHOW_MAX = 200;
+const VEX_FILTER_KEYS = new Set([
+  'vulnerability',
+  'fixedIn',
+  'doesNotAffect',
+  'affects',
+  'underInvestigation'
+]);
+
 function getParserWorker() {
   if (!parserWorker) {
     parserWorker = new Worker(new URL('../parser.worker.js', import.meta.url), { type: 'module' });
@@ -263,6 +277,15 @@ export const loadingMixin = {
 
       Object.assign(this, markPayloadRaw(msg.parsed));
       Object.assign(this, markPayloadRaw(msg.indexes));
+
+      // Fresh data: for a small VEX set, show vulnerabilities + their VEX edges
+      // by default; otherwise keep them off so large VEX sets don't swamp the
+      // graph. This deterministically (re)sets the toggles on every load.
+      const showVex =
+        this.vexRelationships.length > 0 && this.vexRelationships.length < VEX_AUTO_SHOW_MAX;
+      this.graphFilters.forEach((f) => {
+        if (VEX_FILTER_KEYS.has(f.key)) f.active = showVex;
+      });
 
       this.views.find((v) => v.id === 'packages').count = this.plainPackages.length;
       this.views.find((v) => v.id === 'ai').count = this.aiPackages.length;
