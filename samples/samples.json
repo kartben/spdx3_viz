@@ -9,6 +9,15 @@
     "size": 2200897
   },
   {
+    "id": "zephyr-experimental",
+    "name": "Zephyr RTOS (SPDX 3.1)",
+    "emoji": "🪁",
+    "description": "Same application, but with an SPDX 3.1 SBOM.<br/>⚠️ SPDX 3.1 support is not yet available in upstream <code>west spdx</code> tooling.",
+    "dir": "samples/zephyr-experimental",
+    "files": ["app.jsonld", "modules-deps.jsonld", "zephyr.jsonld", "build.jsonld"],
+    "size": 2303722
+  },
+  {
     "id": "linux",
     "name": "Linux kernel",
     "emoji": "🐧",
