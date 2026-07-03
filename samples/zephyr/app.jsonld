@@ -4,14 +4,14 @@
     {
       "type": "simplelicensing_LicenseExpression",
       "spdxId": "https://spdx.org/licenses/Apache-2.0",
-      "creationInfo": "zephyr:creationinfo",
-      "simplelicensing_licenseExpression": "Apache-2.0"
+      "simplelicensing_licenseExpression": "Apache-2.0",
+      "creationInfo": "zephyr:creationinfo"
     },
     {
       "type": "simplelicensing_LicenseExpression",
       "spdxId": "https://spdx.org/licenses/CC0-1.0",
-      "creationInfo": "zephyr:creationinfo",
-      "simplelicensing_licenseExpression": "CC0-1.0"
+      "simplelicensing_licenseExpression": "CC0-1.0",
+      "creationInfo": "zephyr:creationinfo"
     },
     {
       "type": "SoftwareAgent",
@@ -22,19 +22,25 @@
     {
       "type": "SpdxDocument",
       "spdxId": "zephyr:app/documents/app",
-      "creationInfo": "zephyr:creationinfo",
-      "name": "Zephyr Application",
+      "dataLicense": "https://spdx.org/licenses/CC0-1.0",
+      "namespaceMap": [
+        {
+          "type": "NamespaceMap",
+          "namespace": "http://spdx.org/spdxdocs/zephyr-22d142f5-7c5e-4eb6-baaa-76744bd56652/",
+          "prefix": "zephyr"
+        }
+      ],
       "element": [
         "zephyr:agents/west-spdx-agent",
         "zephyr:tools/west-spdx",
         "zephyr:packages/app-sources",
         "zephyr:files/File-main.c",
-        "zephyr:relationships/1139",
+        "zephyr:relationships/1140",
         "https://spdx.org/licenses/Apache-2.0",
-        "zephyr:relationships/1419",
         "zephyr:relationships/1420",
-        "zephyr:relationships/1728",
+        "zephyr:relationships/1421",
         "zephyr:relationships/1729",
+        "zephyr:relationships/1730",
         "https://spdx.org/licenses/CC0-1.0"
       ],
       "profileConformance": [
@@ -45,19 +51,13 @@
       "rootElement": [
         "zephyr:packages/app-sources"
       ],
-      "dataLicense": "https://spdx.org/licenses/CC0-1.0",
-      "namespaceMap": [
-        {
-          "type": "NamespaceMap",
-          "namespace": "http://spdx.org/spdxdocs/zephyr-f9d80562-859a-4431-81b9-fe7053816f03/",
-          "prefix": "zephyr"
-        }
-      ]
+      "creationInfo": "zephyr:creationinfo",
+      "name": "Zephyr Application"
     },
     {
       "type": "CreationInfo",
       "@id": "zephyr:creationinfo",
-      "created": "2026-06-30T13:07:22Z",
+      "created": "2026-07-03T15:31:26Z",
       "createdBy": [
         "zephyr:agents/west-spdx-agent"
       ],
@@ -69,6 +69,9 @@
     {
       "type": "software_File",
       "spdxId": "zephyr:files/File-main.c",
+      "software_fileKind": "file",
+      "software_copyrightText": "<text>\n * Copyright (c) 2023 Fabian Blatz <fabianblatz@gmail.com>\n</text>",
+      "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
       "name": "src/main.c",
       "verifiedUsing": [
@@ -82,69 +85,66 @@
           "algorithm": "sha256",
           "hashValue": "f3298c7defe2a81bec13fa78b89b9b5b16b021b418931f1803873c86cc997ec1"
         }
-      ],
-      "software_copyrightText": "<text>\n * Copyright (c) 2023 Fabian Blatz <fabianblatz@gmail.com>\n</text>",
-      "software_primaryPurpose": "file",
-      "software_fileKind": "file"
+      ]
     },
     {
       "type": "software_Package",
       "spdxId": "zephyr:packages/app-sources",
-      "creationInfo": "zephyr:creationinfo",
-      "name": "app-sources",
+      "software_downloadLocation": "NOASSERTION",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "source",
-      "software_downloadLocation": "NOASSERTION"
+      "creationInfo": "zephyr:creationinfo",
+      "name": "app-sources"
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/1139",
-      "creationInfo": "zephyr:creationinfo",
+      "spdxId": "zephyr:relationships/1140",
       "from": "zephyr:packages/app-sources",
       "relationshipType": "contains",
       "to": [
         "zephyr:files/File-main.c"
-      ]
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/1419",
-      "creationInfo": "zephyr:creationinfo",
-      "from": "zephyr:packages/app-sources",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "https://spdx.org/licenses/Apache-2.0"
-      ]
+      ],
+      "creationInfo": "zephyr:creationinfo"
     },
     {
       "type": "Relationship",
       "spdxId": "zephyr:relationships/1420",
-      "creationInfo": "zephyr:creationinfo",
+      "from": "zephyr:packages/app-sources",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://spdx.org/licenses/Apache-2.0"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/1421",
       "from": "zephyr:packages/app-sources",
       "relationshipType": "hasDeclaredLicense",
       "to": [
         "expandedlicensing_NoAssertionLicense"
-      ]
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/1728",
-      "creationInfo": "zephyr:creationinfo",
-      "from": "zephyr:files/File-main.c",
-      "relationshipType": "hasConcludedLicense",
-      "to": [
-        "https://spdx.org/licenses/Apache-2.0"
-      ]
+      ],
+      "creationInfo": "zephyr:creationinfo"
     },
     {
       "type": "Relationship",
       "spdxId": "zephyr:relationships/1729",
-      "creationInfo": "zephyr:creationinfo",
+      "from": "zephyr:files/File-main.c",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://spdx.org/licenses/Apache-2.0"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/1730",
       "from": "zephyr:files/File-main.c",
       "relationshipType": "hasDeclaredLicense",
       "to": [
         "https://spdx.org/licenses/Apache-2.0"
-      ]
+      ],
+      "creationInfo": "zephyr:creationinfo"
     },
     {
       "type": "Tool",
