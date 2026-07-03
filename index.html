@@ -738,7 +738,7 @@
                 class="card stat-card stat-card-link gold hover:border-yellow-500/50"
               >
                 <div class="text-2xl font-bold text-white" x-text="requirements.length"></div>
-                <div class="text-sm text-slate-400 mt-1">Requirements</div>
+                <div class="text-sm text-slate-400 mt-1">Functional Safety</div>
                 <div
                   class="w-8 h-8 mt-2 rounded-lg bg-yellow-500/15 flex items-center justify-center"
                 >
@@ -2320,20 +2320,66 @@
             </template>
           </div>
 
-          <!-- ========== REQUIREMENTS (SPDX 3.1 FunctionalSafety) ========== -->
+          <!-- ========== FUNCTIONAL SAFETY (SPDX 3.1) ========== -->
           <div x-show="currentView === 'requirements'" class="fade-in space-y-3 max-w-4xl">
             <div class="flex flex-wrap items-center gap-3 mb-3">
-              <span
-                class="text-sm text-slate-400 flex-shrink-0"
-                x-text="`${filteredRequirements.length} ${filteredRequirements.length === 1 ? 'requirement' : 'requirements'}`"
-              ></span>
+              <!-- Breakdown summary of the folded-in FunctionalSafety elements -->
+              <span class="text-sm text-slate-400 flex-shrink-0">
+                <span x-text="safetyCounts.requirements"></span> requirements<template
+                  x-if="safetyCounts.verifications"
+                  ><span
+                    ><span class="text-slate-600"> · </span
+                    ><span x-text="safetyCounts.verifications"></span> verifications</span
+                  ></template
+                ><template x-if="safetyCounts.evaluations"
+                  ><span
+                    ><span class="text-slate-600"> · </span
+                    ><span x-text="safetyCounts.evaluations"></span> evaluations</span
+                  ></template
+                ><template x-if="safetyCounts.assumptions"
+                  ><span
+                    ><span class="text-slate-600"> · </span
+                    ><span x-text="safetyCounts.assumptions"></span> assumptions</span
+                  ></template
+                >
+              </span>
               <input
                 x-model="requirementSearch"
                 @input.debounce.150ms="restreamView('requirements')"
                 type="text"
-                placeholder="Filter requirements…"
+                placeholder="Filter…"
                 class="ml-auto bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-yellow-500 w-44 sm:w-56"
               />
+            </div>
+            <!-- Kind filter: browse just requirements, verifications, etc. Only the
+                 kinds actually present are offered. -->
+            <div class="flex flex-wrap items-center gap-1.5 mb-1">
+              <template
+                x-for="chip in [
+                  { key: '', label: 'All' },
+                  { key: 'Requirement', label: 'Requirements', n: safetyCounts.requirements },
+                  { key: 'functionalsafety_RequirementVerification', label: 'Verifications', n: safetyCounts.verifications },
+                  { key: 'functionalsafety_EvaluationResult', label: 'Evaluations', n: safetyCounts.evaluations },
+                  { key: 'functionalsafety_Assumption', label: 'Assumptions', n: safetyCounts.assumptions }
+                ].filter(c => c.key === '' || c.n > 0)"
+                :key="chip.key"
+              >
+                <button
+                  type="button"
+                  @click="requirementKindFilter = chip.key; restreamView('requirements')"
+                  class="px-2.5 py-1 rounded-full text-xs border transition-colors"
+                  :class="requirementKindFilter === chip.key
+                    ? 'bg-yellow-500/15 text-yellow-300 border-yellow-500/40'
+                    : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200'"
+                >
+                  <span x-text="chip.label"></span>
+                  <span
+                    x-show="chip.n !== undefined"
+                    class="text-slate-500"
+                    x-text="`(${chip.n})`"
+                  ></span>
+                </button>
+              </template>
             </div>
             <template
               x-for="req in (mountedViews.requirements ? renderSlice('requirements', filteredRequirements) : [])"
@@ -2378,9 +2424,8 @@
                     ></div>
                     <div class="flex items-center gap-2 mt-1 flex-wrap">
                       <span
-                        x-show="req.type !== 'Requirement'"
                         class="badge text-xs bg-yellow-500/15 text-yellow-400"
-                        x-text="req.type.replace('functionalsafety_', '')"
+                        x-text="safetyArtifactKind(req)"
                       ></span>
                       <template
                         x-for="eid in externalIdentifiers(req).slice(0, 1)"
@@ -2391,6 +2436,15 @@
                           x-text="eid.identifier"
                         ></span>
                       </template>
+                      <!-- Requirement verification status (pass/fail via the
+                           verifiedBy → evaluation chain) -->
+                      <span
+                        x-show="requirementSafetyStatus(req)"
+                        class="badge text-xs"
+                        :class="requirementSafetyStatus(req)?.badgeClass"
+                        x-text="requirementSafetyStatus(req)?.label"
+                      ></span>
+                      <!-- Evaluation element's own pass/fail outcome -->
                       <span
                         x-show="evaluationResultMeta(req)"
                         class="badge text-xs"
@@ -2462,6 +2516,75 @@
                             :class="field.mono && 'font-mono break-all'"
                             x-text="field.value"
                           ></span>
+                        </div>
+                      </template>
+                    </div>
+
+                    <!-- Verification & evaluation: the verifiedBy → evaluation
+                         chain, showing method, pass/fail and pre/postconditions. -->
+                    <div x-show="requirementVerifications(req).length > 0" class="space-y-2">
+                      <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                        Verification &amp; evaluation
+                      </div>
+                      <template x-for="v in requirementVerifications(req)" :key="v.id">
+                        <div
+                          class="rounded-lg bg-slate-900/40 border border-slate-700/50 p-3 space-y-2"
+                        >
+                          <div class="flex items-center gap-2 flex-wrap">
+                            <button
+                              @click.stop="navigateTo(v.id)"
+                              class="text-xs font-medium text-yellow-300 hover:underline text-left break-words"
+                              x-text="v.verification.name || cleanName(v.id)"
+                            ></button>
+                            <template
+                              x-for="m in (v.verification.functionalsafety_verificationMethod || [])"
+                              :key="m"
+                            >
+                              <span
+                                class="badge text-xs bg-slate-700 text-slate-300"
+                                x-text="m"
+                              ></span>
+                            </template>
+                            <span
+                              x-show="evaluationResultMeta(v.evaluation)"
+                              class="badge text-xs"
+                              :class="evaluationResultMeta(v.evaluation)?.badgeClass"
+                              x-text="evaluationResultMeta(v.evaluation)?.label"
+                            ></span>
+                          </div>
+                          <div
+                            x-show="isMeaningful(v.verification.functionalsafety_verificationPrecondition)"
+                          >
+                            <span class="text-[10px] text-slate-500 uppercase tracking-wider"
+                              >Precondition</span
+                            >
+                            <div
+                              class="text-xs text-slate-300 break-words"
+                              x-text="[].concat(v.verification.functionalsafety_verificationPrecondition || []).join('; ')"
+                            ></div>
+                          </div>
+                          <div
+                            x-show="isMeaningful(v.verification.functionalsafety_verificationPostcondition)"
+                          >
+                            <span class="text-[10px] text-slate-500 uppercase tracking-wider"
+                              >Postcondition</span
+                            >
+                            <div
+                              class="text-xs text-slate-300 break-words"
+                              x-text="[].concat(v.verification.functionalsafety_verificationPostcondition || []).join('; ')"
+                            ></div>
+                          </div>
+                          <div
+                            x-show="v.evaluation && isMeaningful(v.evaluation.functionalsafety_rationale)"
+                          >
+                            <span class="text-[10px] text-slate-500 uppercase tracking-wider"
+                              >Evaluation rationale</span
+                            >
+                            <div
+                              class="text-xs text-slate-300 break-words"
+                              x-text="v.evaluation.functionalsafety_rationale"
+                            ></div>
+                          </div>
                         </div>
                       </template>
                     </div>
@@ -4479,9 +4602,17 @@
                fields (verification method, lifecycle stage, rationale, …). The
                requirement/assumption statement itself renders as a promoted hero. -->
           <div
-            x-show="evaluationResultMeta(detailElement) || safetyFields(detailElement).length > 0"
+            x-show="requirementSafetyStatus(detailElement) || evaluationResultMeta(detailElement) || safetyFields(detailElement).length > 0"
             class="space-y-3"
           >
+            <div class="flex items-center gap-2" x-show="requirementSafetyStatus(detailElement)">
+              <span class="text-xs text-slate-500 flex-shrink-0">Safety status</span>
+              <span
+                class="text-xs px-2 py-0.5 rounded-md"
+                :class="requirementSafetyStatus(detailElement)?.badgeClass"
+                x-text="requirementSafetyStatus(detailElement)?.label"
+              ></span>
+            </div>
             <div class="flex items-center gap-2" x-show="evaluationResultMeta(detailElement)">
               <span class="text-xs text-slate-500 flex-shrink-0">Evaluation</span>
               <span

@@ -413,11 +413,102 @@ export const accessorsMixin = {
     push('Verification method', el.functionalsafety_verificationMethod);
     push('Precondition', el.functionalsafety_verificationPrecondition);
     push('Postcondition', el.functionalsafety_verificationPostcondition);
-    // EvaluationResult (functionalsafety)
-    push('Evaluation', el.functionalsafety_evaluation);
+    // EvaluationResult (functionalsafety): the pass/fail is rendered as a badge via
+    // evaluationResultMeta; here we resolve the verification it was based on.
+    if (el.functionalsafety_evaluationBasedOn) {
+      const v = this.elementMap.get(el.functionalsafety_evaluationBasedOn);
+      push('Based on', v?.name || this.cleanName(el.functionalsafety_evaluationBasedOn));
+    }
     // Shared: the reasoning behind the requirement / verification / evaluation
     push('Rationale', el.rationale || el.functionalsafety_rationale);
     return out;
+  },
+
+  // The verifications a requirement is linked to via `verifiedBy`, each paired
+  // with its EvaluationResult (resolved through the evaluation's
+  // evaluationBasedOn back-reference) — the data behind a requirement's
+  // pass/fail status and its inline verification breakdown.
+  requirementVerifications(el) {
+    if (!el) return [];
+    const out = [];
+    (this.outgoingRels(el.spdxId) || []).forEach((rel) => {
+      if (rel.relationshipType !== 'verifiedBy') return;
+      (Array.isArray(rel.to) ? rel.to : [rel.to]).forEach((vid) => {
+        const verification = this.elementMap.get(vid);
+        if (verification) out.push({ id: vid, verification, evaluation: this.evaluationFor(vid) });
+      });
+    });
+    return out;
+  },
+
+  // The EvaluationResult whose evaluationBasedOn points at a given verification.
+  evaluationFor(verificationId) {
+    return (
+      this.requirements.find(
+        (r) =>
+          r.type === 'functionalsafety_EvaluationResult' &&
+          r.functionalsafety_evaluationBasedOn === verificationId
+      ) || null
+    );
+  },
+
+  // Overall functional-safety status of a Requirement, walking
+  // Requirement --verifiedBy--> RequirementVerification <--evaluationBasedOn-- EvaluationResult.
+  // A single failed evaluation dominates; otherwise all-pass wins, then
+  // inconclusive, then verified-but-not-yet-evaluated, else unverified.
+  requirementSafetyStatus(el) {
+    if (!el || el.type !== 'Requirement') return null;
+    const vers = this.requirementVerifications(el);
+    if (!vers.length) {
+      return {
+        key: 'unverified',
+        label: 'Unverified',
+        badgeClass: 'bg-slate-600/20 text-slate-400'
+      };
+    }
+    const evals = vers.map((v) =>
+      String(v.evaluation?.functionalsafety_evaluation || '').toLowerCase()
+    );
+    if (evals.includes('fail')) {
+      return {
+        key: 'failed',
+        label: 'Verification failed',
+        badgeClass: 'bg-rose-500/15 text-rose-400'
+      };
+    }
+    const decided = evals.filter(Boolean);
+    if (decided.length && decided.every((e) => e === 'pass')) {
+      return {
+        key: 'passed',
+        label: 'Verified · pass',
+        badgeClass: 'bg-emerald-500/15 text-emerald-400'
+      };
+    }
+    if (evals.includes('inconclusive')) {
+      return {
+        key: 'inconclusive',
+        label: 'Inconclusive',
+        badgeClass: 'bg-amber-500/15 text-amber-400'
+      };
+    }
+    return { key: 'verified', label: 'Verified', badgeClass: 'bg-sky-500/15 text-sky-400' };
+  },
+
+  // Friendly kind label for a functional-safety element, for the card/detail
+  // type badge (Requirement / Verification / Assumption / Evaluation).
+  safetyArtifactKind(el) {
+    switch (el?.type) {
+      case 'Requirement':
+        return 'Requirement';
+      case 'functionalsafety_RequirementVerification':
+        return 'Verification';
+      case 'functionalsafety_Assumption':
+        return 'Assumption';
+      case 'functionalsafety_EvaluationResult':
+        return 'Evaluation';
+      default:
+        return '';
+    }
   },
 
   // Number of elements a requirement is implemented by (distinct `to` targets of

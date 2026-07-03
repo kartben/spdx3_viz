@@ -168,8 +168,26 @@ export const derivedMixin = {
   // search box and sorted by name. Matches on name, statement, summary and the
   // requirement UID so a requirement is findable by any of those. Requirements
   // (the first-class "shall" statements) sort ahead of the safety artifacts.
+  // Breakdown of the functional-safety elements by kind, for the tab header
+  // summary and to decide which kind-filter chips to show.
+  get safetyCounts() {
+    const c = { requirements: 0, verifications: 0, assumptions: 0, evaluations: 0 };
+    this.requirements.forEach((r) => {
+      if (r.type === ELEMENT_TYPES.REQUIREMENT) c.requirements++;
+      else if (r.type === ELEMENT_TYPES.FS_VERIFICATION) c.verifications++;
+      else if (r.type === ELEMENT_TYPES.FS_ASSUMPTION) c.assumptions++;
+      else if (r.type === ELEMENT_TYPES.FS_EVALUATION) c.evaluations++;
+    });
+    return c;
+  },
+
   get filteredRequirements() {
     let reqs = this.requirements;
+    // Kind filter chips (all / requirements / verifications / assumptions /
+    // evaluations) let the folded-in artifacts be browsed on their own.
+    if (this.requirementKindFilter) {
+      reqs = reqs.filter((r) => r.type === this.requirementKindFilter);
+    }
     if (this.requirementSearch) {
       const q = this.requirementSearch.toLowerCase();
       reqs = reqs.filter(

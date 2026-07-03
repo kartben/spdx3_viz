@@ -267,8 +267,23 @@ export function parseGraph(graph, onProgress) {
       case ELEMENT_TYPES.REQUIREMENT:
       case ELEMENT_TYPES.FS_VERIFICATION:
       case ELEMENT_TYPES.FS_ASSUMPTION:
+        requirements.push(item);
+        break;
+
       case ELEMENT_TYPES.FS_EVALUATION:
         requirements.push(item);
+        // evaluationBasedOn is a property, not a Relationship. Synthesize an edge
+        // so the EvaluationResult ↔ RequirementVerification link is drawn in the
+        // graph and grouped in the detail panel like any other relationship.
+        if (item.functionalsafety_evaluationBasedOn) {
+          relationships.push({
+            type: 'Relationship',
+            spdxId: `${item.spdxId}#evaluationBasedOn`,
+            from: item.spdxId,
+            relationshipType: RELATIONSHIP_TYPES.EVALUATION_BASED_ON,
+            to: [item.functionalsafety_evaluationBasedOn]
+          });
+        }
         break;
 
       case ELEMENT_TYPES.TOOL:

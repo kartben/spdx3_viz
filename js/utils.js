@@ -147,6 +147,7 @@ export function getRelationshipColor(relType) {
     hasEvidence: COLORS.requirement,
     assumes: COLORS.requirement,
     conformsTo: COLORS.requirement,
+    evaluationBasedOn: COLORS.requirement,
     configures: COLORS.config,
     hasConcludedLicense: COLORS.license,
     hasDeclaredLicense: COLORS.license,

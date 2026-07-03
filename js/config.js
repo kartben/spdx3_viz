@@ -104,6 +104,11 @@ export const RELATIONSHIP_TYPES = {
   HAS_EVIDENCE: 'hasEvidence', // each `to` Element is evidence for the `from` Element
   ASSUMES: 'assumes', // `from` Element assumes each `to` Assumption
   CONFORMS_TO: 'conformsTo', // `from` Element conforms to each `to` Assumption/Specification
+  // Not a Core RelationshipType: EvaluationResult.evaluationBasedOn is a property
+  // pointing at the RequirementVerification it evaluates. The parser synthesizes a
+  // relationship of this type so the evaluation ↔ verification link shows up as a
+  // graph edge and in the detail panel like any other relationship.
+  EVALUATION_BASED_ON: 'evaluationBasedOn',
   // AI profile relationship types (AI model ↔ training/test dataset)
   TRAINED_ON: 'trainedOn',
   TESTED_ON: 'testedOn',
@@ -371,6 +376,14 @@ export function createGraphFilters() {
       isRel: true,
       lineStyle: 'dashed'
     },
+    {
+      key: 'evaluationBasedOn',
+      label: 'evaluationBasedOn',
+      color: COLORS.requirement,
+      active: true,
+      isRel: true,
+      lineStyle: 'dotted'
+    },
     { key: 'trainedOn', label: 'trainedOn', color: COLORS.ai, active: true, isRel: true },
     {
       key: 'testedOn',
@@ -457,7 +470,7 @@ export function createViews() {
     { id: 'dataset', label: 'Datasets', icon: VIEW_ICONS.dataset, count: null },
     { id: 'files', label: 'Files', icon: VIEW_ICONS.files, count: null },
     { id: 'hardware', label: 'Hardware', icon: VIEW_ICONS.hardware, count: null },
-    { id: 'requirements', label: 'Requirements', icon: VIEW_ICONS.requirements, count: null },
+    { id: 'requirements', label: 'Functional Safety', icon: VIEW_ICONS.requirements, count: null },
     { id: 'licenses', label: 'Licenses', icon: VIEW_ICONS.licenses, count: null },
     { id: 'security', label: 'Security', icon: VIEW_ICONS.security, count: null },
     { id: 'configs', label: 'Build Configs', icon: VIEW_ICONS.configs, count: null },
@@ -543,6 +556,8 @@ export const RELATIONSHIP_LABELS = {
   'assumes:in': 'Assumed by',
   'conformsTo:out': 'Conforms to',
   'conformsTo:in': 'Conformed to by',
+  'evaluationBasedOn:out': 'Based on',
+  'evaluationBasedOn:in': 'Evaluated by',
   'trainedOn:out': 'Trained on',
   'trainedOn:in': 'Training dataset for',
   'testedOn:out': 'Tested on',
@@ -665,6 +680,8 @@ export const RELATIONSHIP_SORT_ORDER = {
   'assumes:in': 46,
   'conformsTo:out': 47,
   'conformsTo:in': 48,
+  'evaluationBasedOn:out': 49,
+  'evaluationBasedOn:in': 50,
   'trainedOn:out': 31,
   'trainedOn:in': 32,
   'testedOn:out': 33,

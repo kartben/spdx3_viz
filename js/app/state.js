@@ -61,7 +61,8 @@ export function createState() {
     packageSearch: '', // in-view filter for the Packages / AI / Datasets lists
     fileSearch: '', // in-view filter for the Files list
     hardwareSearch: '', // in-view filter for the Hardware list
-    requirementSearch: '', // in-view filter for the Requirements list
+    requirementSearch: '', // in-view filter for the Functional Safety list
+    requirementKindFilter: '', // '' = all, else an FS element type to show only
     sidebarOpen: false, // mobile off-canvas nav drawer (ignored at md+ where the sidebar is static)
     detailElement: null,
     expandedPkg: null,
