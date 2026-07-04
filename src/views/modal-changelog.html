@@ -45,9 +45,17 @@
             ></span>
             <span x-show="release.date" class="text-xs text-slate-500" x-text="release.date"></span>
           </div>
-          <ul class="space-y-1.5 list-disc list-inside marker:text-slate-600">
+          <ul class="space-y-1.5">
             <template x-for="(item, i) in release.items" :key="i">
-              <li class="text-sm text-slate-300 leading-snug" x-text="item"></li>
+              <li class="flex items-baseline gap-2 text-sm text-slate-300 leading-snug">
+                <span
+                  x-show="item.tag"
+                  x-text="item.tag"
+                  class="flex-shrink-0 text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded"
+                  :class="changelogTagColor(item.tag)"
+                ></span>
+                <span x-text="item.text"></span>
+              </li>
             </template>
           </ul>
         </div>
