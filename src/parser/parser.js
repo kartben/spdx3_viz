@@ -746,9 +746,10 @@ function computePresentTypes(data) {
   data.relationships.forEach((r) => r.relationshipType && relTypes.add(r.relationshipType));
   data.vexRelationships.forEach((r) => r.relationshipType && relTypes.add(r.relationshipType));
 
-  // "createdBy" edges are synthesized in the graph from each element's
-  // CreationInfo (element → creating agent), so list the type when any graph-node
-  // element names a creator agent.
+  // "createdBy" / "suppliedBy" / "originatedBy" / "manufacturedBy" edges are
+  // synthesized in the graph from each element's CreationInfo, suppliedBy /
+  // originatedBy, and productAgent (element → agent), so list each type only
+  // when some graph-node element actually carries that agent reference.
   const createdByHosts = [
     ...data.packages,
     ...data.regularFiles,
@@ -760,6 +761,16 @@ function computePresentTypes(data) {
   ];
   const hasCreatedBy = createdByHosts.some((el) => data.resolveCreationInfo(el)?.createdBy?.length);
   if (hasCreatedBy) relTypes.add('createdBy');
+  const hasSuppliedBy = createdByHosts.some(
+    (el) => (el.suppliedBy ?? el.software_suppliedBy)?.length
+  );
+  if (hasSuppliedBy) relTypes.add('suppliedBy');
+  const hasOriginatedBy = createdByHosts.some(
+    (el) => (el.originatedBy ?? el.software_originatedBy)?.length
+  );
+  if (hasOriginatedBy) relTypes.add('originatedBy');
+  const hasManufacturedBy = createdByHosts.some((el) => el.hardware_productAgent?.length);
+  if (hasManufacturedBy) relTypes.add('manufacturedBy');
 
   // "External" nodes are placeholders for relationship endpoints that resolve
   // to nothing in the element map (and aren't license URLs / NoAssertion).

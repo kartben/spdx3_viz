@@ -38,6 +38,9 @@ function dashPatternFor(type, lineWidth, k) {
     case 'hasOptionalComponent':
       return [8 / k, 4 / k, lineWidth, 4 / k];
     case 'createdBy':
+    case 'suppliedBy':
+    case 'originatedBy':
+    case 'manufacturedBy':
       // Fine dots read as a lightweight provenance link, distinct from structural edges.
       return [lineWidth, 3 / k];
     default:
@@ -245,26 +248,34 @@ export function renderGraph(app, retry = 0) {
   // nodes/edges when the Vulnerabilities node type and a VEX edge type are enabled (both off by default).
   (app.vexRelationships || []).forEach(addRelLinks);
 
-  // "createdBy" edges: each element's CreationInfo names the agent(s) that
-  // created it. Synthesize element → agent links so provenance shows on the
-  // graph. CreationInfo is either inline or a reference to a standalone element.
-  if (activeRelTypes.has('createdBy')) {
-    const resolveCreationInfo = (el) => {
-      const ci = el?.creationInfo;
-      if (typeof ci === 'string') return app.elementMap.get(ci) || null;
-      return ci || null;
-    };
+  // Agent provenance edges: beyond the generic Relationship array, an element
+  // can name agent(s) directly — CreationInfo.createdBy, an Artifact's
+  // suppliedBy / originatedBy, or a Hardware element's productAgent. Synthesize
+  // element → agent links for each so provenance shows on the graph like any
+  // other relationship, toggled independently via the graph filters.
+  const asArray = (v) => (Array.isArray(v) ? v : v == null || v === '' ? [] : [v]);
+  const resolveCreationInfo = (el) => {
+    const ci = el?.creationInfo;
+    if (typeof ci === 'string') return app.elementMap.get(ci) || null;
+    return ci || null;
+  };
+  const agentEdgeSources = {
+    createdBy: (data) => resolveCreationInfo(data)?.createdBy,
+    suppliedBy: (data) => data.suppliedBy ?? data.software_suppliedBy,
+    originatedBy: (data) => data.originatedBy ?? data.software_originatedBy,
+    manufacturedBy: (data) => data.hardware_productAgent
+  };
+  Object.entries(agentEdgeSources).forEach(([type, getAgents]) => {
+    if (!activeRelTypes.has(type)) return;
     createdByHosts.forEach((host) => {
-      const createdBy = resolveCreationInfo(host.data)?.createdBy;
-      if (!Array.isArray(createdBy)) return;
-      createdBy.forEach((agentId) => {
+      asArray(getAgents(host.data)).forEach((agentId) => {
         if (!agentId) return;
-        const agentNode = addNode(agentId, { relationshipType: 'createdBy' }, 'target');
+        const agentNode = addNode(agentId, { relationshipType: type }, 'target');
         if (!agentNode) return;
-        uLinks.push({ sourceId: host.id, targetId: agentId, type: 'createdBy' });
+        uLinks.push({ sourceId: host.id, targetId: agentId, type });
       });
     });
-  }
+  });
 
   // 3. Hierarchical clustering: group files into their parent package (else directory) and
   //    build steps into their root build; everything else is its own node.
