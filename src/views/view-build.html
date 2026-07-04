@@ -1,0 +1,609 @@
+<div x-show="currentView === 'build'" class="fade-in space-y-6 max-w-6xl">
+  <!-- Build overview -->
+  <div class="card" x-show="buildInfo">
+    <div class="flex items-start gap-3 mb-4">
+      <div
+        class="w-10 h-10 rounded-xl bg-purple-500/15 flex items-center justify-center flex-shrink-0"
+      >
+        <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
+          />
+        </svg>
+      </div>
+      <div class="min-w-0">
+        <h3 class="font-semibold text-white">Build</h3>
+        <p class="text-xs text-slate-400 truncate" x-text="buildInfo?.build_buildType || ''"></p>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 text-sm">
+      <div>
+        <span class="text-slate-500">Build ID</span>
+        <div
+          class="text-slate-200 text-xs mt-0.5 font-mono"
+          x-text="buildInfo?.build_buildId || 'N/A'"
+        ></div>
+      </div>
+      <div>
+        <span class="text-slate-500">Created</span>
+        <div class="text-slate-200 text-xs mt-0.5" x-text="formatDate(createdDate)"></div>
+      </div>
+      <div>
+        <span class="text-slate-500">Build steps</span>
+        <div class="text-slate-200 text-xs mt-0.5" x-text="formatCount(builds.length)"></div>
+      </div>
+      <div>
+        <span class="text-slate-500">Environment entries</span>
+        <div
+          class="text-slate-200 text-xs mt-0.5"
+          x-text="formatCount((buildInfo?.build_environment || []).length)"
+        ></div>
+      </div>
+      <div>
+        <span class="text-slate-500">Parameters</span>
+        <div
+          class="text-slate-200 text-xs mt-0.5"
+          x-text="formatCount(buildParameterCount(buildInfo))"
+        ></div>
+      </div>
+    </div>
+    <div
+      x-show="(buildInfo?.build_configSourceUri || []).length > 0"
+      class="mt-4 pt-4 border-t border-slate-700"
+    >
+      <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+        Config Sources
+      </div>
+      <div class="flex flex-wrap gap-1.5">
+        <template x-for="source in (buildInfo?.build_configSourceUri || [])" :key="source">
+          <button
+            class="badge bg-teal-500/15 text-teal-400 hover:bg-teal-500/25"
+            @click="navigateTo(source)"
+            x-text="relTargetDisplayName(source)"
+          ></button>
+        </template>
+      </div>
+    </div>
+    <div x-show="buildParameterCount(buildInfo) > 0" class="mt-4 pt-4 border-t border-slate-700">
+      <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
+        Build Parameters
+      </div>
+      <div class="space-y-3">
+        <template x-for="group in buildParameters(buildInfo)" :key="group.key">
+          <div>
+            <div
+              class="text-xs font-semibold text-purple-400 mb-2"
+              x-text="group.label + ' (' + formatCount(group.entries.length) + ')'"
+            ></div>
+            <div class="space-y-2">
+              <template x-for="entry in group.entries" :key="entry.renderKey">
+                <div class="rounded-lg bg-slate-900/50 border border-slate-700/50 p-2">
+                  <div class="flex items-center gap-2 mb-1">
+                    <span
+                      class="text-[10px] uppercase tracking-wider text-slate-500"
+                      x-text="entry.key"
+                    ></span>
+                  </div>
+                  <div class="flex flex-wrap gap-1" x-show="entry.tokens.length > 1">
+                    <template
+                      x-for="token in entry.tokens.slice(0, 20)"
+                      :key="parameterTokenId(token)"
+                    >
+                      <span
+                        :class="parameterTokenClass(token)"
+                        :title="parameterTokenKind(token)"
+                        x-text="parameterTokenText(token)"
+                      ></span>
+                    </template>
+                  </div>
+                  <div class="mt-1" x-show="entry.tokens.length > 20">
+                    <span
+                      class="text-[10px] text-slate-500 self-center"
+                      x-text="'+' + formatCount(entry.tokens.length - 20) + ' more'"
+                    ></span>
+                  </div>
+                  <code
+                    x-show="entry.tokens.length <= 1"
+                    class="block text-xs text-slate-300 font-mono break-all"
+                    x-text="entry.value"
+                  ></code>
+                  <details x-show="entry.tokens.length > 1" class="param-raw mt-2">
+                    <summary class="cursor-pointer text-[10px] text-slate-500 hover:text-slate-400">
+                      Raw value
+                    </summary>
+                    <code
+                      class="block text-xs text-slate-500 font-mono break-all mt-1"
+                      x-text="entry.value"
+                    ></code>
+                  </details>
+                </div>
+              </template>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+
+  <!-- Agent -->
+  <div class="card" x-show="agentInfo">
+    <div class="flex items-center gap-3 mb-3">
+      <div class="w-10 h-10 rounded-xl bg-red-500/15 flex items-center justify-center">
+        <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+          />
+        </svg>
+      </div>
+      <div>
+        <h3 class="font-semibold text-white" x-text="agentInfo?.name || 'Agent'"></h3>
+        <p class="text-xs text-slate-400" x-text="agentInfo?.type || ''"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Build steps -->
+  <div class="card">
+    <div class="flex items-center gap-3 mb-4">
+      <div>
+        <h3 class="text-sm font-semibold text-white">Build Steps</h3>
+        <p
+          class="text-xs text-slate-500 mt-0.5"
+          x-text="`${formatCount(filteredBuilds.length)} of ${formatCount(builds.length)} builds`"
+        ></p>
+      </div>
+      <div class="ml-auto flex items-center gap-2">
+        <input
+          type="text"
+          x-model="buildSearch"
+          placeholder="Search outputs or IDs..."
+          class="w-56 px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-purple-500 transition-colors"
+        />
+        <select
+          x-model="buildSort"
+          @change="restreamView('build')"
+          class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 text-slate-300 focus:outline-none focus:border-purple-500"
+        >
+          <option value="output">Sort by output</option>
+          <option value="inputs">Sort by input count</option>
+          <option value="buildId">Sort by build ID</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="space-y-2">
+      <template
+        x-for="build in (mountedViews.build ? renderSlice('build', filteredBuilds) : [])"
+        :key="build.spdxId"
+      >
+        <div
+          class="rounded-lg border border-slate-700 bg-slate-900/30 overflow-hidden"
+          data-nav-kind="build"
+          :data-nav-id="build.spdxId"
+          :class="isNavTarget('build', build.spdxId) && 'target-focus'"
+        >
+          <div
+            class="flex items-start gap-3 p-3 cursor-pointer hover:bg-slate-800/60 transition-colors"
+            @click="toggleBuild(build.spdxId)"
+          >
+            <div
+              class="w-8 h-8 rounded-lg bg-purple-500/15 flex items-center justify-center flex-shrink-0 mt-0.5"
+            >
+              <svg
+                class="w-4 h-4 text-purple-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
+                />
+              </svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div
+                class="text-sm font-medium text-white truncate"
+                x-text="buildDisplayName(build)"
+              ></div>
+              <div class="text-xs text-slate-500 font-mono mt-0.5">
+                <span x-text="build.spdxId"></span>
+                <span x-show="build.build_buildId" class="text-slate-600"> / </span>
+                <span x-show="build.build_buildId" x-text="build.build_buildId"></span>
+              </div>
+              <div class="flex flex-wrap gap-1.5 mt-2">
+                <span
+                  class="badge bg-orange-500/15 text-orange-400"
+                  x-text="formatCount(buildInputs(build.spdxId).length) + ' inputs'"
+                ></span>
+                <span
+                  class="badge bg-green-500/15 text-green-400"
+                  x-text="formatCount(buildOutputs(build.spdxId).length) + ' outputs'"
+                ></span>
+                <span
+                  x-show="childBuilds(build.spdxId).length > 0"
+                  class="badge bg-violet-500/15 text-violet-400"
+                  x-text="formatCount(childBuilds(build.spdxId).length) + ' steps'"
+                ></span>
+                <span
+                  x-show="parentBuilds(build.spdxId).length > 0"
+                  class="badge bg-slate-600/30 text-slate-300"
+                  x-text="formatCount(parentBuilds(build.spdxId).length) + ' parents'"
+                ></span>
+                <span
+                  x-show="buildParameterCount(build) > 0"
+                  class="badge bg-purple-500/15 text-purple-400"
+                  x-text="formatCount(buildParameterCount(build)) + ' params'"
+                ></span>
+                <span
+                  x-show="(build.build_environment || []).length > 0"
+                  class="badge bg-teal-500/15 text-teal-400"
+                  x-text="formatCount((build.build_environment || []).length) + ' env'"
+                ></span>
+                <span
+                  x-show="fileTools(build.spdxId).length > 0"
+                  class="badge bg-amber-500/15 text-amber-400"
+                  x-text="formatCount(fileTools(build.spdxId).length) + ' tools'"
+                ></span>
+              </div>
+              <div
+                class="flex flex-wrap items-center gap-1.5 mt-2"
+                x-show="buildOutputs(build.spdxId).length > 0"
+              >
+                <span class="text-xs text-slate-500">Outputs:</span>
+                <template x-for="output in buildOutputs(build.spdxId).slice(0, 3)" :key="output">
+                  <button
+                    class="text-xs text-green-400 hover:text-green-300 truncate max-w-44"
+                    @click.stop="navigateTo(output)"
+                    x-text="relTargetDisplayName(output)"
+                  ></button>
+                </template>
+                <span
+                  x-show="buildOutputs(build.spdxId).length > 3"
+                  class="text-xs text-slate-500"
+                  x-text="'+' + formatCount(buildOutputs(build.spdxId).length - 3) + ' more'"
+                ></span>
+              </div>
+              <div
+                class="flex flex-wrap items-center gap-1.5 mt-1"
+                x-show="buildInputs(build.spdxId).length > 0"
+              >
+                <span class="text-xs text-slate-500">Inputs:</span>
+                <template x-for="input in buildInputs(build.spdxId).slice(0, 5)" :key="input">
+                  <button
+                    class="text-xs text-orange-400 hover:text-orange-300 truncate max-w-36"
+                    @click.stop="navigateTo(input)"
+                    x-text="relTargetDisplayName(input)"
+                  ></button>
+                </template>
+                <span
+                  x-show="buildInputs(build.spdxId).length > 5"
+                  class="text-xs text-slate-500"
+                  x-text="'+' + formatCount(buildInputs(build.spdxId).length - 5) + ' more'"
+                ></span>
+              </div>
+              <div
+                class="flex flex-wrap items-center gap-1.5 mt-1"
+                x-show="buildParameterCount(build) > 0"
+              >
+                <span class="text-xs text-slate-500">Params:</span>
+                <template x-for="entry in buildParameterPreview(build)" :key="entry.renderKey">
+                  <span class="text-xs text-purple-400 truncate max-w-52" x-text="entry.key"></span>
+                </template>
+                <span
+                  x-show="buildParameterCount(build) > 3"
+                  class="text-xs text-slate-500"
+                  x-text="'+' + formatCount(buildParameterCount(build) - 3) + ' more'"
+                ></span>
+              </div>
+              <div
+                class="flex flex-wrap items-center gap-1.5 mt-1"
+                x-show="fileTools(build.spdxId).length > 0"
+              >
+                <span class="text-xs text-slate-500">Tools:</span>
+                <template x-for="tool in fileTools(build.spdxId).slice(0, 4)" :key="tool">
+                  <button
+                    class="text-xs text-amber-400 hover:text-amber-300 truncate max-w-44"
+                    @click.stop="navigateTo(tool)"
+                    x-text="relTargetDisplayName(tool)"
+                  ></button>
+                </template>
+                <span
+                  x-show="fileTools(build.spdxId).length > 4"
+                  class="text-xs text-slate-500"
+                  x-text="'+' + formatCount(fileTools(build.spdxId).length - 4) + ' more'"
+                ></span>
+              </div>
+            </div>
+            <svg
+              class="w-4 h-4 text-slate-500 transition-transform flex-shrink-0 mt-1"
+              :class="expandedBuild === build.spdxId && 'rotate-180'"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </div>
+
+          <!-- Built lazily via x-if (only for the open card) -->
+          <template x-if="expandedBuild === build.spdxId">
+            <div
+              class="border-t border-slate-700 p-3 grid grid-cols-1 gap-4 md:grid-cols-2"
+              @click.stop
+            >
+              <div class="md:pl-11">
+                <div
+                  class="text-xs font-semibold text-orange-400 uppercase tracking-wider mb-2"
+                  x-text="'Inputs (' + formatCount(buildInputs(build.spdxId).length) + ')'"
+                ></div>
+                <div
+                  class="space-y-1 max-h-72 overflow-y-auto pr-1"
+                  x-show="buildInputs(build.spdxId).length > 0"
+                >
+                  <template x-for="input in buildInputs(build.spdxId)" :key="input">
+                    <div
+                      class="text-xs text-orange-400 hover:text-orange-300 cursor-pointer flex items-center gap-1.5"
+                      @click="navigateTo(input)"
+                    >
+                      <span class="w-1.5 h-1.5 rounded-full bg-orange-500/50"></span>
+                      <span class="truncate" x-text="relTargetDisplayName(input)"></span>
+                    </div>
+                  </template>
+                </div>
+                <div
+                  x-show="buildInputs(build.spdxId).length === 0"
+                  class="text-xs text-slate-600 italic"
+                >
+                  None
+                </div>
+              </div>
+
+              <div>
+                <div
+                  class="text-xs font-semibold text-green-400 uppercase tracking-wider mb-2"
+                  x-text="'Outputs (' + formatCount(buildOutputs(build.spdxId).length) + ')'"
+                ></div>
+                <div
+                  class="space-y-1 max-h-72 overflow-y-auto pr-1"
+                  x-show="buildOutputs(build.spdxId).length > 0"
+                >
+                  <template x-for="output in buildOutputs(build.spdxId)" :key="output">
+                    <div
+                      class="text-xs text-green-400 hover:text-green-300 cursor-pointer flex items-center gap-1.5"
+                      @click="navigateTo(output)"
+                    >
+                      <span class="w-1.5 h-1.5 rounded-full bg-green-500/50"></span>
+                      <span class="truncate" x-text="relTargetDisplayName(output)"></span>
+                    </div>
+                  </template>
+                </div>
+                <div
+                  x-show="buildOutputs(build.spdxId).length === 0"
+                  class="text-xs text-slate-600 italic"
+                >
+                  None
+                </div>
+              </div>
+
+              <!-- Tools used (usesTool) -->
+              <div class="md:col-span-2 md:pl-11" x-show="fileTools(build.spdxId).length > 0">
+                <div
+                  class="text-xs font-semibold text-amber-400 uppercase tracking-wider mb-2"
+                  x-text="'Tools (' + formatCount(fileTools(build.spdxId).length) + ')'"
+                ></div>
+                <div class="flex flex-wrap gap-1.5">
+                  <template x-for="tool in fileTools(build.spdxId)" :key="tool">
+                    <button
+                      class="badge bg-amber-500/15 text-amber-400 hover:bg-amber-500/25"
+                      @click="navigateTo(tool)"
+                      x-text="relTargetDisplayName(tool)"
+                    ></button>
+                  </template>
+                </div>
+              </div>
+
+              <!-- Command (some producers store the step's shell command in `comment`) -->
+              <div class="md:col-span-2 md:pl-11" x-show="isMeaningful(build.comment)">
+                <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                  Command
+                </div>
+                <code
+                  class="block text-xs text-slate-300 font-mono whitespace-pre-wrap break-all bg-slate-900/40 border border-slate-700 rounded-lg p-3 max-h-60 overflow-y-auto"
+                  x-text="build.comment"
+                ></code>
+              </div>
+
+              <div
+                class="md:col-span-2 md:pl-11"
+                x-show="(build.build_environment || []).length > 0"
+              >
+                <div
+                  class="text-xs font-semibold text-teal-400 uppercase tracking-wider mb-2"
+                  x-text="'Environment (' + formatCount((build.build_environment || []).length) + ')'"
+                ></div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-1 max-h-72 overflow-y-auto pr-1">
+                  <template x-for="entry in (build.build_environment || [])" :key="entry.key">
+                    <div class="rounded bg-slate-900/40 border border-slate-700/50 px-2 py-1">
+                      <div
+                        class="text-[10px] uppercase tracking-wider text-slate-500"
+                        x-text="entry.key"
+                      ></div>
+                      <div
+                        class="text-xs text-slate-300 font-mono break-all"
+                        x-text="entry.value"
+                      ></div>
+                    </div>
+                  </template>
+                </div>
+              </div>
+
+              <div class="md:col-span-2 md:pl-11" x-show="buildParameterCount(build) > 0">
+                <div
+                  class="text-xs font-semibold text-purple-400 uppercase tracking-wider mb-2"
+                  x-text="'Parameters (' + formatCount(buildParameterCount(build)) + ')'"
+                ></div>
+                <div class="space-y-3">
+                  <template x-for="group in buildParameters(build)" :key="group.key">
+                    <div class="rounded-lg border border-slate-700 bg-slate-900/40 p-3">
+                      <div
+                        class="text-xs font-semibold text-slate-300 mb-2"
+                        x-text="group.label"
+                      ></div>
+                      <div class="space-y-2">
+                        <template x-for="entry in group.entries" :key="entry.renderKey">
+                          <div>
+                            <div
+                              class="text-[10px] uppercase tracking-wider text-slate-500 mb-1"
+                              x-text="entry.key"
+                            ></div>
+                            <div class="flex flex-wrap gap-1" x-show="entry.tokens.length > 1">
+                              <template
+                                x-for="token in entry.tokens.slice(0, 40)"
+                                :key="parameterTokenId(token)"
+                              >
+                                <span
+                                  :class="parameterTokenClass(token)"
+                                  :title="parameterTokenKind(token)"
+                                  x-text="parameterTokenText(token)"
+                                ></span>
+                              </template>
+                            </div>
+                            <div class="mt-1" x-show="entry.tokens.length > 40">
+                              <span
+                                class="text-[10px] text-slate-500 self-center"
+                                x-text="'+' + formatCount(entry.tokens.length - 40) + ' more'"
+                              ></span>
+                            </div>
+                            <code
+                              x-show="entry.tokens.length <= 1"
+                              class="block text-xs text-slate-300 font-mono break-all"
+                              x-text="entry.value"
+                            ></code>
+                            <details x-show="entry.tokens.length > 1" class="param-raw mt-2">
+                              <summary
+                                class="cursor-pointer text-[10px] text-slate-500 hover:text-slate-400"
+                              >
+                                Raw value
+                              </summary>
+                              <code
+                                class="block text-xs text-slate-500 font-mono break-all mt-1"
+                                x-text="entry.value"
+                              ></code>
+                            </details>
+                          </div>
+                        </template>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </div>
+          </template>
+        </div>
+      </template>
+    </div>
+  </div>
+
+  <!-- Tools grid -->
+  <div x-show="tools.length > 0">
+    <h3 class="text-sm font-semibold text-white mb-3">Build Tools</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <template x-for="t in (mountedViews.build ? tools : [])" :key="t.spdxId">
+        <div
+          class="card"
+          data-nav-kind="tool"
+          :data-nav-id="t.spdxId"
+          :class="isNavTarget('tool', t.spdxId) && 'target-focus'"
+        >
+          <div class="flex items-center gap-3 mb-2">
+            <div
+              class="w-8 h-8 rounded-lg bg-amber-500/15 flex items-center justify-center flex-shrink-0"
+            >
+              <svg
+                class="w-4 h-4 text-amber-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <div class="text-sm font-medium text-white" x-text="t.name"></div>
+              <div class="text-xs text-slate-500" x-text="toolUsageCount(t.spdxId) + ' uses'"></div>
+            </div>
+          </div>
+          <div x-show="externalIdentifiers(t).length > 0" class="space-y-1 mt-2">
+            <template x-for="eid in externalIdentifiers(t)" :key="eid.type + eid.identifier">
+              <div class="flex items-start gap-2 bg-slate-900/50 rounded px-2 py-1 group">
+                <span
+                  class="text-[10px] text-slate-500 uppercase tracking-wider flex-shrink-0 pt-px"
+                  x-text="eid.label"
+                ></span>
+                <code
+                  class="text-xs text-slate-400 font-mono break-all flex-1 min-w-0"
+                  x-text="eid.identifier"
+                ></code>
+                <button
+                  @click.stop="copyHash(eid.identifier)"
+                  class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity flex-shrink-0 pt-px"
+                  title="Copy"
+                >
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </template>
+          </div>
+        </div>
+      </template>
+    </div>
+  </div>
+
+  <!-- Generated artifacts -->
+  <div class="card">
+    <h3 class="text-sm font-semibold text-white mb-3">Generated Artifacts</h3>
+    <div class="space-y-1.5">
+      <template x-for="a in (mountedViews.build ? generatedArtifacts : [])" :key="a">
+        <div
+          class="text-xs text-emerald-400 flex items-center gap-1.5 cursor-pointer hover:text-emerald-300"
+          @click="navigateTo(a)"
+        >
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500/50"></span>
+          <span x-text="relTargetDisplayName(a)"></span>
+        </div>
+      </template>
+    </div>
+  </div>
+</div>

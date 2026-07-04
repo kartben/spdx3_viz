@@ -7,13 +7,10 @@ import {
   getVexJustificationLabel,
   getCvssSeverityMeta,
   summarizeCveRecord
-} from '../utils.js';
+} from '../lib/index.js';
 
-/* ==========================================================================
-   Security / VEX
-   VEX status/justification labels, per-package and per-vulnerability
-   assessment lookups, and the on-demand fetch of enriched CVE records.
-   ========================================================================== */
+/* Security / VEX: status and justification labels, per-package and
+   per-vulnerability assessment lookups, and on-demand fetch of CVE records. */
 
 export const securityMixin = {
   vulnLookup(eid) {
@@ -69,11 +66,8 @@ export const securityMixin = {
   cveDetail(cveId) {
     return this.cveDetails[cveId] || null;
   },
-  // Lazily fetch a CVE's public record the first time it's viewed (mirrors the
-  // on-demand license-text fetch). Cached in this.cveDetails so re-opening a
-  // card is instant and we never re-request. Data & terms: the CVE Program's
-  // records are free to use and the SBOM already lists these API URLs as the
-  // vulnerabilities' identifierLocators.
+  // Lazily fetch a CVE's public record the first time it's viewed, cached in
+  // this.cveDetails so re-opening a card is instant and we never re-request.
   ensureCveDetails(cveId) {
     if (!cveId || !/^CVE-\d{4}-\d+$/i.test(cveId)) return;
     if (this.cveDetails[cveId]) return; // cached or already in flight

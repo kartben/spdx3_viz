@@ -1,13 +1,9 @@
 /**
- * SPDX 3.0 SBOM Visualizer - Parser Web Worker
+ * Runs the parse off the main thread so the UI stays responsive on large SBOMs.
  *
- * Runs the expensive parse off the main thread so the UI never freezes while
- * loading large SBOMs (e.g. the Linux kernel: ~8.6 MB / ~8k elements).
- *
- * It reuses the exact same pure functions the app uses on the main thread
- * (parseGraph + buildRelationshipIndexes from parser.js), so there is a single
- * source of truth for parsing. JS Map/Set survive postMessage via structured
- * clone, so the element map and relationship indexes transfer back as-is.
+ * Reuses the same pure functions as the main thread (parseGraph +
+ * buildRelationshipIndexes) for a single source of truth; Map/Set survive
+ * postMessage via structured clone.
  *
  * Protocol:
  *   main → worker: { id, files: [{ name, text }] }
@@ -26,10 +22,8 @@ self.onmessage = (event) => {
   const progress = (phase, value) => post({ type: 'progress', phase, value });
 
   try {
-    // Merge every file's @graph array into one (same logic as the old
-    // main-thread rebuildFromLoadedFiles), JSON-parsing each file here so the
-    // 8 MB+ JSON.parse cost stays off the UI thread too. Report JSON progress
-    // weighted by byte size so the bar advances as each file is parsed.
+    // Merge every file's @graph array into one, JSON-parsing each file here so
+    // that cost stays off the UI thread. Progress is weighted by byte size.
     const totalBytes = (files || []).reduce((sum, f) => sum + (f.text ? f.text.length : 0), 0) || 1;
     let bytesDone = 0;
     const mergedGraph = [];

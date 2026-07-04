@@ -1,0 +1,166 @@
+<div x-show="currentView === 'graph'" class="fade-in absolute inset-0 flex flex-col">
+  <!-- Graph controls -->
+  <div
+    class="flex items-center gap-3 px-5 py-3 bg-slate-800/50 border-b border-slate-700/50 flex-shrink-0 flex-wrap"
+  >
+    <!-- Search -->
+    <div class="flex items-center gap-2">
+      <div class="relative">
+        <svg
+          class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+          />
+        </svg>
+        <input
+          type="text"
+          x-model="graphSearchQuery"
+          @input.debounce.150ms="graphSearch()"
+          placeholder="Search nodes…"
+          class="w-40 sm:w-52 pl-8 pr-7 py-1 bg-slate-800 border border-slate-700 rounded-md text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
+        />
+        <button
+          x-show="graphSearchQuery"
+          @click="clearGraphSearch()"
+          class="absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-200 text-base leading-none"
+          title="Clear search"
+        >
+          &times;
+        </button>
+      </div>
+      <label
+        class="flex items-center gap-1.5 cursor-pointer"
+        title="Search across the whole element (all fields), not just its name"
+      >
+        <input
+          type="checkbox"
+          x-model="graphSearchFullText"
+          @change="graphSearch()"
+          class="rounded border-slate-600 bg-slate-700 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5"
+        />
+        <span class="text-xs text-slate-300">Full-text</span>
+      </label>
+      <select
+        x-show="graphSearchQuery"
+        x-model="graphSearchMode"
+        @change="graphSearch()"
+        title="How to treat non-matching nodes"
+        class="text-xs bg-slate-800 border border-slate-700 rounded-md text-slate-300 px-1.5 py-1 focus:outline-none focus:border-blue-500"
+      >
+        <option value="dim">Dim others</option>
+        <option value="focus">Focus matches</option>
+      </select>
+      <span
+        x-show="graphSearchQuery"
+        class="text-xs whitespace-nowrap"
+        :class="graphMatchCount ? 'text-amber-400' : 'text-slate-500'"
+        x-text="`${formatCount(graphMatchCount)} ${graphMatchCount === 1 ? 'match' : 'matches'}`"
+      ></span>
+    </div>
+    <div class="ml-auto flex items-center gap-3">
+      <span
+        x-show="graphNodeCount"
+        class="text-xs text-slate-400 whitespace-nowrap"
+        x-text="`${formatCount(graphNodeCount)} nodes · ${formatCount(graphEdgeCount)} edges`"
+      ></span>
+      <span
+        x-show="graphTruncated"
+        class="text-xs text-amber-400 whitespace-nowrap"
+        title="Too many nodes to show flat — showing the aggregated view. Double-click a cluster to drill in."
+        >auto-aggregated</span
+      >
+      <label
+        class="flex items-center gap-1.5 cursor-pointer"
+        title="Collapse files into their package/directory and build steps into their root build. Double-click a cluster to expand it."
+      >
+        <input
+          type="checkbox"
+          x-model="graphAggregate"
+          @change="updateGraph()"
+          class="rounded border-slate-600 bg-slate-700 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5"
+        />
+        <span class="text-xs text-slate-300">Aggregate</span>
+      </label>
+      <button
+        x-show="graphAggregate"
+        @click="collapseAllClusters()"
+        class="text-xs px-2.5 py-1 bg-slate-700 hover:bg-slate-600 rounded-md transition-colors text-slate-300"
+      >
+        Collapse all
+      </button>
+      <button
+        @click="resetGraphZoom()"
+        class="text-xs px-2.5 py-1 bg-slate-700 hover:bg-slate-600 rounded-md transition-colors text-slate-300"
+      >
+        Reset Zoom
+      </button>
+    </div>
+  </div>
+  <!-- Graph canvas -->
+  <div class="flex-1 relative graph-container" id="graphContainer">
+    <div id="graphTooltip" class="tooltip hidden"></div>
+  </div>
+  <!-- Graph legend (click an entry to toggle that type on/off) -->
+  <div
+    class="relative z-10 flex items-center gap-x-4 gap-y-1.5 px-5 py-2.5 bg-slate-900/90 backdrop-blur-sm border-t border-slate-700/50 flex-shrink-0 flex-wrap"
+  >
+    <span
+      class="flex items-center gap-1 text-[11px] text-slate-500 italic mr-1 select-none"
+      title="Click any entry below to show or hide that type"
+    >
+      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"
+        />
+      </svg>
+      <span>click to show/hide</span>
+    </span>
+    <div class="basis-full h-0"></div>
+    <span class="text-xs text-slate-500" title="Click an entry to toggle it">Nodes:</span>
+    <template x-for="f in visibleGraphFilters.filter((x) => !x.isRel)" :key="f.key">
+      <button
+        type="button"
+        @click="f.active = !f.active; updateGraph()"
+        :title="f.active ? `Hide ${f.label}` : `Show ${f.label}`"
+        class="flex items-center gap-1.5 text-xs cursor-pointer transition-colors hover:text-white"
+        :class="f.active ? 'text-slate-300' : 'text-slate-500 line-through'"
+      >
+        <span
+          class="w-2.5 h-2.5 rounded-full border transition-colors"
+          :style="f.active
+                      ? `background:${f.color}; border-color:${f.color}`
+                      : `background:transparent; border-color:${f.color}`"
+        ></span>
+        <span x-text="f.label"></span>
+      </button>
+    </template>
+    <div class="basis-full h-0"></div>
+    <span class="text-xs text-slate-500" title="Click an entry to toggle it">Edges:</span>
+    <template x-for="f in visibleGraphFilters.filter((x) => x.isRel)" :key="f.key">
+      <button
+        type="button"
+        @click="f.active = !f.active; updateGraph()"
+        :title="f.active ? `Hide ${f.label}` : `Show ${f.label}`"
+        class="flex items-center gap-1.5 text-xs cursor-pointer transition-colors hover:text-white"
+        :class="f.active ? 'text-slate-300' : 'text-slate-500 line-through'"
+      >
+        <span
+          class="w-4 h-0.5 rounded transition-opacity"
+          :style="relEdgeSwatchStyle(f)"
+          :class="f.active ? 'opacity-100' : 'opacity-30'"
+        ></span>
+        <span x-text="f.label"></span>
+      </button>
+    </template>
+  </div>
+</div>

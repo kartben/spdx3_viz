@@ -1,0 +1,233 @@
+<div x-show="currentView === 'files'" class="fade-in space-y-3 max-w-5xl">
+  <div class="flex flex-wrap items-center gap-3 mb-3">
+    <span
+      class="text-sm text-slate-400 flex-shrink-0"
+      x-text="`${filteredFiles.length} files`"
+    ></span>
+    <input
+      x-model="fileSearch"
+      @input.debounce.150ms="restreamView('files')"
+      type="text"
+      placeholder="Filter files…"
+      class="ml-auto bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-emerald-500 w-44 sm:w-56"
+    />
+  </div>
+  <div x-show="fileTypes.length" class="flex flex-wrap gap-1.5 mb-4">
+    <template x-for="ft in fileTypes" :key="ft">
+      <button
+        class="text-xs px-2.5 py-1 rounded-md transition-colors"
+        :class="fileTypeFilter === ft ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-700 text-slate-400 hover:text-white'"
+        @click="fileTypeFilter = fileTypeFilter === ft ? '' : ft; restreamView('files')"
+        x-text="ft"
+      ></button>
+    </template>
+  </div>
+  <template
+    x-for="f in (mountedViews.files ? renderSlice('files', filteredFiles) : [])"
+    :key="f.spdxId"
+  >
+    <div
+      class="card cursor-pointer"
+      data-nav-kind="file"
+      :data-nav-id="f.spdxId"
+      :class="isNavTarget('file', f.spdxId) && 'target-focus'"
+      @click="toggleFile(f.spdxId)"
+    >
+      <div class="flex items-center gap-3">
+        <div
+          class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+          :class="fileExt(f.name) === '.elf' ? 'bg-purple-500/15' : fileExt(f.name) === '.c' || fileExt(f.name) === '.obj' ? 'bg-amber-500/15' : 'bg-emerald-500/15'"
+        >
+          <svg
+            class="w-4 h-4"
+            :class="fileExt(f.name) === '.elf' ? 'text-purple-400' : fileExt(f.name) === '.c' || fileExt(f.name) === '.obj' ? 'text-amber-400' : 'text-emerald-400'"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
+          </svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="font-medium text-white text-sm truncate" x-text="f.name"></div>
+          <div class="flex items-center gap-2 mt-0.5 flex-wrap">
+            <span
+              class="badge text-xs"
+              :class="fileExt(f.name) === '.elf' ? 'bg-purple-500/15 text-purple-400' : fileExt(f.name) === '.c' || fileExt(f.name) === '.obj' ? 'bg-amber-500/15 text-amber-400' : 'bg-emerald-500/15 text-emerald-400'"
+              x-text="fileExt(f.name)"
+            ></span>
+            <template x-for="lic in elementLicenses(f.spdxId)" :key="lic.id + lic.kind">
+              <button
+                type="button"
+                class="badge text-xs hover:opacity-80"
+                :class="lic.kind === 'concluded' ? 'bg-pink-500/15 text-pink-400' : 'bg-purple-500/15 text-purple-400'"
+                :title="licenseTextActionLabel(lic.id) + ' · ' + (lic.kind === 'concluded' ? 'Concluded' : 'Declared')"
+                @click.stop="showLicenseText(lic.id)"
+                x-text="lic.label"
+              ></button>
+            </template>
+            <span
+              x-show="artifactSize(f)"
+              class="text-[11px] text-slate-500 tabular-nums"
+              x-text="artifactSize(f)"
+            ></span>
+          </div>
+        </div>
+        <svg
+          class="w-4 h-4 text-slate-500 transition-transform flex-shrink-0"
+          :class="expandedFile === f.spdxId && 'rotate-180'"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
+      </div>
+      <!-- Expanded detail — built lazily via x-if (only for the open card) -->
+      <template x-if="expandedFile === f.spdxId">
+        <div class="mt-4 pt-4 border-t border-slate-700 space-y-3 sm:pl-11 fade-in" @click.stop>
+          <!-- Licenses -->
+          <div x-show="elementLicenses(f.spdxId).length > 0">
+            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+              License
+            </div>
+            <div class="flex flex-wrap gap-1.5">
+              <template x-for="lic in elementLicenses(f.spdxId)" :key="lic.id + lic.kind">
+                <button
+                  type="button"
+                  class="badge hover:opacity-80"
+                  :class="lic.kind === 'concluded' ? 'bg-pink-500/15 text-pink-400' : 'bg-purple-500/15 text-purple-400'"
+                  :title="canShowLicenseText(lic.id) ? licenseTextActionLabel(lic.id) : 'View license'"
+                  @click.stop="showLicenseText(lic.id)"
+                  x-text="(lic.kind === 'declared' ? 'Declared: ' : 'Concluded: ') + lic.label"
+                ></button>
+              </template>
+            </div>
+          </div>
+          <!-- Hashes -->
+          <template x-for="h in (f.verifiedUsing || [])" :key="h.hashValue">
+            <div class="flex items-center gap-2">
+              <span
+                class="text-xs text-slate-500 w-12 flex-shrink-0 uppercase"
+                x-text="h.algorithm"
+              ></span>
+              <code class="hash-text text-slate-300 flex-1 truncate" x-text="h.hashValue"></code>
+              <button
+                @click.stop="copyHash(h.hashValue)"
+                class="text-xs px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded text-slate-400 hover:text-white transition-colors flex-shrink-0"
+              >
+                Copy
+              </button>
+            </div>
+          </template>
+          <!-- Parent package -->
+          <div x-show="parentPackage(f.spdxId)">
+            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+              Contained in
+            </div>
+            <div
+              class="text-xs text-blue-400 cursor-pointer hover:text-blue-300"
+              @click.stop="navigateTo(parentPackage(f.spdxId))"
+              x-text="relTargetDisplayName(parentPackage(f.spdxId) || '')"
+            ></div>
+          </div>
+          <!-- Tools used -->
+          <div x-show="(fileTools(f.spdxId)||[]).length > 0">
+            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+              Built with
+            </div>
+            <div class="flex flex-wrap gap-1.5">
+              <template x-for="t in (fileTools(f.spdxId)||[])" :key="t">
+                <span
+                  class="badge bg-amber-500/15 text-amber-400"
+                  x-text="relTargetDisplayName(t)"
+                ></span>
+              </template>
+            </div>
+          </div>
+          <!-- Build configuration -->
+          <div x-show="configuredBy(f.spdxId).length > 0">
+            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+              Build Configuration
+            </div>
+            <template x-for="cfg in configuredBy(f.spdxId)" :key="cfg.configId">
+              <div
+                class="text-xs text-teal-400 hover:text-teal-300 cursor-pointer flex items-center gap-1.5"
+                @click.stop="navigateToConfig(cfg.configId)"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-teal-500/50"></span>
+                <span x-text="relTargetDisplayName(cfg.configId)"></span>
+                <span
+                  class="text-slate-500"
+                  x-show="cfg.scope"
+                  x-text="'(' + cfg.scope + ')'"
+                ></span>
+              </div>
+            </template>
+          </div>
+          <!-- Producing builds -->
+          <div x-show="producedByBuilds(f.spdxId).length > 0">
+            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+              Produced by build
+            </div>
+            <div class="space-y-1">
+              <template x-for="build in producedByBuilds(f.spdxId)" :key="build">
+                <div
+                  class="text-xs text-green-400 hover:text-green-300 cursor-pointer flex items-center gap-1.5"
+                  @click.stop="navigateToBuild(build)"
+                >
+                  <span class="w-1.5 h-1.5 rounded-full bg-green-500/50"></span>
+                  <span x-text="relTargetDisplayName(build)"></span>
+                </div>
+              </template>
+            </div>
+          </div>
+          <!-- Consuming builds -->
+          <div x-show="consumedByBuilds(f.spdxId).length > 0">
+            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+              Consumed by builds
+            </div>
+            <div class="flex flex-wrap gap-1.5">
+              <template x-for="build in consumedByBuilds(f.spdxId).slice(0, 12)" :key="build">
+                <button
+                  class="badge bg-orange-500/15 text-orange-400 hover:bg-orange-500/25"
+                  @click.stop="navigateToBuild(build)"
+                  x-text="relTargetDisplayName(build)"
+                ></button>
+              </template>
+              <span
+                x-show="consumedByBuilds(f.spdxId).length > 12"
+                class="text-xs text-slate-500 self-center"
+                x-text="'+' + formatCount(consumedByBuilds(f.spdxId).length - 12) + ' more'"
+              ></span>
+            </div>
+          </div>
+          <!-- Static links (for .elf files) -->
+          <div x-show="(staticLinks(f.spdxId)||[]).length > 0">
+            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+              Statically linked
+            </div>
+            <div class="space-y-1">
+              <template x-for="l in (staticLinks(f.spdxId)||[])" :key="l">
+                <div class="text-xs text-cyan-400 flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-cyan-500/50"></span>
+                  <span x-text="cleanFileName(l)"></span>
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
+  </template>
+</div>

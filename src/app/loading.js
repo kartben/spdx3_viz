@@ -1,23 +1,17 @@
-/* ==========================================================================
-   File loading + parse orchestration
-   Reading dropped/picked files and bundled samples, driving the progress bar,
-   and applying the worker's parsed result to the component state.
-   ========================================================================== */
+/* File loading and parse orchestration: reading files/samples, driving the
+   progress bar, and applying the worker's parsed result to component state. */
 
-/* Parser worker
-   A single long-lived worker, kept off the Alpine reactive state so it is
-   never proxied. Parsing large SBOMs (JSON.parse + index building) runs here
-   so the main thread stays responsive. latestParseReqId lets us ignore stale
-   results when the user loads a second SBOM before the first finishes. */
+/* A single long-lived parser worker, kept off the reactive state so it is never
+   proxied; parsing runs here to keep the main thread responsive.
+   latestParseReqId lets us ignore stale results when a newer load supersedes an
+   in-flight one. */
 let parserWorker = null;
 let parseReqSeq = 0;
 let latestParseReqId = 0;
 
-// VEX (vulnerability → package) edges and the Vulnerabilities node type default
-// to off, because an SBOM with full VEX can carry tens of thousands of edges
-// that swamp the graph. But for a modest VEX set it's more useful to surface
-// them by default — so when there are fewer than this many VEX edges we turn
-// the vuln node type and all four VEX edge types on at load time.
+// VEX edges and the Vulnerabilities node type default to off since a large VEX
+// set can swamp the graph; when there are fewer than this many VEX edges we
+// enable the vuln node type and all four VEX edge types at load time.
 const VEX_AUTO_SHOW_MAX = 200;
 const VEX_FILTER_KEYS = new Set([
   'vulnerability',
@@ -29,16 +23,17 @@ const VEX_FILTER_KEYS = new Set([
 
 function getParserWorker() {
   if (!parserWorker) {
-    parserWorker = new Worker(new URL('../parser.worker.js', import.meta.url), { type: 'module' });
+    parserWorker = new Worker(new URL('../parser/parser.worker.js', import.meta.url), {
+      type: 'module'
+    });
   }
   return parserWorker;
 }
 
-/* Marks an object so Alpine's (Vue) reactivity leaves it untouched. The parsed
-   SBOM is large (the Linux kernel set is ~8k elements / ~3.9k relationships)
-   and fully immutable after parsing, so deep-proxying it just adds per-access
-   overhead to every render. `__v_skip` is the flag @vue/reactivity checks to
-   skip an object; we set it non-enumerable so it never leaks into iteration. */
+/* Marks an object so Alpine's reactivity leaves it untouched: the parsed SBOM is
+   large and immutable, so deep-proxying only adds per-access overhead. `__v_skip`
+   is the flag @vue/reactivity checks; set non-enumerable so it never leaks into
+   iteration. */
 function markRaw(value) {
   if (
     value &&
@@ -58,10 +53,8 @@ function markPayloadRaw(payload) {
   return payload;
 }
 
-// Human-readable size for a byte count (e.g. 1500 → "1.5 KB"). Uses decimal
-// (1000-based) units to match how macOS Finder and most download prompts report
-// file sizes. Returns '' for anything that isn't a positive, finite number so
-// callers can skip the label.
+// Human-readable size for a byte count using decimal (1000-based) units.
+// Returns '' for anything that isn't a positive, finite number.
 function formatBytes(bytes) {
   if (!Number.isFinite(bytes) || bytes <= 0) return '';
   const units = ['B', 'KB', 'MB', 'GB'];
@@ -82,9 +75,8 @@ export const loadingMixin = {
       const res = await fetch('samples/samples.json');
       if (res.ok) {
         this.samples = await res.json();
-        // Sizes are hardcoded (uncompressed byte totals) in the manifest so the
-        // card label reflects the real download, not a HEAD's Content-Length —
-        // which reports the compressed size when the server uses gzip/brotli.
+        // Sizes come from the manifest (uncompressed totals) so the label
+        // reflects the real download rather than a gzipped Content-Length.
         this.samples.forEach((s) => {
           if (s.size) s.sizeLabel = formatBytes(s.size);
         });
@@ -280,9 +272,8 @@ export const loadingMixin = {
       Object.assign(this, markPayloadRaw(msg.parsed));
       Object.assign(this, markPayloadRaw(msg.indexes));
 
-      // Fresh data: for a small VEX set, show vulnerabilities + their VEX edges
-      // by default; otherwise keep them off so large VEX sets don't swamp the
-      // graph. This deterministically (re)sets the toggles on every load.
+      // Fresh data: show vulnerabilities + their VEX edges by default only for a
+      // small VEX set, otherwise keep them off. Reset deterministically per load.
       const showVex =
         this.vexRelationships.length > 0 && this.vexRelationships.length < VEX_AUTO_SHOW_MAX;
       this.graphFilters.forEach((f) => {

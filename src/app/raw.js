@@ -1,14 +1,9 @@
-import { copyToClipboard, formatByteSize } from '../utils.js';
+import { copyToClipboard, formatByteSize } from '../lib/index.js';
 
-/* ==========================================================================
-   Raw JSON-LD view
-   Shows the underlying JSON-LD file(s) as loaded (or pretty-printed), with
-   lightweight, dependency-free syntax highlighting. String values that are the
-   spdxId of a known element (a definition or a reference to one) render as
-   links that jump to wherever that element is visualized. One file shows at a
-   time (picked from a selector) so a merged multi-file document keeps only the
-   active file's markup in the DOM.
-   ========================================================================== */
+/* Raw JSON-LD view: shows the underlying file(s) as loaded (or pretty-printed)
+   with lightweight syntax highlighting. String values that are the spdxId of a
+   known element render as links to wherever that element is visualized. One
+   file shows at a time so only the active file's markup stays in the DOM. */
 
 const HIGHLIGHT_MAX_CHARS = 10_000_000;
 const INLINE_MAX_CHARS = 50_000_000;

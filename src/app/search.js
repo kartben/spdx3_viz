@@ -1,12 +1,7 @@
-/* ==========================================================================
-   Global search
-   The header search box: a fuzzy-ranked lookup across every navigable element
-   in the loaded document (packages, files, build configs, builds, tools,
-   licenses, vulnerabilities). Returns the top few matches for a styled
-   command-palette style dropdown; picking one navigates to its list card.
-   Per-view "filter" boxes (packages / files) are separate — this box is only
-   the cross-cutting jump-to-anything search.
-   ========================================================================== */
+/* Global header search: a fuzzy-ranked lookup across every navigable element in
+   the loaded document, surfacing the top matches in a command-palette dropdown
+   where picking one navigates to its list card. Distinct from the per-view
+   filter boxes. */
 
 const SEARCH_LIMIT = 10; // top-N matches surfaced in the dropdown
 const MIN_QUERY = 1; // characters before we bother scoring
@@ -50,9 +45,8 @@ const SEARCH_TYPE_LABELS = {
   vulnerability: 'Vulnerability'
 };
 
-// Memo for the (potentially large — ~30k files) searchable corpus. Rebuilt only
-// when a collection's length changes, i.e. when a fresh document is parsed; kept
-// off the reactive state so it isn't proxied.
+// Memo for the searchable corpus, rebuilt only when a collection's length
+// changes (i.e. a fresh document is parsed); kept off the reactive state.
 let searchCorpusKey = null;
 let searchCorpusVal = [];
 // Memo for the last scored result set, so unrelated reactive churn (e.g. hover
@@ -119,9 +113,8 @@ export const searchMixin = {
       );
     }
     for (const r of this.requirements) {
-      // Prefer the requirement UID (e.g. a StrictDoc id) as the subtitle, else
-      // the "shall" statement so a requirement is recognizable and findable by
-      // either its id or its text.
+      // Prefer the requirement UID as the subtitle, else the statement, so a
+      // requirement is findable by either its id or its text.
       const uid = this.externalIdentifiers(r)[0]?.identifier || '';
       const statement = r.requirementStatement || r.functionalsafety_assumptionStatement || '';
       add(
@@ -158,8 +151,8 @@ export const searchMixin = {
   },
 
   // Scores one field: exact > prefix > word-start > substring, plus a coverage
-  // bonus so a query that spans most of a short name (e.g. "apach" in
-  // "Apache-2.0") outranks the same substring buried in a long one.
+  // bonus so a query spanning most of a short name outranks the same substring
+  // buried in a long one.
   _fieldScore(text, q, weight) {
     if (!text) return 0;
     const i = text.indexOf(q);

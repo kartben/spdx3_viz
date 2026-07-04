@@ -1,68 +1,16 @@
 /**
- * SPDX 3.0 SBOM Visualizer - Configuration
- *
- * Central configuration file containing constants, color mappings,
- * view definitions, and filter configurations.
+ * Constants, color mappings, view definitions, and filter configurations.
  *
  * @module config
  */
 
-/* ==========================================================================
-   Type Constants
-   String constants for SPDX element types
-   ========================================================================== */
+// Element categorization by SPDX type is derived from the official class
+// hierarchy in src/spdx/ (see bucketOf / isA), not from hand-maintained type
+// lists. VEX and relationship types below are semantic vocabularies, not class
+// buckets, so they stay here.
 
 /**
- * SPDX element type constants
- * @constant {Object}
- */
-export const ELEMENT_TYPES = {
-  PACKAGE: 'software_Package',
-  // AI profile subclasses of software_Package: an AI model package and a
-  // dataset package (dataset_DatasetPackage extends ai_AIPackage). Both are
-  // treated as packages, with their own node type/color for the graph legend.
-  AI_PACKAGE: 'ai_AIPackage',
-  DATASET_PACKAGE: 'dataset_DatasetPackage',
-  FILE: 'software_File',
-  // Hardware profile (SPDX 3.1). Hardware is the abstract base; PhysicalHardware,
-  // BulkHardware and VirtualHardware are its concrete subclasses. All are treated
-  // as one 'hardware' node type in the graph/legend, with their own tab + colour.
-  HARDWARE: 'hardware_Hardware',
-  HARDWARE_PHYSICAL: 'hardware_PhysicalHardware',
-  HARDWARE_BULK: 'hardware_BulkHardware',
-  HARDWARE_VIRTUAL: 'hardware_VirtualHardware',
-  // FunctionalSafety profile (SPDX 3.1). Requirement is the Core class that
-  // states a "shall" (its own tab + node type — a first-class citizen). The
-  // functionalsafety_* classes are the safety lifecycle artifacts around it:
-  // RequirementVerification (how a requirement was verified), Assumption
-  // (assumption of use), and EvaluationResult (pass/fail of a verification).
-  // All four share the 'requirement' node type/colour so they read as one group.
-  REQUIREMENT: 'Requirement',
-  FS_VERIFICATION: 'functionalsafety_RequirementVerification',
-  FS_ASSUMPTION: 'functionalsafety_Assumption',
-  FS_EVALUATION: 'functionalsafety_EvaluationResult',
-  // EvidenceRelationship is a Relationship subclass (carries from/to/
-  // relationshipType), handled alongside the generic relationships.
-  FS_EVIDENCE_RELATIONSHIP: 'functionalsafety_EvidenceRelationship',
-  TOOL: 'Tool',
-  RELATIONSHIP: 'Relationship',
-  LIFECYCLE_RELATIONSHIP: 'LifecycleScopedRelationship',
-  BUILD: 'build_Build',
-  AGENT: 'SoftwareAgent',
-  ORGANIZATION: 'Organization',
-  PERSON: 'Person',
-  DOCUMENT: 'SpdxDocument',
-  SBOM: 'software_Sbom',
-  CREATION_INFO: 'CreationInfo',
-  VULNERABILITY: 'security_Vulnerability',
-  LICENSE_TEXT: 'simplelicensing_SimpleLicensingText'
-};
-
-/**
- * SPDX 3.0 Security profile VEX assessment relationship element types, mapped to
- * the VEX status they express. These are Relationship subclasses (they carry
- * `from`/`to`/`relationshipType`) but their element `type` is one of these
- * classes rather than the generic `Relationship`.
+ * Security profile VEX assessment relationship element types, keyed by the VEX status they express.
  * @constant {Object}
  */
 export const VEX_TYPES = {
@@ -92,41 +40,31 @@ export const RELATIONSHIP_TYPES = {
   CONFIGURES: 'configures',
   HAS_CONCLUDED_LICENSE: 'hasConcludedLicense',
   HAS_DECLARED_LICENSE: 'hasDeclaredLicense',
-  // Hardware profile (SPDX 3.1): the `from` software element (the instructions)
-  // runs on each `to` Hardware processing element.
+  // Hardware profile: a software element runs on each `to` Hardware element.
   RUNS_ON: 'runsOn',
-  // FunctionalSafety profile (SPDX 3.1) relationship types (Core RelationshipType
-  // vocabulary): they tie a Requirement to what implements it, how it is
-  // verified, its evidence, and its assumptions.
-  IMPLEMENTED_BY: 'implementedBy', // `from` Requirement is implemented by each `to` Element
-  VERIFIED_BY: 'verifiedBy', // `from` Requirement is verified by each `to` RequirementVerification
-  HAS_REQUIREMENT: 'hasRequirement', // `from` Element has a requirement on each `to` Element
-  HAS_EVIDENCE: 'hasEvidence', // each `to` Element is evidence for the `from` Element
-  ASSUMES: 'assumes', // `from` Element assumes each `to` Assumption
-  CONFORMS_TO: 'conformsTo', // `from` Element conforms to each `to` Assumption/Specification
-  // Not a Core RelationshipType: EvaluationResult.evaluationBasedOn is a property
-  // pointing at the RequirementVerification it evaluates. The parser synthesizes a
-  // relationship of this type so the evaluation ↔ verification link shows up as a
-  // graph edge and in the detail panel like any other relationship.
+  // FunctionalSafety profile relationship types tying a Requirement to what implements,
+  // verifies, evidences, and assumes it.
+  IMPLEMENTED_BY: 'implementedBy',
+  VERIFIED_BY: 'verifiedBy',
+  HAS_REQUIREMENT: 'hasRequirement',
+  HAS_EVIDENCE: 'hasEvidence',
+  ASSUMES: 'assumes',
+  CONFORMS_TO: 'conformsTo',
+  // Synthesized by the parser from EvaluationResult.evaluationBasedOn so the evaluation ↔
+  // verification link appears as a graph edge like any other relationship.
   EVALUATION_BASED_ON: 'evaluationBasedOn',
-  // AI profile relationship types (AI model ↔ training/test dataset)
+  // AI profile relationship types (AI model ↔ training/test dataset).
   TRAINED_ON: 'trainedOn',
   TESTED_ON: 'testedOn',
-  // VEX relationship types (SPDX Security profile)
+  // VEX relationship types (Security profile).
   FIXED_IN: 'fixedIn',
   DOES_NOT_AFFECT: 'doesNotAffect',
   AFFECTS: 'affects',
   UNDER_INVESTIGATION: 'underInvestigation'
 };
 
-/* ==========================================================================
-   VEX (Vulnerability Exploitability eXchange)
-   Status vocabulary and justification labels from the SPDX 3 Security profile
-   ========================================================================== */
-
 /**
- * Maps a VEX assessment relationship's `relationshipType` (and element type) to a
- * normalized status key used throughout the UI.
+ * Maps a VEX assessment relationship's `relationshipType` to a normalized status key used throughout the UI.
  * @constant {Object}
  */
 export const VEX_STATUS_BY_REL = {
@@ -178,8 +116,7 @@ export const VEX_STATUSES = {
 };
 
 /**
- * Human-readable labels for the SPDX VexJustificationType vocabulary
- * (why a component is "not affected"). Full text kept as a title/tooltip.
+ * Human-readable labels for the VexJustificationType vocabulary (why a component is "not affected").
  * @constant {Object}
  */
 export const VEX_JUSTIFICATION_LABELS = {
@@ -190,27 +127,19 @@ export const VEX_JUSTIFICATION_LABELS = {
   inlineMitigationsAlreadyExist: 'Inline mitigations exist'
 };
 
-/* ==========================================================================
-   Color Definitions
-   Color mappings for nodes, edges, and UI elements
-   ========================================================================== */
-
 /**
  * Color palette for different element types
  * @constant {Object}
  */
 export const COLORS = {
   package: '#3b82f6',
-  // AI profile node types (AI model package / dataset package)
+  // AI profile node types (AI model / dataset).
   ai: '#e879f9',
   dataset: '#22d3ee',
   file: '#10b981',
-  // Hardware profile node type + runsOn edges (SPDX 3.1): lime, distinct from
-  // file green / tool amber so hardware reads as its own kind at a glance.
+  // Hardware profile node type + runsOn edges.
   hardware: '#a3e635',
-  // FunctionalSafety profile (SPDX 3.1): Requirement node type + its safety
-  // relationship edges (implementedBy, verifiedBy, …). Gold reads as a
-  // spec/seal/compliance colour and stays clear of the blues and purples.
+  // FunctionalSafety profile: Requirement node type + its safety relationship edges.
   requirement: '#eab308',
   tool: '#f59e0b',
   build: '#8b5cf6',
@@ -227,18 +156,13 @@ export const COLORS = {
   optionalComponent: '#d946ef',
   variant: '#eab308',
   vulnerability: '#f43f5e',
-  // VEX edge colors — mirror the VEX_STATUSES palette so an edge reads as its status
+  // VEX edge colors mirror the VEX_STATUSES palette so an edge reads as its status.
   vexFixed: '#10b981',
   vexNotAffected: '#38bdf8',
   vexAffected: '#f43f5e',
   vexUnderInvestigation: '#f59e0b',
   default: '#6b7280'
 };
-
-/* ==========================================================================
-   Graph Filters
-   Filter configurations for the force-directed graph
-   ========================================================================== */
 
 /**
  * Creates the default graph filter configuration
@@ -257,11 +181,8 @@ export function createGraphFilters() {
     { key: 'build', label: 'Build', color: COLORS.build, active: true },
     { key: 'config', label: 'Configs', color: COLORS.config, active: true },
     { key: 'external', label: 'External', color: COLORS.external, active: true },
-    // Vulnerabilities start off here: an SBOM with VEX can carry tens of
-    // thousands of vuln→package edges, which would swamp the graph. On load,
-    // loadingMixin auto-enables this (and the VEX edge types below) for small
-    // VEX sets (see VEX_AUTO_SHOW_MAX); otherwise the user opts in from the
-    // legend.
+    // Vulnerabilities start off to avoid swamping the graph; auto-enabled on load
+    // for small VEX sets (see VEX_AUTO_SHOW_MAX), otherwise opted in from the legend.
     {
       key: 'vulnerability',
       label: 'Vulnerabilities',
@@ -329,7 +250,7 @@ export function createGraphFilters() {
       lineStyle: 'dashed'
     },
     { key: 'configures', label: 'configures', color: COLORS.config, active: true, isRel: true },
-    // FunctionalSafety profile (SPDX 3.1) relationship edges
+    // FunctionalSafety profile relationship edges.
     {
       key: 'implementedBy',
       label: 'implementedBy',
@@ -393,9 +314,7 @@ export function createGraphFilters() {
       isRel: true,
       lineStyle: 'dashed'
     },
-    // VEX assessment edges (vulnerability → package). Start off, but auto-enabled
-    // on load for small VEX sets (see the Vulnerabilities note above). Enabling
-    // the Vulnerabilities node type + one of these surfaces VEX in the graph.
+    // VEX assessment edges (vulnerability → package); start off, auto-enabled on load for small VEX sets.
     { key: 'fixedIn', label: 'fixedIn (VEX)', color: COLORS.vexFixed, active: false, isRel: true },
     {
       key: 'doesNotAffect',
@@ -420,11 +339,6 @@ export function createGraphFilters() {
     }
   ];
 }
-
-/* ==========================================================================
-   View Definitions
-   Navigation view configurations with icons
-   ========================================================================== */
 
 /**
  * SVG icon definitions for views
@@ -479,11 +393,6 @@ export function createViews() {
   ];
 }
 
-/* ==========================================================================
-   Tailwind Configuration
-   Custom color extensions for Tailwind CSS
-   ========================================================================== */
-
 /**
  * Tailwind CSS configuration object
  * @constant {Object}
@@ -504,11 +413,6 @@ export const TAILWIND_CONFIG = {
     }
   }
 };
-
-/* ==========================================================================
-   Relationship Labels
-   Human-readable labels for relationship types
-   ========================================================================== */
 
 /**
  * Maps relationship types and directions to human-readable labels
@@ -543,7 +447,7 @@ export const RELATIONSHIP_LABELS = {
   'configures:in': 'Configured by',
   'runsOn:out': 'Runs on',
   'runsOn:in': 'Runs',
-  // FunctionalSafety profile (SPDX 3.1)
+  // FunctionalSafety profile.
   'implementedBy:out': 'Implemented by',
   'implementedBy:in': 'Implements',
   'verifiedBy:out': 'Verified by',
@@ -593,7 +497,7 @@ export const DETAIL_PROMOTED_FIELDS = [
     types: ['software_File'],
     variant: 'badge'
   },
-  // Hardware profile (SPDX 3.1)
+  // Hardware profile.
   {
     prop: 'hardware_partNumber',
     label: 'Part number',
@@ -616,8 +520,7 @@ export const DETAIL_PROMOTED_FIELDS = [
     ],
     variant: 'badge'
   },
-  // FunctionalSafety profile (SPDX 3.1): the "shall" statement is the headline of
-  // a Requirement; the assumption statement plays the same role for an Assumption.
+  // FunctionalSafety profile: the "shall" statement headlines a Requirement, the assumption statement an Assumption.
   {
     prop: 'requirementStatement',
     label: 'Requirement',
@@ -666,8 +569,7 @@ export const RELATIONSHIP_SORT_ORDER = {
   'usesTool:in': 26,
   'runsOn:out': 35,
   'runsOn:in': 36,
-  // FunctionalSafety profile (SPDX 3.1): keep a requirement's implementation,
-  // verification, evidence and assumptions grouped together, in that order.
+  // FunctionalSafety profile: keep a requirement's implementation, verification, evidence and assumptions grouped.
   'implementedBy:out': 37,
   'implementedBy:in': 38,
   'verifiedBy:out': 39,

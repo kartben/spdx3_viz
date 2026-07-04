@@ -21,14 +21,11 @@ import {
   formatByteSize,
   normalizeUrl,
   copyToClipboard
-} from '../utils.js';
+} from '../lib/index.js';
 
-/* ==========================================================================
-   Element accessors + display helpers
-   Thin lookups into the relationship indexes, name/date formatting, build
-   parameter helpers, and the relationship-group data the detail panel renders.
-   Most are one-liners exposing a util or index to the templates as this.*().
-   ========================================================================== */
+/* Element accessors and display helpers: thin lookups into the relationship
+   indexes, name/date formatting, and the relationship-group data the detail
+   panel renders. Most expose a util or index to templates as this.*(). */
 
 export const accessorsMixin = {
   cleanName(spdxId) {
@@ -172,10 +169,9 @@ export const accessorsMixin = {
   downloadUrl(value) {
     return normalizeUrl(value);
   },
-  // The SPDX 3.0 ExternalMap entry for an element, when a loaded SpdxDocument
-  // imports it (i.e. references it but defines it elsewhere). Returns the merged
-  // entry {locationHint, definingArtifact, verifiedUsing, importedBy} or null.
-  // Works for both unresolved placeholders and resolved cross-document elements.
+  // The ExternalMap entry for an element imported by a loaded SpdxDocument
+  // (referenced here but defined elsewhere), or null. Merged entry:
+  // {locationHint, definingArtifact, verifiedUsing, importedBy}.
   externalRefFor(element) {
     if (!element?.spdxId) return null;
     return this.externalMap?.get(element.spdxId) || null;
@@ -212,8 +208,7 @@ export const accessorsMixin = {
     const groups = new Map(); // key → { label, color, items:[] }
 
     // Vulnerability associations are surfaced in the dedicated security
-    // section, not the generic relationship list (a single package can carry
-    // thousands of them).
+    // section, not the generic relationship list.
     const skip = (rel) => rel.relationshipType === 'hasAssociatedVulnerability';
 
     // Outgoing: this element → targets

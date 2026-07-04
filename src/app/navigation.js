@@ -1,21 +1,15 @@
-/* ==========================================================================
-   Navigation, history + chunked view rendering
-   Browser back/forward wiring, switching between views, streaming heavy list
-   views into the DOM a chunk at a time, expand/collapse of detail cards, and
-   the navigateToX drill-downs (with scroll-into-view).
-   ========================================================================== */
+/* Navigation, history, and chunked view rendering: browser back/forward wiring,
+   view switching, load-on-scroll list rendering, expand/collapse of detail
+   cards, and the navigateToX drill-downs with scroll-into-view. */
 
 /* Load-on-scroll list rendering (see renderSlice/_ensureViewRendered).
-   Building thousands of cards up front freezes the page (the Kubernetes sample
-   has ~28k files), so heavy list views render only an initial page and then
-   grow by RENDER_CHUNK as the user scrolls near the bottom — driven by an
-   IntersectionObserver on a single sentinel at the foot of the scroll area.
-   The whole list is NOT proactively built (no more multi-second "Rendering N
-   of M" streaming), but cards still accumulate in the DOM as you scroll, and a
-   deep link streams the list just far enough to reveal its target (see
-   _streamToNavTarget), so deep links keep working. viewRenderSeq cancels a
-   deep-link stream when a newer navigation supersedes it; scrollObserver is the
-   shared observer — both kept off the reactive state as pure bookkeeping. */
+   Building every card up front freezes the page, so heavy list views render an
+   initial page and grow by RENDER_CHUNK as the user scrolls near the bottom,
+   driven by an IntersectionObserver on a single sentinel at the foot of the
+   scroll area. A deep link streams the list just far enough to reveal its
+   target (see _streamToNavTarget). viewRenderSeq cancels a deep-link stream when
+   a newer navigation supersedes it; scrollObserver is the shared observer — both
+   kept off the reactive state as pure bookkeeping. */
 const INITIAL_RENDER = 200; // cards rendered when a list view first opens
 const RENDER_CHUNK = 200; // cards added per scroll step / deep-link stream frame
 let viewRenderSeq = 0;
@@ -140,11 +134,10 @@ export const navigationMixin = {
     this._scheduleNavPush();
   },
 
-  // Unloads the current document and returns to the landing screen (file drop
-  // zone + sample SBOMs). Clears loadedFiles so a subsequent drop/pick starts
-  // fresh rather than appending to the old document, and resets currentView so
-  // the next load opens on the overview. Nav history is gated by dataLoaded,
-  // so flipping it back to false leaves no dangling in-document entries.
+  // Unloads the current document and returns to the landing screen. Clears
+  // loadedFiles so the next drop/pick starts fresh, and resets the view. Nav
+  // history is gated by dataLoaded, so flipping it false leaves no dangling
+  // in-document entries.
   goHome() {
     this.loadedFiles = [];
     this.dataLoaded = false;
@@ -363,16 +356,15 @@ export const navigationMixin = {
     };
     this.$nextTick(() => requestAnimationFrame(() => attempt(2)));
   },
-  // The list view (if any) that navigateTo would land an element in, used by
-  // the graph detail panel's "View in <list>" link. Returns null for elements
-  // with no dedicated list (placeholders / external references / agents).
-  // Nav-target kind for a package card, so the shared list template can live in
-  // the Packages / AI Models / Datasets tabs and still scroll to the right card.
+  // Nav-target kind for a package card, so the shared list template works across
+  // the Packages / AI Models / Datasets tabs and still scrolls to the right card.
   pkgNavKind(pkg) {
     if (pkg?.type === 'ai_AIPackage') return 'ai';
     if (pkg?.type === 'dataset_DatasetPackage') return 'dataset';
     return 'package';
   },
+  // The list view (if any) that navigateTo would land an element in. Returns
+  // null for elements with no dedicated list (placeholders / agents).
   listTargetFor(el) {
     if (!el || el.placeholder) return null;
     switch (el.type) {
@@ -490,10 +482,8 @@ export const navigationMixin = {
   },
   navigateToRequirement(spdxId) {
     this.requirementSearch = '';
-    // Clear the kind filter too: without this, jumping from (say) an Assumption
-    // card to a Requirement it's linked to would leave the "Assumptions" filter
-    // active, so the target isn't in filteredRequirements and nothing scrolls
-    // into view.
+    // Clear the kind filter too, else the target may be filtered out of
+    // filteredRequirements and nothing scrolls into view.
     this.requirementKindFilter = '';
     this.switchView('requirements');
     this.expandedRequirement = spdxId;

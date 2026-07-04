@@ -1,31 +1,25 @@
+import * as d3 from 'd3';
+
 import {
   getRelationshipColor,
   getNodeType,
   getNodeTypeColor,
   cleanName,
   dirPrefix
-} from './utils.js';
+} from '../lib/index.js';
 
 const INPUT_LAYOUT_LINKS_PER_BUILD = 8;
-// Above this many underlying nodes we auto-collapse into clusters even when the
-// user hasn't turned aggregation on. Rendering is fast now, so the binding limit
-// here is readability, not performance: a flat graph of many thousands of nodes
-// is an unreadable hairball. We force-collapse and surface a hint instead.
+// Above this many underlying nodes, force-collapse into clusters for readability (a flat
+// graph of many thousands of nodes is an unreadable hairball) and surface a hint.
 const MAX_FLAT_NODES = 4000;
-// Labels are expensive and become noise when zoomed out; only draw them past
-// this zoom level, and cap how many we draw per frame.
+// Only draw labels past this zoom level, capped per frame, since they become noise when zoomed out.
 const LABEL_ZOOM_THRESHOLD = 1.1;
 const MAX_LABELS = 400;
-// World-space padding for viewport culling so nodes/edges near the edge of the
-// screen still draw.
+// World-space padding for viewport culling so edge-of-screen nodes/edges still draw.
 const CULL_PAD = 80;
-// Relationship types drawn with a non-solid stroke, each with its own dash
-// signature so the link's semantics read from the line style, not just colour:
-//   usesTool             ·· dotted
-//   hasDynamicLink       -- dashed          (runtime dynamic linking)
-//   hasOptionalComponent -·- dash-dot       (optional component)
-// Patterns are expressed in screen pixels (divided by the zoom factor k) so they
-// stay a constant on-screen size. Returns null for solid (default) edges.
+// Per-type dash signatures so a link's semantics read from the line style, not just colour.
+// Patterns are in screen pixels (divided by zoom factor k) to stay a constant on-screen size;
+// returns null for solid (default) edges.
 function dashPatternFor(type, lineWidth, k) {
   switch (type) {
     case 'usesTool':
@@ -38,18 +32,14 @@ function dashPatternFor(type, lineWidth, k) {
       return null;
   }
 }
-// Relationship types drawn with an arrowhead at their "head" end. hasInput
-// points at the build (the source), hasOutput points at the output file (the
-// target), so the pair reads as inputs → build → outputs.
+// Relationship types drawn with an arrowhead at their head end; hasInput points at its source and
+// hasOutput at its target, so the pair reads as inputs → build → outputs.
 const ARROW_REL_TYPES = new Set(['hasInput', 'hasOutput']);
-// Arrowhead dimensions in screen pixels (divided by the zoom factor to stay a
-// constant on-screen size). Kept deliberately small/light.
+// Arrowhead dimensions in screen pixels (divided by zoom to stay a constant on-screen size).
 const ARROW_LEN = 7;
 const ARROW_HALF_WIDTH = 3;
-// Hover "flow" animation: when a node with directed edges is hovered, dashes
-// march along those edges in the flow direction (into the build for inputs, out
-// to the file for outputs). Dash/gap are screen pixels; SPEED is screen px per
-// frame.
+// Hover "flow" animation: dashes march along a hovered node's directed edges in the flow direction.
+// Dash/gap are screen pixels; SPEED is screen px per frame.
 const FLOW_DASH = 5;
 const FLOW_GAP = 12;
 const FLOW_PERIOD = FLOW_DASH + FLOW_GAP;
@@ -159,11 +149,8 @@ export function renderGraph(app, retry = 0) {
     app.graphFlowRAF = 0;
   }
 
-  if (!globalThis.d3) return;
-  // Measure the container. clientWidth/Height can momentarily read 0 — notably
-  // on Safari/WebKit, which lays out a just-shown flex view a frame later than
-  // Chrome — so fall back to getBoundingClientRect and, if still unsized, retry
-  // on the next frame (bounded so a genuinely hidden view never loops forever).
+  // clientWidth/Height can momentarily read 0 (some browsers lay out a just-shown flex view a frame
+  // late), so fall back to getBoundingClientRect and, if still unsized, retry next frame (bounded).
   const rect = container.getBoundingClientRect();
   const width = container.clientWidth || Math.round(rect.width);
   const height = container.clientHeight || Math.round(rect.height);
@@ -179,9 +166,7 @@ export function renderGraph(app, retry = 0) {
     app.graphFilters.filter((f) => f.isRel && f.active).map((f) => f.key)
   );
 
-  /* ----------------------------------------------------------------------
-     1. Underlying nodes (one per SPDX element that passes the type filters)
-     ---------------------------------------------------------------------- */
+  // 1. Underlying nodes (one per SPDX element that passes the type filters).
   const uNodeIds = new Set();
   const uNodes = [];
   const uNodeById = new Map();
@@ -193,9 +178,8 @@ export function renderGraph(app, retry = 0) {
     let el = app.elementMap.get(spdxId);
     if (!el) {
       el = placeholderFor(spdxId, rel || {}, role);
-      // Unresolved reference: if the document declared it as an ExternalMap
-      // import, attach where it's defined so the node (and its detail panel)
-      // can point at the external location instead of being a bare unknown.
+      // For an unresolved reference declared as an ExternalMap import, attach where it's
+      // defined so the node can point at the external location instead of being a bare unknown.
       const ext = app.externalMap?.get(spdxId);
       if (ext) {
         el.external = true;
@@ -224,9 +208,7 @@ export function renderGraph(app, retry = 0) {
   (app.builds || []).forEach((b) => addNode(b.spdxId));
   if (!app.builds?.length && app.buildInfo) addNode(app.buildInfo.spdxId);
 
-  /* ----------------------------------------------------------------------
-     2. Underlying links
-     ---------------------------------------------------------------------- */
+  // 2. Underlying links.
   const uLinks = [];
   const addRelLinks = (rel) => {
     if (rel.relationshipType === 'hasConcludedLicense') return;
@@ -240,17 +222,12 @@ export function renderGraph(app, retry = 0) {
     });
   };
   app.relationships.forEach(addRelLinks);
-  // VEX assessment relationships (vulnerability → package) live outside the
-  // generic relationships array. They only become nodes/edges when the user
-  // enables the Vulnerabilities node type and a VEX edge type (both off by
-  // default), so by default this adds nothing.
+  // VEX assessment relationships live outside the generic relationships array and only become
+  // nodes/edges when the Vulnerabilities node type and a VEX edge type are enabled (both off by default).
   (app.vexRelationships || []).forEach(addRelLinks);
 
-  /* ----------------------------------------------------------------------
-     3. Hierarchical clustering
-        Group files into their parent package, else their directory; group
-        build steps into their root build; everything else is its own node.
-     ---------------------------------------------------------------------- */
+  // 3. Hierarchical clustering: group files into their parent package (else directory) and
+  //    build steps into their root build; everything else is its own node.
   let aggregate = app.graphAggregate;
   app.graphTruncated = false;
   if (!aggregate && uNodes.length > MAX_FLAT_NODES) {
@@ -263,10 +240,8 @@ export function renderGraph(app, retry = 0) {
     if (!aggregate) return 'self:' + node.id;
     if (node.type === 'package') return 'pkg:' + node.id;
     if (node.type === 'file') {
-      // Only collapse into a parent that is an actual package. SBOMs (e.g. the
-      // Linux kernel) often use a pseudo-root *file* like `$(src_tree)` as the
-      // `contains` parent of every file — clustering on that would collapse the
-      // whole tree into one node, so we fall through to directory grouping.
+      // Only cluster a file into a parent that is an actual package; a pseudo-root file parent
+      // would collapse the whole tree, so fall through to directory grouping.
       const parent = app.parentIndex.get(node.id);
       const parentNode = parent && uNodeById.get(parent);
       if (parentNode && parentNode.type === 'package') return 'pkg:' + parent;
@@ -303,9 +278,7 @@ export function renderGraph(app, retry = 0) {
     return cleanName(c.anchorId);
   };
 
-  /* ----------------------------------------------------------------------
-     4. Render nodes + map every underlying id to its render id
-     ---------------------------------------------------------------------- */
+  // 4. Render nodes + map every underlying id to its render id.
   const renderById = new Map();
   const renderNodes = [];
   const renderKeyOf = new Map(); // underlying id -> render node id
@@ -339,9 +312,7 @@ export function renderGraph(app, retry = 0) {
     }
   });
 
-  /* ----------------------------------------------------------------------
-     5. Remap links onto render nodes, drop self-loops, dedupe, weight
-     ---------------------------------------------------------------------- */
+  // 5. Remap links onto render nodes, drop self-loops, dedupe, weight.
   const linkMap = new Map();
   uLinks.forEach((l) => {
     const s = renderKeyOf.get(l.sourceId);
@@ -388,9 +359,7 @@ export function renderGraph(app, retry = 0) {
   app.graphNodeCount = renderNodes.length;
   app.graphEdgeCount = links.length;
 
-  /* ----------------------------------------------------------------------
-     6. Canvas (edges + nodes + labels on one surface)
-     ---------------------------------------------------------------------- */
+  // 6. Canvas (edges + nodes + labels on one surface).
   const canvas = document.createElement('canvas');
   canvas.className = 'graph-canvas';
   container.appendChild(canvas);
@@ -407,12 +376,8 @@ export function renderGraph(app, retry = 0) {
       ? Math.max(9, Math.min(30, 7 + Math.sqrt(d.memberCount) * 1.6))
       : Math.max(5, Math.min(16, 4 + Math.sqrt(connCount.get(d.id) || 0) * 1.2));
 
-  // Precompute each node's static draw properties once. Radius depends only on
-  // the (now-final) connection/member counts and the fill/stroke only on the
-  // node type, so caching them here removes ~n sqrt() calls per simulation tick
-  // (the collision force) and ~n colour parses/allocations per frame (the draw
-  // loop) — the dominant cost when a big cluster expands to tens of thousands
-  // of nodes. getNodeTypeColor / d3.color().brighter() are memoised per type.
+  // Precompute each node's static draw properties once (radius from connection/member counts,
+  // fill/stroke from node type) to avoid per-tick sqrt() and per-frame colour parses on large graphs.
   const typeFill = new Map();
   const typeStroke = new Map();
   const fillForType = (type) => {
@@ -438,10 +403,8 @@ export function renderGraph(app, retry = 0) {
   });
   const radiusFor = (d) => d._r;
 
-  // Nodes standing in for an unresolved ExternalMap import: drawn with a dashed
-  // grey ring so cross-document references are visible at a glance. Usually few
-  // (often none), so a small dedicated draw pass is cheaper than special-casing
-  // the batched node loop.
+  // Nodes standing in for an unresolved ExternalMap import get a dashed grey ring; a small dedicated
+  // draw pass is cheaper than special-casing the batched node loop.
   const externalRenderNodes = renderNodes.filter((d) => !d.isCluster && d.data?.external);
   const EXTERNAL_RING_COLOR = getNodeTypeColor('external');
   // Draw bigger nodes' labels first so the MAX_LABELS cap keeps the useful ones.
@@ -466,13 +429,10 @@ export function renderGraph(app, retry = 0) {
     d.y >= view.y0 - CULL_PAD &&
     d.y <= view.y1 + CULL_PAD;
 
-  // headAlpha lets the arrowheads stay opaque while the shaft is dimmed (used by
-  // the hover flow, where the shaft fades behind the moving dashes but the heads
-  // should remain crisp). Defaults to the shaft alpha.
+  // headAlpha keeps arrowheads opaque while the shaft is dimmed; defaults to the shaft alpha.
   const drawLinkGroups = (groups, alpha, lineWidth, headAlpha = alpha) => {
     const k = currentTransform.k;
-    // Arrowheads a constant on-screen size, growing only a touch on emphasised
-    // (thicker) edges so they stay light.
+    // Arrowheads a constant on-screen size, growing only slightly on thicker edges.
     const headLen = (ARROW_LEN + lineWidth * k) / k;
     const headHalf = (ARROW_HALF_WIDTH + lineWidth * k * 0.6) / k;
 
@@ -481,11 +441,8 @@ export function renderGraph(app, retry = 0) {
       ctx.globalAlpha = alpha;
       ctx.lineWidth = lineWidth;
 
-      // Solid shafts (plain + directed) batched into one path per colour.
-      // Dashed edges and arrowheads are collected and drawn separately
-      // afterwards — a single path can't mix dashes, and heads are filled.
-      // Dashed edges are bucketed by their pattern so each dash signature is a
-      // single stroke pass.
+      // Solid shafts batched into one path per colour; dashed edges (bucketed by pattern) and
+      // filled arrowheads are collected and drawn separately since one path can't mix dashes.
       let dashedBuckets = null; // Map<patternKey, { pattern, pts:[a,b,…] }>
       let arrows = null;
       ctx.setLineDash([]);
@@ -513,8 +470,7 @@ export function renderGraph(app, retry = 0) {
           ctx.lineTo(b.x, b.y);
           return;
         }
-        // hasInput's head sits on the build (source); hasOutput's on the file
-        // (target). Shaft stops at the base of the head so they meet cleanly.
+        // Head sits on the source for hasInput and the target for hasOutput; shaft stops at its base.
         const head = link.type === 'hasInput' ? a : b;
         const tail = link.type === 'hasInput' ? b : a;
         const dx = head.x - tail.x;
@@ -568,12 +524,8 @@ export function renderGraph(app, retry = 0) {
     });
   };
 
-  // Fast path for the common "no search, nothing highlighted" view (e.g. right
-  // after a big cluster expands): every node is fully opaque, so we can bucket
-  // the visible nodes by fill/stroke and emit a single fill()+stroke() per
-  // bucket instead of two canvas draws per node. Tens of thousands of individual
-  // draw calls collapse to a handful, which is what keeps the expanded k8s
-  // graph interactive.
+  // Fast path for the common "no search, nothing highlighted" view: every node is fully opaque, so
+  // bucket visible nodes by fill/stroke and emit one fill()+stroke() per bucket instead of per node.
   const drawNodesFast = () => {
     const k = currentTransform.k;
     const buckets = new Map();
@@ -602,9 +554,8 @@ export function renderGraph(app, retry = 0) {
     });
   };
 
-  // Dashed grey outline around unresolved external references. Runs after the
-  // node fills so the ring sits on top; nodes faded out by search/hover are
-  // skipped so the ring tracks the same emphasis.
+  // Dashed grey outline around unresolved external references, drawn after node fills so it sits on
+  // top; nodes faded out by search/hover are skipped so the ring tracks the same emphasis.
   const drawExternalRings = () => {
     if (!externalRenderNodes.length) return;
     const k = currentTransform.k;
@@ -669,10 +620,8 @@ export function renderGraph(app, retry = 0) {
     drawExternalRings();
   };
 
-  // Screen-space label decluttering: labels are placed greedily in priority
-  // order and any that would overlap one already drawn is skipped. This keeps
-  // dense areas (e.g. lots of search hits packed together) readable without
-  // re-laying out the graph and jolting node positions around as the user types.
+  // Screen-space label decluttering: labels are placed greedily in priority order and any that would
+  // overlap one already drawn is skipped, keeping dense areas readable without re-laying out the graph.
   const LABEL_CELL = 13; // grid cell size in screen px (≈ label line height)
   let labelCells = null;
   const reserveLabel = (x0, y0, x1, y1) => {
@@ -723,7 +672,7 @@ export function renderGraph(app, retry = 0) {
     labelCells = new Set(); // reset the occupancy grid each frame
     let drawn = 0;
 
-    // Search hits always get a label — even zoomed out — so they're findable.
+    // Search hits always get a label, even zoomed out, so they're findable.
     if (searchActive) {
       for (const d of matchLabelList) {
         if (drawn >= MAX_LABELS) break;
@@ -732,8 +681,7 @@ export function renderGraph(app, retry = 0) {
       }
     }
 
-    // Remaining (non-match) labels only once zoomed in, mirroring the old
-    // behaviour and respecting hover focus when not searching.
+    // Remaining (non-match) labels only once zoomed in, respecting hover focus when not searching.
     if (zoomedIn) {
       const connected =
         !searchActive && highlightedNodeId
@@ -754,8 +702,7 @@ export function renderGraph(app, retry = 0) {
     ctx.restore();
   };
 
-  // The hovered node's directed (hasInput/hasOutput) links, or null. Drives both
-  // the flow animation and the dimmed base shaft under it.
+  // The hovered node's directed (hasInput/hasOutput) links, or null; drives the flow animation and its dimmed base shaft.
   const highlightedDirectedLinks = () => {
     if (searchActive || !highlightedNodeId) return null;
     const hl = linksByNode.get(highlightedNodeId);
@@ -764,8 +711,8 @@ export function renderGraph(app, retry = 0) {
     return directed.length ? directed : null;
   };
 
-  // Marching dashes along the directed edges, animated by flowPhase. Each edge
-  // is drawn tail → head so the dashes travel in the relationship's direction.
+  // Marching dashes along the directed edges, animated by flowPhase; each edge is drawn
+  // tail → head so the dashes travel in the relationship's direction.
   const drawFlowOverlay = (directed, lineWidth) => {
     const k = currentTransform.k;
     const headRoom = (ARROW_LEN + 4) / k; // stop short of the head so it stays clean
@@ -818,8 +765,7 @@ export function renderGraph(app, retry = 0) {
     ctx.lineCap = 'round';
 
     if (searchActive) {
-      // Links touching a match are emphasised; the rest stay faint. In focus
-      // mode, links with a hidden endpoint were dropped during recompute.
+      // Links touching a match are emphasised; the rest stay faint.
       if (searchDimGroups) drawLinkGroups(searchDimGroups, 0.06, 0.7 / k);
       if (searchHotGroups) drawLinkGroups(searchHotGroups, 0.5, 1.4 / k);
     } else if (highlightedNodeId) {
@@ -827,8 +773,7 @@ export function renderGraph(app, retry = 0) {
       const hl = linksByNode.get(highlightedNodeId) || [];
       const directed = highlightedDirectedLinks();
       if (directed) {
-        // Non-directed edges stay bright/solid; directed edges get a dim base
-        // shaft (with a faint head) so the animated flow on top reads as motion.
+        // Non-directed edges stay bright/solid; directed edges get a dim base shaft so the flow reads as motion.
         const others = hl.filter((l) => !ARROW_REL_TYPES.has(l.type));
         if (others.length) drawLinkGroups(groupLinksByColor(others), 0.85, 1.6 / k);
         // Dim shaft, but keep the arrowheads opaque so direction stays clear.
@@ -855,9 +800,8 @@ export function renderGraph(app, retry = 0) {
     });
   };
 
-  // Self-perpetuating loop that advances the flow animation while a node with
-  // directed edges is hovered; it stops itself once the hover no longer applies.
-  // The handle lives on `app` so a graph rebuild can cancel a stale loop.
+  // Self-perpetuating loop advancing the flow animation while a node with directed edges is hovered;
+  // stops itself once the hover no longer applies. The handle lives on `app` so a rebuild can cancel a stale loop.
   const flowTick = () => {
     if (!highlightedDirectedLinks()) {
       app.graphFlowRAF = 0;
@@ -883,13 +827,8 @@ export function renderGraph(app, retry = 0) {
     queueDraw();
   };
 
-  /* ----------------------------------------------------------------------
-     6b. Search overlay
-         Driven by the controls bar via app.graphRecomputeSearch(). Recomputes
-         the match/neighbour sets and link partitions, then redraws — it never
-         rebuilds the graph or restarts the simulation, so typing doesn't
-         re-layout the whole thing.
-     ---------------------------------------------------------------------- */
+  // 6b. Search overlay: recomputes the match/neighbour sets and link partitions then redraws,
+  //     without rebuilding the graph or restarting the simulation, so typing doesn't re-layout.
   // Shared style objects (avoid per-node allocation in the draw loop).
   const SS_VISIBLE = { hidden: false, alpha: 1 };
   const SS_NEIGHBOR = { hidden: false, alpha: 0.4 };
@@ -946,8 +885,8 @@ export function renderGraph(app, retry = 0) {
     if (searchActive) {
       const fullText = !!app.graphSearchFullText;
       const matches = (hay) => tokens.every((t) => hay.includes(t));
-      // Match on the underlying elements, then fold each hit up to its render
-      // node so a collapsed cluster lights up when any member matches.
+      // Match on the underlying elements, then fold each hit up to its render node so a collapsed
+      // cluster lights up when any member matches.
       uNodes.forEach((u) => {
         const hay = fullText ? fullTextOf(u) : searchTextOf(u).name;
         if (matches(hay)) {
@@ -980,15 +919,9 @@ export function renderGraph(app, retry = 0) {
     queueDraw();
   };
 
-  /* ----------------------------------------------------------------------
-     7. Force simulation (main thread; ticks redraw the canvas)
-     ---------------------------------------------------------------------- */
-  // On very large graphs the many-body (charge) force dominates each tick. Raise
-  // Barnes-Hut's theta so it approximates more aggressively, and cap the
-  // interaction distance so far-apart nodes stop repelling — the x/y centering
-  // forces below keep everything cohesive, so the settled layout stays a well-
-  // spread disc rather than a knot while per-tick charge cost drops ~35%. Small
-  // graphs keep the exact old forces.
+  // 7. Force simulation (main thread; ticks redraw the canvas).
+  // On very large graphs the charge force dominates each tick, so raise Barnes-Hut's theta and cap the
+  // interaction distance; the x/y centering forces keep the layout cohesive. Small graphs keep the old forces.
   const bigGraph = renderNodes.length > 4000;
   const hugeGraph = renderNodes.length > 12000;
   const charge = d3.forceManyBody().strength(-150);
@@ -1014,20 +947,13 @@ export function renderGraph(app, retry = 0) {
     .force('y', d3.forceY(height / 2).strength(0.045));
 
   if (bigGraph) {
-    // A big graph reaches a readable spread within ~80 ticks; d3's default decay
-    // grinds through ~300 ticks micro-adjusting positions no one can perceive.
-    // Decay faster and stop a touch sooner so mid-size graphs settle in ~2-3s
-    // and the huge ones in a few seconds, rather than dragging the UI for much
-    // longer.
+    // Big graphs reach a readable spread quickly, so decay faster and stop sooner rather than
+    // grinding through d3's default ~300 ticks of imperceptible micro-adjustment.
     sim.alphaDecay(0.06).alphaMin(0.006);
   }
 
-  // Hit-testing quadtree, rebuilt lazily. d3's simulation.find() builds a fresh
-  // quadtree over every node on each call — brutal when the pointer moves across
-  // a 30k-node graph, firing that rebuild on every mousemove. Instead we keep
-  // our own tree and only rebuild it after the simulation has moved nodes
-  // (flagged on tick); while the layout is settled, every hover/drag hit-test
-  // reuses it in O(log n).
+  // Hit-testing quadtree, rebuilt lazily only after the simulation moves nodes (flagged on tick),
+  // so hover/drag hit-tests on a settled layout reuse it in O(log n) instead of rebuilding per mousemove.
   let hitTree = null;
   let hitTreeDirty = true;
   const findNode = (wx, wy, r) => {
@@ -1047,10 +973,7 @@ export function renderGraph(app, retry = 0) {
     queueDraw();
   });
 
-  /* ----------------------------------------------------------------------
-     8. Interaction: zoom/pan, node drag, hover, click, double-click expand
-        Hit-testing uses the lazily-rebuilt quadtree via findNode().
-     ---------------------------------------------------------------------- */
+  // 8. Interaction: zoom/pan, node drag, hover, click, double-click expand; hit-testing via findNode().
   const nodeAtCanvas = (px, py) => {
     const wx = currentTransform.invertX(px);
     const wy = currentTransform.invertY(py);
