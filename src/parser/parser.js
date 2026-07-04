@@ -1,13 +1,12 @@
+// @ts-check
 /**
- * SPDX 3.0 SBOM Visualizer - Data Parser
- *
- * Handles parsing of SPDX JSON-LD data, building element maps,
- * and creating relationship indexes for efficient lookups.
+ * Parses SPDX JSON-LD data into element maps and relationship indexes.
  *
  * @module parser
  */
 
-import { ELEMENT_TYPES, RELATIONSHIP_TYPES, VEX_TYPES } from './config.js';
+import { RELATIONSHIP_TYPES, VEX_TYPES } from '../config.js';
+import { bucketOf, isA, CLASS, BUCKET } from '../spdx/model.js';
 import {
   displayLicenseExpression,
   renderLicenseExpression,
@@ -15,13 +14,11 @@ import {
   getVulnerabilityId,
   getVulnerabilityLocators,
   vexStatusForRel
-} from './utils.js';
+} from '../lib/index.js';
 
 /**
- * Builds a throttled progress reporter. Returns a function to call once per
- * processed item; it invokes `onProgress(fraction)` at most ~50 times so the
- * parser can drive a progress bar without per-iteration overhead. Returns a
- * no-op when no callback is supplied (e.g. tests, or the synchronous path).
+ * Builds a throttled progress reporter that calls `onProgress(fraction)` at
+ * most ~50 times; returns a no-op when no callback is supplied.
  *
  * @param {((fraction: number) => void)|undefined} onProgress
  * @param {number} total - Total number of items that will be processed
@@ -40,10 +37,6 @@ function makeThrottledReporter(onProgress, total) {
     }
   };
 }
-
-/* ==========================================================================
-   Parser Result Type
-   ========================================================================== */
 
 /**
  * @typedef {Object} ParsedData
@@ -81,9 +74,8 @@ function makeThrottledReporter(onProgress, total) {
  */
 
 /**
- * A single SPDX 3.0 ExternalMap entry (an element used by an SpdxDocument but
+ * A single SPDX ExternalMap entry (an element used by an SpdxDocument but
  * defined outside of it), merged across every document that imports the same id.
- * See https://spdx.github.io/spdx-spec/v3.0.1/model/Core/Classes/ExternalMap/
  *
  * @typedef {Object} ExternalMapEntry
  * @property {string} externalSpdxId - Id of the element defined outside the document
@@ -115,10 +107,6 @@ function makeThrottledReporter(onProgress, total) {
  * @property {Map<string, Array>} distributedByIndex - Artifact to distributing packages mapping
  * @property {Map<string, Array>} licenseUsersIndex - License id to [{from, kind}] mapping
  */
-
-/* ==========================================================================
-   Main Parser Function
-   ========================================================================== */
 
 /**
  * Parses an SPDX JSON-LD graph array and extracts all elements and relationships
@@ -174,11 +162,9 @@ export function parseGraph(graph, onProgress) {
   /** @type {Array<string>} */
   const generatedArtifacts = [];
 
-  // SPDX 3.0 ExternalMap: elements an SpdxDocument references but defines
-  // elsewhere (its `import` array). Keyed by externalSpdxId and merged across
-  // documents, so loading a single file (e.g. Zephyr's build.jsonld) still
-  // resolves where its dangling references live, and loading the whole set
-  // records the cross-document provenance of each shared element.
+  // ExternalMap: elements an SpdxDocument references but defines elsewhere (its
+  // `import` array), keyed by externalSpdxId and merged across documents, so
+  // loading a single document still resolves references defined in another.
   /** @type {Map<string, ExternalMapEntry>} */
   const externalMap = new Map();
 
@@ -209,8 +195,7 @@ export function parseGraph(graph, onProgress) {
   const seen = new Set();
 
   // `creationInfo` is either an inline object or a string reference to a
-  // standalone CreationInfo element (identified by `@id`, e.g. `_:creationinfo`
-  // — the form the Linux kernel and Yocto producers emit).
+  // standalone CreationInfo element identified by `@id`.
   const resolveCreationInfo = (el) => {
     const ci = el?.creationInfo;
     if (typeof ci === 'string') return elementMap.get(ci) || null;
@@ -237,44 +222,24 @@ export function parseGraph(graph, onProgress) {
       seen.add(item.spdxId);
     }
 
-    switch (item.type) {
-      // AI model / dataset packages are software_Package subclasses (AI profile);
-      // categorize them as packages so they flow through the packages view and
-      // graph, keeping their own type for AI/dataset-specific styling.
-      case ELEMENT_TYPES.PACKAGE:
-      case ELEMENT_TYPES.AI_PACKAGE:
-      case ELEMENT_TYPES.DATASET_PACKAGE:
+    // Categorize by the element's place in the class hierarchy, so subclasses
+    // fall into their bucket automatically.
+    switch (bucketOf(item.type)) {
+      case BUCKET.PACKAGES:
         packages.push(item);
         break;
 
-      case ELEMENT_TYPES.FILE:
+      case BUCKET.FILES:
         files.push(item);
         break;
 
-      // Hardware profile (SPDX 3.1): PhysicalHardware / BulkHardware /
-      // VirtualHardware (and the abstract Hardware base) are their own category,
-      // surfaced in the Hardware tab and graph.
-      case ELEMENT_TYPES.HARDWARE:
-      case ELEMENT_TYPES.HARDWARE_PHYSICAL:
-      case ELEMENT_TYPES.HARDWARE_BULK:
-      case ELEMENT_TYPES.HARDWARE_VIRTUAL:
+      case BUCKET.HARDWARE:
         hardware.push(item);
         break;
 
-      // FunctionalSafety profile (SPDX 3.1): the Core Requirement ("shall"
-      // statements) and the safety lifecycle artifacts around it, all surfaced in
-      // the Requirements tab and graph.
-      case ELEMENT_TYPES.REQUIREMENT:
-      case ELEMENT_TYPES.FS_VERIFICATION:
-      case ELEMENT_TYPES.FS_ASSUMPTION:
+      case BUCKET.REQUIREMENTS:
         requirements.push(item);
-        break;
-
-      case ELEMENT_TYPES.FS_EVALUATION:
-        requirements.push(item);
-        // evaluationBasedOn is a property, not a Relationship. Synthesize an edge
-        // so the EvaluationResult ↔ RequirementVerification link is drawn in the
-        // graph and grouped in the detail panel like any other relationship.
+        // evaluationBasedOn is a property, not a Relationship; synthesize an edge.
         if (item.functionalsafety_evaluationBasedOn) {
           relationships.push({
             type: 'Relationship',
@@ -286,60 +251,50 @@ export function parseGraph(graph, onProgress) {
         }
         break;
 
-      case ELEMENT_TYPES.TOOL:
+      case BUCKET.TOOLS:
         tools.push(item);
         break;
 
-      // EvidenceRelationship (FunctionalSafety) is a Relationship subclass
-      // (from/to/relationshipType), so it flows through the generic relationship
-      // handling + graph edges alongside the Core relationship classes.
-      case ELEMENT_TYPES.RELATIONSHIP:
-      case ELEMENT_TYPES.LIFECYCLE_RELATIONSHIP:
-      case ELEMENT_TYPES.FS_EVIDENCE_RELATIONSHIP:
+      case BUCKET.RELATIONSHIPS:
         relationships.push(item);
         break;
 
-      case ELEMENT_TYPES.BUILD:
+      case BUCKET.BUILDS:
         builds.push(item);
         break;
 
-      case ELEMENT_TYPES.VULNERABILITY:
+      case BUCKET.VULNERABILITIES:
         vulnerabilities.push(item);
         break;
 
-      case VEX_TYPES.FIXED:
-      case VEX_TYPES.NOT_AFFECTED:
-      case VEX_TYPES.AFFECTED:
-      case VEX_TYPES.UNDER_INVESTIGATION:
+      case BUCKET.VEX:
         vexRelationships.push(item);
         break;
 
-      case ELEMENT_TYPES.AGENT:
-        agentInfo = agentInfo || item;
+      case BUCKET.AGENTS:
+        // Prefer a SoftwareAgent, else an Organization/Person; ignore a bare Agent.
+        if (isA(item.type, CLASS.SoftwareAgent)) agentInfo = agentInfo || item;
+        else if (isA(item.type, CLASS.Organization) || isA(item.type, CLASS.Person)) {
+          orgInfo = orgInfo || item;
+        }
         break;
 
-      case ELEMENT_TYPES.ORGANIZATION:
-      case ELEMENT_TYPES.PERSON:
-        orgInfo = orgInfo || item;
-        break;
-
-      case ELEMENT_TYPES.SBOM:
+      case BUCKET.SBOMS:
         sboms.push(item);
         break;
 
-      case ELEMENT_TYPES.CREATION_INFO:
+      case BUCKET.CREATION_INFO:
         anyCreationInfo = anyCreationInfo || item;
         break;
 
-      case ELEMENT_TYPES.DOCUMENT: {
+      case BUCKET.DOCUMENTS: {
         // Merge document metadata: accumulate profiles, keep first values
         if (!docName) docName = item.name || '';
         if (!docNamespace) docNamespace = item.namespaceMap?.[0]?.namespace || '';
 
-        // Record the document's imported (external) elements. The first entry
-        // seen for an id keeps its location hint / defining artifact / integrity
-        // hashes; later documents importing the same id just add themselves to
-        // `importedBy`.
+        // Record imported (external) elements. The first entry seen for an id
+        // keeps its location hint / defining artifact / integrity hashes; later
+        // documents importing the same id just add themselves to `importedBy`.
         const docLabel = item.name || item.spdxId || '';
         (item.import || []).forEach((em) => {
           const id = em?.externalSpdxId;
@@ -386,14 +341,12 @@ export function parseGraph(graph, onProgress) {
     }
   });
 
-  // Fallbacks when no SpdxDocument carried the metadata (or its creationInfo
-  // could not be resolved): use any CreationInfo present in the graph.
+  // Fallback when no SpdxDocument carried the metadata: use any CreationInfo.
   if (!createdDate) createdDate = anyCreationInfo?.created || '';
   if (!specVersion) specVersion = anyCreationInfo?.specVersion || '';
 
-  // Documents without a name (e.g. the Linux kernel SBOMs): fall back to the
-  // name of an SBOM element or of one of the SBOMs' root elements, preferring a
-  // root Package (e.g. "Linux Kernel (bzImage)") over a root source-tree File.
+  // Documents without a name: fall back to the name of an SBOM element or of a
+  // SBOM root element, preferring a root Package over a root File.
   if (!docName) {
     const named = sboms.find((sbom) => sbom.name);
     const roots = sboms
@@ -402,13 +355,12 @@ export function parseGraph(graph, onProgress) {
       .filter((el) => el?.name);
     docName =
       named?.name ||
-      roots.find((el) => el.type === ELEMENT_TYPES.PACKAGE)?.name ||
+      roots.find((el) => isA(el.type, CLASS.software_Package))?.name ||
       roots[0]?.name ||
       '';
   }
 
-  // SBOM lifecycle types declared by software_Sbom elements (source / build /
-  // deployed / …) — surfaced as chips next to the profile conformance list.
+  // SBOM lifecycle types declared by software_Sbom elements.
   const sbomTypes = [];
   sboms.forEach((sbom) => {
     (sbom.software_sbomType || []).forEach((type) => {
@@ -416,15 +368,13 @@ export function parseGraph(graph, onProgress) {
     });
   });
 
-  // Who/what produced the documents, resolved from the documents' CreationInfo
-  // (falls back to every CreationInfo when documents carry none).
+  // Who/what produced the documents, resolved from their CreationInfo.
   const { creators, creatorTools } = collectCreators(
     docCreationInfos.length ? docCreationInfos : anyCreationInfo ? [anyCreationInfo] : [],
     elementMap
   );
 
-  // Prefer a SoftwareAgent, but surface an Organization/Person creator
-  // (e.g. Yocto's "OpenEmbedded") when that is all the SBOM declares.
+  // Prefer a SoftwareAgent, but fall back to an Organization/Person creator.
   agentInfo = agentInfo || orgInfo;
 
   // Separate build configs from regular files
@@ -442,7 +392,7 @@ export function parseGraph(graph, onProgress) {
   relationships.forEach((rel) => {
     if (
       rel.relationshipType === RELATIONSHIP_TYPES.ANCESTOR_OF &&
-      elementMap.get(rel.from)?.type === ELEMENT_TYPES.BUILD
+      isA(elementMap.get(rel.from)?.type, CLASS.build_Build)
     ) {
       rootBuildIds.add(rel.from);
     }
@@ -472,10 +422,8 @@ export function parseGraph(graph, onProgress) {
     }
   });
 
-  // Summarize how many imported (ExternalMap) elements are actually present in
-  // the loaded graph vs. still external. When the whole document set is loaded
-  // most resolve; loading a single file leaves them unresolved but now carrying
-  // a location hint to where they're defined.
+  // Summarize how many imported (ExternalMap) elements are present in the
+  // loaded graph vs. still external.
   let externalResolved = 0;
   externalMap.forEach((_, id) => {
     if (elementMap.has(id)) externalResolved++;
@@ -486,16 +434,15 @@ export function parseGraph(graph, onProgress) {
     unresolved: externalMap.size - externalResolved
   };
 
-  // Collect all licenses used across the SBOM, derived from license
-  // relationships so we capture URL-only and NoAssertion targets too.
+  // Collect licenses from license relationships, so URL-only and NoAssertion
+  // targets are captured too.
   const licenses = collectLicenses(relationships, elementMap);
 
   // Build the VEX model: enriched vulnerabilities + vuln↔package indexes.
   const vex = buildVexModel(vulnerabilities, vexRelationships, elementMap);
 
-  // Which node/relationship types actually occur in this dataset. The graph
-  // legend uses these to hide entries for types the SBOM doesn't contain, so it
-  // doesn't grow a long list of irrelevant toggles.
+  // Which node/relationship types actually occur, so the graph legend can hide
+  // entries for types the SBOM doesn't contain.
   const { presentNodeTypes, presentRelTypes } = computePresentTypes({
     packages,
     regularFiles,
@@ -545,10 +492,6 @@ export function parseGraph(graph, onProgress) {
   };
 }
 
-/* ==========================================================================
-   Creator Collection
-   ========================================================================== */
-
 /**
  * Resolves the agents (createdBy) and tools (createdUsing) referenced by the
  * documents' CreationInfo records into displayable {id, name, type} entries.
@@ -578,10 +521,6 @@ function collectCreators(creationInfos, elementMap) {
 
   return { creators: collect('createdBy'), creatorTools: collect('createdUsing') };
 }
-
-/* ==========================================================================
-   VEX Model
-   ========================================================================== */
 
 /**
  * @typedef {Object} VexAssessment
@@ -677,8 +616,8 @@ function buildVexModel(vulnerabilities, vexRelationships, elementMap) {
     const assessments = vexByVuln.get(el.spdxId) || [];
     const cveId = getVulnerabilityId(el);
 
-    // Count distinct packages per status (a vuln can hit the same package via
-    // more than one VEX record; don't double-count).
+    // Count distinct packages per status; a vuln can hit the same package via
+    // more than one VEX record, so don't double-count.
     const pkgsByStatus = {};
     let overallStatus = null;
     assessments.forEach((a) => {
@@ -687,6 +626,7 @@ function buildVexModel(vulnerabilities, vexRelationships, elementMap) {
         overallStatus = a.status;
       }
     });
+    /** @type {Record<string, number>} */
     const statusCounts = {};
     Object.keys(pkgsByStatus).forEach((s) => (statusCounts[s] = pkgsByStatus[s].size));
     const packageCount = new Set(assessments.map((a) => a.packageId)).size;
@@ -699,8 +639,7 @@ function buildVexModel(vulnerabilities, vexRelationships, elementMap) {
       locators: getVulnerabilityLocators(el),
       assessments,
       statusCounts,
-      // A vulnerability with no VEX assessment is "unknown" (present in the SBOM
-      // but not connected to a package by a VEX status) — never assume "fixed".
+      // A vulnerability with no VEX assessment is "unknown", never "fixed".
       overallStatus: overallStatus || 'unknown',
       packageCount
     };
@@ -718,10 +657,10 @@ function buildVexModel(vulnerabilities, vexRelationships, elementMap) {
 function computePresentTypes(data) {
   const nodeTypes = new Set();
   // packages holds plain software_Package plus its AI/dataset subclasses; split
-  // them so the legend only lists the node types actually present.
+  // them so the legend lists the actual node types.
   data.packages.forEach((p) => {
-    if (p.type === ELEMENT_TYPES.AI_PACKAGE) nodeTypes.add('ai');
-    else if (p.type === ELEMENT_TYPES.DATASET_PACKAGE) nodeTypes.add('dataset');
+    if (isA(p.type, CLASS.ai_AIPackage)) nodeTypes.add('ai');
+    else if (isA(p.type, CLASS.dataset_DatasetPackage)) nodeTypes.add('dataset');
     else nodeTypes.add('package');
   });
   if (data.regularFiles.length) nodeTypes.add('file');
@@ -736,9 +675,8 @@ function computePresentTypes(data) {
   data.relationships.forEach((r) => r.relationshipType && relTypes.add(r.relationshipType));
   data.vexRelationships.forEach((r) => r.relationshipType && relTypes.add(r.relationshipType));
 
-  // "External" nodes are placeholders the graph creates for drawn relationship
-  // endpoints that resolve to nothing in the element map (and aren't license
-  // URLs / NoAssertion). Detect whether any such endpoint exists.
+  // "External" nodes are placeholders for relationship endpoints that resolve
+  // to nothing in the element map (and aren't license URLs / NoAssertion).
   const isExternal = (id) =>
     id && !data.elementMap.has(id) && !/^https?:\/\//i.test(id) && !id.includes('NoAssertion');
   const hasExternal = data.relationships.some((rel) => {
@@ -755,10 +693,6 @@ function computePresentTypes(data) {
 
   return { presentNodeTypes: [...nodeTypes], presentRelTypes: [...relTypes] };
 }
-
-/* ==========================================================================
-   License Collection
-   ========================================================================== */
 
 /**
  * Resolves a human-readable label for a license target id.
@@ -798,10 +732,8 @@ function resolveLicenseLabel(id, elementMap) {
 function collectLicenses(relationships, elementMap) {
   const byId = new Map();
 
-  // declaredBy/concludedBy are accumulated as Sets (a popular license can be
-  // declared by tens of thousands of files, so an includes()-based dedup would
-  // be O(n²)); they're converted back to arrays once at the end so callers keep
-  // seeing plain arrays. Set iteration preserves insertion order.
+  // declaredBy/concludedBy are accumulated as Sets so dedup stays O(1) even for
+  // a popular license, then converted back to arrays at the end for callers.
   const ensure = (id) => {
     if (!byId.has(id)) {
       byId.set(id, {
@@ -839,10 +771,6 @@ function collectLicenses(relationships, elementMap) {
   licenses.sort((a, b) => b.userCount - a.userCount || a.label.localeCompare(b.label));
   return licenses;
 }
-
-/* ==========================================================================
-   Relationship Index Builder
-   ========================================================================== */
 
 /**
  * Builds relationship indexes for efficient lookups
@@ -884,17 +812,10 @@ export function buildRelationshipIndexes(relationships, onProgress) {
   const licenseUsersSeen = new Map(); // target -> Set<'from\tkind'>
 
   // Pushes a value into a Map<string, Array> bucket, skipping duplicates.
-  // SPDX producers (e.g. Zephyr) may emit the same logical edge more than once
-  // as distinct Relationship records. These duplicates would otherwise inflate
-  // dependency/dependent counts and, because the UI renders the lists with a
-  // keyed x-for, break rendering entirely on duplicate keys.
-  //
-  // Dedup is backed by a companion Set per (map, key) rather than
-  // `bucket.includes()`: a single hub can fan out to tens of thousands of edges
-  // (e.g. one package that `contains` every file in a large SBOM), which turns
-  // an includes()-scan-per-insert into O(n²) — the dominant cost when indexing
-  // big SBOMs. The Set keeps each insert O(1) while preserving insertion order
-  // and the array-valued output the rest of the app consumes.
+  // Producers may emit the same logical edge more than once; unchecked, these
+  // inflate counts and break the UI's keyed rendering on duplicate keys.
+  // Dedup via a companion Set per (map, key): a hub can fan out to many edges,
+  // so avoid an O(n^2) includes() scan while keeping insertion-ordered arrays.
   const seenByMap = new Map(); // index map -> (key -> Set<value>)
   const pushUnique = (map, key, value) => {
     let perKey = seenByMap.get(map);
@@ -1024,9 +945,8 @@ export function buildRelationshipIndexes(relationships, onProgress) {
             licenseUsersSeen.set(target, licSet);
             licenseUsersIndex.set(target, []);
           }
-          // A single license can be declared/concluded by tens of thousands of
-          // files; dedup on a Set (keyed by from+kind) instead of .some() so a
-          // popular license doesn't turn this into an O(n²) scan.
+          // Dedup on a Set keyed by from+kind so a popular license doesn't
+          // turn this into an O(n^2) scan.
           const seenKey = from + '\t' + kind;
           if (!licSet.has(seenKey)) {
             licSet.add(seenKey);
@@ -1060,11 +980,6 @@ export function buildRelationshipIndexes(relationships, onProgress) {
     licenseUsersIndex
   };
 }
-
-/* ==========================================================================
-   Index Accessor Functions
-   Helper functions to safely access indexes
-   ========================================================================== */
 
 /**
  * Creates accessor functions for relationship indexes
@@ -1196,11 +1111,6 @@ export function createIndexAccessors(indexes) {
   };
 }
 
-/* ==========================================================================
-   Statistics Functions
-   Functions to compute statistics from parsed data
-   ========================================================================== */
-
 /**
  * Computes relationship type counts and percentages
  *
@@ -1222,8 +1132,7 @@ export function computeRelationshipTypeCounts(relationships) {
       type,
       count,
       pct: total ? ((count / total) * 100).toFixed(1) : '0.0',
-      // Single source of truth for edge colours (shared with the graph + detail
-      // panel) so every surface agrees on a relationship type's colour.
+      // Single source of truth for edge colours across every surface.
       color: getRelationshipColor(type)
     }));
 }

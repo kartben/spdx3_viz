@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 
-import { buildRelationshipIndexes, parseGraph } from '../js/parser.js';
+import { buildRelationshipIndexes, parseGraph } from '../src/parser/parser.js';
 import {
   parseBuildParameters,
   extractLicenseExpressionParts,
@@ -17,8 +17,8 @@ import {
   getCdxProperties,
   getRelationshipColor,
   getRelationshipGroupLabel
-} from '../js/utils.js';
-import { spdxApp } from '../js/app.js';
+} from '../src/lib/index.js';
+import { spdxApp } from '../src/app.js';
 
 const fixtureGraph = [
   { type: 'software_Package', spdxId: 'pkg:kernel', name: 'Kernel' },
