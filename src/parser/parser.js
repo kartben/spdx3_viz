@@ -171,6 +171,9 @@ export function parseGraph(graph, onProgress) {
   /** @type {Object|null} */
   let buildInfo = null;
 
+  /** @type {Array<Object>} - All Agent elements (SoftwareAgent / Organization / Person) */
+  const agents = [];
+
   /** @type {Object|null} */
   let agentInfo = null;
 
@@ -272,7 +275,10 @@ export function parseGraph(graph, onProgress) {
         break;
 
       case BUCKET.AGENTS:
-        // Prefer a SoftwareAgent, else an Organization/Person; ignore a bare Agent.
+        // Keep every agent for the graph's "created by" edges (creationInfo →
+        // agent), and pick a representative for the document metadata:
+        // prefer a SoftwareAgent, else an Organization/Person; ignore a bare Agent.
+        agents.push(item);
         if (isA(item.type, CLASS.SoftwareAgent)) agentInfo = agentInfo || item;
         else if (isA(item.type, CLASS.Organization) || isA(item.type, CLASS.Person)) {
           orgInfo = orgInfo || item;
@@ -451,9 +457,11 @@ export function parseGraph(graph, onProgress) {
     tools,
     builds,
     buildConfigs,
+    agents,
     vulnerabilities,
     relationships,
     vexRelationships,
+    resolveCreationInfo,
     elementMap
   });
 
@@ -469,6 +477,7 @@ export function parseGraph(graph, onProgress) {
     buildConfigs,
     buildInfo,
     agentInfo,
+    agents,
     sboms,
     sbomTypes,
     creators,
@@ -669,11 +678,29 @@ function computePresentTypes(data) {
   if (data.tools.length) nodeTypes.add('tool');
   if (data.builds.length) nodeTypes.add('build');
   if (data.buildConfigs.length) nodeTypes.add('config');
+  if (data.agents?.length) nodeTypes.add('agent');
   if (data.vulnerabilities.length) nodeTypes.add('vulnerability');
 
   const relTypes = new Set();
   data.relationships.forEach((r) => r.relationshipType && relTypes.add(r.relationshipType));
   data.vexRelationships.forEach((r) => r.relationshipType && relTypes.add(r.relationshipType));
+
+  // "createdBy" edges are synthesized in the graph from each element's
+  // CreationInfo (element → creating agent), so list the type when any graph-node
+  // element names a creator agent.
+  const createdByHosts = [
+    ...data.packages,
+    ...data.regularFiles,
+    ...data.hardware,
+    ...data.requirements,
+    ...data.tools,
+    ...data.builds,
+    ...data.buildConfigs
+  ];
+  const hasCreatedBy = createdByHosts.some(
+    (el) => data.resolveCreationInfo(el)?.createdBy?.length
+  );
+  if (hasCreatedBy) relTypes.add('createdBy');
 
   // "External" nodes are placeholders for relationship endpoints that resolve
   // to nothing in the element map (and aren't license URLs / NoAssertion).

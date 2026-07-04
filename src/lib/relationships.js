@@ -43,6 +43,7 @@ export function getRelationshipColor(relType) {
     conformsTo: COLORS.requirement,
     evaluationBasedOn: COLORS.requirement,
     configures: COLORS.config,
+    createdBy: COLORS.createdBy,
     hasConcludedLicense: COLORS.license,
     hasDeclaredLicense: COLORS.license,
     trainedOn: COLORS.ai,

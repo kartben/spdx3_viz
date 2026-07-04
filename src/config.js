@@ -61,7 +61,11 @@ export const RELATIONSHIP_TYPES = {
   FIXED_IN: 'fixedIn',
   DOES_NOT_AFFECT: 'doesNotAffect',
   AFFECTS: 'affects',
-  UNDER_INVESTIGATION: 'underInvestigation'
+  UNDER_INVESTIGATION: 'underInvestigation',
+  // Synthesized in the graph from each element's CreationInfo.createdBy so the
+  // agent (Person / Organization / SoftwareAgent) that created an element shows
+  // as an edge (element → agent).
+  CREATED_BY: 'createdBy'
 };
 
 /**
@@ -148,6 +152,8 @@ export const COLORS = {
   buildOutput: '#22c55e',
   buildLineage: '#a78bfa',
   agent: '#ef4444',
+  // "createdBy" provenance edges tint to the agent colour they point at.
+  createdBy: '#ef4444',
   config: '#14b8a6',
   license: '#ec4899',
   distribution: '#38bdf8',
@@ -181,6 +187,7 @@ export function createGraphFilters() {
     { key: 'tool', label: 'Tools', color: COLORS.tool, active: true },
     { key: 'build', label: 'Build', color: COLORS.build, active: true },
     { key: 'config', label: 'Configs', color: COLORS.config, active: true },
+    { key: 'agent', label: 'Agents', color: COLORS.agent, active: true },
     { key: 'external', label: 'External', color: COLORS.external, active: true },
     // Vulnerabilities start off to avoid swamping the graph; auto-enabled on load
     // for small VEX sets (see VEX_AUTO_SHOW_MAX), otherwise opted in from the legend.
@@ -251,6 +258,15 @@ export function createGraphFilters() {
       lineStyle: 'dashed'
     },
     { key: 'configures', label: 'configures', color: COLORS.config, active: true, isRel: true },
+    // Provenance edge synthesized from CreationInfo.createdBy (element → agent).
+    {
+      key: 'createdBy',
+      label: 'createdBy',
+      color: COLORS.createdBy,
+      active: true,
+      isRel: true,
+      lineStyle: 'dotted'
+    },
     // FunctionalSafety profile relationship edges.
     {
       key: 'implementedBy',
@@ -474,7 +490,9 @@ export const RELATIONSHIP_LABELS = {
   'hasConcludedLicense:out': 'Concluded license',
   'hasConcludedLicense:in': 'Licensed (concluded)',
   'hasDeclaredLicense:out': 'Declared license',
-  'hasDeclaredLicense:in': 'Licensed (declared)'
+  'hasDeclaredLicense:in': 'Licensed (declared)',
+  'createdBy:out': 'Created by',
+  'createdBy:in': 'Creator of'
 };
 
 /**
