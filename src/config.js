@@ -190,7 +190,7 @@ export function createGraphFilters() {
     { key: 'dataset', label: 'Datasets', color: COLORS.dataset, active: true },
     { key: 'file', label: 'Files', color: COLORS.file, active: true },
     { key: 'hardware', label: 'Hardware', color: COLORS.hardware, active: true },
-    { key: 'requirement', label: 'Requirements', color: COLORS.requirement, active: true },
+    { key: 'requirement', label: 'Functional Safety', color: COLORS.requirement, active: true },
     { key: 'tool', label: 'Tools', color: COLORS.tool, active: true },
     { key: 'build', label: 'Build', color: COLORS.build, active: true },
     { key: 'config', label: 'Configs', color: COLORS.config, active: true },
@@ -301,22 +301,11 @@ export function createGraphFilters() {
       isRel: true,
       lineStyle: 'dotted'
     },
-    // FunctionalSafety profile relationship edges.
-    {
-      key: 'implementedBy',
-      label: 'implementedBy',
-      color: COLORS.requirement,
-      active: true,
-      isRel: true
-    },
-    {
-      key: 'verifiedBy',
-      label: 'verifiedBy',
-      color: COLORS.requirement,
-      active: true,
-      isRel: true,
-      lineStyle: 'dashed'
-    },
+    // FunctionalSafety profile relationship edges. All share the same yellow
+    // (they're one profile), so each gets its own dash pattern below —
+    // otherwise seven relationship types would be indistinguishable on the
+    // graph canvas (see dashPatternFor in graph-view.js, which draws these
+    // patterns; keep the two in sync).
     {
       key: 'hasRequirement',
       label: 'hasRequirement',
@@ -325,12 +314,28 @@ export function createGraphFilters() {
       isRel: true
     },
     {
+      key: 'implementedBy',
+      label: 'implementedBy',
+      color: COLORS.requirement,
+      active: true,
+      isRel: true,
+      lineStyle: 'dashed'
+    },
+    {
+      key: 'verifiedBy',
+      label: 'verifiedBy',
+      color: COLORS.requirement,
+      active: true,
+      isRel: true,
+      lineStyle: 'dotted'
+    },
+    {
       key: 'hasEvidence',
       label: 'hasEvidence',
       color: COLORS.requirement,
       active: true,
       isRel: true,
-      lineStyle: 'dotted'
+      lineStyle: 'finedot'
     },
     {
       key: 'assumes',
@@ -346,7 +351,7 @@ export function createGraphFilters() {
       color: COLORS.requirement,
       active: true,
       isRel: true,
-      lineStyle: 'dashed'
+      lineStyle: 'longdash'
     },
     {
       key: 'evaluationBasedOn',
@@ -354,7 +359,7 @@ export function createGraphFilters() {
       color: COLORS.requirement,
       active: true,
       isRel: true,
-      lineStyle: 'dotted'
+      lineStyle: 'dashdotdot'
     },
     // Explicit relationship (not synthesized) naming who carried out a
     // verification/evaluation; tinted the agent colour like the other

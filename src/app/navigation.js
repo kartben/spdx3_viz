@@ -400,7 +400,7 @@ export const navigationMixin = {
       case 'functionalsafety_RequirementVerification':
       case 'functionalsafety_Assumption':
       case 'functionalsafety_EvaluationResult':
-        return { label: 'Requirements' };
+        return { label: 'Functional Safety' };
       case 'build_Build':
         return { label: 'Builds' };
       case 'Tool':

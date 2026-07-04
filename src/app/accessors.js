@@ -190,10 +190,16 @@ export const accessorsMixin = {
     switch (filter.lineStyle) {
       case 'dotted':
         return `background-image: repeating-linear-gradient(to right, ${c} 0 2px, transparent 2px 4px)`;
+      case 'finedot':
+        return `background-image: repeating-linear-gradient(to right, ${c} 0 1.5px, transparent 1.5px 3px)`;
       case 'dashed':
         return `background-image: repeating-linear-gradient(to right, ${c} 0 5px, transparent 5px 8px)`;
+      case 'longdash':
+        return `background-image: repeating-linear-gradient(to right, ${c} 0 8px, transparent 8px 12px)`;
       case 'dashdot':
         return `background-image: repeating-linear-gradient(to right, ${c} 0 5px, transparent 5px 7px, ${c} 7px 8px, transparent 8px 10px)`;
+      case 'dashdotdot':
+        return `background-image: repeating-linear-gradient(to right, ${c} 0 5px, transparent 5px 7px, ${c} 7px 8px, transparent 8px 9px, ${c} 9px 10px, transparent 10px 12px)`;
       default:
         return `background:${c}`;
     }

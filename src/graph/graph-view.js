@@ -32,17 +32,29 @@ const CULL_PAD = 80;
 function dashPatternFor(type, lineWidth, k) {
   switch (type) {
     case 'usesTool':
+    case 'verifiedBy':
       return [lineWidth, 4 / k];
     case 'hasDynamicLink':
+    case 'implementedBy':
       return [7 / k, 5 / k];
+    case 'conformsTo':
+      // Longer dash than implementedBy so the two FunctionalSafety "dashed" edges don't read as one.
+      return [12 / k, 6 / k];
     case 'hasOptionalComponent':
+    case 'assumes':
       return [8 / k, 4 / k, lineWidth, 4 / k];
+    case 'evaluationBasedOn':
+      // Dash-dot-dot: one dash longer beat than assumes' dash-dot.
+      return [8 / k, 3 / k, lineWidth, 3 / k, lineWidth, 3 / k];
     case 'createdBy':
     case 'suppliedBy':
     case 'originatedBy':
     case 'manufacturedBy':
       // Fine dots read as a lightweight provenance link, distinct from structural edges.
       return [lineWidth, 3 / k];
+    case 'hasEvidence':
+      // Denser than the provenance dots above so it doesn't read as the same edge kind.
+      return [lineWidth, 2 / k];
     default:
       return null;
   }

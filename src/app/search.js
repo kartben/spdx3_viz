@@ -13,7 +13,7 @@ const SEARCH_TYPE_LABELS = {
   dataset: 'Dataset',
   file: 'File',
   hardware: 'Hardware',
-  requirement: 'Requirement',
+  requirement: 'Functional Safety',
   config: 'Build config',
   build: 'Build',
   tool: 'Tool',
