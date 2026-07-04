@@ -1,0 +1,4170 @@
+{
+ "@context": "https://spdx.org/rdf/3.1/spdx-context.jsonld",
+ "@graph": [
+  {
+   "type": "SpdxDocument",
+   "spdxId": "bms:documents/aurora-bms-functional-safety",
+   "creationInfo": "bms:creationinfo",
+   "name": "Aurora BMS Functional Safety SBOM",
+   "comment": "SYNTHETIC / FICTIONAL example data. The Aurora BMS, Northwind Mobility, all requirements, verifications, evaluations and part numbers are invented to demonstrate the SPDX 3.1 FunctionalSafety profile. Not a real product or safety case.",
+   "dataLicense": "https://spdx.org/licenses/CC0-1.0",
+   "profileConformance": [
+    "core",
+    "software",
+    "functionalSafety"
+   ],
+   "namespaceMap": [
+    {
+     "type": "NamespaceMap",
+     "prefix": "bms",
+     "namespace": "http://spdx.org/spdxdocs/aurora-bms-3f1c8e2a-9b4d-4c7e-8a1f-2d6b0e9c4a5f/"
+    }
+   ],
+   "rootElement": [
+    "bms:packages/aurora-bms"
+   ],
+   "element": [
+    "bms:packages/aurora-bms",
+    "bms:packages/safety-monitor",
+    "bms:packages/cell-measurement-driver",
+    "bms:packages/contactor-control",
+    "bms:packages/e2e-comm-stack",
+    "bms:packages/isolation-monitor",
+    "bms:packages/diagnostics",
+    "bms:packages/hal-mcu",
+    "bms:packages/bootloader",
+    "bms:packages/microos-rtos",
+    "bms:requirements/SG-01",
+    "bms:requirements/SG-02",
+    "bms:requirements/SG-03",
+    "bms:requirements/SG-04",
+    "bms:requirements/SG-05",
+    "bms:requirements/FSR-01-1",
+    "bms:requirements/FSR-01-2",
+    "bms:requirements/FSR-01-3",
+    "bms:requirements/FSR-02-1",
+    "bms:requirements/FSR-02-2",
+    "bms:requirements/FSR-03-1",
+    "bms:requirements/FSR-03-2",
+    "bms:requirements/FSR-04-1",
+    "bms:requirements/FSR-04-2",
+    "bms:requirements/FSR-05-1",
+    "bms:requirements/FSR-05-2",
+    "bms:requirements/TSR-01-1",
+    "bms:requirements/TSR-01-2",
+    "bms:requirements/TSR-01-3",
+    "bms:requirements/TSR-02-1",
+    "bms:requirements/TSR-02-2",
+    "bms:requirements/TSR-03-1",
+    "bms:requirements/TSR-03-2",
+    "bms:requirements/TSR-04-1",
+    "bms:requirements/TSR-04-2",
+    "bms:requirements/TSR-04-3",
+    "bms:requirements/TSR-05-1",
+    "bms:requirements/TSR-06-1",
+    "bms:requirements/TSR-06-2",
+    "bms:requirements/TSR-06-3",
+    "bms:assumptions/AOU-1",
+    "bms:assumptions/AOU-2",
+    "bms:assumptions/AOU-3",
+    "bms:assumptions/AOU-4",
+    "bms:assumptions/AOU-5",
+    "bms:assumptions/AOU-6",
+    "bms:requirements/SWR-01-1",
+    "bms:files/src/cell_voltage_acq",
+    "bms:verifications/VER-SWR-01-1",
+    "bms:evaluations/EVAL-SWR-01-1",
+    "bms:files/evidence/SWR-01-1",
+    "bms:relationships/rel-40",
+    "bms:requirements/SWR-01-2",
+    "bms:files/src/voltage_plausibility",
+    "bms:verifications/VER-SWR-01-2",
+    "bms:evaluations/EVAL-SWR-01-2",
+    "bms:requirements/SWR-01-3",
+    "bms:files/src/over_voltage_monitor",
+    "bms:verifications/VER-SWR-01-3",
+    "bms:evaluations/EVAL-SWR-01-3",
+    "bms:files/evidence/SWR-01-3",
+    "bms:relationships/rel-50",
+    "bms:requirements/SWR-01-4",
+    "bms:files/src/measurement_crc",
+    "bms:verifications/VER-SWR-01-4",
+    "bms:evaluations/EVAL-SWR-01-4",
+    "bms:requirements/SWR-02-1",
+    "bms:files/src/temperature_acq",
+    "bms:verifications/VER-SWR-02-1",
+    "bms:evaluations/EVAL-SWR-02-1",
+    "bms:requirements/SWR-02-2",
+    "bms:files/src/over_temperature_monitor",
+    "bms:verifications/VER-SWR-02-2",
+    "bms:evaluations/EVAL-SWR-02-2",
+    "bms:files/evidence/SWR-02-2",
+    "bms:relationships/rel-63",
+    "bms:requirements/SWR-03-1",
+    "bms:files/src/current_acq",
+    "bms:verifications/VER-SWR-03-1",
+    "bms:evaluations/EVAL-SWR-03-1",
+    "bms:requirements/SWR-03-2",
+    "bms:files/src/over_current_monitor",
+    "bms:verifications/VER-SWR-03-2",
+    "bms:evaluations/EVAL-SWR-03-2",
+    "bms:files/evidence/SWR-03-2",
+    "bms:relationships/rel-72",
+    "bms:requirements/SWR-03-3",
+    "bms:files/src/soc_estimator",
+    "bms:verifications/VER-SWR-03-3",
+    "bms:evaluations/EVAL-SWR-03-3",
+    "bms:requirements/SWR-04-1",
+    "bms:files/src/window_watchdog",
+    "bms:verifications/VER-SWR-04-1",
+    "bms:evaluations/EVAL-SWR-04-1",
+    "bms:files/evidence/SWR-04-1",
+    "bms:relationships/rel-81",
+    "bms:requirements/SWR-04-2",
+    "bms:files/src/safety_manager",
+    "bms:verifications/VER-SWR-04-2",
+    "bms:evaluations/EVAL-SWR-04-2",
+    "bms:files/evidence/SWR-04-2",
+    "bms:relationships/rel-87",
+    "bms:requirements/SWR-04-3",
+    "bms:files/src/fault_memory",
+    "bms:verifications/VER-SWR-04-3",
+    "bms:evaluations/EVAL-SWR-04-3",
+    "bms:requirements/SWR-04-4",
+    "bms:files/src/contactor_driver",
+    "bms:verifications/VER-SWR-04-4",
+    "bms:evaluations/EVAL-SWR-04-4",
+    "bms:files/evidence/SWR-04-4",
+    "bms:relationships/rel-98",
+    "bms:requirements/SWR-04-5",
+    "bms:files/src/weld_detection",
+    "bms:verifications/VER-SWR-04-5",
+    "bms:evaluations/EVAL-SWR-04-5",
+    "bms:requirements/SWR-06-1",
+    "bms:files/src/e2e_protection",
+    "bms:verifications/VER-SWR-06-1",
+    "bms:evaluations/EVAL-SWR-06-1",
+    "bms:files/evidence/SWR-06-1",
+    "bms:relationships/rel-107",
+    "bms:requirements/SWR-06-2",
+    "bms:files/src/e2e_check",
+    "bms:verifications/VER-SWR-06-2",
+    "bms:evaluations/EVAL-SWR-06-2",
+    "bms:requirements/SWR-06-3",
+    "bms:files/src/adc_selftest",
+    "bms:verifications/VER-SWR-06-3",
+    "bms:evaluations/EVAL-SWR-06-3",
+    "bms:files/evidence/SWR-06-3",
+    "bms:relationships/rel-116",
+    "bms:requirements/SWR-05-1",
+    "bms:files/src/isolation_monitor",
+    "bms:verifications/VER-SWR-05-1",
+    "bms:evaluations/EVAL-SWR-05-1",
+    "bms:files/evidence/SWR-05-1",
+    "bms:relationships/rel-121",
+    "bms:verifications/VER-T1",
+    "bms:evaluations/EVAL-T1",
+    "bms:files/evidence/T1",
+    "bms:relationships/rel-123",
+    "bms:verifications/VER-T2",
+    "bms:evaluations/EVAL-T2",
+    "bms:verifications/VER-T3",
+    "bms:evaluations/EVAL-T3",
+    "bms:files/evidence/T3",
+    "bms:relationships/rel-126",
+    "bms:verifications/VER-T4",
+    "bms:evaluations/EVAL-T4",
+    "bms:files/evidence/T4",
+    "bms:relationships/rel-128",
+    "bms:verifications/VER-T5",
+    "bms:evaluations/EVAL-T5",
+    "bms:files/evidence/T5",
+    "bms:relationships/rel-130",
+    "bms:verifications/VER-A1",
+    "bms:evaluations/EVAL-A1",
+    "bms:files/evidence/A1",
+    "bms:relationships/rel-132",
+    "bms:verifications/VER-A2",
+    "bms:evaluations/EVAL-A2",
+    "bms:files/evidence/A2",
+    "bms:relationships/rel-134",
+    "bms:agents/northwind",
+    "bms:agents/cortex-safe",
+    "bms:agents/safety-team",
+    "bms:tools/reqtool",
+    "bms:tools/hilbench",
+    "bms:tools/bomgen"
+   ]
+  },
+  {
+   "type": "software_Package",
+   "spdxId": "bms:packages/aurora-bms",
+   "name": "Aurora BMS Application",
+   "software_packageVersion": "3.4.0",
+   "software_primaryPurpose": "application",
+   "software_copyrightText": "NOASSERTION",
+   "suppliedBy": [
+    "bms:agents/northwind"
+   ],
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "a264a83df5bd92f480e33222debdf76dc56f1c6ce990d8901ef22d719fdf0552"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "software_Package",
+   "spdxId": "bms:packages/safety-monitor",
+   "name": "Safety Monitor Library",
+   "software_packageVersion": "3.4.0",
+   "software_primaryPurpose": "library",
+   "software_copyrightText": "NOASSERTION",
+   "suppliedBy": [
+    "bms:agents/northwind"
+   ],
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "fe18113716f27bc6478e9e52d365fab558840f962fec11d87ae9d468f8e7d76b"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "software_Package",
+   "spdxId": "bms:packages/cell-measurement-driver",
+   "name": "Cell Measurement Driver",
+   "software_packageVersion": "3.4.0",
+   "software_primaryPurpose": "library",
+   "software_copyrightText": "NOASSERTION",
+   "suppliedBy": [
+    "bms:agents/northwind"
+   ],
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "09ad94aa06453e0528456400a8a08fea802c0b873b2576ea8bc1f2b592bfac81"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "software_Package",
+   "spdxId": "bms:packages/contactor-control",
+   "name": "Contactor Control Library",
+   "software_packageVersion": "3.4.0",
+   "software_primaryPurpose": "library",
+   "software_copyrightText": "NOASSERTION",
+   "suppliedBy": [
+    "bms:agents/northwind"
+   ],
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "782d4bdb15312fdef0edf104be1e390c60f0c1f656bbfe025b63147f734a59b9"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "software_Package",
+   "spdxId": "bms:packages/e2e-comm-stack",
+   "name": "E2E Communication Stack",
+   "software_packageVersion": "2.1.0",
+   "software_primaryPurpose": "library",
+   "software_copyrightText": "NOASSERTION",
+   "suppliedBy": [
+    "bms:agents/northwind"
+   ],
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "17a16be23c71f69203bc5f73c37d605e602893ec072cfc7f544bef59ad7b4371"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "software_Package",
+   "spdxId": "bms:packages/isolation-monitor",
+   "name": "Isolation Monitor Library",
+   "software_packageVersion": "1.6.0",
+   "software_primaryPurpose": "library",
+   "software_copyrightText": "NOASSERTION",
+   "suppliedBy": [
+    "bms:agents/northwind"
+   ],
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "67d6a4d26b943b1193870733bfd693e8c26a6eb304a5805aa02d52812fbc8c21"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "software_Package",
+   "spdxId": "bms:packages/diagnostics",
+   "name": "Diagnostics & Fault Memory",
+   "software_packageVersion": "3.4.0",
+   "software_primaryPurpose": "library",
+   "software_copyrightText": "NOASSERTION",
+   "suppliedBy": [
+    "bms:agents/northwind"
+   ],
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "23e9511a38977f8b4ab015053c642a6b07f028aebd3237340886e2b08a581f52"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "software_Package",
+   "spdxId": "bms:packages/hal-mcu",
+   "name": "MCU Hardware Abstraction Layer",
+   "software_packageVersion": "3.4.0",
+   "software_primaryPurpose": "library",
+   "software_copyrightText": "NOASSERTION",
+   "suppliedBy": [
+    "bms:agents/northwind"
+   ],
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "0966c9324d324978569e29a59caa16f6a7156d1ca57810921c9e7dd56100b4f4"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "software_Package",
+   "spdxId": "bms:packages/bootloader",
+   "name": "Secure Bootloader",
+   "software_packageVersion": "1.2.0",
+   "software_primaryPurpose": "firmware",
+   "software_copyrightText": "NOASSERTION",
+   "suppliedBy": [
+    "bms:agents/northwind"
+   ],
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "e057768a93aab8928754deb32494faa34eaae89f4b844cac58622bc8e8e16c9a"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "software_Package",
+   "spdxId": "bms:packages/microos-rtos",
+   "name": "MicroOS Safety RTOS",
+   "software_packageVersion": "5.2.1-cert",
+   "software_primaryPurpose": "library",
+   "software_copyrightText": "NOASSERTION",
+   "suppliedBy": [
+    "bms:agents/cortex-safe"
+   ],
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "ebe5e93b398281cc536c0320b865faff3173bb2d53c717d8225b857f9de4a3a0"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-1",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:packages/aurora-bms",
+   "relationshipType": "contains",
+   "to": [
+    "bms:packages/safety-monitor"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-2",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:packages/aurora-bms",
+   "relationshipType": "contains",
+   "to": [
+    "bms:packages/cell-measurement-driver"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-3",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:packages/aurora-bms",
+   "relationshipType": "contains",
+   "to": [
+    "bms:packages/contactor-control"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-4",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:packages/aurora-bms",
+   "relationshipType": "contains",
+   "to": [
+    "bms:packages/e2e-comm-stack"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-5",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:packages/aurora-bms",
+   "relationshipType": "contains",
+   "to": [
+    "bms:packages/isolation-monitor"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-6",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:packages/aurora-bms",
+   "relationshipType": "contains",
+   "to": [
+    "bms:packages/diagnostics"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-7",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:packages/aurora-bms",
+   "relationshipType": "contains",
+   "to": [
+    "bms:packages/hal-mcu"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-8",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:packages/aurora-bms",
+   "relationshipType": "dependsOn",
+   "to": [
+    "bms:packages/microos-rtos",
+    "bms:packages/hal-mcu",
+    "bms:packages/bootloader"
+   ]
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/SG-01",
+   "name": "SG-01: Overcharge protection",
+   "summary": "Overcharge protection",
+   "requirementStatement": "The Aurora BMS shall prevent any battery cell voltage from exceeding the maximum safe charging voltage.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-SG-01"
+    }
+   ],
+   "rationale": "Safety goal derived from the hazard analysis and risk assessment; classified ASIL D with a fault-tolerant time interval of 200 ms.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/SG-02",
+   "name": "SG-02: Over-temperature protection",
+   "summary": "Over-temperature protection",
+   "requirementStatement": "The Aurora BMS shall prevent any battery module temperature from exceeding its safe operating limit.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-SG-02"
+    }
+   ],
+   "rationale": "Safety goal derived from the hazard analysis and risk assessment; classified ASIL D with a fault-tolerant time interval of 500 ms.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/SG-03",
+   "name": "SG-03: Over-current protection",
+   "summary": "Over-current protection",
+   "requirementStatement": "The Aurora BMS shall prevent the traction-battery pack current from exceeding its safe operating limit.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-SG-03"
+    }
+   ],
+   "rationale": "Safety goal derived from the hazard analysis and risk assessment; classified ASIL C with a fault-tolerant time interval of 100 ms.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/SG-04",
+   "name": "SG-04: Safe high-voltage disconnection",
+   "summary": "Safe high-voltage disconnection",
+   "requirementStatement": "The Aurora BMS shall isolate the traction battery by opening the main contactors upon detection of a critical fault within the fault-tolerant time interval.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-SG-04"
+    }
+   ],
+   "rationale": "Safety goal derived from the hazard analysis and risk assessment; classified ASIL D with a fault-tolerant time interval of 100 ms.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/SG-05",
+   "name": "SG-05: Isolation monitoring",
+   "summary": "Isolation monitoring",
+   "requirementStatement": "The Aurora BMS shall detect a loss of electrical isolation between the high-voltage system and the vehicle chassis.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-SG-05"
+    }
+   ],
+   "rationale": "Safety goal derived from the hazard analysis and risk assessment; classified ASIL C with a fault-tolerant time interval of 1000 ms.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/FSR-01-1",
+   "name": "FSR-01-1: Cyclic cell-voltage acquisition",
+   "summary": "Cyclic cell-voltage acquisition",
+   "requirementStatement": "The BMS shall acquire the voltage of every battery cell at least once every 100 ms.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-FSR-01-1"
+    }
+   ],
+   "rationale": "Functional safety requirement decomposed from safety goal SG-01.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-9",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SG-01",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/FSR-01-1"
+   ]
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/FSR-01-2",
+   "name": "FSR-01-2: Over-voltage safe state",
+   "summary": "Over-voltage safe state",
+   "requirementStatement": "The BMS shall transition to the safe state when any cell voltage exceeds 4.25 V.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-FSR-01-2"
+    }
+   ],
+   "rationale": "Functional safety requirement decomposed from safety goal SG-01.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-10",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SG-01",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/FSR-01-2"
+   ]
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/FSR-01-3",
+   "name": "FSR-01-3: Charge-current limiting",
+   "summary": "Charge-current limiting",
+   "requirementStatement": "The BMS shall request a charging current of zero when any cell voltage exceeds 4.20 V.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-FSR-01-3"
+    }
+   ],
+   "rationale": "Functional safety requirement decomposed from safety goal SG-01.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-11",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SG-01",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/FSR-01-3"
+   ]
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/FSR-02-1",
+   "name": "FSR-02-1: Cyclic temperature acquisition",
+   "summary": "Cyclic temperature acquisition",
+   "requirementStatement": "The BMS shall acquire every module temperature at least once every 100 ms.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-FSR-02-1"
+    }
+   ],
+   "rationale": "Functional safety requirement decomposed from safety goal SG-02.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-12",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SG-02",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/FSR-02-1"
+   ]
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/FSR-02-2",
+   "name": "FSR-02-2: Over-temperature safe state",
+   "summary": "Over-temperature safe state",
+   "requirementStatement": "The BMS shall transition to the safe state when any module temperature exceeds 60 °C.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-FSR-02-2"
+    }
+   ],
+   "rationale": "Functional safety requirement decomposed from safety goal SG-02.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-13",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SG-02",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/FSR-02-2"
+   ]
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/FSR-03-1",
+   "name": "FSR-03-1: Cyclic current measurement",
+   "summary": "Cyclic current measurement",
+   "requirementStatement": "The BMS shall measure the pack current at least once every 10 ms.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-FSR-03-1"
+    }
+   ],
+   "rationale": "Functional safety requirement decomposed from safety goal SG-03.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-14",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SG-03",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/FSR-03-1"
+   ]
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/FSR-03-2",
+   "name": "FSR-03-2: Over-current safe state",
+   "summary": "Over-current safe state",
+   "requirementStatement": "The BMS shall transition to the safe state when the pack current exceeds 350 A for longer than the fault-tolerant time interval.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-FSR-03-2"
+    }
+   ],
+   "rationale": "Functional safety requirement decomposed from safety goal SG-03.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-15",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SG-03",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/FSR-03-2"
+   ]
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/FSR-04-1",
+   "name": "FSR-04-1: Contactor opening on fault",
+   "summary": "Contactor opening on fault",
+   "requirementStatement": "The BMS shall command the main contactors to open within 100 ms of detecting a critical fault.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-FSR-04-1"
+    }
+   ],
+   "rationale": "Functional safety requirement decomposed from safety goal SG-04.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-16",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SG-04",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/FSR-04-1"
+   ]
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/FSR-04-2",
+   "name": "FSR-04-2: Welded-contactor detection",
+   "summary": "Welded-contactor detection",
+   "requirementStatement": "The BMS shall detect a welded (stuck-closed) main contactor before enabling high voltage.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-FSR-04-2"
+    }
+   ],
+   "rationale": "Functional safety requirement decomposed from safety goal SG-04.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-17",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SG-04",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/FSR-04-2"
+   ]
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/FSR-05-1",
+   "name": "FSR-05-1: Isolation-resistance measurement",
+   "summary": "Isolation-resistance measurement",
+   "requirementStatement": "The BMS shall measure the isolation resistance between the HV bus and chassis at least once per second.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-FSR-05-1"
+    }
+   ],
+   "rationale": "Functional safety requirement decomposed from safety goal SG-05.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-18",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SG-05",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/FSR-05-1"
+   ]
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/FSR-05-2",
+   "name": "FSR-05-2: Isolation-fault signalling",
+   "summary": "Isolation-fault signalling",
+   "requirementStatement": "The BMS shall signal an isolation fault when the isolation resistance falls below 500 Ω/V.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-FSR-05-2"
+    }
+   ],
+   "rationale": "Functional safety requirement decomposed from safety goal SG-05.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-19",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SG-05",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/FSR-05-2"
+   ]
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/TSR-01-1",
+   "name": "TSR-01-1: Dual cell-measurement channels",
+   "summary": "Dual cell-measurement channels",
+   "requirementStatement": "Cell voltages shall be acquired through two independent measurement channels and compared for plausibility within 100 ms.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-TSR-01-1"
+    }
+   ],
+   "rationale": "Technical safety requirement allocated to the BMS architecture from FSR-01-1.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-20",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/FSR-01-1",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/TSR-01-1"
+   ]
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/TSR-01-2",
+   "name": "TSR-01-2: Over-voltage debounce",
+   "summary": "Over-voltage debounce",
+   "requirementStatement": "The over-voltage monitor shall confirm an over-voltage condition over three consecutive samples before requesting the safe state.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-TSR-01-2"
+    }
+   ],
+   "rationale": "Technical safety requirement allocated to the BMS architecture from FSR-01-2.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-21",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/FSR-01-2",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/TSR-01-2"
+   ]
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/TSR-01-3",
+   "name": "TSR-01-3: Measurement-path integrity",
+   "summary": "Measurement-path integrity",
+   "requirementStatement": "The cell-measurement data path shall be protected by a CRC verified by the safety monitor.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-TSR-01-3"
+    }
+   ],
+   "rationale": "Technical safety requirement allocated to the BMS architecture from FSR-01-1.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-22",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/FSR-01-1",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/TSR-01-3"
+   ]
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/TSR-02-1",
+   "name": "TSR-02-1: NTC sensor diagnosis",
+   "summary": "NTC sensor diagnosis",
+   "requirementStatement": "Module temperatures shall be acquired by NTC sensors with open- and short-circuit diagnosis each acquisition cycle.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-TSR-02-1"
+    }
+   ],
+   "rationale": "Technical safety requirement allocated to the BMS architecture from FSR-02-1.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-23",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/FSR-02-1",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/TSR-02-1"
+   ]
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/TSR-02-2",
+   "name": "TSR-02-2: Temperature filtering",
+   "summary": "Temperature filtering",
+   "requirementStatement": "The over-temperature monitor shall apply a first-order low-pass filter with a 300 ms time constant before evaluating the temperature threshold.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-TSR-02-2"
+    }
+   ],
+   "rationale": "Technical safety requirement allocated to the BMS architecture from FSR-02-2.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-24",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/FSR-02-2",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/TSR-02-2"
+   ]
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/TSR-03-1",
+   "name": "TSR-03-1: Dual current sensing",
+   "summary": "Dual current sensing",
+   "requirementStatement": "Pack current shall be measured by a shunt and a hall-effect sensor and cross-checked for plausibility every 10 ms.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-TSR-03-1"
+    }
+   ],
+   "rationale": "Technical safety requirement allocated to the BMS architecture from FSR-03-1.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-25",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/FSR-03-1",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/TSR-03-1"
+   ]
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/TSR-03-2",
+   "name": "TSR-03-2: Inverse-time trip",
+   "summary": "Inverse-time trip",
+   "requirementStatement": "The over-current monitor shall implement an inverse-time trip characteristic bounded by the fault-tolerant time interval.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-TSR-03-2"
+    }
+   ],
+   "rationale": "Technical safety requirement allocated to the BMS architecture from FSR-03-2.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-26",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/FSR-03-2",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/TSR-03-2"
+   ]
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/TSR-04-1",
+   "name": "TSR-04-1: Safety-task window watchdog",
+   "summary": "Safety-task window watchdog",
+   "requirementStatement": "A window watchdog shall reset the microcontroller if the safety-monitor task is not serviced within 120 ms.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-TSR-04-1"
+    }
+   ],
+   "rationale": "Technical safety requirement allocated to the BMS architecture from FSR-04-1.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-27",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/FSR-04-1",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/TSR-04-1"
+   ]
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/TSR-04-2",
+   "name": "TSR-04-2: Safe-state definition",
+   "summary": "Safe-state definition",
+   "requirementStatement": "The safe state shall command both main contactors open and latch a non-volatile fault code.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-TSR-04-2"
+    }
+   ],
+   "rationale": "Technical safety requirement allocated to the BMS architecture from FSR-04-1.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-28",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/FSR-04-1",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/TSR-04-2"
+   ]
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/TSR-04-3",
+   "name": "TSR-04-3: Contactor feedback",
+   "summary": "Contactor feedback",
+   "requirementStatement": "Contactor state shall be verified through auxiliary feedback contacts within 20 ms of any command.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-TSR-04-3"
+    }
+   ],
+   "rationale": "Technical safety requirement allocated to the BMS architecture from FSR-04-2.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-29",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/FSR-04-2",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/TSR-04-3"
+   ]
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/TSR-05-1",
+   "name": "TSR-05-1: Isolation measurement method",
+   "summary": "Isolation measurement method",
+   "requirementStatement": "Isolation resistance shall be measured using the alternating measurement-pulse method.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-TSR-05-1"
+    }
+   ],
+   "rationale": "Technical safety requirement allocated to the BMS architecture from FSR-05-1.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-30",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/FSR-05-1",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/TSR-05-1"
+   ]
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/TSR-06-1",
+   "name": "TSR-06-1: End-to-end message protection",
+   "summary": "End-to-end message protection",
+   "requirementStatement": "Safety-relevant CAN messages shall be protected end-to-end with a CRC and a rolling counter per AUTOSAR E2E Profile 1.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-TSR-06-1"
+    }
+   ],
+   "rationale": "Technical safety requirement allocated to the BMS architecture from FSR-04-1.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-31",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/FSR-04-1",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/TSR-06-1"
+   ]
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/TSR-06-2",
+   "name": "TSR-06-2: ADC start-up self-test",
+   "summary": "ADC start-up self-test",
+   "requirementStatement": "The analog-to-digital converter shall execute a self-test at start-up and inhibit high-voltage enable on failure.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-TSR-06-2"
+    }
+   ],
+   "rationale": "Technical safety requirement allocated to the BMS architecture from FSR-01-1.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-32",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/FSR-01-1",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/TSR-06-2"
+   ]
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/TSR-06-3",
+   "name": "TSR-06-3: Lockstep execution",
+   "summary": "Lockstep execution",
+   "requirementStatement": "All safety-relevant computations shall execute on the microcontroller's lockstep core pair.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-TSR-06-3"
+    }
+   ],
+   "rationale": "Technical safety requirement allocated to the BMS architecture from FSR-04-1.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-33",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/FSR-04-1",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/TSR-06-3"
+   ]
+  },
+  {
+   "type": "functionalsafety_Assumption",
+   "spdxId": "bms:assumptions/AOU-1",
+   "name": "AOU-1: Independent hardware over-voltage cut-off",
+   "functionalsafety_assumptionStatement": "An independent hardware over-voltage comparator, external to the BMS, opens the charging contactor if a cell voltage exceeds 4.30 V.",
+   "rationale": "Documented as an assumption of use for the Aurora BMS safety element.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Assumption UID",
+     "identifier": "NW-AOU-1"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "functionalsafety_Assumption",
+   "spdxId": "bms:assumptions/AOU-2",
+   "name": "AOU-2: Initialisation before high voltage",
+   "functionalsafety_assumptionStatement": "The vehicle application calls SafetyManager_Init and completes the start-up self-tests before high voltage is enabled.",
+   "rationale": "Documented as an assumption of use for the Aurora BMS safety element.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Assumption UID",
+     "identifier": "NW-AOU-2"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "functionalsafety_Assumption",
+   "spdxId": "bms:assumptions/AOU-3",
+   "name": "AOU-3: Flash ECC enabled",
+   "functionalsafety_assumptionStatement": "The microcontroller flash ECC is enabled by the integrator's start-up configuration.",
+   "rationale": "Documented as an assumption of use for the Aurora BMS safety element.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Assumption UID",
+     "identifier": "NW-AOU-3"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "functionalsafety_Assumption",
+   "spdxId": "bms:assumptions/AOU-4",
+   "name": "AOU-4: Lockstep enabled and wired",
+   "functionalsafety_assumptionStatement": "The microcontroller lockstep core pair is enabled and its error output is wired to the vehicle safe-state circuit.",
+   "rationale": "Documented as an assumption of use for the Aurora BMS safety element.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Assumption UID",
+     "identifier": "NW-AOU-4"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "functionalsafety_Assumption",
+   "spdxId": "bms:assumptions/AOU-5",
+   "name": "AOU-5: Contactor ratings",
+   "functionalsafety_assumptionStatement": "The main contactors are rated for the maximum pack fault current and their break time is within 30 ms.",
+   "rationale": "Documented as an assumption of use for the Aurora BMS safety element.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Assumption UID",
+     "identifier": "NW-AOU-5"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "functionalsafety_Assumption",
+   "spdxId": "bms:assumptions/AOU-6",
+   "name": "AOU-6: Sensor calibration",
+   "functionalsafety_assumptionStatement": "Cell-voltage sensors are calibrated in production to within ±10 mV over the operating temperature range.",
+   "rationale": "Documented as an assumption of use for the Aurora BMS safety element.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Assumption UID",
+     "identifier": "NW-AOU-6"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-34",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:packages/aurora-bms",
+   "relationshipType": "assumes",
+   "to": [
+    "bms:assumptions/AOU-4"
+   ]
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/SWR-01-1",
+   "name": "SWR-01-1: CellVoltageAcquisition",
+   "summary": "CellVoltageAcquisition",
+   "requirementStatement": "CellVoltageAcquisition shall sample all 96 cell voltages and publish them with an acquisition timestamp within 100 ms.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-SWR-01-1"
+    }
+   ],
+   "rationale": "Software safety requirement derived from TSR-01-1 and allocated to CellVoltageAcquisition.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-35",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/TSR-01-1",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/SWR-01-1"
+   ]
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/src/cell_voltage_acq",
+   "name": "src/cell_voltage_acq.c",
+   "software_primaryPurpose": "source",
+   "software_fileKind": "file",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "990de1719a30cbbd88b400acf922f2a299df45dc98b05f6c328d661d3b7be1aa"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-36",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:packages/cell-measurement-driver",
+   "relationshipType": "contains",
+   "to": [
+    "bms:files/src/cell_voltage_acq"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-37",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-01-1",
+   "relationshipType": "implementedBy",
+   "to": [
+    "bms:files/src/cell_voltage_acq",
+    "bms:packages/cell-measurement-driver"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-38",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-01-1",
+   "relationshipType": "assumes",
+   "to": [
+    "bms:assumptions/AOU-6"
+   ]
+  },
+  {
+   "type": "functionalsafety_RequirementVerification",
+   "spdxId": "bms:verifications/VER-SWR-01-1",
+   "name": "Verification of CellVoltageAcquisition",
+   "summary": "Test-based verification of SWR-01-1.",
+   "functionalsafety_verificationMethod": [
+    "test"
+   ],
+   "functionalsafety_verificationPrecondition": [
+    "Target ECU flashed with the release build and connected to the HIL battery-cell emulator."
+   ],
+   "functionalsafety_verificationPostcondition": [
+    "Acceptance criteria met on all configured pack variants; no deviations recorded."
+   ],
+   "rationale": "SWR-01-1 is safety-relevant and is verified by test.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Verification record UID",
+     "identifier": "NW-VER-SWR-01-1"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-39",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-01-1",
+   "relationshipType": "verifiedBy",
+   "to": [
+    "bms:verifications/VER-SWR-01-1"
+   ]
+  },
+  {
+   "type": "functionalsafety_EvaluationResult",
+   "spdxId": "bms:evaluations/EVAL-SWR-01-1",
+   "name": "Evaluation of SWR-01-1 (pass)",
+   "functionalsafety_evaluation": "pass",
+   "functionalsafety_evaluationBasedOn": "bms:verifications/VER-SWR-01-1",
+   "functionalsafety_rationale": "All acceptance criteria met; the requirement is satisfied.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/evidence/SWR-01-1",
+   "name": "reports/swr_01_1_test_report.xml",
+   "software_primaryPurpose": "evidence",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "b921cb84a8dae8873bd49a66d5846781c31eaf4b801553216e9212c928730e04"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "functionalsafety_EvidenceRelationship",
+   "spdxId": "bms:relationships/rel-40",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-SWR-01-1",
+   "relationshipType": "hasEvidence",
+   "to": [
+    "bms:files/evidence/SWR-01-1"
+   ],
+   "functionalsafety_evidenceCategory": [
+    "report"
+   ],
+   "functionalsafety_evidenceUID": "NW-EVD-1"
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/SWR-01-2",
+   "name": "SWR-01-2: VoltagePlausibility",
+   "summary": "VoltagePlausibility",
+   "requirementStatement": "VoltagePlausibility shall flag a channel fault when the two cell-voltage measurement channels differ by more than 50 mV.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-SWR-01-2"
+    }
+   ],
+   "rationale": "Software safety requirement derived from TSR-01-1 and allocated to VoltagePlausibility.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-41",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/TSR-01-1",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/SWR-01-2"
+   ]
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/src/voltage_plausibility",
+   "name": "src/voltage_plausibility.c",
+   "software_primaryPurpose": "source",
+   "software_fileKind": "file",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "1af982a67905aced662a8b851c157a1eff5872b321ea70289e30666772d7d036"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-42",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:packages/safety-monitor",
+   "relationshipType": "contains",
+   "to": [
+    "bms:files/src/voltage_plausibility"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-43",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-01-2",
+   "relationshipType": "implementedBy",
+   "to": [
+    "bms:files/src/voltage_plausibility",
+    "bms:packages/safety-monitor"
+   ]
+  },
+  {
+   "type": "functionalsafety_RequirementVerification",
+   "spdxId": "bms:verifications/VER-SWR-01-2",
+   "name": "Verification of VoltagePlausibility",
+   "summary": "Test-based verification of SWR-01-2.",
+   "functionalsafety_verificationMethod": [
+    "test"
+   ],
+   "functionalsafety_verificationPrecondition": [
+    "Target ECU flashed with the release build and connected to the HIL battery-cell emulator."
+   ],
+   "functionalsafety_verificationPostcondition": [
+    "Acceptance criteria met on all configured pack variants; no deviations recorded."
+   ],
+   "rationale": "SWR-01-2 is safety-relevant and is verified by test.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Verification record UID",
+     "identifier": "NW-VER-SWR-01-2"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-44",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-01-2",
+   "relationshipType": "verifiedBy",
+   "to": [
+    "bms:verifications/VER-SWR-01-2"
+   ]
+  },
+  {
+   "type": "functionalsafety_EvaluationResult",
+   "spdxId": "bms:evaluations/EVAL-SWR-01-2",
+   "name": "Evaluation of SWR-01-2 (pass)",
+   "functionalsafety_evaluation": "pass",
+   "functionalsafety_evaluationBasedOn": "bms:verifications/VER-SWR-01-2",
+   "functionalsafety_rationale": "All acceptance criteria met; the requirement is satisfied.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/SWR-01-3",
+   "name": "SWR-01-3: OverVoltageMonitor",
+   "summary": "OverVoltageMonitor",
+   "requirementStatement": "OverVoltageMonitor shall request the safe state when a filtered cell voltage exceeds 4.25 V for three consecutive acquisition cycles.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-SWR-01-3"
+    }
+   ],
+   "rationale": "Software safety requirement derived from TSR-01-2 and allocated to OverVoltageMonitor.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-45",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/TSR-01-2",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/SWR-01-3"
+   ]
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/src/over_voltage_monitor",
+   "name": "src/over_voltage_monitor.c",
+   "software_primaryPurpose": "source",
+   "software_fileKind": "file",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "449952001e0f039420167b1fb12e7b44fb0be2d82c34c27bc1292106ef882536"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-46",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:packages/safety-monitor",
+   "relationshipType": "contains",
+   "to": [
+    "bms:files/src/over_voltage_monitor"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-47",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-01-3",
+   "relationshipType": "implementedBy",
+   "to": [
+    "bms:files/src/over_voltage_monitor",
+    "bms:packages/safety-monitor"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-48",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-01-3",
+   "relationshipType": "assumes",
+   "to": [
+    "bms:assumptions/AOU-1"
+   ]
+  },
+  {
+   "type": "functionalsafety_RequirementVerification",
+   "spdxId": "bms:verifications/VER-SWR-01-3",
+   "name": "Verification of OverVoltageMonitor",
+   "summary": "Test-based verification of SWR-01-3.",
+   "functionalsafety_verificationMethod": [
+    "test"
+   ],
+   "functionalsafety_verificationPrecondition": [
+    "Target ECU flashed with the release build and connected to the HIL battery-cell emulator."
+   ],
+   "functionalsafety_verificationPostcondition": [
+    "Acceptance criteria met on all configured pack variants; no deviations recorded."
+   ],
+   "rationale": "SWR-01-3 is safety-relevant and is verified by test.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Verification record UID",
+     "identifier": "NW-VER-SWR-01-3"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-49",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-01-3",
+   "relationshipType": "verifiedBy",
+   "to": [
+    "bms:verifications/VER-SWR-01-3"
+   ]
+  },
+  {
+   "type": "functionalsafety_EvaluationResult",
+   "spdxId": "bms:evaluations/EVAL-SWR-01-3",
+   "name": "Evaluation of SWR-01-3 (pass)",
+   "functionalsafety_evaluation": "pass",
+   "functionalsafety_evaluationBasedOn": "bms:verifications/VER-SWR-01-3",
+   "functionalsafety_rationale": "All acceptance criteria met; the requirement is satisfied.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/evidence/SWR-01-3",
+   "name": "reports/swr_01_3_test_report.xml",
+   "software_primaryPurpose": "evidence",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "6d84c9515705640c33e7224694c73caf68075a9ee7e332ce921b40369f8243a1"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "functionalsafety_EvidenceRelationship",
+   "spdxId": "bms:relationships/rel-50",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-SWR-01-3",
+   "relationshipType": "hasEvidence",
+   "to": [
+    "bms:files/evidence/SWR-01-3"
+   ],
+   "functionalsafety_evidenceCategory": [
+    "report"
+   ],
+   "functionalsafety_evidenceUID": "NW-EVD-2"
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/SWR-01-4",
+   "name": "SWR-01-4: MeasurementCrc",
+   "summary": "MeasurementCrc",
+   "requirementStatement": "MeasurementCrc shall verify a CRC-16 over every cell-measurement frame and discard frames that fail the check.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-SWR-01-4"
+    }
+   ],
+   "rationale": "Software safety requirement derived from TSR-01-3 and allocated to MeasurementCrc.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-51",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/TSR-01-3",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/SWR-01-4"
+   ]
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/src/measurement_crc",
+   "name": "src/measurement_crc.c",
+   "software_primaryPurpose": "source",
+   "software_fileKind": "file",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "e1681a505db1371a3e82a8468a92109047c929c4898147ff37fcfdd8681bc28a"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-52",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:packages/cell-measurement-driver",
+   "relationshipType": "contains",
+   "to": [
+    "bms:files/src/measurement_crc"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-53",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-01-4",
+   "relationshipType": "implementedBy",
+   "to": [
+    "bms:files/src/measurement_crc",
+    "bms:packages/cell-measurement-driver"
+   ]
+  },
+  {
+   "type": "functionalsafety_RequirementVerification",
+   "spdxId": "bms:verifications/VER-SWR-01-4",
+   "name": "Verification of MeasurementCrc",
+   "summary": "Analysis-based verification of SWR-01-4.",
+   "functionalsafety_verificationMethod": [
+    "analysis"
+   ],
+   "functionalsafety_verificationPrecondition": [
+    "Verified static-analysis and worst-case-execution-time models available for the release build."
+   ],
+   "functionalsafety_verificationPostcondition": [
+    "Acceptance criteria met on all configured pack variants; no deviations recorded."
+   ],
+   "rationale": "SWR-01-4 is safety-relevant and is verified by analysis.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Verification record UID",
+     "identifier": "NW-VER-SWR-01-4"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-54",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-01-4",
+   "relationshipType": "verifiedBy",
+   "to": [
+    "bms:verifications/VER-SWR-01-4"
+   ]
+  },
+  {
+   "type": "functionalsafety_EvaluationResult",
+   "spdxId": "bms:evaluations/EVAL-SWR-01-4",
+   "name": "Evaluation of SWR-01-4 (pass)",
+   "functionalsafety_evaluation": "pass",
+   "functionalsafety_evaluationBasedOn": "bms:verifications/VER-SWR-01-4",
+   "functionalsafety_rationale": "All acceptance criteria met; the requirement is satisfied.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/SWR-02-1",
+   "name": "SWR-02-1: TemperatureAcquisition",
+   "summary": "TemperatureAcquisition",
+   "requirementStatement": "TemperatureAcquisition shall sample all module temperatures and diagnose open- and short-circuit NTC faults within 100 ms.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-SWR-02-1"
+    }
+   ],
+   "rationale": "Software safety requirement derived from TSR-02-1 and allocated to TemperatureAcquisition.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-55",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/TSR-02-1",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/SWR-02-1"
+   ]
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/src/temperature_acq",
+   "name": "src/temperature_acq.c",
+   "software_primaryPurpose": "source",
+   "software_fileKind": "file",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "be30daef7e8f4c2900a30112e393460fc042857e0a2f7eebe488bc0762557729"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-56",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:packages/cell-measurement-driver",
+   "relationshipType": "contains",
+   "to": [
+    "bms:files/src/temperature_acq"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-57",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-02-1",
+   "relationshipType": "implementedBy",
+   "to": [
+    "bms:files/src/temperature_acq",
+    "bms:packages/cell-measurement-driver"
+   ]
+  },
+  {
+   "type": "functionalsafety_RequirementVerification",
+   "spdxId": "bms:verifications/VER-SWR-02-1",
+   "name": "Verification of TemperatureAcquisition",
+   "summary": "Test-based verification of SWR-02-1.",
+   "functionalsafety_verificationMethod": [
+    "test"
+   ],
+   "functionalsafety_verificationPrecondition": [
+    "Target ECU flashed with the release build and connected to the HIL battery-cell emulator."
+   ],
+   "functionalsafety_verificationPostcondition": [
+    "Acceptance criteria met on all configured pack variants; no deviations recorded."
+   ],
+   "rationale": "SWR-02-1 is safety-relevant and is verified by test.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Verification record UID",
+     "identifier": "NW-VER-SWR-02-1"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-58",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-02-1",
+   "relationshipType": "verifiedBy",
+   "to": [
+    "bms:verifications/VER-SWR-02-1"
+   ]
+  },
+  {
+   "type": "functionalsafety_EvaluationResult",
+   "spdxId": "bms:evaluations/EVAL-SWR-02-1",
+   "name": "Evaluation of SWR-02-1 (pass)",
+   "functionalsafety_evaluation": "pass",
+   "functionalsafety_evaluationBasedOn": "bms:verifications/VER-SWR-02-1",
+   "functionalsafety_rationale": "All acceptance criteria met; the requirement is satisfied.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/SWR-02-2",
+   "name": "SWR-02-2: OverTemperatureMonitor",
+   "summary": "OverTemperatureMonitor",
+   "requirementStatement": "OverTemperatureMonitor shall request the safe state when a low-pass-filtered module temperature exceeds 60 °C.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-SWR-02-2"
+    }
+   ],
+   "rationale": "Software safety requirement derived from TSR-02-2 and allocated to OverTemperatureMonitor.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-59",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/TSR-02-2",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/SWR-02-2"
+   ]
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/src/over_temperature_monitor",
+   "name": "src/over_temperature_monitor.c",
+   "software_primaryPurpose": "source",
+   "software_fileKind": "file",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "428e9b815420cae9c7c65248684f04248a34ea4ac813c6c3b96ae99dae428ab7"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-60",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:packages/safety-monitor",
+   "relationshipType": "contains",
+   "to": [
+    "bms:files/src/over_temperature_monitor"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-61",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-02-2",
+   "relationshipType": "implementedBy",
+   "to": [
+    "bms:files/src/over_temperature_monitor",
+    "bms:packages/safety-monitor"
+   ]
+  },
+  {
+   "type": "functionalsafety_RequirementVerification",
+   "spdxId": "bms:verifications/VER-SWR-02-2",
+   "name": "Verification of OverTemperatureMonitor",
+   "summary": "Test-based verification of SWR-02-2.",
+   "functionalsafety_verificationMethod": [
+    "test"
+   ],
+   "functionalsafety_verificationPrecondition": [
+    "Target ECU flashed with the release build and connected to the HIL battery-cell emulator."
+   ],
+   "functionalsafety_verificationPostcondition": [
+    "Acceptance criteria met on all configured pack variants; no deviations recorded."
+   ],
+   "rationale": "SWR-02-2 is safety-relevant and is verified by test.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Verification record UID",
+     "identifier": "NW-VER-SWR-02-2"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-62",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-02-2",
+   "relationshipType": "verifiedBy",
+   "to": [
+    "bms:verifications/VER-SWR-02-2"
+   ]
+  },
+  {
+   "type": "functionalsafety_EvaluationResult",
+   "spdxId": "bms:evaluations/EVAL-SWR-02-2",
+   "name": "Evaluation of SWR-02-2 (pass)",
+   "functionalsafety_evaluation": "pass",
+   "functionalsafety_evaluationBasedOn": "bms:verifications/VER-SWR-02-2",
+   "functionalsafety_rationale": "All acceptance criteria met; the requirement is satisfied.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/evidence/SWR-02-2",
+   "name": "reports/swr_02_2_test_report.xml",
+   "software_primaryPurpose": "evidence",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "ba526ac5a81f0969fd6face7515b713821243462d226e5e562e02312bbd589c1"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "functionalsafety_EvidenceRelationship",
+   "spdxId": "bms:relationships/rel-63",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-SWR-02-2",
+   "relationshipType": "hasEvidence",
+   "to": [
+    "bms:files/evidence/SWR-02-2"
+   ],
+   "functionalsafety_evidenceCategory": [
+    "report"
+   ],
+   "functionalsafety_evidenceUID": "NW-EVD-3"
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/SWR-03-1",
+   "name": "SWR-03-1: CurrentAcquisition",
+   "summary": "CurrentAcquisition",
+   "requirementStatement": "CurrentAcquisition shall sample the shunt and hall-effect current channels every 10 ms and reject an implausible pair.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-SWR-03-1"
+    }
+   ],
+   "rationale": "Software safety requirement derived from TSR-03-1 and allocated to CurrentAcquisition.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-64",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/TSR-03-1",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/SWR-03-1"
+   ]
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/src/current_acq",
+   "name": "src/current_acq.c",
+   "software_primaryPurpose": "source",
+   "software_fileKind": "file",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "08abef4dc530f2b23d989b480b5d94ebadb871acd45269b4c720dd68e601339e"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-65",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:packages/cell-measurement-driver",
+   "relationshipType": "contains",
+   "to": [
+    "bms:files/src/current_acq"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-66",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-03-1",
+   "relationshipType": "implementedBy",
+   "to": [
+    "bms:files/src/current_acq",
+    "bms:packages/cell-measurement-driver"
+   ]
+  },
+  {
+   "type": "functionalsafety_RequirementVerification",
+   "spdxId": "bms:verifications/VER-SWR-03-1",
+   "name": "Verification of CurrentAcquisition",
+   "summary": "Test-based verification of SWR-03-1.",
+   "functionalsafety_verificationMethod": [
+    "test"
+   ],
+   "functionalsafety_verificationPrecondition": [
+    "Target ECU flashed with the release build and connected to the HIL battery-cell emulator."
+   ],
+   "functionalsafety_verificationPostcondition": [
+    "Acceptance criteria met on all configured pack variants; no deviations recorded."
+   ],
+   "rationale": "SWR-03-1 is safety-relevant and is verified by test.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Verification record UID",
+     "identifier": "NW-VER-SWR-03-1"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-67",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-03-1",
+   "relationshipType": "verifiedBy",
+   "to": [
+    "bms:verifications/VER-SWR-03-1"
+   ]
+  },
+  {
+   "type": "functionalsafety_EvaluationResult",
+   "spdxId": "bms:evaluations/EVAL-SWR-03-1",
+   "name": "Evaluation of SWR-03-1 (pass)",
+   "functionalsafety_evaluation": "pass",
+   "functionalsafety_evaluationBasedOn": "bms:verifications/VER-SWR-03-1",
+   "functionalsafety_rationale": "All acceptance criteria met; the requirement is satisfied.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/SWR-03-2",
+   "name": "SWR-03-2: OverCurrentMonitor",
+   "summary": "OverCurrentMonitor",
+   "requirementStatement": "OverCurrentMonitor shall request the safe state following the inverse-time trip curve when the pack current exceeds 350 A.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-SWR-03-2"
+    }
+   ],
+   "rationale": "Software safety requirement derived from TSR-03-2 and allocated to OverCurrentMonitor.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-68",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/TSR-03-2",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/SWR-03-2"
+   ]
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/src/over_current_monitor",
+   "name": "src/over_current_monitor.c",
+   "software_primaryPurpose": "source",
+   "software_fileKind": "file",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "b5d8571f66b3c86e0b203ea5c3d0d03b133cfc1421b520ba39d7af8831a3a8cd"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-69",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:packages/safety-monitor",
+   "relationshipType": "contains",
+   "to": [
+    "bms:files/src/over_current_monitor"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-70",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-03-2",
+   "relationshipType": "implementedBy",
+   "to": [
+    "bms:files/src/over_current_monitor",
+    "bms:packages/safety-monitor"
+   ]
+  },
+  {
+   "type": "functionalsafety_RequirementVerification",
+   "spdxId": "bms:verifications/VER-SWR-03-2",
+   "name": "Verification of OverCurrentMonitor",
+   "summary": "Analysis-based verification of SWR-03-2.",
+   "functionalsafety_verificationMethod": [
+    "analysis"
+   ],
+   "functionalsafety_verificationPrecondition": [
+    "Verified static-analysis and worst-case-execution-time models available for the release build."
+   ],
+   "functionalsafety_verificationPostcondition": [
+    "Acceptance criteria met on all configured pack variants; no deviations recorded."
+   ],
+   "rationale": "SWR-03-2 is safety-relevant and is verified by analysis.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Verification record UID",
+     "identifier": "NW-VER-SWR-03-2"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-71",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-03-2",
+   "relationshipType": "verifiedBy",
+   "to": [
+    "bms:verifications/VER-SWR-03-2"
+   ]
+  },
+  {
+   "type": "functionalsafety_EvaluationResult",
+   "spdxId": "bms:evaluations/EVAL-SWR-03-2",
+   "name": "Evaluation of SWR-03-2 (pass)",
+   "functionalsafety_evaluation": "pass",
+   "functionalsafety_evaluationBasedOn": "bms:verifications/VER-SWR-03-2",
+   "functionalsafety_rationale": "All acceptance criteria met; the requirement is satisfied.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/evidence/SWR-03-2",
+   "name": "reports/swr_03_2_test_report.xml",
+   "software_primaryPurpose": "evidence",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "92773ea6a015070d51b5c887764402fd7e6e47be5082f0d178e38e464a3d648f"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "functionalsafety_EvidenceRelationship",
+   "spdxId": "bms:relationships/rel-72",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-SWR-03-2",
+   "relationshipType": "hasEvidence",
+   "to": [
+    "bms:files/evidence/SWR-03-2"
+   ],
+   "functionalsafety_evidenceCategory": [
+    "report"
+   ],
+   "functionalsafety_evidenceUID": "NW-EVD-4"
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/SWR-03-3",
+   "name": "SWR-03-3: SocEstimator",
+   "summary": "SocEstimator",
+   "requirementStatement": "SocEstimator shall bound the reported state-of-charge error and flag an implausible estimate.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-SWR-03-3"
+    }
+   ],
+   "rationale": "Software safety requirement derived from TSR-03-1 and allocated to SocEstimator.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-73",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/TSR-03-1",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/SWR-03-3"
+   ]
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/src/soc_estimator",
+   "name": "src/soc_estimator.c",
+   "software_primaryPurpose": "source",
+   "software_fileKind": "file",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "8ac256134237d7def966371190845c4c1bb0bf87f48f58c88acc46d66fa0b707"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-74",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:packages/aurora-bms",
+   "relationshipType": "contains",
+   "to": [
+    "bms:files/src/soc_estimator"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-75",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-03-3",
+   "relationshipType": "implementedBy",
+   "to": [
+    "bms:files/src/soc_estimator",
+    "bms:packages/aurora-bms"
+   ]
+  },
+  {
+   "type": "functionalsafety_RequirementVerification",
+   "spdxId": "bms:verifications/VER-SWR-03-3",
+   "name": "Verification of SocEstimator",
+   "summary": "Analysis-based verification of SWR-03-3.",
+   "functionalsafety_verificationMethod": [
+    "analysis"
+   ],
+   "functionalsafety_verificationPrecondition": [
+    "Verified static-analysis and worst-case-execution-time models available for the release build."
+   ],
+   "functionalsafety_verificationPostcondition": [
+    "Coverage could not be fully established; re-verification required."
+   ],
+   "rationale": "SWR-03-3 is safety-relevant and is verified by analysis.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Verification record UID",
+     "identifier": "NW-VER-SWR-03-3"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-76",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-03-3",
+   "relationshipType": "verifiedBy",
+   "to": [
+    "bms:verifications/VER-SWR-03-3"
+   ]
+  },
+  {
+   "type": "functionalsafety_EvaluationResult",
+   "spdxId": "bms:evaluations/EVAL-SWR-03-3",
+   "name": "Evaluation of SWR-03-3 (inconclusive)",
+   "functionalsafety_evaluation": "inconclusive",
+   "functionalsafety_evaluationBasedOn": "bms:verifications/VER-SWR-03-3",
+   "functionalsafety_rationale": "Test coverage could not be established across the full operating envelope; re-run required.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/SWR-04-1",
+   "name": "SWR-04-1: WindowWatchdog",
+   "summary": "WindowWatchdog",
+   "requirementStatement": "WindowWatchdog shall trigger a microcontroller reset when the safety-monitor task is not serviced within the 120 ms window.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-SWR-04-1"
+    }
+   ],
+   "rationale": "Software safety requirement derived from TSR-04-1 and allocated to WindowWatchdog.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-77",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/TSR-04-1",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/SWR-04-1"
+   ]
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/src/window_watchdog",
+   "name": "src/window_watchdog.c",
+   "software_primaryPurpose": "source",
+   "software_fileKind": "file",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "0df6e69f0da86b45f5713234159748d39eeb3d48f6a78aa344e7ec6c1a7a8fd2"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-78",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:packages/safety-monitor",
+   "relationshipType": "contains",
+   "to": [
+    "bms:files/src/window_watchdog"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-79",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-04-1",
+   "relationshipType": "implementedBy",
+   "to": [
+    "bms:files/src/window_watchdog",
+    "bms:packages/safety-monitor"
+   ]
+  },
+  {
+   "type": "functionalsafety_RequirementVerification",
+   "spdxId": "bms:verifications/VER-SWR-04-1",
+   "name": "Verification of WindowWatchdog",
+   "summary": "Test-based verification of SWR-04-1.",
+   "functionalsafety_verificationMethod": [
+    "test"
+   ],
+   "functionalsafety_verificationPrecondition": [
+    "Target ECU flashed with the release build and connected to the HIL battery-cell emulator."
+   ],
+   "functionalsafety_verificationPostcondition": [
+    "Acceptance criteria met on all configured pack variants; no deviations recorded."
+   ],
+   "rationale": "SWR-04-1 is safety-relevant and is verified by test.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Verification record UID",
+     "identifier": "NW-VER-SWR-04-1"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-80",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-04-1",
+   "relationshipType": "verifiedBy",
+   "to": [
+    "bms:verifications/VER-SWR-04-1"
+   ]
+  },
+  {
+   "type": "functionalsafety_EvaluationResult",
+   "spdxId": "bms:evaluations/EVAL-SWR-04-1",
+   "name": "Evaluation of SWR-04-1 (pass)",
+   "functionalsafety_evaluation": "pass",
+   "functionalsafety_evaluationBasedOn": "bms:verifications/VER-SWR-04-1",
+   "functionalsafety_rationale": "All acceptance criteria met; the requirement is satisfied.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/evidence/SWR-04-1",
+   "name": "reports/swr_04_1_test_report.xml",
+   "software_primaryPurpose": "evidence",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "9708ddd6954907af40f3c5ae2bbdd9aeaa084bd6bfe9f667aca44dcbb8f1470e"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "functionalsafety_EvidenceRelationship",
+   "spdxId": "bms:relationships/rel-81",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-SWR-04-1",
+   "relationshipType": "hasEvidence",
+   "to": [
+    "bms:files/evidence/SWR-04-1"
+   ],
+   "functionalsafety_evidenceCategory": [
+    "report"
+   ],
+   "functionalsafety_evidenceUID": "NW-EVD-5"
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/SWR-04-2",
+   "name": "SWR-04-2: SafetyManager",
+   "summary": "SafetyManager",
+   "requirementStatement": "SafetyManager shall command the SAFE_STATE within 50 ms of any latched critical fault.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-SWR-04-2"
+    }
+   ],
+   "rationale": "Software safety requirement derived from TSR-04-2 and allocated to SafetyManager.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-82",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/TSR-04-2",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/SWR-04-2"
+   ]
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/src/safety_manager",
+   "name": "src/safety_manager.c",
+   "software_primaryPurpose": "source",
+   "software_fileKind": "file",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "57276166ef272cbf356b4e6053902fc0df5786b73e8df815ba0066589ef6db42"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-83",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:packages/safety-monitor",
+   "relationshipType": "contains",
+   "to": [
+    "bms:files/src/safety_manager"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-84",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-04-2",
+   "relationshipType": "implementedBy",
+   "to": [
+    "bms:files/src/safety_manager",
+    "bms:packages/safety-monitor"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-85",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-04-2",
+   "relationshipType": "assumes",
+   "to": [
+    "bms:assumptions/AOU-2"
+   ]
+  },
+  {
+   "type": "functionalsafety_RequirementVerification",
+   "spdxId": "bms:verifications/VER-SWR-04-2",
+   "name": "Verification of SafetyManager",
+   "summary": "Test-based verification of SWR-04-2.",
+   "functionalsafety_verificationMethod": [
+    "test"
+   ],
+   "functionalsafety_verificationPrecondition": [
+    "Target ECU flashed with the release build and connected to the HIL battery-cell emulator."
+   ],
+   "functionalsafety_verificationPostcondition": [
+    "Acceptance criteria met on all configured pack variants; no deviations recorded."
+   ],
+   "rationale": "SWR-04-2 is safety-relevant and is verified by test.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Verification record UID",
+     "identifier": "NW-VER-SWR-04-2"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-86",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-04-2",
+   "relationshipType": "verifiedBy",
+   "to": [
+    "bms:verifications/VER-SWR-04-2"
+   ]
+  },
+  {
+   "type": "functionalsafety_EvaluationResult",
+   "spdxId": "bms:evaluations/EVAL-SWR-04-2",
+   "name": "Evaluation of SWR-04-2 (pass)",
+   "functionalsafety_evaluation": "pass",
+   "functionalsafety_evaluationBasedOn": "bms:verifications/VER-SWR-04-2",
+   "functionalsafety_rationale": "All acceptance criteria met; the requirement is satisfied.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/evidence/SWR-04-2",
+   "name": "reports/swr_04_2_test_report.xml",
+   "software_primaryPurpose": "evidence",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "b2ccc649b73d63014cd54246da42f8e7a7eb7c9187dfdf62afd21d41bed87d55"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "functionalsafety_EvidenceRelationship",
+   "spdxId": "bms:relationships/rel-87",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-SWR-04-2",
+   "relationshipType": "hasEvidence",
+   "to": [
+    "bms:files/evidence/SWR-04-2"
+   ],
+   "functionalsafety_evidenceCategory": [
+    "report"
+   ],
+   "functionalsafety_evidenceUID": "NW-EVD-6"
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/SWR-04-3",
+   "name": "SWR-04-3: FaultMemory",
+   "summary": "FaultMemory",
+   "requirementStatement": "FaultMemory shall store latched safety fault codes in ECC-protected non-volatile memory.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-SWR-04-3"
+    }
+   ],
+   "rationale": "Software safety requirement derived from TSR-04-2 and allocated to FaultMemory.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-88",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/TSR-04-2",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/SWR-04-3"
+   ]
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/src/fault_memory",
+   "name": "src/fault_memory.c",
+   "software_primaryPurpose": "source",
+   "software_fileKind": "file",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "bae50b532abdfddb7776cb18d8b60076291d573322f5f2fe286c09d1e0935974"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-89",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:packages/diagnostics",
+   "relationshipType": "contains",
+   "to": [
+    "bms:files/src/fault_memory"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-90",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-04-3",
+   "relationshipType": "implementedBy",
+   "to": [
+    "bms:files/src/fault_memory",
+    "bms:packages/diagnostics"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-91",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-04-3",
+   "relationshipType": "assumes",
+   "to": [
+    "bms:assumptions/AOU-3"
+   ]
+  },
+  {
+   "type": "functionalsafety_RequirementVerification",
+   "spdxId": "bms:verifications/VER-SWR-04-3",
+   "name": "Verification of FaultMemory",
+   "summary": "Review-based verification of SWR-04-3.",
+   "functionalsafety_verificationMethod": [
+    "review"
+   ],
+   "functionalsafety_verificationPrecondition": [
+    "Design and code review checklist prepared and reviewers assigned."
+   ],
+   "functionalsafety_verificationPostcondition": [
+    "Acceptance criteria met on all configured pack variants; no deviations recorded."
+   ],
+   "rationale": "SWR-04-3 is safety-relevant and is verified by review.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Verification record UID",
+     "identifier": "NW-VER-SWR-04-3"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-92",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-04-3",
+   "relationshipType": "verifiedBy",
+   "to": [
+    "bms:verifications/VER-SWR-04-3"
+   ]
+  },
+  {
+   "type": "functionalsafety_EvaluationResult",
+   "spdxId": "bms:evaluations/EVAL-SWR-04-3",
+   "name": "Evaluation of SWR-04-3 (pass)",
+   "functionalsafety_evaluation": "pass",
+   "functionalsafety_evaluationBasedOn": "bms:verifications/VER-SWR-04-3",
+   "functionalsafety_rationale": "All acceptance criteria met; the requirement is satisfied.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/SWR-04-4",
+   "name": "SWR-04-4: ContactorDriver",
+   "summary": "ContactorDriver",
+   "requirementStatement": "ContactorDriver shall confirm the commanded contactor state through the auxiliary feedback within 20 ms and raise a fault otherwise.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-SWR-04-4"
+    }
+   ],
+   "rationale": "Software safety requirement derived from TSR-04-3 and allocated to ContactorDriver.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-93",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/TSR-04-3",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/SWR-04-4"
+   ]
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/src/contactor_driver",
+   "name": "src/contactor_driver.c",
+   "software_primaryPurpose": "source",
+   "software_fileKind": "file",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "3be3c52a4373087c4d2ec18d92153f3617e46e35fed9f89f80f6ee88609d1dcf"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-94",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:packages/contactor-control",
+   "relationshipType": "contains",
+   "to": [
+    "bms:files/src/contactor_driver"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-95",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-04-4",
+   "relationshipType": "implementedBy",
+   "to": [
+    "bms:files/src/contactor_driver",
+    "bms:packages/contactor-control"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-96",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-04-4",
+   "relationshipType": "assumes",
+   "to": [
+    "bms:assumptions/AOU-5"
+   ]
+  },
+  {
+   "type": "functionalsafety_RequirementVerification",
+   "spdxId": "bms:verifications/VER-SWR-04-4",
+   "name": "Verification of ContactorDriver",
+   "summary": "Test-based verification of SWR-04-4.",
+   "functionalsafety_verificationMethod": [
+    "test"
+   ],
+   "functionalsafety_verificationPrecondition": [
+    "Target ECU flashed with the release build and connected to the HIL battery-cell emulator."
+   ],
+   "functionalsafety_verificationPostcondition": [
+    "Acceptance criteria not met; a deviation was recorded and a defect raised."
+   ],
+   "rationale": "SWR-04-4 is safety-relevant and is verified by test.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Verification record UID",
+     "identifier": "NW-VER-SWR-04-4"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-97",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-04-4",
+   "relationshipType": "verifiedBy",
+   "to": [
+    "bms:verifications/VER-SWR-04-4"
+   ]
+  },
+  {
+   "type": "functionalsafety_EvaluationResult",
+   "spdxId": "bms:evaluations/EVAL-SWR-04-4",
+   "name": "Evaluation of SWR-04-4 (fail)",
+   "functionalsafety_evaluation": "fail",
+   "functionalsafety_evaluationBasedOn": "bms:verifications/VER-SWR-04-4",
+   "functionalsafety_rationale": "A deviation was observed; defect NW-DEF-217 filed.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/evidence/SWR-04-4",
+   "name": "reports/swr_04_4_test_report.xml",
+   "software_primaryPurpose": "evidence",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "948f5695cb774b315f8334f3f616fb20bd977870cb1d567fc9fdbbb9483d8659"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "functionalsafety_EvidenceRelationship",
+   "spdxId": "bms:relationships/rel-98",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-SWR-04-4",
+   "relationshipType": "hasEvidence",
+   "to": [
+    "bms:files/evidence/SWR-04-4"
+   ],
+   "functionalsafety_evidenceCategory": [
+    "report"
+   ],
+   "functionalsafety_evidenceUID": "NW-EVD-7"
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/SWR-04-5",
+   "name": "SWR-04-5: WeldDetection",
+   "summary": "WeldDetection",
+   "requirementStatement": "WeldDetection shall detect a welded main contactor by evaluating the bus voltage before pre-charge.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-SWR-04-5"
+    }
+   ],
+   "rationale": "Software safety requirement derived from TSR-04-2 and allocated to WeldDetection.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-99",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/TSR-04-2",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/SWR-04-5"
+   ]
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/src/weld_detection",
+   "name": "src/weld_detection.c",
+   "software_primaryPurpose": "source",
+   "software_fileKind": "file",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "b2ef32138473203c768b68d847ccff7f8a03e2dda51528bff40fd23eed9c13d9"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-100",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:packages/contactor-control",
+   "relationshipType": "contains",
+   "to": [
+    "bms:files/src/weld_detection"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-101",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-04-5",
+   "relationshipType": "implementedBy",
+   "to": [
+    "bms:files/src/weld_detection",
+    "bms:packages/contactor-control"
+   ]
+  },
+  {
+   "type": "functionalsafety_RequirementVerification",
+   "spdxId": "bms:verifications/VER-SWR-04-5",
+   "name": "Verification of WeldDetection",
+   "summary": "Test-based verification of SWR-04-5.",
+   "functionalsafety_verificationMethod": [
+    "test"
+   ],
+   "functionalsafety_verificationPrecondition": [
+    "Target ECU flashed with the release build and connected to the HIL battery-cell emulator."
+   ],
+   "functionalsafety_verificationPostcondition": [
+    "Acceptance criteria met on all configured pack variants; no deviations recorded."
+   ],
+   "rationale": "SWR-04-5 is safety-relevant and is verified by test.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Verification record UID",
+     "identifier": "NW-VER-SWR-04-5"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-102",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-04-5",
+   "relationshipType": "verifiedBy",
+   "to": [
+    "bms:verifications/VER-SWR-04-5"
+   ]
+  },
+  {
+   "type": "functionalsafety_EvaluationResult",
+   "spdxId": "bms:evaluations/EVAL-SWR-04-5",
+   "name": "Evaluation of SWR-04-5 (pass)",
+   "functionalsafety_evaluation": "pass",
+   "functionalsafety_evaluationBasedOn": "bms:verifications/VER-SWR-04-5",
+   "functionalsafety_rationale": "All acceptance criteria met; the requirement is satisfied.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/SWR-06-1",
+   "name": "SWR-06-1: E2EProtection",
+   "summary": "E2EProtection",
+   "requirementStatement": "E2EProtection shall append a CRC-8 and an incrementing message counter to every safety-relevant CAN frame per AUTOSAR E2E Profile 1.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-SWR-06-1"
+    }
+   ],
+   "rationale": "Software safety requirement derived from TSR-06-1 and allocated to E2EProtection.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-103",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/TSR-06-1",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/SWR-06-1"
+   ]
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/src/e2e_protection",
+   "name": "src/e2e_protection.c",
+   "software_primaryPurpose": "source",
+   "software_fileKind": "file",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "78249285e6c196de5edc1e5eb501cac6b36a518f0e854a9d9ea13ad4f2bd084d"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-104",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:packages/e2e-comm-stack",
+   "relationshipType": "contains",
+   "to": [
+    "bms:files/src/e2e_protection"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-105",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-06-1",
+   "relationshipType": "implementedBy",
+   "to": [
+    "bms:files/src/e2e_protection",
+    "bms:packages/e2e-comm-stack"
+   ]
+  },
+  {
+   "type": "functionalsafety_RequirementVerification",
+   "spdxId": "bms:verifications/VER-SWR-06-1",
+   "name": "Verification of E2EProtection",
+   "summary": "Inspection-based verification of SWR-06-1.",
+   "functionalsafety_verificationMethod": [
+    "inspection"
+   ],
+   "functionalsafety_verificationPrecondition": [
+    "Inspection template for the message-protection configuration prepared."
+   ],
+   "functionalsafety_verificationPostcondition": [
+    "Acceptance criteria met on all configured pack variants; no deviations recorded."
+   ],
+   "rationale": "SWR-06-1 is safety-relevant and is verified by inspection.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Verification record UID",
+     "identifier": "NW-VER-SWR-06-1"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-106",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-06-1",
+   "relationshipType": "verifiedBy",
+   "to": [
+    "bms:verifications/VER-SWR-06-1"
+   ]
+  },
+  {
+   "type": "functionalsafety_EvaluationResult",
+   "spdxId": "bms:evaluations/EVAL-SWR-06-1",
+   "name": "Evaluation of SWR-06-1 (pass)",
+   "functionalsafety_evaluation": "pass",
+   "functionalsafety_evaluationBasedOn": "bms:verifications/VER-SWR-06-1",
+   "functionalsafety_rationale": "All acceptance criteria met; the requirement is satisfied.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/evidence/SWR-06-1",
+   "name": "reviews/swr_06_1_review_record.md",
+   "software_primaryPurpose": "evidence",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "6e65c1866df0cab55907eee4ae8381b81361875fd01f6bd358afb5a4c6799435"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "functionalsafety_EvidenceRelationship",
+   "spdxId": "bms:relationships/rel-107",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-SWR-06-1",
+   "relationshipType": "hasEvidence",
+   "to": [
+    "bms:files/evidence/SWR-06-1"
+   ],
+   "functionalsafety_evidenceCategory": [
+    "observation"
+   ],
+   "functionalsafety_evidenceUID": "NW-EVD-8"
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/SWR-06-2",
+   "name": "SWR-06-2: E2ECheck",
+   "summary": "E2ECheck",
+   "requirementStatement": "E2ECheck shall reject a received safety frame whose CRC or counter is invalid and substitute the fail-safe value.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-SWR-06-2"
+    }
+   ],
+   "rationale": "Software safety requirement derived from TSR-06-1 and allocated to E2ECheck.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-108",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/TSR-06-1",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/SWR-06-2"
+   ]
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/src/e2e_check",
+   "name": "src/e2e_check.c",
+   "software_primaryPurpose": "source",
+   "software_fileKind": "file",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "85d8ba92325125145859770326807d2191a9d275a86f5b3d00139a753be8243f"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-109",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:packages/e2e-comm-stack",
+   "relationshipType": "contains",
+   "to": [
+    "bms:files/src/e2e_check"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-110",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-06-2",
+   "relationshipType": "implementedBy",
+   "to": [
+    "bms:files/src/e2e_check",
+    "bms:packages/e2e-comm-stack"
+   ]
+  },
+  {
+   "type": "functionalsafety_RequirementVerification",
+   "spdxId": "bms:verifications/VER-SWR-06-2",
+   "name": "Verification of E2ECheck",
+   "summary": "Test-based verification of SWR-06-2.",
+   "functionalsafety_verificationMethod": [
+    "test"
+   ],
+   "functionalsafety_verificationPrecondition": [
+    "Target ECU flashed with the release build and connected to the HIL battery-cell emulator."
+   ],
+   "functionalsafety_verificationPostcondition": [
+    "Acceptance criteria met on all configured pack variants; no deviations recorded."
+   ],
+   "rationale": "SWR-06-2 is safety-relevant and is verified by test.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Verification record UID",
+     "identifier": "NW-VER-SWR-06-2"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-111",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-06-2",
+   "relationshipType": "verifiedBy",
+   "to": [
+    "bms:verifications/VER-SWR-06-2"
+   ]
+  },
+  {
+   "type": "functionalsafety_EvaluationResult",
+   "spdxId": "bms:evaluations/EVAL-SWR-06-2",
+   "name": "Evaluation of SWR-06-2 (pass)",
+   "functionalsafety_evaluation": "pass",
+   "functionalsafety_evaluationBasedOn": "bms:verifications/VER-SWR-06-2",
+   "functionalsafety_rationale": "All acceptance criteria met; the requirement is satisfied.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/SWR-06-3",
+   "name": "SWR-06-3: AdcSelfTest",
+   "summary": "AdcSelfTest",
+   "requirementStatement": "AdcSelfTest shall execute the ADC start-up self-test and inhibit high-voltage enable on failure.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-SWR-06-3"
+    }
+   ],
+   "rationale": "Software safety requirement derived from TSR-06-2 and allocated to AdcSelfTest.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-112",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/TSR-06-2",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/SWR-06-3"
+   ]
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/src/adc_selftest",
+   "name": "src/adc_selftest.c",
+   "software_primaryPurpose": "source",
+   "software_fileKind": "file",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "2848fb82d2d9b394f9d59807c2de38585e691d9cfd96148edf5abf0d56cf7f48"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-113",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:packages/hal-mcu",
+   "relationshipType": "contains",
+   "to": [
+    "bms:files/src/adc_selftest"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-114",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-06-3",
+   "relationshipType": "implementedBy",
+   "to": [
+    "bms:files/src/adc_selftest",
+    "bms:packages/hal-mcu"
+   ]
+  },
+  {
+   "type": "functionalsafety_RequirementVerification",
+   "spdxId": "bms:verifications/VER-SWR-06-3",
+   "name": "Verification of AdcSelfTest",
+   "summary": "Test-based verification of SWR-06-3.",
+   "functionalsafety_verificationMethod": [
+    "test"
+   ],
+   "functionalsafety_verificationPrecondition": [
+    "Target ECU flashed with the release build and connected to the HIL battery-cell emulator."
+   ],
+   "functionalsafety_verificationPostcondition": [
+    "Acceptance criteria met on all configured pack variants; no deviations recorded."
+   ],
+   "rationale": "SWR-06-3 is safety-relevant and is verified by test.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Verification record UID",
+     "identifier": "NW-VER-SWR-06-3"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-115",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-06-3",
+   "relationshipType": "verifiedBy",
+   "to": [
+    "bms:verifications/VER-SWR-06-3"
+   ]
+  },
+  {
+   "type": "functionalsafety_EvaluationResult",
+   "spdxId": "bms:evaluations/EVAL-SWR-06-3",
+   "name": "Evaluation of SWR-06-3 (pass)",
+   "functionalsafety_evaluation": "pass",
+   "functionalsafety_evaluationBasedOn": "bms:verifications/VER-SWR-06-3",
+   "functionalsafety_rationale": "All acceptance criteria met; the requirement is satisfied.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/evidence/SWR-06-3",
+   "name": "reports/swr_06_3_test_report.xml",
+   "software_primaryPurpose": "evidence",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "ac66be95246838f53cbcabe018ff1532e968fe39d59c4252265cad41366e7bfe"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "functionalsafety_EvidenceRelationship",
+   "spdxId": "bms:relationships/rel-116",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-SWR-06-3",
+   "relationshipType": "hasEvidence",
+   "to": [
+    "bms:files/evidence/SWR-06-3"
+   ],
+   "functionalsafety_evidenceCategory": [
+    "report"
+   ],
+   "functionalsafety_evidenceUID": "NW-EVD-9"
+  },
+  {
+   "type": "Requirement",
+   "spdxId": "bms:requirements/SWR-05-1",
+   "name": "SWR-05-1: IsolationMonitor",
+   "summary": "IsolationMonitor",
+   "requirementStatement": "IsolationMonitor shall measure the isolation resistance once per second and signal a fault below 500 Ω/V.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Requirement management UID",
+     "identifier": "NW-SWR-05-1"
+    }
+   ],
+   "rationale": "Software safety requirement derived from TSR-05-1 and allocated to IsolationMonitor.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-117",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/TSR-05-1",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/SWR-05-1"
+   ]
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/src/isolation_monitor",
+   "name": "src/isolation_monitor.c",
+   "software_primaryPurpose": "source",
+   "software_fileKind": "file",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "0ecfc978491c0f3c35cae35c0d96929e166fcb455b717b22180947df58f7bbd3"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-118",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:packages/isolation-monitor",
+   "relationshipType": "contains",
+   "to": [
+    "bms:files/src/isolation_monitor"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-119",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-05-1",
+   "relationshipType": "implementedBy",
+   "to": [
+    "bms:files/src/isolation_monitor",
+    "bms:packages/isolation-monitor"
+   ]
+  },
+  {
+   "type": "functionalsafety_RequirementVerification",
+   "spdxId": "bms:verifications/VER-SWR-05-1",
+   "name": "Verification of IsolationMonitor",
+   "summary": "Test-based verification of SWR-05-1.",
+   "functionalsafety_verificationMethod": [
+    "test"
+   ],
+   "functionalsafety_verificationPrecondition": [
+    "Target ECU flashed with the release build and connected to the HIL battery-cell emulator."
+   ],
+   "functionalsafety_verificationPostcondition": [
+    "Coverage could not be fully established; re-verification required."
+   ],
+   "rationale": "SWR-05-1 is safety-relevant and is verified by test.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Verification record UID",
+     "identifier": "NW-VER-SWR-05-1"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-120",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SWR-05-1",
+   "relationshipType": "verifiedBy",
+   "to": [
+    "bms:verifications/VER-SWR-05-1"
+   ]
+  },
+  {
+   "type": "functionalsafety_EvaluationResult",
+   "spdxId": "bms:evaluations/EVAL-SWR-05-1",
+   "name": "Evaluation of SWR-05-1 (inconclusive)",
+   "functionalsafety_evaluation": "inconclusive",
+   "functionalsafety_evaluationBasedOn": "bms:verifications/VER-SWR-05-1",
+   "functionalsafety_rationale": "Test coverage could not be established across the full operating envelope; re-run required.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/evidence/SWR-05-1",
+   "name": "reports/swr_05_1_test_report.xml",
+   "software_primaryPurpose": "evidence",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "24fcbad047a0d6f1a441c8a9b92688ba4f59eab998f84c2a9403ada4c62ee3d5"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "functionalsafety_EvidenceRelationship",
+   "spdxId": "bms:relationships/rel-121",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-SWR-05-1",
+   "relationshipType": "hasEvidence",
+   "to": [
+    "bms:files/evidence/SWR-05-1"
+   ],
+   "functionalsafety_evidenceCategory": [
+    "report"
+   ],
+   "functionalsafety_evidenceUID": "NW-EVD-10"
+  },
+  {
+   "type": "functionalsafety_RequirementVerification",
+   "spdxId": "bms:verifications/VER-T1",
+   "name": "FMEDA of the dual cell-measurement channel",
+   "summary": "Analysis-based verification of TSR-01-1.",
+   "functionalsafety_verificationMethod": [
+    "analysis"
+   ],
+   "functionalsafety_verificationPrecondition": [
+    "Verified static-analysis and worst-case-execution-time models available for the release build."
+   ],
+   "functionalsafety_verificationPostcondition": [
+    "Acceptance criteria met on all configured pack variants; no deviations recorded."
+   ],
+   "rationale": "TSR-01-1 is safety-relevant and is verified by analysis.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Verification record UID",
+     "identifier": "NW-VER-T1"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-122",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/TSR-01-1",
+   "relationshipType": "verifiedBy",
+   "to": [
+    "bms:verifications/VER-T1"
+   ]
+  },
+  {
+   "type": "functionalsafety_EvaluationResult",
+   "spdxId": "bms:evaluations/EVAL-T1",
+   "name": "Evaluation of TSR-01-1 (pass)",
+   "functionalsafety_evaluation": "pass",
+   "functionalsafety_evaluationBasedOn": "bms:verifications/VER-T1",
+   "functionalsafety_rationale": "All acceptance criteria met; the requirement is satisfied.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/evidence/T1",
+   "name": "reports/t1_test_report.xml",
+   "software_primaryPurpose": "evidence",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "81f21c7fbb7d3bbe100a2ff956a82465e6bc39d6b19aaebb3e7cfbd3ccce7485"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "functionalsafety_EvidenceRelationship",
+   "spdxId": "bms:relationships/rel-123",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-T1",
+   "relationshipType": "hasEvidence",
+   "to": [
+    "bms:files/evidence/T1"
+   ],
+   "functionalsafety_evidenceCategory": [
+    "report"
+   ],
+   "functionalsafety_evidenceUID": "NW-EVD-11"
+  },
+  {
+   "type": "functionalsafety_RequirementVerification",
+   "spdxId": "bms:verifications/VER-T2",
+   "name": "Timing analysis of the safety-monitor watchdog window",
+   "summary": "Analysis-based verification of TSR-04-1.",
+   "functionalsafety_verificationMethod": [
+    "analysis"
+   ],
+   "functionalsafety_verificationPrecondition": [
+    "Verified static-analysis and worst-case-execution-time models available for the release build."
+   ],
+   "functionalsafety_verificationPostcondition": [
+    "Acceptance criteria met on all configured pack variants; no deviations recorded."
+   ],
+   "rationale": "TSR-04-1 is safety-relevant and is verified by analysis.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Verification record UID",
+     "identifier": "NW-VER-T2"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-124",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/TSR-04-1",
+   "relationshipType": "verifiedBy",
+   "to": [
+    "bms:verifications/VER-T2"
+   ]
+  },
+  {
+   "type": "functionalsafety_EvaluationResult",
+   "spdxId": "bms:evaluations/EVAL-T2",
+   "name": "Evaluation of TSR-04-1 (pass)",
+   "functionalsafety_evaluation": "pass",
+   "functionalsafety_evaluationBasedOn": "bms:verifications/VER-T2",
+   "functionalsafety_rationale": "All acceptance criteria met; the requirement is satisfied.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "functionalsafety_RequirementVerification",
+   "spdxId": "bms:verifications/VER-T3",
+   "name": "Review of the E2E protection profile configuration",
+   "summary": "Review-based verification of TSR-06-1.",
+   "functionalsafety_verificationMethod": [
+    "review"
+   ],
+   "functionalsafety_verificationPrecondition": [
+    "Design and code review checklist prepared and reviewers assigned."
+   ],
+   "functionalsafety_verificationPostcondition": [
+    "Acceptance criteria met on all configured pack variants; no deviations recorded."
+   ],
+   "rationale": "TSR-06-1 is safety-relevant and is verified by review.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Verification record UID",
+     "identifier": "NW-VER-T3"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-125",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/TSR-06-1",
+   "relationshipType": "verifiedBy",
+   "to": [
+    "bms:verifications/VER-T3"
+   ]
+  },
+  {
+   "type": "functionalsafety_EvaluationResult",
+   "spdxId": "bms:evaluations/EVAL-T3",
+   "name": "Evaluation of TSR-06-1 (pass)",
+   "functionalsafety_evaluation": "pass",
+   "functionalsafety_evaluationBasedOn": "bms:verifications/VER-T3",
+   "functionalsafety_rationale": "All acceptance criteria met; the requirement is satisfied.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/evidence/T3",
+   "name": "reviews/t3_review_record.md",
+   "software_primaryPurpose": "evidence",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "50641d6804a5f12c52f4ca6d647c6bc88331a36dd2db46d952a10fa7be43dc48"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "functionalsafety_EvidenceRelationship",
+   "spdxId": "bms:relationships/rel-126",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-T3",
+   "relationshipType": "hasEvidence",
+   "to": [
+    "bms:files/evidence/T3"
+   ],
+   "functionalsafety_evidenceCategory": [
+    "observation"
+   ],
+   "functionalsafety_evidenceUID": "NW-EVD-12"
+  },
+  {
+   "type": "functionalsafety_RequirementVerification",
+   "spdxId": "bms:verifications/VER-T4",
+   "name": "Assessment of freedom from interference on the lockstep platform",
+   "summary": "Assessment-based verification of TSR-06-3.",
+   "functionalsafety_verificationMethod": [
+    "assessment"
+   ],
+   "functionalsafety_verificationPrecondition": [
+    "Safety case, work products and confirmation-measure records made available to the assessor."
+   ],
+   "functionalsafety_verificationPostcondition": [
+    "Acceptance criteria met on all configured pack variants; no deviations recorded."
+   ],
+   "rationale": "TSR-06-3 is safety-relevant and is verified by assessment.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Verification record UID",
+     "identifier": "NW-VER-T4"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-127",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/TSR-06-3",
+   "relationshipType": "verifiedBy",
+   "to": [
+    "bms:verifications/VER-T4"
+   ]
+  },
+  {
+   "type": "functionalsafety_EvaluationResult",
+   "spdxId": "bms:evaluations/EVAL-T4",
+   "name": "Evaluation of TSR-06-3 (pass)",
+   "functionalsafety_evaluation": "pass",
+   "functionalsafety_evaluationBasedOn": "bms:verifications/VER-T4",
+   "functionalsafety_rationale": "All acceptance criteria met; the requirement is satisfied.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/evidence/T4",
+   "name": "reports/t4_test_report.xml",
+   "software_primaryPurpose": "evidence",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "275bfceb7c2e4c3e733a162d2cc39f044626867d43aee4b00d9fb4a7b02601b3"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "functionalsafety_EvidenceRelationship",
+   "spdxId": "bms:relationships/rel-128",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-T4",
+   "relationshipType": "hasEvidence",
+   "to": [
+    "bms:files/evidence/T4"
+   ],
+   "functionalsafety_evidenceCategory": [
+    "report"
+   ],
+   "functionalsafety_evidenceUID": "NW-EVD-13"
+  },
+  {
+   "type": "functionalsafety_RequirementVerification",
+   "spdxId": "bms:verifications/VER-T5",
+   "name": "Demonstration of contactor feedback timing on the HIL bench",
+   "summary": "Demonstration-based verification of TSR-04-3.",
+   "functionalsafety_verificationMethod": [
+    "demonstration"
+   ],
+   "functionalsafety_verificationPrecondition": [
+    "HIL bench configured with instrumented contactors and a calibrated logic analyser."
+   ],
+   "functionalsafety_verificationPostcondition": [
+    "Acceptance criteria met on all configured pack variants; no deviations recorded."
+   ],
+   "rationale": "TSR-04-3 is safety-relevant and is verified by demonstration.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Verification record UID",
+     "identifier": "NW-VER-T5"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-129",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/TSR-04-3",
+   "relationshipType": "verifiedBy",
+   "to": [
+    "bms:verifications/VER-T5"
+   ]
+  },
+  {
+   "type": "functionalsafety_EvaluationResult",
+   "spdxId": "bms:evaluations/EVAL-T5",
+   "name": "Evaluation of TSR-04-3 (pass)",
+   "functionalsafety_evaluation": "pass",
+   "functionalsafety_evaluationBasedOn": "bms:verifications/VER-T5",
+   "functionalsafety_rationale": "All acceptance criteria met; the requirement is satisfied.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/evidence/T5",
+   "name": "bench/t5_capture.csv",
+   "software_primaryPurpose": "evidence",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "255d4fbeb7d98edce978b1ace0ab1b82d4ebaf3b779cfe8c08fd07e1b5947f4c"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "functionalsafety_EvidenceRelationship",
+   "spdxId": "bms:relationships/rel-130",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-T5",
+   "relationshipType": "hasEvidence",
+   "to": [
+    "bms:files/evidence/T5"
+   ],
+   "functionalsafety_evidenceCategory": [
+    "recording"
+   ],
+   "functionalsafety_evidenceUID": "NW-EVD-14"
+  },
+  {
+   "type": "functionalsafety_RequirementVerification",
+   "spdxId": "bms:verifications/VER-A1",
+   "name": "Functional safety assessment of the Aurora BMS safety case",
+   "summary": "Assessment-based verification of SG-04.",
+   "functionalsafety_verificationMethod": [
+    "assessment"
+   ],
+   "functionalsafety_verificationPrecondition": [
+    "Safety case, work products and confirmation-measure records made available to the assessor."
+   ],
+   "functionalsafety_verificationPostcondition": [
+    "Assessor confirmed the safety case is adequate for the item.Acceptance criteria met on all configured pack variants; no deviations recorded."
+   ],
+   "rationale": "SG-04 is safety-relevant and is verified by assessment.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Verification record UID",
+     "identifier": "NW-VER-A1"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-131",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SG-04",
+   "relationshipType": "verifiedBy",
+   "to": [
+    "bms:verifications/VER-A1"
+   ]
+  },
+  {
+   "type": "functionalsafety_EvaluationResult",
+   "spdxId": "bms:evaluations/EVAL-A1",
+   "name": "Evaluation of SG-04 (pass)",
+   "functionalsafety_evaluation": "pass",
+   "functionalsafety_evaluationBasedOn": "bms:verifications/VER-A1",
+   "functionalsafety_rationale": "All acceptance criteria met; the requirement is satisfied.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/evidence/A1",
+   "name": "reports/a1_test_report.xml",
+   "software_primaryPurpose": "evidence",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "761aa7592d779c57694641aa6c9637a59078009ebf6d45a170db78227f0a4c30"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "functionalsafety_EvidenceRelationship",
+   "spdxId": "bms:relationships/rel-132",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-A1",
+   "relationshipType": "hasEvidence",
+   "to": [
+    "bms:files/evidence/A1"
+   ],
+   "functionalsafety_evidenceCategory": [
+    "report"
+   ],
+   "functionalsafety_evidenceUID": "NW-EVD-15"
+  },
+  {
+   "type": "functionalsafety_RequirementVerification",
+   "spdxId": "bms:verifications/VER-A2",
+   "name": "Confirmation review and safety audit of the BMS development",
+   "summary": "Audit-based verification of SG-01.",
+   "functionalsafety_verificationMethod": [
+    "audit"
+   ],
+   "functionalsafety_verificationPrecondition": [
+    "Development-process records and the safety plan made available to the auditor."
+   ],
+   "functionalsafety_verificationPostcondition": [
+    "Audit confirmed the development complied with the safety plan.Acceptance criteria met on all configured pack variants; no deviations recorded."
+   ],
+   "rationale": "SG-01 is safety-relevant and is verified by audit.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Verification record UID",
+     "identifier": "NW-VER-A2"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-133",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SG-01",
+   "relationshipType": "verifiedBy",
+   "to": [
+    "bms:verifications/VER-A2"
+   ]
+  },
+  {
+   "type": "functionalsafety_EvaluationResult",
+   "spdxId": "bms:evaluations/EVAL-A2",
+   "name": "Evaluation of SG-01 (pass)",
+   "functionalsafety_evaluation": "pass",
+   "functionalsafety_evaluationBasedOn": "bms:verifications/VER-A2",
+   "functionalsafety_rationale": "All acceptance criteria met; the requirement is satisfied.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/evidence/A2",
+   "name": "reports/a2_test_report.xml",
+   "software_primaryPurpose": "evidence",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "f606793ceefeb785489627896f797d40cc0b3241439ee91b301addb8c435cf4a"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "functionalsafety_EvidenceRelationship",
+   "spdxId": "bms:relationships/rel-134",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-A2",
+   "relationshipType": "hasEvidence",
+   "to": [
+    "bms:files/evidence/A2"
+   ],
+   "functionalsafety_evidenceCategory": [
+    "report"
+   ],
+   "functionalsafety_evidenceUID": "NW-EVD-16"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-135",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:packages/aurora-bms",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/SG-01"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-136",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:packages/aurora-bms",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/SG-02"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-137",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:packages/aurora-bms",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/SG-03"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-138",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:packages/aurora-bms",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/SG-04"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-139",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:packages/aurora-bms",
+   "relationshipType": "hasRequirement",
+   "to": [
+    "bms:requirements/SG-05"
+   ]
+  },
+  {
+   "type": "Organization",
+   "spdxId": "bms:agents/northwind",
+   "name": "Northwind Mobility (fictional)",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Organization",
+   "spdxId": "bms:agents/cortex-safe",
+   "name": "CortexSafe Software (fictional RTOS vendor)",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "SoftwareAgent",
+   "spdxId": "bms:agents/safety-team",
+   "name": "Aurora BMS Functional Safety Team",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Tool",
+   "spdxId": "bms:tools/reqtool",
+   "name": "Aurora Requirements Manager",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Tool",
+   "spdxId": "bms:tools/hilbench",
+   "name": "HIL Safety Test Bench",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Tool",
+   "spdxId": "bms:tools/bomgen",
+   "name": "SPDX BOM Generator",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "CreationInfo",
+   "@id": "bms:creationinfo",
+   "created": "2026-07-04T09:00:00Z",
+   "createdBy": [
+    "bms:agents/safety-team",
+    "bms:agents/northwind"
+   ],
+   "createdUsing": [
+    "bms:tools/reqtool",
+    "bms:tools/bomgen"
+   ],
+   "specVersion": "3.1.0"
+  }
+ ]
+}
