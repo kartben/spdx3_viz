@@ -106,5 +106,14 @@
     "dir": "samples/ai",
     "files": ["simplehtr-example.spdx3.json"],
     "size": 73134
+  },
+  {
+    "id": "safety",
+    "name": "Functional Safety",
+    "emoji": "🛡️",
+    "description": "<strong>Synthetic / fictional</strong> SPDX 3.1 SBOM for a SIL 3 emergency-shutdown logic solver (\"ESD-3000\"). Exercises the <a href=\"https://spdx.github.io/spdx-spec/v3.1-dev/model/FunctionalSafety/FunctionalSafety/\" target=\"_blank\" rel=\"noopener\" onclick=\"event.stopPropagation()\">FunctionalSafety profile</a>: ~38 safety requirements with verifications, pass/fail evaluations, assumptions of use, and traced evidence.",
+    "dir": "samples/safety",
+    "files": ["esd-3000-safety-controller.spdx3.json"],
+    "size": 346537
   }
 ]

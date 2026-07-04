@@ -64,3 +64,48 @@ Options:
 ## Declared profiles
 
 `core`, `software`, `security`, `simpleLicensing`, `expandedLicensing`, `extension`.
+
+---
+
+# Functional Safety sample generator
+
+[`generate_safety_sample.py`](generate_safety_sample.py) emits the bundled
+**Functional Safety** demo SBOM at
+`samples/safety/esd-3000-safety-controller.spdx3.json`.
+
+The data is **entirely synthetic / fictional**: a SIL 3 emergency-shutdown (ESD)
+"Safety Logic Solver" firmware (2-out-of-3 / TMR architecture, de-energize-to-trip).
+No real product, company, person, tool, test result or certificate is described.
+Its sole purpose is to exercise the SPDX 3.1
+[FunctionalSafety profile](https://spdx.github.io/spdx-spec/v3.1-dev/model/FunctionalSafety/FunctionalSafety/)
+in the visualizer's **Functional Safety** view.
+
+```bash
+python3 scripts/generate_safety_sample.py     # no dependencies; stdlib only
+```
+
+The script is the source of truth for the JSON — regenerate rather than editing
+the output by hand (the file is listed in `.prettierignore` for that reason).
+
+## What it models
+
+| SPDX 3.1 concept                           | In the sample                                                                                                                 |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| Core `Requirement`                         | ~38 software safety requirements (`SRS-SW-*`) with `requirementStatement`, `devLifecycleStage`, `rationale`, `requirementUID` |
+| `functionalsafety_RequirementVerification` | ~64 verifications with `verificationMethod` (VerificationType), pre/postconditions, `rationale`, `verificationUID`            |
+| `functionalsafety_EvaluationResult`        | pass / fail / inconclusive outcomes, each with `evaluationBasedOn` → a verification and a mandatory `rationale`               |
+| `functionalsafety_Assumption`              | assumptions of use (proof-test interval, de-energize wiring, …) + normative baselines                                         |
+| `functionalsafety_EvidenceRelationship`    | evidence links (`hasEvidence`) to reports / logs, with `evidenceCategory` (EvidenceType)                                      |
+| Relationship types                         | `implementedBy`, `verifiedBy`, `assumes`, `conformsTo`, `hasRequirement`, `hasEvidence`, `usesTool`, `contains`, `dependsOn`  |
+| Software / licensing                       | 15 `software_Package`, ~20 source + ~12 evidence `software_File`, 8 qualified `Tool`, licenses                                |
+
+The mix of outcomes is deliberate so all of the view's status badges appear:
+mostly _passed_, one _failed_ (open defect), one _inconclusive_ (coverage waiver
+pending), one _verified_ (evaluation pending) and one _unverified_ (V&V in progress).
+
+Each `*UID` is the canonical SPDX 3.1 identifier property; it is also mirrored into
+the generic Core `externalIdentifier` list so the visualizer surfaces the id chip.
+
+## Declared profiles
+
+`core`, `software`, `simpleLicensing`, `functionalSafety`.
