@@ -1,8 +1,12 @@
 node_modules
+dist
 .git
 .DS_Store
 .claude
 
 # Bundled demo SBOM data — kept verbatim, not formatted
-samples/zephyr
-samples/linux
+public/samples/zephyr
+public/samples/linux
+
+# Auto-generated from the official SPDX model (scripts/gen-spdx-model.mjs)
+src/spdx/hierarchy.js

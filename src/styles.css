@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /**
  * SPDX 3.0 SBOM Visualizer - Styles
  *

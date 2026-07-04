@@ -4,15 +4,29 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
     "test": "node --test",
+    "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint ."
   },
+  "dependencies": {
+    "@alpinejs/collapse": "^3.14.0",
+    "alpinejs": "^3.14.0",
+    "d3": "^7.9.0"
+  },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
+    "autoprefixer": "^10.4.0",
     "eslint": "^9.0.0",
     "globals": "^16.0.0",
-    "prettier": "^3.8.4"
+    "postcss": "^8.4.0",
+    "prettier": "^3.8.4",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^6.0.3",
+    "vite": "^5.4.0"
   }
 }
