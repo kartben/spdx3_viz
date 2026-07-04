@@ -47,11 +47,13 @@
           </div>
           <ul class="space-y-1.5">
             <template x-for="(item, i) in release.items" :key="i">
-              <li class="flex items-baseline gap-2 text-sm text-slate-300 leading-snug">
+              <li
+                class="grid grid-cols-[5rem_1fr] items-baseline gap-x-2 gap-y-0.5 text-sm text-slate-300 leading-snug"
+              >
                 <span
                   x-show="item.tag"
                   x-text="item.tag"
-                  class="flex-shrink-0 text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded"
+                  class="justify-self-start text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded"
                   :class="changelogTagColor(item.tag)"
                 ></span>
                 <span x-text="item.text"></span>

@@ -11,15 +11,15 @@ export const CHANGELOG = [
     items: [
       {
         tag: 'Changed',
-        text: 'migrated the build to Vite; reorganized source into modules and view partials.'
+        text: 'Migrated the build to Vite; reorganized source into modules and view partials.'
       },
       {
         tag: 'Added',
-        text: 'dedicated Agents view.'
+        text: 'Dedicated Agents view.'
       },
       {
         tag: 'Added',
-        text: 'createdBy/performedBy provenance edges in the graph, hidden by default.'
+        text: 'CreatedBy/performedBy provenance edges in the graph, hidden by default.'
       },
       {
         tag: 'Fixed',
@@ -37,7 +37,7 @@ export const CHANGELOG = [
       },
       {
         tag: 'Added',
-        text: 'experimental Zephyr SPDX 3.1 sample.'
+        text: 'Experimental Zephyr SPDX 3.1 sample.'
       },
       {
         tag: 'Added',
@@ -49,7 +49,7 @@ export const CHANGELOG = [
       },
       {
         tag: 'Fixed',
-        text: 'build configs view showing up with nothing to show.'
+        text: 'Build configs view showing up with nothing to show.'
       }
     ]
   },
@@ -59,7 +59,7 @@ export const CHANGELOG = [
     items: [
       {
         tag: 'Improved',
-        text: 'package and file lists now load incrementally on scroll.'
+        text: 'Package and file lists now load incrementally on scroll.'
       },
       {
         tag: 'Added',
@@ -67,7 +67,7 @@ export const CHANGELOG = [
       },
       {
         tag: 'Added',
-        text: 'global search across all elements.'
+        text: 'Global search across all elements.'
       },
       {
         tag: 'Added',
@@ -89,7 +89,7 @@ export const CHANGELOG = [
     items: [
       {
         tag: 'Added',
-        text: 'sample SBOMs for Vue.js, Jenkins, Android, and Kubernetes.'
+        text: 'Sample SBOMs for Vue.js, Jenkins, Android, and Kubernetes.'
       },
       {
         tag: 'Added',
@@ -97,11 +97,11 @@ export const CHANGELOG = [
       },
       {
         tag: 'Improved',
-        text: 'graph rendering performance for large SBOMs, via node caching and a faster draw path.'
+        text: 'Graph rendering performance for large SBOMs, via node caching and a faster draw path.'
       },
       {
         tag: 'Improved',
-        text: 'file list rendering, via memoization.'
+        text: 'File list rendering, via memoization.'
       }
     ]
   },
@@ -111,11 +111,11 @@ export const CHANGELOG = [
     items: [
       {
         tag: 'Added',
-        text: 'initial release. Interactive relationship graph for SPDX 3 SBOMs, color-coded by element type.'
+        text: 'Initial release. Interactive relationship graph for SPDX 3 SBOMs, color-coded by element type.'
       },
       {
         tag: 'Added',
-        text: 'sample SBOMs for Linux, Windows, Yocto, Zephyr, and a Docker container image.'
+        text: 'Sample SBOMs for Linux, Windows, Yocto, Zephyr, and a Docker container image.'
       }
     ]
   }
