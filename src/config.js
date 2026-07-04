@@ -263,7 +263,7 @@ export function createGraphFilters() {
       key: 'createdBy',
       label: 'createdBy',
       color: COLORS.createdBy,
-      active: true,
+      active: false,
       isRel: true,
       lineStyle: 'dotted'
     },
