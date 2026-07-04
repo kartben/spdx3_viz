@@ -8,6 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "node --test",
+    "test:coverage": "mkdir -p coverage && node --test --experimental-test-coverage --test-reporter=spec --test-reporter-destination=stdout --test-reporter=spec --test-reporter-destination=coverage/summary.txt --test-reporter=lcov --test-reporter-destination=coverage/lcov.info",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
