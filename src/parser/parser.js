@@ -697,9 +697,7 @@ function computePresentTypes(data) {
     ...data.builds,
     ...data.buildConfigs
   ];
-  const hasCreatedBy = createdByHosts.some(
-    (el) => data.resolveCreationInfo(el)?.createdBy?.length
-  );
+  const hasCreatedBy = createdByHosts.some((el) => data.resolveCreationInfo(el)?.createdBy?.length);
   if (hasCreatedBy) relTypes.add('createdBy');
 
   // "External" nodes are placeholders for relationship endpoints that resolve
