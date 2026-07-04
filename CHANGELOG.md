@@ -17,7 +17,6 @@ via the "What's new" link.
 - **Added:** SPDX 3.1 Hardware profile support.
 - **Added:** SPDX 3.1 Functional Safety profile support, with a dedicated Requirements view.
 - **Fixed:** build configs view showing up with nothing to show.
-- **Fixed:** requirement filters not resetting between requirements.
 
 ## [0.0.3] - 2026-07-03
 

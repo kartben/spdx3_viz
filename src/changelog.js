@@ -50,10 +50,6 @@ export const CHANGELOG = [
       {
         tag: 'Fixed',
         text: 'build configs view showing up with nothing to show.'
-      },
-      {
-        tag: 'Fixed',
-        text: 'requirement filters not resetting between requirements.'
       }
     ]
   },
