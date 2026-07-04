@@ -7,6 +7,13 @@
       "runtimeArgs": [".claude/serve.py"],
       "port": 8770,
       "autoPort": true
+    },
+    {
+      "name": "dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--", "--port", "5173", "--strictPort"],
+      "port": 5173,
+      "autoPort": true
     }
   ]
 }

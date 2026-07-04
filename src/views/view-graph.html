@@ -78,6 +78,18 @@
       >
       <label
         class="flex items-center gap-1.5 cursor-pointer"
+        title="Represent each node with its type's icon (folder, package, chip, …) instead of a plain coloured dot."
+      >
+        <input
+          type="checkbox"
+          x-model="graphUseIcons"
+          @change="toggleGraphIcons()"
+          class="rounded border-slate-600 bg-slate-700 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5"
+        />
+        <span class="text-xs text-slate-300">Icons</span>
+      </label>
+      <label
+        class="flex items-center gap-1.5 cursor-pointer"
         title="Collapse files into their package/directory and build steps into their root build. Double-click a cluster to expand it."
       >
         <input
@@ -136,6 +148,14 @@
         :class="f.active ? 'text-slate-300' : 'text-slate-500 line-through'"
       >
         <span
+          x-show="graphUseIcons"
+          class="flex items-center justify-center transition-opacity"
+          :style="`color:${f.color}`"
+          :class="f.active ? 'opacity-100' : 'opacity-40'"
+          x-html="nodeTypeIconSvg(f.key)"
+        ></span>
+        <span
+          x-show="!graphUseIcons"
           class="w-2.5 h-2.5 rounded-full border transition-colors"
           :style="f.active
                       ? `background:${f.color}; border-color:${f.color}`

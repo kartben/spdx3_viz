@@ -39,20 +39,11 @@
           class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
           :style="`background:${nodeTypeColor(getNodeType(pkg))}26`"
         >
-          <svg
-            class="w-4 h-4"
+          <span
+            class="flex items-center justify-center"
             :style="`color:${nodeTypeColor(getNodeType(pkg))}`"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-            />
-          </svg>
+            x-html="elementIcon(pkg, 'w-4 h-4')"
+          ></span>
         </div>
         <div class="flex-1 min-w-0">
           <div
@@ -548,8 +539,9 @@
                       x-text="item.direction === 'out' ? '→' : '←'"
                     ></span>
                     <span
-                      class="detail-rel-target-dot"
-                      :style="`background: ${nodeTypeColor(getNodeType(elementMap.get(item.id) || {}))}`"
+                      class="flex items-center flex-shrink-0"
+                      :style="`color: ${nodeTypeColor(getNodeType(elementMap.get(item.id) || {}))}`"
+                      x-html="elementIcon(elementMap.get(item.id) || { spdxId: item.id }, 'w-3.5 h-3.5')"
                     ></span>
                     <span class="flex-1 truncate" x-text="item.displayName"></span>
                     <span

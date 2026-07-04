@@ -5,8 +5,17 @@ import {
   getNodeType,
   getNodeTypeColor,
   cleanName,
-  dirPrefix
+  dirPrefix,
+  iconKeyForElement,
+  getNodeIconPath2D
 } from '../lib/index.js';
+
+// Icon-node mode: below this on-screen node radius (px) icons are illegible, so
+// fall back to a plain dot. Glyphs are scaled to span ICON_SPAN * diameter, over
+// a faint type-coloured halo that keeps the colour legend and a clear hit target.
+const ICON_MIN_PX = 7;
+const ICON_SPAN = 1.2;
+const ICON_HALO_ALPHA = 0.22;
 
 const INPUT_LAYOUT_LINKS_PER_BUILD = 8;
 // Above this many underlying nodes, force-collapse into clusters for readability (a flat
@@ -400,6 +409,9 @@ export function renderGraph(app, retry = 0) {
     d._r = computeRadius(d);
     d._fill = fillForType(d.type);
     d._stroke = d.isCluster ? 'rgba(255,255,255,0.85)' : strokeForType(d.type);
+    // Resolved once here (not per frame); clusters stand for many elements so they
+    // keep the plain disc rather than any single member's glyph.
+    d._iconKey = d.isCluster ? null : iconKeyForElement(d.data, d.type);
   });
   const radiusFor = (d) => d._r;
 
@@ -578,7 +590,86 @@ export function renderGraph(app, retry = 0) {
     ctx.restore();
   };
 
+  // One icon node: a faint type-colour halo (which keeps the colour legend and a
+  // clear hit target) with the Material glyph, tinted a shade brighter, on top.
+  const drawIconNode = (d, r, k, alpha) => {
+    const path = getNodeIconPath2D(d._iconKey);
+    if (!path) {
+      ctx.globalAlpha = alpha;
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, r, 0, 2 * Math.PI);
+      ctx.fillStyle = d._fill;
+      ctx.fill();
+      ctx.lineWidth = 1.5 / k;
+      ctx.strokeStyle = d._stroke;
+      ctx.stroke();
+      return;
+    }
+    ctx.globalAlpha = alpha * ICON_HALO_ALPHA;
+    ctx.beginPath();
+    ctx.arc(d.x, d.y, r, 0, 2 * Math.PI);
+    ctx.fillStyle = d._fill;
+    ctx.fill();
+
+    const size = r * 2 * ICON_SPAN;
+    const s = size / 24; // Material icons live in a 24x24 box
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = d._stroke; // brighter than the fill so the glyph reads on the halo
+    ctx.save();
+    ctx.translate(d.x - size / 2, d.y - size / 2);
+    ctx.scale(s, s);
+    ctx.fill(path);
+    ctx.restore();
+  };
+
+  // Icon-mode node pass: unifies the plain/hover/search cases (alpha comes from
+  // the search style + hover focus). Clusters, glyph-less nodes, and nodes too
+  // small on screen keep the plain dot; everything else draws its Material glyph.
+  const drawNodesIcons = () => {
+    const k = currentTransform.k;
+    const minR = ICON_MIN_PX / k;
+    const connected =
+      !searchActive && highlightedNodeId
+        ? connectedIndex.get(highlightedNodeId) || new Set([highlightedNodeId])
+        : null;
+    renderNodes.forEach((d) => {
+      if (d.x == null || !nodeInView(d)) return;
+      const ss = nodeSearchStyle(d.id);
+      if (ss.hidden) return;
+      const r = radiusFor(d);
+      let alpha = ss.alpha;
+      if (connected && !connected.has(d.id)) alpha = 0.12;
+      if (d.isCluster || !d._iconKey || r < minR) {
+        ctx.globalAlpha = alpha;
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, r, 0, 2 * Math.PI);
+        ctx.fillStyle = d._fill;
+        ctx.fill();
+        ctx.lineWidth = (d.isCluster ? 2.5 : 1.5) / k;
+        ctx.strokeStyle = d._stroke;
+        ctx.stroke();
+      } else {
+        drawIconNode(d, r, k, alpha);
+      }
+      if (searchActive && matchSet.has(d.id)) {
+        // Amber ring so search hits pop regardless of node colour.
+        ctx.globalAlpha = 1;
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, r + 3 / k, 0, 2 * Math.PI);
+        ctx.strokeStyle = '#fbbf24';
+        ctx.lineWidth = 2 / k;
+        ctx.stroke();
+      }
+    });
+    ctx.globalAlpha = 1;
+    drawExternalRings();
+  };
+
   const drawNodes = () => {
+    if (app.graphUseIcons) {
+      drawNodesIcons();
+      return;
+    }
     if (!searchActive && !highlightedNodeId) {
       drawNodesFast();
       drawExternalRings();
@@ -1107,6 +1198,9 @@ export function renderGraph(app, retry = 0) {
   // Expose the search recompute so the controls bar can update the overlay
   // without rebuilding the graph, and apply any active query to the fresh build.
   app.graphRecomputeSearch = recomputeSearch;
+  // A pure redraw (no re-layout) so visual-only toggles like icon mode can flip
+  // a flag and repaint the settled canvas instead of restarting the simulation.
+  app.graphRedraw = queueDraw;
   recomputeSearch();
   setFlow();
 

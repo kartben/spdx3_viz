@@ -540,13 +540,6 @@
    Right-side detail panel styling for element inspection
    ========================================================================== */
 
-.detail-type-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
 .detail-rel-line {
   width: 3px;
   height: 14px;
@@ -577,13 +570,6 @@
   font-weight: 700;
   width: 12px;
   text-align: center;
-}
-
-.detail-rel-target-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  flex-shrink: 0;
 }
 
 .detail-promoted-hero {

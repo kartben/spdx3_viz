@@ -12,6 +12,8 @@ import {
   getNodeType as resolveNodeType,
   getNodeTypeColor,
   getElementBadgeClass,
+  elementIconSvg as elementIconMarkup,
+  typeIconSvg as typeIconMarkup,
   parseCompileFlags as parseBuildConfigFlags,
   parseBuildParameters as parseBuildParameterGroups,
   getToolUsageCount,
@@ -294,6 +296,14 @@ export const accessorsMixin = {
   },
   nodeTypeColor(type) {
     return getNodeTypeColor(type);
+  },
+  // Inline Material-icon <svg> for the DOM UI (sidebar, detail panel, list rows,
+  // graph legend). fill=currentColor, so callers tint via CSS/Tailwind colour.
+  elementIcon(el, className) {
+    return elementIconMarkup(el, className);
+  },
+  nodeTypeIconSvg(nodeType, className = 'w-3.5 h-3.5') {
+    return typeIconMarkup(nodeType, className);
   },
 
   // Flattened AI-profile / Dataset-profile fields for an element (ai_AIPackage

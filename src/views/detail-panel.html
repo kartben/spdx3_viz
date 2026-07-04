@@ -12,10 +12,11 @@
   <div class="p-4 border-b border-slate-700/50">
     <div class="flex items-start justify-between gap-2">
       <div class="min-w-0">
-        <div class="flex items-center gap-2 mb-1">
+        <div class="flex items-center gap-1.5 mb-1">
           <span
-            class="detail-type-dot"
-            :style="detailElement && `background:${nodeTypeColor(getNodeType(detailElement))}`"
+            class="flex items-center flex-shrink-0"
+            :style="detailElement && `color:${nodeTypeColor(getNodeType(detailElement))}`"
+            x-html="detailElement ? elementIcon(detailElement, 'w-4 h-4') : ''"
           ></span>
           <span
             class="text-xs text-slate-400"
@@ -1005,8 +1006,9 @@
                 x-text="item.direction === 'out' ? '→' : '←'"
               ></span>
               <span
-                class="detail-rel-target-dot"
-                :style="`background: ${nodeTypeColor(getNodeType(elementMap.get(item.id) || {}))}`"
+                class="flex items-center flex-shrink-0"
+                :style="`color: ${nodeTypeColor(getNodeType(elementMap.get(item.id) || {}))}`"
+                x-html="elementIcon(elementMap.get(item.id) || { spdxId: item.id }, 'w-3.5 h-3.5')"
               ></span>
               <span class="flex-1 truncate" x-text="item.displayName"></span>
               <span

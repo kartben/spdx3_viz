@@ -32,6 +32,12 @@ export const graphMixin = {
     this.expandedClusters = new Set();
     this.renderGraph();
   },
+  // Icon mode is purely visual, so repaint the settled canvas rather than
+  // rebuilding the graph and restarting the force simulation.
+  toggleGraphIcons() {
+    if (this.graphRedraw) this.graphRedraw();
+    else this.renderGraph();
+  },
   resetGraphZoom() {
     resetGraphViewZoom(this);
   }

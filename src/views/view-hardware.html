@@ -27,15 +27,10 @@
         <div
           class="w-8 h-8 rounded-lg bg-lime-500/15 flex items-center justify-center flex-shrink-0"
         >
-          <svg class="w-4 h-4 text-lime-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <rect x="7" y="7" width="10" height="10" rx="1" stroke-width="2" />
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"
-            />
-          </svg>
+          <span
+            class="flex items-center justify-center text-lime-400"
+            x-html="elementIcon(hw, 'w-4 h-4')"
+          ></span>
         </div>
         <div class="flex-1 min-w-0">
           <div
@@ -175,8 +170,9 @@
                       x-text="item.direction === 'out' ? '→' : '←'"
                     ></span>
                     <span
-                      class="detail-rel-target-dot"
-                      :style="`background: ${nodeTypeColor(getNodeType(elementMap.get(item.id) || {}))}`"
+                      class="flex items-center flex-shrink-0"
+                      :style="`color: ${nodeTypeColor(getNodeType(elementMap.get(item.id) || {}))}`"
+                      x-html="elementIcon(elementMap.get(item.id) || { spdxId: item.id }, 'w-3.5 h-3.5')"
                     ></span>
                     <span class="flex-1 truncate" x-text="item.displayName"></span>
                     <span

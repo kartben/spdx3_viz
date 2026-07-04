@@ -155,6 +155,7 @@ export function createState() {
     graphZoom: null,
     graphFilters: createGraphFilters(),
     graphAggregate: false,
+    graphUseIcons: false, // draw nodes as their type's Material icon instead of a plain dot
     expandedClusters: new Set(), // cluster keys the user has drilled into
     graphNodeCount: 0, // live readout of rendered nodes/edges
     graphEdgeCount: 0,

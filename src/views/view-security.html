@@ -62,14 +62,10 @@
           class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
           :class="vexStatusMeta(vuln.overallStatus).badgeClass"
         >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 9v2m0 4h.01M12 3l7 4v5c0 4.418-3 8.418-7 9.5C8 20.418 5 16.418 5 12V7l7-4z"
-            />
-          </svg>
+          <span
+            class="flex items-center justify-center"
+            x-html="nodeTypeIconSvg('vulnerability', 'w-4 h-4')"
+          ></span>
         </div>
         <div class="flex-1 min-w-0">
           <div class="flex items-center gap-2">
