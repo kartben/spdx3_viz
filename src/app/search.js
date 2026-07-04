@@ -13,7 +13,7 @@ const SEARCH_TYPE_LABELS = {
   dataset: 'Dataset',
   file: 'File',
   hardware: 'Hardware',
-  requirement: 'Functional Safety',
+  requirement: 'Requirement',
   config: 'Build config',
   build: 'Build',
   tool: 'Tool',
@@ -57,12 +57,12 @@ export const searchMixin = {
     if (key === searchCorpusKey) return searchCorpusVal;
 
     const out = [];
-    const add = (id, nodeType, name, sub, extra) => {
+    const add = (id, nodeType, name, sub, extra, typeLabelOverride) => {
       if (!id || !name) return;
       out.push({
         id,
         nodeType,
-        typeLabel: SEARCH_TYPE_LABELS[nodeType] || 'Element',
+        typeLabel: typeLabelOverride || SEARCH_TYPE_LABELS[nodeType] || 'Element',
         name,
         sub: sub || '',
         _n: name.toLowerCase(),
@@ -100,7 +100,8 @@ export const searchMixin = {
         'requirement',
         r.name || this.cleanName(r.spdxId),
         uid || statement,
-        `${uid} ${statement} ${r.spdxId}`
+        `${uid} ${statement} ${r.spdxId}`,
+        this.safetyArtifactKind(r)
       );
     }
     for (const c of this.buildConfigs) {
