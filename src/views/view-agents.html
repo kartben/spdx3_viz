@@ -22,8 +22,8 @@
   </div>
 
   <p class="text-xs text-slate-500 -mt-1 mb-2">
-    People, organizations, and software agents referenced across the document —
-    and everything they created, supplied, originated, or manufactured.
+    People, organizations, and software agents referenced across the document — and everything they
+    created, supplied, originated, or manufactured.
   </p>
 
   <template
@@ -70,7 +70,12 @@
             stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 9l-7 7-7-7"
+            />
           </svg>
         </div>
       </div>
@@ -86,7 +91,10 @@
           <div class="space-y-3">
             <div>
               <div class="text-xs text-slate-500 mb-1">SPDX ID</div>
-              <code class="hash-text text-slate-300 break-all leading-relaxed" x-text="agent.spdxId"></code>
+              <code
+                class="hash-text text-slate-300 break-all leading-relaxed"
+                x-text="agent.spdxId"
+              ></code>
             </div>
             <div x-show="agentEmail(agent)" class="flex items-center gap-2">
               <span class="text-xs text-slate-500 flex-shrink-0">Email</span>
@@ -113,10 +121,7 @@
               Identifiers
             </div>
             <div class="space-y-1.5">
-              <template
-                x-for="eid in externalIdentifiers(agent)"
-                :key="eid.type + eid.identifier"
-              >
+              <template x-for="eid in externalIdentifiers(agent)" :key="eid.type + eid.identifier">
                 <div class="flex items-start gap-2 group">
                   <span
                     class="text-[10px] text-slate-500 uppercase tracking-wider w-20 pt-0.5 flex-shrink-0 text-right"
@@ -207,10 +212,7 @@
   </template>
 
   <!-- Empty view -->
-  <div
-    x-show="filteredAgents.length === 0"
-    class="text-sm text-slate-500 italic text-center py-12"
-  >
+  <div x-show="filteredAgents.length === 0" class="text-sm text-slate-500 italic text-center py-12">
     No agents match your filter.
   </div>
 </div>
