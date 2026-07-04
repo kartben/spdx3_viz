@@ -52,6 +52,7 @@ function makeThrottledReporter(onProgress, total) {
  * @property {Object|null} buildInfo - Build information element
  * @property {Object|null} agentInfo - Agent information element (SoftwareAgent, Organization or Person)
  * @property {Array<Object>} agents - Agent elements (SoftwareAgent, Organization, Person) referenced as creators, for the graph's "created by" edges
+ * @property {Map<string, {created: string[], supplied: string[], originated: string[], manufactured: string[]}>} agentLinkIndex - Agent spdxId -> the elements it created / supplied / originated / manufactured
  * @property {Array<Object>} sboms - software_Sbom elements
  * @property {Array<string>} sbomTypes - Distinct software_sbomType values (source, build, …)
  * @property {Array<{id: string, name: string, type: string}>} creators - Document creators (createdBy)
@@ -448,6 +449,14 @@ export function parseGraph(graph, onProgress) {
   // Build the VEX model: enriched vulnerabilities + vuln↔package indexes.
   const vex = buildVexModel(vulnerabilities, vexRelationships, elementMap);
 
+  // Reverse provenance index for agents: which elements each agent is tied to,
+  // grouped by *how*. An agent is rarely a Relationship endpoint — instead the
+  // links are properties on the other elements: an element's CreationInfo.createdBy,
+  // an Artifact's suppliedBy / originatedBy, or a Hardware element's productAgent.
+  // Collecting the back-references here lets an agent's detail view (and the
+  // Agents tab) surface everything it created / supplied / originated / made.
+  const agentLinkIndex = buildAgentLinkIndex(graph, resolveCreationInfo);
+
   // Which node/relationship types actually occur, so the graph legend can hide
   // entries for types the SBOM doesn't contain.
   const { presentNodeTypes, presentRelTypes } = computePresentTypes({
@@ -479,6 +488,7 @@ export function parseGraph(graph, onProgress) {
     buildInfo,
     agentInfo,
     agents,
+    agentLinkIndex,
     sboms,
     sbomTypes,
     creators,
@@ -530,6 +540,56 @@ function collectCreators(creationInfos, elementMap) {
   };
 
   return { creators: collect('createdBy'), creatorTools: collect('createdUsing') };
+}
+
+/**
+ * Builds the reverse "agent → what it's linked to" index used by the Agents view
+ * and an agent's detail panel. Walks every element once and records the agent
+ * back-references it carries: CreationInfo.createdBy (creator), the Software
+ * profile's suppliedBy / originatedBy (both the bare and `software_`-prefixed
+ * spellings occur in the wild), and the Hardware profile's productAgent.
+ *
+ * @param {Array<Object>} graph - The merged element graph
+ * @param {(el: Object) => (Object|null)} resolveCreationInfo - Resolves an element's inline/ref CreationInfo
+ * @returns {Map<string, {created: string[], supplied: string[], originated: string[], manufactured: string[]}>}
+ */
+function buildAgentLinkIndex(graph, resolveCreationInfo) {
+  const index = new Map();
+  // Companion Sets keep the dedup O(1): a single document creator can be the
+  // createdBy of every element, so a plain includes() scan would be O(n^2).
+  const seen = new Map();
+  const asArray = (v) => (Array.isArray(v) ? v : v == null || v === '' ? [] : [v]);
+
+  const link = (agentId, bucket, elId) => {
+    if (!agentId || agentId === elId || String(agentId).includes('NoAssertion')) return;
+    let entry = index.get(agentId);
+    if (!entry) {
+      entry = { created: [], supplied: [], originated: [], manufactured: [] };
+      index.set(agentId, entry);
+      seen.set(agentId, {
+        created: new Set(),
+        supplied: new Set(),
+        originated: new Set(),
+        manufactured: new Set()
+      });
+    }
+    const bucketSeen = seen.get(agentId)[bucket];
+    if (!bucketSeen.has(elId)) {
+      bucketSeen.add(elId);
+      entry[bucket].push(elId);
+    }
+  };
+
+  graph.forEach((el) => {
+    const id = el?.spdxId;
+    if (!id) return;
+    asArray(resolveCreationInfo(el)?.createdBy).forEach((a) => link(a, 'created', id));
+    asArray(el.suppliedBy ?? el.software_suppliedBy).forEach((a) => link(a, 'supplied', id));
+    asArray(el.originatedBy ?? el.software_originatedBy).forEach((a) => link(a, 'originated', id));
+    asArray(el.hardware_productAgent).forEach((a) => link(a, 'manufactured', id));
+  });
+
+  return index;
 }
 
 /**

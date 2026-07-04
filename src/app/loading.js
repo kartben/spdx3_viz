@@ -290,6 +290,7 @@ export const loadingMixin = {
       this.views.find((v) => v.id === 'security').count = this.vulnerabilities.length;
       this.views.find((v) => v.id === 'configs').count = this.buildConfigs.length;
       this.views.find((v) => v.id === 'build').count = this.builds.length;
+      this.views.find((v) => v.id === 'agents').count = this.agents.length;
       this.expandedClusters = new Set(); // fresh data: start fully collapsed
       this.cveDetails = {}; // drop cached CVE fetches from the previous SBOM
       this._resetListMemos(); // invalidate the build + vulnerability sort memos for new data

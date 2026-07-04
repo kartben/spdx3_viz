@@ -31,6 +31,7 @@ export function createState() {
       security: false,
       configs: false,
       build: false,
+      agents: false,
       raw: false
     },
     // How many items of each heavy view's filtered list the DOM may show.
@@ -46,7 +47,8 @@ export function createState() {
       licenses: 0,
       security: 0,
       configs: 0,
-      build: 0
+      build: 0,
+      agents: 0
     },
     viewRender: { active: false, view: '', done: 0, total: 0 }, // streaming progress readout
     searchQuery: '', // header global-search box (cross-cutting jump-to-anything)
@@ -67,6 +69,7 @@ export function createState() {
     expandedBuild: null,
     expandedLicense: null,
     expandedVuln: null,
+    expandedAgent: null,
     _navPushQueued: false, // batches same-tick nav-state changes into one history entry
     _lastNavKey: null, // JSON of the last pushed/replaced nav state, to skip no-op pushes
     focusedNavKind: '',
@@ -75,6 +78,8 @@ export function createState() {
     _scrollNavSeq: 0, // invalidates pending scrollToNavTarget retries
     configSearch: '',
     buildSearch: '',
+    agentSearch: '', // in-view filter for the Agents list
+    agentSort: 'links', // Agents list sort: 'links' (most connected) | 'name'
     licenseSearch: '',
     securitySearch: '',
     securitySort: 'severity',
@@ -106,6 +111,7 @@ export function createState() {
     buildInfo: null,
     agentInfo: null,
     agents: [], // all Agent elements (SoftwareAgent / Organization / Person)
+    agentLinkIndex: new Map(), // agent spdxId -> { created, supplied, originated, manufactured }
     sboms: [], // software_Sbom elements
     sbomTypes: [], // distinct software_sbomType values (source, build, …)
     creators: [], // document creators (createdBy → SoftwareAgent/Organization/Person)

@@ -18,7 +18,8 @@ const SEARCH_TYPE_LABELS = {
   build: 'Build',
   tool: 'Tool',
   license: 'License',
-  vulnerability: 'Vulnerability'
+  vulnerability: 'Vulnerability',
+  agent: 'Agent'
 };
 
 // Memo for the searchable corpus, rebuilt only when a collection's length
@@ -50,7 +51,8 @@ export const searchMixin = {
       this.builds.length,
       this.tools.length,
       this.licenses.length,
-      this.vulnerabilities.length
+      this.vulnerabilities.length,
+      this.agents.length
     ].join('|');
     if (key === searchCorpusKey) return searchCorpusVal;
 
@@ -119,6 +121,17 @@ export const searchMixin = {
         ? `${v.packageCount} package${v.packageCount === 1 ? '' : 's'} affected`
         : '';
       add(v.spdxId, 'vulnerability', v.name, sub, '');
+    }
+    for (const a of this.agents) {
+      const links = this.agentLinkCount(a);
+      const sub = links ? `${links} link${links === 1 ? '' : 's'}` : this.agentTypeLabel(a);
+      add(
+        a.spdxId,
+        'agent',
+        a.name || this.cleanName(a.spdxId),
+        sub,
+        `${this.agentEmail(a)} ${a.spdxId}`
+      );
     }
 
     searchCorpusKey = key;

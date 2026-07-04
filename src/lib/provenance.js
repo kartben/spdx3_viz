@@ -14,6 +14,7 @@ const EXTERNAL_ID_LABELS = {
   gitoid: 'gitoid',
   swid: 'SWID',
   swhid: 'SWHID',
+  email: 'Email',
   urlScheme: 'URL',
   securityOther: 'Security ref',
   other: 'Other'

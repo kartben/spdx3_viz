@@ -24,6 +24,7 @@ import {
   normalizeUrl,
   copyToClipboard
 } from '../lib/index.js';
+import { COLORS } from '../config.js';
 
 /* Element accessors and display helpers: thin lookups into the relationship
    indexes, name/date formatting, and the relationship-group data the detail
@@ -270,6 +271,73 @@ export const accessorsMixin = {
   // Grouped relationships for the currently graph-selected element.
   get detailRelGroups() {
     return this.detailRelGroupsFor(this.detailElement);
+  },
+
+  // True for Agent elements (Person / Organization / SoftwareAgent, or a bare
+  // Agent) — the ones the Agents tab lists and gives a provenance-focused view.
+  isAgent(el) {
+    return this.getNodeType(el) === 'agent';
+  },
+
+  // Human-readable kind of an agent, used as the card/detail subtitle.
+  agentTypeLabel(el) {
+    switch (el?.type) {
+      case 'Organization':
+        return 'Organization';
+      case 'Person':
+        return 'Person';
+      case 'SoftwareAgent':
+        return 'Software agent';
+      default:
+        return 'Agent';
+    }
+  },
+
+  // First email address carried by an agent's externalIdentifier list, or '' —
+  // so templates can gate a mailto link on truthiness.
+  agentEmail(el) {
+    const ids = el?.externalIdentifier;
+    if (!Array.isArray(ids)) return '';
+    const email = ids.find((id) => id?.externalIdentifierType === 'email' && id?.identifier);
+    return email?.identifier?.replace(/^mailto:/i, '') || '';
+  },
+
+  // How many elements an agent is tied to across all provenance roles, for the
+  // list-card badge and the "most connected" sort.
+  agentLinkCount(el) {
+    const e = el && this.agentLinkIndex.get(el.spdxId);
+    if (!e) return 0;
+    return e.created.length + e.supplied.length + e.originated.length + e.manufactured.length;
+  },
+
+  // The provenance links an agent has, shaped like detailRelGroups so the detail
+  // panel and the Agents-view card render them with the same template. Each group
+  // is capped so a document-wide creator (createdBy on every element) can't mount
+  // thousands of rows; the surplus is reported via hiddenCount.
+  agentLinkGroups(el) {
+    const entry = el && this.agentLinkIndex.get(el.spdxId);
+    if (!entry) return [];
+    const CAP = 50;
+    const defs = [
+      { bucket: 'created', label: 'Created', color: COLORS.createdBy },
+      { bucket: 'manufactured', label: 'Manufacturer of', color: COLORS.hardware },
+      { bucket: 'supplied', label: 'Supplier of', color: COLORS.distribution },
+      { bucket: 'originated', label: 'Originator of', color: COLORS.package }
+    ];
+    const groups = [];
+    for (const d of defs) {
+      const ids = entry[d.bucket] || [];
+      if (!ids.length) continue;
+      groups.push({
+        key: d.bucket,
+        label: d.label,
+        color: d.color,
+        total: ids.length,
+        hiddenCount: Math.max(0, ids.length - CAP),
+        items: ids.slice(0, CAP).map((id) => ({ id, displayName: this.relTargetDisplayName(id) }))
+      });
+    }
+    return groups;
   },
 
   // Sort order for relationship groups (most relevant first)
