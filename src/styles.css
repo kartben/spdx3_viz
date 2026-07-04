@@ -20,6 +20,20 @@
 }
 
 /* ==========================================================================
+   Full-viewport height
+   `h-screen` (100vh) overshoots the visible area on mobile browsers, whose
+   dynamic toolbars are excluded from vh. That pushes the bottom of the UI
+   off-screen (and, with the body's overflow-hidden, out of reach). `dvh`
+   tracks the *visible* viewport as the toolbars show/hide; the vh line is a
+   fallback for the rare browser without dvh support.
+   ========================================================================== */
+
+.h-screen-dvh {
+  height: 100vh; /* fallback for browsers without dvh */
+  height: 100dvh;
+}
+
+/* ==========================================================================
    Scrollbar Styling
    Custom thin scrollbars for dark theme
    ========================================================================== */
