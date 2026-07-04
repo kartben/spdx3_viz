@@ -41,9 +41,22 @@
           Created
           <span class="text-white font-medium" x-text="formatDate(createdDate)"></span>
         </div>
-        <div class="text-slate-400 mt-1" x-show="creators.length">
-          By
-          <span class="text-white font-medium" x-text="creators.map(c => c.name).join(', ')"></span>
+        <div
+          class="text-slate-400 mt-1 flex flex-wrap items-center gap-x-1 gap-y-0.5 sm:justify-end"
+          x-show="creators.length"
+        >
+          <span>By</span>
+          <template x-for="(c, i) in creators" :key="c.id">
+            <span class="inline-flex items-center">
+              <button
+                @click="navigateTo(c.id)"
+                class="text-white font-medium hover:text-red-300 hover:underline decoration-slate-600 underline-offset-2 transition-colors"
+                :title="'View agent: ' + c.name"
+                x-text="c.name"
+              ></button>
+              <span x-show="i < creators.length - 1" class="text-slate-500">,</span>
+            </span>
+          </template>
         </div>
         <div class="text-slate-400 mt-1" x-show="creatorTools.length">
           Using

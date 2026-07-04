@@ -25,7 +25,8 @@ const viewListProps = {
   licenses: 'filteredLicenses',
   security: 'filteredVulnerabilities',
   configs: 'filteredConfigs',
-  build: 'filteredBuilds'
+  build: 'filteredBuilds',
+  agents: 'filteredAgents'
 };
 // Nav-target kind -> how to locate its card in the corresponding list, so a
 // deep link can grow that list far enough to render the target before scrolling.
@@ -39,7 +40,8 @@ const navKindListInfo = {
   license: { view: 'licenses', list: 'filteredLicenses', idField: 'id' },
   vuln: { view: 'security', list: 'filteredVulnerabilities', idField: 'spdxId' },
   config: { view: 'configs', list: 'filteredConfigs', idField: 'spdxId' },
-  build: { view: 'build', list: 'filteredBuilds', idField: 'spdxId' }
+  build: { view: 'build', list: 'filteredBuilds', idField: 'spdxId' },
+  agent: { view: 'agents', list: 'filteredAgents', idField: 'spdxId' }
 };
 
 export const navigationMixin = {
@@ -60,6 +62,7 @@ export const navigationMixin = {
       expandedBuild: this.expandedBuild,
       expandedLicense: this.expandedLicense,
       expandedVuln: this.expandedVuln,
+      expandedAgent: this.expandedAgent,
       detail: this.detailElement?.spdxId || null,
       graphSelected: this.graphSelectedNodeId
     };
@@ -97,6 +100,7 @@ export const navigationMixin = {
     this.expandedBuild = state.expandedBuild;
     this.expandedLicense = state.expandedLicense;
     this.expandedVuln = state.expandedVuln;
+    this.expandedAgent = state.expandedAgent;
     if (this.expandedVuln) this.ensureCveDetails(this.vulnRecord(this.expandedVuln)?.cveId);
     this.detailElement = state.detail
       ? this.elementMap.get(state.detail) || this.placeholderElement(state.detail)
@@ -119,7 +123,8 @@ export const navigationMixin = {
       configs: ['config', this.expandedConfig],
       build: ['build', this.expandedBuild],
       licenses: ['license', this.expandedLicense],
-      security: ['vuln', this.expandedVuln]
+      security: ['vuln', this.expandedVuln],
+      agents: ['agent', this.expandedAgent]
     }[state.view];
     if (expandedNavTarget?.[1]) this.scrollToNavTarget(...expandedNavTarget);
   },
@@ -151,6 +156,7 @@ export const navigationMixin = {
     this.expandedBuild = null;
     this.expandedLicense = null;
     this.expandedVuln = null;
+    this.expandedAgent = null;
     this.rawActiveFile = 0;
     this.sampleError = '';
     this.sidebarOpen = false;
@@ -319,6 +325,10 @@ export const navigationMixin = {
     if (this.expandedVuln) this.ensureCveDetails(this.vulnRecord(id)?.cveId);
     this._scheduleNavPush();
   },
+  toggleAgent(id) {
+    this.expandedAgent = this.expandedAgent === id ? null : id;
+    this._scheduleNavPush();
+  },
   isNavTarget(kind, id) {
     return this.focusedNavKind === kind && this.focusedNavId === id;
   },
@@ -367,6 +377,9 @@ export const navigationMixin = {
   // null for elements with no dedicated list (placeholders / agents).
   listTargetFor(el) {
     if (!el || el.placeholder) return null;
+    // Agents (Person / Organization / SoftwareAgent) resolve by node type rather
+    // than an exact class, so they land in the Agents tab regardless of subclass.
+    if (this.getNodeType(el) === 'agent') return { label: 'Agents' };
     switch (el.type) {
       case 'software_Package':
         return { label: 'Packages' };
@@ -404,6 +417,11 @@ export const navigationMixin = {
     const el = this.elementMap.get(spdxId);
     if (!el) {
       this.selectGraphNode(spdxId);
+      return;
+    }
+    // Agents route by node type so every subclass lands in the Agents tab.
+    if (this.getNodeType(el) === 'agent') {
+      this.navigateToAgent(spdxId);
       return;
     }
     if (el.type === 'software_Package') {
@@ -518,5 +536,11 @@ export const navigationMixin = {
     // Tools live in the Build Tools grid at the bottom of the build view.
     this.switchView('build');
     this.scrollToNavTarget('tool', spdxId);
+  },
+  navigateToAgent(spdxId) {
+    this.agentSearch = '';
+    this.switchView('agents');
+    this.expandedAgent = spdxId;
+    this.scrollToNavTarget('agent', spdxId);
   }
 };

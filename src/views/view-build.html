@@ -126,18 +126,33 @@
 
   <!-- Agent -->
   <div class="card" x-show="agentInfo">
-    <div class="flex items-center gap-3 mb-3">
-      <div class="w-10 h-10 rounded-xl bg-red-500/15 flex items-center justify-center">
+    <button
+      @click="agentInfo && navigateToAgent(agentInfo.spdxId)"
+      class="flex items-center gap-3 w-full text-left group"
+      title="View agent details"
+    >
+      <div class="w-10 h-10 rounded-xl bg-red-500/15 flex items-center justify-center flex-shrink-0">
         <span
           class="flex items-center justify-center text-red-400"
           x-html="agentInfo ? elementIcon(agentInfo, 'w-5 h-5') : ''"
         ></span>
       </div>
-      <div>
-        <h3 class="font-semibold text-white" x-text="agentInfo?.name || 'Agent'"></h3>
-        <p class="text-xs text-slate-400" x-text="agentInfo?.type || ''"></p>
+      <div class="min-w-0">
+        <h3
+          class="font-semibold text-white group-hover:text-red-300 transition-colors truncate"
+          x-text="agentInfo?.name || 'Agent'"
+        ></h3>
+        <p class="text-xs text-slate-400" x-text="agentInfo ? agentTypeLabel(agentInfo) : ''"></p>
       </div>
-    </div>
+      <svg
+        class="w-4 h-4 text-slate-600 group-hover:text-slate-400 transition-colors ml-auto flex-shrink-0"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
+    </button>
   </div>
 
   <!-- Build steps -->

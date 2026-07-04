@@ -206,10 +206,12 @@
     >
       <div class="flex items-center gap-2" x-show="hardwareManufacturer(detailElement)">
         <span class="text-xs text-slate-500 flex-shrink-0">Manufacturer</span>
-        <span
-          class="text-xs px-2 py-0.5 rounded-md bg-red-500/15 text-red-400"
+        <button
+          @click="navigateTo(hardwareManufacturer(detailElement)?.id)"
+          class="text-xs px-2 py-0.5 rounded-md bg-red-500/15 text-red-400 hover:brightness-125 transition"
+          title="View agent details"
           x-text="hardwareManufacturer(detailElement)?.name"
-        ></span>
+        ></button>
       </div>
       <template x-for="spec in hardwareSpecs(detailElement)" :key="spec.label">
         <div>
@@ -985,6 +987,72 @@
       </button>
     </div>
 
+    <!-- Agent provenance: contact + everything this agent created / supplied /
+         originated / manufactured across the loaded document(s) -->
+    <div x-show="isAgent(detailElement)" class="space-y-4">
+      <div x-show="agentEmail(detailElement)" class="flex items-center gap-2">
+        <span class="text-xs text-slate-500 flex-shrink-0">Email</span>
+        <a
+          :href="'mailto:' + agentEmail(detailElement)"
+          class="text-xs text-sky-400 hover:text-sky-300 break-all"
+          x-text="agentEmail(detailElement)"
+        ></a>
+      </div>
+      <template x-for="group in agentLinkGroups(detailElement)" :key="group.key">
+        <div class="detail-rel-section">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="detail-rel-line" :style="`background: ${group.color}`"></span>
+            <span
+              class="text-xs font-semibold uppercase tracking-wider"
+              :style="`color: ${group.color}`"
+              x-text="group.label"
+            ></span>
+            <span
+              class="text-[10px] text-slate-500"
+              x-text="'(' + formatCount(group.total) + ')'"
+            ></span>
+          </div>
+          <div class="space-y-1 ml-3">
+            <template x-for="item in group.items" :key="item.id">
+              <div class="detail-rel-item group" @click="selectGraphNode(item.id)">
+                <span class="detail-rel-arrow" :style="`color: ${group.color}`">→</span>
+                <span
+                  class="flex items-center flex-shrink-0"
+                  :style="`color: ${nodeTypeColor(getNodeType(elementMap.get(item.id) || {}))}`"
+                  x-html="elementIcon(elementMap.get(item.id) || { spdxId: item.id }, 'w-3.5 h-3.5')"
+                ></span>
+                <span class="flex-1 truncate" x-text="item.displayName"></span>
+                <svg
+                  class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors flex-shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </div>
+            </template>
+            <div
+              x-show="group.hiddenCount > 0"
+              class="text-[10px] text-slate-500 italic pl-1"
+              x-text="'+' + formatCount(group.hiddenCount) + ' more'"
+            ></div>
+          </div>
+        </div>
+      </template>
+      <div
+        x-show="agentLinkGroups(detailElement).length === 0"
+        class="text-xs text-slate-500 italic text-center py-2"
+      >
+        Not linked to any elements in the loaded document(s).
+      </div>
+    </div>
+
     <!-- Relationships — grouped semantically -->
     <template x-for="group in detailRelGroups" :key="group.key">
       <div class="detail-rel-section">
@@ -1036,9 +1104,10 @@
       </div>
     </template>
 
-    <!-- Empty state -->
+    <!-- Empty state (agents carry their own provenance section + empty state) -->
     <div
       x-show="detailElement && detailRelGroups.length === 0
+                    && !isAgent(detailElement)
                     && detailElement.type !== 'security_Vulnerability'
                     && vulnsForPackage(detailElement.spdxId).length === 0"
       class="text-xs text-slate-500 italic text-center py-4"

@@ -353,5 +353,31 @@ export const derivedMixin = {
   get fileTypes() {
     const exts = new Set(this.files.map((f) => this.fileExt(f.name)));
     return [...exts].sort();
+  },
+
+  // Agents (Person / Organization / SoftwareAgent) filtered by the in-view search
+  // box (name, id, or email) and sorted either by how many elements they're tied
+  // to — the most active creators/suppliers first — or by name.
+  get filteredAgents() {
+    let list = this.agents;
+    if (this.agentSearch) {
+      const q = this.agentSearch.toLowerCase();
+      list = list.filter(
+        (a) =>
+          (a.name || '').toLowerCase().includes(q) ||
+          this.cleanName(a.spdxId).toLowerCase().includes(q) ||
+          (this.agentEmail(a) || '').toLowerCase().includes(q)
+      );
+    }
+    if (this.agentSort === 'name') {
+      return [...list].sort((a, b) =>
+        (a.name || this.cleanName(a.spdxId)).localeCompare(b.name || this.cleanName(b.spdxId))
+      );
+    }
+    return [...list].sort(
+      (a, b) =>
+        this.agentLinkCount(b) - this.agentLinkCount(a) ||
+        (a.name || this.cleanName(a.spdxId)).localeCompare(b.name || this.cleanName(b.spdxId))
+    );
   }
 };
