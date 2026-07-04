@@ -3,17 +3,16 @@ import globals from 'globals';
 
 export default [
   {
-    ignores: ['node_modules/**']
+    ignores: ['node_modules/**', 'dist/**']
   },
   js.configs.recommended,
   {
-    files: ['js/**/*.js'],
+    files: ['src/**/*.js', '*.config.js'],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
       globals: {
-        ...globals.browser,
-        d3: 'readonly'
+        ...globals.browser
       }
     },
     rules: {
@@ -21,12 +20,13 @@ export default [
     }
   },
   {
-    files: ['tests/**/*.js'],
+    files: ['tests/**/*.js', 'scripts/**/*.mjs'],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
       globals: {
-        ...globals.node
+        ...globals.node,
+        fetch: 'readonly'
       }
     },
     rules: {
