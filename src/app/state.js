@@ -105,6 +105,7 @@ export function createState() {
     builds: [],
     buildInfo: null,
     agentInfo: null,
+    agents: [], // every Agent (SoftwareAgent / Organization / Person)
     sboms: [], // software_Sbom elements
     sbomTypes: [], // distinct software_sbomType values (source, build, …)
     creators: [], // document creators (createdBy → SoftwareAgent/Organization/Person)

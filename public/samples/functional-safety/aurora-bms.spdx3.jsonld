@@ -24,6 +24,22 @@
     "bms:packages/aurora-bms"
    ],
    "element": [
+    "bms:agents/northwind",
+    "bms:agents/cortex-safe",
+    "bms:agents/meridian",
+    "bms:agents/safety-team",
+    "bms:agents/vasquez",
+    "bms:agents/feldt",
+    "bms:agents/nair",
+    "bms:agents/berg",
+    "bms:agents/tanaka",
+    "bms:agents/okoro",
+    "bms:agents/rossi",
+    "bms:agents/oconnor",
+    "bms:agents/weber",
+    "bms:agents/malhotra",
+    "bms:agents/sorensen",
+    "bms:agents/klein",
     "bms:packages/aurora-bms",
     "bms:packages/safety-monitor",
     "bms:packages/cell-measurement-driver",
@@ -75,7 +91,7 @@
     "bms:verifications/VER-SWR-01-1",
     "bms:evaluations/EVAL-SWR-01-1",
     "bms:files/evidence/SWR-01-1",
-    "bms:relationships/rel-40",
+    "bms:relationships/rel-41",
     "bms:requirements/SWR-01-2",
     "bms:files/src/voltage_plausibility",
     "bms:verifications/VER-SWR-01-2",
@@ -85,7 +101,7 @@
     "bms:verifications/VER-SWR-01-3",
     "bms:evaluations/EVAL-SWR-01-3",
     "bms:files/evidence/SWR-01-3",
-    "bms:relationships/rel-50",
+    "bms:relationships/rel-53",
     "bms:requirements/SWR-01-4",
     "bms:files/src/measurement_crc",
     "bms:verifications/VER-SWR-01-4",
@@ -99,7 +115,7 @@
     "bms:verifications/VER-SWR-02-2",
     "bms:evaluations/EVAL-SWR-02-2",
     "bms:files/evidence/SWR-02-2",
-    "bms:relationships/rel-63",
+    "bms:relationships/rel-69",
     "bms:requirements/SWR-03-1",
     "bms:files/src/current_acq",
     "bms:verifications/VER-SWR-03-1",
@@ -109,7 +125,7 @@
     "bms:verifications/VER-SWR-03-2",
     "bms:evaluations/EVAL-SWR-03-2",
     "bms:files/evidence/SWR-03-2",
-    "bms:relationships/rel-72",
+    "bms:relationships/rel-80",
     "bms:requirements/SWR-03-3",
     "bms:files/src/soc_estimator",
     "bms:verifications/VER-SWR-03-3",
@@ -119,13 +135,13 @@
     "bms:verifications/VER-SWR-04-1",
     "bms:evaluations/EVAL-SWR-04-1",
     "bms:files/evidence/SWR-04-1",
-    "bms:relationships/rel-81",
+    "bms:relationships/rel-91",
     "bms:requirements/SWR-04-2",
     "bms:files/src/safety_manager",
     "bms:verifications/VER-SWR-04-2",
     "bms:evaluations/EVAL-SWR-04-2",
     "bms:files/evidence/SWR-04-2",
-    "bms:relationships/rel-87",
+    "bms:relationships/rel-98",
     "bms:requirements/SWR-04-3",
     "bms:files/src/fault_memory",
     "bms:verifications/VER-SWR-04-3",
@@ -135,7 +151,7 @@
     "bms:verifications/VER-SWR-04-4",
     "bms:evaluations/EVAL-SWR-04-4",
     "bms:files/evidence/SWR-04-4",
-    "bms:relationships/rel-98",
+    "bms:relationships/rel-111",
     "bms:requirements/SWR-04-5",
     "bms:files/src/weld_detection",
     "bms:verifications/VER-SWR-04-5",
@@ -145,7 +161,7 @@
     "bms:verifications/VER-SWR-06-1",
     "bms:evaluations/EVAL-SWR-06-1",
     "bms:files/evidence/SWR-06-1",
-    "bms:relationships/rel-107",
+    "bms:relationships/rel-122",
     "bms:requirements/SWR-06-2",
     "bms:files/src/e2e_check",
     "bms:verifications/VER-SWR-06-2",
@@ -155,46 +171,254 @@
     "bms:verifications/VER-SWR-06-3",
     "bms:evaluations/EVAL-SWR-06-3",
     "bms:files/evidence/SWR-06-3",
-    "bms:relationships/rel-116",
+    "bms:relationships/rel-133",
     "bms:requirements/SWR-05-1",
     "bms:files/src/isolation_monitor",
     "bms:verifications/VER-SWR-05-1",
     "bms:evaluations/EVAL-SWR-05-1",
     "bms:files/evidence/SWR-05-1",
-    "bms:relationships/rel-121",
+    "bms:relationships/rel-139",
     "bms:verifications/VER-T1",
     "bms:evaluations/EVAL-T1",
     "bms:files/evidence/T1",
-    "bms:relationships/rel-123",
+    "bms:relationships/rel-142",
     "bms:verifications/VER-T2",
     "bms:evaluations/EVAL-T2",
     "bms:verifications/VER-T3",
     "bms:evaluations/EVAL-T3",
     "bms:files/evidence/T3",
-    "bms:relationships/rel-126",
+    "bms:relationships/rel-147",
     "bms:verifications/VER-T4",
     "bms:evaluations/EVAL-T4",
     "bms:files/evidence/T4",
-    "bms:relationships/rel-128",
+    "bms:relationships/rel-150",
     "bms:verifications/VER-T5",
     "bms:evaluations/EVAL-T5",
     "bms:files/evidence/T5",
-    "bms:relationships/rel-130",
+    "bms:relationships/rel-153",
     "bms:verifications/VER-A1",
     "bms:evaluations/EVAL-A1",
     "bms:files/evidence/A1",
-    "bms:relationships/rel-132",
+    "bms:relationships/rel-156",
     "bms:verifications/VER-A2",
     "bms:evaluations/EVAL-A2",
     "bms:files/evidence/A2",
-    "bms:relationships/rel-134",
-    "bms:agents/northwind",
-    "bms:agents/cortex-safe",
-    "bms:agents/safety-team",
+    "bms:relationships/rel-159",
+    "bms:verifications/VER-A3",
+    "bms:evaluations/EVAL-A3",
+    "bms:files/evidence/A3",
+    "bms:relationships/rel-162",
     "bms:tools/reqtool",
     "bms:tools/hilbench",
     "bms:tools/bomgen"
    ]
+  },
+  {
+   "type": "Organization",
+   "spdxId": "bms:agents/northwind",
+   "name": "Northwind Mobility (fictional)",
+   "comment": "Vehicle manufacturer and BMS supplier",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Organization",
+   "spdxId": "bms:agents/cortex-safe",
+   "name": "CortexSafe Software (fictional)",
+   "comment": "Independent RTOS vendor — supplier of the certified MicroOS kernel",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Organization",
+   "spdxId": "bms:agents/meridian",
+   "name": "Meridian Assessment Services (fictional)",
+   "comment": "Independent functional safety assessment and audit body",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "SoftwareAgent",
+   "spdxId": "bms:agents/safety-team",
+   "name": "Aurora BMS Functional Safety Team",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Person",
+   "spdxId": "bms:agents/vasquez",
+   "name": "Elena Vasquez",
+   "comment": "Functional Safety Manager",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "email",
+     "comment": "Work email",
+     "identifier": "e.vasquez@northwind.example"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Person",
+   "spdxId": "bms:agents/feldt",
+   "name": "Marcus Feldt",
+   "comment": "Safety Requirements Engineer",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "email",
+     "comment": "Work email",
+     "identifier": "m.feldt@northwind.example"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Person",
+   "spdxId": "bms:agents/nair",
+   "name": "Priya Nair",
+   "comment": "Software Safety Engineer",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "email",
+     "comment": "Work email",
+     "identifier": "p.nair@northwind.example"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Person",
+   "spdxId": "bms:agents/berg",
+   "name": "Tomas Berg",
+   "comment": "Test Engineer",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "email",
+     "comment": "Work email",
+     "identifier": "t.berg@northwind.example"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Person",
+   "spdxId": "bms:agents/tanaka",
+   "name": "Aiko Tanaka",
+   "comment": "Test Engineer",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "email",
+     "comment": "Work email",
+     "identifier": "a.tanaka@northwind.example"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Person",
+   "spdxId": "bms:agents/okoro",
+   "name": "Daniel Okoro",
+   "comment": "Verification & Validation Engineer",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "email",
+     "comment": "Work email",
+     "identifier": "d.okoro@northwind.example"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Person",
+   "spdxId": "bms:agents/rossi",
+   "name": "Sofia Rossi",
+   "comment": "Software Developer — Measurement",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "email",
+     "comment": "Work email",
+     "identifier": "s.rossi@northwind.example"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Person",
+   "spdxId": "bms:agents/oconnor",
+   "name": "Liam O'Connor",
+   "comment": "Software Developer — Safety Monitor",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "email",
+     "comment": "Work email",
+     "identifier": "l.oconnor@northwind.example"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Person",
+   "spdxId": "bms:agents/weber",
+   "name": "Hannah Weber",
+   "comment": "Software Architect / Reviewer",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "email",
+     "comment": "Work email",
+     "identifier": "h.weber@northwind.example"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Person",
+   "spdxId": "bms:agents/malhotra",
+   "name": "Raj Malhotra",
+   "comment": "Hardware & ADC Engineer",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "email",
+     "comment": "Work email",
+     "identifier": "r.malhotra@northwind.example"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Person",
+   "spdxId": "bms:agents/sorensen",
+   "name": "Dr. Ingrid Sørensen",
+   "comment": "Lead Functional Safety Assessor (Meridian)",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "email",
+     "comment": "Work email",
+     "identifier": "i.sorensen@meridian.example"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "Person",
+   "spdxId": "bms:agents/klein",
+   "name": "Werner Klein",
+   "comment": "Safety Auditor (Meridian)",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "email",
+     "comment": "Work email",
+     "identifier": "w.klein@meridian.example"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
   },
   {
    "type": "software_Package",
@@ -206,12 +430,18 @@
    "suppliedBy": [
     "bms:agents/northwind"
    ],
+   "originatedBy": [
+    "bms:agents/northwind"
+   ],
    "verifiedUsing": [
     {
      "type": "Hash",
      "algorithm": "sha256",
      "hashValue": "a264a83df5bd92f480e33222debdf76dc56f1c6ce990d8901ef22d719fdf0552"
     }
+   ],
+   "builtBy": [
+    "bms:agents/safety-team"
    ],
    "creationInfo": "bms:creationinfo"
   },
@@ -224,6 +454,9 @@
    "software_copyrightText": "NOASSERTION",
    "suppliedBy": [
     "bms:agents/northwind"
+   ],
+   "originatedBy": [
+    "bms:agents/oconnor"
    ],
    "verifiedUsing": [
     {
@@ -244,6 +477,9 @@
    "suppliedBy": [
     "bms:agents/northwind"
    ],
+   "originatedBy": [
+    "bms:agents/rossi"
+   ],
    "verifiedUsing": [
     {
      "type": "Hash",
@@ -262,6 +498,9 @@
    "software_copyrightText": "NOASSERTION",
    "suppliedBy": [
     "bms:agents/northwind"
+   ],
+   "originatedBy": [
+    "bms:agents/rossi"
    ],
    "verifiedUsing": [
     {
@@ -282,6 +521,9 @@
    "suppliedBy": [
     "bms:agents/northwind"
    ],
+   "originatedBy": [
+    "bms:agents/oconnor"
+   ],
    "verifiedUsing": [
     {
      "type": "Hash",
@@ -300,6 +542,9 @@
    "software_copyrightText": "NOASSERTION",
    "suppliedBy": [
     "bms:agents/northwind"
+   ],
+   "originatedBy": [
+    "bms:agents/nair"
    ],
    "verifiedUsing": [
     {
@@ -320,6 +565,9 @@
    "suppliedBy": [
     "bms:agents/northwind"
    ],
+   "originatedBy": [
+    "bms:agents/nair"
+   ],
    "verifiedUsing": [
     {
      "type": "Hash",
@@ -338,6 +586,9 @@
    "software_copyrightText": "NOASSERTION",
    "suppliedBy": [
     "bms:agents/northwind"
+   ],
+   "originatedBy": [
+    "bms:agents/malhotra"
    ],
    "verifiedUsing": [
     {
@@ -358,6 +609,9 @@
    "suppliedBy": [
     "bms:agents/northwind"
    ],
+   "originatedBy": [
+    "bms:agents/malhotra"
+   ],
    "verifiedUsing": [
     {
      "type": "Hash",
@@ -377,12 +631,18 @@
    "suppliedBy": [
     "bms:agents/cortex-safe"
    ],
+   "originatedBy": [
+    "bms:agents/cortex-safe"
+   ],
    "verifiedUsing": [
     {
      "type": "Hash",
      "algorithm": "sha256",
      "hashValue": "ebe5e93b398281cc536c0320b865faff3173bb2d53c717d8225b857f9de4a3a0"
     }
+   ],
+   "builtBy": [
+    "bms:agents/cortex-safe"
    ],
    "creationInfo": "bms:creationinfo"
   },
@@ -1443,6 +1703,16 @@
    ]
   },
   {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-40",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-SWR-01-1",
+   "relationshipType": "performedBy",
+   "to": [
+    "bms:agents/berg"
+   ]
+  },
+  {
    "type": "functionalsafety_EvaluationResult",
    "spdxId": "bms:evaluations/EVAL-SWR-01-1",
    "name": "Evaluation of SWR-01-1 (pass)",
@@ -1467,7 +1737,7 @@
   },
   {
    "type": "functionalsafety_EvidenceRelationship",
-   "spdxId": "bms:relationships/rel-40",
+   "spdxId": "bms:relationships/rel-41",
    "creationInfo": "bms:creationinfo",
    "from": "bms:verifications/VER-SWR-01-1",
    "relationshipType": "hasEvidence",
@@ -1498,7 +1768,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-41",
+   "spdxId": "bms:relationships/rel-42",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/TSR-01-1",
    "relationshipType": "hasRequirement",
@@ -1523,7 +1793,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-42",
+   "spdxId": "bms:relationships/rel-43",
    "creationInfo": "bms:creationinfo",
    "from": "bms:packages/safety-monitor",
    "relationshipType": "contains",
@@ -1533,7 +1803,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-43",
+   "spdxId": "bms:relationships/rel-44",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-01-2",
    "relationshipType": "implementedBy",
@@ -1569,12 +1839,22 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-44",
+   "spdxId": "bms:relationships/rel-45",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-01-2",
    "relationshipType": "verifiedBy",
    "to": [
     "bms:verifications/VER-SWR-01-2"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-46",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-SWR-01-2",
+   "relationshipType": "performedBy",
+   "to": [
+    "bms:agents/tanaka"
    ]
   },
   {
@@ -1605,7 +1885,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-45",
+   "spdxId": "bms:relationships/rel-47",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/TSR-01-2",
    "relationshipType": "hasRequirement",
@@ -1630,7 +1910,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-46",
+   "spdxId": "bms:relationships/rel-48",
    "creationInfo": "bms:creationinfo",
    "from": "bms:packages/safety-monitor",
    "relationshipType": "contains",
@@ -1640,7 +1920,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-47",
+   "spdxId": "bms:relationships/rel-49",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-01-3",
    "relationshipType": "implementedBy",
@@ -1651,7 +1931,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-48",
+   "spdxId": "bms:relationships/rel-50",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-01-3",
    "relationshipType": "assumes",
@@ -1686,12 +1966,22 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-49",
+   "spdxId": "bms:relationships/rel-51",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-01-3",
    "relationshipType": "verifiedBy",
    "to": [
     "bms:verifications/VER-SWR-01-3"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-52",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-SWR-01-3",
+   "relationshipType": "performedBy",
+   "to": [
+    "bms:agents/berg"
    ]
   },
   {
@@ -1719,7 +2009,7 @@
   },
   {
    "type": "functionalsafety_EvidenceRelationship",
-   "spdxId": "bms:relationships/rel-50",
+   "spdxId": "bms:relationships/rel-53",
    "creationInfo": "bms:creationinfo",
    "from": "bms:verifications/VER-SWR-01-3",
    "relationshipType": "hasEvidence",
@@ -1750,7 +2040,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-51",
+   "spdxId": "bms:relationships/rel-54",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/TSR-01-3",
    "relationshipType": "hasRequirement",
@@ -1775,7 +2065,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-52",
+   "spdxId": "bms:relationships/rel-55",
    "creationInfo": "bms:creationinfo",
    "from": "bms:packages/cell-measurement-driver",
    "relationshipType": "contains",
@@ -1785,7 +2075,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-53",
+   "spdxId": "bms:relationships/rel-56",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-01-4",
    "relationshipType": "implementedBy",
@@ -1821,12 +2111,22 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-54",
+   "spdxId": "bms:relationships/rel-57",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-01-4",
    "relationshipType": "verifiedBy",
    "to": [
     "bms:verifications/VER-SWR-01-4"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-58",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-SWR-01-4",
+   "relationshipType": "performedBy",
+   "to": [
+    "bms:agents/okoro"
    ]
   },
   {
@@ -1857,7 +2157,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-55",
+   "spdxId": "bms:relationships/rel-59",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/TSR-02-1",
    "relationshipType": "hasRequirement",
@@ -1882,7 +2182,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-56",
+   "spdxId": "bms:relationships/rel-60",
    "creationInfo": "bms:creationinfo",
    "from": "bms:packages/cell-measurement-driver",
    "relationshipType": "contains",
@@ -1892,7 +2192,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-57",
+   "spdxId": "bms:relationships/rel-61",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-02-1",
    "relationshipType": "implementedBy",
@@ -1928,12 +2228,22 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-58",
+   "spdxId": "bms:relationships/rel-62",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-02-1",
    "relationshipType": "verifiedBy",
    "to": [
     "bms:verifications/VER-SWR-02-1"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-63",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-SWR-02-1",
+   "relationshipType": "performedBy",
+   "to": [
+    "bms:agents/tanaka"
    ]
   },
   {
@@ -1964,7 +2274,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-59",
+   "spdxId": "bms:relationships/rel-64",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/TSR-02-2",
    "relationshipType": "hasRequirement",
@@ -1989,7 +2299,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-60",
+   "spdxId": "bms:relationships/rel-65",
    "creationInfo": "bms:creationinfo",
    "from": "bms:packages/safety-monitor",
    "relationshipType": "contains",
@@ -1999,7 +2309,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-61",
+   "spdxId": "bms:relationships/rel-66",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-02-2",
    "relationshipType": "implementedBy",
@@ -2035,12 +2345,22 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-62",
+   "spdxId": "bms:relationships/rel-67",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-02-2",
    "relationshipType": "verifiedBy",
    "to": [
     "bms:verifications/VER-SWR-02-2"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-68",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-SWR-02-2",
+   "relationshipType": "performedBy",
+   "to": [
+    "bms:agents/berg"
    ]
   },
   {
@@ -2068,7 +2388,7 @@
   },
   {
    "type": "functionalsafety_EvidenceRelationship",
-   "spdxId": "bms:relationships/rel-63",
+   "spdxId": "bms:relationships/rel-69",
    "creationInfo": "bms:creationinfo",
    "from": "bms:verifications/VER-SWR-02-2",
    "relationshipType": "hasEvidence",
@@ -2099,7 +2419,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-64",
+   "spdxId": "bms:relationships/rel-70",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/TSR-03-1",
    "relationshipType": "hasRequirement",
@@ -2124,7 +2444,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-65",
+   "spdxId": "bms:relationships/rel-71",
    "creationInfo": "bms:creationinfo",
    "from": "bms:packages/cell-measurement-driver",
    "relationshipType": "contains",
@@ -2134,7 +2454,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-66",
+   "spdxId": "bms:relationships/rel-72",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-03-1",
    "relationshipType": "implementedBy",
@@ -2170,12 +2490,22 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-67",
+   "spdxId": "bms:relationships/rel-73",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-03-1",
    "relationshipType": "verifiedBy",
    "to": [
     "bms:verifications/VER-SWR-03-1"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-74",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-SWR-03-1",
+   "relationshipType": "performedBy",
+   "to": [
+    "bms:agents/tanaka"
    ]
   },
   {
@@ -2206,7 +2536,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-68",
+   "spdxId": "bms:relationships/rel-75",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/TSR-03-2",
    "relationshipType": "hasRequirement",
@@ -2231,7 +2561,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-69",
+   "spdxId": "bms:relationships/rel-76",
    "creationInfo": "bms:creationinfo",
    "from": "bms:packages/safety-monitor",
    "relationshipType": "contains",
@@ -2241,7 +2571,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-70",
+   "spdxId": "bms:relationships/rel-77",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-03-2",
    "relationshipType": "implementedBy",
@@ -2277,12 +2607,22 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-71",
+   "spdxId": "bms:relationships/rel-78",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-03-2",
    "relationshipType": "verifiedBy",
    "to": [
     "bms:verifications/VER-SWR-03-2"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-79",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-SWR-03-2",
+   "relationshipType": "performedBy",
+   "to": [
+    "bms:agents/okoro"
    ]
   },
   {
@@ -2310,7 +2650,7 @@
   },
   {
    "type": "functionalsafety_EvidenceRelationship",
-   "spdxId": "bms:relationships/rel-72",
+   "spdxId": "bms:relationships/rel-80",
    "creationInfo": "bms:creationinfo",
    "from": "bms:verifications/VER-SWR-03-2",
    "relationshipType": "hasEvidence",
@@ -2341,7 +2681,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-73",
+   "spdxId": "bms:relationships/rel-81",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/TSR-03-1",
    "relationshipType": "hasRequirement",
@@ -2366,7 +2706,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-74",
+   "spdxId": "bms:relationships/rel-82",
    "creationInfo": "bms:creationinfo",
    "from": "bms:packages/aurora-bms",
    "relationshipType": "contains",
@@ -2376,7 +2716,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-75",
+   "spdxId": "bms:relationships/rel-83",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-03-3",
    "relationshipType": "implementedBy",
@@ -2412,12 +2752,22 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-76",
+   "spdxId": "bms:relationships/rel-84",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-03-3",
    "relationshipType": "verifiedBy",
    "to": [
     "bms:verifications/VER-SWR-03-3"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-85",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-SWR-03-3",
+   "relationshipType": "performedBy",
+   "to": [
+    "bms:agents/okoro"
    ]
   },
   {
@@ -2448,7 +2798,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-77",
+   "spdxId": "bms:relationships/rel-86",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/TSR-04-1",
    "relationshipType": "hasRequirement",
@@ -2473,7 +2823,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-78",
+   "spdxId": "bms:relationships/rel-87",
    "creationInfo": "bms:creationinfo",
    "from": "bms:packages/safety-monitor",
    "relationshipType": "contains",
@@ -2483,7 +2833,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-79",
+   "spdxId": "bms:relationships/rel-88",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-04-1",
    "relationshipType": "implementedBy",
@@ -2519,12 +2869,22 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-80",
+   "spdxId": "bms:relationships/rel-89",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-04-1",
    "relationshipType": "verifiedBy",
    "to": [
     "bms:verifications/VER-SWR-04-1"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-90",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-SWR-04-1",
+   "relationshipType": "performedBy",
+   "to": [
+    "bms:agents/berg"
    ]
   },
   {
@@ -2552,7 +2912,7 @@
   },
   {
    "type": "functionalsafety_EvidenceRelationship",
-   "spdxId": "bms:relationships/rel-81",
+   "spdxId": "bms:relationships/rel-91",
    "creationInfo": "bms:creationinfo",
    "from": "bms:verifications/VER-SWR-04-1",
    "relationshipType": "hasEvidence",
@@ -2583,7 +2943,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-82",
+   "spdxId": "bms:relationships/rel-92",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/TSR-04-2",
    "relationshipType": "hasRequirement",
@@ -2608,7 +2968,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-83",
+   "spdxId": "bms:relationships/rel-93",
    "creationInfo": "bms:creationinfo",
    "from": "bms:packages/safety-monitor",
    "relationshipType": "contains",
@@ -2618,7 +2978,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-84",
+   "spdxId": "bms:relationships/rel-94",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-04-2",
    "relationshipType": "implementedBy",
@@ -2629,7 +2989,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-85",
+   "spdxId": "bms:relationships/rel-95",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-04-2",
    "relationshipType": "assumes",
@@ -2664,12 +3024,22 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-86",
+   "spdxId": "bms:relationships/rel-96",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-04-2",
    "relationshipType": "verifiedBy",
    "to": [
     "bms:verifications/VER-SWR-04-2"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-97",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-SWR-04-2",
+   "relationshipType": "performedBy",
+   "to": [
+    "bms:agents/tanaka"
    ]
   },
   {
@@ -2697,7 +3067,7 @@
   },
   {
    "type": "functionalsafety_EvidenceRelationship",
-   "spdxId": "bms:relationships/rel-87",
+   "spdxId": "bms:relationships/rel-98",
    "creationInfo": "bms:creationinfo",
    "from": "bms:verifications/VER-SWR-04-2",
    "relationshipType": "hasEvidence",
@@ -2728,7 +3098,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-88",
+   "spdxId": "bms:relationships/rel-99",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/TSR-04-2",
    "relationshipType": "hasRequirement",
@@ -2753,7 +3123,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-89",
+   "spdxId": "bms:relationships/rel-100",
    "creationInfo": "bms:creationinfo",
    "from": "bms:packages/diagnostics",
    "relationshipType": "contains",
@@ -2763,7 +3133,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-90",
+   "spdxId": "bms:relationships/rel-101",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-04-3",
    "relationshipType": "implementedBy",
@@ -2774,7 +3144,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-91",
+   "spdxId": "bms:relationships/rel-102",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-04-3",
    "relationshipType": "assumes",
@@ -2809,12 +3179,22 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-92",
+   "spdxId": "bms:relationships/rel-103",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-04-3",
    "relationshipType": "verifiedBy",
    "to": [
     "bms:verifications/VER-SWR-04-3"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-104",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-SWR-04-3",
+   "relationshipType": "performedBy",
+   "to": [
+    "bms:agents/feldt"
    ]
   },
   {
@@ -2845,7 +3225,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-93",
+   "spdxId": "bms:relationships/rel-105",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/TSR-04-3",
    "relationshipType": "hasRequirement",
@@ -2870,7 +3250,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-94",
+   "spdxId": "bms:relationships/rel-106",
    "creationInfo": "bms:creationinfo",
    "from": "bms:packages/contactor-control",
    "relationshipType": "contains",
@@ -2880,7 +3260,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-95",
+   "spdxId": "bms:relationships/rel-107",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-04-4",
    "relationshipType": "implementedBy",
@@ -2891,7 +3271,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-96",
+   "spdxId": "bms:relationships/rel-108",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-04-4",
    "relationshipType": "assumes",
@@ -2926,12 +3306,22 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-97",
+   "spdxId": "bms:relationships/rel-109",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-04-4",
    "relationshipType": "verifiedBy",
    "to": [
     "bms:verifications/VER-SWR-04-4"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-110",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-SWR-04-4",
+   "relationshipType": "performedBy",
+   "to": [
+    "bms:agents/berg"
    ]
   },
   {
@@ -2959,7 +3349,7 @@
   },
   {
    "type": "functionalsafety_EvidenceRelationship",
-   "spdxId": "bms:relationships/rel-98",
+   "spdxId": "bms:relationships/rel-111",
    "creationInfo": "bms:creationinfo",
    "from": "bms:verifications/VER-SWR-04-4",
    "relationshipType": "hasEvidence",
@@ -2990,7 +3380,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-99",
+   "spdxId": "bms:relationships/rel-112",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/TSR-04-2",
    "relationshipType": "hasRequirement",
@@ -3015,7 +3405,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-100",
+   "spdxId": "bms:relationships/rel-113",
    "creationInfo": "bms:creationinfo",
    "from": "bms:packages/contactor-control",
    "relationshipType": "contains",
@@ -3025,7 +3415,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-101",
+   "spdxId": "bms:relationships/rel-114",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-04-5",
    "relationshipType": "implementedBy",
@@ -3061,12 +3451,22 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-102",
+   "spdxId": "bms:relationships/rel-115",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-04-5",
    "relationshipType": "verifiedBy",
    "to": [
     "bms:verifications/VER-SWR-04-5"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-116",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-SWR-04-5",
+   "relationshipType": "performedBy",
+   "to": [
+    "bms:agents/tanaka"
    ]
   },
   {
@@ -3097,7 +3497,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-103",
+   "spdxId": "bms:relationships/rel-117",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/TSR-06-1",
    "relationshipType": "hasRequirement",
@@ -3122,7 +3522,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-104",
+   "spdxId": "bms:relationships/rel-118",
    "creationInfo": "bms:creationinfo",
    "from": "bms:packages/e2e-comm-stack",
    "relationshipType": "contains",
@@ -3132,7 +3532,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-105",
+   "spdxId": "bms:relationships/rel-119",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-06-1",
    "relationshipType": "implementedBy",
@@ -3168,12 +3568,22 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-106",
+   "spdxId": "bms:relationships/rel-120",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-06-1",
    "relationshipType": "verifiedBy",
    "to": [
     "bms:verifications/VER-SWR-06-1"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-121",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-SWR-06-1",
+   "relationshipType": "performedBy",
+   "to": [
+    "bms:agents/weber"
    ]
   },
   {
@@ -3201,7 +3611,7 @@
   },
   {
    "type": "functionalsafety_EvidenceRelationship",
-   "spdxId": "bms:relationships/rel-107",
+   "spdxId": "bms:relationships/rel-122",
    "creationInfo": "bms:creationinfo",
    "from": "bms:verifications/VER-SWR-06-1",
    "relationshipType": "hasEvidence",
@@ -3232,7 +3642,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-108",
+   "spdxId": "bms:relationships/rel-123",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/TSR-06-1",
    "relationshipType": "hasRequirement",
@@ -3257,7 +3667,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-109",
+   "spdxId": "bms:relationships/rel-124",
    "creationInfo": "bms:creationinfo",
    "from": "bms:packages/e2e-comm-stack",
    "relationshipType": "contains",
@@ -3267,7 +3677,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-110",
+   "spdxId": "bms:relationships/rel-125",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-06-2",
    "relationshipType": "implementedBy",
@@ -3303,12 +3713,22 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-111",
+   "spdxId": "bms:relationships/rel-126",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-06-2",
    "relationshipType": "verifiedBy",
    "to": [
     "bms:verifications/VER-SWR-06-2"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-127",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-SWR-06-2",
+   "relationshipType": "performedBy",
+   "to": [
+    "bms:agents/berg"
    ]
   },
   {
@@ -3339,7 +3759,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-112",
+   "spdxId": "bms:relationships/rel-128",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/TSR-06-2",
    "relationshipType": "hasRequirement",
@@ -3364,7 +3784,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-113",
+   "spdxId": "bms:relationships/rel-129",
    "creationInfo": "bms:creationinfo",
    "from": "bms:packages/hal-mcu",
    "relationshipType": "contains",
@@ -3374,7 +3794,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-114",
+   "spdxId": "bms:relationships/rel-130",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-06-3",
    "relationshipType": "implementedBy",
@@ -3410,12 +3830,22 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-115",
+   "spdxId": "bms:relationships/rel-131",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-06-3",
    "relationshipType": "verifiedBy",
    "to": [
     "bms:verifications/VER-SWR-06-3"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-132",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-SWR-06-3",
+   "relationshipType": "performedBy",
+   "to": [
+    "bms:agents/tanaka"
    ]
   },
   {
@@ -3443,7 +3873,7 @@
   },
   {
    "type": "functionalsafety_EvidenceRelationship",
-   "spdxId": "bms:relationships/rel-116",
+   "spdxId": "bms:relationships/rel-133",
    "creationInfo": "bms:creationinfo",
    "from": "bms:verifications/VER-SWR-06-3",
    "relationshipType": "hasEvidence",
@@ -3474,7 +3904,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-117",
+   "spdxId": "bms:relationships/rel-134",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/TSR-05-1",
    "relationshipType": "hasRequirement",
@@ -3499,7 +3929,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-118",
+   "spdxId": "bms:relationships/rel-135",
    "creationInfo": "bms:creationinfo",
    "from": "bms:packages/isolation-monitor",
    "relationshipType": "contains",
@@ -3509,7 +3939,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-119",
+   "spdxId": "bms:relationships/rel-136",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-05-1",
    "relationshipType": "implementedBy",
@@ -3545,12 +3975,22 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-120",
+   "spdxId": "bms:relationships/rel-137",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SWR-05-1",
    "relationshipType": "verifiedBy",
    "to": [
     "bms:verifications/VER-SWR-05-1"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-138",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-SWR-05-1",
+   "relationshipType": "performedBy",
+   "to": [
+    "bms:agents/berg"
    ]
   },
   {
@@ -3578,7 +4018,7 @@
   },
   {
    "type": "functionalsafety_EvidenceRelationship",
-   "spdxId": "bms:relationships/rel-121",
+   "spdxId": "bms:relationships/rel-139",
    "creationInfo": "bms:creationinfo",
    "from": "bms:verifications/VER-SWR-05-1",
    "relationshipType": "hasEvidence",
@@ -3617,12 +4057,22 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-122",
+   "spdxId": "bms:relationships/rel-140",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/TSR-01-1",
    "relationshipType": "verifiedBy",
    "to": [
     "bms:verifications/VER-T1"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-141",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-T1",
+   "relationshipType": "performedBy",
+   "to": [
+    "bms:agents/okoro"
    ]
   },
   {
@@ -3650,7 +4100,7 @@
   },
   {
    "type": "functionalsafety_EvidenceRelationship",
-   "spdxId": "bms:relationships/rel-123",
+   "spdxId": "bms:relationships/rel-142",
    "creationInfo": "bms:creationinfo",
    "from": "bms:verifications/VER-T1",
    "relationshipType": "hasEvidence",
@@ -3689,12 +4139,22 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-124",
+   "spdxId": "bms:relationships/rel-143",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/TSR-04-1",
    "relationshipType": "verifiedBy",
    "to": [
     "bms:verifications/VER-T2"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-144",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-T2",
+   "relationshipType": "performedBy",
+   "to": [
+    "bms:agents/okoro"
    ]
   },
   {
@@ -3733,12 +4193,22 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-125",
+   "spdxId": "bms:relationships/rel-145",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/TSR-06-1",
    "relationshipType": "verifiedBy",
    "to": [
     "bms:verifications/VER-T3"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-146",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-T3",
+   "relationshipType": "performedBy",
+   "to": [
+    "bms:agents/feldt"
    ]
   },
   {
@@ -3766,7 +4236,7 @@
   },
   {
    "type": "functionalsafety_EvidenceRelationship",
-   "spdxId": "bms:relationships/rel-126",
+   "spdxId": "bms:relationships/rel-147",
    "creationInfo": "bms:creationinfo",
    "from": "bms:verifications/VER-T3",
    "relationshipType": "hasEvidence",
@@ -3805,12 +4275,23 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-127",
+   "spdxId": "bms:relationships/rel-148",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/TSR-06-3",
    "relationshipType": "verifiedBy",
    "to": [
     "bms:verifications/VER-T4"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-149",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-T4",
+   "relationshipType": "performedBy",
+   "to": [
+    "bms:agents/sorensen",
+    "bms:agents/meridian"
    ]
   },
   {
@@ -3838,7 +4319,7 @@
   },
   {
    "type": "functionalsafety_EvidenceRelationship",
-   "spdxId": "bms:relationships/rel-128",
+   "spdxId": "bms:relationships/rel-150",
    "creationInfo": "bms:creationinfo",
    "from": "bms:verifications/VER-T4",
    "relationshipType": "hasEvidence",
@@ -3877,12 +4358,22 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-129",
+   "spdxId": "bms:relationships/rel-151",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/TSR-04-3",
    "relationshipType": "verifiedBy",
    "to": [
     "bms:verifications/VER-T5"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-152",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-T5",
+   "relationshipType": "performedBy",
+   "to": [
+    "bms:agents/malhotra"
    ]
   },
   {
@@ -3910,7 +4401,7 @@
   },
   {
    "type": "functionalsafety_EvidenceRelationship",
-   "spdxId": "bms:relationships/rel-130",
+   "spdxId": "bms:relationships/rel-153",
    "creationInfo": "bms:creationinfo",
    "from": "bms:verifications/VER-T5",
    "relationshipType": "hasEvidence",
@@ -3949,12 +4440,23 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-131",
+   "spdxId": "bms:relationships/rel-154",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SG-04",
    "relationshipType": "verifiedBy",
    "to": [
     "bms:verifications/VER-A1"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-155",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-A1",
+   "relationshipType": "performedBy",
+   "to": [
+    "bms:agents/sorensen",
+    "bms:agents/meridian"
    ]
   },
   {
@@ -3982,7 +4484,7 @@
   },
   {
    "type": "functionalsafety_EvidenceRelationship",
-   "spdxId": "bms:relationships/rel-132",
+   "spdxId": "bms:relationships/rel-156",
    "creationInfo": "bms:creationinfo",
    "from": "bms:verifications/VER-A1",
    "relationshipType": "hasEvidence",
@@ -4021,12 +4523,23 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-133",
+   "spdxId": "bms:relationships/rel-157",
    "creationInfo": "bms:creationinfo",
    "from": "bms:requirements/SG-01",
    "relationshipType": "verifiedBy",
    "to": [
     "bms:verifications/VER-A2"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-158",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-A2",
+   "relationshipType": "performedBy",
+   "to": [
+    "bms:agents/klein",
+    "bms:agents/meridian"
    ]
   },
   {
@@ -4054,7 +4567,7 @@
   },
   {
    "type": "functionalsafety_EvidenceRelationship",
-   "spdxId": "bms:relationships/rel-134",
+   "spdxId": "bms:relationships/rel-159",
    "creationInfo": "bms:creationinfo",
    "from": "bms:verifications/VER-A2",
    "relationshipType": "hasEvidence",
@@ -4067,8 +4580,90 @@
    "functionalsafety_evidenceUID": "NW-EVD-16"
   },
   {
+   "type": "functionalsafety_RequirementVerification",
+   "spdxId": "bms:verifications/VER-A3",
+   "name": "Confirmation review of the safety requirements and safe-state concept",
+   "summary": "Review-based verification of SG-02.",
+   "functionalsafety_verificationMethod": [
+    "review"
+   ],
+   "functionalsafety_verificationPrecondition": [
+    "Design and code review checklist prepared and reviewers assigned."
+   ],
+   "functionalsafety_verificationPostcondition": [
+    "Reviewed by safety management with the required independence.Acceptance criteria met on all configured pack variants; no deviations recorded."
+   ],
+   "rationale": "SG-02 is safety-relevant and is verified by review.",
+   "externalIdentifier": [
+    {
+     "type": "ExternalIdentifier",
+     "externalIdentifierType": "other",
+     "comment": "Verification record UID",
+     "identifier": "NW-VER-A3"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-135",
+   "spdxId": "bms:relationships/rel-160",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:requirements/SG-02",
+   "relationshipType": "verifiedBy",
+   "to": [
+    "bms:verifications/VER-A3"
+   ]
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-161",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-A3",
+   "relationshipType": "performedBy",
+   "to": [
+    "bms:agents/vasquez"
+   ]
+  },
+  {
+   "type": "functionalsafety_EvaluationResult",
+   "spdxId": "bms:evaluations/EVAL-A3",
+   "name": "Evaluation of SG-02 (pass)",
+   "functionalsafety_evaluation": "pass",
+   "functionalsafety_evaluationBasedOn": "bms:verifications/VER-A3",
+   "functionalsafety_rationale": "All acceptance criteria met; the requirement is satisfied.",
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "software_File",
+   "spdxId": "bms:files/evidence/A3",
+   "name": "reviews/a3_review_record.md",
+   "software_primaryPurpose": "evidence",
+   "verifiedUsing": [
+    {
+     "type": "Hash",
+     "algorithm": "sha256",
+     "hashValue": "bb336674225d32e28167aac34a9ccaf0e63736f5bf3d0b0a7939809f90b5808b"
+    }
+   ],
+   "creationInfo": "bms:creationinfo"
+  },
+  {
+   "type": "functionalsafety_EvidenceRelationship",
+   "spdxId": "bms:relationships/rel-162",
+   "creationInfo": "bms:creationinfo",
+   "from": "bms:verifications/VER-A3",
+   "relationshipType": "hasEvidence",
+   "to": [
+    "bms:files/evidence/A3"
+   ],
+   "functionalsafety_evidenceCategory": [
+    "observation"
+   ],
+   "functionalsafety_evidenceUID": "NW-EVD-17"
+  },
+  {
+   "type": "Relationship",
+   "spdxId": "bms:relationships/rel-163",
    "creationInfo": "bms:creationinfo",
    "from": "bms:packages/aurora-bms",
    "relationshipType": "hasRequirement",
@@ -4078,7 +4673,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-136",
+   "spdxId": "bms:relationships/rel-164",
    "creationInfo": "bms:creationinfo",
    "from": "bms:packages/aurora-bms",
    "relationshipType": "hasRequirement",
@@ -4088,7 +4683,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-137",
+   "spdxId": "bms:relationships/rel-165",
    "creationInfo": "bms:creationinfo",
    "from": "bms:packages/aurora-bms",
    "relationshipType": "hasRequirement",
@@ -4098,7 +4693,7 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-138",
+   "spdxId": "bms:relationships/rel-166",
    "creationInfo": "bms:creationinfo",
    "from": "bms:packages/aurora-bms",
    "relationshipType": "hasRequirement",
@@ -4108,31 +4703,13 @@
   },
   {
    "type": "Relationship",
-   "spdxId": "bms:relationships/rel-139",
+   "spdxId": "bms:relationships/rel-167",
    "creationInfo": "bms:creationinfo",
    "from": "bms:packages/aurora-bms",
    "relationshipType": "hasRequirement",
    "to": [
     "bms:requirements/SG-05"
    ]
-  },
-  {
-   "type": "Organization",
-   "spdxId": "bms:agents/northwind",
-   "name": "Northwind Mobility (fictional)",
-   "creationInfo": "bms:creationinfo"
-  },
-  {
-   "type": "Organization",
-   "spdxId": "bms:agents/cortex-safe",
-   "name": "CortexSafe Software (fictional RTOS vendor)",
-   "creationInfo": "bms:creationinfo"
-  },
-  {
-   "type": "SoftwareAgent",
-   "spdxId": "bms:agents/safety-team",
-   "name": "Aurora BMS Functional Safety Team",
-   "creationInfo": "bms:creationinfo"
   },
   {
    "type": "Tool",
@@ -4157,8 +4734,10 @@
    "@id": "bms:creationinfo",
    "created": "2026-07-04T09:00:00Z",
    "createdBy": [
-    "bms:agents/safety-team",
-    "bms:agents/northwind"
+    "bms:agents/northwind",
+    "bms:agents/vasquez",
+    "bms:agents/feldt",
+    "bms:agents/nair"
    ],
    "createdUsing": [
     "bms:tools/reqtool",

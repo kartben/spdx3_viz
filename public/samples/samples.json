@@ -111,9 +111,9 @@
     "id": "functional-safety",
     "name": "Functional Safety (EV BMS)",
     "emoji": "🛡️",
-    "description": "<strong>Synthetic / fictional</strong> ISO 26262-style safety case for an EV battery management system, showcasing the SPDX 3.1 FunctionalSafety profile: ~50 requirements decomposed from safety goals down to software, with verifications, evaluations, assumptions, and evidence.",
+    "description": "<strong>Synthetic / fictional</strong> ISO 26262-style safety case for an EV battery management system, showcasing the SPDX 3.1 FunctionalSafety profile: ~50 requirements decomposed from safety goals down to software, with verifications, evaluations, assumptions, evidence, and a team of engineers, developers and independent assessors (Agents) attributed via <code>performedBy</code> / <code>originatedBy</code>.",
     "dir": "samples/functional-safety",
     "files": ["aurora-bms.spdx3.jsonld"],
-    "size": 129505
+    "size": 144014
   }
 ]

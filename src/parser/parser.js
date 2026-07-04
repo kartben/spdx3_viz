@@ -39,6 +39,37 @@ function makeThrottledReporter(onProgress, total) {
 }
 
 /**
+ * Provenance is carried on an Artifact as agent-valued properties
+ * (`suppliedBy`, `originatedBy`, `builtBy`), not as Relationship elements.
+ * Synthesize an edge for each so the artifact ↔ agent link appears in the graph
+ * and detail panel like any other relationship. Mirrors the evaluationBasedOn
+ * synthesis for the FunctionalSafety profile.
+ *
+ * @param {Object} item - A package or file element
+ * @param {Array<Object>} relationships - The relationship accumulator to push into
+ */
+const PROVENANCE_PROPS = [
+  ['suppliedBy', RELATIONSHIP_TYPES.SUPPLIED_BY],
+  ['originatedBy', RELATIONSHIP_TYPES.ORIGINATED_BY],
+  ['builtBy', RELATIONSHIP_TYPES.BUILT_BY]
+];
+function synthesizeProvenanceEdges(item, relationships) {
+  for (const [prop, relationshipType] of PROVENANCE_PROPS) {
+    const value = item[prop];
+    if (!value) continue;
+    const targets = (Array.isArray(value) ? value : [value]).filter(Boolean);
+    if (!targets.length) continue;
+    relationships.push({
+      type: 'Relationship',
+      spdxId: `${item.spdxId}#${prop}`,
+      from: item.spdxId,
+      relationshipType,
+      to: targets
+    });
+  }
+}
+
+/**
  * @typedef {Object} ParsedData
  * @property {Map<string, Object>} elementMap - Map of SPDX IDs to elements
  * @property {Array<Object>} packages - Package elements
@@ -174,6 +205,9 @@ export function parseGraph(graph, onProgress) {
   /** @type {Object|null} */
   let agentInfo = null;
 
+  /** @type {Array<Object>} - Every Agent (SoftwareAgent / Organization / Person) */
+  const agents = [];
+
   /** @type {Object|null} */
   let orgInfo = null; // first Organization/Person, used when no SoftwareAgent exists
 
@@ -227,10 +261,12 @@ export function parseGraph(graph, onProgress) {
     switch (bucketOf(item.type)) {
       case BUCKET.PACKAGES:
         packages.push(item);
+        synthesizeProvenanceEdges(item, relationships);
         break;
 
       case BUCKET.FILES:
         files.push(item);
+        synthesizeProvenanceEdges(item, relationships);
         break;
 
       case BUCKET.HARDWARE:
@@ -272,6 +308,7 @@ export function parseGraph(graph, onProgress) {
         break;
 
       case BUCKET.AGENTS:
+        agents.push(item);
         // Prefer a SoftwareAgent, else an Organization/Person; ignore a bare Agent.
         if (isA(item.type, CLASS.SoftwareAgent)) agentInfo = agentInfo || item;
         else if (isA(item.type, CLASS.Organization) || isA(item.type, CLASS.Person)) {
@@ -452,6 +489,7 @@ export function parseGraph(graph, onProgress) {
     builds,
     buildConfigs,
     vulnerabilities,
+    agents,
     relationships,
     vexRelationships,
     elementMap
@@ -469,6 +507,7 @@ export function parseGraph(graph, onProgress) {
     buildConfigs,
     buildInfo,
     agentInfo,
+    agents,
     sboms,
     sbomTypes,
     creators,
@@ -670,6 +709,7 @@ function computePresentTypes(data) {
   if (data.builds.length) nodeTypes.add('build');
   if (data.buildConfigs.length) nodeTypes.add('config');
   if (data.vulnerabilities.length) nodeTypes.add('vulnerability');
+  if (data.agents.length) nodeTypes.add('agent');
 
   const relTypes = new Set();
   data.relationships.forEach((r) => r.relationshipType && relTypes.add(r.relationshipType));

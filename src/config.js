@@ -53,6 +53,13 @@ export const RELATIONSHIP_TYPES = {
   // Synthesized by the parser from EvaluationResult.evaluationBasedOn so the evaluation ↔
   // verification link appears as a graph edge like any other relationship.
   EVALUATION_BASED_ON: 'evaluationBasedOn',
+  // Agent attribution: an Action (build, verification, assessment, …) performedBy an Agent.
+  PERFORMED_BY: 'performedBy',
+  // Provenance, synthesized by the parser from the Artifact `suppliedBy` /
+  // `originatedBy` / `builtBy` agent-valued properties.
+  SUPPLIED_BY: 'suppliedBy',
+  ORIGINATED_BY: 'originatedBy',
+  BUILT_BY: 'builtBy',
   // AI profile relationship types (AI model ↔ training/test dataset).
   TRAINED_ON: 'trainedOn',
   TESTED_ON: 'testedOn',
@@ -178,6 +185,7 @@ export function createGraphFilters() {
     { key: 'hardware', label: 'Hardware', color: COLORS.hardware, active: true },
     { key: 'requirement', label: 'Requirements', color: COLORS.requirement, active: true },
     { key: 'tool', label: 'Tools', color: COLORS.tool, active: true },
+    { key: 'agent', label: 'Agents', color: COLORS.agent, active: true },
     { key: 'build', label: 'Build', color: COLORS.build, active: true },
     { key: 'config', label: 'Configs', color: COLORS.config, active: true },
     { key: 'external', label: 'External', color: COLORS.external, active: true },
@@ -304,6 +312,39 @@ export function createGraphFilters() {
       active: true,
       isRel: true,
       lineStyle: 'dotted'
+    },
+    // Agent attribution edges (Action/Artifact → Agent). COLORS.agent matches the agent node.
+    {
+      key: 'performedBy',
+      label: 'performedBy',
+      color: COLORS.agent,
+      active: true,
+      isRel: true,
+      lineStyle: 'dashed'
+    },
+    {
+      key: 'suppliedBy',
+      label: 'suppliedBy',
+      color: COLORS.agent,
+      active: true,
+      isRel: true,
+      lineStyle: 'dotted'
+    },
+    {
+      key: 'originatedBy',
+      label: 'originatedBy',
+      color: COLORS.agent,
+      active: true,
+      isRel: true,
+      lineStyle: 'dotted'
+    },
+    {
+      key: 'builtBy',
+      label: 'builtBy',
+      color: COLORS.agent,
+      active: true,
+      isRel: true,
+      lineStyle: 'dashdot'
     },
     { key: 'trainedOn', label: 'trainedOn', color: COLORS.ai, active: true, isRel: true },
     {
@@ -462,6 +503,15 @@ export const RELATIONSHIP_LABELS = {
   'conformsTo:in': 'Conformed to by',
   'evaluationBasedOn:out': 'Based on',
   'evaluationBasedOn:in': 'Evaluated by',
+  // Agent attribution.
+  'performedBy:out': 'Performed by',
+  'performedBy:in': 'Performed',
+  'suppliedBy:out': 'Supplied by',
+  'suppliedBy:in': 'Supplies',
+  'originatedBy:out': 'Originated by',
+  'originatedBy:in': 'Originated',
+  'builtBy:out': 'Built by',
+  'builtBy:in': 'Built',
   'trainedOn:out': 'Trained on',
   'trainedOn:in': 'Training dataset for',
   'testedOn:out': 'Tested on',
@@ -584,6 +634,15 @@ export const RELATIONSHIP_SORT_ORDER = {
   'conformsTo:in': 48,
   'evaluationBasedOn:out': 49,
   'evaluationBasedOn:in': 50,
+  // Agent attribution (kept together, just after the safety group).
+  'performedBy:out': 51,
+  'performedBy:in': 52,
+  'suppliedBy:out': 53,
+  'suppliedBy:in': 54,
+  'originatedBy:out': 55,
+  'originatedBy:in': 56,
+  'builtBy:out': 57,
+  'builtBy:in': 58,
   'trainedOn:out': 31,
   'trainedOn:in': 32,
   'testedOn:out': 33,
