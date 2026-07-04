@@ -51,6 +51,7 @@ function makeThrottledReporter(onProgress, total) {
  * @property {Array<Object>} buildConfigs - Build configuration elements
  * @property {Object|null} buildInfo - Build information element
  * @property {Object|null} agentInfo - Agent information element (SoftwareAgent, Organization or Person)
+ * @property {Array<Object>} agents - Agent elements (SoftwareAgent, Organization, Person) referenced as creators, for the graph's "created by" edges
  * @property {Array<Object>} sboms - software_Sbom elements
  * @property {Array<string>} sbomTypes - Distinct software_sbomType values (source, build, …)
  * @property {Array<{id: string, name: string, type: string}>} creators - Document creators (createdBy)
