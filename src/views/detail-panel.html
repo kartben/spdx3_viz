@@ -1083,7 +1083,7 @@
                 x-show="item.scope"
                 class="text-[10px] px-1.5 py-0.5 rounded bg-slate-700/60 text-slate-400 flex-shrink-0"
                 :title="'Lifecycle scope: ' + item.scope"
-                x-text="item.scope"
+                x-text="humanizeCamelCase(item.scope)"
               ></span>
               <svg
                 class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors flex-shrink-0"

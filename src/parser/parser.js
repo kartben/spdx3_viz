@@ -13,6 +13,7 @@ import {
   getRelationshipColor,
   getVulnerabilityId,
   getVulnerabilityLocators,
+  humanizeCamelCase,
   vexStatusForRel
 } from '../lib/index.js';
 
@@ -1212,7 +1213,7 @@ export function createIndexAccessors(indexes) {
  * Computes relationship type counts and percentages
  *
  * @param {Array<Object>} relationships - Array of relationship objects
- * @returns {Array<{type: string, count: number, pct: string, color: string}>}
+ * @returns {Array<{type: string, label: string, count: number, pct: string, color: string}>}
  */
 export function computeRelationshipTypeCounts(relationships) {
   const counts = {};
@@ -1227,6 +1228,7 @@ export function computeRelationshipTypeCounts(relationships) {
     .sort((a, b) => b[1] - a[1])
     .map(([type, count]) => ({
       type,
+      label: humanizeCamelCase(type),
       count,
       pct: total ? ((count / total) * 100).toFixed(1) : '0.0',
       // Single source of truth for edge colours across every surface.

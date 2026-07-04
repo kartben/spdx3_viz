@@ -254,73 +254,88 @@
                   x-text="formatCount(fileTools(build.spdxId).length) + ' tools'"
                 ></span>
               </div>
-              <div
-                class="flex flex-wrap items-center gap-1.5 mt-2"
-                x-show="buildOutputs(build.spdxId).length > 0"
-              >
-                <span class="text-xs text-slate-500">Outputs:</span>
-                <template x-for="output in buildOutputs(build.spdxId).slice(0, 3)" :key="output">
-                  <button
-                    class="text-xs text-green-400 hover:text-green-300 truncate max-w-44"
-                    @click.stop="navigateTo(output)"
-                    x-text="relTargetDisplayName(output)"
-                  ></button>
+              <div class="grid grid-cols-[3.5rem_1fr] items-start gap-x-2 gap-y-1 mt-2">
+                <template x-if="buildOutputs(build.spdxId).length > 0">
+                  <div class="contents">
+                    <span class="text-xs text-slate-500 pt-0.5">Outputs:</span>
+                    <div class="flex flex-wrap items-center gap-1.5">
+                      <template
+                        x-for="output in buildOutputs(build.spdxId).slice(0, 3)"
+                        :key="output"
+                      >
+                        <button
+                          class="text-xs text-green-400 hover:text-green-300 truncate max-w-44"
+                          @click.stop="navigateTo(output)"
+                          x-text="relTargetDisplayName(output)"
+                        ></button>
+                      </template>
+                      <span
+                        x-show="buildOutputs(build.spdxId).length > 3"
+                        class="text-xs text-slate-500"
+                        x-text="'+' + formatCount(buildOutputs(build.spdxId).length - 3) + ' more'"
+                      ></span>
+                    </div>
+                  </div>
                 </template>
-                <span
-                  x-show="buildOutputs(build.spdxId).length > 3"
-                  class="text-xs text-slate-500"
-                  x-text="'+' + formatCount(buildOutputs(build.spdxId).length - 3) + ' more'"
-                ></span>
-              </div>
-              <div
-                class="flex flex-wrap items-center gap-1.5 mt-1"
-                x-show="buildInputs(build.spdxId).length > 0"
-              >
-                <span class="text-xs text-slate-500">Inputs:</span>
-                <template x-for="input in buildInputs(build.spdxId).slice(0, 5)" :key="input">
-                  <button
-                    class="text-xs text-orange-400 hover:text-orange-300 truncate max-w-36"
-                    @click.stop="navigateTo(input)"
-                    x-text="relTargetDisplayName(input)"
-                  ></button>
+                <template x-if="buildInputs(build.spdxId).length > 0">
+                  <div class="contents">
+                    <span class="text-xs text-slate-500 pt-0.5">Inputs:</span>
+                    <div class="flex flex-wrap items-center gap-1.5">
+                      <template x-for="input in buildInputs(build.spdxId).slice(0, 5)" :key="input">
+                        <button
+                          class="text-xs text-orange-400 hover:text-orange-300 truncate max-w-36"
+                          @click.stop="navigateTo(input)"
+                          x-text="relTargetDisplayName(input)"
+                        ></button>
+                      </template>
+                      <span
+                        x-show="buildInputs(build.spdxId).length > 5"
+                        class="text-xs text-slate-500"
+                        x-text="'+' + formatCount(buildInputs(build.spdxId).length - 5) + ' more'"
+                      ></span>
+                    </div>
+                  </div>
                 </template>
-                <span
-                  x-show="buildInputs(build.spdxId).length > 5"
-                  class="text-xs text-slate-500"
-                  x-text="'+' + formatCount(buildInputs(build.spdxId).length - 5) + ' more'"
-                ></span>
-              </div>
-              <div
-                class="flex flex-wrap items-center gap-1.5 mt-1"
-                x-show="buildParameterCount(build) > 0"
-              >
-                <span class="text-xs text-slate-500">Params:</span>
-                <template x-for="entry in buildParameterPreview(build)" :key="entry.renderKey">
-                  <span class="text-xs text-purple-400 truncate max-w-52" x-text="entry.key"></span>
+                <template x-if="buildParameterCount(build) > 0">
+                  <div class="contents">
+                    <span class="text-xs text-slate-500 pt-0.5">Params:</span>
+                    <div class="flex flex-wrap items-center gap-1.5">
+                      <template
+                        x-for="entry in buildParameterPreview(build)"
+                        :key="entry.renderKey"
+                      >
+                        <span
+                          class="text-xs text-purple-400 truncate max-w-52"
+                          x-text="entry.key"
+                        ></span>
+                      </template>
+                      <span
+                        x-show="buildParameterCount(build) > 3"
+                        class="text-xs text-slate-500"
+                        x-text="'+' + formatCount(buildParameterCount(build) - 3) + ' more'"
+                      ></span>
+                    </div>
+                  </div>
                 </template>
-                <span
-                  x-show="buildParameterCount(build) > 3"
-                  class="text-xs text-slate-500"
-                  x-text="'+' + formatCount(buildParameterCount(build) - 3) + ' more'"
-                ></span>
-              </div>
-              <div
-                class="flex flex-wrap items-center gap-1.5 mt-1"
-                x-show="fileTools(build.spdxId).length > 0"
-              >
-                <span class="text-xs text-slate-500">Tools:</span>
-                <template x-for="tool in fileTools(build.spdxId).slice(0, 4)" :key="tool">
-                  <button
-                    class="text-xs text-amber-400 hover:text-amber-300 truncate max-w-44"
-                    @click.stop="navigateTo(tool)"
-                    x-text="relTargetDisplayName(tool)"
-                  ></button>
+                <template x-if="fileTools(build.spdxId).length > 0">
+                  <div class="contents">
+                    <span class="text-xs text-slate-500 pt-0.5">Tools:</span>
+                    <div class="flex flex-wrap items-center gap-1.5">
+                      <template x-for="tool in fileTools(build.spdxId).slice(0, 4)" :key="tool">
+                        <button
+                          class="text-xs text-amber-400 hover:text-amber-300 truncate max-w-44"
+                          @click.stop="navigateTo(tool)"
+                          x-text="relTargetDisplayName(tool)"
+                        ></button>
+                      </template>
+                      <span
+                        x-show="fileTools(build.spdxId).length > 4"
+                        class="text-xs text-slate-500"
+                        x-text="'+' + formatCount(fileTools(build.spdxId).length - 4) + ' more'"
+                      ></span>
+                    </div>
+                  </div>
                 </template>
-                <span
-                  x-show="fileTools(build.spdxId).length > 4"
-                  class="text-xs text-slate-500"
-                  x-text="'+' + formatCount(fileTools(build.spdxId).length - 4) + ' more'"
-                ></span>
               </div>
             </div>
             <svg

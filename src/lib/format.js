@@ -76,6 +76,27 @@ export function dirPrefix(name, depth = 2) {
 }
 
 /**
+ * Turns a camelCase/PascalCase identifier into a capitalized, space-separated
+ * label. Used for SPDX vocabulary values (relationship types, primary
+ * purposes, categories, …) that are stored lowerCamelCase but shown to users.
+ *
+ * @param {string} value - e.g. 'hasDistributionArtifact'
+ * @returns {string} e.g. 'Has distribution artifact'
+ *
+ * @example
+ * humanizeCamelCase('dependsOn') // returns 'Depends on'
+ * humanizeCamelCase('operatingSystem') // returns 'Operating system'
+ */
+export function humanizeCamelCase(value) {
+  if (!value) return '';
+  const spaced = String(value)
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
+    .toLowerCase();
+  return spaced.charAt(0).toUpperCase() + spaced.slice(1);
+}
+
+/**
  * Formats an ISO date string for display
  *
  * @param {string} dateStr - ISO date string

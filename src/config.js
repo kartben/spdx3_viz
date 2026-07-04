@@ -4,6 +4,7 @@
  * @module config
  */
 import { ICON_PATHS } from './lib/icon-paths.js';
+import { humanizeCamelCase } from './lib/format.js';
 
 // Element categorization by SPDX type is derived from the official class
 // hierarchy in src/spdx/ (see bucketOf / isA), not from hand-maintained type
@@ -204,29 +205,60 @@ export function createGraphFilters() {
       color: COLORS.vulnerability,
       active: false
     },
-    // Relationship type filters
-    { key: 'dependsOn', label: 'dependsOn', color: COLORS.package, active: true, isRel: true },
-    { key: 'contains', label: 'contains', color: COLORS.file, active: true, isRel: true },
-    { key: 'generates', label: 'generates', color: COLORS.build, active: true, isRel: true },
-    { key: 'hasInput', label: 'hasInput', color: COLORS.buildInput, active: true, isRel: true },
-    { key: 'hasOutput', label: 'hasOutput', color: COLORS.buildOutput, active: true, isRel: true },
+    // Relationship type filters. Labels are humanized from the camelCase key
+    // (see humanizeCamelCase) so the legend reads as prose, not raw vocab.
+    {
+      key: 'dependsOn',
+      label: humanizeCamelCase('dependsOn'),
+      color: COLORS.package,
+      active: true,
+      isRel: true
+    },
+    {
+      key: 'contains',
+      label: humanizeCamelCase('contains'),
+      color: COLORS.file,
+      active: true,
+      isRel: true
+    },
+    {
+      key: 'generates',
+      label: humanizeCamelCase('generates'),
+      color: COLORS.build,
+      active: true,
+      isRel: true
+    },
+    {
+      key: 'hasInput',
+      label: humanizeCamelCase('hasInput'),
+      color: COLORS.buildInput,
+      active: true,
+      isRel: true
+    },
+    {
+      key: 'hasOutput',
+      label: humanizeCamelCase('hasOutput'),
+      color: COLORS.buildOutput,
+      active: true,
+      isRel: true
+    },
     {
       key: 'hasDistributionArtifact',
-      label: 'hasDistributionArtifact',
+      label: humanizeCamelCase('hasDistributionArtifact'),
       color: COLORS.distribution,
       active: true,
       isRel: true
     },
     {
       key: 'ancestorOf',
-      label: 'ancestorOf',
+      label: humanizeCamelCase('ancestorOf'),
       color: COLORS.buildLineage,
       active: true,
       isRel: true
     },
     {
       key: 'usesTool',
-      label: 'usesTool',
+      label: humanizeCamelCase('usesTool'),
       color: COLORS.tool,
       active: true,
       isRel: true,
@@ -234,14 +266,14 @@ export function createGraphFilters() {
     },
     {
       key: 'hasStaticLink',
-      label: 'hasStaticLink',
+      label: humanizeCamelCase('hasStaticLink'),
       color: COLORS.staticLink,
       active: true,
       isRel: true
     },
     {
       key: 'hasDynamicLink',
-      label: 'hasDynamicLink',
+      label: humanizeCamelCase('hasDynamicLink'),
       color: COLORS.dynamicLink,
       active: true,
       isRel: true,
@@ -249,29 +281,41 @@ export function createGraphFilters() {
     },
     {
       key: 'hasOptionalComponent',
-      label: 'hasOptionalComponent',
+      label: humanizeCamelCase('hasOptionalComponent'),
       color: COLORS.optionalComponent,
       active: true,
       isRel: true,
       lineStyle: 'dashdot'
     },
-    { key: 'hasVariant', label: 'hasVariant', color: COLORS.variant, active: true, isRel: true },
+    {
+      key: 'hasVariant',
+      label: humanizeCamelCase('hasVariant'),
+      color: COLORS.variant,
+      active: true,
+      isRel: true
+    },
     {
       key: 'runsOn',
-      label: 'runsOn',
+      label: humanizeCamelCase('runsOn'),
       color: COLORS.hardware,
       active: true,
       isRel: true,
       lineStyle: 'dashed'
     },
-    { key: 'configures', label: 'configures', color: COLORS.config, active: true, isRel: true },
+    {
+      key: 'configures',
+      label: humanizeCamelCase('configures'),
+      color: COLORS.config,
+      active: true,
+      isRel: true
+    },
     // Provenance edges synthesized from an element's CreationInfo.createdBy,
     // Artifact.suppliedBy / .originatedBy, and Hardware.productAgent (element →
     // agent). Off by default and dotted so they stay in the background rather
     // than crowding the structural edges above.
     {
       key: 'createdBy',
-      label: 'createdBy',
+      label: humanizeCamelCase('createdBy'),
       color: COLORS.createdBy,
       active: false,
       isRel: true,
@@ -279,7 +323,7 @@ export function createGraphFilters() {
     },
     {
       key: 'suppliedBy',
-      label: 'suppliedBy',
+      label: humanizeCamelCase('suppliedBy'),
       color: COLORS.createdBy,
       active: false,
       isRel: true,
@@ -287,7 +331,7 @@ export function createGraphFilters() {
     },
     {
       key: 'originatedBy',
-      label: 'originatedBy',
+      label: humanizeCamelCase('originatedBy'),
       color: COLORS.createdBy,
       active: false,
       isRel: true,
@@ -295,7 +339,7 @@ export function createGraphFilters() {
     },
     {
       key: 'manufacturedBy',
-      label: 'manufacturedBy',
+      label: humanizeCamelCase('manufacturedBy'),
       color: COLORS.createdBy,
       active: false,
       isRel: true,
@@ -308,14 +352,14 @@ export function createGraphFilters() {
     // patterns; keep the two in sync).
     {
       key: 'hasRequirement',
-      label: 'hasRequirement',
+      label: humanizeCamelCase('hasRequirement'),
       color: COLORS.requirement,
       active: true,
       isRel: true
     },
     {
       key: 'implementedBy',
-      label: 'implementedBy',
+      label: humanizeCamelCase('implementedBy'),
       color: COLORS.requirement,
       active: true,
       isRel: true,
@@ -323,7 +367,7 @@ export function createGraphFilters() {
     },
     {
       key: 'verifiedBy',
-      label: 'verifiedBy',
+      label: humanizeCamelCase('verifiedBy'),
       color: COLORS.requirement,
       active: true,
       isRel: true,
@@ -331,7 +375,7 @@ export function createGraphFilters() {
     },
     {
       key: 'hasEvidence',
-      label: 'hasEvidence',
+      label: humanizeCamelCase('hasEvidence'),
       color: COLORS.requirement,
       active: true,
       isRel: true,
@@ -339,7 +383,7 @@ export function createGraphFilters() {
     },
     {
       key: 'assumes',
-      label: 'assumes',
+      label: humanizeCamelCase('assumes'),
       color: COLORS.requirement,
       active: true,
       isRel: true,
@@ -347,7 +391,7 @@ export function createGraphFilters() {
     },
     {
       key: 'conformsTo',
-      label: 'conformsTo',
+      label: humanizeCamelCase('conformsTo'),
       color: COLORS.requirement,
       active: true,
       isRel: true,
@@ -355,7 +399,7 @@ export function createGraphFilters() {
     },
     {
       key: 'evaluationBasedOn',
-      label: 'evaluationBasedOn',
+      label: humanizeCamelCase('evaluationBasedOn'),
       color: COLORS.requirement,
       active: true,
       isRel: true,
@@ -366,40 +410,52 @@ export function createGraphFilters() {
     // agent-pointing edges since its target is always an Agent.
     {
       key: 'performedBy',
-      label: 'performedBy',
+      label: humanizeCamelCase('performedBy'),
       color: COLORS.agent,
       active: true,
       isRel: true,
       lineStyle: 'dashed'
     },
-    { key: 'trainedOn', label: 'trainedOn', color: COLORS.ai, active: true, isRel: true },
+    {
+      key: 'trainedOn',
+      label: humanizeCamelCase('trainedOn'),
+      color: COLORS.ai,
+      active: true,
+      isRel: true
+    },
     {
       key: 'testedOn',
-      label: 'testedOn',
+      label: humanizeCamelCase('testedOn'),
       color: COLORS.dataset,
       active: true,
       isRel: true,
       lineStyle: 'dashed'
     },
     // VEX assessment edges (vulnerability → package); start off, auto-enabled on load for small VEX sets.
-    { key: 'fixedIn', label: 'fixedIn (VEX)', color: COLORS.vexFixed, active: false, isRel: true },
+    {
+      key: 'fixedIn',
+      label: `${humanizeCamelCase('fixedIn')} (VEX)`,
+      color: COLORS.vexFixed,
+      active: false,
+      isRel: true
+    },
     {
       key: 'doesNotAffect',
-      label: 'doesNotAffect (VEX)',
+      label: `${humanizeCamelCase('doesNotAffect')} (VEX)`,
       color: COLORS.vexNotAffected,
       active: false,
       isRel: true
     },
     {
       key: 'affects',
-      label: 'affects (VEX)',
+      label: `${humanizeCamelCase('affects')} (VEX)`,
       color: COLORS.vexAffected,
       active: false,
       isRel: true
     },
     {
       key: 'underInvestigation',
-      label: 'underInvestigation (VEX)',
+      label: `${humanizeCamelCase('underInvestigation')} (VEX)`,
       color: COLORS.vexUnderInvestigation,
       active: false,
       isRel: true

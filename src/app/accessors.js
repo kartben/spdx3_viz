@@ -22,7 +22,8 @@ import {
   isMeaningfulValue,
   formatByteSize,
   normalizeUrl,
-  copyToClipboard
+  copyToClipboard,
+  humanizeCamelCase as toHumanLabel
 } from '../lib/index.js';
 import { COLORS } from '../config.js';
 
@@ -33,6 +34,9 @@ import { COLORS } from '../config.js';
 export const accessorsMixin = {
   cleanName(spdxId) {
     return formatSpdxName(spdxId);
+  },
+  humanizeCamelCase(value) {
+    return toHumanLabel(value);
   },
   cleanFileName(spdxId) {
     return formatFileName(spdxId, this.elementMap);

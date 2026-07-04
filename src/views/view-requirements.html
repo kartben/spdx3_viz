@@ -187,7 +187,10 @@
                     x-for="m in (v.verification.functionalsafety_verificationMethod || [])"
                     :key="m"
                   >
-                    <span class="badge text-xs bg-slate-700 text-slate-300" x-text="m"></span>
+                    <span
+                      class="badge text-xs bg-slate-700 text-slate-300"
+                      x-text="humanizeCamelCase(m)"
+                    ></span>
                   </template>
                   <span
                     x-show="evaluationResultMeta(v.evaluation)"

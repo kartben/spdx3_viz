@@ -52,10 +52,10 @@
           ></div>
           <div
             class="text-xs text-slate-500"
-            x-text="pkg.software_primaryPurpose || 'library'"
+            x-text="humanizeCamelCase(pkg.software_primaryPurpose || 'library')"
           ></div>
         </div>
-        <div class="flex items-center gap-2 flex-shrink-0">
+        <div class="flex items-center gap-2 flex-wrap justify-end">
           <span
             x-show="(depsOf(pkg.spdxId)||[]).length > 0"
             class="badge bg-blue-500/15 text-blue-400"
@@ -548,7 +548,7 @@
                       x-show="item.scope"
                       class="text-[10px] px-1.5 py-0.5 rounded bg-slate-700/60 text-slate-400 flex-shrink-0"
                       :title="'Lifecycle scope: ' + item.scope"
-                      x-text="item.scope"
+                      x-text="humanizeCamelCase(item.scope)"
                     ></span>
                     <svg
                       class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors flex-shrink-0"
