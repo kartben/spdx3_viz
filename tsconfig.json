@@ -8,6 +8,7 @@
     "noImplicitAny": false,
     "allowJs": true,
     "checkJs": false,
+    "resolveJsonModule": true,
     "noEmit": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true

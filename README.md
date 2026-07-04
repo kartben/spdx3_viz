@@ -12,6 +12,9 @@ relationships between packages, files, tools, builds, agents, etc. as an interac
 - Dedicated views for packages, files, licenses, build configs, and builds.
 - Runs entirely in the browser; no server or data upload.
 
+See [CHANGELOG.md](CHANGELOG.md) for release history (also viewable in-app via
+the "What's new" link).
+
 ## Usage
 
 The app is built with [Vite](https://vite.dev/). For a production build:

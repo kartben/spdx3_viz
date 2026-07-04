@@ -160,5 +160,17 @@
         />
       </svg>
     </a>
+
+    <div class="mt-2 flex items-center justify-center gap-2 text-xs text-slate-600">
+      <span x-text="'v' + appVersion"></span>
+      <span aria-hidden="true">&middot;</span>
+      <button
+        type="button"
+        @click="openChangelogModal()"
+        class="underline decoration-slate-700 hover:text-slate-300 hover:decoration-slate-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 rounded"
+      >
+        What's new
+      </button>
+    </div>
   </div>
 </div>
