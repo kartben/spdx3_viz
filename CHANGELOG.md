@@ -5,6 +5,7 @@ via the "What's new" link.
 
 ## Unreleased
 
+- **Added:** Statistics view with an SBOM quality score (NTIA minimum elements, license/copyright, provenance, integrity, and structural health categories), plus worst-offender drill-downs, license-family exposure, and supply-chain concentration insights.
 - **Changed:** Migrated the build to Vite; reorganized source into modules and view partials.
 - **Added:** Dedicated Agents view.
 - **Added:** CreatedBy/performedBy provenance edges in the graph, hidden by default.

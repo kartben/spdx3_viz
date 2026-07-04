@@ -10,6 +10,10 @@ export const CHANGELOG = [
     date: null,
     items: [
       {
+        tag: 'Added',
+        text: 'Statistics view with an SBOM quality score (NTIA minimum elements, license/copyright, provenance, integrity, and structural health categories), plus worst-offender drill-downs, license-family exposure, and supply-chain concentration insights.'
+      },
+      {
         tag: 'Changed',
         text: 'Migrated the build to Vite; reorganized source into modules and view partials.'
       },
