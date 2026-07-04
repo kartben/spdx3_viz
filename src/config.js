@@ -259,11 +259,13 @@ export function createGraphFilters() {
     },
     { key: 'configures', label: 'configures', color: COLORS.config, active: true, isRel: true },
     // Provenance edge synthesized from CreationInfo.createdBy (element → agent).
+    // Starts off like the VEX edges below, since documents can have a createdBy
+    // edge on every element and swamp the graph; opt in from the legend.
     {
       key: 'createdBy',
       label: 'createdBy',
       color: COLORS.createdBy,
-      active: true,
+      active: false,
       isRel: true,
       lineStyle: 'dotted'
     },
