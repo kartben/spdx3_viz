@@ -44,12 +44,12 @@
     <script type="module" src="/src/main.js"></script>
   </head>
 
-  <body class="bg-slate-900 text-slate-200 h-screen overflow-hidden" x-data="spdxApp()" x-cloak>
+  <body class="bg-slate-900 text-slate-200 h-screen-dvh overflow-hidden" x-data="spdxApp()" x-cloak>
     <!-- FILE DROP ZONE (shown before data loaded) -->
     <include src="src/views/landing.html"></include>
 
     <!-- MAIN APP (shown after data loaded) -->
-    <div x-show="dataLoaded" class="flex h-screen">
+    <div x-show="dataLoaded" class="flex h-screen-dvh">
       <!-- SIDEBAR BACKDROP (mobile only, when drawer is open) -->
       <div
         x-show="sidebarOpen"
