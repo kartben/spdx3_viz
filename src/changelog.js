@@ -33,15 +33,19 @@ export const CHANGELOG = [
     items: [
       {
         tag: 'Added',
+        text: 'SPDX ExternalMap support, with placeholder nodes for external elements.'
+      },
+      {
+        tag: 'Added',
+        text: 'experimental Zephyr SPDX 3.1 sample.'
+      },
+      {
+        tag: 'Added',
         text: 'SPDX 3.1 Hardware profile support.'
       },
       {
         tag: 'Added',
         text: 'SPDX 3.1 Functional Safety profile support, with a dedicated Requirements view.'
-      },
-      {
-        tag: 'Added',
-        text: 'experimental Zephyr SPDX 3.1 sample.'
       },
       {
         tag: 'Fixed',
@@ -58,36 +62,6 @@ export const CHANGELOG = [
     date: '2026-07-03',
     items: [
       {
-        tag: 'Added',
-        text: 'CycloneDX to SPDX 3 converter.'
-      },
-      {
-        tag: 'Added',
-        text: 'Raw JSON-LD view with syntax highlighting.'
-      },
-      {
-        tag: 'Added',
-        text: 'SPDX ExternalMap support, with placeholder nodes for external elements.'
-      },
-      {
-        tag: 'Improved',
-        text: 'vulnerability/VEX filters auto-enable when a scan has findings.'
-      },
-      {
-        tag: 'Added',
-        text: 'Trivy vulnerability scan sample.'
-      }
-    ]
-  },
-  {
-    version: '0.0.2',
-    date: '2026-07-03',
-    items: [
-      {
-        tag: 'Improved',
-        text: 'graph rendering performance for large SBOMs, via node caching and a faster draw path.'
-      },
-      {
         tag: 'Improved',
         text: 'package and file lists now load incrementally on scroll.'
       },
@@ -98,6 +72,40 @@ export const CHANGELOG = [
       {
         tag: 'Added',
         text: 'global search across all elements.'
+      },
+      {
+        tag: 'Added',
+        text: 'CycloneDX to SPDX 3 converter.'
+      },
+      {
+        tag: 'Added',
+        text: 'Raw JSON-LD view with syntax highlighting.'
+      },
+      {
+        tag: 'Added',
+        text: 'Trivy vulnerability scan sample; vulnerability/VEX filters now auto-enable when a scan has findings.'
+      }
+    ]
+  },
+  {
+    version: '0.0.2',
+    date: '2026-07-03',
+    items: [
+      {
+        tag: 'Added',
+        text: 'sample SBOMs for Vue.js, Jenkins, Android, and Kubernetes.'
+      },
+      {
+        tag: 'Added',
+        text: 'CycloneDX property display, plus dynamic link, optional component, and hasVariant relationship types.'
+      },
+      {
+        tag: 'Improved',
+        text: 'graph rendering performance for large SBOMs, via node caching and a faster draw path.'
+      },
+      {
+        tag: 'Improved',
+        text: 'file list rendering, via memoization.'
       }
     ]
   },
@@ -107,15 +115,11 @@ export const CHANGELOG = [
     items: [
       {
         tag: 'Added',
-        text: 'interactive relationship graph for SPDX 3 SBOMs, color-coded by element type.'
+        text: 'initial release. Interactive relationship graph for SPDX 3 SBOMs, color-coded by element type.'
       },
       {
         tag: 'Added',
-        text: 'sample SBOMs for Linux, Windows, Yocto, Zephyr, Docker, Vue.js, Jenkins, Android, and Kubernetes.'
-      },
-      {
-        tag: 'Added',
-        text: 'CycloneDX property display, plus dynamic link, optional component, and hasVariant relationship types.'
+        text: 'sample SBOMs for Linux, Windows, Yocto, Zephyr, and a Docker container image.'
       }
     ]
   }
