@@ -8,14 +8,11 @@ import {
   spdxLicenseExceptionJsonUrl,
   spdxLicensePageUrl,
   spdxLicenseExceptionPageUrl
-} from '../utils.js';
+} from '../lib/index.js';
 
-/* ==========================================================================
-   Licenses
-   License labels, expression resolution, and the license-text modal — which
-   shows text embedded in the SBOM directly and otherwise fetches it from the
-   SPDX License List on demand (cached in licenseTextCache).
-   ========================================================================== */
+/* Licenses: labels, expression resolution, and the license-text modal, which
+   shows SBOM-embedded text directly and otherwise fetches from the SPDX License
+   List on demand (cached in licenseTextCache). */
 
 const licenseTextCache = new Map(); // licenseId -> { name, text }
 
@@ -89,8 +86,8 @@ export const licensesMixin = {
   licenseModalText() {
     return this.licenseModalActivePart()?.text || '';
   },
-  // Full license text embedded in the SBOM itself (simplelicensing_SimpleLicensingText
-  // elements, e.g. Yocto's custom/CLOSED licenses) — no fetch needed.
+  // Full license text embedded in the SBOM itself
+  // (simplelicensing_SimpleLicensingText elements) — no fetch needed.
   inlineLicenseText(licenseRef) {
     return this.elementMap.get(licenseRef)?.simplelicensing_licenseText || '';
   },
@@ -225,8 +222,8 @@ export const licensesMixin = {
 
     // Custom LicenseRef-… parts: the expression element's customIdToUri map
     // points at simplelicensing_SimpleLicensingText elements carrying the full
-    // text inside the SBOM (e.g. Yocto's LicenseRef-PD) — use that instead of
-    // fetching from the SPDX License List (where custom refs don't exist).
+    // text inside the SBOM — use that instead of fetching from the SPDX License
+    // List, where custom refs don't exist.
     const customIdMap = this.elementMap.get(licenseRef)?.simplelicensing_customIdToUri || [];
     this.licenseModalParts.forEach((part) => {
       const entry = customIdMap.find((e) => e?.key === part.id);

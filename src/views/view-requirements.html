@@ -1,0 +1,328 @@
+<div x-show="currentView === 'requirements'" class="fade-in space-y-3 max-w-4xl">
+  <div class="flex flex-wrap items-center gap-3 mb-3">
+    <!-- Breakdown summary of the folded-in FunctionalSafety elements -->
+    <span class="text-sm text-slate-400 flex-shrink-0">
+      <span x-text="safetyCounts.requirements"></span> requirements<template
+        x-if="safetyCounts.verifications"
+        ><span
+          ><span class="text-slate-600"> · </span
+          ><span x-text="safetyCounts.verifications"></span> verifications</span
+        ></template
+      ><template x-if="safetyCounts.evaluations"
+        ><span
+          ><span class="text-slate-600"> · </span
+          ><span x-text="safetyCounts.evaluations"></span> evaluations</span
+        ></template
+      ><template x-if="safetyCounts.assumptions"
+        ><span
+          ><span class="text-slate-600"> · </span
+          ><span x-text="safetyCounts.assumptions"></span> assumptions</span
+        ></template
+      >
+    </span>
+    <input
+      x-model="requirementSearch"
+      @input.debounce.150ms="restreamView('requirements')"
+      type="text"
+      placeholder="Filter…"
+      class="ml-auto bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-yellow-500 w-44 sm:w-56"
+    />
+  </div>
+  <!-- Kind filter (only kinds actually present are offered) -->
+  <div class="flex flex-wrap items-center gap-1.5 mb-1">
+    <template
+      x-for="chip in [
+                  { key: '', label: 'All' },
+                  { key: 'Requirement', label: 'Requirements', n: safetyCounts.requirements },
+                  { key: 'functionalsafety_RequirementVerification', label: 'Verifications', n: safetyCounts.verifications },
+                  { key: 'functionalsafety_EvaluationResult', label: 'Evaluations', n: safetyCounts.evaluations },
+                  { key: 'functionalsafety_Assumption', label: 'Assumptions', n: safetyCounts.assumptions }
+                ].filter(c => c.key === '' || c.n > 0)"
+      :key="chip.key"
+    >
+      <button
+        type="button"
+        @click="requirementKindFilter = chip.key; restreamView('requirements')"
+        class="px-2.5 py-1 rounded-full text-xs border transition-colors"
+        :class="requirementKindFilter === chip.key
+                    ? 'bg-yellow-500/15 text-yellow-300 border-yellow-500/40'
+                    : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200'"
+      >
+        <span x-text="chip.label"></span>
+        <span x-show="chip.n !== undefined" class="text-slate-500" x-text="`(${chip.n})`"></span>
+      </button>
+    </template>
+  </div>
+  <template
+    x-for="req in (mountedViews.requirements ? renderSlice('requirements', filteredRequirements) : [])"
+    :key="req.spdxId"
+  >
+    <div
+      class="card cursor-pointer"
+      data-nav-kind="requirement"
+      :data-nav-id="req.spdxId"
+      :class="isNavTarget('requirement', req.spdxId) && 'target-focus'"
+      @click="toggleRequirement(req.spdxId)"
+    >
+      <div class="flex items-center gap-3">
+        <div
+          class="w-8 h-8 rounded-lg bg-yellow-500/15 flex items-center justify-center flex-shrink-0"
+        >
+          <svg
+            class="w-4 h-4 text-yellow-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+            />
+          </svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div
+            class="font-medium text-white text-sm break-words"
+            x-text="req.name || cleanName(req.spdxId)"
+          ></div>
+          <!-- "shall" / assumption statement, one-line preview -->
+          <div
+            x-show="isMeaningful(req.requirementStatement || req.functionalsafety_assumptionStatement)"
+            class="text-xs text-slate-400 mt-0.5 line-clamp-1"
+            x-text="req.requirementStatement || req.functionalsafety_assumptionStatement"
+          ></div>
+          <div class="flex items-center gap-2 mt-1 flex-wrap">
+            <span
+              class="badge text-xs bg-yellow-500/15 text-yellow-400"
+              x-text="safetyArtifactKind(req)"
+            ></span>
+            <template x-for="eid in externalIdentifiers(req).slice(0, 1)" :key="eid.identifier">
+              <span
+                class="badge text-xs bg-slate-700 text-slate-300 font-mono"
+                x-text="eid.identifier"
+              ></span>
+            </template>
+            <!-- Requirement verification status (pass/fail) -->
+            <span
+              x-show="requirementSafetyStatus(req)"
+              class="badge text-xs"
+              :class="requirementSafetyStatus(req)?.badgeClass"
+              x-text="requirementSafetyStatus(req)?.label"
+            ></span>
+            <!-- Evaluation element's own pass/fail outcome -->
+            <span
+              x-show="evaluationResultMeta(req)"
+              class="badge text-xs"
+              :class="evaluationResultMeta(req)?.badgeClass"
+              x-text="evaluationResultMeta(req)?.label"
+            ></span>
+            <span
+              x-show="(outgoingRels(req.spdxId)||[]).some(r => r.relationshipType === 'implementedBy')"
+              class="badge text-xs bg-emerald-500/15 text-emerald-400"
+              x-text="`implemented by ${implementedByCount(req.spdxId)}`"
+            ></span>
+          </div>
+        </div>
+        <svg
+          class="w-4 h-4 text-slate-500 transition-transform flex-shrink-0"
+          :class="expandedRequirement === req.spdxId && 'rotate-180'"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
+      </div>
+      <!-- Expanded detail (built lazily via x-if for only the open card) -->
+      <template x-if="expandedRequirement === req.spdxId">
+        <div class="mt-4 pt-4 border-t border-slate-700 space-y-3 sm:pl-11 fade-in" @click.stop>
+          <!-- Requirement / assumption statement -->
+          <div
+            x-show="isMeaningful(req.requirementStatement || req.functionalsafety_assumptionStatement)"
+          >
+            <div class="text-[10px] text-slate-500 uppercase tracking-wider mb-1">
+              <span x-text="req.type === 'Requirement' ? 'Requirement' : 'Statement'"></span>
+            </div>
+            <div
+              class="text-sm text-slate-200 break-words leading-relaxed"
+              x-text="req.requirementStatement || req.functionalsafety_assumptionStatement"
+            ></div>
+          </div>
+
+          <!-- Summary -->
+          <div x-show="isMeaningful(req.summary) && req.summary !== req.name">
+            <div class="text-xs text-slate-500 mb-1">Summary</div>
+            <div class="text-xs text-slate-300 break-words" x-text="req.summary"></div>
+          </div>
+
+          <!-- Safety fields (lifecycle stage, verification method, rationale, …) -->
+          <div x-show="safetyFields(req).length > 0" class="grid grid-cols-2 gap-x-4 gap-y-2">
+            <template x-for="field in safetyFields(req)" :key="field.label">
+              <div>
+                <div
+                  class="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5"
+                  x-text="field.label"
+                ></div>
+                <span
+                  class="text-xs text-slate-300 break-words"
+                  :class="field.mono && 'font-mono break-all'"
+                  x-text="field.value"
+                ></span>
+              </div>
+            </template>
+          </div>
+
+          <!-- Verification & evaluation: method, pass/fail, pre/postconditions -->
+          <div x-show="requirementVerifications(req).length > 0" class="space-y-2">
+            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              Verification &amp; evaluation
+            </div>
+            <template x-for="v in requirementVerifications(req)" :key="v.id">
+              <div class="rounded-lg bg-slate-900/40 border border-slate-700/50 p-3 space-y-2">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <button
+                    @click.stop="navigateTo(v.id)"
+                    class="text-xs font-medium text-yellow-300 hover:underline text-left break-words"
+                    x-text="v.verification.name || cleanName(v.id)"
+                  ></button>
+                  <template
+                    x-for="m in (v.verification.functionalsafety_verificationMethod || [])"
+                    :key="m"
+                  >
+                    <span class="badge text-xs bg-slate-700 text-slate-300" x-text="m"></span>
+                  </template>
+                  <span
+                    x-show="evaluationResultMeta(v.evaluation)"
+                    class="badge text-xs"
+                    :class="evaluationResultMeta(v.evaluation)?.badgeClass"
+                    x-text="evaluationResultMeta(v.evaluation)?.label"
+                  ></span>
+                </div>
+                <div
+                  x-show="isMeaningful(v.verification.functionalsafety_verificationPrecondition)"
+                >
+                  <span class="text-[10px] text-slate-500 uppercase tracking-wider"
+                    >Precondition</span
+                  >
+                  <div
+                    class="text-xs text-slate-300 break-words"
+                    x-text="[].concat(v.verification.functionalsafety_verificationPrecondition || []).join('; ')"
+                  ></div>
+                </div>
+                <div
+                  x-show="isMeaningful(v.verification.functionalsafety_verificationPostcondition)"
+                >
+                  <span class="text-[10px] text-slate-500 uppercase tracking-wider"
+                    >Postcondition</span
+                  >
+                  <div
+                    class="text-xs text-slate-300 break-words"
+                    x-text="[].concat(v.verification.functionalsafety_verificationPostcondition || []).join('; ')"
+                  ></div>
+                </div>
+                <div x-show="v.evaluation && isMeaningful(v.evaluation.functionalsafety_rationale)">
+                  <span class="text-[10px] text-slate-500 uppercase tracking-wider"
+                    >Evaluation rationale</span
+                  >
+                  <div
+                    class="text-xs text-slate-300 break-words"
+                    x-text="v.evaluation.functionalsafety_rationale"
+                  ></div>
+                </div>
+              </div>
+            </template>
+          </div>
+
+          <!-- Identifiers -->
+          <div x-show="externalIdentifiers(req).length > 0">
+            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+              Identifiers
+            </div>
+            <div class="space-y-1.5">
+              <template x-for="eid in externalIdentifiers(req)" :key="eid.type + eid.identifier">
+                <div class="flex items-start gap-2 group">
+                  <span
+                    class="text-[10px] text-slate-500 uppercase tracking-wider w-20 pt-0.5 flex-shrink-0 text-right"
+                    x-text="eid.label"
+                  ></span>
+                  <code
+                    class="hash-text text-slate-300 break-all flex-1 leading-relaxed"
+                    x-text="eid.identifier"
+                  ></code>
+                  <button
+                    @click.stop="copyHash(eid.identifier)"
+                    class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity flex-shrink-0 pt-0.5"
+                    title="Copy"
+                  >
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </template>
+            </div>
+          </div>
+
+          <!-- Relationships — grouped semantically (implementedBy, verifiedBy, …) -->
+          <template x-for="group in detailRelGroupsFor(req)" :key="group.key">
+            <div class="detail-rel-section">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="detail-rel-line" :style="`background: ${group.color}`"></span>
+                <span
+                  class="text-xs font-semibold uppercase tracking-wider"
+                  :style="`color: ${group.color}`"
+                  x-text="group.label"
+                ></span>
+                <span
+                  class="text-[10px] text-slate-500"
+                  x-text="'(' + group.items.length + ')'"
+                ></span>
+              </div>
+              <div class="space-y-1 ml-3">
+                <template x-for="item in group.items" :key="item.id">
+                  <div class="detail-rel-item group" @click.stop="navigateTo(item.id)">
+                    <span
+                      class="detail-rel-arrow"
+                      :style="`color: ${group.color}`"
+                      x-text="item.direction === 'out' ? '→' : '←'"
+                    ></span>
+                    <span
+                      class="detail-rel-target-dot"
+                      :style="`background: ${nodeTypeColor(getNodeType(elementMap.get(item.id) || {}))}`"
+                    ></span>
+                    <span class="flex-1 truncate" x-text="item.displayName"></span>
+                    <svg
+                      class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors flex-shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </template>
+        </div>
+      </template>
+    </div>
+  </template>
+</div>

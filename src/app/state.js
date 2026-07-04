@@ -1,9 +1,7 @@
 import { createGraphFilters, createViews } from '../config.js';
 
-/* The Alpine component's initial reactive state. Returned fresh per component
-   instance so the Maps/Sets and the graph-filter/view arrays aren't shared
-   between (re)mounts. Pure data only — behaviour lives in the method mixins
-   that spdxApp() composes on top of this (see app.js). */
+/* The Alpine component's initial reactive state, returned fresh per instance so
+   Maps/Sets and arrays aren't shared between mounts. Pure data only. */
 export function createState() {
   return {
     // State
@@ -18,11 +16,8 @@ export function createState() {
     progressPhase: '', // human-readable current phase label
     progressEta: null, // estimated seconds remaining, or null when unknown
     currentView: 'dashboard',
-    // Views render their (potentially huge) item lists lazily: a view's heavy
-    // x-for only builds once the view has been opened. The dashboard is the
-    // landing view so it's mounted from the start. This keeps the initial
-    // load fast — otherwise Alpine would build every hidden view's DOM (e.g.
-    // thousands of file cards) up front, freezing the page right at the end.
+    // Views build their heavy x-for lists lazily, only once opened; the
+    // dashboard is the landing view so it's mounted from the start.
     mountedViews: {
       dashboard: true,
       graph: false,
@@ -40,8 +35,7 @@ export function createState() {
     },
     // How many items of each heavy view's filtered list the DOM may show.
     // Starts at one page and grows as the user scrolls (see loadMoreForView /
-    // _ensureScrollLoader), so opening e.g. the 28k-file Kubernetes list renders
-    // instantly instead of building every card up front.
+    // _ensureScrollLoader) so large lists open instantly.
     renderLimits: {
       packages: 0,
       ai: 0,

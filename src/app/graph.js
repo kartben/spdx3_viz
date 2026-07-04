@@ -1,13 +1,10 @@
 import {
   renderGraph as renderGraphView,
   resetGraphZoom as resetGraphViewZoom
-} from '../graph-view.js';
+} from '../graph/graph-view.js';
 
-/* ==========================================================================
-   Force graph
-   Thin bridge between the Alpine component and the D3 renderer in
-   graph-view.js, plus selecting a node into the detail panel.
-   ========================================================================== */
+/* Force graph: thin bridge between the Alpine component and the D3 renderer in
+   graph-view.js, plus selecting a node into the detail panel. */
 
 export const graphMixin = {
   selectGraphNode(spdxId) {

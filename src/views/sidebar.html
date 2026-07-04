@@ -1,0 +1,63 @@
+<aside
+  class="fixed inset-y-0 left-0 z-50 w-60 bg-slate-800/50 border-r border-slate-700/50 flex flex-col flex-shrink-0 transition-transform duration-200 md:static md:z-auto md:translate-x-0"
+  :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+>
+  <div class="p-4 border-b border-slate-700/50">
+    <div
+      class="flex items-center gap-2.5 cursor-pointer"
+      role="button"
+      tabindex="0"
+      title="Go to home"
+      @click="goHome()"
+      @keydown.enter="goHome()"
+      @keydown.space.prevent="goHome()"
+    >
+      <div
+        class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0"
+      >
+        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+          />
+        </svg>
+      </div>
+      <div class="min-w-0">
+        <div class="text-sm font-semibold text-white truncate">SPDX 3 Visualizer</div>
+        <div class="text-xs text-slate-400">SPDX 3.0 &amp; 3.1</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="px-3 pt-4 pb-1">
+    <span class="text-[10px] font-semibold uppercase tracking-widest text-slate-500"
+      >Navigation</span
+    >
+  </div>
+  <nav class="flex-1 px-2 pb-2 space-y-0.5 overflow-y-auto">
+    <template x-for="v in views" :key="v.id">
+      <div
+        class="nav-item"
+        x-show="(v.id !== 'security' || vulnerabilities.length > 0) &&
+                      (v.id !== 'ai' || aiPackages.length > 0) &&
+                      (v.id !== 'dataset' || datasetPackages.length > 0) &&
+                      (v.id !== 'hardware' || hardware.length > 0) &&
+                      (v.id !== 'requirements' || requirements.length > 0) &&
+                      (v.id !== 'configs' || buildConfigs.length > 0)"
+        :class="currentView === v.id && 'active'"
+        @click="switchView(v.id)"
+      >
+        <span x-html="v.icon" class="nav-icon"></span>
+        <span x-text="v.label" class="flex-1"></span>
+        <span
+          x-show="v.count"
+          x-text="v.count"
+          class="text-[10px] bg-slate-700/60 px-1.5 py-0.5 rounded text-slate-400"
+          :class="v.id === 'security' && 'bg-rose-500/15 text-rose-300'"
+        ></span>
+      </div>
+    </template>
+  </nav>
+</aside>

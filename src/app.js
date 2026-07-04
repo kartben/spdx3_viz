@@ -9,16 +9,9 @@ import { licensesMixin } from './app/licenses.js';
 import { graphMixin } from './app/graph.js';
 import { rawMixin } from './app/raw.js';
 
-/* ==========================================================================
-   spdxApp — the Alpine component (x-data="spdxApp()")
-   Assembled from focused mixins: fresh reactive state (state.js) plus behaviour
-   grouped by concern (loading, derived data, element accessors, navigation,
-   security/VEX, licenses, graph). This file just wires them together and hooks
-   the component lifecycle.
-   ========================================================================== */
+/* The spdxApp Alpine component: assembles fresh state with behaviour mixins. */
 
-// Lifecycle wiring. Kept here rather than in a mixin since it reaches across
-// several concerns (loading, navigation, graph).
+// Lifecycle wiring, kept here since it reaches across several concerns.
 const lifecycleMixin = {
   init() {
     this.$watch('currentView', (v) => {
@@ -32,10 +25,9 @@ const lifecycleMixin = {
   }
 };
 
-// Behaviour mixins, layered onto a fresh state object. defineProperties (rather
-// than spread) is used so getters stay lazy getters instead of being evaluated
-// once at assembly time; getOwnPropertyDescriptors preserves their enumerable
-// flag so Alpine's reactivity still sees them.
+// Behaviour mixins, layered onto a fresh state object. defineProperties (not
+// spread) keeps getters lazy, and getOwnPropertyDescriptors preserves their
+// enumerable flag so Alpine's reactivity still sees them.
 const mixins = [
   lifecycleMixin,
   loadingMixin,
@@ -55,12 +47,4 @@ export function spdxApp() {
     Object.defineProperties(app, Object.getOwnPropertyDescriptors(mixin));
   }
   return app;
-}
-
-if (typeof window !== 'undefined') {
-  window.spdxApp = spdxApp;
-
-  document.addEventListener('alpine:init', () => {
-    window.Alpine.data('spdxApp', spdxApp);
-  });
 }

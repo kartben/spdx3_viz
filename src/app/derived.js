@@ -1,28 +1,17 @@
-import { computeRelationshipTypeCounts } from '../parser.js';
-import { ELEMENT_TYPES } from '../config.js';
+import { computeRelationshipTypeCounts } from '../parser/parser.js';
+import { isA, CLASS } from '../spdx/model.js';
 
-/* ==========================================================================
-   Derived data
-   Computed getters over the parsed model: the filtered/sorted list views, the
-   security summary, and the small counts/labels the templates read.
-   ========================================================================== */
+/* Derived data: computed getters over the parsed model — filtered/sorted list
+   views, the security summary, and the counts/labels templates read. */
 
-// Memo for the filteredBuilds getter. Sorting ~1k builds (the default sort
-// derives a display name per item) is wasted work when it re-runs on unrelated
-// reactive changes (e.g. expanding a card). Cached on the inputs that actually
-// affect the result; kept off the reactive state so it isn't proxied.
+// Memoized filtered-list results, keyed on the inputs that actually affect them
+// so unrelated reactive changes don't re-sort the list. Kept off the reactive
+// state so it isn't proxied. The files memo matters most: without it the getter
+// re-ran a full locale-aware sort on every streamed chunk.
 let filteredBuildsCacheKey = null;
 let filteredBuildsCacheVal = [];
-// Same idea for the security view: sorting/filtering ~3k vulnerabilities is
-// wasted work when it re-runs on unrelated reactive changes (e.g. expanding a
-// card). Cached on the inputs that actually affect the result.
 let filteredVulnsCacheKey = null;
 let filteredVulnsCacheVal = [];
-// Same idea for the files view — critical here because the list can be huge
-// (~28k files in the Kubernetes SBOM) and the view streams into the DOM one
-// chunk per frame: without this memo the getter re-ran a full 28k-item
-// locale-aware sort on every chunk (~dozens of times), which is what made the
-// Files tab slow to open.
 let filteredFilesCacheKey = null;
 let filteredFilesCacheVal = [];
 
@@ -47,14 +36,14 @@ export const derivedMixin = {
   // and get their own tabs, so the Packages tab lists only plain packages. All
   // three read the same search box + sort control (see _filterSortPackages).
   get aiPackages() {
-    return this.packages.filter((p) => p.type === ELEMENT_TYPES.AI_PACKAGE);
+    return this.packages.filter((p) => isA(p.type, CLASS.ai_AIPackage));
   },
   get datasetPackages() {
-    return this.packages.filter((p) => p.type === ELEMENT_TYPES.DATASET_PACKAGE);
+    return this.packages.filter((p) => isA(p.type, CLASS.dataset_DatasetPackage));
   },
   get plainPackages() {
     return this.packages.filter(
-      (p) => p.type !== ELEMENT_TYPES.AI_PACKAGE && p.type !== ELEMENT_TYPES.DATASET_PACKAGE
+      (p) => !isA(p.type, CLASS.ai_AIPackage) && !isA(p.type, CLASS.dataset_DatasetPackage)
     );
   },
 
@@ -120,9 +109,8 @@ export const derivedMixin = {
   },
 
   get filteredFiles() {
-    // Memoized on the only inputs that affect the result (see the cache note
-    // above): the file list, the search box, and the type-filter chip. Keeps the
-    // streaming render from re-sorting all ~28k files on every chunk.
+    // Memoized on the only inputs that affect the result: the file list, the
+    // search box, and the type-filter chip (see the cache note above).
     const search = this.fileSearch;
     const typeFilter = this.fileTypeFilter;
     const files = this.files;
@@ -144,9 +132,8 @@ export const derivedMixin = {
     return sorted;
   },
 
-  // Hardware profile elements (SPDX 3.1), filtered by the in-view search box and
-  // sorted by name. Matches on name, part number and summary so a component is
-  // findable by any of those.
+  // Hardware elements filtered by the in-view search box (name, part number,
+  // summary) and sorted by name.
   get filteredHardware() {
     let hw = this.hardware;
     if (this.hardwareSearch) {
@@ -164,19 +151,15 @@ export const derivedMixin = {
     );
   },
 
-  // Requirements + FunctionalSafety artifacts (SPDX 3.1), filtered by the in-view
-  // search box and sorted by name. Matches on name, statement, summary and the
-  // requirement UID so a requirement is findable by any of those. Requirements
-  // (the first-class "shall" statements) sort ahead of the safety artifacts.
   // Breakdown of the functional-safety elements by kind, for the tab header
   // summary and to decide which kind-filter chips to show.
   get safetyCounts() {
     const c = { requirements: 0, verifications: 0, assumptions: 0, evaluations: 0 };
     this.requirements.forEach((r) => {
-      if (r.type === ELEMENT_TYPES.REQUIREMENT) c.requirements++;
-      else if (r.type === ELEMENT_TYPES.FS_VERIFICATION) c.verifications++;
-      else if (r.type === ELEMENT_TYPES.FS_ASSUMPTION) c.assumptions++;
-      else if (r.type === ELEMENT_TYPES.FS_EVALUATION) c.evaluations++;
+      if (isA(r.type, CLASS.Requirement)) c.requirements++;
+      else if (isA(r.type, CLASS.functionalsafety_RequirementVerification)) c.verifications++;
+      else if (isA(r.type, CLASS.functionalsafety_Assumption)) c.assumptions++;
+      else if (isA(r.type, CLASS.functionalsafety_EvaluationResult)) c.evaluations++;
     });
     return c;
   },
@@ -200,7 +183,7 @@ export const derivedMixin = {
           this.externalIdentifiers(r).some((eid) => eid.identifier.toLowerCase().includes(q))
       );
     }
-    const rank = (r) => (r.type === 'Requirement' ? 0 : 1);
+    const rank = (r) => (r.type === CLASS.Requirement ? 0 : 1);
     return [...reqs].sort(
       (a, b) =>
         rank(a) - rank(b) ||
@@ -225,8 +208,7 @@ export const derivedMixin = {
   },
 
   // Vulnerabilities filtered by the search box + status filter, then sorted.
-  // Memoized on those inputs (see filteredVulnsCache*) so unrelated reactive
-  // changes don't re-sort ~3k CVEs.
+  // Memoized on those inputs so unrelated reactive changes don't re-sort.
   get filteredVulnerabilities() {
     const search = this.securitySearch;
     const sort = this.securitySort;
