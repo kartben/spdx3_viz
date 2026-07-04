@@ -1,4 +1,6 @@
 import { createGraphFilters, createViews } from '../config.js';
+import { APP_VERSION } from '../version.js';
+import { CHANGELOG } from '../changelog.js';
 
 /* The Alpine component's initial reactive state, returned fresh per instance so
    Maps/Sets and arrays aren't shared between mounts. Pure data only. */
@@ -98,6 +100,9 @@ export function createState() {
     licenseModalParts: [],
     licenseModalActiveIndex: 0,
     licenseModalRef: '',
+    appVersion: APP_VERSION,
+    changelog: CHANGELOG,
+    changelogModalOpen: false,
 
     // Parsed data
     elementMap: new Map(),
