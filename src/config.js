@@ -54,6 +54,8 @@ export const RELATIONSHIP_TYPES = {
   // Synthesized by the parser from EvaluationResult.evaluationBasedOn so the evaluation ↔
   // verification link appears as a graph edge like any other relationship.
   EVALUATION_BASED_ON: 'evaluationBasedOn',
+  // FunctionalSafety profile: names the agent who carried out a verification/evaluation activity.
+  PERFORMED_BY: 'performedBy',
   // AI profile relationship types (AI model ↔ training/test dataset).
   TRAINED_ON: 'trainedOn',
   TESTED_ON: 'testedOn',
@@ -65,7 +67,12 @@ export const RELATIONSHIP_TYPES = {
   // Synthesized in the graph from each element's CreationInfo.createdBy so the
   // agent (Person / Organization / SoftwareAgent) that created an element shows
   // as an edge (element → agent).
-  CREATED_BY: 'createdBy'
+  CREATED_BY: 'createdBy',
+  // Synthesized in the graph the same way as createdBy, but read from an
+  // Artifact's suppliedBy / originatedBy and a Hardware element's productAgent.
+  SUPPLIED_BY: 'suppliedBy',
+  ORIGINATED_BY: 'originatedBy',
+  MANUFACTURED_BY: 'manufacturedBy'
 };
 
 /**
@@ -258,10 +265,37 @@ export function createGraphFilters() {
       lineStyle: 'dashed'
     },
     { key: 'configures', label: 'configures', color: COLORS.config, active: true, isRel: true },
-    // Provenance edge synthesized from CreationInfo.createdBy (element → agent).
+    // Provenance edges synthesized from an element's CreationInfo.createdBy,
+    // Artifact.suppliedBy / .originatedBy, and Hardware.productAgent (element →
+    // agent). Off by default and dotted so they stay in the background rather
+    // than crowding the structural edges above.
     {
       key: 'createdBy',
       label: 'createdBy',
+      color: COLORS.createdBy,
+      active: false,
+      isRel: true,
+      lineStyle: 'dotted'
+    },
+    {
+      key: 'suppliedBy',
+      label: 'suppliedBy',
+      color: COLORS.createdBy,
+      active: false,
+      isRel: true,
+      lineStyle: 'dotted'
+    },
+    {
+      key: 'originatedBy',
+      label: 'originatedBy',
+      color: COLORS.createdBy,
+      active: false,
+      isRel: true,
+      lineStyle: 'dotted'
+    },
+    {
+      key: 'manufacturedBy',
+      label: 'manufacturedBy',
       color: COLORS.createdBy,
       active: false,
       isRel: true,
@@ -321,6 +355,17 @@ export function createGraphFilters() {
       active: true,
       isRel: true,
       lineStyle: 'dotted'
+    },
+    // Explicit relationship (not synthesized) naming who carried out a
+    // verification/evaluation; tinted the agent colour like the other
+    // agent-pointing edges since its target is always an Agent.
+    {
+      key: 'performedBy',
+      label: 'performedBy',
+      color: COLORS.agent,
+      active: true,
+      isRel: true,
+      lineStyle: 'dashed'
     },
     { key: 'trainedOn', label: 'trainedOn', color: COLORS.ai, active: true, isRel: true },
     {
@@ -494,7 +539,15 @@ export const RELATIONSHIP_LABELS = {
   'hasDeclaredLicense:out': 'Declared license',
   'hasDeclaredLicense:in': 'Licensed (declared)',
   'createdBy:out': 'Created by',
-  'createdBy:in': 'Creator of'
+  'createdBy:in': 'Creator of',
+  'suppliedBy:out': 'Supplied by',
+  'suppliedBy:in': 'Supplier of',
+  'originatedBy:out': 'Originated by',
+  'originatedBy:in': 'Originator of',
+  'manufacturedBy:out': 'Manufactured by',
+  'manufacturedBy:in': 'Manufacturer of',
+  'performedBy:out': 'Performed by',
+  'performedBy:in': 'Performer of'
 };
 
 /**
@@ -609,6 +662,8 @@ export const RELATIONSHIP_SORT_ORDER = {
   'conformsTo:in': 48,
   'evaluationBasedOn:out': 49,
   'evaluationBasedOn:in': 50,
+  'performedBy:out': 51,
+  'performedBy:in': 52,
   'trainedOn:out': 31,
   'trainedOn:in': 32,
   'testedOn:out': 33,
