@@ -761,7 +761,9 @@ function computePresentTypes(data) {
   ];
   const hasCreatedBy = createdByHosts.some((el) => data.resolveCreationInfo(el)?.createdBy?.length);
   if (hasCreatedBy) relTypes.add('createdBy');
-  const hasSuppliedBy = createdByHosts.some((el) => (el.suppliedBy ?? el.software_suppliedBy)?.length);
+  const hasSuppliedBy = createdByHosts.some(
+    (el) => (el.suppliedBy ?? el.software_suppliedBy)?.length
+  );
   if (hasSuppliedBy) relTypes.add('suppliedBy');
   const hasOriginatedBy = createdByHosts.some(
     (el) => (el.originatedBy ?? el.software_originatedBy)?.length
