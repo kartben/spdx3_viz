@@ -1,6 +1,8 @@
 /* File loading and parse orchestration: reading files/samples, driving the
    progress bar, and applying the worker's parsed result to component state. */
 
+import { parseShareHash } from '../lib/index.js';
+
 /* A single long-lived parser worker, kept off the reactive state so it is never
    proxied; parsing runs here to keep the main thread responsive.
    latestParseReqId lets us ignore stale results when a newer load supersedes an
@@ -85,6 +87,16 @@ export const loadingMixin = {
       /* demos just won't show if the manifest is missing */
     }
   },
+  // Startup: a share link in the URL auto-loads its sample, then _applyDeepLink
+  // restores the view/element once parsing completes.
+  _maybeLoadFromUrl() {
+    const link = parseShareHash(location.hash);
+    if (!link) return;
+    const sample = this.samples.find((s) => s.id === link.sample);
+    if (!sample) return;
+    this._pendingDeepLink = link;
+    this.loadSample(sample);
+  },
   async loadSample(sample) {
     this.loadingSample = sample.id;
     this.sampleError = '';
@@ -101,6 +113,7 @@ export const loadingMixin = {
         loaded.push({ name: fname, text });
       }
       this.loadedFiles = loaded; // replace — the drop zone starts empty
+      this.loadedSampleId = sample.id; // pure sample content: the URL can link back to it
       this.rebuildFromLoadedFiles(); // existing merge + parse path (session continues)
       this.dataLoaded = true;
     } catch (err) {
@@ -146,6 +159,7 @@ export const loadingMixin = {
     e.target.value = ''; // reset so same file can be re-added
   },
   readFiles(fileList) {
+    this.loadedSampleId = null; // user files (even added to a sample) aren't linkable
     this._beginParseSession(); // show the overlay during file reads too
     this.progressPhase = 'Reading files…';
     const total = fileList.length;
@@ -176,6 +190,7 @@ export const loadingMixin = {
     });
   },
   removeFile(index) {
+    this.loadedSampleId = null;
     this.loadedFiles.splice(index, 1);
     if (this.loadedFiles.length === 0) {
       this.dataLoaded = false;
@@ -304,6 +319,13 @@ export const loadingMixin = {
       // Fresh data: reset the streaming cursors so every list view streams its
       // (new) content on next visit, and kick the one currently shown.
       this._resetStreaming();
+
+      // A share link's target can only be applied now that the data exists.
+      if (this._pendingDeepLink) {
+        const link = this._pendingDeepLink;
+        this._pendingDeepLink = null;
+        this.$nextTick(() => this._applyDeepLink(link));
+      }
 
       // Re-render D3 views if currently active (they don't auto-update from
       // Alpine reactivity).

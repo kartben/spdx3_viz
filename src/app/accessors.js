@@ -18,6 +18,7 @@ import {
   parseBuildParameters as parseBuildParameterGroups,
   getToolUsageCount,
   getExternalIdentifiers,
+  getPurlLink,
   getCdxProperties,
   isMeaningfulValue,
   formatByteSize,
@@ -162,6 +163,9 @@ export const accessorsMixin = {
   },
   externalIdentifiers(element) {
     return getExternalIdentifiers(element);
+  },
+  purlLink(eid) {
+    return getPurlLink(eid);
   },
   cdxProperties(element) {
     return getCdxProperties(element);

@@ -41,11 +41,15 @@
       <div
         class="nav-item"
         x-show="(v.id !== 'security' || vulnerabilities.length > 0) &&
+                      (v.id !== 'packages' || plainPackages.length > 0) &&
                       (v.id !== 'ai' || aiPackages.length > 0) &&
                       (v.id !== 'dataset' || datasetPackages.length > 0) &&
+                      (v.id !== 'files' || files.length > 0) &&
                       (v.id !== 'hardware' || hardware.length > 0) &&
                       (v.id !== 'requirements' || requirements.length > 0) &&
+                      (v.id !== 'licenses' || licenses.length > 0) &&
                       (v.id !== 'configs' || buildConfigs.length > 0) &&
+                      (v.id !== 'build' || builds.length > 0 || tools.length > 0) &&
                       (v.id !== 'impact' || hasImpactData) &&
                       (v.id !== 'agents' || agents.length > 0)"
         :class="{ 'active': currentView === v.id, 'nav-group-start': v.id === 'statistics' }"

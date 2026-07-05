@@ -11,6 +11,8 @@ export function createState() {
     loadedFiles: [], // [{name, data}] — one entry per loaded file
     samples: [], // bundled demo sets, loaded from samples/samples.json
     loadingSample: null, // id of the sample currently being fetched
+    loadedSampleId: null, // id of the sample the loaded files came from (null once user files mix in); gates shareable URLs
+    _pendingDeepLink: null, // parsed share hash to apply once the sample finishes parsing
     sampleError: '',
     parsing: false, // true while loading/parsing a freshly loaded SBOM
     parseError: '',

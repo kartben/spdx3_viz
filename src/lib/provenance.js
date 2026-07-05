@@ -29,8 +29,7 @@ const EXTERNAL_ID_LABELS = {
  */
 export function getExternalIdentifiers(element) {
   const ids = element?.externalIdentifier;
-  if (!Array.isArray(ids)) return [];
-  return ids
+  const rows = (Array.isArray(ids) ? ids : [])
     .filter((id) => id && isMeaningfulValue(id.identifier))
     .map((id) => {
       const type = id.externalIdentifierType || 'other';
@@ -42,6 +41,71 @@ export function getExternalIdentifiers(element) {
         isUrl: /^https?:\/\//i.test(identifier)
       };
     });
+  // Some generators (e.g. cdxgen) carry the purl in the software_packageUrl
+  // property instead of an ExternalIdentifier; surface it the same way.
+  const purlProp = element?.software_packageUrl;
+  if (isMeaningfulValue(purlProp) && !rows.some((r) => r.type === 'packageUrl')) {
+    rows.push({
+      type: 'packageUrl',
+      label: EXTERNAL_ID_LABELS.packageUrl,
+      identifier: String(purlProp).trim(),
+      isUrl: false
+    });
+  }
+  return rows;
+}
+
+// PackageURL types with a deps.dev equivalent (purl type -> deps.dev system).
+const DEPS_DEV_SYSTEMS = {
+  npm: 'npm',
+  maven: 'maven',
+  pypi: 'pypi',
+  golang: 'go',
+  cargo: 'cargo',
+  nuget: 'nuget',
+  gem: 'rubygems'
+};
+
+/**
+ * Builds a deps.dev link for a PackageURL external identifier, for the
+ * ecosystems deps.dev covers. Returns null for unsupported types (deb, rpm, …)
+ * rather than linking to a 404.
+ *
+ * @param {{type: string, identifier: string}} eid
+ * @returns {{url: string, label: string}|null}
+ */
+export function getPurlLink(eid) {
+  if (!eid || eid.type !== 'packageUrl' || !isMeaningfulValue(eid.identifier)) return null;
+  const m = String(eid.identifier)
+    .trim()
+    .match(/^pkg:([A-Za-z0-9.+-]+)\/(.+)$/);
+  if (!m) return null;
+  const system = DEPS_DEV_SYSTEMS[m[1].toLowerCase()];
+  if (!system) return null;
+
+  // Strip qualifiers/subpath, split off the version, and decode each segment.
+  const path = m[2].split('?')[0].split('#')[0];
+  const at = path.lastIndexOf('@');
+  const version = at > 0 ? decodeURIComponent(path.slice(at + 1)) : '';
+  const segments = (at > 0 ? path.slice(0, at) : path)
+    .split('/')
+    .filter(Boolean)
+    .map((s) => decodeURIComponent(s));
+  if (!segments.length) return null;
+
+  // Maven names are group:artifact; everything else keeps its namespace path.
+  const name =
+    system === 'maven'
+      ? segments.length >= 2
+        ? `${segments[0]}:${segments[1]}`
+        : null
+      : segments.join('/');
+  if (!name) return null;
+
+  const url =
+    `https://deps.dev/${system}/${encodeURIComponent(name)}` +
+    (version ? `/${encodeURIComponent(version)}` : '');
+  return { url, label: `View ${name} on deps.dev` };
 }
 
 // Verbose CycloneDX properties (serialized JSON blobs), sorted after the

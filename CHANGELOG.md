@@ -5,6 +5,9 @@ via the "What's new" link.
 
 ## Unreleased
 
+- **Added:** Shareable links: for sample SBOMs the URL now tracks the current view and selected element, with a Share button to copy it.
+- **Added:** PackageURL identifiers link out to deps.dev for supported ecosystems; purls carried in `software_packageUrl` now show as identifiers too.
+- **Changed:** Simplified the dashboard and sidebar: removed the duplicate quick-jump cards, and views with nothing to show stay hidden.
 - **Added:** Impact view: trace why a component is in the build (provenance) and what depends on it (blast radius), with SBOM-wide risk rankings.
 - **Added:** Security view surfaces the CVSS, EPSS, and known-exploited signals carried in the SBOM, with severity sorting and filtering.
 - **Added:** Statistics view with an SBOM completeness score, category breakdowns, and worst-offender drill-downs.
