@@ -280,7 +280,10 @@ export const accessorsMixin = {
   // Grouped relationship data for the detail panel. Parameterized on the
   // element so both the graph detail panel (this.detailElement) and the
   // expanded package card (its pkg) render the same grouped relationships.
-  detailRelGroupsFor(element) {
+  // `excludeKeys` drops relationship groups (by `<relType>:<direction>` key)
+  // that are already surfaced by a dedicated section, e.g. the requirements
+  // view renders `verifiedBy` as its own "Verification & evaluation" block.
+  detailRelGroupsFor(element, { excludeKeys = null } = {}) {
     if (!element) return [];
     const id = element.spdxId;
     const groups = new Map(); // key → { label, color, items:[], total, hiddenCount }
@@ -294,6 +297,8 @@ export const accessorsMixin = {
     // Vulnerability associations are surfaced in the dedicated security
     // section, not the generic relationship list.
     const skip = (rel) => rel.relationshipType === 'hasAssociatedVulnerability';
+
+    const excluded = excludeKeys ? new Set(excludeKeys) : null;
 
     const ensure = (key, relType, direction) => {
       let group = groups.get(key);
@@ -338,6 +343,7 @@ export const accessorsMixin = {
     (this.relFromIndex.get(id) || []).forEach((rel) => {
       if (skip(rel)) return;
       const key = rel.relationshipType + ':out';
+      if (excluded?.has(key)) return;
       ensure(key, rel.relationshipType, 'out');
       const targets = Array.isArray(rel.to) ? rel.to : [rel.to];
       targets.forEach((t) => add(key, t, 'out', rel.scope));
@@ -347,6 +353,7 @@ export const accessorsMixin = {
     (this.relToIndex.get(id) || []).forEach((rel) => {
       if (skip(rel)) return;
       const key = rel.relationshipType + ':in';
+      if (excluded?.has(key)) return;
       ensure(key, rel.relationshipType, 'in');
       add(key, rel.from, 'in', rel.scope);
     });
@@ -608,6 +615,28 @@ export const accessorsMixin = {
       });
     });
     return out;
+  },
+
+  // Ordered detail sequence for a requirement card: the relationship groups with
+  // the "Verification & evaluation" block spliced in at the verifiedBy slot, so
+  // the card reads implementation → verification → traceability. Verification is
+  // shown here (not as its own hoisted section) so it never sits ahead of the
+  // implementation it validates. Each entry is { kind: 'rel', group } or
+  // { kind: 'verification' }.
+  requirementDetailSequence(el) {
+    const seq = this.detailRelGroupsFor(el, { excludeKeys: ['verifiedBy:out'] }).map((g) => ({
+      kind: 'rel',
+      key: g.key,
+      group: g
+    }));
+    if (this.requirementVerifications(el).length > 0) {
+      // verifiedBy's own slot: after implementedBy, before Required by / traced.
+      const pivot = this.relSortOrder('verifiedBy', 'out');
+      let idx = seq.findIndex((s) => s.group.sortOrder > pivot);
+      if (idx === -1) idx = seq.length;
+      seq.splice(idx, 0, { kind: 'verification', key: '__verification__' });
+    }
+    return seq;
   },
 
   // The EvaluationResult whose evaluationBasedOn points at a given verification.

@@ -349,72 +349,6 @@
             </template>
           </div>
 
-          <!-- Verification & evaluation: method, pass/fail, pre/postconditions -->
-          <div x-show="requirementVerifications(req).length > 0" class="space-y-2">
-            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-              Verification &amp; evaluation
-            </div>
-            <template x-for="v in requirementVerifications(req)" :key="v.id">
-              <div class="rounded-lg bg-slate-900/40 border border-slate-700/50 p-3 space-y-2">
-                <div class="flex items-center gap-2 flex-wrap">
-                  <button
-                    @click.stop="navigateTo(v.id)"
-                    class="text-xs font-medium text-yellow-300 hover:underline text-left break-words"
-                    x-text="v.verification.name || cleanName(v.id)"
-                  ></button>
-                  <template
-                    x-for="m in (v.verification.functionalsafety_verificationMethod || [])"
-                    :key="m"
-                  >
-                    <span
-                      class="badge text-xs bg-slate-700 text-slate-300"
-                      x-text="enumLabel(m)"
-                    ></span>
-                  </template>
-                  <span
-                    x-show="evaluationResultMeta(v.evaluation)"
-                    class="badge text-xs"
-                    :class="evaluationResultMeta(v.evaluation)?.badgeClass"
-                    x-text="evaluationResultMeta(v.evaluation)?.label"
-                  ></span>
-                </div>
-                <div
-                  x-show="isMeaningful(v.verification.functionalsafety_verificationPrecondition)"
-                >
-                  <span class="text-[10px] text-slate-500 uppercase tracking-wider"
-                    >Precondition</span
-                  >
-                  <div
-                    class="text-xs text-slate-300 break-words"
-                    x-text="[].concat(v.verification.functionalsafety_verificationPrecondition || []).join('; ')"
-                  ></div>
-                </div>
-                <div
-                  x-show="isMeaningful(v.verification.functionalsafety_verificationPostcondition)"
-                >
-                  <span class="text-[10px] text-slate-500 uppercase tracking-wider"
-                    >Postcondition</span
-                  >
-                  <div
-                    class="text-xs text-slate-300 break-words"
-                    x-text="[].concat(v.verification.functionalsafety_verificationPostcondition || []).join('; ')"
-                  ></div>
-                </div>
-                <div
-                  x-show="v.evaluation && isMeaningful(v.evaluation.rationale || v.evaluation.functionalsafety_rationale)"
-                >
-                  <span class="text-[10px] text-slate-500 uppercase tracking-wider"
-                    >Evaluation rationale</span
-                  >
-                  <div
-                    class="text-xs text-slate-300 break-words"
-                    x-text="v.evaluation.rationale || v.evaluation.functionalsafety_rationale"
-                  ></div>
-                </div>
-              </div>
-            </template>
-          </div>
-
           <!-- Identifiers -->
           <div x-show="externalIdentifiers(req).length > 0">
             <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
@@ -450,53 +384,137 @@
             </div>
           </div>
 
-          <!-- Relationships — grouped semantically (implementedBy, verifiedBy, …) -->
-          <template x-for="group in detailRelGroupsFor(req)" :key="group.key">
-            <div class="detail-rel-section">
-              <div class="flex items-center gap-2 mb-2">
-                <span class="detail-rel-line" :style="`background: ${group.color}`"></span>
-                <span
-                  class="text-xs font-semibold uppercase tracking-wider"
-                  :style="`color: ${group.color}`"
-                  x-text="group.label"
-                ></span>
-                <span class="text-[10px] text-slate-500" x-text="'(' + group.total + ')'"></span>
-              </div>
-              <div class="space-y-1 ml-3">
-                <template x-for="item in group.items" :key="item.id">
-                  <div class="detail-rel-item group" @click.stop="navigateTo(item.id)">
-                    <span
-                      class="detail-rel-arrow"
-                      :style="`color: ${group.color}`"
-                      x-text="item.direction === 'out' ? '→' : '←'"
-                    ></span>
-                    <span
-                      class="flex items-center flex-shrink-0"
-                      :style="`color: ${nodeTypeColor(getNodeType(elementMap.get(item.id) || {}))}`"
-                      x-html="elementIcon(elementMap.get(item.id) || { spdxId: item.id }, 'w-3.5 h-3.5')"
-                    ></span>
-                    <span class="flex-1 truncate" x-text="item.displayName"></span>
-                    <svg
-                      class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors flex-shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
+          <!-- Implementation, verification & traceability, in lifecycle order.
+               `verifiedBy` is folded into the "Verification & evaluation" block,
+               spliced in at the verifiedBy slot (after Implemented by, before
+               Required by / traced) so verification never precedes the
+               implementation it validates. -->
+          <template x-for="section in requirementDetailSequence(req)" :key="section.key">
+            <div>
+              <!-- Verification & evaluation: method, pass/fail, pre/postconditions -->
+              <template x-if="section.kind === 'verification'">
+                <div class="space-y-2">
+                  <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                    Verification &amp; evaluation
                   </div>
-                </template>
-                <div
-                  x-show="group.hiddenCount > 0"
-                  class="text-[10px] text-slate-500 italic pl-1"
-                  x-text="'+' + formatCount(group.hiddenCount) + ' more'"
-                ></div>
-              </div>
+                  <template x-for="v in requirementVerifications(req)" :key="v.id">
+                    <div
+                      class="rounded-lg bg-slate-900/40 border border-slate-700/50 p-3 space-y-2"
+                    >
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <button
+                          @click.stop="navigateTo(v.id)"
+                          class="text-xs font-medium text-yellow-300 hover:underline text-left break-words"
+                          x-text="v.verification.name || cleanName(v.id)"
+                        ></button>
+                        <template
+                          x-for="m in (v.verification.functionalsafety_verificationMethod || [])"
+                          :key="m"
+                        >
+                          <span
+                            class="badge text-xs bg-slate-700 text-slate-300"
+                            x-text="enumLabel(m)"
+                          ></span>
+                        </template>
+                        <span
+                          x-show="evaluationResultMeta(v.evaluation)"
+                          class="badge text-xs"
+                          :class="evaluationResultMeta(v.evaluation)?.badgeClass"
+                          x-text="evaluationResultMeta(v.evaluation)?.label"
+                        ></span>
+                      </div>
+                      <div
+                        x-show="isMeaningful(v.verification.functionalsafety_verificationPrecondition)"
+                      >
+                        <span class="text-[10px] text-slate-500 uppercase tracking-wider"
+                          >Precondition</span
+                        >
+                        <div
+                          class="text-xs text-slate-300 break-words"
+                          x-text="[].concat(v.verification.functionalsafety_verificationPrecondition || []).join('; ')"
+                        ></div>
+                      </div>
+                      <div
+                        x-show="isMeaningful(v.verification.functionalsafety_verificationPostcondition)"
+                      >
+                        <span class="text-[10px] text-slate-500 uppercase tracking-wider"
+                          >Postcondition</span
+                        >
+                        <div
+                          class="text-xs text-slate-300 break-words"
+                          x-text="[].concat(v.verification.functionalsafety_verificationPostcondition || []).join('; ')"
+                        ></div>
+                      </div>
+                      <div
+                        x-show="v.evaluation && isMeaningful(v.evaluation.rationale || v.evaluation.functionalsafety_rationale)"
+                      >
+                        <span class="text-[10px] text-slate-500 uppercase tracking-wider"
+                          >Evaluation rationale</span
+                        >
+                        <div
+                          class="text-xs text-slate-300 break-words"
+                          x-text="v.evaluation.rationale || v.evaluation.functionalsafety_rationale"
+                        ></div>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </template>
+              <!-- Relationship group (implementedBy, Required by, traced, …) -->
+              <template x-if="section.kind === 'rel'">
+                <div class="detail-rel-section">
+                  <div class="flex items-center gap-2 mb-2">
+                    <span
+                      class="detail-rel-line"
+                      :style="`background: ${section.group.color}`"
+                    ></span>
+                    <span
+                      class="text-xs font-semibold uppercase tracking-wider"
+                      :style="`color: ${section.group.color}`"
+                      x-text="section.group.label"
+                    ></span>
+                    <span
+                      class="text-[10px] text-slate-500"
+                      x-text="'(' + section.group.total + ')'"
+                    ></span>
+                  </div>
+                  <div class="space-y-1 ml-3">
+                    <template x-for="item in section.group.items" :key="item.id">
+                      <div class="detail-rel-item group" @click.stop="navigateTo(item.id)">
+                        <span
+                          class="detail-rel-arrow"
+                          :style="`color: ${section.group.color}`"
+                          x-text="item.direction === 'out' ? '→' : '←'"
+                        ></span>
+                        <span
+                          class="flex items-center flex-shrink-0"
+                          :style="`color: ${nodeTypeColor(getNodeType(elementMap.get(item.id) || {}))}`"
+                          x-html="elementIcon(elementMap.get(item.id) || { spdxId: item.id }, 'w-3.5 h-3.5')"
+                        ></span>
+                        <span class="flex-1 truncate" x-text="item.displayName"></span>
+                        <svg
+                          class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors flex-shrink-0"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                      </div>
+                    </template>
+                    <div
+                      x-show="section.group.hiddenCount > 0"
+                      class="text-[10px] text-slate-500 italic pl-1"
+                      x-text="'+' + formatCount(section.group.hiddenCount) + ' more'"
+                    ></div>
+                  </div>
+                </div>
+              </template>
             </div>
           </template>
         </div>
