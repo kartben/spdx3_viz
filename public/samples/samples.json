@@ -45,6 +45,18 @@
     "size": 51353598
   },
   {
+    "id": "ansible",
+    "name": "Ansible Automation Platform",
+    "icon": "favicon.svg",
+    "description": "Red Hat <a href=\"https://security.access.redhat.com/data/sbom/v1/spdx/\" target=\"_blank\" rel=\"noopener\" onclick=\"event.stopPropagation()\">Ansible Automation Platform 2.6</a> SBOM (~40k packages), converted from SPDX 2.3 to 3.0, with <a href=\"https://security.access.redhat.com/data/csaf/v2/vex/\" target=\"_blank\" rel=\"noopener\" onclick=\"event.stopPropagation()\">CSAF</a> VEX data.",
+    "dir": "samples/ansible",
+    "files": [
+      "ansible-automation-platform-2.6.spdx3.jsonld",
+      "ansible-automation-platform-2.6-vex.spdx3.jsonld"
+    ],
+    "size": 173539928
+  },
+  {
     "id": "docker",
     "name": "Syft (Ubuntu 24.04)",
     "icon": "favicon.svg",
