@@ -20,6 +20,10 @@ export const CHANGELOG = [
       {
         tag: 'Improved',
         text: 'Opening an element deep in a large list jumps straight to it and loads more as you scroll up or down, instead of rendering every row above it.'
+      },
+      {
+        tag: 'Fixed',
+        text: 'Browser Back from a loaded document returns to the home screen instead of leaving the site.'
       }
     ]
   },
