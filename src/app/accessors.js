@@ -21,6 +21,7 @@ import {
   getPurlLink,
   getCdxProperties,
   isMeaningfulValue,
+  enumValue,
   formatByteSize,
   normalizeUrl,
   copyToClipboard
@@ -421,7 +422,10 @@ export const accessorsMixin = {
           out.push({ label, kind: 'badge', value: formatByteSize(value) });
         }
       } else if (isMeaningfulValue(value)) {
-        out.push({ label, kind, value });
+        // 'badge' fields are all SPDX vocab enums; reduce to the short token so
+        // a CURIE/IRI-serialized value (e.g. spdx:Core/PresenceType/yes) reads
+        // as 'yes' rather than the full term reference.
+        out.push({ label, kind, value: kind === 'badge' ? enumValue(value) : value });
       }
     };
 
@@ -514,8 +518,15 @@ export const accessorsMixin = {
     };
     // Requirement (Core)
     push('Lifecycle stage', el.devLifecycleStage);
-    // RequirementVerification (functionalsafety)
-    push('Verification method', el.functionalsafety_verificationMethod);
+    // RequirementVerification (functionalsafety): verificationMethod is a vocab
+    // enum, so reduce each entry to its short token (test / analysis / ...).
+    push(
+      'Verification method',
+      Array.isArray(el.functionalsafety_verificationMethod)
+        ? el.functionalsafety_verificationMethod.map(enumValue)
+        : el.functionalsafety_verificationMethod &&
+            enumValue(el.functionalsafety_verificationMethod)
+    );
     push('Precondition', el.functionalsafety_verificationPrecondition);
     push('Postcondition', el.functionalsafety_verificationPostcondition);
     // EvaluationResult (functionalsafety): the pass/fail is rendered as a badge via
@@ -572,7 +583,7 @@ export const accessorsMixin = {
       };
     }
     const evals = vers.map((v) =>
-      String(v.evaluation?.functionalsafety_evaluation || '').toLowerCase()
+      enumValue(v.evaluation?.functionalsafety_evaluation).toLowerCase()
     );
     if (evals.includes('fail')) {
       return {
@@ -674,13 +685,21 @@ export const accessorsMixin = {
   evaluationResultMeta(el) {
     const v = el?.functionalsafety_evaluation;
     if (!isMeaningfulValue(v)) return null;
-    const key = String(v).toLowerCase();
+    const token = enumValue(v);
+    const key = token.toLowerCase();
     const map = {
       pass: { label: 'Pass', badgeClass: 'bg-emerald-500/15 text-emerald-400' },
       fail: { label: 'Fail', badgeClass: 'bg-rose-500/15 text-rose-400' },
       inconclusive: { label: 'Inconclusive', badgeClass: 'bg-amber-500/15 text-amber-400' }
     };
-    return map[key] || { label: String(v), badgeClass: 'bg-slate-600/20 text-slate-300' };
+    return map[key] || { label: token, badgeClass: 'bg-slate-600/20 text-slate-300' };
+  },
+
+  // Normalize an SPDX enumerated (vocab) value for display in a template. Kept
+  // as a thin accessor so views can render enum badges (e.g. verification
+  // method) without leaking the CURIE/IRI form the JSON-LD context may use.
+  enumLabel(value) {
+    return enumValue(value);
   },
 
   placeholderElement(spdxId) {

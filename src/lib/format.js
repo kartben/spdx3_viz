@@ -93,6 +93,32 @@ export function formatDate(dateStr) {
   }
 }
 
+/**
+ * Reduces an SPDX enumerated (vocab) value to its trailing token so it renders
+ * and compares consistently regardless of how the JSON-LD context serialized it.
+ *
+ * The same enum literal can appear as a bare token (`pass`), a CURIE
+ * (`spdx:FunctionalSafety/EvaluationResultType/pass`), or a full term IRI
+ * (`https://spdx.org/rdf/3.1/terms/FunctionalSafety/EvaluationResultType/pass`),
+ * depending on whether the context's term base is current. All three mean the
+ * same value, so we keep only the final path/prefix segment.
+ *
+ * @param {*} value
+ * @returns {string} The trailing token (e.g. 'pass'), or '' when empty.
+ *
+ * @example
+ * enumValue('spdx:FunctionalSafety/EvaluationResultType/pass') // 'pass'
+ * enumValue('test') // 'test'
+ */
+export function enumValue(value) {
+  if (value == null) return '';
+  const s = String(value).trim();
+  if (s === '') return '';
+  const seg = s.split(/[/#]/).pop();
+  const colon = seg.lastIndexOf(':');
+  return colon >= 0 ? seg.slice(colon + 1) : seg;
+}
+
 const NO_ASSERTION = /^(noassertion|none)$/i;
 
 /**
