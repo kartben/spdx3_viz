@@ -1,11 +1,19 @@
 /**
- * SBOM quality score: a document-level completeness score plus actionable
- * "worst offender" insights, computed purely from data the parser already
- * produces (no extra parsing pass). The category/metric vocabulary mirrors
- * publicly documented practice in the SBOM tooling space — the NTIA "minimum
- * elements" baseline, and the category breakdown used by tools such as
- * Interlynk's sbomqs and eBay's sbom-scorecard — reimplemented natively
- * against this app's own model rather than any vendored code.
+ * SBOM quality score: a single document-level completeness score, plus a
+ * ranked list of the concrete fixes that would raise it the most. Everything is
+ * computed from data the parser already produces (no extra parsing pass). The
+ * category/metric vocabulary mirrors publicly documented practice in the SBOM
+ * tooling space — the NTIA "minimum elements" baseline, and the category
+ * breakdown used by tools such as Interlynk's sbomqs and eBay's sbom-scorecard —
+ * reimplemented natively against this app's own model rather than any vendored
+ * code.
+ *
+ * Each improvement's "gain" is the number of overall-score points that would be
+ * recovered by fully satisfying that one dimension, computed by re-scoring the
+ * document with that dimension treated as complete and diffing against the
+ * baseline. This makes the "what to fix first" list honest: it is ranked by real
+ * score impact, and it naturally accounts for a dimension (e.g. supplier) that
+ * feeds more than one category.
  *
  * @module lib/quality
  */
@@ -57,8 +65,8 @@ export function gradeMeta(grade) {
 }
 
 /**
- * The grade-scale color for a raw 0-100 score (used to tint category bars,
- * which don't carry their own letter grade).
+ * The grade-scale color for a raw 0-100 score (used to tint category bars and
+ * coverage meters, which don't carry their own letter grade).
  *
  * @param {number} score
  * @returns {string} hex color
@@ -67,20 +75,8 @@ export function scoreColor(score) {
   return gradeMeta(gradeFor(score)).color;
 }
 
-// Best-effort license-family classification for the copyleft-exposure insight.
-// A substring match against the resolved license label, not a full SPDX license
-// expression parser — good enough to flag exposure, not to be relied on as legal
-// advice (the UI says so explicitly).
-const COPYLEFT_PATTERN = /(gpl|mpl-|epl-|cddl|osl-|eupl|sspl)/i;
-const PERMISSIVE_PATTERN = /(^|[^a-z])(mit|bsd|apache|isc|zlib|unlicense|cc0|0bsd|python-2)/i;
-
-function classifyLicenseFamily(label) {
-  if (!label || /^(noassertion|none)$/i.test(label.trim())) return null;
-  if (COPYLEFT_PATTERN.test(label)) return 'copyleft';
-  if (PERMISSIVE_PATTERN.test(label)) return 'permissive';
-  return 'other';
-}
-
+// --- Per-element predicates (the atoms every category and improvement is built
+// from) ---
 function pkgHasVersion(p) {
   return isMeaningfulValue(p.software_packageVersion);
 }
@@ -93,8 +89,14 @@ function pkgHasSupplier(p) {
 function pkgHasIdentifier(p) {
   return isMeaningfulValue(p.software_packageUrl) || getExternalIdentifiers(p).length > 0;
 }
+function pkgHasName(p) {
+  return isMeaningfulValue(p.name);
+}
 function elHasHash(el) {
   return asArray(el.verifiedUsing).some((h) => isMeaningfulValue(h?.hashValue));
+}
+function elHasCopyright(el) {
+  return isMeaningfulValue(el.software_copyrightText);
 }
 function elIsConnected(el, relFromIndex, relToIndex) {
   return (
@@ -102,58 +104,148 @@ function elIsConnected(el, relFromIndex, relToIndex) {
   );
 }
 
+// A real, resolvable license label — anything that isn't the NoAssertion / None
+// sentinel. Substring check because expanded labels look like "NoAssertion" or a
+// full expression; the sentinel never appears inside a genuine expression.
+function isRealLicenseLabel(label) {
+  return !!label && !/noassertion/i.test(label) && !/^none$/i.test(String(label).trim());
+}
+
 /**
- * Maps each license's declaring/concluding elements (from the parser's
- * `licenses` list) onto the subset that are packages, so per-package license
- * coverage and family classification can be read off in O(1).
+ * The set of element ids (packages and files) that declare or conclude a real
+ * license, read off the parser's `licenses` list.
  *
- * @param {Array<Object>} packages
- * @param {Array<Object>} licenses - {id, label, declaredBy, concludedBy}[]
- * @returns {{coveredPkgIds: Set<string>, familyByPkgId: Map<string,string>}}
+ * @param {Array<{label: string, declaredBy: string[], concludedBy: string[]}>} licenses
+ * @returns {Set<string>}
  */
-function buildPackageLicenseCoverage(packages, licenses) {
-  const pkgIds = new Set(packages.map((p) => p.spdxId));
-  const coveredPkgIds = new Set();
-  const familyByPkgId = new Map();
-
+function buildLicensedIdSet(licenses) {
+  const ids = new Set();
   licenses.forEach((lic) => {
-    const family = classifyLicenseFamily(lic.label);
-    const users = new Set([...(lic.declaredBy || []), ...(lic.concludedBy || [])]);
-    users.forEach((uid) => {
-      if (!pkgIds.has(uid)) return;
-      if (family) coveredPkgIds.add(uid);
-      // Copyleft dominates when a package carries more than one license.
-      if (family === 'copyleft') familyByPkgId.set(uid, 'copyleft');
-      else if (family && familyByPkgId.get(uid) !== 'copyleft') familyByPkgId.set(uid, family);
-    });
+    if (!isRealLicenseLabel(lic.label)) return;
+    (lic.declaredBy || []).forEach((id) => ids.add(id));
+    (lic.concludedBy || []).forEach((id) => ids.add(id));
   });
-
-  return { coveredPkgIds, familyByPkgId };
+  return ids;
 }
 
 function pct(numerator, denominator) {
   return denominator > 0 ? (numerator / denominator) * 100 : null;
 }
 
-function offenderList(elements, total) {
-  return {
-    total,
-    sample: elements
-      .slice(0, OFFENDER_CAP)
-      .map((el) => ({ id: el.spdxId, name: displayName(el), type: el.type }))
-  };
+// License and copyright are assessed at whichever granularity the document uses:
+// a package-licensed SBOM scores on its packages, a file-licensed one (e.g.
+// Zephyr, where the package nodes are NoAssertion but the contained files carry
+// Apache/MIT) scores on its files. Taking the better of the two credits either
+// practice without penalizing an SBOM for not also doing the other.
+function betterOf(a, b) {
+  if (a == null) return b;
+  if (b == null) return a;
+  return Math.max(a, b);
 }
 
+function weighted(a, b, wa, wb) {
+  if (a != null && b != null) return a * wa + b * wb;
+  return a ?? b;
+}
+
+const CATEGORY_META = [
+  {
+    key: 'ntia',
+    label: 'NTIA Minimum Elements',
+    weight: 0.3,
+    detail: 'Name, version, supplier, a unique identifier and a relationship, per package'
+  },
+  {
+    key: 'license',
+    label: 'License & Copyright',
+    weight: 0.25,
+    detail: 'Declared/concluded license and copyright coverage, at the package or file level'
+  },
+  {
+    key: 'provenance',
+    label: 'Provenance & Identifiers',
+    weight: 0.2,
+    detail: 'Supplier/originator and PURL/CPE coverage across packages'
+  },
+  {
+    key: 'integrity',
+    label: 'Integrity & Verification',
+    weight: 0.15,
+    detail: 'Packages and files carrying an integrity hash'
+  },
+  {
+    key: 'structural',
+    label: 'Structural Health',
+    weight: 0.1,
+    detail: 'Elements with no relationships, and unresolved external references'
+  }
+];
+
+// The fixable dimensions surfaced as "improve your score" cards. `pop`/`pred`
+// pick out the failing elements (for the count + clickable sample); `key` is the
+// lever fed to scoreCategories() to measure the point gain.
+const IMPROVEMENT_META = [
+  {
+    key: 'supplier',
+    title: 'Missing supplier',
+    hint: 'Declare who supplied or originated each package (suppliedBy / originatedBy).'
+  },
+  {
+    key: 'identifier',
+    title: 'Missing a unique identifier',
+    hint: 'Add a Package URL, CPE, or other external identifier so each package can be looked up.'
+  },
+  {
+    key: 'license',
+    title: 'Missing license information',
+    hint: 'Declare or conclude a license for each package (or license its files).'
+  },
+  {
+    key: 'version',
+    title: 'Missing a version',
+    hint: 'Give each package a version so it can be matched to advisories.'
+  },
+  {
+    key: 'copyright',
+    title: 'Missing copyright text',
+    hint: 'Record the copyright notice for each package.'
+  },
+  {
+    key: 'hash',
+    title: 'Missing an integrity hash',
+    hint: 'Attach a checksum (verifiedUsing) so the element can be verified.'
+  },
+  {
+    key: 'orphans',
+    title: 'No relationships',
+    hint: 'Connect these elements into the dependency graph so their role is defined.'
+  }
+];
+
+// Which population and predicate each improvement lever draws its offenders from.
+// Kept beside IMPROVEMENT_META so the two stay in lock-step.
+const IMPROVEMENT_POPULATIONS = {
+  supplier: ({ packages }) => ({ pop: packages, pred: pkgHasSupplier }),
+  identifier: ({ packages }) => ({ pop: packages, pred: pkgHasIdentifier }),
+  license: ({ packages, hasLicense }) => ({ pop: packages, pred: hasLicense }),
+  version: ({ packages }) => ({ pop: packages, pred: pkgHasVersion }),
+  copyright: ({ packages }) => ({ pop: packages, pred: elHasCopyright }),
+  hash: ({ artifacts }) => ({ pop: artifacts, pred: elHasHash }),
+  orphans: ({ artifacts, isConnected }) => ({ pop: artifacts, pred: isConnected })
+};
+
 /**
- * Computes the document-level quality report.
+ * Computes the document-level quality report: one overall score, the category
+ * breakdown behind it, and the ranked list of fixes that would raise it most.
  *
  * @param {Object} data - Duck-typed subset of the app's parsed state:
- *   packages, files, licenses, vulnerabilities, creators, createdDate,
- *   externalRefStats, relFromIndex, relToIndex, dependentIndex.
+ *   packages, files, licenses, creators, createdDate, externalRefStats,
+ *   relFromIndex, relToIndex.
  * @returns {{
  *   overall: {score: number, grade: string},
  *   categories: Array<{key: string, label: string, score: number, weight: number, applicable: boolean, detail: string}>,
- *   insights: Object
+ *   improvements: Array<{key: string, title: string, hint: string, count: number, gain: number, coveragePct: number|null, sample: Array<{id: string, name: string, type: string}>, moreCount: number}>,
+ *   counts: {packages: number, files: number, elements: number}
  * }}
  */
 export function computeQualityReport(data) {
@@ -164,163 +256,139 @@ export function computeQualityReport(data) {
   const relToIndex = data.relToIndex || new Map();
   const artifacts = [...packages, ...files];
 
-  const { coveredPkgIds, familyByPkgId } = buildPackageLicenseCoverage(packages, licenses);
+  const licensedIds = buildLicensedIdSet(licenses);
+  const isConnected = (el) => elIsConnected(el, relFromIndex, relToIndex);
+  const hasLicense = (el) => licensedIds.has(el.spdxId);
 
-  // --- NTIA minimum elements (per-package name/version/supplier/id/relationship
-  // checks, plus the document-level author/timestamp) ---
-  let ntiaPasses = 0;
-  let ntiaChecks = 0;
-  const missingVersion = [];
-  const missingSupplier = [];
-  packages.forEach((p) => {
-    const checks = [
-      isMeaningfulValue(p.name),
-      pkgHasVersion(p),
-      pkgHasSupplier(p),
-      pkgHasIdentifier(p),
-      elIsConnected(p, relFromIndex, relToIndex)
-    ];
-    ntiaChecks += checks.length;
-    ntiaPasses += checks.filter(Boolean).length;
-    if (!checks[1]) missingVersion.push(p);
-    if (!checks[2]) missingSupplier.push(p);
-  });
   const hasAuthor = (data.creators || []).length > 0;
   const hasTimestamp = isMeaningfulValue(data.createdDate);
-  ntiaChecks += 2;
-  ntiaPasses += (hasAuthor ? 1 : 0) + (hasTimestamp ? 1 : 0);
-
-  // --- License & copyright (packages only — file-level licensing is rarely
-  // practiced even in well-formed SBOMs, so scoring it would just add noise) ---
-  const missingLicense = packages.filter((p) => !coveredPkgIds.has(p.spdxId));
-  const missingCopyright = packages.filter((p) => !isMeaningfulValue(p.software_copyrightText));
-  const licensePct = pct(coveredPkgIds.size, packages.length);
-  const copyrightPct = pct(packages.length - missingCopyright.length, packages.length);
-
-  // --- Provenance & identifiers (packages only) ---
-  const withSupplier = packages.filter(pkgHasSupplier).length;
-  const withIdentifier = packages.filter(pkgHasIdentifier).length;
-  const supplierPct = pct(withSupplier, packages.length);
-  const identifierPct = pct(withIdentifier, packages.length);
-
-  // --- Integrity & verification (packages + files) ---
-  const missingHash = artifacts.filter((el) => !elHasHash(el));
-  const integrityPct = pct(artifacts.length - missingHash.length, artifacts.length);
-
-  // --- Structural health (orphans across packages + files, plus unresolved
-  // external refs already computed by the parser) ---
-  const orphans = artifacts.filter((el) => !elIsConnected(el, relFromIndex, relToIndex));
-  const orphanPct = pct(artifacts.length - orphans.length, artifacts.length);
   const refStats = data.externalRefStats || { total: 0, resolved: 0, unresolved: 0 };
-  const resolvedRefPct = refStats.total > 0 ? (refStats.resolved / refStats.total) * 100 : null;
-  const structuralParts = [orphanPct, resolvedRefPct].filter((v) => v != null);
-  const structuralScore = structuralParts.length
-    ? structuralParts.reduce((a, b) => a + b, 0) / structuralParts.length
-    : null;
+  const refResolvedPct = pct(refStats.resolved, refStats.total);
 
-  const categories = [
-    {
-      key: 'ntia',
-      label: 'NTIA Minimum Elements',
-      weight: 0.3,
-      score: ntiaChecks > 0 ? (ntiaPasses / ntiaChecks) * 100 : null,
-      detail: 'Name, version, supplier, a unique identifier and a relationship, per package'
-    },
-    {
-      key: 'license',
-      label: 'License & Copyright',
-      weight: 0.25,
-      score:
-        licensePct != null && copyrightPct != null
-          ? licensePct * 0.6 + copyrightPct * 0.4
-          : (licensePct ?? copyrightPct),
-      detail: 'Declared/concluded license and copyright text coverage across packages'
-    },
-    {
-      key: 'provenance',
-      label: 'Provenance & Identifiers',
-      weight: 0.2,
-      score:
-        supplierPct != null && identifierPct != null
-          ? (supplierPct + identifierPct) / 2
-          : (supplierPct ?? identifierPct),
-      detail: 'Supplier/originator and PURL/CPE coverage across packages'
-    },
-    {
-      key: 'integrity',
-      label: 'Integrity & Verification',
-      weight: 0.15,
-      score: integrityPct,
-      detail: 'Packages and files carrying an integrity hash'
-    },
-    {
-      key: 'structural',
-      label: 'Structural Health',
-      weight: 0.1,
-      score: structuralScore,
-      detail: 'Elements with no relationships, and unresolved external references'
-    }
-  ].map((c) => ({ ...c, applicable: c.score != null }));
+  const count = (pop, pred) => pop.filter(pred).length;
 
-  const applicable = categories.filter((c) => c.applicable);
-  const weightSum = applicable.reduce((sum, c) => sum + c.weight, 0);
-  const overallScore =
-    weightSum > 0 ? applicable.reduce((sum, c) => sum + c.score * c.weight, 0) / weightSum : 0;
+  // Category scores as a function of which fix dimensions are treated as fully
+  // satisfied. Passing an empty set yields the document's real scores; forcing a
+  // single dimension is how each improvement's point gain is measured.
+  function scoreCategories(forced) {
+    const on = (k) => forced.has(k);
+    const passes = (pop, pred, key) => (on(key) ? pop.length : count(pop, pred));
 
-  // --- Copyleft exposure among packages with a meaningful license ---
-  const copyleftExposure = { copyleft: 0, permissive: 0, other: 0 };
-  familyByPkgId.forEach((family) => {
-    copyleftExposure[family] = (copyleftExposure[family] || 0) + 1;
+    // NTIA: five per-package checks plus the document-level author + timestamp.
+    const ntiaChecks = packages.length * 5 + 2;
+    const ntiaPasses =
+      count(packages, pkgHasName) +
+      passes(packages, pkgHasVersion, 'version') +
+      passes(packages, pkgHasSupplier, 'supplier') +
+      passes(packages, pkgHasIdentifier, 'identifier') +
+      passes(packages, isConnected, 'orphans') +
+      (hasAuthor ? 1 : 0) +
+      (hasTimestamp ? 1 : 0);
+    const ntia = ntiaChecks > 0 ? (ntiaPasses / ntiaChecks) * 100 : null;
+
+    // License & copyright — the better of package-level and file-level coverage.
+    // The 'license'/'copyright' levers force the package side (the offenders are
+    // packages), so a file-licensed SBOM still keeps its file-side credit.
+    const pkgLicense = on('license') ? 100 : pct(count(packages, hasLicense), packages.length);
+    const fileLicense = pct(count(files, hasLicense), files.length);
+    const pkgCopyright = on('copyright')
+      ? 100
+      : pct(count(packages, elHasCopyright), packages.length);
+    const fileCopyright = pct(count(files, elHasCopyright), files.length);
+    const license = weighted(
+      betterOf(pkgLicense, fileLicense),
+      betterOf(pkgCopyright, fileCopyright),
+      0.6,
+      0.4
+    );
+
+    const supplierPct = on('supplier')
+      ? 100
+      : pct(count(packages, pkgHasSupplier), packages.length);
+    const identifierPct = on('identifier')
+      ? 100
+      : pct(count(packages, pkgHasIdentifier), packages.length);
+    const provenance = weighted(supplierPct, identifierPct, 0.5, 0.5);
+
+    const integrity = on('hash') ? 100 : pct(count(artifacts, elHasHash), artifacts.length);
+
+    const orphanPct = on('orphans') ? 100 : pct(count(artifacts, isConnected), artifacts.length);
+    const resolvedPct = on('refs') ? 100 : refResolvedPct;
+    const structuralParts = [orphanPct, resolvedPct].filter((v) => v != null);
+    const structural = structuralParts.length
+      ? structuralParts.reduce((a, b) => a + b, 0) / structuralParts.length
+      : null;
+
+    return { ntia, license, provenance, integrity, structural };
+  }
+
+  function overallOf(scores) {
+    const cats = CATEGORY_META.map((c) => ({
+      ...c,
+      score: scores[c.key],
+      applicable: scores[c.key] != null
+    }));
+    const applicable = cats.filter((c) => c.applicable);
+    const weightSum = applicable.reduce((sum, c) => sum + c.weight, 0);
+    const overall =
+      weightSum > 0 ? applicable.reduce((sum, c) => sum + c.score * c.weight, 0) / weightSum : 0;
+    return { cats, overall };
+  }
+
+  const baseline = overallOf(scoreCategories(new Set()));
+  const overallScore = baseline.overall;
+
+  // How much the overall score would rise if this one dimension were fully fixed.
+  const gainFor = (key) =>
+    Math.max(0, overallOf(scoreCategories(new Set([key]))).overall - overallScore);
+
+  const improvements = IMPROVEMENT_META.flatMap((meta) => {
+    const { pop, pred } = IMPROVEMENT_POPULATIONS[meta.key]({
+      packages,
+      artifacts,
+      hasLicense,
+      isConnected
+    });
+    const failing = pop.filter((el) => !pred(el));
+    if (failing.length === 0) return [];
+    const sample = failing
+      .slice(0, OFFENDER_CAP)
+      .map((el) => ({ id: el.spdxId, name: displayName(el), type: el.type }));
+    return [
+      {
+        key: meta.key,
+        title: meta.title,
+        hint: meta.hint,
+        count: failing.length,
+        gain: gainFor(meta.key),
+        coveragePct: pct(pop.length - failing.length, pop.length),
+        sample,
+        moreCount: failing.length - sample.length
+      }
+    ];
   });
 
-  // --- Supply-chain concentration: most depended-upon packages ---
-  const dependentIndex = data.dependentIndex || new Map();
-  const supplyChainConcentration = [...packages]
-    .map((p) => ({
-      id: p.spdxId,
-      name: displayName(p),
-      dependents: dependentIndex.get(p.spdxId)?.length || 0
-    }))
-    .filter((p) => p.dependents > 0)
-    .sort((a, b) => b.dependents - a.dependents)
-    .slice(0, OFFENDER_CAP);
-
-  // --- Vulnerability triage completeness ---
-  const vulnerabilities = data.vulnerabilities || [];
-  let vulnerabilityTriage = null;
-  if (vulnerabilities.length) {
-    const resolved = vulnerabilities.filter(
-      (v) => v.overallStatus === 'fixed' || v.overallStatus === 'not_affected'
-    ).length;
-    const open = vulnerabilities.filter(
-      (v) => v.overallStatus === 'affected' || v.overallStatus === 'under_investigation'
-    ).length;
-    vulnerabilityTriage = {
-      total: vulnerabilities.length,
-      resolved,
-      open,
-      unknown: vulnerabilities.length - resolved - open
-    };
+  // Unresolved external references have no element to click through to, so they
+  // are surfaced as a count-only improvement rather than an offender list.
+  if (refStats.unresolved > 0) {
+    improvements.push({
+      key: 'refs',
+      title: 'Unresolved external references',
+      hint: 'These reference elements imported from documents this SBOM does not include.',
+      count: refStats.unresolved,
+      gain: gainFor('refs'),
+      coveragePct: pct(refStats.resolved, refStats.total),
+      sample: [],
+      moreCount: 0
+    });
   }
+
+  improvements.sort((a, b) => b.gain - a.gain || b.count - a.count);
 
   return {
     overall: { score: Math.round(overallScore), grade: gradeFor(overallScore) },
-    categories,
-    insights: {
-      packageCount: packages.length,
-      fileCount: files.length,
-      offenders: {
-        missingLicense: offenderList(missingLicense, missingLicense.length),
-        missingCopyright: offenderList(missingCopyright, missingCopyright.length),
-        missingSupplier: offenderList(missingSupplier, missingSupplier.length),
-        missingVersion: offenderList(missingVersion, missingVersion.length),
-        missingHash: offenderList(missingHash, missingHash.length),
-        orphans: offenderList(orphans, orphans.length)
-      },
-      copyleftExposure,
-      supplyChainConcentration,
-      externalRefs: refStats,
-      vulnerabilityTriage
-    }
+    categories: baseline.cats,
+    improvements,
+    counts: { packages: packages.length, files: files.length, elements: artifacts.length }
   };
 }

@@ -1,19 +1,23 @@
-<div x-show="currentView === 'statistics'" class="fade-in space-y-6 max-w-6xl">
+<div x-show="currentView === 'statistics'" class="fade-in space-y-6 max-w-4xl">
   <!-- Overall score -->
   <div class="card">
     <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6">
       <div
-        class="relative w-28 h-28 rounded-full flex items-center justify-center flex-shrink-0"
+        class="relative w-32 h-32 rounded-full flex items-center justify-center flex-shrink-0"
         :style="qualityRingStyle(qualityReport.overall.score, qualityGradeMeta(qualityReport.overall.grade).color)"
       >
         <div
           class="absolute inset-2 rounded-full bg-slate-800 flex flex-col items-center justify-center"
         >
-          <div class="text-2xl font-bold text-white" x-text="qualityReport.overall.score"></div>
+          <div
+            class="text-3xl font-bold"
+            :style="`color:${qualityGradeMeta(qualityReport.overall.grade).color}`"
+            x-text="qualityReport.overall.score"
+          ></div>
           <div class="text-[10px] text-slate-500 -mt-0.5">/ 100</div>
         </div>
       </div>
-      <div class="min-w-0 text-center sm:text-left">
+      <div class="min-w-0 flex-1 text-center sm:text-left">
         <div class="flex items-center justify-center sm:justify-start gap-2 mb-1">
           <h3 class="text-lg font-semibold text-white">SBOM Quality Score</h3>
           <span
@@ -22,13 +26,50 @@
             x-text="'Grade ' + qualityReport.overall.grade"
           ></span>
         </div>
-        <p class="text-sm text-slate-400 max-w-2xl">
+        <p class="text-sm text-slate-400">
           A completeness score across this document's
-          <span x-text="formatCount(qualityReport.insights.packageCount)"></span>
-          packages, weighted across five categories inspired by the NTIA "minimum elements" baseline
-          and common SBOM-scorer methodology. Not a measure of security risk or license compliance
-          on its own — see the breakdown and worst offenders below for what to fix first.
+          <span x-text="formatCount(qualityReport.counts.packages)"></span>
+          packages<template x-if="qualityReport.counts.files > 0"
+            ><span>
+              and <span x-text="formatCount(qualityReport.counts.files)"></span> files</span
+            ></template
+          >, weighted across five categories inspired by the NTIA "minimum elements" baseline. It
+          measures how well-described the SBOM is — not security risk or license compliance on its
+          own.
         </p>
+        <!-- Grade scale -->
+        <div class="mt-4">
+          <div
+            class="relative h-2.5 rounded-full"
+            style="
+              background: linear-gradient(
+                to right,
+                #ef4444 0%,
+                #ef4444 50%,
+                #f97316 50%,
+                #f97316 65%,
+                #f59e0b 65%,
+                #f59e0b 80%,
+                #22c55e 80%,
+                #22c55e 90%,
+                #10b981 90%
+              );
+            "
+          >
+            <div
+              class="absolute -top-1 h-4.5 w-1.5 rounded-full bg-white ring-2 ring-slate-800"
+              style="top: -3px; height: 16px"
+              :style="`left: calc(${qualityReport.overall.score}% - 3px)`"
+            ></div>
+          </div>
+          <div class="relative h-4 mt-0.5 text-[10px] font-medium text-slate-500">
+            <span class="absolute -translate-x-1/2" style="left: 25%">F</span>
+            <span class="absolute -translate-x-1/2" style="left: 57.5%">D</span>
+            <span class="absolute -translate-x-1/2" style="left: 72.5%">C</span>
+            <span class="absolute -translate-x-1/2" style="left: 85%">B</span>
+            <span class="absolute -translate-x-1/2" style="left: 95%">A</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -62,190 +103,121 @@
     </div>
   </div>
 
-  <!-- Worst offenders -->
-  <div
-    x-data="{
-      groups: [
-        { key: 'missingLicense', label: 'Packages missing a license' },
-        { key: 'missingCopyright', label: 'Packages missing copyright text' },
-        { key: 'missingSupplier', label: 'Packages missing a supplier/originator' },
-        { key: 'missingVersion', label: 'Packages missing a version' },
-        { key: 'missingHash', label: 'Packages/files missing an integrity hash' },
-        { key: 'orphans', label: 'Elements with no relationships' }
-      ]
-    }"
-    class="grid grid-cols-1 md:grid-cols-2 gap-4"
-  >
-    <template x-for="g in groups" :key="g.key">
-      <div class="card" x-show="qualityReport.insights.offenders[g.key].total > 0">
-        <div class="flex items-center justify-between mb-3">
-          <h3 class="text-sm font-semibold text-white" x-text="g.label"></h3>
-          <span
-            class="badge bg-amber-500/15 text-amber-400"
-            x-text="formatCount(qualityReport.insights.offenders[g.key].total)"
-          ></span>
-        </div>
-        <div class="space-y-1.5">
-          <template x-for="o in qualityReport.insights.offenders[g.key].sample" :key="o.id">
-            <button
-              @click="navigateTo(o.id)"
-              class="flex items-center gap-2 w-full text-left rounded-lg px-2 py-1.5 -mx-2 hover:bg-slate-700/40 transition"
-            >
-              <span
-                class="flex items-center justify-center flex-shrink-0"
-                :style="`color:${nodeTypeColor(getNodeType(o))}`"
-                x-html="nodeTypeIconSvg(getNodeType(o), 'w-3.5 h-3.5')"
-              ></span>
-              <span class="text-sm text-slate-300 truncate" x-text="o.name"></span>
-            </button>
-          </template>
-          <div
-            x-show="qualityReport.insights.offenders[g.key].total > qualityReport.insights.offenders[g.key].sample.length"
-            class="text-xs text-slate-500 px-2 pt-1"
-            x-text="`+ ${formatCount(qualityReport.insights.offenders[g.key].total - qualityReport.insights.offenders[g.key].sample.length)} more`"
-          ></div>
-        </div>
-      </div>
-    </template>
-  </div>
+  <!-- Improve your score -->
+  <div>
+    <div class="flex items-baseline justify-between mb-1">
+      <h3 class="text-sm font-semibold text-white">Improve Your Score</h3>
+      <span
+        x-show="qualityReport.improvements.length > 0"
+        class="text-xs text-slate-500"
+        x-text="formatCount(qualityReport.improvements.length) + ' opportunities'"
+      ></span>
+    </div>
+    <p class="text-xs text-slate-500 mb-4">
+      Ranked by how many points each fix would add to the overall score. Expand a card to see and
+      jump to the elements that need it.
+    </p>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <!-- Copyleft exposure -->
+    <!-- Nothing to fix -->
     <div
-      class="card"
-      x-show="qualityReport.insights.copyleftExposure.copyleft + qualityReport.insights.copyleftExposure.permissive + qualityReport.insights.copyleftExposure.other > 0"
+      x-show="qualityReport.improvements.length === 0"
+      class="card flex items-center gap-3 text-sm text-slate-300"
     >
-      <h3 class="text-sm font-semibold text-white mb-1">License Family Exposure</h3>
-      <p class="text-xs text-slate-500 mb-4">
-        Best-effort classification by license id — a heuristic, not legal advice.
-      </p>
-      <div class="space-y-3">
-        <template
-          x-for="row in [
-            { key: 'copyleft', label: 'Copyleft (GPL/AGPL/LGPL/MPL family)', color: '#ef4444' },
-            { key: 'permissive', label: 'Permissive (MIT/BSD/Apache/…)', color: '#10b981' },
-            { key: 'other', label: 'Other / uncommon', color: '#f59e0b' }
-          ]"
-          :key="row.key"
-        >
-          <div x-show="qualityReport.insights.copyleftExposure[row.key] > 0">
-            <div class="flex items-center justify-between text-sm mb-1">
-              <span class="text-slate-300" x-text="row.label"></span>
-              <span
-                class="text-slate-400"
-                x-text="formatCount(qualityReport.insights.copyleftExposure[row.key])"
-              ></span>
-            </div>
-            <div class="h-2 bg-slate-700 rounded-full overflow-hidden">
-              <div
-                class="h-full rounded-full"
-                :style="`width: ${(qualityReport.insights.copyleftExposure[row.key] / qualityReport.insights.packageCount) * 100}%; background-color: ${row.color}`"
-              ></div>
-            </div>
-          </div>
-        </template>
-      </div>
+      <svg
+        class="w-5 h-5 text-emerald-400 flex-shrink-0"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+      Nothing left to flag — every scored attribute is fully covered.
     </div>
 
-    <!-- Supply-chain concentration -->
-    <div class="card" x-show="qualityReport.insights.supplyChainConcentration.length > 0">
-      <h3 class="text-sm font-semibold text-white mb-1">Supply-Chain Concentration</h3>
-      <p class="text-xs text-slate-500 mb-4">
-        Packages the most other packages depend on — the highest-impact links if compromised.
-      </p>
-      <div class="space-y-1.5">
-        <template x-for="p in qualityReport.insights.supplyChainConcentration" :key="p.id">
+    <div class="space-y-3">
+      <template x-for="im in qualityReport.improvements" :key="im.key">
+        <div class="card !p-0 overflow-hidden" x-data="{ open: false }">
+          <!-- Header: title + coverage meter + gain -->
           <button
-            @click="navigateTo(p.id)"
-            class="flex items-center justify-between gap-2 w-full text-left rounded-lg px-2 py-1.5 -mx-2 hover:bg-slate-700/40 transition"
+            @click="open = !open"
+            :disabled="im.sample.length === 0"
+            class="w-full text-left p-4 flex items-center gap-4"
+            :class="im.sample.length > 0 ? 'hover:bg-slate-700/30 transition cursor-pointer' : 'cursor-default'"
           >
-            <span class="flex items-center gap-2 min-w-0">
-              <span
-                class="flex items-center justify-center flex-shrink-0"
-                :style="`color:${nodeTypeColor('package')}`"
-                x-html="nodeTypeIconSvg('package', 'w-3.5 h-3.5')"
-              ></span>
-              <span class="text-sm text-slate-300 truncate" x-text="p.name"></span>
-            </span>
-            <span
-              class="text-xs text-slate-500 flex-shrink-0"
-              x-text="formatCount(p.dependents) + ' dependents'"
-            ></span>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2 mb-1.5">
+                <span class="text-sm font-medium text-white truncate" x-text="im.title"></span>
+                <span
+                  class="text-xs text-slate-500 flex-shrink-0"
+                  x-text="formatCount(im.count) + ' to fix'"
+                ></span>
+              </div>
+              <!-- Coverage meter -->
+              <div class="h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                <div
+                  class="h-full rounded-full"
+                  :style="`width: ${im.coveragePct ?? 0}%; background-color: ${qualityScoreColor(im.coveragePct ?? 0)}`"
+                ></div>
+              </div>
+              <div class="text-xs text-slate-500 mt-1.5" x-text="im.hint"></div>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <div class="text-right">
+                <div
+                  class="text-lg font-bold text-emerald-400 leading-none tabular-nums"
+                  x-text="(im.gain >= 1 ? '+' + Math.round(im.gain) : im.gain > 0 ? '+<1' : '+0')"
+                ></div>
+                <div class="text-[10px] text-slate-500 mt-0.5">pts</div>
+              </div>
+              <svg
+                x-show="im.sample.length > 0"
+                class="w-4 h-4 text-slate-500 transition-transform"
+                :class="open ? 'rotate-90' : ''"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </div>
           </button>
-        </template>
-      </div>
-    </div>
-
-    <!-- Unresolved external references -->
-    <div class="card" x-show="qualityReport.insights.externalRefs.total > 0">
-      <h3 class="text-sm font-semibold text-white mb-1">External Reference Resolution</h3>
-      <p class="text-xs text-slate-500 mb-4">
-        Elements this document references but doesn't define (SPDX ExternalMap imports).
-      </p>
-      <div class="flex items-baseline gap-4">
-        <div>
+          <!-- Expanded: clickable offenders -->
           <div
-            class="text-xl font-bold text-white"
-            x-text="formatCount(qualityReport.insights.externalRefs.resolved)"
-          ></div>
-          <div class="text-xs text-slate-500">Resolved</div>
+            x-show="open && im.sample.length > 0"
+            x-collapse
+            class="px-4 pb-4 pt-1 border-t border-slate-700/60 space-y-1"
+          >
+            <template x-for="o in im.sample" :key="o.id">
+              <button
+                @click="navigateTo(o.id)"
+                class="flex items-center gap-2 w-full text-left rounded-lg px-2 py-1.5 -mx-2 hover:bg-slate-700/40 transition"
+              >
+                <span
+                  class="flex items-center justify-center flex-shrink-0"
+                  :style="`color:${nodeTypeColor(getNodeType(o))}`"
+                  x-html="nodeTypeIconSvg(getNodeType(o), 'w-3.5 h-3.5')"
+                ></span>
+                <span class="text-sm text-slate-300 truncate" x-text="o.name"></span>
+              </button>
+            </template>
+            <div
+              x-show="im.moreCount > 0"
+              class="text-xs text-slate-500 px-2 pt-1"
+              x-text="`+ ${formatCount(im.moreCount)} more not shown`"
+            ></div>
+          </div>
         </div>
-        <div>
-          <div
-            class="text-xl font-bold"
-            :class="qualityReport.insights.externalRefs.unresolved > 0 ? 'text-amber-400' : 'text-white'"
-            x-text="formatCount(qualityReport.insights.externalRefs.unresolved)"
-          ></div>
-          <div class="text-xs text-slate-500">Unresolved</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Vulnerability triage completeness -->
-    <div class="card" x-show="qualityReport.insights.vulnerabilityTriage">
-      <div class="flex items-center justify-between mb-1">
-        <h3 class="text-sm font-semibold text-white">Vulnerability Triage</h3>
-        <button
-          @click="switchView('security')"
-          class="text-xs text-rose-300 hover:text-rose-200 inline-flex items-center gap-1"
-        >
-          View all
-          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
-        </button>
-      </div>
-      <p class="text-xs text-slate-500 mb-4">
-        How much of this document's known vulnerabilities have a resolved VEX status.
-      </p>
-      <div class="flex items-baseline gap-4" x-show="qualityReport.insights.vulnerabilityTriage">
-        <div>
-          <div
-            class="text-xl font-bold text-emerald-400"
-            x-text="formatCount(qualityReport.insights.vulnerabilityTriage?.resolved)"
-          ></div>
-          <div class="text-xs text-slate-500">Resolved</div>
-        </div>
-        <div>
-          <div
-            class="text-xl font-bold text-rose-400"
-            x-text="formatCount(qualityReport.insights.vulnerabilityTriage?.open)"
-          ></div>
-          <div class="text-xs text-slate-500">Still open</div>
-        </div>
-        <div>
-          <div
-            class="text-xl font-bold text-slate-400"
-            x-text="formatCount(qualityReport.insights.vulnerabilityTriage?.unknown)"
-          ></div>
-          <div class="text-xs text-slate-500">Unknown</div>
-        </div>
-      </div>
+      </template>
     </div>
   </div>
 </div>

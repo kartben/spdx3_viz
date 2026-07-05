@@ -11,7 +11,7 @@ export const CHANGELOG = [
     items: [
       {
         tag: 'Added',
-        text: 'Statistics view with an SBOM quality score (NTIA minimum elements, license/copyright, provenance, integrity, and structural health categories), plus worst-offender drill-downs, license-family exposure, and supply-chain concentration insights.'
+        text: 'Statistics view with an SBOM quality score (NTIA minimum elements, license/copyright, provenance, integrity, and structural health categories), focused on the score and a ranked "Improve Your Score" list showing each fix\'s point impact, current coverage, and the elements to jump to. License & copyright coverage is now credited at whichever granularity the SBOM uses — file-level licensing (as in the Zephyr SBOM) counts, so those documents are no longer under-scored.'
       },
       {
         tag: 'Changed',
