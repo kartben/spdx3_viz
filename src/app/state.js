@@ -86,6 +86,7 @@ export function createState() {
     securitySearch: '',
     securitySort: 'severity',
     securityStatusFilter: '',
+    securitySeverityFilter: '', // '' = all, else a CVSS severity band (critical…low)
     // CVE id -> { loading, error, data } fetched on demand from cve.org
     cveDetails: {},
     licenseSort: 'usage',

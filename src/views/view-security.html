@@ -17,6 +17,7 @@
       class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 text-slate-300 focus:outline-none focus:border-rose-500"
     >
       <option value="severity">Sort by status</option>
+      <option x-show="hasCvssData" value="cvss">Sort by CVSS severity</option>
       <option value="packages">Sort by affected packages</option>
       <option value="cve">Sort by CVE id</option>
     </select>
@@ -42,6 +43,26 @@
         <span class="w-1.5 h-1.5 rounded-full mr-1.5" :class="vexStatusMeta(s).dotClass"></span>
         <span x-text="vexStatusMeta(s).label"></span>
         <span class="ml-1.5 font-semibold" x-text="formatCount(securitySummary.counts[s])"></span>
+      </button>
+    </template>
+  </div>
+
+  <!-- CVSS severity filter chips (only when the SBOM carries CVSS assessments) -->
+  <div x-show="hasCvssData" class="flex flex-wrap items-center gap-2">
+    <span class="text-xs text-slate-500 mr-0.5">Severity</span>
+    <template x-for="s in securitySeverityOrder" :key="s">
+      <button
+        @click="securitySeverityFilter = (securitySeverityFilter === s ? '' : s); restreamView('security')"
+        class="badge transition"
+        :class="securitySeverityFilter === s ? cvssSeverityMeta(s).badgeClass + ' brightness-125' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
+        :title="`Show ${cvssSeverityMeta(s).label}-severity vulnerabilities`"
+      >
+        <span class="w-1.5 h-1.5 rounded-full mr-1.5" :class="cvssSeverityMeta(s).dotClass"></span>
+        <span x-text="cvssSeverityMeta(s).label"></span>
+        <span
+          class="ml-1.5 font-semibold"
+          x-text="formatCount(securitySeveritySummary.counts[s])"
+        ></span>
       </button>
     </template>
   </div>
@@ -95,6 +116,26 @@
           ></div>
         </div>
         <div class="flex items-center gap-2 flex-shrink-0">
+          <span
+            x-show="vuln.kev"
+            class="badge bg-rose-500/15 text-rose-300 ring-1 ring-rose-500/40"
+            title="Listed in a known-exploited vulnerability catalog (e.g. CISA KEV)"
+          >
+            KEV
+          </span>
+          <span
+            x-show="vuln.cvss"
+            class="badge"
+            :class="cvssSeverityMeta(vuln.severity).badgeClass"
+            :title="(vuln.cvss?.vector || '') + (vuln.cvss?.version ? ' · CVSS v' + vuln.cvss.version : '')"
+          >
+            <span x-text="cvssSeverityMeta(vuln.severity).label"></span>
+            <span
+              x-show="vuln.cvss?.score != null"
+              class="ml-1.5 font-semibold tabular-nums"
+              x-text="vuln.cvss?.score"
+            ></span>
+          </span>
           <span class="badge" :class="vexStatusMeta(vuln.overallStatus).badgeClass">
             <span
               class="w-1.5 h-1.5 rounded-full mr-1.5"
@@ -125,6 +166,54 @@
         x-collapse
         class="mt-4 pt-4 border-t border-slate-700 sm:pl-11 space-y-3"
       >
+        <!-- In-SBOM risk assessment (CVSS/EPSS/exploit), straight from the document -->
+        <div
+          x-show="vuln.cvss || vuln.epss || vuln.kev"
+          class="rounded-lg bg-slate-900/40 border border-slate-700/50 p-3 space-y-2"
+        >
+          <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+            Risk assessment
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <span
+              x-show="vuln.cvss"
+              class="badge"
+              :class="cvssSeverityMeta(vuln.severity).badgeClass"
+            >
+              <span x-text="cvssSeverityMeta(vuln.severity).label"></span>
+              <span
+                x-show="vuln.cvss?.score != null"
+                class="ml-1.5 font-semibold tabular-nums"
+                x-text="vuln.cvss?.score"
+              ></span>
+            </span>
+            <span
+              x-show="vuln.cvss?.version"
+              class="text-[10px] text-slate-500"
+              x-text="'CVSS v' + vuln.cvss?.version"
+            ></span>
+            <span
+              x-show="vuln.epss"
+              class="badge bg-slate-700/60 text-slate-300"
+              title="Exploit Prediction Scoring System — likelihood of exploitation in the next 30 days"
+              x-text="'EPSS ' + (vuln.epss ? (vuln.epss.probability * 100).toFixed(1) + '%' : '')"
+            ></span>
+            <span
+              x-show="vuln.kev"
+              class="badge bg-rose-500/15 text-rose-300 ring-1 ring-rose-500/40"
+              title="Listed in a known-exploited vulnerability catalog (e.g. CISA KEV)"
+            >
+              Known exploited
+            </span>
+          </div>
+          <div
+            x-show="vuln.cvss?.vector"
+            class="text-[11px] font-mono text-slate-500 break-all"
+            x-text="vuln.cvss?.vector"
+          ></div>
+          <div class="text-[10px] text-slate-600">Source: this SBOM's risk assessment</div>
+        </div>
+
         <!-- CVE details, fetched on demand from cve.org -->
         <div
           class="rounded-lg bg-slate-900/40 border border-slate-700/50 p-3"

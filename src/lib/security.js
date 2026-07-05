@@ -4,7 +4,13 @@
  *
  * @module lib/security
  */
-import { COLORS, VEX_STATUSES, VEX_STATUS_BY_REL, VEX_JUSTIFICATION_LABELS } from '../config.js';
+import {
+  COLORS,
+  CVSS_SEVERITIES,
+  VEX_STATUSES,
+  VEX_STATUS_BY_REL,
+  VEX_JUSTIFICATION_LABELS
+} from '../config.js';
 import { cleanName, isMeaningfulValue } from './format.js';
 
 /**
@@ -110,34 +116,87 @@ export function getVexJustificationLabel(type) {
 }
 
 /**
- * Presentation metadata for a CVSS qualitative severity rating.
+ * Presentation metadata for a CVSS qualitative severity rating. Accepts either
+ * spelling (`HIGH` from a fetched CVE record, or `high` from an in-SBOM CVSS
+ * assessment relationship).
  *
- * @param {string} severity - CRITICAL | HIGH | MEDIUM | LOW | NONE
- * @returns {{label: string, badgeClass: string}}
+ * @param {string} severity - critical | high | medium | low | none
+ * @returns {{key: string, label: string, color: string, badgeClass: string, dotClass: string, rank: number}}
  */
 export function getCvssSeverityMeta(severity) {
-  const map = {
-    CRITICAL: {
-      label: 'Critical',
-      badgeClass: 'bg-rose-500/15 text-rose-300 ring-1 ring-rose-500/40'
-    },
-    HIGH: {
-      label: 'High',
-      badgeClass: 'bg-orange-500/15 text-orange-300 ring-1 ring-orange-500/40'
-    },
-    MEDIUM: {
-      label: 'Medium',
-      badgeClass: 'bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/40'
-    },
-    LOW: { label: 'Low', badgeClass: 'bg-sky-500/15 text-sky-300 ring-1 ring-sky-500/40' },
-    NONE: { label: 'None', badgeClass: 'bg-slate-600/20 text-slate-300 ring-1 ring-slate-500/30' }
-  };
   return (
-    map[String(severity || '').toUpperCase()] || {
+    CVSS_SEVERITIES[String(severity || '').toLowerCase()] || {
+      key: 'unknown',
       label: severity || 'Unknown',
-      badgeClass: 'bg-slate-600/20 text-slate-300 ring-1 ring-slate-500/30'
+      color: COLORS.default,
+      badgeClass: 'bg-slate-600/20 text-slate-300 ring-1 ring-slate-500/30',
+      dotClass: 'bg-slate-500',
+      rank: 0
     }
   );
+}
+
+/**
+ * Normalizes a CVSS base score to its qualitative severity band, used as a
+ * fallback when an assessment omits an explicit severity. CVSS v2 has no
+ * Critical band (Low/Medium/High only), so a v2 score never maps above High.
+ *
+ * @param {number} score
+ * @param {string} [version] - CVSS version (e.g. '2.0', '3.1'); v2 caps at High
+ * @returns {string} critical | high | medium | low | none
+ */
+export function cvssSeverityForScore(score, version = '') {
+  if (!Number.isFinite(score)) return '';
+  if (score >= 9 && !String(version).startsWith('2')) return 'critical';
+  if (score >= 7) return 'high';
+  if (score >= 4) return 'medium';
+  if (score > 0) return 'low';
+  return 'none';
+}
+
+/**
+ * Distills the non-VEX vulnerability assessment relationships attached to a
+ * single vulnerability (CVSS, EPSS, exploit-catalog) into the headline risk
+ * signals the UI badges. All of it comes straight from the SBOM — no network.
+ *
+ * @param {Array<Object>} assessments - security_*VulnAssessmentRelationship elements
+ * @returns {{cvss: (Object|null), epss: (Object|null), kev: boolean, severity: string, severityRank: number}}
+ */
+export function summarizeVulnAssessments(assessments) {
+  let cvss = null;
+  let epss = null;
+  let kev = false;
+
+  (assessments || []).filter(Boolean).forEach((a) => {
+    const type = a.type || '';
+    if (/Cvss/.test(type)) {
+      const score = parseFloat(a.security_score);
+      const numeric = Number.isFinite(score) ? score : null;
+      const versionMatch = /CVSS:(\d(?:\.\d)?)/i.exec(a.security_vectorString || '');
+      const version = versionMatch ? versionMatch[1] : (/CvssV(\d)/i.exec(type)?.[1] ?? '');
+      // Map common distro synonyms (Red Hat's moderate/important) onto the
+      // standard bands; fall back to the score when the label is unrecognized.
+      let severity = String(a.security_severity || '').toLowerCase();
+      if (severity === 'moderate') severity = 'medium';
+      else if (severity === 'important') severity = 'high';
+      if (!CVSS_SEVERITIES[severity]) severity = cvssSeverityForScore(numeric, version);
+      const cand = { score: numeric, severity, vector: a.security_vectorString || '', version };
+      if (!cvss || (cand.score ?? -1) > (cvss.score ?? -1)) cvss = cand;
+    } else if (/Epss/.test(type)) {
+      const probability = parseFloat(a.security_probability);
+      if (Number.isFinite(probability)) {
+        const percentile = parseFloat(a.security_percentile);
+        epss = { probability, percentile: Number.isFinite(percentile) ? percentile : null };
+      }
+    } else if (/ExploitCatalog/.test(type)) {
+      if (a.security_exploited === true || String(a.security_catalogType).toLowerCase() === 'kev') {
+        kev = true;
+      }
+    }
+  });
+
+  const severity = cvss?.severity || '';
+  return { cvss, epss, kev, severity, severityRank: getCvssSeverityMeta(severity).rank };
 }
 
 /**

@@ -13,6 +13,8 @@ import {
   parseCpe,
   getVulnerabilityLookup,
   summarizeCveRecord,
+  summarizeVulnAssessments,
+  cvssSeverityForScore,
   getCvssSeverityMeta,
   getCdxProperties,
   getRelationshipColor,
@@ -360,6 +362,115 @@ test('parseGraph builds the VEX model from vulnerabilities and assessment relati
 
   // VEX assessment relationships are NOT mixed into the generic relationships
   assert.ok(!parsed.relationships.some((r) => r.type?.startsWith('security_Vex')));
+});
+
+test('parseGraph enriches vulnerabilities with in-SBOM CVSS/EPSS/exploit signals', () => {
+  const graph = [
+    { type: 'software_Package', spdxId: 'pkg:libx', name: 'libx' },
+    {
+      type: 'security_Vulnerability',
+      spdxId: 'vuln:cve-a',
+      externalIdentifier: [{ externalIdentifierType: 'cve', identifier: 'CVE-2024-1000' }]
+    },
+    {
+      type: 'security_Vulnerability',
+      spdxId: 'vuln:cve-b',
+      externalIdentifier: [{ externalIdentifierType: 'cve', identifier: 'CVE-2024-2000' }]
+    },
+    {
+      type: 'security_CvssV3VulnAssessmentRelationship',
+      spdxId: 'assess:cvss-a1',
+      relationshipType: 'hasAssessmentFor',
+      from: 'vuln:cve-a',
+      to: ['pkg:libx'],
+      security_score: '5.9',
+      security_severity: 'medium',
+      security_vectorString: 'CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N'
+    },
+    {
+      // A second, higher CVSS for the same vuln: the highest score wins.
+      type: 'security_CvssV3VulnAssessmentRelationship',
+      spdxId: 'assess:cvss-a2',
+      relationshipType: 'hasAssessmentFor',
+      from: 'vuln:cve-a',
+      to: ['pkg:libx'],
+      security_score: '9.8',
+      security_severity: 'critical',
+      security_vectorString: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H'
+    },
+    {
+      type: 'security_EpssVulnAssessmentRelationship',
+      spdxId: 'assess:epss-a',
+      relationshipType: 'hasAssessmentFor',
+      from: 'vuln:cve-a',
+      to: ['pkg:libx'],
+      security_probability: '0.42',
+      security_percentile: '0.97'
+    },
+    {
+      type: 'security_ExploitCatalogVulnAssessmentRelationship',
+      spdxId: 'assess:kev-a',
+      relationshipType: 'hasAssessmentFor',
+      from: 'vuln:cve-a',
+      to: ['pkg:libx'],
+      security_catalogType: 'kev',
+      security_exploited: true
+    }
+  ];
+
+  const parsed = parseGraph(graph);
+  const byId = Object.fromEntries(parsed.vulnerabilities.map((v) => [v.spdxId, v]));
+
+  const a = byId['vuln:cve-a'];
+  assert.equal(a.severity, 'critical');
+  assert.equal(a.severityRank, 5);
+  assert.equal(a.cvss.score, 9.8);
+  assert.equal(a.cvss.version, '3.1');
+  assert.equal(a.epss.probability, 0.42);
+  assert.equal(a.kev, true);
+
+  // A vulnerability with no assessment relationships carries no risk signals.
+  const b = byId['vuln:cve-b'];
+  assert.equal(b.severity, '');
+  assert.equal(b.severityRank, 0);
+  assert.equal(b.cvss, null);
+  assert.equal(b.epss, null);
+  assert.equal(b.kev, false);
+
+  // The assessment relationships must not leak into the generic relationships.
+  assert.ok(!parsed.relationships.some((r) => r.type?.includes('VulnAssessment')));
+});
+
+test('summarizeVulnAssessments normalizes distro synonyms and CVSS-v2 bands', () => {
+  // Red Hat-style qualitative synonyms map onto the standard bands.
+  assert.equal(
+    summarizeVulnAssessments([
+      { type: 'security_CvssV3VulnAssessmentRelationship', security_severity: 'moderate' }
+    ]).severity,
+    'medium'
+  );
+  assert.equal(
+    summarizeVulnAssessments([
+      { type: 'security_CvssV3VulnAssessmentRelationship', security_severity: 'important' }
+    ]).severity,
+    'high'
+  );
+
+  // A CVSS v2 assessment with no explicit severity never becomes "critical"
+  // (v2 has no Critical band), even for a 9.0+ score.
+  const v2 = summarizeVulnAssessments([
+    {
+      type: 'security_CvssV2VulnAssessmentRelationship',
+      security_score: '9.3',
+      security_vectorString: 'CVSS:2.0/AV:N/AC:M/Au:N/C:C/I:C/A:C'
+    }
+  ]);
+  assert.equal(v2.severity, 'high');
+  assert.equal(cvssSeverityForScore(9.3, '2.0'), 'high');
+  assert.equal(cvssSeverityForScore(9.3, '3.1'), 'critical');
+
+  // Null entries in the list are ignored rather than throwing.
+  assert.equal(summarizeVulnAssessments([null, undefined]).severity, '');
 });
 
 test('VEX assessment elements are excluded from the generic relationship indexes', () => {

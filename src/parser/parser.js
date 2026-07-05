@@ -13,7 +13,8 @@ import {
   getRelationshipColor,
   getVulnerabilityId,
   getVulnerabilityLocators,
-  vexStatusForRel
+  vexStatusForRel,
+  summarizeVulnAssessments
 } from '../lib/index.js';
 
 /**
@@ -159,6 +160,9 @@ export function parseGraph(graph, onProgress) {
   /** @type {Array<Object>} */
   const vexRelationships = [];
 
+  /** @type {Array<Object>} - Non-VEX vuln assessments (CVSS, EPSS, exploit catalog) */
+  const vulnAssessments = [];
+
   /** @type {Array<Object>} */
   const sboms = [];
 
@@ -275,6 +279,10 @@ export function parseGraph(graph, onProgress) {
 
       case BUCKET.VEX:
         vexRelationships.push(item);
+        break;
+
+      case BUCKET.VULN_ASSESSMENT:
+        vulnAssessments.push(item);
         break;
 
       case BUCKET.AGENTS:
@@ -448,7 +456,7 @@ export function parseGraph(graph, onProgress) {
   const licenses = collectLicenses(relationships, elementMap);
 
   // Build the VEX model: enriched vulnerabilities + vuln↔package indexes.
-  const vex = buildVexModel(vulnerabilities, vexRelationships, elementMap);
+  const vex = buildVexModel(vulnerabilities, vexRelationships, vulnAssessments, elementMap);
 
   // Reverse provenance index for agents: which elements each agent is tied to,
   // grouped by *how*. An agent is rarely a Relationship endpoint — instead the
@@ -619,6 +627,11 @@ function buildAgentLinkIndex(graph, resolveCreationInfo) {
  * @property {Object<string, number>} statusCounts - status -> distinct package count
  * @property {string} overallStatus - Most severe status across all assessments
  * @property {number} packageCount - Distinct assessed packages
+ * @property {{score: (number|null), severity: string, vector: string, version: string}|null} cvss - Best in-SBOM CVSS assessment
+ * @property {{probability: number, percentile: (number|null)}|null} epss - In-SBOM EPSS assessment
+ * @property {boolean} kev - Listed in a known-exploited catalog (e.g. CISA KEV)
+ * @property {string} severity - CVSS qualitative severity (critical…none), or ''
+ * @property {number} severityRank - Numeric rank of `severity` for sorting
  */
 
 /**
@@ -627,10 +640,11 @@ function buildAgentLinkIndex(graph, resolveCreationInfo) {
  *
  * @param {Array<Object>} vulnerabilities - Raw security_Vulnerability elements
  * @param {Array<Object>} vexRelationships - Raw VEX assessment relationship elements
+ * @param {Array<Object>} vulnAssessments - Raw non-VEX assessment relationships (CVSS/EPSS/exploit)
  * @param {Map<string, Object>} elementMap
  * @returns {{vulnerabilities: EnrichedVulnerability[], vexByVuln: Map<string, VexAssessment[]>, vexByPackage: Map<string, VexAssessment[]>}}
  */
-function buildVexModel(vulnerabilities, vexRelationships, elementMap) {
+function buildVexModel(vulnerabilities, vexRelationships, vulnAssessments, elementMap) {
   /** @type {Map<string, VexAssessment[]>} */
   const vexByVuln = new Map();
   /** @type {Map<string, VexAssessment[]>} */
@@ -684,9 +698,14 @@ function buildVexModel(vulnerabilities, vexRelationships, elementMap) {
 
   const SEVERITY = { affected: 4, under_investigation: 3, not_affected: 2, fixed: 1 };
 
+  // CVSS/EPSS/exploit assessments point `from` the vulnerability they assess.
+  const assessmentsByVuln = new Map();
+  vulnAssessments.forEach((a) => push(assessmentsByVuln, a.from, a));
+
   const enriched = vulnerabilities.map((el) => {
     const assessments = vexByVuln.get(el.spdxId) || [];
     const cveId = getVulnerabilityId(el);
+    const risk = summarizeVulnAssessments(assessmentsByVuln.get(el.spdxId) || []);
 
     // Count distinct packages per status; a vuln can hit the same package via
     // more than one VEX record, so don't double-count.
@@ -713,7 +732,12 @@ function buildVexModel(vulnerabilities, vexRelationships, elementMap) {
       statusCounts,
       // A vulnerability with no VEX assessment is "unknown", never "fixed".
       overallStatus: overallStatus || 'unknown',
-      packageCount
+      packageCount,
+      cvss: risk.cvss,
+      epss: risk.epss,
+      kev: risk.kev,
+      severity: risk.severity,
+      severityRank: risk.severityRank
     };
   });
 
