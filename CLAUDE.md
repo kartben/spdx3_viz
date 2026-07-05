@@ -9,6 +9,7 @@
 - Keep entries short: one concise line, like the existing bullets.
 - Only add an entry for something genuinely notable: an important new capability, or a fix for a bug that shipped in a **previous** release. Do **not** add an entry for a bug introduced and fixed within the current unreleased cycle.
 - Before adding a bullet, check whether it folds into an existing one for the same release rather than adding another line.
+- After editing CHANGELOG.md, run node scripts/gen-changelog.mjs to regenerate src/changelog.js so the in-app "What's new" modal stays in sync.
 
 ## Before proposing/creating a PR
 
