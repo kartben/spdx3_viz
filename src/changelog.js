@@ -28,6 +28,10 @@ export const CHANGELOG = [
       {
         tag: 'Fixed',
         text: 'Browser Back from a loaded document returns to the home screen instead of leaving the site.'
+      },
+      {
+        tag: 'Fixed',
+        text: 'Agent nodes used a red nearly identical to vulnerability/VEX nodes; agents are now indigo.'
       }
     ]
   },
