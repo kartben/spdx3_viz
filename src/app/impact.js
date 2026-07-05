@@ -243,6 +243,7 @@ export const impactMixin = {
       path.map((hop) => ({
         id: hop.id,
         name: this.relTargetDisplayName(hop.id),
+        version: this.impactVersionOf(hop.id),
         type: this.impactNodeTypeOf(hop.id),
         rel: hop.rel,
         verb: hop.rel ? impactEdgeVerb(hop.rel) : '',
@@ -260,6 +261,22 @@ export const impactMixin = {
     return el ? this.getNodeType(el) : 'package';
   },
 
+  // Package version for an impact node, or '' when absent. Surfaced alongside
+  // the name so different versions of the same package stay distinguishable
+  // (common in large distro SBOMs where one name ships many builds).
+  impactVersionOf(id) {
+    const ver = this.elementMap.get(id)?.software_packageVersion;
+    return this.isMeaningful(ver) ? String(ver) : '';
+  },
+
+  // Name with the version appended, for one-line contexts (the sub-graph SVG
+  // labels) where a separate muted span isn't practical.
+  impactDisplayName(id) {
+    const ver = this.impactVersionOf(id);
+    const base = this.relTargetDisplayName(id);
+    return ver ? `${base} ${ver}` : base;
+  },
+
   // Direct + transitive dependents of the focused element, resolved for the
   // "what depends on it" list (transitive shown separately from direct).
   impactDependents(id) {
@@ -269,6 +286,7 @@ export const impactMixin = {
     const toEntry = (nid) => ({
       id: nid,
       name: this.relTargetDisplayName(nid),
+      version: this.impactVersionOf(nid),
       type: this.impactNodeTypeOf(nid)
     });
     const byName = (a, b) => a.name.localeCompare(b.name);
@@ -381,7 +399,7 @@ export const impactMixin = {
         text.setAttribute('fill', isTarget ? '#c7d2fe' : '#cbd5e1');
         text.setAttribute('font-size', isTarget ? '11' : '9.5');
         text.setAttribute('font-family', 'ui-monospace, monospace');
-        text.textContent = this.relTargetDisplayName(nid);
+        text.textContent = this.impactDisplayName(nid);
         svg.appendChild(text);
       }
     });
