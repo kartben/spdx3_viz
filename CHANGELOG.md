@@ -6,6 +6,7 @@ via the "What's new" link.
 ## Unreleased
 
 - **Added:** Ansible Automation Platform 2.6 sample (~40k packages), a large-SBOM stress test, with a VEX overlay converted from Red Hat CSAF.
+- **Added:** Synthetic AEB safety case with requirement, verification, evidence, and software traceability.
 - **Improved:** Impact view shows package versions, so different builds of the same package are distinguishable.
 - **Improved:** Opening an element deep in a large list jumps straight to it and loads more as you scroll up or down, instead of rendering every row above it.
 
