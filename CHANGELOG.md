@@ -5,15 +5,15 @@ via the "What's new" link.
 
 ## Unreleased
 
-- **Added:** Shareable links: for sample SBOMs the URL now tracks the current view and selected element, with a Share button to copy it.
-- **Added:** PackageURL identifiers link out to deps.dev for supported ecosystems; purls carried in `software_packageUrl` now show as identifiers too.
-- **Changed:** Simplified the dashboard and sidebar: removed the duplicate quick-jump cards, and views with nothing to show stay hidden.
-- **Added:** Impact view: trace why a component is in the build (provenance) and what depends on it (blast radius), with SBOM-wide risk rankings.
-- **Added:** Security view surfaces the CVSS, EPSS, and known-exploited signals carried in the SBOM, with severity sorting and filtering.
-- **Added:** Statistics view with an SBOM completeness score, category breakdowns, and worst-offender drill-downs.
-- **Changed:** Migrated the build to Vite; reorganized source into modules and view partials.
+- **Added:** Shareable links tracking the current view and selected element.
+- **Added:** PackageURL identifiers link out to deps.dev.
+- **Added:** Impact view: trace provenance and blast radius, with risk rankings.
+- **Added:** Security view surfacing CVSS, EPSS, and known-exploited signals.
+- **Added:** Statistics view with completeness score and category breakdowns.
 - **Added:** Dedicated Agents view.
-- **Added:** CreatedBy/performedBy provenance edges in the graph, hidden by default.
+- **Added:** CreatedBy/performedBy provenance edges, hidden by default.
+- **Changed:** Simplified the dashboard and sidebar; empty views stay hidden.
+- **Changed:** Migrated the build to Vite.
 - **Fixed:** UI cut off on mobile browsers.
 
 ## [0.0.4] - 2026-07-04

@@ -11,31 +11,23 @@ export const CHANGELOG = [
     items: [
       {
         tag: 'Added',
-        text: 'Shareable links: for sample SBOMs the URL now tracks the current view and selected element, with a Share button to copy it.'
+        text: 'Shareable links tracking the current view and selected element.'
       },
       {
         tag: 'Added',
-        text: 'PackageURL identifiers link out to deps.dev for supported ecosystems; purls carried in `software_packageUrl` now show as identifiers too.'
-      },
-      {
-        tag: 'Changed',
-        text: 'Simplified the dashboard and sidebar: removed the duplicate quick-jump cards, and views with nothing to show stay hidden.'
+        text: 'PackageURL identifiers link out to deps.dev.'
       },
       {
         tag: 'Added',
-        text: 'Impact view: trace why a component is in the build (provenance) and what depends on it (blast radius), with SBOM-wide risk rankings.'
+        text: 'Impact view: trace provenance and blast radius, with risk rankings.'
       },
       {
         tag: 'Added',
-        text: 'Security view surfaces the CVSS, EPSS, and known-exploited signals carried in the SBOM, with severity sorting and filtering.'
+        text: 'Security view surfacing CVSS, EPSS, and known-exploited signals.'
       },
       {
         tag: 'Added',
-        text: 'Statistics view with an SBOM completeness score, category breakdowns, and worst-offender drill-downs.'
-      },
-      {
-        tag: 'Changed',
-        text: 'Migrated the build to Vite; reorganized source into modules and view partials.'
+        text: 'Statistics view with completeness score and category breakdowns.'
       },
       {
         tag: 'Added',
@@ -43,7 +35,15 @@ export const CHANGELOG = [
       },
       {
         tag: 'Added',
-        text: 'CreatedBy/performedBy provenance edges in the graph, hidden by default.'
+        text: 'CreatedBy/performedBy provenance edges, hidden by default.'
+      },
+      {
+        tag: 'Changed',
+        text: 'Simplified the dashboard and sidebar; empty views stay hidden.'
+      },
+      {
+        tag: 'Changed',
+        text: 'Migrated the build to Vite.'
       },
       {
         tag: 'Fixed',
