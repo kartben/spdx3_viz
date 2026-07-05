@@ -6,27 +6,9 @@ import {
   getNodeTypeColor,
   cleanName,
   dirPrefix,
-  fileExt,
   iconKeyForElement,
   getNodeIconPath2D
 } from '../lib/index.js';
-
-// A compiled source file (.c/.cpp/.s …) with zero snippets in the SBOM means no
-// code from it survived into the final binary — the linker dead-stripped it.
-// We surface these "not linked" files distinctively in the graph.
-const COMPILED_SOURCE_EXTS = new Set(['.c', '.cpp', '.cc', '.cxx', '.s']);
-// Fraction of their normal alpha that edges touching a "not linked" node keep,
-// so a dead-stripped branch fades out (shafts, arrowheads, and animated flow).
-const WASH_EDGE = 0.3;
-// The animated flow has a high base alpha (0.95), so washing it by WASH_EDGE
-// still reads as bright. Washed flow uses this faint absolute alpha instead, so
-// motion on a dead-stripped branch is barely-there rather than attention-grabbing.
-const WASH_FLOW_ALPHA = 0.14;
-function isUnlinkedSource(el, app) {
-  if (!el || getNodeType(el) !== 'file') return false;
-  if (!COMPILED_SOURCE_EXTS.has(fileExt(el.name || '').toLowerCase())) return false;
-  return (app.snippetsByFileIndex.get(el.spdxId)?.length || 0) === 0;
-}
 
 // Icon-node mode: below this on-screen node radius (px) icons are illegible, so
 // fall back to a plain dot. Glyphs are scaled to span ICON_SPAN * diameter, over
@@ -251,7 +233,6 @@ export function renderGraph(app, retry = 0) {
     if (!activeNodeTypes.has(type)) return null;
 
     const node = { id: spdxId, name: el.name || cleanName(spdxId), type, data: el };
-    if (isUnlinkedSource(el, app)) node.notLinked = true;
     uNodeIds.add(spdxId);
     uNodeById.set(spdxId, node);
     uNodes.push(node);
@@ -470,10 +451,6 @@ export function renderGraph(app, retry = 0) {
   links.forEach((l) => {
     l.sourceNode = renderById.get(l.sourceId);
     l.targetNode = renderById.get(l.targetId);
-    // An edge touching a dead-stripped ("not linked") source is washed out too,
-    // so the whole disconnected branch reads as faint — including the animated
-    // flow when such a node is hovered.
-    l.washed = !!(l.sourceNode?.notLinked || l.targetNode?.notLinked);
   });
 
   const connCount = new Map();
@@ -577,20 +554,18 @@ export function renderGraph(app, retry = 0) {
     const headLen = (ARROW_LEN + lineWidth * k) / k;
     const headHalf = (ARROW_HALF_WIDTH + lineWidth * k * 0.6) / k;
 
-    // Draws one batch (links sharing a colour AND a wash state) at the given
-    // shaft/head alpha. Solid shafts batch into one path per colour; dashed edges
-    // (bucketed by pattern) and filled arrowheads are collected and drawn
-    // separately since one path can't mix dashes.
-    const drawBatch = (batch, color, a, ha) => {
+    groups.forEach((group, color) => {
       ctx.strokeStyle = color;
-      ctx.globalAlpha = a;
+      ctx.globalAlpha = alpha;
       ctx.lineWidth = lineWidth;
 
+      // Solid shafts batched into one path per colour; dashed edges (bucketed by pattern) and
+      // filled arrowheads are collected and drawn separately since one path can't mix dashes.
       let dashedBuckets = null; // Map<patternKey, { pattern, pts:[a,b,…] }>
       let arrows = null;
       ctx.setLineDash([]);
       ctx.beginPath();
-      batch.forEach((link) => {
+      group.forEach((link) => {
         const a = link.sourceNode;
         const b = link.targetNode;
         if (!a || !b || a.x == null || b.x == null) return;
@@ -639,7 +614,7 @@ export function renderGraph(app, retry = 0) {
       ctx.stroke();
 
       if (arrows) {
-        ctx.globalAlpha = ha;
+        ctx.globalAlpha = headAlpha;
         ctx.beginPath();
         ctx.fillStyle = color;
         arrows.forEach((ar) => {
@@ -652,7 +627,7 @@ export function renderGraph(app, retry = 0) {
       }
 
       if (dashedBuckets) {
-        ctx.globalAlpha = a;
+        ctx.globalAlpha = alpha;
         dashedBuckets.forEach(({ pattern, pts }) => {
           ctx.setLineDash(pattern);
           ctx.beginPath();
@@ -664,65 +639,7 @@ export function renderGraph(app, retry = 0) {
         });
         ctx.setLineDash([]);
       }
-    };
-
-    groups.forEach((group, color) => {
-      // Split by wash state so edges touching a dead-stripped node render fainter
-      // than the rest of their colour group.
-      let normal = null;
-      let washed = null;
-      group.forEach((l) => {
-        if (l.washed) (washed ||= []).push(l);
-        else (normal ||= []).push(l);
-      });
-      if (normal) drawBatch(normal, color, alpha, headAlpha);
-      if (washed) drawBatch(washed, color, alpha * WASH_EDGE, headAlpha * WASH_EDGE);
     });
-  };
-
-  // A dead-stripped ("not linked") source node: washed-out fill + diagonal hatch
-  // + dashed ring, so it reads as "present but not in the binary" at a glance.
-  // Base colour is the node's type fill (d._fill).
-  const drawNotLinkedNode = (d, r, k, alpha) => {
-    ctx.globalAlpha = alpha;
-    const wash = d3.color(d._fill);
-    wash.opacity = 0.28;
-    ctx.beginPath();
-    ctx.arc(d.x, d.y, r, 0, 2 * Math.PI);
-    // Opaque base disc (graph bg) first, so edges drawn underneath don't bleed
-    // through the translucent wash fill. Then the wash on top.
-    ctx.fillStyle = '#0f172a';
-    ctx.fill();
-    ctx.fillStyle = wash.toString();
-    ctx.fill();
-
-    // Washed-out shade shared by the stripes and the dashed ring.
-    const faded = d3.color(d._fill);
-    faded.opacity = 0.5;
-    const fadedStr = faded.toString();
-
-    // Diagonal stripes, clipped to the circle.
-    ctx.save();
-    ctx.clip(); // clips to the arc path above
-    ctx.strokeStyle = fadedStr;
-    ctx.lineWidth = Math.max(0.6, r * 0.13);
-    const gap = Math.max(2.4, r * 0.46);
-    ctx.beginPath();
-    for (let o = -2 * r; o <= 2 * r; o += gap) {
-      ctx.moveTo(d.x - r + o, d.y - r);
-      ctx.lineTo(d.x + r + o, d.y + r);
-    }
-    ctx.stroke();
-    ctx.restore();
-
-    // Dashed outline in the same lighter shade.
-    ctx.beginPath();
-    ctx.arc(d.x, d.y, r, 0, 2 * Math.PI);
-    ctx.setLineDash([2.5 / k, 2 / k]);
-    ctx.lineWidth = 1.5 / k;
-    ctx.strokeStyle = fadedStr;
-    ctx.stroke();
-    ctx.setLineDash([]);
   };
 
   // Fast path for the common "no search, nothing highlighted" view: every node is fully opaque, so
@@ -730,13 +647,8 @@ export function renderGraph(app, retry = 0) {
   const drawNodesFast = () => {
     const k = currentTransform.k;
     const buckets = new Map();
-    const notLinked = []; // rare; drawn individually (hatch + dashed ring)
     renderNodes.forEach((d) => {
       if (d.x == null || !nodeInView(d)) return;
-      if (d.notLinked) {
-        notLinked.push(d);
-        return;
-      }
       const key = d._fill + '|' + d._stroke + '|' + (d.isCluster ? 1 : 0);
       let b = buckets.get(key);
       if (!b) {
@@ -758,7 +670,6 @@ export function renderGraph(app, retry = 0) {
       ctx.strokeStyle = b.stroke;
       ctx.stroke();
     });
-    notLinked.forEach((d) => drawNotLinkedNode(d, d._r, k, 1));
   };
 
   // Dashed grey outline around unresolved external references, drawn after node fills so it sits on
@@ -834,9 +745,7 @@ export function renderGraph(app, retry = 0) {
       const r = radiusFor(d);
       let alpha = ss.alpha;
       if (connected && !connected.has(d.id)) alpha = 0.12;
-      if (d.notLinked) {
-        drawNotLinkedNode(d, r, k, alpha);
-      } else if (d.isCluster || !d._iconKey || r < minR) {
+      if (d.isCluster || !d._iconKey || r < minR) {
         ctx.globalAlpha = alpha;
         ctx.beginPath();
         ctx.arc(d.x, d.y, r, 0, 2 * Math.PI);
@@ -886,18 +795,14 @@ export function renderGraph(app, retry = 0) {
       const r = radiusFor(d);
       let alpha = ss.alpha;
       if (connected && !connected.has(d.id)) alpha = 0.12;
-      if (d.notLinked) {
-        drawNotLinkedNode(d, r, k, alpha);
-      } else {
-        ctx.globalAlpha = alpha;
-        ctx.beginPath();
-        ctx.arc(d.x, d.y, r, 0, 2 * Math.PI);
-        ctx.fillStyle = d._fill;
-        ctx.fill();
-        ctx.lineWidth = (d.isCluster ? 2.5 : 1.5) / k;
-        ctx.strokeStyle = d._stroke;
-        ctx.stroke();
-      }
+      ctx.globalAlpha = alpha;
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, r, 0, 2 * Math.PI);
+      ctx.fillStyle = d._fill;
+      ctx.fill();
+      ctx.lineWidth = (d.isCluster ? 2.5 : 1.5) / k;
+      ctx.strokeStyle = d._stroke;
+      ctx.stroke();
       if (searchActive && matchSet.has(d.id)) {
         // Amber ring so search hits pop regardless of node colour.
         ctx.globalAlpha = 1;
@@ -1011,18 +916,18 @@ export function renderGraph(app, retry = 0) {
     ctx.lineCap = 'round';
     ctx.setLineDash([FLOW_DASH / k, FLOW_GAP / k]);
     ctx.lineDashOffset = -flowPhase / k; // decreasing → dashes move toward head
-    const strokeFlow = (batch, color, a) => {
+    groupLinksByColor(directed).forEach((group, color) => {
       ctx.strokeStyle = color;
-      ctx.globalAlpha = a;
+      ctx.globalAlpha = 0.95;
       ctx.lineWidth = lineWidth;
       ctx.beginPath();
-      batch.forEach((link) => {
-        const na = link.sourceNode;
-        const nb = link.targetNode;
-        if (!na || !nb || na.x == null || nb.x == null) return;
-        if (!nodeInView(na) && !nodeInView(nb)) return;
-        const head = link.type === 'hasInput' ? na : nb;
-        const tail = link.type === 'hasInput' ? nb : na;
+      group.forEach((link) => {
+        const a = link.sourceNode;
+        const b = link.targetNode;
+        if (!a || !b || a.x == null || b.x == null) return;
+        if (!nodeInView(a) && !nodeInView(b)) return;
+        const head = link.type === 'hasInput' ? a : b;
+        const tail = link.type === 'hasInput' ? b : a;
         const dx = head.x - tail.x;
         const dy = head.y - tail.y;
         const dist = Math.hypot(dx, dy);
@@ -1035,17 +940,6 @@ export function renderGraph(app, retry = 0) {
         }
       });
       ctx.stroke();
-    };
-    groupLinksByColor(directed).forEach((group, color) => {
-      // Wash the flow on edges touching a dead-stripped node, same as the shaft.
-      let normal = null;
-      let washed = null;
-      group.forEach((l) => {
-        if (l.washed) (washed ||= []).push(l);
-        else (normal ||= []).push(l);
-      });
-      if (normal) strokeFlow(normal, color, 0.95);
-      if (washed) strokeFlow(washed, color, WASH_FLOW_ALPHA);
     });
     ctx.setLineDash([]);
     ctx.lineDashOffset = 0;
