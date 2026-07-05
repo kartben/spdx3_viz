@@ -5,6 +5,7 @@ via the "What's new" link.
 
 ## Unreleased
 
+- **Added:** Ansible Automation Platform 2.6 sample (~40k packages), a large-SBOM stress test, with a VEX overlay converted from Red Hat CSAF.
 - **Improved:** Impact view shows package versions, so different builds of the same package are distinguishable.
 
 ## [0.0.5] - 2026-07-05

@@ -10,6 +10,10 @@ export const CHANGELOG = [
     date: null,
     items: [
       {
+        tag: 'Added',
+        text: 'Ansible Automation Platform 2.6 sample (~40k packages), a large-SBOM stress test, with a VEX overlay converted from Red Hat CSAF.'
+      },
+      {
         tag: 'Improved',
         text: 'Impact view shows package versions, so different builds of the same package are distinguishable.'
       }
