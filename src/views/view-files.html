@@ -287,6 +287,23 @@
                 </svg>
                 not linked
               </span>
+              <button
+                x-show="focusedSnippetFor(f.spdxId)"
+                type="button"
+                class="badge bg-amber-400/10 text-amber-300 text-xs flex items-center gap-1 hover:bg-amber-400/20"
+                title="Jump to the linked section"
+                @click.stop="_scrollToFocusedSnippet()"
+              >
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                  />
+                </svg>
+                <span x-text="focusedSnippetLabel(f.spdxId)"></span>
+              </button>
               <a
                 x-show="fileSourceIndex.get(f.spdxId)"
                 :href="fileSourceIndex.get(f.spdxId)"
@@ -366,7 +383,14 @@
                       </div>
                       <!-- Code lines -->
                       <template x-for="line in win.lines" :key="line.lineNum">
-                        <div class="sv-line" :class="line.covered && 'covered'">
+                        <div
+                          class="sv-line"
+                          :data-line="line.lineNum"
+                          :class="{
+                            covered: line.covered,
+                            focused: isFocusedSnippetLine(f.spdxId, line.lineNum)
+                          }"
+                        >
                           <span class="sv-lnum" x-text="line.lineNum"></span>
                           <span class="sv-code" x-html="line.html || '​'"></span>
                         </div>

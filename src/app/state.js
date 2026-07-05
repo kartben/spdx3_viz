@@ -107,6 +107,10 @@ export function createState() {
     focusedNavId: '',
     focusedNavTimer: null,
     _scrollNavSeq: 0, // invalidates pending scrollToNavTarget retries
+    // When a link into a snippet is followed, the file it belongs to is opened
+    // and its source viewer scrolls to + emphasizes these lines.
+    focusedSnippet: null, // { snippetId, fileId, start, end } | null
+    _scrollSnippetSeq: 0, // invalidates pending _scrollToFocusedSnippet retries
     configSearch: '',
     buildSearch: '',
     agentSearch: '', // in-view filter for the Agents list

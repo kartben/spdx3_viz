@@ -706,6 +706,32 @@
   border-left-color: rgba(34, 197, 94, 0.5);
 }
 
+/* The exact section a link points at: amber accent, brighter than the generic
+   covered green, plus a one-shot pulse when the viewer scrolls to it. */
+.source-viewer .sv-line.focused {
+  background: rgba(251, 191, 36, 0.16);
+  border-left-color: #fbbf24;
+  opacity: 1;
+  animation: sv-focus-pulse 1.1s ease-out;
+}
+
+.source-viewer .sv-line.focused .sv-lnum {
+  color: #fbbf24;
+}
+
+.source-viewer.unlinked .sv-line.focused {
+  opacity: 1;
+}
+
+@keyframes sv-focus-pulse {
+  0% {
+    background: rgba(251, 191, 36, 0.42);
+  }
+  100% {
+    background: rgba(251, 191, 36, 0.16);
+  }
+}
+
 .source-viewer .sv-line .sv-lnum {
   flex-shrink: 0;
   width: 3rem;

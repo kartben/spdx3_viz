@@ -273,6 +273,31 @@ export const accessorsMixin = {
 
     this.fileSourceCache = { ...this.fileSourceCache, [fileId]: { ...cache, windows } };
   },
+  // The snippet currently being pointed at within this file, if any (set when a
+  // relationship into a snippet is followed). Drives the focus highlight + scroll.
+  focusedSnippetFor(fileId) {
+    const f = this.focusedSnippet;
+    return f && f.fileId === fileId ? f : null;
+  },
+  isFocusedSnippetLine(fileId, lineNum) {
+    const f = this.focusedSnippet;
+    if (!f || f.fileId !== fileId || f.start == null) return false;
+    return lineNum >= f.start && (f.end == null ? lineNum === f.start : lineNum <= f.end);
+  },
+  // "<function> · L289-364" label for the focused-snippet chip in the source header.
+  focusedSnippetLabel(fileId) {
+    const f = this.focusedSnippetFor(fileId);
+    if (!f) return '';
+    const snip = this.elementMap.get(f.snippetId);
+    const lines =
+      f.start != null
+        ? f.end != null && f.end !== f.start
+          ? `L${f.start}-${f.end}`
+          : `L${f.start}`
+        : '';
+    const name = snip?.name || '';
+    return name && lines ? `${name} · ${lines}` : name || lines;
+  },
   outgoingRels(spdxId) {
     return this.relFromIndex.get(spdxId) || [];
   },

@@ -261,6 +261,8 @@ export const COLORS = {
   ai: '#e879f9',
   dataset: '#22d3ee',
   file: '#10b981',
+  // A snippet is a slice of a file: a lighter emerald so it reads as file-adjacent.
+  snippet: '#34d399',
   // Hardware profile node type + runsOn edges.
   hardware: '#a3e635',
   // FunctionalSafety profile: Requirement node type + its safety relationship edges.

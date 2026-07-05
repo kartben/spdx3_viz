@@ -11,6 +11,10 @@ export const CHANGELOG = [
     items: [
       {
         tag: 'Added',
+        text: 'Snippet source viewer, with requirement-to-code traceability.'
+      },
+      {
+        tag: 'Added',
         text: 'Ansible Automation Platform 2.6 sample (~40k packages) with VEX overlay.'
       },
       {
