@@ -2,7 +2,7 @@
    view switching, load-on-scroll list rendering, expand/collapse of detail
    cards, and the navigateToX drill-downs with scroll-into-view. */
 
-import { buildShareHash, copyToClipboard } from '../lib/index.js';
+import { buildShareHash, copyToClipboard, snippetFileRef } from '../lib/index.js';
 
 // View id -> the nav-snapshot field holding that view's expanded card, for
 // carrying the selection in a share link.
@@ -546,6 +546,12 @@ export const navigationMixin = {
       this.navigateToAgent(spdxId);
       return;
     }
+    // A snippet isn't a page of its own: open its file and focus its lines, so a
+    // link into a snippet feels like a link into that section of the source.
+    if (this.getNodeType(el) === 'snippet') {
+      this.navigateToSnippet(spdxId);
+      return;
+    }
     if (el.type === 'software_Package') {
       this.navigateToPackage(spdxId);
     } else if (el.type === 'ai_AIPackage') {
@@ -616,6 +622,47 @@ export const navigationMixin = {
       this.loadFileSource(spdxId);
     }
     this.scrollToNavTarget('file', spdxId);
+  },
+  // Follow a link that points at a snippet: open the file it was carved from and
+  // focus its source viewer on the snippet's lines, so it reads as a jump into
+  // that section of the file rather than to an abstract "snippet" element.
+  navigateToSnippet(snippetId) {
+    const snip = this.elementMap.get(snippetId);
+    const ref = snippetFileRef(snip, this.elementMap);
+    // File not loaded (e.g. an unresolved import): fall back to selecting the node.
+    if (!ref?.fileId || !this.elementMap.get(ref.fileId)) {
+      this.selectGraphNode(snippetId);
+      return;
+    }
+    this.focusedSnippet = {
+      snippetId,
+      fileId: ref.fileId,
+      start: ref.start,
+      end: ref.end
+    };
+    this.navigateToFile(ref.fileId);
+    this._scrollToFocusedSnippet();
+  },
+  // Retry until the focused snippet's source line is in the DOM (the source is
+  // fetched async), then centre it in the viewer. A sequence guard drops retries
+  // superseded by a newer navigation, mirroring scrollToNavTarget.
+  _scrollToFocusedSnippet() {
+    const f = this.focusedSnippet;
+    if (!f || f.start == null) return;
+    const seq = ++this._scrollSnippetSeq;
+    const attempt = (retriesLeft) => {
+      if (seq !== this._scrollSnippetSeq) return;
+      const card = [...document.querySelectorAll('[data-nav-kind="file"]')].find(
+        (el) => el.dataset.navId === f.fileId && el.offsetParent !== null
+      );
+      const line = card?.querySelector(`.sv-line[data-line="${f.start}"]`);
+      if (line) {
+        line.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else if (retriesLeft > 0) {
+        setTimeout(() => attempt(retriesLeft - 1), 150);
+      }
+    };
+    this.$nextTick(() => requestAnimationFrame(() => attempt(25)));
   },
   navigateToHardware(spdxId) {
     this.hardwareSearch = '';

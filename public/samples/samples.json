@@ -19,9 +19,11 @@
       "modules-deps.jsonld",
       "zephyr.jsonld",
       "build.jsonld",
-      "snippets.jsonld"
+      "snippets.jsonld",
+      "safety.jsonld",
+      "sdk.jsonld"
     ],
-    "size": 21077602
+    "size": 22302823
   },
   {
     "id": "linux",

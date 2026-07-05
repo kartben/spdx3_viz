@@ -45,6 +45,8 @@ function makeThrottledReporter(onProgress, total) {
  * @property {Map<string, Object>} elementMap - Map of SPDX IDs to elements
  * @property {Array<Object>} packages - Package elements
  * @property {Array<Object>} files - File elements (excluding build configs)
+ * @property {Array<Object>} snippets - Snippet elements (regions of a file)
+ * @property {Map<string, Array>} snippetsByFileIndex - fileId to its snippets
  * @property {Array<Object>} tools - Tool elements
  * @property {Array<Object>} relationships - Relationship elements
  * @property {Array<Object>} builds - Build elements
@@ -1376,7 +1378,7 @@ export function buildFileSourceIndex(parsed, indexes) {
         // ✅ TO RESTORE CORRECT BEHAVIOUR: delete this block and uncomment the
         //    packageVersion-derived SHA logic below.
         // ███████████████████████████████████████████████████████████████████
-        sha = 'c74133ec989e27ca93dbac05eb77c72bf0641988'; // <-- HARDCODED HACK
+        sha = '74442555d7308926225bc0aef85b3b6ca8a16d18'; // <-- HARDCODED HACK
         // ███████████████████████████████████████████████████████████████████
 
         // --- CORRECT (dynamic) behaviour, disabled by the hack above ---------

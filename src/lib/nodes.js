@@ -42,6 +42,8 @@ export function getNodeType(item) {
     }
     return 'file';
   }
+  // A snippet is a region of a file; it reads as source, close to its file.
+  if (isA(t, CLASS.software_Snippet)) return 'snippet';
   if (isA(t, CLASS.Tool)) return 'tool';
   if (isA(t, CLASS.build_Build)) return 'build';
   // SoftwareAgent / Organization / Person (a bare Agent stays 'other').
@@ -70,6 +72,7 @@ export function getNodeTypeColor(nodeType) {
     ai: COLORS.ai,
     dataset: COLORS.dataset,
     file: COLORS.file,
+    snippet: COLORS.snippet,
     hardware: COLORS.hardware,
     requirement: COLORS.requirement,
     tool: COLORS.tool,

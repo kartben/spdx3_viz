@@ -114,11 +114,60 @@ export function getRelationshipTargetDisplayName(spdxId, elementMap) {
   const licenseExpr = renderLicenseExpression(element, elementMap);
   if (licenseExpr) return licenseExpr;
   if (element?.type === 'security_Vulnerability') return getVulnerabilityId(element);
+  // A snippet reads as a slice of its file, so present the file, not the raw id.
+  if (element?.type === 'software_Snippet') return snippetTargetLabel(element, elementMap);
   if (element?.name) return element.name;
 
   // Unresolved external http(s) reference: show the raw URL.
   if (spdxId.startsWith('http')) return spdxId;
   return cleanName(spdxId);
+}
+
+/**
+ * Resolves a Snippet to the file it was carved from and its line range, so the
+ * UI can make a link into a snippet read (and behave) like a link into the
+ * file's source at the right section.
+ *
+ * @param {Object} element - A software_Snippet element
+ * @param {Map} [elementMap] - Map of SPDX IDs to elements
+ * @returns {{fileId: string, fileName: string, baseName: string, name: string,
+ *   start: (number|null), end: (number|null)}|null}
+ */
+export function snippetFileRef(element, elementMap) {
+  if (!element || element.type !== 'software_Snippet') return null;
+  const fileId = element.software_snippetFromFile || '';
+  const file = fileId ? elementMap?.get(fileId) : null;
+  const fileName = file?.name || (fileId ? cleanName(fileId) : '');
+  const baseName = fileName ? fileName.split('/').pop() : '';
+  const lr = element.software_lineRange;
+  return {
+    fileId,
+    fileName,
+    baseName,
+    name: element.name || '',
+    start: lr?.beginIntegerRange ?? null,
+    end: lr?.endIntegerRange ?? null
+  };
+}
+
+/** Compact "1-based line span" label for a snippet, e.g. "L289-364" or "L633". */
+export function snippetLineLabel(element) {
+  const lr = element?.software_lineRange;
+  if (!lr || lr.beginIntegerRange == null) return '';
+  const { beginIntegerRange: a, endIntegerRange: b } = lr;
+  return b != null && b !== a ? `L${a}-${b}` : `L${a}`;
+}
+
+/**
+ * File-flavored label for a snippet link: "<file> › <function-or-line-span>",
+ * so it reads as "this points at a section of <file>".
+ */
+export function snippetTargetLabel(element, elementMap) {
+  const ref = snippetFileRef(element, elementMap);
+  if (!ref) return '';
+  const detail = ref.name || snippetLineLabel(element);
+  const base = ref.baseName || 'snippet';
+  return detail ? `${base} › ${detail}` : base;
 }
 
 /**

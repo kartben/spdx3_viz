@@ -29,6 +29,7 @@ const TYPE_ICON = {
   ai: 'ai',
   dataset: 'dataset',
   file: 'file',
+  snippet: 'source',
   hardware: 'hardware',
   requirement: 'requirement',
   tool: 'tool',
