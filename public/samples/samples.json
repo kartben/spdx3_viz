@@ -118,5 +118,14 @@
     "dir": "samples/ai",
     "files": ["simplehtr-example.spdx3.json"],
     "size": 73134
+  },
+  {
+    "id": "functional-safety",
+    "name": "AEB safety case (synthetic)",
+    "icon": "favicon.svg",
+    "description": "Synthetic AEB safety case with requirements, verification, evidence, and traceability.",
+    "dir": "samples/functional-safety",
+    "files": ["aeb-safety-case.spdx3.jsonld"],
+    "size": 471062
   }
 ]
