@@ -128,6 +128,56 @@ export const VEX_STATUSES = {
 };
 
 /**
+ * Presentation metadata for each CVSS qualitative severity, sourced directly
+ * from the SBOM's own CVSS assessment relationships. `rank` orders them from
+ * most to least severe (used to sort/filter the security view and to size the
+ * dashboard histogram).
+ * @constant {Object}
+ */
+export const CVSS_SEVERITIES = {
+  critical: {
+    key: 'critical',
+    label: 'Critical',
+    color: '#f43f5e',
+    badgeClass: 'bg-rose-500/15 text-rose-300 ring-1 ring-rose-500/40',
+    dotClass: 'bg-rose-500',
+    rank: 5
+  },
+  high: {
+    key: 'high',
+    label: 'High',
+    color: '#fb923c',
+    badgeClass: 'bg-orange-500/15 text-orange-300 ring-1 ring-orange-500/40',
+    dotClass: 'bg-orange-500',
+    rank: 4
+  },
+  medium: {
+    key: 'medium',
+    label: 'Medium',
+    color: '#f59e0b',
+    badgeClass: 'bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/40',
+    dotClass: 'bg-amber-500',
+    rank: 3
+  },
+  low: {
+    key: 'low',
+    label: 'Low',
+    color: '#38bdf8',
+    badgeClass: 'bg-sky-500/15 text-sky-300 ring-1 ring-sky-500/40',
+    dotClass: 'bg-sky-500',
+    rank: 2
+  },
+  none: {
+    key: 'none',
+    label: 'None',
+    color: '#64748b',
+    badgeClass: 'bg-slate-600/20 text-slate-300 ring-1 ring-slate-500/30',
+    dotClass: 'bg-slate-500',
+    rank: 1
+  }
+};
+
+/**
  * Human-readable labels for the VexJustificationType vocabulary (why a component is "not affected").
  * @constant {Object}
  */

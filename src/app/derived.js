@@ -213,8 +213,9 @@ export const derivedMixin = {
     const search = this.securitySearch;
     const sort = this.securitySort;
     const statusFilter = this.securityStatusFilter;
+    const severityFilter = this.securitySeverityFilter;
     const vulns = this.vulnerabilities;
-    const key = `${vulns.length}|${search}|${sort}|${statusFilter}`;
+    const key = `${vulns.length}|${search}|${sort}|${statusFilter}|${severityFilter}`;
     if (key === filteredVulnsCacheKey) return filteredVulnsCacheVal;
 
     let list = vulns;
@@ -235,10 +236,21 @@ export const derivedMixin = {
         statusFilter === 'unknown' ? v.overallStatus === 'unknown' : v.statusCounts[statusFilter]
       );
     }
+    if (severityFilter) {
+      list = list.filter((v) => v.severity === severityFilter);
+    }
 
     const sev = { affected: 4, under_investigation: 3, not_affected: 2, fixed: 1, unknown: 0 };
     const sorted = [...list];
-    if (sort === 'cve') {
+    if (sort === 'cvss') {
+      sorted.sort(
+        (a, b) =>
+          b.severityRank - a.severityRank ||
+          (b.cvss?.score ?? -1) - (a.cvss?.score ?? -1) ||
+          b.packageCount - a.packageCount ||
+          b.name.localeCompare(a.name, undefined, { numeric: true })
+      );
+    } else if (sort === 'cve') {
       sorted.sort((a, b) => b.name.localeCompare(a.name, undefined, { numeric: true }));
     } else if (sort === 'packages') {
       sorted.sort((a, b) => b.packageCount - a.packageCount || a.name.localeCompare(b.name));
@@ -272,6 +284,32 @@ export const derivedMixin = {
   get securityStatusOrder() {
     const order = ['affected', 'under_investigation', 'not_affected', 'fixed', 'unknown'];
     const counts = this.securitySummary.counts;
+    return order.filter((s) => counts[s] > 0);
+  },
+
+  // True when at least one vulnerability carries an in-SBOM CVSS severity, so the
+  // severity histogram/filter/badges only appear when there's data behind them.
+  get hasCvssData() {
+    return this.vulnerabilities.some((v) => v.severity);
+  },
+
+  // CVSS-severity histogram across all scored vulnerabilities, counted once each
+  // by their headline severity. `scored` is the total that carry a CVSS band.
+  get securitySeveritySummary() {
+    const counts = { critical: 0, high: 0, medium: 0, low: 0, none: 0 };
+    let scored = 0;
+    this.vulnerabilities.forEach((v) => {
+      if (!v.severity) return;
+      counts[v.severity] = (counts[v.severity] || 0) + 1;
+      scored++;
+    });
+    return { scored, counts };
+  },
+
+  // Severity bands that actually occur, most-severe first, for the chips and bar.
+  get securitySeverityOrder() {
+    const order = ['critical', 'high', 'medium', 'low', 'none'];
+    const counts = this.securitySeveritySummary.counts;
     return order.filter((s) => counts[s] > 0);
   },
 

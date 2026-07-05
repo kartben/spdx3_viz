@@ -239,6 +239,36 @@
         </button>
       </template>
     </div>
+
+    <!-- CVSS severity breakdown (only when the SBOM carries CVSS assessments) -->
+    <div x-show="hasCvssData" class="mt-4 pt-4 border-t border-slate-700/50">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs font-medium text-slate-400">CVSS severity</span>
+        <span
+          class="text-[10px] text-slate-500"
+          x-text="`${formatCount(securitySeveritySummary.scored)} scored`"
+        ></span>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <template x-for="s in securitySeverityOrder" :key="s">
+          <button
+            @click="securitySeverityFilter = s; securityStatusFilter = ''; securitySearch = ''; securitySort = 'cvss'; restreamView('security'); switchView('security')"
+            class="flex items-center gap-2 rounded-lg bg-slate-900/40 border border-slate-700/50 px-3 py-2 hover:border-slate-600 transition"
+            :title="`Show ${cvssSeverityMeta(s).label}-severity vulnerabilities`"
+          >
+            <span
+              class="w-2 h-2 rounded-full"
+              :style="`background:${cvssSeverityMeta(s).color}`"
+            ></span>
+            <span
+              class="text-lg font-bold text-white tabular-nums"
+              x-text="securitySeveritySummary.counts[s]"
+            ></span>
+            <span class="text-xs text-slate-400" x-text="cvssSeverityMeta(s).label"></span>
+          </button>
+        </template>
+      </div>
+    </div>
   </div>
 
   <!-- Relationship breakdown -->
