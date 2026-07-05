@@ -11,7 +11,11 @@ export const CHANGELOG = [
     items: [
       {
         tag: 'Added',
-        text: 'Security view now surfaces the CVSS severity/score, EPSS, and known-exploited (KEV) signals carried in the SBOM\'s own vulnerability assessment relationships — with severity badges, a "Sort by CVSS severity" order, severity filter chips, and a CVSS severity breakdown on the Overview. No network round-trip needed.'
+        text: 'Impact view: trace why a component is in the build (provenance) and what depends on it (blast radius), with SBOM-wide risk rankings.'
+      },
+      {
+        tag: 'Added',
+        text: 'Security view surfaces the CVSS, EPSS, and known-exploited signals carried in the SBOM, with severity sorting and filtering.'
       },
       {
         tag: 'Added',
