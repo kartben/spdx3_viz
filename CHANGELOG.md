@@ -10,6 +10,7 @@ via the "What's new" link.
 - **Improved:** Impact view shows package versions, so different builds of the same package are distinguishable.
 - **Improved:** Opening an element deep in a large list jumps straight to it and loads more as you scroll up or down, instead of rendering every row above it.
 - **Fixed:** Browser Back from a loaded document returns to the home screen instead of leaving the site.
+- **Fixed:** Agent nodes used a red nearly identical to vulnerability/VEX nodes; agents are now indigo.
 
 ## [0.0.5] - 2026-07-05
 
