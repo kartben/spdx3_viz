@@ -12,3 +12,4 @@ export * from './build.js';
 export * from './provenance.js';
 export * from './security.js';
 export * from './quality.js';
+export * from './impact.js';
