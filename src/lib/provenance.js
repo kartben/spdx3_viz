@@ -28,8 +28,15 @@ const EXTERNAL_ID_LABELS = {
  * @returns {Array<{type: string, label: string, identifier: string, isUrl: boolean}>}
  */
 export function getExternalIdentifiers(element) {
-  const ids = element?.externalIdentifier;
-  const rows = (Array.isArray(ids) ? ids : [])
+  const asArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
+  const ids = [
+    ...asArray(element?.externalIdentifier),
+    ...asArray(element?.requirementUID),
+    ...asArray(element?.functionalsafety_assumptionUID),
+    ...asArray(element?.functionalsafety_verificationUID),
+    ...asArray(element?.functionalsafety_evidenceUID)
+  ];
+  const rows = ids
     .filter((id) => id && isMeaningfulValue(id.identifier))
     .map((id) => {
       const type = id.externalIdentifierType || 'other';
@@ -40,7 +47,13 @@ export function getExternalIdentifiers(element) {
         identifier,
         isUrl: /^https?:\/\//i.test(identifier)
       };
-    });
+    })
+    .filter(
+      (row, index, allRows) =>
+        allRows.findIndex(
+          (candidate) => candidate.type === row.type && candidate.identifier === row.identifier
+        ) === index
+    );
   // Some generators (e.g. cdxgen) carry the purl in the software_packageUrl
   // property instead of an ExternalIdentifier; surface it the same way.
   const purlProp = element?.software_packageUrl;

@@ -218,13 +218,15 @@
                     x-text="[].concat(v.verification.functionalsafety_verificationPostcondition || []).join('; ')"
                   ></div>
                 </div>
-                <div x-show="v.evaluation && isMeaningful(v.evaluation.functionalsafety_rationale)">
+                <div
+                  x-show="v.evaluation && isMeaningful(v.evaluation.rationale || v.evaluation.functionalsafety_rationale)"
+                >
                   <span class="text-[10px] text-slate-500 uppercase tracking-wider"
                     >Evaluation rationale</span
                   >
                   <div
                     class="text-xs text-slate-300 break-words"
-                    x-text="v.evaluation.functionalsafety_rationale"
+                    x-text="v.evaluation.rationale || v.evaluation.functionalsafety_rationale"
                   ></div>
                 </div>
               </div>
