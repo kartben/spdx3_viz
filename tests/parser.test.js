@@ -13,6 +13,8 @@ import {
   parseCpe,
   getVulnerabilityLookup,
   summarizeCveRecord,
+  summarizeVulnAssessments,
+  cvssSeverityForScore,
   getCvssSeverityMeta,
   getCdxProperties,
   getRelationshipColor,
@@ -437,6 +439,38 @@ test('parseGraph enriches vulnerabilities with in-SBOM CVSS/EPSS/exploit signals
 
   // The assessment relationships must not leak into the generic relationships.
   assert.ok(!parsed.relationships.some((r) => r.type?.includes('VulnAssessment')));
+});
+
+test('summarizeVulnAssessments normalizes distro synonyms and CVSS-v2 bands', () => {
+  // Red Hat-style qualitative synonyms map onto the standard bands.
+  assert.equal(
+    summarizeVulnAssessments([
+      { type: 'security_CvssV3VulnAssessmentRelationship', security_severity: 'moderate' }
+    ]).severity,
+    'medium'
+  );
+  assert.equal(
+    summarizeVulnAssessments([
+      { type: 'security_CvssV3VulnAssessmentRelationship', security_severity: 'important' }
+    ]).severity,
+    'high'
+  );
+
+  // A CVSS v2 assessment with no explicit severity never becomes "critical"
+  // (v2 has no Critical band), even for a 9.0+ score.
+  const v2 = summarizeVulnAssessments([
+    {
+      type: 'security_CvssV2VulnAssessmentRelationship',
+      security_score: '9.3',
+      security_vectorString: 'CVSS:2.0/AV:N/AC:M/Au:N/C:C/I:C/A:C'
+    }
+  ]);
+  assert.equal(v2.severity, 'high');
+  assert.equal(cvssSeverityForScore(9.3, '2.0'), 'high');
+  assert.equal(cvssSeverityForScore(9.3, '3.1'), 'critical');
+
+  // Null entries in the list are ignored rather than throwing.
+  assert.equal(summarizeVulnAssessments([null, undefined]).severity, '');
 });
 
 test('VEX assessment elements are excluded from the generic relationship indexes', () => {

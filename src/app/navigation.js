@@ -522,6 +522,7 @@ export const navigationMixin = {
   navigateToVuln(spdxId) {
     this.securitySearch = '';
     this.securityStatusFilter = '';
+    this.securitySeverityFilter = '';
     this.switchView('security');
     this.expandedVuln = spdxId;
     this.scrollToNavTarget('vuln', spdxId);
@@ -529,6 +530,7 @@ export const navigationMixin = {
   // Jump to the Security view pre-filtered to a package's vulnerabilities.
   navigateToPackageSecurity(pkgSpdxId) {
     this.securityStatusFilter = '';
+    this.securitySeverityFilter = '';
     this.securitySearch = this.relTargetDisplayName(pkgSpdxId);
     this.switchView('security');
   },

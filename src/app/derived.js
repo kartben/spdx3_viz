@@ -236,7 +236,10 @@ export const derivedMixin = {
         statusFilter === 'unknown' ? v.overallStatus === 'unknown' : v.statusCounts[statusFilter]
       );
     }
-    if (severityFilter) {
+    // Ignore a stale severity filter when the loaded SBOM carries no CVSS data
+    // (the severity chips are hidden then, so an invisible filter would just
+    // strip the whole list).
+    if (severityFilter && this.hasCvssData) {
       list = list.filter((v) => v.severity === severityFilter);
     }
 
@@ -299,8 +302,10 @@ export const derivedMixin = {
     const counts = { critical: 0, high: 0, medium: 0, low: 0, none: 0 };
     let scored = 0;
     this.vulnerabilities.forEach((v) => {
-      if (!v.severity) return;
-      counts[v.severity] = (counts[v.severity] || 0) + 1;
+      // Only count the standard bands the chips/bar can render, so `scored`
+      // never diverges from what the UI shows.
+      if (!Object.hasOwn(counts, v.severity)) return;
+      counts[v.severity]++;
       scored++;
     });
     return { scored, counts };

@@ -137,15 +137,17 @@ export function getCvssSeverityMeta(severity) {
 }
 
 /**
- * Normalizes a CVSS base score to its qualitative severity band (CVSS v3/v4
- * ranges), used as a fallback when an assessment omits an explicit severity.
+ * Normalizes a CVSS base score to its qualitative severity band, used as a
+ * fallback when an assessment omits an explicit severity. CVSS v2 has no
+ * Critical band (Low/Medium/High only), so a v2 score never maps above High.
  *
  * @param {number} score
+ * @param {string} [version] - CVSS version (e.g. '2.0', '3.1'); v2 caps at High
  * @returns {string} critical | high | medium | low | none
  */
-export function cvssSeverityForScore(score) {
+export function cvssSeverityForScore(score, version = '') {
   if (!Number.isFinite(score)) return '';
-  if (score >= 9) return 'critical';
+  if (score >= 9 && !String(version).startsWith('2')) return 'critical';
   if (score >= 7) return 'high';
   if (score >= 4) return 'medium';
   if (score > 0) return 'low';
@@ -165,15 +167,19 @@ export function summarizeVulnAssessments(assessments) {
   let epss = null;
   let kev = false;
 
-  (assessments || []).forEach((a) => {
-    const type = a?.type || '';
+  (assessments || []).filter(Boolean).forEach((a) => {
+    const type = a.type || '';
     if (/Cvss/.test(type)) {
       const score = parseFloat(a.security_score);
       const numeric = Number.isFinite(score) ? score : null;
-      const severity =
-        String(a.security_severity || '').toLowerCase() || cvssSeverityForScore(numeric);
       const versionMatch = /CVSS:(\d(?:\.\d)?)/i.exec(a.security_vectorString || '');
       const version = versionMatch ? versionMatch[1] : (/CvssV(\d)/i.exec(type)?.[1] ?? '');
+      // Map common distro synonyms (Red Hat's moderate/important) onto the
+      // standard bands; fall back to the score when the label is unrecognized.
+      let severity = String(a.security_severity || '').toLowerCase();
+      if (severity === 'moderate') severity = 'medium';
+      else if (severity === 'important') severity = 'high';
+      if (!CVSS_SEVERITIES[severity]) severity = cvssSeverityForScore(numeric, version);
       const cand = { score: numeric, severity, vector: a.security_vectorString || '', version };
       if (!cvss || (cand.score ?? -1) > (cvss.score ?? -1)) cvss = cand;
     } else if (/Epss/.test(type)) {
