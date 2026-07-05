@@ -1231,7 +1231,7 @@
             :style="`color: ${group.color}`"
             x-text="group.label"
           ></span>
-          <span class="text-[10px] text-slate-500" x-text="'(' + group.items.length + ')'"></span>
+          <span class="text-[10px] text-slate-500" x-text="'(' + group.total + ')'"></span>
         </div>
         <div class="space-y-1 ml-3">
           <template x-for="item in group.items" :key="item.id">
@@ -1269,6 +1269,11 @@
               </svg>
             </div>
           </template>
+          <div
+            x-show="group.hiddenCount > 0"
+            class="text-[10px] text-slate-500 italic pl-1"
+            x-text="'+' + formatCount(group.hiddenCount) + ' more'"
+          ></div>
         </div>
       </div>
     </template>

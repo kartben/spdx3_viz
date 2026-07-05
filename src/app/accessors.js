@@ -31,6 +31,12 @@ import { COLORS, getScopeColor } from '../config.js';
    indexes, name/date formatting, and the relationship-group data the detail
    panel renders. Most expose a util or index to templates as this.*(). */
 
+// Preview cap per relationship group in the detail panel / expanded cards. A hub
+// element can be tied to tens of thousands of relationships; mounting them all
+// would freeze the page, so each group shows this many rows and reports the rest
+// via a "+N more" indicator (mirrors agentLinkGroups' CAP).
+const DETAIL_REL_CAP = 50;
+
 export const accessorsMixin = {
   cleanName(spdxId) {
     return formatSpdxName(spdxId);
@@ -223,61 +229,72 @@ export const accessorsMixin = {
   detailRelGroupsFor(element) {
     if (!element) return [];
     const id = element.spdxId;
-    const groups = new Map(); // key → { label, color, items:[] }
+    const groups = new Map(); // key → { label, color, items:[], total, hiddenCount }
+    // Companion Sets keep dedup O(1): a hub element can be an endpoint of tens of
+    // thousands of relationships, so an items.find() scan per edge would be
+    // O(n^2). Each group also renders only a capped preview (the rest surface via
+    // a "+N more" indicator), so we stop materializing items past DETAIL_REL_CAP
+    // and just keep counting to report the true total / hidden count.
+    const seen = new Map(); // key → Set<endpoint id>
 
     // Vulnerability associations are surfaced in the dedicated security
     // section, not the generic relationship list.
     const skip = (rel) => rel.relationshipType === 'hasAssociatedVulnerability';
 
+    const ensure = (key, relType, direction) => {
+      let group = groups.get(key);
+      if (!group) {
+        group = {
+          key,
+          label: this.relGroupLabel(relType, direction),
+          color: this.relColor(relType),
+          sortOrder: this.relSortOrder(relType, direction),
+          items: [],
+          total: 0,
+          hiddenCount: 0
+        };
+        groups.set(key, group);
+        seen.set(key, new Set());
+      }
+      return group;
+    };
+
+    // Records one deduped endpoint in a group, materializing its row only while
+    // the group is still under the preview cap.
+    const add = (key, endpointId, direction, scope) => {
+      const set = seen.get(key);
+      if (set.has(endpointId)) return;
+      set.add(endpointId);
+      const group = groups.get(key);
+      group.total++;
+      if (group.items.length < DETAIL_REL_CAP) {
+        group.items.push({
+          id: endpointId,
+          displayName: this.relTargetDisplayName(endpointId),
+          direction,
+          // LifecycleScopedRelationship scope (build / runtime / test / …)
+          scope: scope || ''
+        });
+      } else {
+        group.hiddenCount++;
+      }
+    };
+
     // Outgoing: this element → targets
     (this.relFromIndex.get(id) || []).forEach((rel) => {
       if (skip(rel)) return;
       const key = rel.relationshipType + ':out';
-      if (!groups.has(key)) {
-        groups.set(key, {
-          key,
-          label: this.relGroupLabel(rel.relationshipType, 'out'),
-          color: this.relColor(rel.relationshipType),
-          sortOrder: this.relSortOrder(rel.relationshipType, 'out'),
-          items: []
-        });
-      }
+      ensure(key, rel.relationshipType, 'out');
       const targets = Array.isArray(rel.to) ? rel.to : [rel.to];
-      targets.forEach((t) => {
-        // Avoid duplicate entries
-        if (!groups.get(key).items.find((i) => i.id === t)) {
-          groups.get(key).items.push({
-            id: t,
-            displayName: this.relTargetDisplayName(t),
-            direction: 'out',
-            // LifecycleScopedRelationship scope (build / runtime / test / …)
-            scope: rel.scope || ''
-          });
-        }
-      });
+      targets.forEach((t) => add(key, t, 'out', rel.scope));
     });
 
     // Incoming: sources → this element
     (this.relToIndex.get(id) || []).forEach((rel) => {
       if (skip(rel)) return;
       const key = rel.relationshipType + ':in';
-      if (!groups.has(key)) {
-        groups.set(key, {
-          key,
-          label: this.relGroupLabel(rel.relationshipType, 'in'),
-          color: this.relColor(rel.relationshipType),
-          sortOrder: this.relSortOrder(rel.relationshipType, 'in'),
-          items: []
-        });
-      }
-      if (!groups.get(key).items.find((i) => i.id === rel.from)) {
-        groups.get(key).items.push({
-          id: rel.from,
-          displayName: this.relTargetDisplayName(rel.from),
-          direction: 'in',
-          scope: rel.scope || ''
-        });
-      }
+      ensure(key, rel.relationshipType, 'in');
+      add(key, rel.from, 'in', rel.scope);
     });
 
     return [...groups.values()].sort((a, b) => a.sortOrder - b.sortOrder);

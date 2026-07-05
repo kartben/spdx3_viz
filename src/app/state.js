@@ -73,6 +73,12 @@ export function createState() {
       build: 0,
       agents: 0
     },
+    // How many rows of an in-card "show more" list are currently revealed,
+    // keyed by an arbitrary list id (e.g. a license's declaredBy list). Absent
+    // keys use the base cap; each reveal grows the entry by a chunk. Keeps big
+    // secondary lists (a license used by every package, a build's tens of
+    // thousands of generated artifacts) from mounting all at once on view open.
+    listReveal: {},
     searchQuery: '', // header global-search box (cross-cutting jump-to-anything)
     searchOpen: false, // whether the global-search results dropdown is showing
     searchActiveIndex: 0, // keyboard-highlighted result row in the dropdown
