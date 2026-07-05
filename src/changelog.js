@@ -14,6 +14,10 @@ export const CHANGELOG = [
         text: 'Ansible Automation Platform 2.6 sample (~40k packages), a large-SBOM stress test, with a VEX overlay converted from Red Hat CSAF.'
       },
       {
+        tag: 'Added',
+        text: 'Synthetic AEB safety case with requirement, verification, evidence, and software traceability.'
+      },
+      {
         tag: 'Improved',
         text: 'Impact view shows package versions, so different builds of the same package are distinguishable.'
       },
