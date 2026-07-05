@@ -3,6 +3,8 @@
 All notable changes to this project are documented here. Also viewable in-app
 via the "What's new" link.
 
+## Unreleased
+
 ## [0.0.5] - 2026-07-05
 
 - **Added:** Shareable links tracking the current view and selected element.
