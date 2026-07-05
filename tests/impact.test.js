@@ -8,6 +8,8 @@ import {
   impactEdgeVerb,
   IMPACT_EDGE_TYPES
 } from '../src/lib/impact.js';
+import { parseGraph } from '../src/parser/parser.js';
+import { spdxApp } from '../src/app.js';
 
 // root R contains A and B; A and B both dependsOn L; L dependsOn C.
 // R also has an OPTIONAL component P. X<->Y form a dependency cycle with no root.
@@ -98,6 +100,60 @@ test('blastRadius honors the visited cap', () => {
   const capped = blastRadius('L', { parentIndex }, { cap: 1 });
   assert.equal(capped.truncated, true);
   assert.ok(capped.total <= 1);
+});
+
+test('parseGraph collects rootElement whether it is an array or a single string', () => {
+  const parsed = parseGraph([
+    { type: 'software_Package', spdxId: 'pkg:root', name: 'root' },
+    { type: 'software_Sbom', spdxId: 'sbom:1', rootElement: 'pkg:root' }
+  ]);
+  assert.ok(parsed.rootElementIds.has('pkg:root'));
+});
+
+test('packageRiskIndex counts only packages a CVE affects, not fixed/not-affected ones', () => {
+  const app = spdxApp();
+  const parsed = parseGraph([
+    { type: 'software_Package', spdxId: 'pkg:a', name: 'a' },
+    { type: 'software_Package', spdxId: 'pkg:b', name: 'b' },
+    {
+      type: 'security_Vulnerability',
+      spdxId: 'vuln:1',
+      externalIdentifier: [{ externalIdentifierType: 'cve', identifier: 'CVE-2026-0001' }]
+    },
+    {
+      type: 'security_VexAffectedVulnAssessmentRelationship',
+      spdxId: 'vex:aff',
+      relationshipType: 'affects',
+      from: 'vuln:1',
+      to: ['pkg:a']
+    },
+    {
+      type: 'security_VexFixedVulnAssessmentRelationship',
+      spdxId: 'vex:fix',
+      relationshipType: 'fixedIn',
+      from: 'vuln:1',
+      to: ['pkg:b']
+    },
+    {
+      type: 'security_CvssV3VulnAssessmentRelationship',
+      spdxId: 'cvss:1',
+      relationshipType: 'hasAssessmentFor',
+      from: 'vuln:1',
+      to: ['pkg:a', 'pkg:b'],
+      security_score: '7.5',
+      security_severity: 'high'
+    }
+  ]);
+  app.vulnerabilities = parsed.vulnerabilities;
+  app.packages = parsed.packages;
+  app._resetImpactMemos();
+
+  const risk = app.packageRiskIndex;
+  // pkg:a is "affected" → at risk; pkg:b is "fixed" → excluded.
+  assert.equal(risk.has('pkg:a'), true);
+  assert.equal(risk.has('pkg:b'), false);
+  assert.equal(risk.get('pkg:a').severity, 'high');
+  assert.equal(risk.get('pkg:a').vulnIds.size, 1);
 });
 
 test('impactEdgeVerb and IMPACT_EDGE_TYPES cover the cross-topology edge set', () => {
