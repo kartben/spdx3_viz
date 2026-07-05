@@ -677,6 +677,9 @@ test('parseGraph supports LifecycleScopedRelationship dynamic-link / optional-co
   // …and surface in the legend's present relationship types.
   assert.ok(parsed.presentRelTypes.includes('hasDynamicLink'));
   assert.ok(parsed.presentRelTypes.includes('hasOptionalComponent'));
+  // Both edges are runtime-scoped and none are unscoped, so the scope legend
+  // lists just 'runtime' (no synthetic 'unscoped' bucket).
+  assert.deepEqual(parsed.presentScopes, ['runtime']);
 
   // Each type has a distinct, non-default colour and a directional label.
   const dyn = getRelationshipColor('hasDynamicLink');
@@ -756,6 +759,61 @@ test('detailRelGroupsFor surfaces lifecycle-scoped relationships with their scop
   assert.equal(dyn.label, 'Dynamically links');
   assert.equal(dyn.items[0].id, 'pkg:lib');
   assert.equal(dyn.items[0].scope, 'runtime');
+});
+
+test('parseGraph reports present lifecycle scopes in lifecycle order with unscoped last', () => {
+  const graph = [
+    { type: 'software_Package', spdxId: 'pkg:app', name: 'app' },
+    { type: 'software_Package', spdxId: 'pkg:lib', name: 'lib' },
+    { type: 'software_Package', spdxId: 'pkg:buildtool', name: 'buildtool' },
+    // A runtime-scoped edge, a build-scoped edge, and a plain unscoped one.
+    {
+      type: 'LifecycleScopedRelationship',
+      spdxId: 'rel:rt',
+      relationshipType: 'dependsOn',
+      scope: 'runtime',
+      from: 'pkg:app',
+      to: ['pkg:lib']
+    },
+    {
+      type: 'LifecycleScopedRelationship',
+      spdxId: 'rel:bt',
+      relationshipType: 'dependsOn',
+      scope: 'build',
+      from: 'pkg:app',
+      to: ['pkg:buildtool']
+    },
+    {
+      type: 'Relationship',
+      spdxId: 'rel:plain',
+      relationshipType: 'contains',
+      from: 'pkg:app',
+      to: ['pkg:lib']
+    }
+  ];
+
+  const parsed = parseGraph(graph);
+  // Ordered per SCOPE_ORDER (build before runtime), 'unscoped' appended because
+  // the plain `contains` relationship carries no scope.
+  assert.deepEqual(parsed.presentScopes, ['build', 'runtime', 'unscoped']);
+});
+
+test('parseGraph reports no scopes when nothing is lifecycle-scoped', () => {
+  const graph = [
+    { type: 'software_Package', spdxId: 'pkg:app', name: 'app' },
+    { type: 'software_Package', spdxId: 'pkg:lib', name: 'lib' },
+    {
+      type: 'Relationship',
+      spdxId: 'rel:plain',
+      relationshipType: 'dependsOn',
+      from: 'pkg:app',
+      to: ['pkg:lib']
+    }
+  ];
+
+  const parsed = parseGraph(graph);
+  // No scoped relationships → empty, which hides the scope legend row entirely.
+  assert.deepEqual(parsed.presentScopes, []);
 });
 
 test('parseGraph collects SpdxDocument.import ExternalMap entries and resolution stats', () => {

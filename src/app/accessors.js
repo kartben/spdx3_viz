@@ -24,7 +24,7 @@ import {
   normalizeUrl,
   copyToClipboard
 } from '../lib/index.js';
-import { COLORS } from '../config.js';
+import { COLORS, getScopeColor } from '../config.js';
 
 /* Element accessors and display helpers: thin lookups into the relationship
    indexes, name/date formatting, and the relationship-group data the detail
@@ -181,6 +181,11 @@ export const accessorsMixin = {
   },
   relColor(type) {
     return getRelationshipColor(type);
+  },
+  // Colour for a lifecycle scope value, so the detail-panel scope badge reads the
+  // same as the graph's scope legend chips.
+  scopeColor(scope) {
+    return getScopeColor(scope);
   },
   // CSS background for a graph edge-legend swatch, mirroring the line style the
   // edge is drawn with (solid / dotted / dashed / dash-dot) so the legend reads

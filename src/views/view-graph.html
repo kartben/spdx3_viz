@@ -182,5 +182,35 @@
         <span x-text="f.label"></span>
       </button>
     </template>
+    <!-- Lifecycle-scope filters: only shown when the SBOM scopes some relationship.
+         Toggling a scope off hides its edges (and any node left with none), so you
+         can isolate, e.g., the runtime dependency graph from build-time edges. -->
+    <template x-if="visibleScopeFilters.length">
+      <div class="basis-full h-0"></div>
+    </template>
+    <template x-if="visibleScopeFilters.length">
+      <span
+        class="text-xs text-slate-500"
+        title="Lifecycle scope of each relationship. Toggle a scope off to hide its edges — turn off Build and Unscoped to see just the runtime graph."
+        >Scope:</span
+      >
+    </template>
+    <template x-for="f in visibleScopeFilters" :key="f.key">
+      <button
+        type="button"
+        @click="f.active = !f.active; updateGraph()"
+        :title="f.active ? `Hide ${f.label} edges` : `Show ${f.label} edges`"
+        class="flex items-center gap-1.5 text-xs cursor-pointer transition-colors hover:text-white"
+        :class="f.active ? 'text-slate-300' : 'text-slate-500 line-through'"
+      >
+        <span
+          class="w-2.5 h-2.5 rounded-sm border transition-colors"
+          :style="f.active
+                      ? `background:${f.color}; border-color:${f.color}`
+                      : `background:transparent; border-color:${f.color}`"
+        ></span>
+        <span x-text="f.label"></span>
+      </button>
+    </template>
   </div>
 </div>

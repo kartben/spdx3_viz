@@ -179,6 +179,58 @@ export const COLORS = {
 };
 
 /**
+ * Presentation metadata for the LifecycleScopeType vocabulary carried by
+ * LifecycleScopedRelationship.scope (build / runtime / test / …). The synthetic
+ * `unscoped` bucket covers ordinary Relationships that carry no scope. Colours
+ * tint the scope chips in the graph legend and the scope badge in the detail
+ * panel so the two read the same. `SCOPE_ORDER` is roughly lifecycle order.
+ * @constant {Object}
+ */
+export const SCOPE_META = {
+  design: { key: 'design', label: 'Design', color: '#38bdf8' },
+  build: { key: 'build', label: 'Build', color: '#f59e0b' },
+  development: { key: 'development', label: 'Development', color: '#f472b6' },
+  test: { key: 'test', label: 'Test', color: '#a855f7' },
+  runtime: { key: 'runtime', label: 'Runtime', color: '#22c55e' },
+  other: { key: 'other', label: 'Other', color: '#94a3b8' },
+  unscoped: { key: 'unscoped', label: 'Unscoped', color: '#64748b' }
+};
+
+/** Order scope chips appear in the legend (roughly design → runtime, unscoped last). */
+export const SCOPE_ORDER = [
+  'design',
+  'build',
+  'development',
+  'test',
+  'runtime',
+  'other',
+  'unscoped'
+];
+
+/**
+ * Colour for a lifecycle scope value (falls back to the "other" tint).
+ * @param {string} scope - A LifecycleScopeType value, or 'unscoped'
+ * @returns {string} Hex color code
+ */
+export function getScopeColor(scope) {
+  return SCOPE_META[scope]?.color || SCOPE_META.other.color;
+}
+
+/**
+ * Creates the default lifecycle-scope filter configuration (all scopes active).
+ * The graph legend trims these to the scopes actually present in the data.
+ * @returns {Array<Object>} Array of scope filter objects
+ */
+export function createScopeFilters() {
+  return SCOPE_ORDER.map((key) => ({
+    key,
+    label: SCOPE_META[key].label,
+    color: SCOPE_META[key].color,
+    active: true
+  }));
+}
+
+/**
  * Creates the default graph filter configuration
  * @returns {Array<Object>} Array of filter objects
  */

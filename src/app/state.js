@@ -1,4 +1,4 @@
-import { createGraphFilters, createViews } from '../config.js';
+import { createGraphFilters, createScopeFilters, createViews } from '../config.js';
 import { APP_VERSION } from '../version.js';
 import { CHANGELOG } from '../changelog.js';
 
@@ -126,6 +126,7 @@ export function createState() {
     vexRelationships: [], // raw VEX assessment relationship elements (for the graph)
     presentNodeTypes: [], // graph node types present in the data (trims the legend)
     presentRelTypes: [], // relationship types present in the data (trims the legend)
+    presentScopes: [], // lifecycle scopes present in the data (empty hides the scope legend)
     docName: '',
     docNamespace: '',
     specVersion: '',
@@ -166,6 +167,9 @@ export function createState() {
     graphCanvasSel: null,
     graphZoom: null,
     graphFilters: createGraphFilters(),
+    // Lifecycle-scope filters (build / runtime / …). All active by default, so
+    // the graph is unchanged until the user narrows to a scope.
+    scopeFilters: createScopeFilters(),
     graphAggregate: false,
     graphUseIcons: false, // draw nodes as their type's Material icon instead of a plain dot
     expandedClusters: new Set(), // cluster keys the user has drilled into

@@ -284,6 +284,13 @@ export const derivedMixin = {
     return this.graphFilters.filter((f) => (f.isRel ? relTypes.has(f.key) : nodeTypes.has(f.key)));
   },
 
+  // Lifecycle-scope legend entries for the scopes actually present in the data
+  // (empty when the SBOM has no scoped relationships, which hides the row).
+  get visibleScopeFilters() {
+    const scopes = new Set(this.presentScopes);
+    return this.scopeFilters.filter((f) => scopes.has(f.key));
+  },
+
   get filteredConfigs() {
     let cfgs = this.buildConfigs;
     if (this.configSearch) {
