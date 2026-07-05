@@ -65,6 +65,63 @@ Options:
 
 `core`, `software`, `security`, `simpleLicensing`, `expandedLicensing`, `extension`.
 
+# SPDX 2.x to SPDX 3 converter
+
+[`spdx2_to_spdx3.py`](spdx2_to_spdx3.py) converts an **SPDX 2.2 / 2.3** JSON SBOM
+(as published by e.g. Red Hat, Syft, Microsoft, Google) into an **SPDX 3.0.1**
+JSON-LD document, built on the same [`spdx-python-model`](https://github.com/spdx/spdx-python-model)
+bindings as the CycloneDX converter. It maps the SPDX 2.x structures onto native
+SPDX 3 concepts rather than flattening them into free text.
+
+## Usage
+
+```bash
+python3 -m pip install -r scripts/requirements.txt
+
+python3 scripts/spdx2_to_spdx3.py sbom.spdx.json -o sbom.spdx3.json
+```
+
+Options:
+
+| flag           | meaning                                                                        |
+| -------------- | ------------------------------------------------------------------------------ |
+| `-o, --output` | Output path (default: `<input>.spdx3.json`)                                    |
+| `--namespace`  | Base IRI for minted elements (default: the SPDX 2.x `documentNamespace`)       |
+| `--sbom-type`  | `software_sbomType` value (`build`, `source`, `analyzed`, …; default: `build`) |
+| `--compact`    | Emit compact JSON instead of pretty-printed                                    |
+
+## Mapping
+
+| SPDX 2.x                                                                          | SPDX 3.0.1                                                                             |
+| --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `creationInfo.creators` (`Tool:` / `Organization:` / `Person:`)                   | `Tool` / `Organization` / `Person` (`CreationInfo.createdUsing` / `createdBy`)         |
+| `SPDXRef-DOCUMENT`                                                                | `SpdxDocument` + a `software_Sbom` whose `rootElement` is the `DESCRIBES` target(s)    |
+| `packages[]`                                                                      | `software_Package` (with a `software_SoftwarePurpose` from `primaryPackagePurpose`)    |
+| `packages[].externalRefs` (`purl`)                                                | `software_packageUrl` + `ExternalIdentifier(packageUrl)`                               |
+| `packages[].externalRefs` (`cpe22Type` / `cpe23Type` / `swid` / `swh` / `gitoid`) | `ExternalIdentifier`                                                                   |
+| other `externalRefs` (`advisory`, `fix`, `maven-central`, …)                      | `ExternalRef`                                                                          |
+| `*.supplier` / `*.originator`                                                     | `suppliedBy` / `originatedBy` → `Organization` / `Person`                              |
+| `*.checksums[]`                                                                   | `Hash` (`verifiedUsing`)                                                               |
+| `*.licenseConcluded` / `licenseDeclared`                                          | `Relationship(hasConcludedLicense / hasDeclaredLicense)` → `LicenseExpression`         |
+| `hasExtractedLicensingInfos[]`                                                    | `expandedlicensing_CustomLicense` (lossless)                                           |
+| `files[]`                                                                         | `software_File` (+ `licenseInfoInFiles` → `hasDeclaredLicense`)                        |
+| `*.annotations[]`                                                                 | `Annotation`                                                                           |
+| `relationships[]`                                                                 | `Relationship`, with 2.x types bumped to 3.0 and inverse `…_OF` / `…_BY` forms flipped |
+
+### Notes
+
+- Inverse SPDX 2.x relationship types (`CONTAINED_BY`, `GENERATED_FROM`,
+  `VARIANT_OF`, …) become their SPDX 3 forward form with the two endpoints
+  swapped, since 3.0 only kept one direction.
+- Document-level `DESCRIBES` becomes the SBOM's `rootElement`; unknown or
+  `NONE` / `NOASSERTION` endpoints are skipped rather than emitted as dangling
+  relationships.
+- The output validates by round-tripping through the model's `JSONLDDeserializer`.
+
+## Declared profiles (SPDX 2.x → 3)
+
+`core`, `software`, `simpleLicensing`, `expandedLicensing`.
+
 # Releasing
 
 Releases are cut by the [`Release`](../.github/workflows/release.yml) GitHub
