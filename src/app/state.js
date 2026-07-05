@@ -113,6 +113,10 @@ export function createState() {
     snippetModal: null, // { snippetId, fileId, fileName, baseName, name, start, end, sourceUrl }
     snippetModalOpen: false,
     _scrollSnippetSeq: 0, // invalidates pending _scrollSnippetModal retries
+    // Graph detail panel: the snippet whose source is currently shown inline, so
+    // its highlighted lines are only scrolled into view once per selection.
+    _detailSnippetId: null,
+    _scrollDetailSnippetSeq: 0, // invalidates pending _scrollDetailSnippet retries
     configSearch: '',
     buildSearch: '',
     agentSearch: '', // in-view filter for the Agents list
