@@ -578,9 +578,19 @@
 
   <!-- Generated artifacts -->
   <div class="card">
-    <h3 class="text-sm font-semibold text-white mb-3">Generated Artifacts</h3>
+    <h3 class="text-sm font-semibold text-white mb-3">
+      Generated Artifacts
+      <span
+        x-show="generatedArtifacts.length > 0"
+        class="text-xs font-normal text-slate-500"
+        x-text="'(' + formatCount(generatedArtifacts.length) + ')'"
+      ></span>
+    </h3>
     <div class="space-y-1.5">
-      <template x-for="a in (mountedViews.build ? generatedArtifacts : [])" :key="a">
+      <template
+        x-for="a in (mountedViews.build ? generatedArtifacts.slice(0, revealLimit('genArtifacts')) : [])"
+        :key="a"
+      >
         <div
           class="text-xs text-emerald-400 flex items-center gap-1.5 cursor-pointer hover:text-emerald-300"
           @click="navigateTo(a)"
@@ -589,6 +599,12 @@
           <span x-text="relTargetDisplayName(a)"></span>
         </div>
       </template>
+      <button
+        x-show="mountedViews.build && generatedArtifacts.length > revealLimit('genArtifacts')"
+        @click="revealMore('genArtifacts')"
+        class="text-xs text-slate-500 hover:text-slate-300 mt-1"
+        x-text="'+' + formatCount(generatedArtifacts.length - revealLimit('genArtifacts')) + ' more'"
+      ></button>
     </div>
   </div>
 </div>

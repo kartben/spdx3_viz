@@ -34,6 +34,10 @@ const expandedFieldByView = {
    state as pure bookkeeping. */
 const INITIAL_RENDER = 200; // cards rendered when a list view first opens
 const RENDER_CHUNK = 200; // cards added per scroll step toward either end
+// In-card "show more" lists (revealLimit/revealMore): rows shown before the
+// first reveal, and rows added per reveal click.
+const REVEAL_BASE = 50;
+const REVEAL_CHUNK = 200;
 let scrollObserver = null; // grows the window downward (bottom sentinel)
 let prevObserver = null; // grows the window upward (top sentinel)
 // View id -> the filtered list its main x-for renders.
@@ -390,7 +394,19 @@ export const navigationMixin = {
       this.renderLimits[k] = 0;
       this.renderStarts[k] = 0;
     });
+    this.listReveal = {}; // drop any expanded in-card "show more" lists
     this._ensureViewRendered(this.currentView);
+  },
+
+  // "Show more" for an in-card secondary list (a license's users, a build's
+  // generated artifacts, …). These aren't the view's main streamed list, so
+  // they render a capped preview and grow a chunk at a time on demand rather
+  // than mounting tens of thousands of rows the moment the view opens.
+  revealLimit(key) {
+    return this.listReveal[key] || REVEAL_BASE;
+  },
+  revealMore(key) {
+    this.listReveal[key] = this.revealLimit(key) + REVEAL_CHUNK;
   },
 
   closeDetailPanel() {

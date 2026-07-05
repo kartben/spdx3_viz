@@ -8,6 +8,7 @@ via the "What's new" link.
 - **Added:** Ansible Automation Platform 2.6 sample (~40k packages) with VEX overlay.
 - **Added:** Synthetic AEB safety case with full traceability.
 - **Improved:** Much faster parsing of large, build-heavy SBOMs.
+- **Fixed:** Licenses and Build views no longer freeze on huge lists.
 - **Improved:** Impact view shows package versions to distinguish builds.
 - **Improved:** Opening a deep list element jumps straight to it.
 - **Fixed:** Browser Back from a document returns to the home screen.

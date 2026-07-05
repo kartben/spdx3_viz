@@ -22,6 +22,10 @@ export const CHANGELOG = [
         text: 'Much faster parsing of large, build-heavy SBOMs.'
       },
       {
+        tag: 'Fixed',
+        text: 'Licenses and Build views no longer freeze on huge lists.'
+      },
+      {
         tag: 'Improved',
         text: 'Impact view shows package versions to distinguish builds.'
       },
