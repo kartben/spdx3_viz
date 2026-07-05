@@ -338,7 +338,22 @@ export function renderGraph(app, retry = 0) {
 
   const clusterKeyFor = (node) => {
     if (!aggregate) return 'self:' + node.id;
-    if (node.type === 'package') return 'pkg:' + node.id;
+    if (node.type === 'package') {
+      // A package that contains or generates other elements stays its own
+      // cluster anchor so it remains visible. A leaf package folds into the
+      // package that contains or generates it, so the large package sets that
+      // make distro SBOMs unreadable (a container image's RPMs, a source
+      // package's many binaries) collapse into one expandable bubble.
+      const contained = app.containsIndex.get(node.id);
+      const generated = app.buildOutputIndex.get(node.id);
+      if ((contained && contained.length) || (generated && generated.length)) {
+        return 'pkg:' + node.id;
+      }
+      const parent = app.parentIndex.get(node.id) || app.producedByBuildIndex.get(node.id)?.[0];
+      const parentNode = parent && uNodeById.get(parent);
+      if (parentNode && parentNode.type === 'package') return 'pkg:' + parent;
+      return 'pkg:' + node.id;
+    }
     if (node.type === 'file') {
       // Only cluster a file into a parent that is an actual package; a pseudo-root file parent
       // would collapse the whole tree, so fall through to directory grouping.
