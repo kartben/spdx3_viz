@@ -81,6 +81,9 @@ export function createState() {
     hardwareSearch: '', // in-view filter for the Hardware list
     requirementSearch: '', // in-view filter for the Functional Safety list
     requirementKindFilter: '', // '' = all, else an FS element type to show only
+    requirementStatusFilter: '', // '' = all, else a verification-status key or 'noimpl'
+    requirementLayout: 'list', // Functional Safety tab: 'list' | 'tree' (tracedToDetail decomposition)
+    collapsedReqs: {}, // decomposition tree: spdxId -> true for collapsed subtrees
     sidebarOpen: false, // mobile off-canvas nav drawer (ignored at md+ where the sidebar is static)
     detailElement: null,
     expandedPkg: null,

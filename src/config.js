@@ -128,6 +128,68 @@ export const VEX_STATUSES = {
 };
 
 /**
+ * FunctionalSafety profile: presentation metadata for a Requirement's overall
+ * verification outcome, keyed by the `key` that `requirementSafetyStatus`
+ * returns. `rank` orders them gaps-first (a failed verification is the most
+ * urgent), matching the order the rollup bar and status-filter chips render in.
+ */
+export const SAFETY_STATUSES = {
+  failed: {
+    key: 'failed',
+    label: 'Failed',
+    color: '#f43f5e',
+    badgeClass: 'bg-rose-500/15 text-rose-300 ring-1 ring-rose-500/30',
+    dotClass: 'bg-rose-500',
+    rank: 5
+  },
+  inconclusive: {
+    key: 'inconclusive',
+    label: 'Inconclusive',
+    color: '#f59e0b',
+    badgeClass: 'bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/30',
+    dotClass: 'bg-amber-500',
+    rank: 4
+  },
+  unverified: {
+    key: 'unverified',
+    label: 'Unverified',
+    color: '#64748b',
+    badgeClass: 'bg-slate-600/20 text-slate-300 ring-1 ring-slate-500/30',
+    dotClass: 'bg-slate-500',
+    rank: 3
+  },
+  verified: {
+    key: 'verified',
+    label: 'Verified',
+    color: '#38bdf8',
+    badgeClass: 'bg-sky-500/15 text-sky-300 ring-1 ring-sky-500/30',
+    dotClass: 'bg-sky-500',
+    rank: 2
+  },
+  passed: {
+    key: 'passed',
+    label: 'Pass',
+    color: '#10b981',
+    badgeClass: 'bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30',
+    dotClass: 'bg-emerald-500',
+    rank: 1
+  }
+};
+
+/**
+ * FunctionalSafety profile: chip metadata for the "no implementation link" gap
+ * (requirements carrying no `implementedBy` relationship). Kept separate from
+ * SAFETY_STATUSES because it's a traceability gap, not a verification outcome.
+ */
+export const SAFETY_NO_IMPL_META = {
+  key: 'noimpl',
+  label: 'No implementation',
+  color: '#fb923c',
+  badgeClass: 'bg-orange-500/15 text-orange-300 ring-1 ring-orange-500/30',
+  dotClass: 'bg-orange-500'
+};
+
+/**
  * Presentation metadata for each CVSS qualitative severity, sourced directly
  * from the SBOM's own CVSS assessment relationships. `rank` orders them from
  * most to least severe (used to sort/filter the security view and to size the
