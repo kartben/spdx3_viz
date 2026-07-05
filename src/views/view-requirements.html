@@ -332,6 +332,15 @@
             <div class="text-xs text-slate-300 break-words" x-text="req.summary"></div>
           </div>
 
+          <!-- Note -->
+          <div x-show="isMeaningful(req.comment)">
+            <div class="text-xs text-slate-500 mb-1">Note</div>
+            <div
+              class="text-xs text-slate-300 whitespace-pre-wrap break-words bg-slate-900/50 rounded px-2 py-1.5"
+              x-text="req.comment"
+            ></div>
+          </div>
+
           <!-- Safety fields (lifecycle stage, verification method, rationale, …) -->
           <div x-show="safetyFields(req).length > 0" class="grid grid-cols-2 gap-x-4 gap-y-2">
             <template x-for="field in safetyFields(req)" :key="field.label">
