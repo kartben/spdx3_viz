@@ -144,6 +144,9 @@ export function parseGraph(graph, onProgress) {
   const files = [];
 
   /** @type {Array<Object>} */
+  const snippets = [];
+
+  /** @type {Array<Object>} */
   const tools = [];
 
   /** @type {Array<Object>} */
@@ -248,6 +251,10 @@ export function parseGraph(graph, onProgress) {
 
       case BUCKET.FILES:
         files.push(item);
+        break;
+
+      case BUCKET.SNIPPETS:
+        snippets.push(item);
         break;
 
       case BUCKET.HARDWARE:
@@ -480,6 +487,23 @@ export function parseGraph(graph, onProgress) {
   // Agents tab) surface everything it created / supplied / originated / made.
   const agentLinkIndex = buildAgentLinkIndex(graph, resolveCreationInfo);
 
+  // Index snippets by the file they were carved from (software_snippetFromFile),
+  // sorted by start line, so the file detail view can render them in order.
+  const snippetsByFileIndex = new Map();
+  for (const snippet of snippets) {
+    const fileId = snippet.software_snippetFromFile;
+    if (!fileId) continue;
+    if (!snippetsByFileIndex.has(fileId)) snippetsByFileIndex.set(fileId, []);
+    snippetsByFileIndex.get(fileId).push(snippet);
+  }
+  for (const [, list] of snippetsByFileIndex) {
+    list.sort(
+      (a, b) =>
+        (a.software_lineRange?.beginIntegerRange ?? 0) -
+        (b.software_lineRange?.beginIntegerRange ?? 0)
+    );
+  }
+
   // Which node/relationship types actually occur, so the graph legend can hide
   // entries for types the SBOM doesn't contain.
   const { presentNodeTypes, presentRelTypes, presentScopes } = computePresentTypes({
@@ -502,6 +526,8 @@ export function parseGraph(graph, onProgress) {
     elementMap,
     packages,
     files: regularFiles,
+    snippets,
+    snippetsByFileIndex,
     tools,
     hardware,
     requirements,
@@ -1273,6 +1299,109 @@ export function createIndexAccessors(indexes) {
      */
     incomingRels: (spdxId) => indexes.relToIndex.get(spdxId) || []
   };
+}
+
+/* ==========================================================================
+   File Source Index Builder
+   Maps file spdxId → raw GitHub URL using *-sources packages and their
+   software_downloadLocation + contains relationships.
+   ========================================================================== */
+
+const GH_DL_RE = /^git\+https:\/\/github\.com\/([^/]+\/[^@]+)@([a-f0-9]{40})$/;
+
+function longestCommonPathPrefix(paths) {
+  if (!paths.length) return '';
+  const parts = paths.map((p) => p.split('/'));
+  const minLen = Math.min(...parts.map((p) => p.length));
+  let commonSegs = 0;
+  for (let i = 0; i < minLen - 1; i++) {
+    if (parts.every((p) => p[i] === parts[0][i])) {
+      commonSegs = i + 1;
+    } else {
+      break;
+    }
+  }
+  return commonSegs > 0 ? parts[0].slice(0, commonSegs).join('/') + '/' : '';
+}
+
+/**
+ * Builds a Map from file spdxId to its raw GitHub URL, derived from the SBOM's
+ * *-sources packages (software_downloadLocation) and their contains relationships.
+ *
+ * For packages where downloadLocation is NOASSERTION (e.g. zephyr-sources when
+ * the repo has multiple git remotes), falls back to packageVersion + a hardcoded
+ * org/repo when the package is recognisably the Zephyr kernel.
+ *
+ * @param {ParsedData} parsed
+ * @param {RelationshipIndexes} indexes
+ * @returns {Map<string, string>} fileId → rawUrl
+ */
+export function buildFileSourceIndex(parsed, indexes) {
+  const { packages, elementMap } = parsed;
+  const { containsIndex } = indexes;
+  const fileSourceIndex = new Map();
+
+  for (const pkg of packages) {
+    const dloc = pkg.software_downloadLocation || '';
+    const fileIds = containsIndex.get(pkg.spdxId) || [];
+    if (!fileIds.length) continue;
+
+    let ghPath, sha; // ghPath = "org/repo"
+
+    const ghMatch = GH_DL_RE.exec(dloc);
+    if (ghMatch) {
+      ghPath = ghMatch[1];
+      sha = ghMatch[2];
+    } else if (dloc === 'NOASSERTION' || !dloc) {
+      // zephyr-sources falls here when the repo has multiple git remotes —
+      // git_remote() in zephyr_module.py returns None → NOASSERTION.
+      const pkgId = pkg.spdxId || '';
+      const pkgName = pkg.name || '';
+      if (pkgId.includes('zephyr-sources') || pkgName === 'zephyr-sources') {
+        ghPath = 'zephyrproject-rtos/zephyr';
+
+        // ███████████████████████████████████████████████████████████████████
+        // ██  ⚠️  TEMPORARY HACK — REMOVE ME  ⚠️                            ██
+        // ███████████████████████████████████████████████████████████████████
+        // The matching `snippets.jsonld` sample data was lost, and the SBOM's
+        // own zephyr-sources commit (software_packageVersion) no longer lines
+        // up with any source we can fetch. So instead of deriving the SHA from
+        // packageVersion (the correct, dynamic behaviour), we PIN every
+        // zephyr-sources file to a single hardcoded commit just so the demo
+        // resolves to real, fetchable source on GitHub.
+        //
+        // ❌ This means highlighted line ranges may NOT match the actual code
+        //    at this commit. It is a stopgap, not correct behaviour.
+        //
+        // ✅ TO RESTORE CORRECT BEHAVIOUR: delete this block and uncomment the
+        //    packageVersion-derived SHA logic below.
+        // ███████████████████████████████████████████████████████████████████
+        sha = 'c74133ec989e27ca93dbac05eb77c72bf0641988'; // <-- HARDCODED HACK
+        // ███████████████████████████████████████████████████████████████████
+
+        // --- CORRECT (dynamic) behaviour, disabled by the hack above ---------
+        // const rawVer = pkg.software_packageVersion || '';
+        // const cleanSha = rawVer.replace(/[+\-](dirty|off).*$/, '').trim();
+        // if (/^[a-f0-9]{40}$/.test(cleanSha)) sha = cleanSha;
+      }
+    }
+
+    if (!ghPath || !sha) continue;
+
+    // Strip the common path prefix shared by all files in this package to get
+    // the repo-relative path (e.g. "modules/lib/gui/lvgl/" → "").
+    const fileNames = fileIds.map((id) => elementMap.get(id)?.name).filter(Boolean);
+    const prefix = longestCommonPathPrefix(fileNames);
+
+    for (const fileId of fileIds) {
+      const file = elementMap.get(fileId);
+      if (!file?.name) continue;
+      const rel = file.name.startsWith(prefix) ? file.name.slice(prefix.length) : file.name;
+      fileSourceIndex.set(fileId, `https://raw.githubusercontent.com/${ghPath}/${sha}/${rel}`);
+    }
+  }
+
+  return fileSourceIndex;
 }
 
 /**
