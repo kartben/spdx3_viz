@@ -26,6 +26,10 @@ export const CHANGELOG = [
         text: 'Functional Safety verification rollup and requirement decomposition tree.'
       },
       {
+        tag: 'Added',
+        text: 'Graph traces requirements to their files through snippets.'
+      },
+      {
         tag: 'Improved',
         text: 'List filters and counts stay pinned while scrolling.'
       },

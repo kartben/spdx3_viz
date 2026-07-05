@@ -7,7 +7,8 @@ import {
   cleanName,
   dirPrefix,
   iconKeyForElement,
-  getNodeIconPath2D
+  getNodeIconPath2D,
+  snippetFileRef
 } from '../lib/index.js';
 
 // Icon-node mode: below this on-screen node radius (px) icons are illegible, so
@@ -71,6 +72,12 @@ const FLOW_DASH = 5;
 const FLOW_GAP = 12;
 const FLOW_PERIOD = FLOW_DASH + FLOW_GAP;
 const FLOW_SPEED = 0.3;
+
+// Edge hover: how close (screen px) the pointer must be to a link to tooltip it, and
+// the edge count above which the per-move linear scan is skipped (a dense hairball is
+// unreadable anyway, so edge inspection there isn't worth the hit-test cost).
+const EDGE_HIT_PX = 6;
+const EDGE_HOVER_MAX = 8000;
 
 function asTargets(to) {
   return Array.isArray(to) ? to : [to];
@@ -164,6 +171,20 @@ function escapeHtml(value) {
   );
 }
 
+// Squared distance from point (px,py) to the segment (ax,ay)-(bx,by); used for edge hit-testing.
+function distToSegment2(px, py, ax, ay, bx, by) {
+  const dx = bx - ax;
+  const dy = by - ay;
+  const len2 = dx * dx + dy * dy;
+  let t = len2 ? ((px - ax) * dx + (py - ay) * dy) / len2 : 0;
+  t = t < 0 ? 0 : t > 1 ? 1 : t;
+  const cx = ax + t * dx;
+  const cy = ay + t * dy;
+  const ex = px - cx;
+  const ey = py - cy;
+  return ex * ex + ey * ey;
+}
+
 export function renderGraph(app, retry = 0) {
   const container = document.getElementById('graphContainer');
   if (!container) return;
@@ -255,6 +276,19 @@ export function renderGraph(app, retry = 0) {
   // right, so an agent shows even when the createdBy edge type is toggled off.
   (app.agents || []).forEach((a) => addNode(a.spdxId));
 
+  // A snippet is never its own graph node, so an edge that lands on one is redirected to the
+  // file it came from (via snippetFileRef, the same resolver the source/detail views use) and
+  // tagged with the snippet name. This surfaces requirement→snippet traceability (e.g. a
+  // Requirement's `implementedBy → snippet` reads as an edge to the file) while letting the
+  // tooltip hint it's routed "via snippet …" rather than a direct file relationship. Non-snippets,
+  // and snippets with no resolvable source file, pass through unchanged (the latter then drop as
+  // before instead of pointing at a phantom node).
+  const redirectSnippet = (spdxId) => {
+    const ref = snippetFileRef(app.elementMap.get(spdxId), app.elementMap);
+    if (!ref || !ref.fileId) return { id: spdxId, snippet: null };
+    return { id: ref.fileId, snippet: ref.name || cleanName(spdxId) };
+  };
+
   // 2. Underlying links.
   const uLinks = [];
   const addRelLinks = (rel) => {
@@ -263,11 +297,19 @@ export function renderGraph(app, retry = 0) {
     const scope = scopeOf(rel);
     if (!scopeAllows(scope)) return;
 
-    const sourceNode = addNode(rel.from, rel, 'source');
+    const src = redirectSnippet(rel.from);
+    const sourceNode = addNode(src.id, rel, 'source');
     asTargets(rel.to).forEach((target) => {
-      const targetNode = addNode(target, rel, 'target');
+      const tgt = redirectSnippet(target);
+      const targetNode = addNode(tgt.id, rel, 'target');
       if (!sourceNode || !targetNode) return;
-      uLinks.push({ sourceId: rel.from, targetId: target, type: rel.relationshipType, scope });
+      uLinks.push({
+        sourceId: src.id,
+        targetId: tgt.id,
+        type: rel.relationshipType,
+        scope,
+        viaSnippet: tgt.snippet || src.snippet || null
+      });
     });
   };
   app.relationships.forEach(addRelLinks);
@@ -446,6 +488,9 @@ export function renderGraph(app, retry = 0) {
       linkMap.set(key, link);
     }
     link.weight++;
+    // Collapse multiple snippets of the same file (targeted by the same source) into one
+    // edge, keeping the distinct snippet names for the "via snippet …" hover hint.
+    if (l.viaSnippet) (link.viaSnippets ||= new Set()).add(l.viaSnippet);
   });
   const links = [...linkMap.values()];
   links.forEach((l) => {
@@ -1186,6 +1231,53 @@ export function renderGraph(app, retry = 0) {
     return nodeAtCanvas(event.clientX - rect.left, event.clientY - rect.top);
   };
 
+  // Nearest visible edge within EDGE_HIT_PX of the pointer, or null. Backs the edge tooltip
+  // (notably the "via snippet" hint). Linear over visible links, so it's skipped while searching
+  // (the overlay owns emphasis then) and on very dense graphs where the scan wouldn't pay off.
+  const edgeAtCanvas = (px, py) => {
+    if (searchActive || links.length > EDGE_HOVER_MAX) return null;
+    const wx = currentTransform.invertX(px);
+    const wy = currentTransform.invertY(py);
+    const tol = EDGE_HIT_PX / currentTransform.k;
+    let best = null;
+    let bestD2 = tol * tol;
+    for (const link of links) {
+      const a = link.sourceNode;
+      const b = link.targetNode;
+      if (!a || !b || a.x == null || b.x == null) continue;
+      if (!nodeInView(a) && !nodeInView(b)) continue;
+      const d2 = distToSegment2(wx, wy, a.x, a.y, b.x, b.y);
+      if (d2 < bestD2) {
+        bestD2 = d2;
+        best = link;
+      }
+    }
+    return best;
+  };
+
+  // Tooltip body for a hovered edge: the relationship type (matching the legend labels), its
+  // endpoints, and, for snippet-redirected edges, the snippet name(s) the traceability runs through.
+  const edgeTooltipHtml = (edge) => {
+    const s = edge.sourceNode?.name || cleanName(edge.sourceId);
+    const t = edge.targetNode?.name || cleanName(edge.targetId);
+    let hint = '';
+    if (edge.viaSnippets?.size) {
+      const names = [...edge.viaSnippets];
+      const shown = names.slice(0, 3).join(', ');
+      const extra = names.length > 3 ? ` +${names.length - 3} more` : '';
+      hint =
+        `<div class="text-xs mt-1">via snippet${names.length > 1 ? 's' : ''} ` +
+        `${escapeHtml(shown)}${escapeHtml(extra)}</div>`;
+    } else if (edge.weight > 1) {
+      hint = `<div class="text-xs mt-1">${edge.weight} relationships</div>`;
+    }
+    return (
+      `<div class="font-semibold text-white">${escapeHtml(edge.type)}</div>` +
+      `<div class="text-slate-400 text-xs">${escapeHtml(s)} → ${escapeHtml(t)}</div>` +
+      hint
+    );
+  };
+
   const sel = d3.select(canvas);
 
   app.graphZoom = d3
@@ -1240,8 +1332,14 @@ export function renderGraph(app, retry = 0) {
     syncHighlight();
     const tooltip = document.getElementById('graphTooltip');
     if (!tooltip) return;
+    const rect = canvas.getBoundingClientRect();
+    const showTooltip = (html) => {
+      tooltip.innerHTML = html;
+      tooltip.classList.remove('hidden');
+      tooltip.style.left = `${event.clientX - rect.left + 15}px`;
+      tooltip.style.top = `${event.clientY - rect.top - 10}px`;
+    };
     if (found) {
-      const rect = canvas.getBoundingClientRect();
       const isExternal = !found.isCluster && found.data?.external;
       const meta = found.isCluster
         ? `${found.clusterKind} cluster · ${found.memberCount} items`
@@ -1253,13 +1351,17 @@ export function renderGraph(app, retry = 0) {
         : isExternal && found.data?.locationHint
           ? `defined in ${found.data.locationHint}`
           : `${connCount.get(found.id) || 0} connections`;
-      tooltip.innerHTML =
+      showTooltip(
         `<div class="font-semibold text-white">${escapeHtml(found.name)}</div>` +
-        `<div class="text-slate-400 text-xs">${escapeHtml(meta)}</div>` +
-        `<div class="text-xs mt-1">${escapeHtml(hint)}</div>`;
-      tooltip.classList.remove('hidden');
-      tooltip.style.left = `${event.clientX - rect.left + 15}px`;
-      tooltip.style.top = `${event.clientY - rect.top - 10}px`;
+          `<div class="text-slate-400 text-xs">${escapeHtml(meta)}</div>` +
+          `<div class="text-xs mt-1">${escapeHtml(hint)}</div>`
+      );
+      return;
+    }
+    // No node under the pointer: fall back to hovering an edge (surfaces the "via snippet" hint).
+    const edge = edgeAtCanvas(event.clientX - rect.left, event.clientY - rect.top);
+    if (edge) {
+      showTooltip(edgeTooltipHtml(edge));
     } else {
       tooltip.classList.add('hidden');
     }
