@@ -11,6 +11,18 @@ export const CHANGELOG = [
     items: [
       {
         tag: 'Added',
+        text: 'Shareable links: for sample SBOMs the URL now tracks the current view and selected element, with a Share button to copy it.'
+      },
+      {
+        tag: 'Added',
+        text: 'PackageURL identifiers link out to deps.dev for supported ecosystems; purls carried in `software_packageUrl` now show as identifiers too.'
+      },
+      {
+        tag: 'Changed',
+        text: 'Simplified the dashboard and sidebar: removed the duplicate quick-jump cards, and views with nothing to show stay hidden.'
+      },
+      {
+        tag: 'Added',
         text: 'Impact view: trace why a component is in the build (provenance) and what depends on it (blast radius), with SBOM-wide risk rankings.'
       },
       {

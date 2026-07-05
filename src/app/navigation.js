@@ -2,6 +2,24 @@
    view switching, load-on-scroll list rendering, expand/collapse of detail
    cards, and the navigateToX drill-downs with scroll-into-view. */
 
+import { buildShareHash, copyToClipboard } from '../lib/index.js';
+
+// View id -> the nav-snapshot field holding that view's expanded card, for
+// carrying the selection in a share link.
+const expandedFieldByView = {
+  packages: 'expandedPkg',
+  ai: 'expandedPkg',
+  dataset: 'expandedPkg',
+  files: 'expandedFile',
+  hardware: 'expandedHardware',
+  requirements: 'expandedRequirement',
+  configs: 'expandedConfig',
+  build: 'expandedBuild',
+  licenses: 'expandedLicense',
+  security: 'expandedVuln',
+  agents: 'expandedAgent'
+};
+
 /* Load-on-scroll list rendering (see renderSlice/_ensureViewRendered).
    Building every card up front freezes the page, so heavy list views render an
    initial page and grow by RENDER_CHUNK as the user scrolls near the bottom,
@@ -70,7 +88,7 @@ export const navigationMixin = {
   _initNavHistory() {
     const state = this._navSnapshot();
     this._lastNavKey = JSON.stringify(state);
-    history.replaceState(state, '');
+    history.replaceState(state, '', this._navUrl(state));
   },
   _scheduleNavPush() {
     if (!this.dataLoaded || this._navPushQueued) return;
@@ -81,7 +99,55 @@ export const navigationMixin = {
       const key = JSON.stringify(state);
       if (key === this._lastNavKey) return;
       this._lastNavKey = key;
-      history.pushState(state, '');
+      history.pushState(state, '', this._navUrl(state));
+    });
+  },
+
+  // URL for a history entry. Sample-loaded sessions get a share hash so the
+  // address bar is always a link to the current spot; anything else (dropped
+  // files can't be re-fetched) gets a hashless URL.
+  _navUrl(state) {
+    const base = location.pathname + location.search;
+    if (!this.loadedSampleId) return base;
+    const hash = buildShareHash({
+      sample: this.loadedSampleId,
+      view: state.view,
+      expanded: state[expandedFieldByView[state.view]] || null,
+      detail: state.detail,
+      graphSelected: state.graphSelected
+    });
+    return hash ? `${base}#${hash}` : base;
+  },
+
+  // Applies a parsed share hash (see lib/share.js) once its sample has parsed.
+  _applyDeepLink(link) {
+    if (!link) return;
+    const view = this.views.some((v) => v.id === link.view) ? link.view : 'dashboard';
+    const state = {
+      view,
+      expandedPkg: null,
+      expandedFile: null,
+      expandedHardware: null,
+      expandedRequirement: null,
+      expandedConfig: null,
+      expandedBuild: null,
+      expandedLicense: null,
+      expandedVuln: null,
+      expandedAgent: null,
+      detail: link.detail,
+      graphSelected: link.graphSelected
+    };
+    const field = expandedFieldByView[view];
+    if (field && link.expanded) state[field] = link.expanded;
+    this._applyNavState(state);
+    history.replaceState(state, '', this._navUrl(state));
+  },
+
+  // Copies the current share link (the address bar URL) to the clipboard.
+  copyShareLink() {
+    copyToClipboard(location.href).then(() => {
+      this.toastMsg = 'Link copied';
+      setTimeout(() => (this.toastMsg = ''), 2000);
     });
   },
   _applyNavState(state) {
@@ -146,6 +212,9 @@ export const navigationMixin = {
   goHome() {
     this.loadedFiles = [];
     this.dataLoaded = false;
+    this.loadedSampleId = null;
+    this._pendingDeepLink = null;
+    history.replaceState(null, '', location.pathname + location.search);
     this.currentView = 'dashboard';
     this.detailElement = null;
     this.expandedPkg = null;

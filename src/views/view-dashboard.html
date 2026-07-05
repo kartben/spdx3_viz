@@ -89,10 +89,11 @@
   <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
     <button
       type="button"
+      x-show="plainPackages.length > 0"
       @click="switchView('packages')"
       class="card stat-card stat-card-link blue hover:border-blue-500/50"
     >
-      <div class="text-2xl font-bold text-white" x-text="packages.length"></div>
+      <div class="text-2xl font-bold text-white" x-text="plainPackages.length"></div>
       <div class="text-sm text-slate-400 mt-1">Packages</div>
       <div class="w-8 h-8 mt-2 rounded-lg bg-blue-500/15 flex items-center justify-center">
         <span
@@ -103,6 +104,7 @@
     </button>
     <button
       type="button"
+      x-show="files.length > 0"
       @click="switchView('files')"
       class="card stat-card stat-card-link green hover:border-emerald-500/50"
     >
@@ -147,6 +149,7 @@
     </button>
     <button
       type="button"
+      x-show="licenses.length > 0"
       @click="switchView('licenses')"
       class="card stat-card stat-card-link pink hover:border-pink-500/50"
     >
@@ -176,6 +179,7 @@
     </button>
     <button
       type="button"
+      x-show="builds.length > 0 || tools.length > 0"
       @click="switchView('build')"
       class="card stat-card stat-card-link purple hover:border-purple-500/50"
     >
@@ -290,57 +294,5 @@
         </div>
       </template>
     </div>
-  </div>
-
-  <!-- Quick jump -->
-  <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-    <button @click="switchView('graph')" class="card hover:border-blue-500/50 text-left group">
-      <div class="text-blue-400 mb-2">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"
-          />
-        </svg>
-      </div>
-      <div class="font-medium text-white text-sm">Explore Graph</div>
-      <div class="text-xs text-slate-400 mt-1">Interactive force-directed visualization</div>
-    </button>
-    <button @click="switchView('packages')" class="card hover:border-blue-500/50 text-left group">
-      <div class="text-emerald-400 mb-2">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-          />
-        </svg>
-      </div>
-      <div class="font-medium text-white text-sm">Browse Packages</div>
-      <div class="text-xs text-slate-400 mt-1">
-        Search and explore <span x-text="packages.length"></span> packages
-      </div>
-    </button>
-    <button
-      x-show="buildConfigs.length > 0"
-      @click="switchView('configs')"
-      class="card hover:border-teal-500/50 text-left group"
-    >
-      <div class="text-teal-400 mb-2">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
-          />
-        </svg>
-      </div>
-      <div class="font-medium text-white text-sm">Build Configs</div>
-      <div class="text-xs text-slate-400 mt-1">Compiler flags, defines, targets</div>
-    </button>
   </div>
 </div>

@@ -12,6 +12,10 @@ import {
   getVexJustificationLabel,
   parseCpe,
   getVulnerabilityLookup,
+  getPurlLink,
+  getExternalIdentifiers,
+  buildShareHash,
+  parseShareHash,
   summarizeCveRecord,
   summarizeVulnAssessments,
   cvssSeverityForScore,
@@ -536,6 +540,72 @@ test('getVulnerabilityLookup routes wildcard CPEs to a cve.org product search', 
 
   // Non-CPE identifiers are not linked
   assert.equal(getVulnerabilityLookup({ type: 'packageUrl', identifier: 'pkg:deb/glibc' }), null);
+});
+
+test('getPurlLink links supported ecosystems to deps.dev', () => {
+  assert.equal(
+    getPurlLink({ type: 'packageUrl', identifier: 'pkg:npm/%40vue/compiler-sfc@3.4.0' }).url,
+    'https://deps.dev/npm/%40vue%2Fcompiler-sfc/3.4.0'
+  );
+  assert.equal(
+    getPurlLink({
+      type: 'packageUrl',
+      identifier: 'pkg:maven/org.jenkins-ci.main/jenkins-core@2.572'
+    }).url,
+    'https://deps.dev/maven/org.jenkins-ci.main%3Ajenkins-core/2.572'
+  );
+  assert.equal(
+    getPurlLink({ type: 'packageUrl', identifier: 'pkg:golang/github.com/gorilla/mux@v1.8.1' }).url,
+    'https://deps.dev/go/github.com%2Fgorilla%2Fmux/v1.8.1'
+  );
+  // Qualifiers are stripped, versionless purls link to the package page
+  assert.equal(
+    getPurlLink({ type: 'packageUrl', identifier: 'pkg:pypi/requests?os=linux' }).url,
+    'https://deps.dev/pypi/requests'
+  );
+  // Ecosystems deps.dev doesn't cover are not linked
+  assert.equal(
+    getPurlLink({ type: 'packageUrl', identifier: 'pkg:deb/ubuntu/coreutils@9.4' }),
+    null
+  );
+  assert.equal(getPurlLink({ type: 'cpe23', identifier: 'cpe:2.3:a:x:y' }), null);
+});
+
+test('share hash round-trips a spot in a sample', () => {
+  const spot = {
+    sample: 'trivy',
+    view: 'security',
+    expanded: 'urn:spdx:vuln/CVE-2026-1234',
+    detail: null,
+    graphSelected: null
+  };
+  assert.deepEqual(parseShareHash('#' + buildShareHash(spot)), spot);
+
+  // The default view stays out of the hash, and parsing restores it
+  const home = buildShareHash({ sample: 'zephyr', view: 'dashboard' });
+  assert.equal(home, 's=zephyr');
+  assert.equal(parseShareHash(home).view, 'dashboard');
+
+  // Not a share link without a sample id
+  assert.equal(buildShareHash({ view: 'graph' }), '');
+  assert.equal(parseShareHash(''), null);
+  assert.equal(parseShareHash('#v=graph'), null);
+});
+
+test('getExternalIdentifiers surfaces the software_packageUrl property as a purl', () => {
+  const rows = getExternalIdentifiers({
+    software_packageUrl: 'pkg:npm/leftpad@1.0.0'
+  });
+  assert.deepEqual(rows, [
+    { type: 'packageUrl', label: 'PackageURL', identifier: 'pkg:npm/leftpad@1.0.0', isUrl: false }
+  ]);
+  // ...but not when an ExternalIdentifier purl is already present
+  const withEid = getExternalIdentifiers({
+    software_packageUrl: 'pkg:npm/leftpad@1.0.0',
+    externalIdentifier: [{ externalIdentifierType: 'packageUrl', identifier: 'pkg:npm/leftpad' }]
+  });
+  assert.equal(withEid.length, 1);
+  assert.equal(withEid[0].identifier, 'pkg:npm/leftpad');
 });
 
 test('summarizeCveRecord distills a CVE 5.x record', () => {

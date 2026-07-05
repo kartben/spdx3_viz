@@ -24,7 +24,7 @@ const lifecycleMixin = {
       if (loaded) this._initNavHistory();
     });
     window.addEventListener('popstate', (e) => this._applyNavState(e.state));
-    this.loadSampleManifest();
+    this.loadSampleManifest().then(() => this._maybeLoadFromUrl());
   }
 };
 
