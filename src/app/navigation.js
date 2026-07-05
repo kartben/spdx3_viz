@@ -92,7 +92,10 @@ export const navigationMixin = {
   _initNavHistory() {
     const state = this._navSnapshot();
     this._lastNavKey = JSON.stringify(state);
-    history.replaceState(state, '', this._navUrl(state));
+    // Push (not replace) so the pre-load landing entry survives underneath as
+    // the previous history state; browser Back then returns to the home screen
+    // (handled by the null-state branch of the popstate listener).
+    history.pushState(state, '', this._navUrl(state));
   },
   _scheduleNavPush() {
     if (!this.dataLoaded || this._navPushQueued) return;

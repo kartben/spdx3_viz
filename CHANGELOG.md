@@ -9,6 +9,7 @@ via the "What's new" link.
 - **Added:** Synthetic AEB safety case with requirement, verification, evidence, and software traceability.
 - **Improved:** Impact view shows package versions, so different builds of the same package are distinguishable.
 - **Improved:** Opening an element deep in a large list jumps straight to it and loads more as you scroll up or down, instead of rendering every row above it.
+- **Fixed:** Browser Back from a loaded document returns to the home screen instead of leaving the site.
 
 ## [0.0.5] - 2026-07-05
 

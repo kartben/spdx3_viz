@@ -23,7 +23,13 @@ const lifecycleMixin = {
     this.$watch('dataLoaded', (loaded) => {
       if (loaded) this._initNavHistory();
     });
-    window.addEventListener('popstate', (e) => this._applyNavState(e.state));
+    // A null history state is the pre-load landing entry: navigating back to it
+    // (browser Back / "previous") returns to the home screen rather than leaving
+    // the loaded document stuck on screen.
+    window.addEventListener('popstate', (e) => {
+      if (e.state) this._applyNavState(e.state);
+      else if (this.dataLoaded) this.goHome();
+    });
     this.loadSampleManifest().then(() => this._maybeLoadFromUrl());
   }
 };
