@@ -51,6 +51,11 @@
                       class="text-sm text-slate-300 truncate font-mono"
                       x-text="relTargetDisplayName(row.id)"
                     ></span>
+                    <span
+                      x-show="impactVersionOf(row.id)"
+                      class="text-xs text-slate-500 font-mono truncate max-w-[12rem]"
+                      x-text="impactVersionOf(row.id)"
+                    ></span>
                   </span>
                   <span class="flex items-center gap-3 flex-shrink-0">
                     <span
@@ -102,10 +107,17 @@
                     :style="`color:${nodeTypeColor(impactNodeTypeOf(row.id))}`"
                     x-html="nodeTypeIconSvg(impactNodeTypeOf(row.id), 'w-3.5 h-3.5')"
                   ></span>
-                  <span
-                    class="text-sm text-slate-300 truncate font-mono flex-1 min-w-0"
-                    x-text="relTargetDisplayName(row.id)"
-                  ></span>
+                  <span class="flex items-baseline gap-1.5 flex-1 min-w-0">
+                    <span
+                      class="text-sm text-slate-300 truncate font-mono"
+                      x-text="relTargetDisplayName(row.id)"
+                    ></span>
+                    <span
+                      x-show="impactVersionOf(row.id)"
+                      class="text-xs text-slate-500 font-mono truncate max-w-[12rem]"
+                      x-text="impactVersionOf(row.id)"
+                    ></span>
+                  </span>
                   <span
                     class="badge flex-shrink-0"
                     :class="cvssSeverityMeta(row.severity).badgeClass"
@@ -153,6 +165,11 @@
           <span
             class="text-lg font-semibold text-white font-mono truncate"
             x-text="impactFocus ? relTargetDisplayName(impactFocus) : ''"
+          ></span>
+          <span
+            x-show="impactFocus && impactVersionOf(impactFocus)"
+            class="text-sm text-slate-400 font-mono truncate max-w-[16rem]"
+            x-text="impactFocus ? impactVersionOf(impactFocus) : ''"
           ></span>
           <template x-if="packageRisk(impactFocus)">
             <span class="badge" :class="packageRisk(impactFocus).meta.badgeClass">
@@ -212,6 +229,11 @@
                         <span
                           class="text-sm text-slate-200 font-mono truncate"
                           x-text="hop.name"
+                        ></span>
+                        <span
+                          x-show="hop.version"
+                          class="text-xs text-slate-500 font-mono truncate max-w-[12rem]"
+                          x-text="hop.version"
                         ></span>
                       </button>
                       <div
@@ -282,6 +304,11 @@
                           :style="`width:7px;height:7px;background:${nodeTypeColor(d.type)}`"
                         ></span>
                         <span class="truncate max-w-[10rem]" x-text="d.name"></span>
+                        <span
+                          x-show="d.version"
+                          class="text-slate-500 truncate max-w-[9rem]"
+                          x-text="d.version"
+                        ></span>
                       </button>
                     </template>
                     <span
@@ -307,6 +334,11 @@
                           :style="`width:7px;height:7px;background:${nodeTypeColor(d.type)}`"
                         ></span>
                         <span class="truncate max-w-[10rem]" x-text="d.name"></span>
+                        <span
+                          x-show="d.version"
+                          class="text-slate-500 truncate max-w-[9rem]"
+                          x-text="d.version"
+                        ></span>
                       </button>
                     </template>
                     <span

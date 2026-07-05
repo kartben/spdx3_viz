@@ -6,6 +6,16 @@
  */
 export const CHANGELOG = [
   {
+    version: 'Unreleased',
+    date: null,
+    items: [
+      {
+        tag: 'Improved',
+        text: 'Impact view shows package versions, so different builds of the same package are distinguishable.'
+      }
+    ]
+  },
+  {
     version: '0.0.5',
     date: '2026-07-05',
     items: [
