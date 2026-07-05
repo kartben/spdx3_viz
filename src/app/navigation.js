@@ -420,7 +420,7 @@ export const navigationMixin = {
   toggleFile(id) {
     this.expandedFile = this.expandedFile === id ? null : id;
     this._scheduleNavPush();
-    if (this.expandedFile === id && this.shouldShowFileSource(id)) {
+    if (this.expandedFile === id && this.fileSourceIndex.get(id)) {
       this.loadFileSource(id);
     }
   },
@@ -546,10 +546,10 @@ export const navigationMixin = {
       this.navigateToAgent(spdxId);
       return;
     }
-    // A snippet isn't a page of its own: open its file and focus its lines, so a
-    // link into a snippet feels like a link into that section of the source.
+    // A snippet isn't a page of its own: open it in a popup showing its file's
+    // source with the snippet's lines highlighted.
     if (this.getNodeType(el) === 'snippet') {
-      this.navigateToSnippet(spdxId);
+      this.openSnippet(spdxId);
       return;
     }
     if (el.type === 'software_Package') {
@@ -618,51 +618,59 @@ export const navigationMixin = {
     this.fileTypeFilter = '';
     this.switchView('files');
     this.expandedFile = spdxId;
-    if (this.shouldShowFileSource(spdxId)) {
+    if (this.fileSourceIndex.get(spdxId)) {
       this.loadFileSource(spdxId);
     }
     this.scrollToNavTarget('file', spdxId);
   },
-  // Follow a link that points at a snippet: open the file it was carved from and
-  // focus its source viewer on the snippet's lines, so it reads as a jump into
-  // that section of the file rather than to an abstract "snippet" element.
-  navigateToSnippet(snippetId) {
+  // Open a snippet in a popup: it shows the source of the file the snippet was
+  // carved from, with the snippet's lines highlighted and scrolled into view,
+  // plus a link to open the full file in the Files view.
+  openSnippet(snippetId) {
     const snip = this.elementMap.get(snippetId);
     const ref = snippetFileRef(snip, this.elementMap);
-    // File not loaded (e.g. an unresolved import): fall back to selecting the node.
-    if (!ref?.fileId || !this.elementMap.get(ref.fileId)) {
-      this.selectGraphNode(snippetId);
-      return;
-    }
-    this.focusedSnippet = {
+    if (!ref?.fileId) return;
+    this.snippetModal = {
       snippetId,
       fileId: ref.fileId,
+      fileName: ref.fileName,
+      baseName: ref.baseName,
+      name: ref.name,
       start: ref.start,
-      end: ref.end
+      end: ref.end,
+      sourceUrl: this.fileSourceIndex.get(ref.fileId) || ''
     };
-    this.navigateToFile(ref.fileId);
-    this._scrollToFocusedSnippet();
+    this.snippetModalOpen = true;
+    this.loadFileSource(ref.fileId);
+    this._scrollSnippetModal();
   },
-  // Retry until the focused snippet's source line is in the DOM (the source is
-  // fetched async), then centre it in the viewer. A sequence guard drops retries
-  // superseded by a newer navigation, mirroring scrollToNavTarget.
-  _scrollToFocusedSnippet() {
-    const f = this.focusedSnippet;
-    if (!f || f.start == null) return;
+  closeSnippetModal() {
+    // Keep snippetModal data so the header doesn't flash empty while fading out.
+    this.snippetModalOpen = false;
+  },
+  // From the popup, jump to the full file in the Files view.
+  openSnippetFile() {
+    const m = this.snippetModal;
+    if (!m) return;
+    this.closeSnippetModal();
+    this.navigateToFile(m.fileId);
+  },
+  // Retry until the highlighted first line is in the popup DOM (source loads
+  // async), then centre it. Sequence guard drops retries from a stale open.
+  _scrollSnippetModal() {
+    const m = this.snippetModal;
+    if (!m || m.start == null) return;
     const seq = ++this._scrollSnippetSeq;
     const attempt = (retriesLeft) => {
-      if (seq !== this._scrollSnippetSeq) return;
-      const card = [...document.querySelectorAll('[data-nav-kind="file"]')].find(
-        (el) => el.dataset.navId === f.fileId && el.offsetParent !== null
-      );
-      const line = card?.querySelector(`.sv-line[data-line="${f.start}"]`);
+      if (seq !== this._scrollSnippetSeq || !this.snippetModalOpen) return;
+      const line = document.querySelector(`#snippet-modal-body .sv-line[data-line="${m.start}"]`);
       if (line) {
-        line.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        line.scrollIntoView({ block: 'center' });
       } else if (retriesLeft > 0) {
-        setTimeout(() => attempt(retriesLeft - 1), 150);
+        setTimeout(() => attempt(retriesLeft - 1), 120);
       }
     };
-    this.$nextTick(() => requestAnimationFrame(() => attempt(25)));
+    this.$nextTick(() => requestAnimationFrame(() => attempt(30)));
   },
   navigateToHardware(spdxId) {
     this.hardwareSearch = '';

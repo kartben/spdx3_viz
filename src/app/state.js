@@ -107,10 +107,12 @@ export function createState() {
     focusedNavId: '',
     focusedNavTimer: null,
     _scrollNavSeq: 0, // invalidates pending scrollToNavTarget retries
-    // When a link into a snippet is followed, the file it belongs to is opened
-    // and its source viewer scrolls to + emphasizes these lines.
-    focusedSnippet: null, // { snippetId, fileId, start, end } | null
-    _scrollSnippetSeq: 0, // invalidates pending _scrollToFocusedSnippet retries
+    // A link into a snippet opens this popup: the file's source with the
+    // snippet's lines highlighted. Data is retained while the popup fades out
+    // (visibility is driven by snippetModalOpen) so the header doesn't flash.
+    snippetModal: null, // { snippetId, fileId, fileName, baseName, name, start, end, sourceUrl }
+    snippetModalOpen: false,
+    _scrollSnippetSeq: 0, // invalidates pending _scrollSnippetModal retries
     configSearch: '',
     buildSearch: '',
     agentSearch: '', // in-view filter for the Agents list

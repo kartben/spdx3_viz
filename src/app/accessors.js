@@ -100,203 +100,57 @@ export const accessorsMixin = {
   configuredBy(spdxId) {
     return this.configuredByIndex.get(spdxId) || [];
   },
-  snippetsOf(fileId) {
-    return this.snippetsByFileIndex.get(fileId) || [];
-  },
-  isCompiledSource(file) {
-    const ext = getFileExtension(file?.name || '').toLowerCase();
-    return ['.c', '.cpp', '.cc', '.cxx', '.s'].includes(ext);
-  },
-  isUnlinkedSource(fileId) {
-    const file = this.elementMap.get(fileId);
-    return this.isCompiledSource(file) && this.snippetsOf(fileId).length === 0;
-  },
-  shouldShowFileSource(fileId) {
-    if (this.snippetsOf(fileId).length > 0) return true;
-    return this.isUnlinkedSource(fileId) && !!this.fileSourceIndex.get(fileId);
-  },
+  // Fetches a file's source (via its raw URL) and caches it as a syntax-
+  // highlighted list of lines. The Files view and the snippet popup both render
+  // from this; neither knows anything about snippets.
   async loadFileSource(fileId) {
     if (this.fileSourceCache[fileId]) return;
     const url = this.fileSourceIndex.get(fileId);
     if (!url) return;
     const file = this.elementMap.get(fileId);
 
-    this.fileSourceCache[fileId] = { loading: true, windows: null, error: null };
+    this.fileSourceCache[fileId] = { loading: true, lines: null, error: null };
 
     try {
       const res = await fetch(url);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const content = await res.text();
-      const result = this._buildSnippetWindows(fileId, content, file?.name);
-      this.fileSourceCache[fileId] = { loading: false, error: null, ...result };
+      const lines = this._highlightSource(content, file?.name);
+      this.fileSourceCache[fileId] = {
+        loading: false,
+        error: null,
+        lines,
+        totalLines: lines.length
+      };
     } catch (err) {
-      this.fileSourceCache[fileId] = { loading: false, windows: null, error: err.message };
+      this.fileSourceCache[fileId] = { loading: false, lines: null, error: err.message };
     }
   },
-  _buildSnippetWindows(fileId, content, fileName) {
+  // Syntax-highlights a whole file into [{ lineNum, html }], escaping to plain
+  // text when no grammar matches.
+  _highlightSource(content, fileName) {
     const ext = getFileExtension(fileName || '');
     const rawLines = content.split('\n');
-    const snippetList = this.snippetsOf(fileId);
-    const unlinked = !snippetList.length;
+    const escaped = rawLines.map((l) =>
+      l.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    );
 
-    // Syntax-highlight full content, then split by line.
-    let highlightedLines;
+    let highlighted = null;
     const langMap = { '.c': 'c', '.h': 'c', '.cpp': 'cpp', '.py': 'python', '.js': 'javascript' };
     const lang = langMap[ext];
     try {
       const html = lang
         ? hljs.highlight(content, { language: lang, ignoreIllegals: true }).value
         : hljs.highlightAuto(content).value;
-      highlightedLines = html.split('\n');
+      highlighted = html.split('\n');
     } catch {
-      highlightedLines = null;
-    }
-    if (!highlightedLines) {
-      highlightedLines = rawLines.map((l) =>
-        l.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      );
+      highlighted = null;
     }
 
-    const coveredLines = new Set();
-    const totalLines = rawLines.length;
-    const sliceCtx = { _allHighlightedLines: highlightedLines, _coveredLines: coveredLines };
-
-    if (unlinked) {
-      const PREVIEW = 50;
-      const endLine = Math.min(PREVIEW, totalLines);
-      const windows =
-        endLine > 0
-          ? [
-              {
-                startLine: 1,
-                endLine,
-                gapBefore: false,
-                gapAfter: endLine < totalLines,
-                lines: this._sliceLines(sliceCtx, 1, endLine)
-              }
-            ]
-          : [];
-      return {
-        windows,
-        _allHighlightedLines: highlightedLines,
-        _coveredLines: coveredLines,
-        _totalLines: totalLines,
-        unlinked: true
-      };
-    }
-
-    for (const s of snippetList) {
-      const lr = s.software_lineRange;
-      if (!lr) continue;
-      for (let i = lr.beginIntegerRange; i <= lr.endIntegerRange; i++) coveredLines.add(i);
-    }
-
-    // Build merged context windows (each snippet ±CONTEXT lines).
-    const CONTEXT = 5;
-    const rawWindows = [];
-    for (const s of snippetList) {
-      const lr = s.software_lineRange;
-      if (!lr) continue;
-      const wStart = Math.max(1, lr.beginIntegerRange - CONTEXT);
-      const wEnd = Math.min(totalLines, lr.endIntegerRange + CONTEXT);
-      const last = rawWindows[rawWindows.length - 1];
-      if (last && wStart <= last.end + 2) {
-        last.end = Math.max(last.end, wEnd);
-      } else {
-        rawWindows.push({ start: wStart, end: wEnd });
-      }
-    }
-
-    const windows = rawWindows.map((w) => ({
-      startLine: w.start,
-      endLine: w.end,
-      gapBefore: w.start > 1,
-      gapAfter: w.end < totalLines,
-      lines: this._sliceLines(sliceCtx, w.start, w.end)
+    return rawLines.map((_, i) => ({
+      lineNum: i + 1,
+      html: highlighted && highlighted[i] != null ? highlighted[i] : escaped[i]
     }));
-
-    return {
-      windows,
-      _allHighlightedLines: highlightedLines,
-      _coveredLines: coveredLines,
-      _totalLines: totalLines
-    };
-  },
-  _sliceLines(cache, start, end) {
-    return Array.from({ length: end - start + 1 }, (_, i) => {
-      const lineNum = start + i;
-      return {
-        lineNum,
-        html: cache._allHighlightedLines[lineNum - 1] ?? '',
-        covered: cache._coveredLines.has(lineNum)
-      };
-    });
-  },
-  gapBeforeCount(fileId, wi) {
-    const cache = this.fileSourceCache[fileId];
-    const win = cache?.windows?.[wi];
-    if (!win) return 0;
-    const prevEnd = wi > 0 ? cache.windows[wi - 1].endLine : 0;
-    return win.startLine - prevEnd - 1;
-  },
-  gapAfterCount(fileId, wi) {
-    const cache = this.fileSourceCache[fileId];
-    const win = cache?.windows?.[wi];
-    if (!win) return 0;
-    const nextStart =
-      wi < cache.windows.length - 1
-        ? cache.windows[wi + 1].startLine
-        : (cache._totalLines ?? 0) + 1;
-    return nextStart - win.endLine - 1;
-  },
-  expandWindow(fileId, wi, direction) {
-    const cache = this.fileSourceCache[fileId];
-    if (!cache?._allHighlightedLines) return;
-
-    const CHUNK = 50;
-    const windows = cache.windows.map((w) => ({ ...w }));
-    const w = windows[wi];
-
-    if (direction === 'before') {
-      const prevEnd = wi > 0 ? windows[wi - 1].endLine : 0;
-      const newStart = Math.max(prevEnd + 1, w.startLine - CHUNK);
-      w.lines = this._sliceLines(cache, newStart, w.endLine);
-      w.gapBefore = newStart > (wi > 0 ? windows[wi - 1].endLine + 1 : 1);
-      w.startLine = newStart;
-    } else {
-      const nextStart = wi < windows.length - 1 ? windows[wi + 1].startLine : Infinity;
-      const newEnd = Math.min(nextStart - 1, w.endLine + CHUNK, cache._totalLines);
-      w.lines = this._sliceLines(cache, w.startLine, newEnd);
-      w.gapAfter = newEnd < Math.min(nextStart - 1, cache._totalLines);
-      w.endLine = newEnd;
-    }
-
-    this.fileSourceCache = { ...this.fileSourceCache, [fileId]: { ...cache, windows } };
-  },
-  // The snippet currently being pointed at within this file, if any (set when a
-  // relationship into a snippet is followed). Drives the focus highlight + scroll.
-  focusedSnippetFor(fileId) {
-    const f = this.focusedSnippet;
-    return f && f.fileId === fileId ? f : null;
-  },
-  isFocusedSnippetLine(fileId, lineNum) {
-    const f = this.focusedSnippet;
-    if (!f || f.fileId !== fileId || f.start == null) return false;
-    return lineNum >= f.start && (f.end == null ? lineNum === f.start : lineNum <= f.end);
-  },
-  // "<function> · L289-364" label for the focused-snippet chip in the source header.
-  focusedSnippetLabel(fileId) {
-    const f = this.focusedSnippetFor(fileId);
-    if (!f) return '';
-    const snip = this.elementMap.get(f.snippetId);
-    const lines =
-      f.start != null
-        ? f.end != null && f.end !== f.start
-          ? `L${f.start}-${f.end}`
-          : `L${f.start}`
-        : '';
-    const name = snip?.name || '';
-    return name && lines ? `${name} · ${lines}` : name || lines;
   },
   outgoingRels(spdxId) {
     return this.relFromIndex.get(spdxId) || [];
