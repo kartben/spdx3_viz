@@ -64,3 +64,35 @@ Options:
 ## Declared profiles
 
 `core`, `software`, `security`, `simpleLicensing`, `expandedLicensing`, `extension`.
+
+# Releasing
+
+Releases are cut by the [`Release`](../.github/workflows/release.yml) GitHub
+Actions workflow, which wraps [`release.mjs`](release.mjs). The version lives in
+`package.json` as `X.Y.Z-dev` while in development, and changelog notes collect
+under `## Unreleased` in [`CHANGELOG.md`](../CHANGELOG.md).
+
+## From CI (the usual way)
+
+1. Actions tab → **Release** → **Run workflow**.
+2. Pick a **bump**: `auto` (ship the current `-dev` as `X.Y.Z`), `patch`,
+   `minor`, `major`, or `explicit` (then fill in **version**, e.g. `1.2.0`).
+3. Run. The workflow runs the full CI gate, then in one go: sets the version,
+   dates the `## Unreleased` section, tags `vX.Y.Z`, reopens the next `-dev`
+   cycle, pushes both commits and the tag to `main`, and publishes a GitHub
+   Release. The push to `main` triggers the Pages deploy of the new version.
+
+> The workflow pushes to `main`. If `main` is protected, allow the
+> `github-actions[bot]` actor to push (or run the release from a maintainer PAT).
+
+## Locally (same steps by hand)
+
+```bash
+node scripts/release.mjs resolve  minor        # preview release + next dev version
+node scripts/release.mjs prepare  minor        # version + dated changelog (the tagged commit)
+#   git commit ... && git tag vX.Y.Z
+node scripts/release.mjs bump-dev              # reopen the next -dev cycle
+node scripts/release.mjs notes    X.Y.Z        # print notes for a GitHub Release body
+```
+
+Add `--dry-run` to `prepare` / `bump-dev` to preview without writing files.

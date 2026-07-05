@@ -36,7 +36,11 @@ function parseChangelog(markdown) {
   return releases;
 }
 
-const releases = parseChangelog(readFileSync(changelogPath, 'utf8'));
+// Drop sections with no items (e.g. a freshly reopened "## Unreleased" between
+// releases) so the "What's new" modal never shows an empty heading.
+const releases = parseChangelog(readFileSync(changelogPath, 'utf8')).filter(
+  (release) => release.items.length > 0
+);
 if (!releases.length) throw new Error(`No releases parsed from ${changelogPath}`);
 
 const out = `/**
