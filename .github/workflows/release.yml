@@ -4,7 +4,7 @@ name: Release
 # (or type an exact version), and this workflow will: run the full CI gate, cut
 # the release commit (version + dated changelog), tag it, reopen the next dev
 # cycle, push both commits and the tag to main, and publish a GitHub Release.
-# Pushing to main then triggers deploy-pages.yml to ship the new version.
+# Publishing the release triggers deploy-pages.yml to ship the tagged version.
 on:
   workflow_dispatch:
     inputs:
@@ -36,8 +36,12 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
   release:
     name: Cut release
+    needs: ci
     runs-on: ubuntu-latest
 
     steps:
@@ -55,18 +59,6 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-
-      # Gate the release on the exact same checks as deploy-pages.yml.
-      - name: Check formatting
-        run: npm run format:check
-      - name: Lint
-        run: npm run lint
-      - name: Type check
-        run: npm run typecheck
-      - name: Test
-        run: npm test
-      - name: Build site
-        run: npm run build
 
       - name: Resolve version
         id: version
