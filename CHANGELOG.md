@@ -5,13 +5,13 @@ via the "What's new" link.
 
 ## Unreleased
 
-- **Added:** Ansible Automation Platform 2.6 sample (~40k packages), a large-SBOM stress test, with a VEX overlay converted from Red Hat CSAF.
-- **Added:** Synthetic AEB safety case with requirement, verification, evidence, and software traceability.
-- **Improved:** Much faster parsing of large SBOMs: a quadratic dedup while tracking generated artifacts made loading build-heavy graphs (like Ansible) crawl.
-- **Improved:** Impact view shows package versions, so different builds of the same package are distinguishable.
-- **Improved:** Opening an element deep in a large list jumps straight to it and loads more as you scroll up or down, instead of rendering every row above it.
-- **Fixed:** Browser Back from a loaded document returns to the home screen instead of leaving the site.
-- **Fixed:** Agent nodes used a red nearly identical to vulnerability/VEX nodes; agents are now indigo.
+- **Added:** Ansible Automation Platform 2.6 sample (~40k packages) with VEX overlay.
+- **Added:** Synthetic AEB safety case with full traceability.
+- **Improved:** Much faster parsing of large, build-heavy SBOMs.
+- **Improved:** Impact view shows package versions to distinguish builds.
+- **Improved:** Opening a deep list element jumps straight to it.
+- **Fixed:** Browser Back from a document returns to the home screen.
+- **Fixed:** Agent nodes are now indigo, distinct from vulnerability nodes.
 
 ## [0.0.5] - 2026-07-05
 

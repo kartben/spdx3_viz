@@ -11,31 +11,31 @@ export const CHANGELOG = [
     items: [
       {
         tag: 'Added',
-        text: 'Ansible Automation Platform 2.6 sample (~40k packages), a large-SBOM stress test, with a VEX overlay converted from Red Hat CSAF.'
+        text: 'Ansible Automation Platform 2.6 sample (~40k packages) with VEX overlay.'
       },
       {
         tag: 'Added',
-        text: 'Synthetic AEB safety case with requirement, verification, evidence, and software traceability.'
+        text: 'Synthetic AEB safety case with full traceability.'
       },
       {
         tag: 'Improved',
-        text: 'Much faster parsing of large SBOMs: a quadratic dedup while tracking generated artifacts made loading build-heavy graphs (like Ansible) crawl.'
+        text: 'Much faster parsing of large, build-heavy SBOMs.'
       },
       {
         tag: 'Improved',
-        text: 'Impact view shows package versions, so different builds of the same package are distinguishable.'
+        text: 'Impact view shows package versions to distinguish builds.'
       },
       {
         tag: 'Improved',
-        text: 'Opening an element deep in a large list jumps straight to it and loads more as you scroll up or down, instead of rendering every row above it.'
+        text: 'Opening a deep list element jumps straight to it.'
       },
       {
         tag: 'Fixed',
-        text: 'Browser Back from a loaded document returns to the home screen instead of leaving the site.'
+        text: 'Browser Back from a document returns to the home screen.'
       },
       {
         tag: 'Fixed',
-        text: 'Agent nodes used a red nearly identical to vulnerability/VEX nodes; agents are now indigo.'
+        text: 'Agent nodes are now indigo, distinct from vulnerability nodes.'
       }
     ]
   },
