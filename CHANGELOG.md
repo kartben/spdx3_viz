@@ -11,6 +11,7 @@ via the "What's new" link.
 - **Added:** Functional Safety verification rollup and requirement decomposition tree.
 - **Added:** Graph traces requirements to their files through snippets.
 - **Improved:** List filters and counts stay pinned while scrolling.
+- **Improved:** Graph detail panel is drag-resizable, with width remembered.
 - **Improved:** Much faster parsing of large, build-heavy SBOMs.
 - **Fixed:** Licenses and Build views no longer freeze on huge lists.
 - **Improved:** Impact view shows package versions to distinguish builds.

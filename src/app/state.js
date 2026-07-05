@@ -1,6 +1,7 @@
 import { createGraphFilters, createScopeFilters, createViews } from '../config.js';
 import { APP_VERSION } from '../version.js';
 import { CHANGELOG } from '../changelog.js';
+import { storedDetailPanelWidth } from './detail-panel.js';
 
 /* The Alpine component's initial reactive state, returned fresh per instance so
    Maps/Sets and arrays aren't shared between mounts. Pure data only. */
@@ -92,6 +93,7 @@ export function createState() {
     collapsedReqs: {}, // decomposition tree: spdxId -> true for collapsed subtrees
     sidebarOpen: false, // mobile off-canvas nav drawer (ignored at md+ where the sidebar is static)
     detailElement: null,
+    detailPanelWidth: storedDetailPanelWidth(), // graph detail panel width (px) at md+, drag-resizable
     expandedPkg: null,
     expandedFile: null,
     expandedHardware: null,

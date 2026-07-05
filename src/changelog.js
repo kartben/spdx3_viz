@@ -35,6 +35,10 @@ export const CHANGELOG = [
       },
       {
         tag: 'Improved',
+        text: 'Graph detail panel is drag-resizable, with width remembered.'
+      },
+      {
+        tag: 'Improved',
         text: 'Much faster parsing of large, build-heavy SBOMs.'
       },
       {
