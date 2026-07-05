@@ -72,46 +72,6 @@
 
         <!-- VIEW CONTENT -->
         <main class="flex-1 overflow-y-auto p-4 sm:p-6 relative" id="mainContent">
-          <!-- Chunked-render progress strip for streamed lists -->
-          <div
-            x-show="viewRender.active && viewRender.view === currentView"
-            class="sticky top-0 z-30 -mx-4 sm:-mx-6 -mt-4 sm:-mt-6 mb-4 px-4 sm:px-6 py-2.5 bg-slate-900/90 backdrop-blur border-b border-slate-700/50"
-          >
-            <div class="flex items-center gap-3 max-w-4xl">
-              <svg
-                class="w-4 h-4 text-blue-400 animate-spin flex-shrink-0"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  class="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  stroke-width="4"
-                />
-                <path
-                  class="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                />
-              </svg>
-              <span class="text-xs text-slate-300 flex-shrink-0 tabular-nums">
-                Rendering
-                <span
-                  x-text="`${formatCount(viewRender.done)} of ${formatCount(viewRender.total)}`"
-                ></span
-                >…
-              </span>
-              <div class="flex-1 h-1.5 bg-slate-700 rounded-full overflow-hidden max-w-xs">
-                <div
-                  class="h-full bg-blue-500 rounded-full transition-[width] duration-150 ease-out"
-                  :style="`width:${viewRender.total ? Math.max(2, Math.round((viewRender.done / viewRender.total) * 100)) : 0}%`"
-                ></div>
-              </div>
-            </div>
-          </div>
           <!-- DASHBOARD -->
           <include src="src/views/view-dashboard.html"></include>
 
