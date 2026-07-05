@@ -18,6 +18,10 @@ export const CHANGELOG = [
         text: 'Synthetic AEB safety case with full traceability.'
       },
       {
+        tag: 'Added',
+        text: 'Functional Safety verification rollup and requirement decomposition tree.'
+      },
+      {
         tag: 'Improved',
         text: 'Much faster parsing of large, build-heavy SBOMs.'
       },

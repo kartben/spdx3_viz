@@ -619,9 +619,12 @@ export const navigationMixin = {
   },
   navigateToRequirement(spdxId) {
     this.requirementSearch = '';
-    // Clear the kind filter too, else the target may be filtered out of
-    // filteredRequirements and nothing scrolls into view.
+    // Clear the kind + status filters and drop back to the list layout, else the
+    // target may be filtered out of filteredRequirements (or hidden by the
+    // decomposition tree) and nothing scrolls into view.
     this.requirementKindFilter = '';
+    this.requirementStatusFilter = '';
+    this.requirementLayout = 'list';
     this.switchView('requirements');
     this.expandedRequirement = spdxId;
     this.scrollToNavTarget('requirement', spdxId);

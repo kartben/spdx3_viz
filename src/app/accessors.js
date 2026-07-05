@@ -25,7 +25,7 @@ import {
   normalizeUrl,
   copyToClipboard
 } from '../lib/index.js';
-import { COLORS, getScopeColor } from '../config.js';
+import { COLORS, getScopeColor, SAFETY_STATUSES, SAFETY_NO_IMPL_META } from '../config.js';
 
 /* Element accessors and display helpers: thin lookups into the relationship
    indexes, name/date formatting, and the relationship-group data the detail
@@ -597,6 +597,46 @@ export const accessorsMixin = {
       };
     }
     return { key: 'verified', label: 'Verified', badgeClass: 'bg-sky-500/15 text-sky-400' };
+  },
+
+  // Presentation metadata ({label, color, dotClass, badgeClass}) for a
+  // requirement verification-status key (as returned by requirementSafetyStatus)
+  // or the 'noimpl' traceability-gap key. Drives the rollup bar and the
+  // status-filter chips, mirroring vexStatusMeta for the security view.
+  safetyStatusMeta(key) {
+    if (key === SAFETY_NO_IMPL_META.key) return SAFETY_NO_IMPL_META;
+    return (
+      SAFETY_STATUSES[key] || {
+        key: key || 'unknown',
+        label: key || 'Unknown',
+        color: COLORS.default || '#64748b',
+        badgeClass: 'bg-slate-600/20 text-slate-300 ring-1 ring-slate-500/30',
+        dotClass: 'bg-slate-500'
+      }
+    );
+  },
+
+  // Decomposition tree: collapse/expand a requirement's subtree. collapsedReqs is
+  // reassigned (not mutated in place) so Alpine reliably re-renders the tree.
+  toggleReqCollapse(spdxId) {
+    const next = { ...this.collapsedReqs };
+    if (next[spdxId]) delete next[spdxId];
+    else next[spdxId] = true;
+    this.collapsedReqs = next;
+  },
+
+  // Decomposition tree: collapse every parent node (roots stay visible).
+  collapseAllReqs() {
+    const next = {};
+    this.safetyDecomposition.childrenOf.forEach((_children, parentId) => {
+      next[parentId] = true;
+    });
+    this.collapsedReqs = next;
+  },
+
+  // Decomposition tree: expand everything.
+  expandAllReqs() {
+    this.collapsedReqs = {};
   },
 
   // Friendly kind label for a functional-safety element, for the card/detail

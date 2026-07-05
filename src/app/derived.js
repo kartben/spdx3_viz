@@ -164,12 +164,116 @@ export const derivedMixin = {
     return c;
   },
 
+  // Rollup of every Requirement's overall verification outcome, for the
+  // safety-case status bar and status-filter chips. `noImpl` counts requirements
+  // carrying no implementedBy link (a traceability gap), and `verifiedPct` is the
+  // share that reached a passing verification.
+  get safetyStatusSummary() {
+    const counts = { failed: 0, inconclusive: 0, unverified: 0, verified: 0, passed: 0 };
+    let total = 0;
+    let noImpl = 0;
+    this.requirements.forEach((r) => {
+      if (!isA(r.type, CLASS.Requirement)) return;
+      total++;
+      const status = this.requirementSafetyStatus(r);
+      if (status && Object.hasOwn(counts, status.key)) counts[status.key]++;
+      if (!this.implementedByCount(r.spdxId)) noImpl++;
+    });
+    return {
+      total,
+      counts,
+      noImpl,
+      verifiedPct: total ? Math.round((counts.passed / total) * 100) : 0
+    };
+  },
+
+  // Verification statuses that actually occur, gaps-first, so the rollup bar and
+  // chips never render empty buckets.
+  get safetyStatusOrder() {
+    const order = ['failed', 'inconclusive', 'unverified', 'verified', 'passed'];
+    const counts = this.safetyStatusSummary.counts;
+    return order.filter((s) => counts[s] > 0);
+  },
+
+  // Requirement decomposition graph from `tracedToDetail` relationships
+  // (higher-level requirement -> more detailed requirements). Requirements never
+  // appearing as a child become roots, so isolated requirements still show. Only
+  // Requirement-typed endpoints are kept (verifications/assumptions are excluded).
+  get safetyDecomposition() {
+    const reqIds = new Set();
+    this.requirements.forEach((r) => {
+      if (isA(r.type, CLASS.Requirement)) reqIds.add(r.spdxId);
+    });
+    const childrenOf = new Map();
+    const isChild = new Set();
+    this.relationships.forEach((rel) => {
+      if (rel.relationshipType !== 'tracedToDetail' || !reqIds.has(rel.from)) return;
+      const tos = (Array.isArray(rel.to) ? rel.to : [rel.to]).filter((t) => reqIds.has(t));
+      if (!tos.length) return;
+      const kids = childrenOf.get(rel.from) || [];
+      tos.forEach((t) => {
+        if (!kids.includes(t)) kids.push(t);
+        isChild.add(t);
+      });
+      childrenOf.set(rel.from, kids);
+    });
+    const roots = [...reqIds].filter((id) => !isChild.has(id));
+    return { childrenOf, roots, hasDecomposition: childrenOf.size > 0 };
+  },
+
+  get hasSafetyDecomposition() {
+    return this.safetyDecomposition.hasDecomposition;
+  },
+
+  // Flattened, depth-annotated rows of the decomposition tree honoring
+  // collapsedReqs, so the (recursive) tree renders through a single x-for.
+  // Siblings sort by display name; a cycle guard stops a malformed graph looping.
+  get safetyTreeRows() {
+    const { childrenOf, roots } = this.safetyDecomposition;
+    const nameOf = (id) => this.elementMap.get(id)?.name || this.cleanName(id);
+    const sortIds = (ids) =>
+      [...ids].sort((a, b) => nameOf(a).localeCompare(nameOf(b), undefined, { numeric: true }));
+    const rows = [];
+    const visit = (id, depth, ancestry) => {
+      if (ancestry.has(id)) return;
+      const kids = childrenOf.get(id) || [];
+      const collapsed = !!this.collapsedReqs[id];
+      rows.push({
+        id,
+        el: this.elementMap.get(id),
+        depth,
+        hasChildren: kids.length > 0,
+        childCount: kids.length,
+        collapsed
+      });
+      if (kids.length && !collapsed) {
+        const next = new Set(ancestry).add(id);
+        sortIds(kids).forEach((k) => visit(k, depth + 1, next));
+      }
+    };
+    sortIds(roots).forEach((r) => visit(r, 0, new Set()));
+    return rows;
+  },
+
   get filteredRequirements() {
     let reqs = this.requirements;
     // Kind filter chips (all / requirements / verifications / assumptions /
     // evaluations) let the folded-in artifacts be browsed on their own.
     if (this.requirementKindFilter) {
       reqs = reqs.filter((r) => r.type === this.requirementKindFilter);
+    }
+    // Verification-status rollup chips filter Requirements by their outcome, or
+    // by the 'noimpl' traceability gap (no implementedBy link).
+    if (this.requirementStatusFilter === 'noimpl') {
+      reqs = reqs.filter(
+        (r) => isA(r.type, CLASS.Requirement) && !this.implementedByCount(r.spdxId)
+      );
+    } else if (this.requirementStatusFilter) {
+      reqs = reqs.filter(
+        (r) =>
+          isA(r.type, CLASS.Requirement) &&
+          this.requirementSafetyStatus(r)?.key === this.requirementStatusFilter
+      );
     }
     if (this.requirementSearch) {
       const q = this.requirementSearch.toLowerCase();
