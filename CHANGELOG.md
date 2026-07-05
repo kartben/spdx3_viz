@@ -6,7 +6,7 @@ via the "What's new" link.
 ## Unreleased
 
 - **Added:** Security view now surfaces the CVSS severity/score, EPSS, and known-exploited (KEV) signals carried in the SBOM's own vulnerability assessment relationships — with severity badges, a "Sort by CVSS severity" order, severity filter chips, and a CVSS severity breakdown on the Overview. No network round-trip needed.
-- **Added:** Statistics view with an SBOM quality score (NTIA minimum elements, license/copyright, provenance, integrity, and structural health categories), plus worst-offender drill-downs, license-family exposure, and supply-chain concentration insights.
+- **Added:** Statistics view with an SBOM completeness score, category breakdowns, and worst-offender drill-downs.
 - **Changed:** Migrated the build to Vite; reorganized source into modules and view partials.
 - **Added:** Dedicated Agents view.
 - **Added:** CreatedBy/performedBy provenance edges in the graph, hidden by default.
