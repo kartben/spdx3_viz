@@ -36,6 +36,7 @@ export const CLASS = /** @type {any} */ (
 export const BUCKET = Object.freeze({
   PACKAGES: 'packages',
   FILES: 'files',
+  SNIPPETS: 'snippets',
   HARDWARE: 'hardware',
   REQUIREMENTS: 'requirements',
   TOOLS: 'tools',
@@ -94,6 +95,7 @@ export function isA(type, base) {
 /** @type {Array<[SpdxClass, Bucket]>} */
 const BUCKET_RULES = [
   [CLASS.software_File, BUCKET.FILES],
+  [CLASS.software_Snippet, BUCKET.SNIPPETS], // snippet metadata attached to a file, not a graph node
   [CLASS.software_Package, BUCKET.PACKAGES], // incl. ai_AIPackage, dataset_DatasetPackage
   [CLASS.hardware_Hardware, BUCKET.HARDWARE],
   [CLASS.security_Vulnerability, BUCKET.VULNERABILITIES],

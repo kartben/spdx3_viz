@@ -14,8 +14,14 @@
     "emoji": "🪁",
     "description": "Same application, but with an SPDX 3.1 SBOM.<br/>⚠️ SPDX 3.1 support is not yet available in upstream <code>west spdx</code> tooling.",
     "dir": "samples/zephyr-experimental",
-    "files": ["app.jsonld", "modules-deps.jsonld", "zephyr.jsonld", "build.jsonld"],
-    "size": 2303722
+    "files": [
+      "app.jsonld",
+      "modules-deps.jsonld",
+      "zephyr.jsonld",
+      "build.jsonld",
+      "snippets.jsonld"
+    ],
+    "size": 21077602
   },
   {
     "id": "linux",

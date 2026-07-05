@@ -135,11 +135,15 @@ export function createState() {
     appVersion: APP_VERSION,
     changelog: CHANGELOG,
     changelogModalOpen: false,
+    fileSourceCache: {}, // fileId → {loading, windows, error} for the source viewer
+    fileSourceIndex: new Map(), // fileId → raw GitHub URL (built in the parse worker)
 
     // Parsed data
     elementMap: new Map(),
     packages: [],
     files: [],
+    snippets: [],
+    snippetsByFileIndex: new Map(), // fileId → snippet[] (sorted by start line)
     tools: [],
     hardware: [], // hardware profile elements (SPDX 3.1)
     requirements: [], // requirements + FunctionalSafety artifacts (SPDX 3.1)
