@@ -427,7 +427,8 @@ const VIEW_ICON_KEYS = {
   configs: 'config',
   build: 'build',
   agents: 'agent_person',
-  raw: 'view_raw'
+  raw: 'view_raw',
+  statistics: 'view_statistics'
 };
 
 /** Inline Material-icon <svg> per view (currentColor, so the nav item tints it). */
@@ -462,7 +463,8 @@ export function createViews() {
     { id: 'configs', label: 'Build Configs', icon: VIEW_ICONS.configs, count: null },
     { id: 'build', label: 'Build', icon: VIEW_ICONS.build, count: null },
     { id: 'agents', label: 'Agents', icon: VIEW_ICONS.agents, count: null },
-    { id: 'raw', label: 'Raw JSON-LD', icon: VIEW_ICONS.raw, count: null }
+    { id: 'raw', label: 'Raw JSON-LD', icon: VIEW_ICONS.raw, count: null },
+    { id: 'statistics', label: 'Statistics', icon: VIEW_ICONS.statistics, count: null }
   ];
 }
 

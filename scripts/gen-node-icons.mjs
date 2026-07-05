@@ -63,7 +63,8 @@ const ICONS = {
   view_dashboard: 'dashboard',
   view_graph: 'hub',
   view_security: 'security',
-  view_raw: 'data_object'
+  view_raw: 'data_object',
+  view_statistics: { symbol: 'monitoring' }
 };
 
 const here = dirname(fileURLToPath(import.meta.url));
