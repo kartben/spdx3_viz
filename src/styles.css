@@ -735,6 +735,30 @@
   overflow: visible;
 }
 
+/* In the graph detail panel the viewer owns both scroll axes: it fills the
+   height its flex parent allows and scrolls horizontally since the panel is
+   narrow. The inner track is as wide as the widest line (min-width: 100% so a
+   short file still fills the width); every row stretches to that track width so
+   highlight backgrounds span the full scroll width, not just the visible part. */
+.source-viewer.sv-detail {
+  max-height: none;
+  overflow: auto;
+}
+
+.source-viewer.sv-detail .sv-detail-lines {
+  width: max-content;
+  min-width: 100%;
+}
+
+.source-viewer.sv-detail .sv-line {
+  width: 100%;
+}
+
+.source-viewer.sv-detail .sv-line .sv-code {
+  flex: 0 0 auto;
+  overflow: visible;
+}
+
 /* Reset hljs container styles so our per-line backgrounds show through */
 .source-viewer .hljs {
   background: transparent;

@@ -679,6 +679,54 @@ export const navigationMixin = {
     };
     this.$nextTick(() => requestAnimationFrame(() => attempt(30)));
   },
+
+  // True when the graph-selected element is a snippet, gating the inline source
+  // viewer in the detail panel.
+  get isSnippetDetail() {
+    return this.detailElement?.type === 'software_Snippet';
+  },
+  // File/line ref for the selected snippet (or null), so the detail panel can
+  // render its file's source with the snippet's lines highlighted.
+  get detailSnippet() {
+    const el = this.detailElement;
+    if (!el || el.type !== 'software_Snippet') return null;
+    return snippetFileRef(el, this.elementMap);
+  },
+  // Lazily fetch the source behind the selected snippet and, once per selection,
+  // scroll its highlighted lines into view. Driven by x-effect in the panel.
+  ensureDetailSnippetSource() {
+    const el = this.detailElement;
+    const ref = el?.type === 'software_Snippet' ? snippetFileRef(el, this.elementMap) : null;
+    if (!ref?.fileId) return;
+    this.loadFileSource(ref.fileId);
+    if (this._detailSnippetId !== el.spdxId) {
+      this._detailSnippetId = el.spdxId;
+      this._scrollDetailSnippet(ref.start);
+    }
+  },
+  // From the detail panel, jump to the snippet's file in the Files view.
+  openDetailSnippetFile() {
+    const ref = this.detailSnippet;
+    if (!ref?.fileId) return;
+    this.closeDetailPanel();
+    this.navigateToFile(ref.fileId);
+  },
+  // Retry until the highlighted first line is in the panel DOM (source loads
+  // async), then centre it vertically without disturbing horizontal scroll.
+  _scrollDetailSnippet(start) {
+    if (start == null) return;
+    const seq = ++this._scrollDetailSnippetSeq;
+    const attempt = (retriesLeft) => {
+      if (seq !== this._scrollDetailSnippetSeq) return;
+      const line = document.querySelector(`#detail-snippet-source .sv-line[data-line="${start}"]`);
+      if (line) {
+        line.scrollIntoView({ block: 'center', inline: 'nearest' });
+      } else if (retriesLeft > 0) {
+        setTimeout(() => attempt(retriesLeft - 1), 120);
+      }
+    };
+    this.$nextTick(() => requestAnimationFrame(() => attempt(30)));
+  },
   navigateToHardware(spdxId) {
     this.hardwareSearch = '';
     this.switchView('hardware');
