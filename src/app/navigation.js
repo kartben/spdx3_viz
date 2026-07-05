@@ -470,12 +470,16 @@ export const navigationMixin = {
   // Scrolls the list card for (kind, id) into view. With load-on-scroll the card
   // may be outside the rendered window, so first center the window on it (a
   // no-op when it's already rendered); the card then mounts on the next tick and
-  // the retry loop finds and scrolls to it.
+  // the retry loop finds and scrolls to it. The window is re-centered on every
+  // attempt (cheap no-op once rendered) so a late reactive re-render that resets
+  // the window can't leave the target permanently outside it, and the retry
+  // budget is generous because a heavy list view's first render after a deep
+  // link can take well over half a second to mount the target card.
   scrollToNavTarget(kind, id) {
-    this._windowToNavTarget(kind, id);
     const seq = ++this._scrollNavSeq;
     const attempt = (retriesLeft) => {
       if (seq !== this._scrollNavSeq) return; // superseded by a newer navigation
+      this._windowToNavTarget(kind, id);
       const target = [...document.querySelectorAll(`[data-nav-kind="${kind}"]`)].find(
         (el) => el.dataset.navId === id && el.offsetParent !== null
       );
@@ -493,7 +497,9 @@ export const navigationMixin = {
         setTimeout(() => attempt(retriesLeft - 1), 100);
       }
     };
-    this.$nextTick(() => requestAnimationFrame(() => attempt(5)));
+    // ~3s of retries at 100ms: stops the instant the card is found, so the only
+    // cost of a high ceiling is tolerating a slow first render.
+    this.$nextTick(() => requestAnimationFrame(() => attempt(30)));
   },
   // Nav-target kind for a package card, so the shared list template works across
   // the Packages / AI Models / Datasets tabs and still scrolls to the right card.
