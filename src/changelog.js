@@ -11,7 +11,11 @@ export const CHANGELOG = [
     items: [
       {
         tag: 'Added',
-        text: 'Statistics view with an SBOM quality score (NTIA minimum elements, license/copyright, provenance, integrity, and structural health categories), plus worst-offender drill-downs, license-family exposure, and supply-chain concentration insights.'
+        text: 'Security view now surfaces the CVSS severity/score, EPSS, and known-exploited (KEV) signals carried in the SBOM\'s own vulnerability assessment relationships — with severity badges, a "Sort by CVSS severity" order, severity filter chips, and a CVSS severity breakdown on the Overview. No network round-trip needed.'
+      },
+      {
+        tag: 'Added',
+        text: 'Statistics view with an SBOM completeness score, category breakdowns, and worst-offender drill-downs.'
       },
       {
         tag: 'Changed',
