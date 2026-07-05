@@ -19,7 +19,6 @@
       "modules-deps.jsonld",
       "zephyr.jsonld",
       "build.jsonld",
-      "snippets.jsonld",
       "safety.jsonld",
       "sdk.jsonld"
     ],

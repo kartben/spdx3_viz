@@ -28,7 +28,7 @@
     {
       "type": "CreationInfo",
       "@id": "zephyr:creationinfo",
-      "created": "2026-07-05T21:49:58Z",
+      "created": "2026-07-05T23:07:20Z",
       "createdBy": [
         "zephyr:agents/west-spdx-agent"
       ],
@@ -503,7 +503,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-limits.h",
       "software_fileKind": "file",
-      "software_copyrightText": "<text>\n/* Copyright (C) 1991-2024 Free Software Foundation, Inc.\n/* Copyright (C) 1992-2024 Free Software Foundation, Inc.\n</text>",
+      "software_copyrightText": "<text>\n/* Copyright (C) 1992-2024 Free Software Foundation, Inc.\n/* Copyright (C) 1991-2024 Free Software Foundation, Inc.\n</text>",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
       "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/lib/gcc/xtensa-espressif_esp32s3_zephyr-elf/14.3.0/include/limits.h",
@@ -776,7 +776,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-stdio.h",
       "software_fileKind": "file",
-      "software_copyrightText": "<text>\n/* Copyright (c) 2002, 2005, 2007 Joerg Wunsch\n   Portions of documentation Copyright (c) 1990, 1991, 1993\n</text>",
+      "software_copyrightText": "<text>\n   Portions of documentation Copyright (c) 1990, 1991, 1993\n/* Copyright (c) 2002, 2005, 2007 Joerg Wunsch\n</text>",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
       "name": "gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf/sys-include/stdio.h",
@@ -2056,7 +2056,7 @@
       "namespaceMap": [
         {
           "type": "NamespaceMap",
-          "namespace": "http://spdx.org/spdxdocs/zephyr-67becc68-b134-4f63-ad5a-19ef043e148f/",
+          "namespace": "http://spdx.org/spdxdocs/zephyr-5bdcdd41-94fc-454b-8db6-f3e76da302f0/",
           "prefix": "zephyr"
         }
       ],
