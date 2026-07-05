@@ -19,7 +19,8 @@
   "dependencies": {
     "@alpinejs/collapse": "^3.14.0",
     "alpinejs": "^3.14.0",
-    "d3": "^7.9.0"
+    "d3": "^7.9.0",
+    "highlight.js": "^11.11.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",

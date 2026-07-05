@@ -27,6 +27,7 @@ import {
   copyToClipboard
 } from '../lib/index.js';
 import { COLORS, getScopeColor, SAFETY_STATUSES, SAFETY_NO_IMPL_META } from '../config.js';
+import hljs from '../lib/highlight.js';
 
 /* Element accessors and display helpers: thin lookups into the relationship
    indexes, name/date formatting, and the relationship-group data the detail
@@ -98,6 +99,179 @@ export const accessorsMixin = {
   },
   configuredBy(spdxId) {
     return this.configuredByIndex.get(spdxId) || [];
+  },
+  snippetsOf(fileId) {
+    return this.snippetsByFileIndex.get(fileId) || [];
+  },
+  isCompiledSource(file) {
+    const ext = getFileExtension(file?.name || '').toLowerCase();
+    return ['.c', '.cpp', '.cc', '.cxx', '.s'].includes(ext);
+  },
+  isUnlinkedSource(fileId) {
+    const file = this.elementMap.get(fileId);
+    return this.isCompiledSource(file) && this.snippetsOf(fileId).length === 0;
+  },
+  shouldShowFileSource(fileId) {
+    if (this.snippetsOf(fileId).length > 0) return true;
+    return this.isUnlinkedSource(fileId) && !!this.fileSourceIndex.get(fileId);
+  },
+  async loadFileSource(fileId) {
+    if (this.fileSourceCache[fileId]) return;
+    const url = this.fileSourceIndex.get(fileId);
+    if (!url) return;
+    const file = this.elementMap.get(fileId);
+
+    this.fileSourceCache[fileId] = { loading: true, windows: null, error: null };
+
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const content = await res.text();
+      const result = this._buildSnippetWindows(fileId, content, file?.name);
+      this.fileSourceCache[fileId] = { loading: false, error: null, ...result };
+    } catch (err) {
+      this.fileSourceCache[fileId] = { loading: false, windows: null, error: err.message };
+    }
+  },
+  _buildSnippetWindows(fileId, content, fileName) {
+    const ext = getFileExtension(fileName || '');
+    const rawLines = content.split('\n');
+    const snippetList = this.snippetsOf(fileId);
+    const unlinked = !snippetList.length;
+
+    // Syntax-highlight full content, then split by line.
+    let highlightedLines;
+    const langMap = { '.c': 'c', '.h': 'c', '.cpp': 'cpp', '.py': 'python', '.js': 'javascript' };
+    const lang = langMap[ext];
+    try {
+      const html = lang
+        ? hljs.highlight(content, { language: lang, ignoreIllegals: true }).value
+        : hljs.highlightAuto(content).value;
+      highlightedLines = html.split('\n');
+    } catch {
+      highlightedLines = null;
+    }
+    if (!highlightedLines) {
+      highlightedLines = rawLines.map((l) =>
+        l.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      );
+    }
+
+    const coveredLines = new Set();
+    const totalLines = rawLines.length;
+    const sliceCtx = { _allHighlightedLines: highlightedLines, _coveredLines: coveredLines };
+
+    if (unlinked) {
+      const PREVIEW = 50;
+      const endLine = Math.min(PREVIEW, totalLines);
+      const windows =
+        endLine > 0
+          ? [
+              {
+                startLine: 1,
+                endLine,
+                gapBefore: false,
+                gapAfter: endLine < totalLines,
+                lines: this._sliceLines(sliceCtx, 1, endLine)
+              }
+            ]
+          : [];
+      return {
+        windows,
+        _allHighlightedLines: highlightedLines,
+        _coveredLines: coveredLines,
+        _totalLines: totalLines,
+        unlinked: true
+      };
+    }
+
+    for (const s of snippetList) {
+      const lr = s.software_lineRange;
+      if (!lr) continue;
+      for (let i = lr.beginIntegerRange; i <= lr.endIntegerRange; i++) coveredLines.add(i);
+    }
+
+    // Build merged context windows (each snippet ±CONTEXT lines).
+    const CONTEXT = 5;
+    const rawWindows = [];
+    for (const s of snippetList) {
+      const lr = s.software_lineRange;
+      if (!lr) continue;
+      const wStart = Math.max(1, lr.beginIntegerRange - CONTEXT);
+      const wEnd = Math.min(totalLines, lr.endIntegerRange + CONTEXT);
+      const last = rawWindows[rawWindows.length - 1];
+      if (last && wStart <= last.end + 2) {
+        last.end = Math.max(last.end, wEnd);
+      } else {
+        rawWindows.push({ start: wStart, end: wEnd });
+      }
+    }
+
+    const windows = rawWindows.map((w) => ({
+      startLine: w.start,
+      endLine: w.end,
+      gapBefore: w.start > 1,
+      gapAfter: w.end < totalLines,
+      lines: this._sliceLines(sliceCtx, w.start, w.end)
+    }));
+
+    return {
+      windows,
+      _allHighlightedLines: highlightedLines,
+      _coveredLines: coveredLines,
+      _totalLines: totalLines
+    };
+  },
+  _sliceLines(cache, start, end) {
+    return Array.from({ length: end - start + 1 }, (_, i) => {
+      const lineNum = start + i;
+      return {
+        lineNum,
+        html: cache._allHighlightedLines[lineNum - 1] ?? '',
+        covered: cache._coveredLines.has(lineNum)
+      };
+    });
+  },
+  gapBeforeCount(fileId, wi) {
+    const cache = this.fileSourceCache[fileId];
+    const win = cache?.windows?.[wi];
+    if (!win) return 0;
+    const prevEnd = wi > 0 ? cache.windows[wi - 1].endLine : 0;
+    return win.startLine - prevEnd - 1;
+  },
+  gapAfterCount(fileId, wi) {
+    const cache = this.fileSourceCache[fileId];
+    const win = cache?.windows?.[wi];
+    if (!win) return 0;
+    const nextStart =
+      wi < cache.windows.length - 1
+        ? cache.windows[wi + 1].startLine
+        : (cache._totalLines ?? 0) + 1;
+    return nextStart - win.endLine - 1;
+  },
+  expandWindow(fileId, wi, direction) {
+    const cache = this.fileSourceCache[fileId];
+    if (!cache?._allHighlightedLines) return;
+
+    const CHUNK = 50;
+    const windows = cache.windows.map((w) => ({ ...w }));
+    const w = windows[wi];
+
+    if (direction === 'before') {
+      const prevEnd = wi > 0 ? windows[wi - 1].endLine : 0;
+      const newStart = Math.max(prevEnd + 1, w.startLine - CHUNK);
+      w.lines = this._sliceLines(cache, newStart, w.endLine);
+      w.gapBefore = newStart > (wi > 0 ? windows[wi - 1].endLine + 1 : 1);
+      w.startLine = newStart;
+    } else {
+      const nextStart = wi < windows.length - 1 ? windows[wi + 1].startLine : Infinity;
+      const newEnd = Math.min(nextStart - 1, w.endLine + CHUNK, cache._totalLines);
+      w.lines = this._sliceLines(cache, w.startLine, newEnd);
+      w.gapAfter = newEnd < Math.min(nextStart - 1, cache._totalLines);
+      w.endLine = newEnd;
+    }
+
+    this.fileSourceCache = { ...this.fileSourceCache, [fileId]: { ...cache, windows } };
   },
   outgoingRels(spdxId) {
     return this.relFromIndex.get(spdxId) || [];
