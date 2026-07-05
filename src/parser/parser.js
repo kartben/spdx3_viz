@@ -5,7 +5,7 @@
  * @module parser
  */
 
-import { RELATIONSHIP_TYPES, VEX_TYPES } from '../config.js';
+import { RELATIONSHIP_TYPES, VEX_TYPES, SCOPE_ORDER } from '../config.js';
 import { bucketOf, isA, CLASS, BUCKET } from '../spdx/model.js';
 import {
   displayLicenseExpression,
@@ -64,6 +64,7 @@ function makeThrottledReporter(onProgress, total) {
  * @property {Map<string, Array>} vexByPackage - Package spdxId -> [VexAssessment]
  * @property {Array<string>} presentNodeTypes - Graph node types present in the data
  * @property {Array<string>} presentRelTypes - Relationship types present in the data
+ * @property {Array<string>} presentScopes - Lifecycle scopes present in the data (empty when none)
  * @property {string} docName - Document name
  * @property {string} docNamespace - Document namespace
  * @property {string} specVersion - SPDX spec version
@@ -459,7 +460,7 @@ export function parseGraph(graph, onProgress) {
 
   // Which node/relationship types actually occur, so the graph legend can hide
   // entries for types the SBOM doesn't contain.
-  const { presentNodeTypes, presentRelTypes } = computePresentTypes({
+  const { presentNodeTypes, presentRelTypes, presentScopes } = computePresentTypes({
     packages,
     regularFiles,
     hardware,
@@ -500,6 +501,7 @@ export function parseGraph(graph, onProgress) {
     vexByPackage: vex.vexByPackage,
     presentNodeTypes,
     presentRelTypes,
+    presentScopes,
     docName,
     docNamespace,
     specVersion,
@@ -722,7 +724,7 @@ function buildVexModel(vulnerabilities, vexRelationships, elementMap) {
  * Determines which node and relationship types are actually present in the
  * parsed dataset. Used to trim the graph legend.
  *
- * @returns {{presentNodeTypes: string[], presentRelTypes: string[]}}
+ * @returns {{presentNodeTypes: string[], presentRelTypes: string[], presentScopes: string[]}}
  */
 function computePresentTypes(data) {
   const nodeTypes = new Set();
@@ -743,7 +745,18 @@ function computePresentTypes(data) {
   if (data.vulnerabilities.length) nodeTypes.add('vulnerability');
 
   const relTypes = new Set();
-  data.relationships.forEach((r) => r.relationshipType && relTypes.add(r.relationshipType));
+  // LifecycleScopedRelationship.scope buckets present in the data. Only real
+  // scopes count toward "are there scoped relationships at all"; the synthetic
+  // `unscoped` bucket is added alongside them so the legend can offer it as a
+  // toggle (used to isolate, say, the runtime graph from build-time edges).
+  const scopes = new Set();
+  let hasUnscoped = false;
+  data.relationships.forEach((r) => {
+    if (!r.relationshipType) return;
+    relTypes.add(r.relationshipType);
+    if (r.scope) scopes.add(r.scope);
+    else hasUnscoped = true;
+  });
   data.vexRelationships.forEach((r) => r.relationshipType && relTypes.add(r.relationshipType));
 
   // "createdBy" / "suppliedBy" / "originatedBy" / "manufacturedBy" edges are
@@ -788,7 +801,14 @@ function computePresentTypes(data) {
   });
   if (hasExternal) nodeTypes.add('external');
 
-  return { presentNodeTypes: [...nodeTypes], presentRelTypes: [...relTypes] };
+  // Only surface the scope legend when the data actually scopes some
+  // relationship; then list the present scopes in lifecycle order, appending the
+  // `unscoped` bucket when plain (un-scoped) relationships also exist.
+  const presentScopes = scopes.size
+    ? SCOPE_ORDER.filter((s) => scopes.has(s) || (s === 'unscoped' && hasUnscoped))
+    : [];
+
+  return { presentNodeTypes: [...nodeTypes], presentRelTypes: [...relTypes], presentScopes };
 }
 
 /**

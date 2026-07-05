@@ -193,6 +193,19 @@ export function renderGraph(app, retry = 0) {
     app.graphFilters.filter((f) => f.isRel && f.active).map((f) => f.key)
   );
 
+  // Lifecycle-scope filtering: an edge is kept only if its scope bucket
+  // (LifecycleScopedRelationship.scope, or 'unscoped') is active. Scope filtering
+  // only applies when the data carries scopes at all; `scopeNarrowed` (some
+  // present scope switched off) additionally prunes nodes left with no edge, so
+  // narrowing to e.g. Runtime isolates that subgraph instead of leaving a cloud
+  // of disconnected build-only nodes.
+  const presentScopes = new Set(app.presentScopes || []);
+  const scopeFiltersActive = presentScopes.size > 0;
+  const activeScopes = new Set((app.scopeFilters || []).filter((f) => f.active).map((f) => f.key));
+  const scopeNarrowed = scopeFiltersActive && [...presentScopes].some((s) => !activeScopes.has(s));
+  const scopeOf = (rel) => rel.scope || 'unscoped';
+  const scopeAllows = (scope) => !scopeFiltersActive || activeScopes.has(scope);
+
   // 1. Underlying nodes (one per SPDX element that passes the type filters).
   const uNodeIds = new Set();
   const uNodes = [];
@@ -247,12 +260,14 @@ export function renderGraph(app, retry = 0) {
   const addRelLinks = (rel) => {
     if (rel.relationshipType === 'hasConcludedLicense') return;
     if (!activeRelTypes.has(rel.relationshipType)) return;
+    const scope = scopeOf(rel);
+    if (!scopeAllows(scope)) return;
 
     const sourceNode = addNode(rel.from, rel, 'source');
     asTargets(rel.to).forEach((target) => {
       const targetNode = addNode(target, rel, 'target');
       if (!sourceNode || !targetNode) return;
-      uLinks.push({ sourceId: rel.from, targetId: target, type: rel.relationshipType });
+      uLinks.push({ sourceId: rel.from, targetId: target, type: rel.relationshipType, scope });
     });
   };
   app.relationships.forEach(addRelLinks);
@@ -279,15 +294,37 @@ export function renderGraph(app, retry = 0) {
   };
   Object.entries(agentEdgeSources).forEach(([type, getAgents]) => {
     if (!activeRelTypes.has(type)) return;
+    // Provenance edges carry no lifecycle scope, so they follow the 'unscoped' toggle.
+    if (!scopeAllows('unscoped')) return;
     createdByHosts.forEach((host) => {
       asArray(getAgents(host.data)).forEach((agentId) => {
         if (!agentId) return;
         const agentNode = addNode(agentId, { relationshipType: type }, 'target');
         if (!agentNode) return;
-        uLinks.push({ sourceId: host.id, targetId: agentId, type });
+        uLinks.push({ sourceId: host.id, targetId: agentId, type, scope: 'unscoped' });
       });
     });
   });
+
+  // 2b. When a lifecycle scope has been switched off, drop nodes left with no
+  // surviving edge so the remaining scope (e.g. Runtime) reads as an isolated
+  // subgraph rather than its edges floating amid every build-only node. Only
+  // runs while narrowed; the default all-scopes-on view keeps every node.
+  if (scopeNarrowed) {
+    const linked = new Set();
+    uLinks.forEach((l) => {
+      linked.add(l.sourceId);
+      linked.add(l.targetId);
+    });
+    for (let i = uNodes.length - 1; i >= 0; i--) {
+      const id = uNodes[i].id;
+      if (!linked.has(id)) {
+        uNodes.splice(i, 1);
+        uNodeIds.delete(id);
+        uNodeById.delete(id);
+      }
+    }
+  }
 
   // 3. Hierarchical clustering: group files into their parent package (else directory) and
   //    build steps into their root build; everything else is its own node.
