@@ -649,6 +649,24 @@
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
+/* Resizable detail panel: only at md+ (matches Tailwind's `md:`) where the panel
+   is an in-flow flex column. Below that it stays a full-width slide-over. The
+   width comes from a per-instance CSS variable set from persisted state; 80vw is
+   a safety clamp so a large stored width can't crowd out the main view. */
+@media (min-width: 768px) {
+  .detail-panel-resizable {
+    width: var(--detail-panel-w, 24rem);
+    max-width: 80vw;
+  }
+}
+
+/* While dragging the grip, lock the resize cursor everywhere and suppress text
+   selection so the pointer doesn't select panel content mid-drag. */
+body.detail-resizing {
+  cursor: col-resize;
+  user-select: none;
+}
+
 /* ==========================================================================
    Tooltip
    Floating tooltip for hover information
