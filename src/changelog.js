@@ -23,6 +23,10 @@ export const CHANGELOG = [
       },
       {
         tag: 'Improved',
+        text: 'List filters and counts stay pinned while scrolling.'
+      },
+      {
+        tag: 'Improved',
         text: 'Much faster parsing of large, build-heavy SBOMs.'
       },
       {

@@ -1,26 +1,28 @@
 <div x-show="currentView === 'files'" class="fade-in space-y-3 max-w-5xl">
-  <div class="flex flex-wrap items-center gap-3 mb-3">
-    <span
-      class="text-sm text-slate-400 flex-shrink-0"
-      x-text="`${filteredFiles.length} files`"
-    ></span>
-    <input
-      x-model="fileSearch"
-      @input.debounce.150ms="restreamView('files')"
-      type="text"
-      placeholder="Filter files…"
-      class="ml-auto bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-emerald-500 w-44 sm:w-56"
-    />
-  </div>
-  <div x-show="fileTypes.length" class="flex flex-wrap gap-1.5 mb-4">
-    <template x-for="ft in fileTypes" :key="ft">
-      <button
-        class="text-xs px-2.5 py-1 rounded-md transition-colors"
-        :class="fileTypeFilter === ft ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-700 text-slate-400 hover:text-white'"
-        @click="fileTypeFilter = fileTypeFilter === ft ? '' : ft; restreamView('files')"
-        x-text="ft"
-      ></button>
-    </template>
+  <div class="list-sticky space-y-3">
+    <div class="flex flex-wrap items-center gap-3">
+      <span
+        class="text-sm text-slate-400 flex-shrink-0"
+        x-text="`${filteredFiles.length} files`"
+      ></span>
+      <input
+        x-model="fileSearch"
+        @input.debounce.150ms="restreamView('files')"
+        type="text"
+        placeholder="Filter files…"
+        class="ml-auto bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-emerald-500 w-44 sm:w-56"
+      />
+    </div>
+    <div x-show="fileTypes.length" class="flex flex-wrap gap-1.5">
+      <template x-for="ft in fileTypes" :key="ft">
+        <button
+          class="text-xs px-2.5 py-1 rounded-md transition-colors"
+          :class="fileTypeFilter === ft ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-700 text-slate-400 hover:text-white'"
+          @click="fileTypeFilter = fileTypeFilter === ft ? '' : ft; restreamView('files')"
+          x-text="ft"
+        ></button>
+      </template>
+    </div>
   </div>
   <template
     x-for="f in (mountedViews.files ? renderSlice('files', filteredFiles) : [])"

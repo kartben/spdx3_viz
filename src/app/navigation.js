@@ -477,6 +477,13 @@ export const navigationMixin = {
         (el) => el.dataset.navId === id && el.offsetParent !== null
       );
       if (target) {
+        // Offset the landing spot by the visible view's sticky header height so
+        // the card isn't scrolled underneath it (block:'start' honours
+        // scroll-margin-top). Only one list-sticky is on-screen at a time.
+        const stickyH = [...document.querySelectorAll('#mainContent .list-sticky')].find(
+          (el) => el.offsetParent !== null
+        )?.offsetHeight;
+        target.style.scrollMarginTop = stickyH ? `${stickyH + 12}px` : '';
         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         this.focusNavTarget(kind, id);
       } else if (retriesLeft > 0) {
