@@ -948,6 +948,155 @@
       </div>
     </div>
 
+    <!-- Impact: provenance + blast radius (collapsed by default) -->
+    <div
+      x-show="detailElement && showImpactHook(detailElement)"
+      class="rounded-lg border border-slate-700/60 bg-slate-900/30 overflow-hidden"
+    >
+      <button
+        @click="toggleImpactHook(detailElement)"
+        class="w-full flex items-center gap-2.5 px-3 py-2.5 text-left hover:bg-slate-800/40 transition"
+      >
+        <span class="text-indigo-400 flex-shrink-0">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+            />
+          </svg>
+        </span>
+        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Impact</span>
+        <span
+          class="text-xs text-slate-500 truncate"
+          x-text="detailElement ? impactHookLabel(detailElement) : ''"
+        ></span>
+        <svg
+          class="w-4 h-4 ml-auto text-slate-500 transition-transform flex-shrink-0"
+          :class="isImpactHookOpen(detailElement) && 'rotate-180'"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
+      </button>
+      <div
+        x-show="isImpactHookOpen(detailElement)"
+        x-collapse
+        class="px-3 pb-3 pt-3 border-t border-slate-700/50 space-y-3"
+        x-data="{ get prov() { return detailElement ? impactProvenance(detailElement.spdxId) : {} }, get dep() { return detailElement ? impactDependents(detailElement.spdxId) : { total: 0, direct: [], transitive: [] } } }"
+      >
+        <!-- Why it's here -->
+        <div>
+          <div class="text-[10px] uppercase tracking-wider text-slate-500 mb-1.5">
+            Why it's here
+          </div>
+          <template x-if="prov.isRoot">
+            <p class="text-xs text-slate-400">Top-level element — a document root.</p>
+          </template>
+          <template x-if="!prov.isRoot && !prov.reachable">
+            <p class="text-xs text-slate-400">Not reachable from a document root.</p>
+          </template>
+          <template x-if="!prov.isRoot && prov.reachable">
+            <div>
+              <div class="flex flex-wrap items-center gap-x-1 gap-y-1">
+                <template x-for="(hop, i) in prov.resolvedPaths[0]" :key="hop.id + ':' + i">
+                  <span class="inline-flex items-center gap-1">
+                    <button
+                      @click="focusImpact(hop.id)"
+                      class="font-mono text-xs hover:underline decoration-slate-600"
+                      :class="hop.id === detailElement?.spdxId ? 'text-indigo-300' : 'text-slate-300 hover:text-white'"
+                      x-text="hop.name"
+                    ></button>
+                    <svg
+                      x-show="i < prov.resolvedPaths[0].length - 1"
+                      class="w-3 h-3 text-slate-600 flex-shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </span>
+                </template>
+              </div>
+              <div
+                x-show="prov.resolvedPaths.length > 1"
+                class="text-[10px] text-slate-500 mt-1"
+                x-text="`· ${prov.resolvedPaths.length - 1} other path${prov.resolvedPaths.length - 1 === 1 ? '' : 's'}`"
+              ></div>
+            </div>
+          </template>
+        </div>
+
+        <!-- What depends on it -->
+        <div x-show="dep.total > 0">
+          <div class="text-[10px] uppercase tracking-wider text-slate-500 mb-1.5">
+            What depends on it
+          </div>
+          <div class="flex items-baseline gap-1.5 mb-2">
+            <span
+              class="text-base font-bold text-white tabular-nums"
+              x-text="formatCount(dep.direct.length)"
+            ></span>
+            <span class="text-[11px] text-slate-400">direct</span>
+            <span class="text-slate-600">·</span>
+            <span
+              class="text-base font-bold text-white tabular-nums"
+              x-text="formatCount(dep.total)"
+            ></span>
+            <span class="text-[11px] text-slate-400">transitively</span>
+          </div>
+          <div class="flex flex-wrap gap-1.5">
+            <template x-for="d in dep.direct.slice(0, 5)" :key="d.id">
+              <button
+                @click="navigateTo(d.id)"
+                class="inline-flex items-center gap-1.5 text-[11px] bg-slate-900/50 border border-slate-700 rounded-md px-2 py-0.5 hover:border-slate-600 transition font-mono text-slate-300"
+              >
+                <span
+                  class="rounded-sm flex-shrink-0"
+                  :style="`width:6px;height:6px;background:${nodeTypeColor(d.type)}`"
+                ></span>
+                <span class="truncate max-w-[9rem]" x-text="d.name"></span>
+              </button>
+            </template>
+            <span
+              x-show="dep.direct.length > 5"
+              class="inline-flex items-center text-[11px] text-slate-500 border border-dashed border-slate-700 rounded-md px-2 py-0.5"
+              x-text="`+${formatCount(dep.direct.length - 5)} more`"
+            ></span>
+          </div>
+        </div>
+
+        <button
+          @click="focusImpact(detailElement.spdxId)"
+          class="text-xs text-indigo-300 hover:text-indigo-200 inline-flex items-center gap-1.5"
+        >
+          Open in Impact tab
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+
     <!-- Element security: associated vulnerabilities (VEX) -->
     <div
       x-show="detailElement && detailElement.type !== 'security_Vulnerability' && vulnsForPackage(detailElement.spdxId).length > 0"

@@ -34,7 +34,8 @@ export function createState() {
       configs: false,
       build: false,
       agents: false,
-      raw: false
+      raw: false,
+      impact: false
     },
     // How many items of each heavy view's filtered list the DOM may show.
     // Starts at one page and grows as the user scrolls (see loadMoreForView /
@@ -87,6 +88,8 @@ export function createState() {
     securitySort: 'severity',
     securityStatusFilter: '',
     securitySeverityFilter: '', // '' = all, else a CVSS severity band (critical…low)
+    impactFocus: null, // Impact tab: focused element spdxId, or null for the rankings
+    _impactHookOpenId: null, // element id whose inline Impact hook is expanded
     // CVE id -> { loading, error, data } fetched on demand from cve.org
     cveDetails: {},
     licenseSort: 'usage',
@@ -159,6 +162,9 @@ export function createState() {
     licenseUsersIndex: new Map(), // license id -> [{from, kind}]
     vexByVuln: new Map(), // vulnerability spdxId -> [VexAssessment]
     vexByPackage: new Map(), // package spdxId -> [VexAssessment]
+    impactChildIndex: new Map(), // element -> [{id, rel, soft}] it depends on / includes
+    impactParentIndex: new Map(), // element -> [{id, rel, soft}] that depend on / include it
+    rootElementIds: new Set(), // spdxIds declared as an SBOM/document rootElement
     buildConfigs: [], // build configuration elements
     generatedArtifacts: [],
 

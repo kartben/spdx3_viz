@@ -341,6 +341,14 @@
   color: #e2e8f0;
 }
 
+/* Divider above the analysis group (Statistics / Impact), set apart from the
+   per-type browse views above it. */
+.nav-item.nav-group-start {
+  margin-top: 10px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(51, 65, 85, 0.5);
+}
+
 .nav-item.active {
   background: rgba(59, 130, 246, 0.1);
   color: #60a5fa;
