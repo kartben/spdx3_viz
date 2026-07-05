@@ -21,17 +21,21 @@ const expandedFieldByView = {
 };
 
 /* Load-on-scroll list rendering (see renderSlice/_ensureViewRendered).
-   Building every card up front freezes the page, so heavy list views render an
-   initial page and grow by RENDER_CHUNK as the user scrolls near the bottom,
-   driven by an IntersectionObserver on a single sentinel at the foot of the
-   scroll area. A deep link streams the list just far enough to reveal its
-   target (see _streamToNavTarget). viewRenderSeq cancels a deep-link stream when
-   a newer navigation supersedes it; scrollObserver is the shared observer — both
-   kept off the reactive state as pure bookkeeping. */
+   Building every card up front freezes the page, so heavy list views render a
+   window [start, end) of their filtered list and grow it in whichever direction
+   the user scrolls: nearing the bottom grows `end` (renderLimits), nearing the
+   top grows the window upward by lowering `start` (renderStarts). Both edges are
+   tracked by IntersectionObservers on a sentinel at each end of the scroll area.
+   For normal top-down browsing `start` stays 0, so this behaves exactly like a
+   grow-downward list. A deep link instead drops the window straight onto its
+   target (see _windowToNavTarget) so opening a package buried deep in the Ansible
+   SBOM no longer has to render every row above it; scrolling up from there loads
+   the earlier rows a chunk at a time. The observers are kept off the reactive
+   state as pure bookkeeping. */
 const INITIAL_RENDER = 200; // cards rendered when a list view first opens
-const RENDER_CHUNK = 200; // cards added per scroll step / deep-link stream frame
-let viewRenderSeq = 0;
-let scrollObserver = null;
+const RENDER_CHUNK = 200; // cards added per scroll step toward either end
+let scrollObserver = null; // grows the window downward (bottom sentinel)
+let prevObserver = null; // grows the window upward (top sentinel)
 // View id -> the filtered list its main x-for renders.
 const viewListProps = {
   packages: 'filteredPackages',
@@ -47,7 +51,7 @@ const viewListProps = {
   agents: 'filteredAgents'
 };
 // Nav-target kind -> how to locate its card in the corresponding list, so a
-// deep link can grow that list far enough to render the target before scrolling.
+// deep link can center the render window on the target before scrolling to it.
 const navKindListInfo = {
   package: { view: 'packages', list: 'filteredPackages', idField: 'spdxId' },
   ai: { view: 'ai', list: 'filteredAiPackages', idField: 'spdxId' },
@@ -231,34 +235,38 @@ export const navigationMixin = {
     this.sidebarOpen = false;
   },
 
-  // Every heavy list x-for renders through this. It's a pure clamp to
-  // renderLimits[view] — the growth of that limit is driven by the scroll
-  // observer (loadMoreForView) and, for deep links, _streamToNavTarget, so
-  // there's one source of truth for how much of the list is in the DOM.
+  // Every heavy list x-for renders through this. It's a pure window into the
+  // filtered list: [renderStarts[view], renderLimits[view]). Both edges are the
+  // single source of truth for what's in the DOM, grown by the scroll observers
+  // (loadMoreForView / loadPrevForView) and, for deep links, _windowToNavTarget.
   renderSlice(view, list) {
-    const limit = this.renderLimits[view];
-    return list.length <= limit ? list : list.slice(0, limit);
+    const end = this.renderLimits[view];
+    let start = this.renderStarts[view] || 0;
+    // Guard against a stale start left over if the list shrank out from under
+    // the window (filter/sort changes reset it, but be defensive).
+    if (start >= list.length) start = 0;
+    return start <= 0 && list.length <= end ? list : list.slice(start, Math.max(start, end));
   },
 
   // Ensures a view has at least its first page rendered, then makes sure the
-  // scroll loader is wired up. Preserves an already-larger limit so returning
+  // scroll loaders are wired up. Preserves an already-larger window so returning
   // to a view you'd scrolled through (or deep-linked into) doesn't collapse it
   // back to the first page.
   _ensureViewRendered(view) {
     const listProp = viewListProps[view];
     if (!listProp) return;
     const total = this[listProp].length;
+    const start = this.renderStarts[view] || 0;
     this.renderLimits[view] = Math.min(
-      Math.max(this.renderLimits[view] || 0, INITIAL_RENDER),
+      Math.max(this.renderLimits[view] || 0, start + INITIAL_RENDER),
       total
     );
-    this.viewRender.active = false;
     this.$nextTick(() => this._ensureScrollLoader());
   },
 
-  // Grows the current view's rendered slice by one chunk. Called by the scroll
-  // observer as its sentinel nears the viewport; no-ops once the whole list is
-  // in the DOM or for non-list views.
+  // Grows the current view's window downward by one chunk. Called by the bottom
+  // scroll observer as its sentinel nears the viewport; no-ops once the window
+  // already reaches the end of the list or for non-list views.
   loadMoreForView(view) {
     const listProp = viewListProps[view];
     if (!listProp) return;
@@ -267,15 +275,40 @@ export const navigationMixin = {
     this.renderLimits[view] = Math.min(this.renderLimits[view] + RENDER_CHUNK, total);
   },
 
-  // Lazily creates the shared IntersectionObserver + a single sentinel at the
-  // foot of the scroll area (#mainContent). Only the active view contributes
-  // height, so one sentinel tracks whichever list is showing; when it nears the
-  // viewport we load the next chunk of the current view.
+  // Grows the current view's window upward by one chunk (lowers `start`). Called
+  // by the top scroll observer when the user scrolls back toward the top of a
+  // window that was opened deep in the list. Prepending rows above the viewport
+  // would shove the visible content down, so we measure the scroll height before
+  // and after and re-pin scrollTop by the delta to hold the view still. The
+  // _prevLoading guard keeps it to one chunk per frame so the pin is applied
+  // before another chunk can queue.
+  loadPrevForView(view) {
+    const listProp = viewListProps[view];
+    if (!listProp) return;
+    if ((this.renderStarts[view] || 0) <= 0 || this._prevLoading) return;
+    const root = document.getElementById('mainContent');
+    if (!root) return;
+    this._prevLoading = true;
+    const prevHeight = root.scrollHeight;
+    const prevTop = root.scrollTop;
+    this.renderStarts[view] = Math.max(0, this.renderStarts[view] - RENDER_CHUNK);
+    this.$nextTick(() => {
+      requestAnimationFrame(() => {
+        root.scrollTop = prevTop + (root.scrollHeight - prevHeight);
+        this._prevLoading = false;
+      });
+    });
+  },
+
+  // Lazily creates the two IntersectionObservers and a sentinel at each end of
+  // the scroll area (#mainContent). Only the active view contributes height, so
+  // one pair of sentinels tracks whichever list is showing; nearing the bottom
+  // loads the next chunk, nearing the top loads the previous one.
   _ensureScrollLoader() {
     const root = document.getElementById('mainContent');
     if (!root) return;
+    const app = this;
     if (!scrollObserver) {
-      const app = this;
       scrollObserver = new IntersectionObserver(
         (entries) => {
           for (const e of entries) if (e.isIntersecting) app.loadMoreForView(app.currentView);
@@ -285,59 +318,60 @@ export const navigationMixin = {
         { root, rootMargin: '1000px 0px' }
       );
     }
-    if (!root.querySelector(':scope > [data-stream-sentinel]')) {
-      const sentinel = document.createElement('div');
-      sentinel.setAttribute('data-stream-sentinel', '');
-      sentinel.setAttribute('aria-hidden', 'true');
-      root.appendChild(sentinel);
-      scrollObserver.observe(sentinel);
+    if (!prevObserver) {
+      prevObserver = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) if (e.isIntersecting) app.loadPrevForView(app.currentView);
+        },
+        // A tighter margin than the bottom: each upward chunk re-pins scrollTop,
+        // which pushes this sentinel back out of range, so a smaller lookahead
+        // keeps loading to roughly one chunk per scroll-up gesture.
+        { root, rootMargin: '300px 0px' }
+      );
+    }
+    if (!root.querySelector(':scope > [data-stream-sentinel="top"]')) {
+      const top = document.createElement('div');
+      top.setAttribute('data-stream-sentinel', 'top');
+      top.setAttribute('aria-hidden', 'true');
+      root.prepend(top);
+      prevObserver.observe(top);
+    }
+    if (!root.querySelector(':scope > [data-stream-sentinel="bottom"]')) {
+      const bottom = document.createElement('div');
+      bottom.setAttribute('data-stream-sentinel', 'bottom');
+      bottom.setAttribute('aria-hidden', 'true');
+      root.appendChild(bottom);
+      scrollObserver.observe(bottom);
     }
   },
 
-  // Grows a view's rendered slice up to `targetLimit`, a chunk per frame behind
-  // the progress bar. Used only for deep links that land beyond the currently
-  // rendered rows (see _streamToNavTarget) — normal browsing never triggers it.
-  async _streamTo(view, targetLimit) {
-    const listProp = viewListProps[view];
-    if (!listProp) return;
-    const goal = Math.min(targetLimit, this[listProp].length);
-    if (this.renderLimits[view] >= goal) return;
-    const token = ++viewRenderSeq;
-    while (this.renderLimits[view] < goal) {
-      this.renderLimits[view] = Math.min(this.renderLimits[view] + RENDER_CHUNK, goal);
-      const active = this.renderLimits[view] < goal;
-      Object.assign(this.viewRender, { active, view, done: this.renderLimits[view], total: goal });
-      if (!active) break;
-      await this.$nextTick();
-      await new Promise((resolve) => setTimeout(resolve, 0));
-      if (token !== viewRenderSeq || this.currentView !== view) {
-        this.viewRender.active = false;
-        return;
-      }
-    }
-    this.viewRender.active = false;
-  },
-
-  // Reveals a deep-link target: grows its list far enough that the card exists
-  // in the DOM (plus a small buffer) so scrollToNavTarget can find and scroll
-  // to it. No-ops when the target is already rendered or has no streamed list.
-  _streamToNavTarget(kind, id) {
+  // Centers a view's window on a deep-link target: renders a chunk on each side
+  // of the target index so its card exists in the DOM (and scrolling up/down
+  // grows the window from there) without rendering every row above it. No-ops
+  // when the target is already inside the current window or has no list.
+  _windowToNavTarget(kind, id) {
     const info = navKindListInfo[kind];
     if (!info) return;
     const list = this[info.list];
     if (!list) return;
     const idx = list.findIndex((item) => item[info.idField] === id);
     if (idx < 0) return;
-    this._streamTo(info.view, idx + 1 + RENDER_CHUNK);
+    const view = info.view;
+    const start = this.renderStarts[view] || 0;
+    const end = this.renderLimits[view] || 0;
+    if (idx >= start && idx < end) return; // already rendered
+    this.renderStarts[view] = Math.max(0, idx - RENDER_CHUNK);
+    this.renderLimits[view] = Math.min(list.length, idx + RENDER_CHUNK + 1);
   },
 
   // Re-renders a view from its first page. Used when its sort order or a filter
   // chip changes: the list content/order changes wholesale, so drop back to the
-  // first page and scroll to the top rather than keeping a deep slice of the
+  // first page and scroll to the top rather than keeping a deep window of the
   // old ordering mounted.
   restreamView(view) {
     if (!(view in this.renderLimits)) return;
     const total = this[viewListProps[view]]?.length ?? 0;
+    this.renderStarts[view] = 0;
     this.renderLimits[view] = Math.min(INITIAL_RENDER, total);
     this.$nextTick(() => {
       document.getElementById('mainContent')?.scrollTo({ top: 0 });
@@ -345,14 +379,13 @@ export const navigationMixin = {
     });
   },
 
-  // Resets the render cursors after fresh data is applied: drops every view
-  // back to zero and re-renders the first page of the one currently shown.
-  // Called from parseData.
+  // Resets the render windows after fresh data is applied: drops every view back
+  // to zero and re-renders the first page of the one currently shown. Called
+  // from parseData.
   _resetStreaming() {
-    viewRenderSeq++; // cancel any in-flight deep-link stream of the old data
-    this.viewRender.active = false;
     Object.keys(this.renderLimits).forEach((k) => {
       this.renderLimits[k] = 0;
+      this.renderStarts[k] = 0;
     });
     this._ensureViewRendered(this.currentView);
   },
@@ -412,12 +445,12 @@ export const navigationMixin = {
       }
     }, 1800);
   },
-  // Scrolls the list card for (kind, id) into view. With load-on-scroll the
-  // card may be beyond the rendered slice, so first grow the list far enough to
-  // include it (a no-op when it's already rendered); the retry loop then waits
-  // out that stream (viewRender.active) before it appears.
+  // Scrolls the list card for (kind, id) into view. With load-on-scroll the card
+  // may be outside the rendered window, so first center the window on it (a
+  // no-op when it's already rendered); the card then mounts on the next tick and
+  // the retry loop finds and scrolls to it.
   scrollToNavTarget(kind, id) {
-    this._streamToNavTarget(kind, id);
+    this._windowToNavTarget(kind, id);
     const seq = ++this._scrollNavSeq;
     const attempt = (retriesLeft) => {
       if (seq !== this._scrollNavSeq) return; // superseded by a newer navigation
@@ -427,13 +460,11 @@ export const navigationMixin = {
       if (target) {
         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         this.focusNavTarget(kind, id);
-      } else if (this.viewRender.active) {
-        setTimeout(() => attempt(retriesLeft), 200); // list still streaming — wait
       } else if (retriesLeft > 0) {
-        setTimeout(() => attempt(retriesLeft - 1), 200);
+        setTimeout(() => attempt(retriesLeft - 1), 100);
       }
     };
-    this.$nextTick(() => requestAnimationFrame(() => attempt(2)));
+    this.$nextTick(() => requestAnimationFrame(() => attempt(5)));
   },
   // Nav-target kind for a package card, so the shared list template works across
   // the Packages / AI Models / Datasets tabs and still scrolls to the right card.

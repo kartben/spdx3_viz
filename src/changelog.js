@@ -16,6 +16,10 @@ export const CHANGELOG = [
       {
         tag: 'Improved',
         text: 'Impact view shows package versions, so different builds of the same package are distinguishable.'
+      },
+      {
+        tag: 'Improved',
+        text: 'Opening an element deep in a large list jumps straight to it and loads more as you scroll up or down, instead of rendering every row above it.'
       }
     ]
   },

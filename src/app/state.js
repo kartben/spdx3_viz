@@ -39,9 +39,12 @@ export function createState() {
       raw: false,
       impact: false
     },
-    // How many items of each heavy view's filtered list the DOM may show.
-    // Starts at one page and grows as the user scrolls (see loadMoreForView /
-    // _ensureScrollLoader) so large lists open instantly.
+    // The [start, end) slice of each heavy view's filtered list the DOM shows.
+    // renderLimits is the end index, renderStarts the start. Both grow as the
+    // user scrolls (down grows end via loadMoreForView, up grows the window
+    // above via loadPrevForView) so large lists open instantly and a deep link
+    // can drop a window straight onto its target instead of rendering every row
+    // above it. See navigation.js (renderSlice / _ensureScrollLoader).
     renderLimits: {
       packages: 0,
       ai: 0,
@@ -55,7 +58,21 @@ export function createState() {
       build: 0,
       agents: 0
     },
-    viewRender: { active: false, view: '', done: 0, total: 0 }, // streaming progress readout
+    // Start index of each view's rendered window; stays 0 for normal top-down
+    // browsing and only moves when a deep link centers the window deep in a list.
+    renderStarts: {
+      packages: 0,
+      ai: 0,
+      dataset: 0,
+      files: 0,
+      hardware: 0,
+      requirements: 0,
+      licenses: 0,
+      security: 0,
+      configs: 0,
+      build: 0,
+      agents: 0
+    },
     searchQuery: '', // header global-search box (cross-cutting jump-to-anything)
     searchOpen: false, // whether the global-search results dropdown is showing
     searchActiveIndex: 0, // keyboard-highlighted result row in the dropdown
