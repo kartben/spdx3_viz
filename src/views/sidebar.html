@@ -46,8 +46,9 @@
                       (v.id !== 'hardware' || hardware.length > 0) &&
                       (v.id !== 'requirements' || requirements.length > 0) &&
                       (v.id !== 'configs' || buildConfigs.length > 0) &&
+                      (v.id !== 'impact' || hasImpactData) &&
                       (v.id !== 'agents' || agents.length > 0)"
-        :class="currentView === v.id && 'active'"
+        :class="{ 'active': currentView === v.id, 'nav-group-start': v.id === 'statistics' }"
         @click="switchView(v.id)"
       >
         <span x-html="v.icon" class="nav-icon"></span>

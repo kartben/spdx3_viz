@@ -494,6 +494,11 @@ const VIEW_ICONS = Object.fromEntries(
   })
 );
 
+// The Impact view's icon (a dependency-tree glyph) is defined inline rather than
+// in the generated ICON_PATHS set.
+const IMPACT_ICON =
+  '<svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 11V3h-7v3H9V3H2v8h7V8h2v10h4v3h7v-8h-7v3h-2V8h2v3z"/></svg>';
+
 /**
  * Creates the view configuration array
  * @returns {Array<Object>} Array of view definition objects
@@ -513,8 +518,9 @@ export function createViews() {
     { id: 'configs', label: 'Build Configs', icon: VIEW_ICONS.configs, count: null },
     { id: 'build', label: 'Build', icon: VIEW_ICONS.build, count: null },
     { id: 'agents', label: 'Agents', icon: VIEW_ICONS.agents, count: null },
-    { id: 'raw', label: 'Raw JSON-LD', icon: VIEW_ICONS.raw, count: null },
-    { id: 'statistics', label: 'Statistics', icon: VIEW_ICONS.statistics, count: null }
+    { id: 'statistics', label: 'Statistics', icon: VIEW_ICONS.statistics, count: null },
+    { id: 'impact', label: 'Impact', icon: IMPACT_ICON, count: null },
+    { id: 'raw', label: 'Raw JSON-LD', icon: VIEW_ICONS.raw, count: null }
   ];
 }
 

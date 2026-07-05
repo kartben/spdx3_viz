@@ -5,6 +5,7 @@ via the "What's new" link.
 
 ## Unreleased
 
+- **Added:** Impact view (grouped with Statistics) — trace **why a component is here** (its shortest provenance path from a document root) and **what depends on it** (blast radius), over a cross-topology dependency edge set (dependsOn / contains / static + dynamic link / …). Lands on whole-SBOM rankings, including "vulnerable × blast radius", which ranks CVEs by reach (worst severity × how many components inherit them). A slim, collapsed-by-default Impact section is also added to the element detail panel.
 - **Added:** Security view now surfaces the CVSS severity/score, EPSS, and known-exploited (KEV) signals carried in the SBOM's own vulnerability assessment relationships — with severity badges, a "Sort by CVSS severity" order, severity filter chips, and a CVSS severity breakdown on the Overview. No network round-trip needed.
 - **Added:** Statistics view with an SBOM quality score (NTIA minimum elements, license/copyright, provenance, integrity, and structural health categories), plus worst-offender drill-downs, license-family exposure, and supply-chain concentration insights.
 - **Changed:** Migrated the build to Vite; reorganized source into modules and view partials.
