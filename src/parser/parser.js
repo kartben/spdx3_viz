@@ -14,7 +14,8 @@ import {
   getVulnerabilityId,
   getVulnerabilityLocators,
   vexStatusForRel,
-  summarizeVulnAssessments
+  summarizeVulnAssessments,
+  buildImpactAdjacency
 } from '../lib/index.js';
 
 /**
@@ -74,6 +75,7 @@ function makeThrottledReporter(onProgress, total) {
  * @property {Array<string>} generatedArtifacts - Generated artifact IDs
  * @property {Map<string, ExternalMapEntry>} externalMap - Imported elements (SpdxDocument.import), keyed by externalSpdxId
  * @property {{total: number, resolved: number, unresolved: number}} externalRefStats - Import resolution summary
+ * @property {Set<string>} rootElementIds - spdxIds declared as an SBOM/document rootElement
  */
 
 /**
@@ -109,6 +111,8 @@ function makeThrottledReporter(onProgress, total) {
  * @property {Map<string, Array>} distributionArtifactIndex - Package to distribution artifacts mapping
  * @property {Map<string, Array>} distributedByIndex - Artifact to distributing packages mapping
  * @property {Map<string, Array>} licenseUsersIndex - License id to [{from, kind}] mapping
+ * @property {Map<string, Array<{id: string, rel: string, soft: boolean}>>} impactChildIndex - Element to what it depends on / includes (impact edge set)
+ * @property {Map<string, Array<{id: string, rel: string, soft: boolean}>>} impactParentIndex - Element to what depends on / includes it (impact edge set)
  */
 
 /**
@@ -164,6 +168,9 @@ export function parseGraph(graph, onProgress) {
 
   /** @type {Array<Object>} */
   const sboms = [];
+
+  /** @type {Set<string>} - spdxIds declared as rootElement by any SBOM/Document */
+  const rootElementIds = new Set();
 
   /** @type {Array<string>} */
   const generatedArtifacts = [];
@@ -297,6 +304,8 @@ export function parseGraph(graph, onProgress) {
 
       case BUCKET.SBOMS:
         sboms.push(item);
+        // rootElement may be compacted to a single string in JSON-LD.
+        [].concat(item.rootElement || []).forEach((id) => rootElementIds.add(id));
         break;
 
       case BUCKET.CREATION_INFO:
@@ -304,6 +313,7 @@ export function parseGraph(graph, onProgress) {
         break;
 
       case BUCKET.DOCUMENTS: {
+        [].concat(item.rootElement || []).forEach((id) => rootElementIds.add(id));
         // Merge document metadata: accumulate profiles, keep first values
         if (!docName) docName = item.name || '';
         if (!docNamespace) docNamespace = item.namespaceMap?.[0]?.namespace || '';
@@ -516,7 +526,8 @@ export function parseGraph(graph, onProgress) {
     profileConformance,
     generatedArtifacts,
     externalMap,
-    externalRefStats
+    externalRefStats,
+    rootElementIds
   };
 }
 
@@ -1079,6 +1090,12 @@ export function buildRelationshipIndexes(relationships, onProgress) {
     }
   });
 
+  // Impact analysis adjacency over the cross-topology dependency edge set
+  // (dependsOn / contains / static+dynamic link / …), used for provenance paths
+  // and blast radius. Kept separate from the type-specific indexes above.
+  const { childIndex: impactChildIndex, parentIndex: impactParentIndex } =
+    buildImpactAdjacency(relationships);
+
   return {
     relFromIndex,
     relToIndex,
@@ -1098,7 +1115,9 @@ export function buildRelationshipIndexes(relationships, onProgress) {
     parentBuildIndex,
     distributionArtifactIndex,
     distributedByIndex,
-    licenseUsersIndex
+    licenseUsersIndex,
+    impactChildIndex,
+    impactParentIndex
   };
 }
 
