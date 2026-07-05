@@ -1,150 +1,152 @@
 <div x-show="currentView === 'requirements'" class="fade-in space-y-3 max-w-4xl">
-  <div class="flex flex-wrap items-center gap-3 mb-3">
-    <!-- Breakdown summary of the folded-in FunctionalSafety elements -->
-    <span class="text-sm text-slate-400 flex-shrink-0">
-      <span x-text="safetyCounts.requirements"></span> requirements<template
-        x-if="safetyCounts.verifications"
-        ><span
-          ><span class="text-slate-600"> · </span
-          ><span x-text="safetyCounts.verifications"></span> verifications</span
-        ></template
-      ><template x-if="safetyCounts.evaluations"
-        ><span
-          ><span class="text-slate-600"> · </span
-          ><span x-text="safetyCounts.evaluations"></span> evaluations</span
-        ></template
-      ><template x-if="safetyCounts.assumptions"
-        ><span
-          ><span class="text-slate-600"> · </span
-          ><span x-text="safetyCounts.assumptions"></span> assumptions</span
-        ></template
+  <div class="list-sticky space-y-3">
+    <div class="flex flex-wrap items-center gap-3">
+      <!-- Breakdown summary of the folded-in FunctionalSafety elements -->
+      <span class="text-sm text-slate-400 flex-shrink-0">
+        <span x-text="safetyCounts.requirements"></span> requirements<template
+          x-if="safetyCounts.verifications"
+          ><span
+            ><span class="text-slate-600"> · </span
+            ><span x-text="safetyCounts.verifications"></span> verifications</span
+          ></template
+        ><template x-if="safetyCounts.evaluations"
+          ><span
+            ><span class="text-slate-600"> · </span
+            ><span x-text="safetyCounts.evaluations"></span> evaluations</span
+          ></template
+        ><template x-if="safetyCounts.assumptions"
+          ><span
+            ><span class="text-slate-600"> · </span
+            ><span x-text="safetyCounts.assumptions"></span> assumptions</span
+          ></template
+        >
+      </span>
+      <!-- Layout toggle: flat list vs. tracedToDetail decomposition tree -->
+      <div
+        x-show="hasSafetyDecomposition"
+        class="ml-auto inline-flex rounded-lg border border-slate-700 overflow-hidden text-xs"
       >
-    </span>
-    <!-- Layout toggle: flat list vs. tracedToDetail decomposition tree -->
-    <div
-      x-show="hasSafetyDecomposition"
-      class="ml-auto inline-flex rounded-lg border border-slate-700 overflow-hidden text-xs"
-    >
-      <button
-        type="button"
-        @click="requirementLayout = 'list'"
-        class="px-3 py-1.5 transition-colors"
-        :class="requirementLayout === 'list' ? 'bg-slate-700 text-white' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
-      >
-        List
-      </button>
-      <button
-        type="button"
-        @click="requirementLayout = 'tree'; requirementStatusFilter = ''"
-        class="px-3 py-1.5 transition-colors"
-        :class="requirementLayout === 'tree' ? 'bg-slate-700 text-white' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
-      >
-        Decomposition
-      </button>
+        <button
+          type="button"
+          @click="requirementLayout = 'list'"
+          class="px-3 py-1.5 transition-colors"
+          :class="requirementLayout === 'list' ? 'bg-slate-700 text-white' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
+        >
+          List
+        </button>
+        <button
+          type="button"
+          @click="requirementLayout = 'tree'; requirementStatusFilter = ''"
+          class="px-3 py-1.5 transition-colors"
+          :class="requirementLayout === 'tree' ? 'bg-slate-700 text-white' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
+        >
+          Decomposition
+        </button>
+      </div>
+      <input
+        x-show="requirementLayout === 'list'"
+        x-model="requirementSearch"
+        @input.debounce.150ms="restreamView('requirements')"
+        type="text"
+        placeholder="Filter…"
+        :class="!hasSafetyDecomposition && 'ml-auto'"
+        class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-yellow-500 w-44 sm:w-56"
+      />
     </div>
-    <input
-      x-show="requirementLayout === 'list'"
-      x-model="requirementSearch"
-      @input.debounce.150ms="restreamView('requirements')"
-      type="text"
-      placeholder="Filter…"
-      :class="!hasSafetyDecomposition && 'ml-auto'"
-      class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-yellow-500 w-44 sm:w-56"
-    />
-  </div>
 
-  <!-- Safety-case verification rollup: at-a-glance status bar + status filters -->
-  <template x-if="safetyCounts.requirements > 0 && safetyStatusOrder.length">
-    <div class="space-y-2 mb-3">
-      <div class="flex items-baseline gap-2">
-        <span
-          class="text-sm font-semibold text-white"
-          x-text="`${safetyStatusSummary.verifiedPct}% verified`"
-        ></span>
-        <span
-          class="text-xs text-slate-500"
-          x-text="`${formatCount(safetyStatusSummary.counts.passed)} of ${formatCount(safetyStatusSummary.total)} requirements pass verification`"
-        ></span>
+    <!-- Safety-case verification rollup: at-a-glance status bar + status filters -->
+    <template x-if="safetyCounts.requirements > 0 && safetyStatusOrder.length">
+      <div class="space-y-2">
+        <div class="flex items-baseline gap-2">
+          <span
+            class="text-sm font-semibold text-white"
+            x-text="`${safetyStatusSummary.verifiedPct}% verified`"
+          ></span>
+          <span
+            class="text-xs text-slate-500"
+            x-text="`${formatCount(safetyStatusSummary.counts.passed)} of ${formatCount(safetyStatusSummary.total)} requirements pass verification`"
+          ></span>
+        </div>
+        <!-- Stacked status bar -->
+        <div class="flex h-2.5 w-full rounded-full overflow-hidden bg-slate-700">
+          <template x-for="s in safetyStatusOrder" :key="s">
+            <div
+              class="h-full first:rounded-l-full last:rounded-r-full"
+              :style="`width:${(safetyStatusSummary.counts[s] / safetyStatusSummary.total) * 100}%; background:${safetyStatusMeta(s).color}`"
+              :title="`${safetyStatusMeta(s).label}: ${safetyStatusSummary.counts[s]}`"
+            ></div>
+          </template>
+        </div>
+        <!-- Status filter chips (click to filter the list; click again to clear) -->
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-xs text-slate-500 mr-0.5">Verification</span>
+          <template x-for="s in safetyStatusOrder" :key="s">
+            <button
+              type="button"
+              @click="requirementStatusFilter = (requirementStatusFilter === s ? '' : s); requirementKindFilter = 'Requirement'; requirementLayout = 'list'; restreamView('requirements')"
+              class="badge transition"
+              :class="requirementStatusFilter === s ? safetyStatusMeta(s).badgeClass + ' brightness-125' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
+              :title="`Show ${safetyStatusMeta(s).label} requirements`"
+            >
+              <span
+                class="w-1.5 h-1.5 rounded-full mr-1.5"
+                :class="safetyStatusMeta(s).dotClass"
+              ></span>
+              <span x-text="safetyStatusMeta(s).label"></span>
+              <span
+                class="ml-1.5 font-semibold"
+                x-text="formatCount(safetyStatusSummary.counts[s])"
+              ></span>
+            </button>
+          </template>
+          <!-- Traceability gap: requirements carrying no implementedBy link -->
+          <template x-if="safetyStatusSummary.noImpl > 0">
+            <button
+              type="button"
+              @click="requirementStatusFilter = (requirementStatusFilter === 'noimpl' ? '' : 'noimpl'); requirementKindFilter = 'Requirement'; requirementLayout = 'list'; restreamView('requirements')"
+              class="badge transition"
+              :class="requirementStatusFilter === 'noimpl' ? safetyStatusMeta('noimpl').badgeClass + ' brightness-125' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
+              title="Requirements with no implementedBy link"
+            >
+              <span
+                class="w-1.5 h-1.5 rounded-full mr-1.5"
+                :class="safetyStatusMeta('noimpl').dotClass"
+              ></span>
+              <span x-text="safetyStatusMeta('noimpl').label"></span>
+              <span
+                class="ml-1.5 font-semibold"
+                x-text="formatCount(safetyStatusSummary.noImpl)"
+              ></span>
+            </button>
+          </template>
+        </div>
       </div>
-      <!-- Stacked status bar -->
-      <div class="flex h-2.5 w-full rounded-full overflow-hidden bg-slate-700">
-        <template x-for="s in safetyStatusOrder" :key="s">
-          <div
-            class="h-full first:rounded-l-full last:rounded-r-full"
-            :style="`width:${(safetyStatusSummary.counts[s] / safetyStatusSummary.total) * 100}%; background:${safetyStatusMeta(s).color}`"
-            :title="`${safetyStatusMeta(s).label}: ${safetyStatusSummary.counts[s]}`"
-          ></div>
-        </template>
-      </div>
-      <!-- Status filter chips (click to filter the list; click again to clear) -->
-      <div class="flex flex-wrap items-center gap-2">
-        <span class="text-xs text-slate-500 mr-0.5">Verification</span>
-        <template x-for="s in safetyStatusOrder" :key="s">
-          <button
-            type="button"
-            @click="requirementStatusFilter = (requirementStatusFilter === s ? '' : s); requirementKindFilter = 'Requirement'; requirementLayout = 'list'; restreamView('requirements')"
-            class="badge transition"
-            :class="requirementStatusFilter === s ? safetyStatusMeta(s).badgeClass + ' brightness-125' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
-            :title="`Show ${safetyStatusMeta(s).label} requirements`"
-          >
-            <span
-              class="w-1.5 h-1.5 rounded-full mr-1.5"
-              :class="safetyStatusMeta(s).dotClass"
-            ></span>
-            <span x-text="safetyStatusMeta(s).label"></span>
-            <span
-              class="ml-1.5 font-semibold"
-              x-text="formatCount(safetyStatusSummary.counts[s])"
-            ></span>
-          </button>
-        </template>
-        <!-- Traceability gap: requirements carrying no implementedBy link -->
-        <template x-if="safetyStatusSummary.noImpl > 0">
-          <button
-            type="button"
-            @click="requirementStatusFilter = (requirementStatusFilter === 'noimpl' ? '' : 'noimpl'); requirementKindFilter = 'Requirement'; requirementLayout = 'list'; restreamView('requirements')"
-            class="badge transition"
-            :class="requirementStatusFilter === 'noimpl' ? safetyStatusMeta('noimpl').badgeClass + ' brightness-125' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
-            title="Requirements with no implementedBy link"
-          >
-            <span
-              class="w-1.5 h-1.5 rounded-full mr-1.5"
-              :class="safetyStatusMeta('noimpl').dotClass"
-            ></span>
-            <span x-text="safetyStatusMeta('noimpl').label"></span>
-            <span
-              class="ml-1.5 font-semibold"
-              x-text="formatCount(safetyStatusSummary.noImpl)"
-            ></span>
-          </button>
-        </template>
-      </div>
-    </div>
-  </template>
-  <!-- Kind filter (only kinds actually present are offered) -->
-  <div x-show="requirementLayout === 'list'" class="flex flex-wrap items-center gap-1.5 mb-1">
-    <template
-      x-for="chip in [
+    </template>
+    <!-- Kind filter (only kinds actually present are offered) -->
+    <div x-show="requirementLayout === 'list'" class="flex flex-wrap items-center gap-1.5">
+      <template
+        x-for="chip in [
                   { key: '', label: 'All' },
                   { key: 'Requirement', label: 'Requirements', n: safetyCounts.requirements },
                   { key: 'functionalsafety_RequirementVerification', label: 'Verifications', n: safetyCounts.verifications },
                   { key: 'functionalsafety_EvaluationResult', label: 'Evaluations', n: safetyCounts.evaluations },
                   { key: 'functionalsafety_Assumption', label: 'Assumptions', n: safetyCounts.assumptions }
                 ].filter(c => c.key === '' || c.n > 0)"
-      :key="chip.key"
-    >
-      <button
-        type="button"
-        @click="requirementKindFilter = chip.key; requirementStatusFilter = ''; restreamView('requirements')"
-        class="px-2.5 py-1 rounded-full text-xs border transition-colors"
-        :class="requirementKindFilter === chip.key
+        :key="chip.key"
+      >
+        <button
+          type="button"
+          @click="requirementKindFilter = chip.key; requirementStatusFilter = ''; restreamView('requirements')"
+          class="px-2.5 py-1 rounded-full text-xs border transition-colors"
+          :class="requirementKindFilter === chip.key
                     ? 'bg-yellow-500/15 text-yellow-300 border-yellow-500/40'
                     : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200'"
-      >
-        <span x-text="chip.label"></span>
-        <span x-show="chip.n !== undefined" class="text-slate-500" x-text="`(${chip.n})`"></span>
-      </button>
-    </template>
+        >
+          <span x-text="chip.label"></span>
+          <span x-show="chip.n !== undefined" class="text-slate-500" x-text="`(${chip.n})`"></span>
+        </button>
+      </template>
+    </div>
   </div>
   <!-- Requirement decomposition tree (tracedToDetail: goal → detailed requirement) -->
   <template x-if="requirementLayout === 'tree'">

@@ -1,70 +1,75 @@
 <div x-show="currentView === 'security'" class="fade-in space-y-3 max-w-4xl">
-  <!-- Controls: count + search + sort -->
-  <div class="flex flex-wrap items-center gap-3">
-    <span
-      class="text-sm text-slate-400"
-      x-text="`${formatCount(filteredVulnerabilities.length)} of ${formatCount(vulnerabilities.length)} vulnerabilities`"
-    ></span>
-    <input
-      x-model.debounce.200ms="securitySearch"
-      type="text"
-      placeholder="Search CVE, package, statement…"
-      class="ml-auto bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-rose-500 w-56"
-    />
-    <select
-      x-model="securitySort"
-      @change="restreamView('security')"
-      class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 text-slate-300 focus:outline-none focus:border-rose-500"
-    >
-      <option value="severity">Sort by status</option>
-      <option x-show="hasCvssData" value="cvss">Sort by CVSS severity</option>
-      <option value="packages">Sort by affected packages</option>
-      <option value="cve">Sort by CVE id</option>
-    </select>
-  </div>
-
-  <!-- Status filter chips -->
-  <div class="flex flex-wrap items-center gap-2">
-    <button
-      @click="securityStatusFilter = ''; restreamView('security')"
-      class="badge transition"
-      :class="securityStatusFilter === '' ? 'bg-slate-600/40 text-white ring-1 ring-slate-400/40' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
-    >
-      All
-      <span class="ml-1.5 font-semibold" x-text="formatCount(securitySummary.total)"></span>
-    </button>
-    <template x-for="s in securityStatusOrder" :key="s">
-      <button
-        @click="securityStatusFilter = (securityStatusFilter === s ? '' : s); restreamView('security')"
-        class="badge transition"
-        :class="securityStatusFilter === s ? vexStatusMeta(s).badgeClass + ' brightness-125' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
-        :title="`Show ${vexStatusMeta(s).label} vulnerabilities`"
+  <div class="list-sticky space-y-3">
+    <!-- Controls: count + search + sort -->
+    <div class="flex flex-wrap items-center gap-3">
+      <span
+        class="text-sm text-slate-400"
+        x-text="`${formatCount(filteredVulnerabilities.length)} of ${formatCount(vulnerabilities.length)} vulnerabilities`"
+      ></span>
+      <input
+        x-model.debounce.200ms="securitySearch"
+        type="text"
+        placeholder="Search CVE, package, statement…"
+        class="ml-auto bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-rose-500 w-56"
+      />
+      <select
+        x-model="securitySort"
+        @change="restreamView('security')"
+        class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 text-slate-300 focus:outline-none focus:border-rose-500"
       >
-        <span class="w-1.5 h-1.5 rounded-full mr-1.5" :class="vexStatusMeta(s).dotClass"></span>
-        <span x-text="vexStatusMeta(s).label"></span>
-        <span class="ml-1.5 font-semibold" x-text="formatCount(securitySummary.counts[s])"></span>
-      </button>
-    </template>
-  </div>
+        <option value="severity">Sort by status</option>
+        <option x-show="hasCvssData" value="cvss">Sort by CVSS severity</option>
+        <option value="packages">Sort by affected packages</option>
+        <option value="cve">Sort by CVE id</option>
+      </select>
+    </div>
 
-  <!-- CVSS severity filter chips (only when the SBOM carries CVSS assessments) -->
-  <div x-show="hasCvssData" class="flex flex-wrap items-center gap-2">
-    <span class="text-xs text-slate-500 mr-0.5">Severity</span>
-    <template x-for="s in securitySeverityOrder" :key="s">
+    <!-- Status filter chips -->
+    <div class="flex flex-wrap items-center gap-2">
       <button
-        @click="securitySeverityFilter = (securitySeverityFilter === s ? '' : s); restreamView('security')"
+        @click="securityStatusFilter = ''; restreamView('security')"
         class="badge transition"
-        :class="securitySeverityFilter === s ? cvssSeverityMeta(s).badgeClass + ' brightness-125' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
-        :title="`Show ${cvssSeverityMeta(s).label}-severity vulnerabilities`"
+        :class="securityStatusFilter === '' ? 'bg-slate-600/40 text-white ring-1 ring-slate-400/40' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
       >
-        <span class="w-1.5 h-1.5 rounded-full mr-1.5" :class="cvssSeverityMeta(s).dotClass"></span>
-        <span x-text="cvssSeverityMeta(s).label"></span>
-        <span
-          class="ml-1.5 font-semibold"
-          x-text="formatCount(securitySeveritySummary.counts[s])"
-        ></span>
+        All
+        <span class="ml-1.5 font-semibold" x-text="formatCount(securitySummary.total)"></span>
       </button>
-    </template>
+      <template x-for="s in securityStatusOrder" :key="s">
+        <button
+          @click="securityStatusFilter = (securityStatusFilter === s ? '' : s); restreamView('security')"
+          class="badge transition"
+          :class="securityStatusFilter === s ? vexStatusMeta(s).badgeClass + ' brightness-125' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
+          :title="`Show ${vexStatusMeta(s).label} vulnerabilities`"
+        >
+          <span class="w-1.5 h-1.5 rounded-full mr-1.5" :class="vexStatusMeta(s).dotClass"></span>
+          <span x-text="vexStatusMeta(s).label"></span>
+          <span class="ml-1.5 font-semibold" x-text="formatCount(securitySummary.counts[s])"></span>
+        </button>
+      </template>
+    </div>
+
+    <!-- CVSS severity filter chips (only when the SBOM carries CVSS assessments) -->
+    <div x-show="hasCvssData" class="flex flex-wrap items-center gap-2">
+      <span class="text-xs text-slate-500 mr-0.5">Severity</span>
+      <template x-for="s in securitySeverityOrder" :key="s">
+        <button
+          @click="securitySeverityFilter = (securitySeverityFilter === s ? '' : s); restreamView('security')"
+          class="badge transition"
+          :class="securitySeverityFilter === s ? cvssSeverityMeta(s).badgeClass + ' brightness-125' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
+          :title="`Show ${cvssSeverityMeta(s).label}-severity vulnerabilities`"
+        >
+          <span
+            class="w-1.5 h-1.5 rounded-full mr-1.5"
+            :class="cvssSeverityMeta(s).dotClass"
+          ></span>
+          <span x-text="cvssSeverityMeta(s).label"></span>
+          <span
+            class="ml-1.5 font-semibold"
+            x-text="formatCount(securitySeveritySummary.counts[s])"
+          ></span>
+        </button>
+      </template>
+    </div>
   </div>
 
   <!-- Vulnerability cards -->

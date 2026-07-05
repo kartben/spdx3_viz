@@ -222,6 +222,36 @@
 }
 
 /* ==========================================================================
+   Sticky list header
+   Keeps a list view's controls (count, filters, sort, status chips) pinned to
+   the top of <main> while its long card list scrolls underneath. The negative
+   margins cancel <main>'s padding so the opaque background spans edge-to-edge
+   and fully covers cards scrolling behind it; the matching padding restores the
+   original inner spacing. The negative `top` (equal to <main>'s padding-top,
+   which the sticky inset otherwise honours) pins the bar flush against the top
+   of the scroll area so nothing bleeds through above it. The bottom margin is
+   the gap to the first card.
+   ========================================================================== */
+
+.list-sticky {
+  position: sticky;
+  top: -1rem; /* cancel the p-4 top inset so it pins flush */
+  z-index: 20;
+  background: #0f172a; /* slate-900, matches the page background */
+  margin: -1rem -1rem 0.75rem; /* cancel <main>'s p-4 top/sides */
+  padding: 1rem 1rem 0.75rem;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.7); /* slate-700/70 divider */
+}
+
+@media (min-width: 640px) {
+  .list-sticky {
+    top: -1.5rem; /* cancel the sm:p-6 top inset */
+    margin: -1.5rem -1.5rem 0.75rem; /* cancel <main>'s sm:p-6 top/sides */
+    padding: 1.5rem 1.5rem 0.75rem;
+  }
+}
+
+/* ==========================================================================
    Global Search
    The header search box's results dropdown + matched-substring highlight.
    ========================================================================== */
