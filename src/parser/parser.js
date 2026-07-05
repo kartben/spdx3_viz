@@ -304,9 +304,8 @@ export function parseGraph(graph, onProgress) {
 
       case BUCKET.SBOMS:
         sboms.push(item);
-        (Array.isArray(item.rootElement) ? item.rootElement : []).forEach((id) =>
-          rootElementIds.add(id)
-        );
+        // rootElement may be compacted to a single string in JSON-LD.
+        [].concat(item.rootElement || []).forEach((id) => rootElementIds.add(id));
         break;
 
       case BUCKET.CREATION_INFO:
@@ -314,9 +313,7 @@ export function parseGraph(graph, onProgress) {
         break;
 
       case BUCKET.DOCUMENTS: {
-        (Array.isArray(item.rootElement) ? item.rootElement : []).forEach((id) =>
-          rootElementIds.add(id)
-        );
+        [].concat(item.rootElement || []).forEach((id) => rootElementIds.add(id));
         // Merge document metadata: accumulate profiles, keep first values
         if (!docName) docName = item.name || '';
         if (!docNamespace) docNamespace = item.namespaceMap?.[0]?.namespace || '';

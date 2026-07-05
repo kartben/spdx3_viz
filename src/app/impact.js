@@ -125,9 +125,13 @@ export const impactMixin = {
     const map = new Map();
     this.vulnerabilities.forEach((v) => {
       const rank = v.severityRank || 0;
-      const score = parseFloat(v.cvss?.score);
+      // Normalize a missing score to -1 so a valid CVSS 0.0 still compares correctly.
+      const score = v.cvss?.score != null ? parseFloat(v.cvss.score) : -1;
       const seen = new Set();
       v.assessments.forEach((a) => {
+        // Only count a package as at-risk when its VEX status says so: a CVE marked
+        // fixed / not-affected for a package must not rank it as vulnerable.
+        if (a.status !== 'affected' && a.status !== 'under_investigation') return;
         const pid = a.packageId;
         if (!pid || seen.has(pid)) return;
         seen.add(pid);
@@ -137,7 +141,8 @@ export const impactMixin = {
           map.set(pid, e);
         }
         e.vulnIds.add(v.spdxId);
-        if (rank > e.rank || (rank === e.rank && (score || -1) > (parseFloat(e.score) || -1))) {
+        const currentScore = e.score != null ? parseFloat(e.score) : -1;
+        if (rank > e.rank || (rank === e.rank && score > currentScore)) {
           e.rank = rank;
           e.severity = v.severity;
           e.score = v.cvss?.score ?? null;
