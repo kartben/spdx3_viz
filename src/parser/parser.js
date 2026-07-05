@@ -432,9 +432,13 @@ export function parseGraph(graph, onProgress) {
     builds[0] ||
     null;
 
-  // Track generated artifacts
+  // Track generated artifacts. A companion Set keeps dedup O(1): a build-heavy
+  // SBOM can carry tens of thousands of generates/hasOutput edges, so a plain
+  // includes() scan on the growing array would be O(n^2).
+  const generatedArtifactSeen = new Set();
   const pushGeneratedArtifact = (target) => {
-    if (target && !generatedArtifacts.includes(target)) {
+    if (target && !generatedArtifactSeen.has(target)) {
+      generatedArtifactSeen.add(target);
       generatedArtifacts.push(target);
     }
   };

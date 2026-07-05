@@ -19,6 +19,10 @@ export const CHANGELOG = [
       },
       {
         tag: 'Improved',
+        text: 'Much faster parsing of large SBOMs: a quadratic dedup while tracking generated artifacts made loading build-heavy graphs (like Ansible) crawl.'
+      },
+      {
+        tag: 'Improved',
         text: 'Impact view shows package versions, so different builds of the same package are distinguishable.'
       },
       {
