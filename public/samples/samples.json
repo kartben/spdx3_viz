@@ -134,5 +134,14 @@
     "dir": "samples/functional-safety",
     "files": ["aeb-safety-case.spdx3.jsonld"],
     "size": 471062
+  },
+  {
+    "id": "supply-chain",
+    "name": "Supply chain (synthetic)",
+    "icon": "favicon.svg",
+    "description": "Synthetic SPDX 3.1 SupplyChain sample for an industrial edge gateway: HBOM/SBOM, custody, transport, quarantine, resolution, and deployment.",
+    "dir": "samples/supply-chain",
+    "files": ["arborlink-sg1-supply-chain.spdx3.jsonld"],
+    "size": 150448
   }
 ]
