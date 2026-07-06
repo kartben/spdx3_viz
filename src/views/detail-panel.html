@@ -1262,8 +1262,8 @@
         <div class="space-y-1 ml-3">
           <template x-for="item in group.items" :key="item.id">
             <div
-              x-data="{ evaluationMeta: null }"
-              x-effect="evaluationMeta = evaluationResultMeta(elementMap.get(item.id))"
+              x-data="{ statusMeta: null }"
+              x-effect="statusMeta = safetyArtifactStatus(elementMap.get(item.id))"
               class="detail-rel-item group"
               @click="item.multiRange ? openSnippetRanges(item.snippetIds) : selectGraphNode(item.id)"
             >
@@ -1279,12 +1279,12 @@
               ></span>
               <span class="flex-1 truncate" x-text="item.displayName"></span>
               <span
-                x-show="evaluationMeta"
+                x-show="statusMeta"
                 class="w-6 h-6 rounded-full inline-flex items-center justify-center flex-shrink-0"
-                :class="evaluationMeta?.badgeClass"
-                :title="evaluationMeta ? `Evaluation: ${evaluationMeta.label}` : null"
-                :aria-label="evaluationMeta ? `Evaluation: ${evaluationMeta.label}` : null"
-                x-html="uiIconSvg(evaluationMeta?.iconKey, 'w-4 h-4')"
+                :class="statusMeta?.badgeClass"
+                :title="statusMeta ? `Safety status: ${statusMeta.label}` : null"
+                :aria-label="statusMeta ? `Safety status: ${statusMeta.label}` : null"
+                x-html="uiIconSvg(statusMeta?.iconKey, 'w-4 h-4')"
               ></span>
               <span
                 x-show="item.scope"

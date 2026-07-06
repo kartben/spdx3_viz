@@ -854,6 +854,14 @@ export const accessorsMixin = {
     );
   },
 
+  // Status metadata for any safety artifact that directly carries an outcome:
+  // Requirements derive their aggregate verification state, while evaluation
+  // results expose their own pass/fail/inconclusive value. This lets generic
+  // relationship rows decorate both kinds consistently.
+  safetyArtifactStatus(el) {
+    return this.requirementSafetyStatus(el) || this.evaluationResultMeta(el);
+  },
+
   // Normalize an SPDX enumerated (vocab) value for display in a template. Kept
   // as a thin accessor so views can render enum badges (e.g. verification
   // method) without leaking the CURIE/IRI form the JSON-LD context may use.
