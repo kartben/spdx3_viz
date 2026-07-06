@@ -312,7 +312,10 @@ export const accessorsMixin = {
     push('Destruction by', this.supplyChainRefName(el?.supplychain_destructionPerformedBy));
     const responsibility = this.supplyChainResponsibility(el);
     if (responsibility) {
-      push('Responsibility', `${responsibility.previous || '—'} → ${responsibility.current || '—'}`);
+      push(
+        'Responsibility',
+        `${responsibility.previous || '—'} → ${responsibility.current || '—'}`
+      );
       push('Changed on', responsibility.product);
       push('Category', responsibility.category);
     }
