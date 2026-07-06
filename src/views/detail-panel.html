@@ -250,17 +250,21 @@
       <div class="flex items-center gap-2" x-show="requirementSafetyStatus(detailElement)">
         <span class="text-xs text-slate-500 flex-shrink-0">Safety status</span>
         <span
-          class="text-xs px-2 py-0.5 rounded-md"
+          class="w-7 h-7 rounded-full inline-flex items-center justify-center"
           :class="requirementSafetyStatus(detailElement)?.badgeClass"
-          x-text="requirementSafetyStatus(detailElement)?.label"
+          :title="requirementSafetyStatus(detailElement)?.label"
+          :aria-label="requirementSafetyStatus(detailElement)?.label"
+          x-html="uiIconSvg(requirementSafetyStatus(detailElement)?.iconKey, 'w-4 h-4')"
         ></span>
       </div>
       <div class="flex items-center gap-2" x-show="evaluationResultMeta(detailElement)">
         <span class="text-xs text-slate-500 flex-shrink-0">Evaluation</span>
         <span
-          class="text-xs px-2 py-0.5 rounded-md"
+          class="w-7 h-7 rounded-full inline-flex items-center justify-center"
           :class="evaluationResultMeta(detailElement)?.badgeClass"
-          x-text="evaluationResultMeta(detailElement)?.label"
+          :title="evaluationResultMeta(detailElement)?.label"
+          :aria-label="evaluationResultMeta(detailElement)?.label"
+          x-html="uiIconSvg(evaluationResultMeta(detailElement)?.iconKey, 'w-4 h-4')"
         ></span>
       </div>
       <template x-for="field in safetyFields(detailElement)" :key="field.label">
@@ -1270,6 +1274,14 @@
                 x-html="elementIcon(elementMap.get(item.id) || { spdxId: item.id }, 'w-3.5 h-3.5')"
               ></span>
               <span class="flex-1 truncate" x-text="item.displayName"></span>
+              <span
+                x-show="evaluationResultMeta(elementMap.get(item.id))"
+                class="w-6 h-6 rounded-full inline-flex items-center justify-center flex-shrink-0"
+                :class="evaluationResultMeta(elementMap.get(item.id))?.badgeClass"
+                :title="`Evaluation: ${evaluationResultMeta(elementMap.get(item.id))?.label}`"
+                :aria-label="`Evaluation: ${evaluationResultMeta(elementMap.get(item.id))?.label}`"
+                x-html="uiIconSvg(evaluationResultMeta(elementMap.get(item.id))?.iconKey, 'w-4 h-4')"
+              ></span>
               <span
                 x-show="item.scope"
                 class="text-[10px] px-1.5 py-0.5 rounded flex-shrink-0 border"
