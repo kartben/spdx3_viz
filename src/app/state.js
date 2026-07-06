@@ -229,6 +229,7 @@ export function createState() {
     scopeFilters: createScopeFilters(),
     graphAggregate: false,
     graphUseIcons: false, // draw nodes as their type's Material icon instead of a plain dot
+    graphHideOrphans: false, // hide nodes left with no edges once every other filter is applied
     expandedClusters: new Set(), // cluster keys the user has drilled into
     graphNodeCount: 0, // live readout of rendered nodes/edges
     graphEdgeCount: 0,

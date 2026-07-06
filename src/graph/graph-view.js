@@ -515,6 +515,18 @@ export function renderGraph(app, retry = 0) {
   };
   links.forEach((link) => connect(link.sourceId, link.targetId, link));
 
+  // Optionally drop nodes left with no surviving edge (after aggregation and every
+  // other active filter), so a sparse graph isn't cluttered with isolated dots.
+  if (app.graphHideOrphans) {
+    for (let i = renderNodes.length - 1; i >= 0; i--) {
+      const id = renderNodes[i].id;
+      if (!connCount.get(id)) {
+        renderById.delete(id);
+        renderNodes.splice(i, 1);
+      }
+    }
+  }
+
   // Live readout for the controls bar.
   app.graphNodeCount = renderNodes.length;
   app.graphEdgeCount = links.length;
