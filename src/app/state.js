@@ -95,6 +95,7 @@ export function createState() {
     supplyChainSearch: '', // in-view filter for the Supply Chain list
     supplyChainKindFilter: '', // '' = all, else action | process | state
     supplyChainExceptionFilter: '', // '' = all, 'exception' | 'resolved'
+    supplyChainViewMode: 'timeline', // Supply Chain angle: timeline | custody | lifecycle | map
     requirementSearch: '', // in-view filter for the Functional Safety list
     requirementKindFilter: '', // '' = all, else an FS element type to show only
     requirementStatusFilter: '', // '' = all, else a verification-status key or 'noimpl'

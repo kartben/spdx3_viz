@@ -104,6 +104,25 @@
   }
 }
 
+/* Supply Chain route map: dashed transport legs animate a flow of "packets"
+   from pickup to dropoff. Honours reduced-motion. */
+.sc-flow {
+  stroke-dasharray: 5 6;
+  animation: scFlow 0.9s linear infinite;
+}
+
+@keyframes scFlow {
+  to {
+    stroke-dashoffset: -22;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sc-flow {
+    animation: none;
+  }
+}
+
 /* ==========================================================================
    Graph Container
    Styles for the D3 force-directed graph visualization

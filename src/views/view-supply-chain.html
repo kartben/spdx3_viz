@@ -2,7 +2,7 @@
   <div class="list-sticky space-y-3">
     <div class="flex flex-wrap items-center gap-3">
       <span class="text-sm text-slate-400 flex-shrink-0">
-        <span x-text="filteredSupplyChain.length"></span> supply-chain elements<template
+        <span x-text="supplyChain.length"></span> supply-chain elements<template
           x-if="supplyChainCounts.actions"
           ><span
             ><span class="text-slate-600"> · </span
@@ -20,15 +20,66 @@
           ></template
         >
       </span>
-      <input
-        x-model="supplyChainSearch"
-        @input.debounce.150ms="restreamView('supplychain')"
-        type="text"
-        placeholder="Filter supply chain…"
-        class="ml-auto bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-cyan-500 w-44 sm:w-64"
-      />
-    </div>
 
+      <!-- Angle switcher: the supply chain reads several ways, not just a timeline. -->
+      <div
+        class="ml-auto flex items-center gap-0.5 bg-slate-800 border border-slate-700 rounded-lg p-0.5 flex-shrink-0"
+      >
+        <template
+          x-for="mode in [
+            { key: 'timeline', label: 'Timeline' },
+            { key: 'custody', label: 'Custody' },
+            { key: 'lifecycle', label: 'Lifecycle' },
+            { key: 'map', label: 'Route map' }
+          ]"
+          :key="mode.key"
+        >
+          <button
+            type="button"
+            @click="supplyChainViewMode = mode.key"
+            class="px-2.5 py-1 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5"
+            :class="supplyChainViewMode === mode.key
+              ? 'bg-cyan-500/20 text-cyan-300'
+              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700'"
+          >
+            <span
+              class="flex items-center justify-center"
+              x-html="supplyChainModeIcon(mode.key)"
+            ></span>
+            <span class="hidden sm:inline" x-text="mode.label"></span>
+          </button>
+        </template>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shared summary cards -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <div class="rounded-xl border border-slate-700 bg-slate-800/40 p-3">
+      <div class="text-lg font-semibold text-white" x-text="supplyChainCounts.actions"></div>
+      <div class="text-xs text-slate-500">Actions</div>
+    </div>
+    <div class="rounded-xl border border-slate-700 bg-slate-800/40 p-3">
+      <div class="text-lg font-semibold text-white" x-text="supplyChainCounts.processes"></div>
+      <div class="text-xs text-slate-500">Processes</div>
+    </div>
+    <div class="rounded-xl border border-slate-700 bg-slate-800/40 p-3">
+      <div class="text-lg font-semibold text-white" x-text="supplyChainCounts.states"></div>
+      <div class="text-xs text-slate-500">States</div>
+    </div>
+    <div class="rounded-xl border border-slate-700 bg-slate-800/40 p-3">
+      <div
+        class="text-lg font-semibold text-white"
+        x-text="formatCarbonKg(supplyChainCarbonSummary.totalKg) || '—'"
+      ></div>
+      <div class="text-xs text-slate-500">Transport CO₂e</div>
+    </div>
+  </div>
+
+  <!-- ==================================================================== -->
+  <!-- TIMELINE                                                              -->
+  <!-- ==================================================================== -->
+  <div x-show="supplyChainViewMode === 'timeline'" class="space-y-4">
     <div class="flex flex-wrap items-center gap-1.5">
       <template
         x-for="chip in [
@@ -80,283 +131,638 @@
         Resolutions
         <span class="text-slate-500" x-text="`(${supplyChainCounts.resolutions})`"></span>
       </button>
+      <input
+        x-model="supplyChainSearch"
+        @input.debounce.150ms="restreamView('supplychain')"
+        type="text"
+        placeholder="Filter timeline…"
+        class="ml-auto bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-cyan-500 w-40 sm:w-56"
+      />
     </div>
-  </div>
 
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-    <div class="rounded-xl border border-slate-700 bg-slate-800/40 p-3">
-      <div class="text-lg font-semibold text-white" x-text="supplyChainCounts.actions"></div>
-      <div class="text-xs text-slate-500">Actions</div>
-    </div>
-    <div class="rounded-xl border border-slate-700 bg-slate-800/40 p-3">
-      <div class="text-lg font-semibold text-white" x-text="supplyChainCounts.processes"></div>
-      <div class="text-xs text-slate-500">Processes</div>
-    </div>
-    <div class="rounded-xl border border-slate-700 bg-slate-800/40 p-3">
-      <div class="text-lg font-semibold text-white" x-text="supplyChainCounts.states"></div>
-      <div class="text-xs text-slate-500">States</div>
-    </div>
-    <div class="rounded-xl border border-slate-700 bg-slate-800/40 p-3">
-      <div
-        class="text-lg font-semibold text-white"
-        x-text="formatCarbonKg(supplyChainCarbonSummary.totalKg) || '—'"
-      ></div>
-      <div class="text-xs text-slate-500">Transport CO₂e</div>
-    </div>
-  </div>
-
-  <section class="card" x-show="supplyChainCarbonSummary.rows.length">
-    <div class="flex items-center gap-3 mb-3">
-      <div class="text-sm font-semibold text-white">Transport CO₂e</div>
-      <div class="text-xs text-slate-500">
-        From CdxPropertiesExtension values attached to transport actions.
+    <section class="card" x-show="supplyChainCarbonSummary.rows.length">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="text-sm font-semibold text-white">Transport CO₂e</div>
+        <div class="text-xs text-slate-500">
+          From CdxPropertiesExtension values attached to transport actions.
+        </div>
       </div>
-    </div>
-    <div class="space-y-2">
-      <template x-for="row in supplyChainCarbonSummary.rows" :key="row.action.spdxId">
-        <button
-          type="button"
-          @click="navigateToSupplyChain(row.action.spdxId)"
-          class="w-full text-left rounded-lg border border-slate-700 bg-slate-900/40 px-3 py-2 hover:bg-slate-800/70 transition"
-        >
-          <div class="flex flex-wrap items-center gap-2">
-            <div
-              class="text-xs font-medium text-white min-w-0 flex-1 truncate"
-              x-text="row.action.name || cleanName(row.action.spdxId)"
-            ></div>
-            <span class="badge text-xs bg-slate-700 text-slate-300" x-text="row.mode"></span>
-            <span
-              class="badge text-xs bg-emerald-500/15 text-emerald-300"
-              x-text="formatCarbonKg(row.kg)"
-            ></span>
-          </div>
-          <div class="mt-2 h-2 rounded-full bg-slate-800 overflow-hidden">
-            <div class="h-full rounded-full bg-emerald-400" :style="`width:${row.pct}%`"></div>
-          </div>
-        </button>
-      </template>
-    </div>
-  </section>
-
-  <section class="space-y-3">
-    <div class="flex items-center gap-3">
-      <div class="text-sm font-semibold text-white">Timeline</div>
-      <div
-        class="text-xs text-slate-500"
-        x-text="`${filteredSupplyChain.length} shown after filters`"
-      ></div>
-    </div>
-
-    <div class="relative pl-6">
-      <div class="absolute left-[0.7rem] top-2 bottom-2 w-px bg-slate-700"></div>
-      <template
-        x-for="row in (mountedViews.supplychain ? renderSlice('supplychain', supplyChainTimelineRows) : [])"
-        :key="row.item.spdxId"
-      >
-        <div
-          x-data="{ item: row.item, kind: '', status: null, meta: null }"
-          x-effect="kind = supplyChainKind(item); status = supplyChainExceptionStatus(item); meta = supplyChainFamilyMeta(item)"
-          class="relative pb-3"
-          data-nav-kind="supplychain"
-          :data-nav-id="item.spdxId"
-        >
-          <span
-            class="absolute left-[-1.45rem] top-6 w-3 h-3 rounded-full ring-4 ring-slate-900"
-            :class="meta?.dot"
-          ></span>
-          <div
-            class="card cursor-pointer"
-            :class="isNavTarget('supplychain', item.spdxId) && 'target-focus'"
-            @click="toggleSupplyChain(item.spdxId)"
+      <div class="space-y-2">
+        <template x-for="row in supplyChainCarbonSummary.rows" :key="row.action.spdxId">
+          <button
+            type="button"
+            @click="navigateToSupplyChain(row.action.spdxId)"
+            class="w-full text-left rounded-lg border border-slate-700 bg-slate-900/40 px-3 py-2 hover:bg-slate-800/70 transition"
           >
-            <div class="flex items-start gap-3">
+            <div class="flex flex-wrap items-center gap-2">
               <div
-                class="w-8 h-8 rounded-lg bg-cyan-500/15 flex items-center justify-center flex-shrink-0 mt-0.5"
-              >
-                <span
-                  class="flex items-center justify-center text-cyan-300"
-                  x-html="elementIcon(item, 'w-4 h-4')"
-                ></span>
-              </div>
-              <div class="flex-1 min-w-0">
-                <div class="flex flex-wrap items-center gap-2">
-                  <div
-                    class="font-medium text-white text-sm truncate"
-                    x-text="item.name || cleanName(item.spdxId)"
-                  ></div>
-                  <span class="badge text-xs" :class="supplyChainKindBadge(kind)">
-                    <span x-text="supplyChainKindLabel(kind)"></span>
-                  </span>
-                  <span
-                    class="badge text-xs bg-slate-700 text-slate-300"
-                    x-text="supplyChainTypeLabel(item)"
-                  ></span>
-                  <span
-                    x-show="status"
-                    class="badge text-xs"
-                    :class="status?.badgeClass"
-                    x-text="status?.label"
-                  ></span>
-                </div>
+                class="text-xs font-medium text-white min-w-0 flex-1 truncate"
+                x-text="row.action.name || cleanName(row.action.spdxId)"
+              ></div>
+              <span class="badge text-xs bg-slate-700 text-slate-300" x-text="row.mode"></span>
+              <span
+                class="badge text-xs bg-emerald-500/15 text-emerald-300"
+                x-text="formatCarbonKg(row.kg)"
+              ></span>
+            </div>
+            <div class="mt-2 h-2 rounded-full bg-slate-800 overflow-hidden">
+              <div class="h-full rounded-full bg-emerald-400" :style="`width:${row.pct}%`"></div>
+            </div>
+          </button>
+        </template>
+      </div>
+    </section>
 
-                <div class="flex flex-wrap items-center gap-2 mt-1">
-                  <span
-                    x-show="supplyChainTimeRange(item)"
-                    class="text-xs text-slate-500"
-                    x-text="supplyChainTimeRange(item)"
-                  ></span>
-                  <span
-                    x-show="row.duration"
-                    class="badge text-xs bg-slate-700/70 text-slate-300"
-                    x-text="row.duration"
-                  ></span>
-                  <span
-                    x-show="row.route"
-                    class="text-xs text-cyan-300 truncate max-w-full"
-                    x-text="row.route"
-                  ></span>
-                  <span
-                    x-show="row.state"
-                    class="badge text-xs bg-teal-500/15 text-teal-300"
-                    x-text="row.state"
-                  ></span>
-                  <span
-                    x-show="row.carbonKg"
-                    class="badge text-xs bg-emerald-500/15 text-emerald-300"
-                    x-text="formatCarbonKg(row.carbonKg)"
-                  ></span>
-                </div>
+    <section class="space-y-3">
+      <div class="flex items-center gap-3">
+        <div class="text-sm font-semibold text-white">Timeline</div>
+        <div
+          class="text-xs text-slate-500"
+          x-text="`${filteredSupplyChain.length} shown after filters`"
+        ></div>
+      </div>
 
-                <div
-                  x-show="!supplyChainTimeRange(item)"
-                  class="text-xs text-slate-500 mt-1"
-                  x-text="kind === 'process' ? 'Defined process' : kind === 'state' ? 'Product state' : 'Supply-chain element'"
-                ></div>
-                <div
-                  x-show="isMeaningful(item.summary || item.description)"
-                  class="text-xs text-slate-400 mt-2 line-clamp-2"
-                  x-text="item.summary || item.description"
-                ></div>
-              </div>
-              <svg
-                class="w-4 h-4 text-slate-500 transition-transform flex-shrink-0 mt-2"
-                :class="expandedSupplyChain === item.spdxId && 'rotate-180'"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
+      <div class="relative pl-6">
+        <div
+          class="absolute left-[0.7rem] top-2 bottom-2 w-px bg-gradient-to-b from-slate-700 via-slate-700 to-transparent"
+        ></div>
+        <template
+          x-for="row in (mountedViews.supplychain ? renderSlice('supplychain', supplyChainTimelineRows) : [])"
+          :key="row.item.spdxId"
+        >
+          <div>
+            <!-- Day divider: gives the chronological list temporal orientation. -->
+            <div x-show="row.dayLabel" class="flex items-center gap-2 mt-5 mb-3 first:mt-0">
+              <span
+                class="text-[11px] font-semibold uppercase tracking-wider text-slate-400"
+                x-text="row.dayLabel"
+              ></span>
+              <span class="h-px flex-1 bg-slate-800"></span>
+            </div>
+            <!-- Elapsed-time marker between consecutive events. -->
+            <div
+              x-show="row.gapLabel && !row.dayLabel"
+              class="pl-0.5 pb-1 text-[10px] text-slate-600"
+            >
+              ↓ <span x-text="row.gapLabel"></span> later
             </div>
 
-            <template x-if="expandedSupplyChain === item.spdxId">
+            <div
+              x-data="{ item: row.item, kind: '', status: null, meta: null }"
+              x-effect="kind = supplyChainKind(item); status = supplyChainExceptionStatus(item); meta = supplyChainFamilyMeta(item)"
+              class="relative pb-5"
+              data-nav-kind="supplychain"
+              :data-nav-id="item.spdxId"
+            >
+              <span
+                class="absolute left-[-1.45rem] top-6 w-3 h-3 rounded-full ring-4 ring-slate-900"
+                :class="meta?.dot"
+              ></span>
               <div
-                class="mt-4 pt-4 border-t border-slate-700 space-y-3 sm:pl-11 fade-in"
-                @click.stop
+                class="card cursor-pointer relative overflow-hidden"
+                :class="isNavTarget('supplychain', item.spdxId) && 'target-focus'"
+                @click="toggleSupplyChain(item.spdxId)"
               >
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
-                  <template x-for="fact in supplyChainCardFacts(item)" :key="fact.label">
-                    <div>
-                      <div
-                        class="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5"
-                        x-text="fact.label"
-                      ></div>
-                      <div class="text-xs text-slate-300 break-words" x-text="fact.value"></div>
-                    </div>
-                  </template>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
-                  <template x-for="row in supplyChainSpecRows(item)" :key="row.label">
-                    <div>
-                      <div
-                        class="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5"
-                        x-text="row.label"
-                      ></div>
-                      <span
-                        class="text-xs text-slate-300 break-words"
-                        :class="row.mono && 'font-mono break-all'"
-                        x-text="row.value"
-                      ></span>
-                    </div>
-                  </template>
-                </div>
-
-                <div x-show="supplyChainPerformerNames(item).length" class="flex flex-wrap gap-2">
-                  <span class="text-xs text-slate-500">Performed by</span>
-                  <template x-for="name in supplyChainPerformerNames(item)" :key="name">
-                    <span class="badge text-xs bg-lime-500/15 text-lime-300" x-text="name"></span>
-                  </template>
-                </div>
-
-                <div x-show="isMeaningful(item.description) && item.description !== item.summary">
-                  <div class="text-xs text-slate-500 mb-1">Description</div>
+                <span class="absolute left-0 top-0 bottom-0 w-1" :class="meta?.dot"></span>
+                <div class="flex items-start gap-3">
                   <div
-                    class="text-xs text-slate-300 whitespace-pre-wrap"
-                    x-text="item.description"
-                  ></div>
-                </div>
-
-                <template x-for="group in detailRelGroupsFor(item)" :key="group.key">
-                  <div class="detail-rel-section">
-                    <div class="flex items-center gap-2 mb-2">
-                      <span class="detail-rel-line" :style="`background: ${group.color}`"></span>
+                    class="w-8 h-8 rounded-lg bg-cyan-500/15 flex items-center justify-center flex-shrink-0 mt-0.5"
+                  >
+                    <span
+                      class="flex items-center justify-center text-cyan-300"
+                      x-html="elementIcon(item, 'w-4 h-4')"
+                    ></span>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex flex-wrap items-center gap-2">
+                      <div
+                        class="font-medium text-white text-sm truncate"
+                        x-text="item.name || cleanName(item.spdxId)"
+                      ></div>
+                      <span class="badge text-xs" :class="supplyChainKindBadge(kind)">
+                        <span x-text="supplyChainKindLabel(kind)"></span>
+                      </span>
                       <span
-                        class="text-xs font-semibold uppercase tracking-wider"
-                        :style="`color: ${group.color}`"
-                        x-text="group.label"
+                        class="badge text-xs bg-slate-700 text-slate-300"
+                        x-text="supplyChainTypeLabel(item)"
                       ></span>
                       <span
-                        class="text-[10px] text-slate-500"
-                        x-text="'(' + group.total + ')'"
+                        x-show="status"
+                        class="badge text-xs"
+                        :class="status?.badgeClass"
+                        x-text="status?.label"
                       ></span>
                     </div>
-                    <div class="space-y-1 ml-3">
-                      <template x-for="rel in group.items" :key="rel.id">
-                        <div class="detail-rel-item group" @click.stop="navigateTo(rel.id)">
+
+                    <div class="flex flex-wrap items-center gap-2 mt-1">
+                      <span
+                        x-show="supplyChainClock(item)"
+                        class="text-xs text-slate-500"
+                        x-text="supplyChainClock(item)"
+                      ></span>
+                      <span
+                        x-show="row.duration"
+                        class="badge text-xs bg-slate-700/70 text-slate-300"
+                        x-text="row.duration"
+                      ></span>
+                      <span
+                        x-show="row.route"
+                        class="text-xs text-cyan-300 truncate max-w-full"
+                        x-text="row.route"
+                      ></span>
+                      <span
+                        x-show="row.state"
+                        class="badge text-xs bg-teal-500/15 text-teal-300"
+                        x-text="row.state"
+                      ></span>
+                      <span
+                        x-show="row.carbonKg"
+                        class="badge text-xs bg-emerald-500/15 text-emerald-300"
+                        x-text="formatCarbonKg(row.carbonKg)"
+                      ></span>
+                    </div>
+
+                    <div
+                      x-show="!supplyChainClock(item)"
+                      class="text-xs text-slate-500 mt-1"
+                      x-text="kind === 'process' ? 'Defined process' : kind === 'state' ? 'Product state' : 'Supply-chain element'"
+                    ></div>
+                    <div
+                      x-show="isMeaningful(item.summary || item.description)"
+                      class="text-xs text-slate-400 mt-2 line-clamp-2"
+                      x-text="item.summary || item.description"
+                    ></div>
+                  </div>
+                  <svg
+                    class="w-4 h-4 text-slate-500 transition-transform flex-shrink-0 mt-2"
+                    :class="expandedSupplyChain === item.spdxId && 'rotate-180'"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+
+                <template x-if="expandedSupplyChain === item.spdxId">
+                  <div
+                    class="mt-4 pt-4 border-t border-slate-700 space-y-3 sm:pl-11 fade-in"
+                    @click.stop
+                  >
+                    <!-- Detail grid: spec rows for actions, kind facts for processes/states. -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
+                      <template
+                        x-for="row in (supplyChainKind(item) === 'action' ? supplyChainSpecRows(item) : supplyChainCardFacts(item))"
+                        :key="row.label"
+                      >
+                        <div>
+                          <div
+                            class="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5"
+                            x-text="row.label"
+                          ></div>
                           <span
-                            class="detail-rel-arrow"
-                            :style="`color: ${group.color}`"
-                            x-text="rel.direction === 'out' ? '→' : '←'"
-                          ></span>
-                          <span
-                            class="flex items-center flex-shrink-0"
-                            :style="`color: ${nodeTypeColor(getNodeType(elementMap.get(rel.id) || {}))}`"
-                            x-html="elementIcon(elementMap.get(rel.id) || { spdxId: rel.id }, 'w-3.5 h-3.5')"
-                          ></span>
-                          <span class="flex-1 truncate" x-text="rel.displayName"></span>
-                          <span
-                            x-show="rel.scope"
-                            class="text-[10px] px-1.5 py-0.5 rounded bg-slate-700/60 text-slate-400 flex-shrink-0"
-                            x-text="rel.scope"
+                            class="text-xs text-slate-300 break-words"
+                            :class="row.mono && 'font-mono break-all'"
+                            x-text="row.value"
                           ></span>
                         </div>
                       </template>
+                    </div>
+
+                    <div
+                      x-show="supplyChainPerformerNames(item).length"
+                      class="flex flex-wrap gap-2"
+                    >
+                      <span class="text-xs text-slate-500">Performed by</span>
+                      <template x-for="name in supplyChainPerformerNames(item)" :key="name">
+                        <span
+                          class="badge text-xs bg-lime-500/15 text-lime-300"
+                          x-text="name"
+                        ></span>
+                      </template>
+                    </div>
+
+                    <div
+                      x-show="isMeaningful(item.description) && item.description !== item.summary"
+                    >
+                      <div class="text-xs text-slate-500 mb-1">Description</div>
                       <div
-                        x-show="group.hiddenCount > 0"
-                        class="text-[10px] text-slate-500 italic pl-1"
-                        x-text="'+' + formatCount(group.hiddenCount) + ' more'"
+                        class="text-xs text-slate-300 whitespace-pre-wrap"
+                        x-text="item.description"
                       ></div>
                     </div>
+
+                    <template x-for="group in detailRelGroupsFor(item)" :key="group.key">
+                      <div class="detail-rel-section">
+                        <div class="flex items-center gap-2 mb-2">
+                          <span
+                            class="detail-rel-line"
+                            :style="`background: ${group.color}`"
+                          ></span>
+                          <span
+                            class="text-xs font-semibold uppercase tracking-wider"
+                            :style="`color: ${group.color}`"
+                            x-text="group.label"
+                          ></span>
+                          <span
+                            class="text-[10px] text-slate-500"
+                            x-text="'(' + group.total + ')'"
+                          ></span>
+                        </div>
+                        <div class="space-y-1 ml-3">
+                          <template x-for="rel in group.items" :key="rel.id">
+                            <div class="detail-rel-item group" @click.stop="navigateTo(rel.id)">
+                              <span
+                                class="detail-rel-arrow"
+                                :style="`color: ${group.color}`"
+                                x-text="rel.direction === 'out' ? '→' : '←'"
+                              ></span>
+                              <span
+                                class="flex items-center flex-shrink-0"
+                                :style="`color: ${nodeTypeColor(getNodeType(elementMap.get(rel.id) || {}))}`"
+                                x-html="elementIcon(elementMap.get(rel.id) || { spdxId: rel.id }, 'w-3.5 h-3.5')"
+                              ></span>
+                              <span class="flex-1 truncate" x-text="rel.displayName"></span>
+                              <span
+                                x-show="rel.scope"
+                                class="text-[10px] px-1.5 py-0.5 rounded bg-slate-700/60 text-slate-400 flex-shrink-0"
+                                x-text="rel.scope"
+                              ></span>
+                            </div>
+                          </template>
+                          <div
+                            x-show="group.hiddenCount > 0"
+                            class="text-[10px] text-slate-500 italic pl-1"
+                            x-text="'+' + formatCount(group.hiddenCount) + ' more'"
+                          ></div>
+                        </div>
+                      </div>
+                    </template>
                   </div>
                 </template>
               </div>
-            </template>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <div
+        x-show="mountedViews.supplychain && filteredSupplyChain.length === 0"
+        class="text-center py-12 text-slate-500"
+      >
+        No supply-chain elements match these filters
+      </div>
+    </section>
+  </div>
+
+  <!-- ==================================================================== -->
+  <!-- CHAIN OF CUSTODY                                                      -->
+  <!-- ==================================================================== -->
+  <div x-show="supplyChainViewMode === 'custody'" class="space-y-4">
+    <template x-if="mountedViews.supplychain && supplyChainViewMode === 'custody'">
+      <section class="space-y-3">
+        <div class="flex items-center gap-3">
+          <div class="text-sm font-semibold text-white">Chain of custody</div>
+          <div class="text-xs text-slate-500">
+            Who held the product, for how long, and what happened on their watch.
           </div>
         </div>
-      </template>
-    </div>
 
-    <div
-      x-show="mountedViews.supplychain && filteredSupplyChain.length === 0"
-      class="text-center py-12 text-slate-500"
-    >
-      No supply-chain elements found
-    </div>
-  </section>
+        <div class="space-y-2">
+          <template x-for="(seg, i) in supplyChainCustodyJourney" :key="i">
+            <div>
+              <!-- Handoff between holders -->
+              <div
+                x-show="seg.gainedVia"
+                class="flex items-center gap-2 py-1.5 pl-2 text-[11px] text-slate-500"
+              >
+                <svg
+                  class="w-4 h-4 text-slate-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                  />
+                </svg>
+                <span>
+                  Transfer of
+                  <span class="font-semibold text-slate-300" x-text="seg.role"></span>
+                  <template x-if="seg.handoffLocation"
+                    ><span>
+                      at <span class="text-slate-400" x-text="seg.handoffLocation"></span></span
+                  ></template>
+                  <template x-if="seg.gainedVia"
+                    ><span>
+                      · <span x-text="formatDate(seg.gainedVia.action.startTime)"></span></span
+                  ></template>
+                </span>
+              </div>
+
+              <!-- Holder card -->
+              <div class="card relative overflow-hidden">
+                <span
+                  class="absolute left-0 top-0 bottom-0 w-1"
+                  :class="{
+                    'bg-sky-400': seg.role === 'origin',
+                    'bg-cyan-400': seg.role === 'custody',
+                    'bg-violet-400': seg.role === 'ownership'
+                  }"
+                ></span>
+                <div class="flex items-start gap-3">
+                  <div
+                    class="w-9 h-9 rounded-lg bg-slate-700/50 flex items-center justify-center flex-shrink-0 text-slate-200"
+                    x-html="elementIcon(seg.holder || { type: 'Organization' }, 'w-5 h-5')"
+                  ></div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex flex-wrap items-center gap-2">
+                      <span class="font-semibold text-white text-sm" x-text="seg.name"></span>
+                      <span
+                        class="badge text-[11px]"
+                        :class="{
+                          'bg-sky-500/15 text-sky-300 ring-1 ring-sky-500/30': seg.role === 'origin',
+                          'bg-cyan-500/15 text-cyan-300 ring-1 ring-cyan-500/30': seg.role === 'custody',
+                          'bg-violet-500/15 text-violet-300 ring-1 ring-violet-500/30': seg.role === 'ownership'
+                        }"
+                        x-text="seg.role === 'origin' ? 'Origin & build' : seg.role"
+                      ></span>
+                      <span
+                        x-show="seg.duration"
+                        class="badge text-[11px] bg-slate-700 text-slate-300"
+                        x-text="'held ' + seg.duration"
+                      ></span>
+                    </div>
+                    <div class="text-xs text-slate-500 mt-0.5">
+                      <span x-text="formatDate(seg.start)"></span>
+                      <span x-show="seg.end"> → <span x-text="formatDate(seg.end)"></span></span>
+                    </div>
+                    <div
+                      x-show="isMeaningful(seg.summary)"
+                      class="text-xs text-slate-400 mt-1 line-clamp-2"
+                      x-text="seg.summary"
+                    ></div>
+
+                    <div class="flex flex-wrap gap-2 mt-2">
+                      <span
+                        x-show="seg.distanceKm"
+                        class="badge text-[11px] bg-slate-700/70 text-slate-300"
+                        x-text="Math.round(seg.distanceKm).toLocaleString() + ' km'"
+                      ></span>
+                      <span
+                        x-show="seg.carbonKg"
+                        class="badge text-[11px] bg-emerald-500/15 text-emerald-300"
+                        x-text="formatCarbonKg(seg.carbonKg)"
+                      ></span>
+                      <span
+                        x-show="seg.exceptions"
+                        class="badge text-[11px] bg-rose-500/15 text-rose-300"
+                        x-text="seg.exceptions + (seg.exceptions === 1 ? ' exception' : ' exceptions')"
+                      ></span>
+                    </div>
+
+                    <!-- Transport legs on this watch -->
+                    <div x-show="seg.legs.length" class="mt-3 space-y-1.5">
+                      <template x-for="leg in seg.legs" :key="leg.action.spdxId">
+                        <button
+                          type="button"
+                          @click="navigateToSupplyChain(leg.action.spdxId)"
+                          class="w-full text-left flex flex-wrap items-center gap-2 rounded-lg border border-slate-700 bg-slate-900/40 px-2.5 py-1.5 hover:bg-slate-800/70 transition"
+                        >
+                          <svg
+                            class="w-3.5 h-3.5 text-cyan-300 flex-shrink-0"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M13 5l7 7-7 7M5 5l7 7-7 7"
+                            />
+                          </svg>
+                          <span
+                            class="text-xs text-slate-200 min-w-0 flex-1 truncate"
+                            x-text="leg.route || leg.action.name"
+                          ></span>
+                          <span
+                            x-show="leg.mode"
+                            class="badge text-[10px] bg-slate-700 text-slate-300"
+                            x-text="leg.mode"
+                          ></span>
+                          <span
+                            x-show="leg.distanceKm"
+                            class="text-[10px] text-slate-500"
+                            x-text="Math.round(leg.distanceKm).toLocaleString() + ' km'"
+                          ></span>
+                          <span
+                            x-show="leg.carbonKg"
+                            class="badge text-[10px] bg-emerald-500/15 text-emerald-300"
+                            x-text="formatCarbonKg(leg.carbonKg)"
+                          ></span>
+                        </button>
+                      </template>
+                    </div>
+
+                    <!-- Checkpoints on this watch -->
+                    <div x-show="seg.checkpoints.length" class="mt-3 flex flex-wrap gap-1.5">
+                      <template x-for="cp in seg.checkpoints" :key="cp.action.spdxId">
+                        <button
+                          type="button"
+                          @click="navigateToSupplyChain(cp.action.spdxId)"
+                          class="badge text-[11px] hover:brightness-110 transition"
+                          :class="cp.status?.badgeClass || cp.meta.chip"
+                          x-text="cp.action.name || cleanName(cp.action.spdxId)"
+                        ></button>
+                      </template>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </template>
+        </div>
+
+        <div
+          x-show="supplyChainCustodyJourney.length === 0"
+          class="text-center py-12 text-slate-500 text-sm"
+        >
+          No custody or ownership transfers recorded
+        </div>
+      </section>
+    </template>
+  </div>
+
+  <!-- ==================================================================== -->
+  <!-- LIFECYCLE STATES                                                      -->
+  <!-- ==================================================================== -->
+  <div x-show="supplyChainViewMode === 'lifecycle'" class="space-y-4">
+    <template x-if="mountedViews.supplychain && supplyChainViewMode === 'lifecycle'">
+      <section class="space-y-3">
+        <div class="flex items-center gap-3">
+          <div class="text-sm font-semibold text-white">Lifecycle states</div>
+          <div class="text-xs text-slate-500">
+            The product's state machine, driven by StateActions and their decision processes.
+          </div>
+        </div>
+
+        <ol class="relative pl-7 space-y-4">
+          <div class="absolute left-[0.85rem] top-3 bottom-3 w-0.5 rounded bg-slate-700/70"></div>
+          <template x-for="(step, i) in supplyChainLifecycleSteps" :key="step.action.spdxId">
+            <li class="relative">
+              <span
+                class="absolute left-[-1.72rem] top-3 w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold ring-4 ring-slate-900"
+                :class="{
+                  'bg-emerald-500/20 text-emerald-300': step.tone === 'positive',
+                  'bg-rose-500/20 text-rose-300': step.tone === 'exception',
+                  'bg-cyan-500/20 text-cyan-300': step.tone === 'neutral'
+                }"
+                x-text="i + 1"
+              ></span>
+              <div
+                class="card cursor-pointer relative overflow-hidden"
+                @click="navigateToSupplyChain(step.action.spdxId)"
+              >
+                <span
+                  class="absolute left-0 top-0 bottom-0 w-1"
+                  :class="{
+                    'bg-emerald-400': step.tone === 'positive',
+                    'bg-rose-400': step.tone === 'exception',
+                    'bg-cyan-400': step.tone === 'neutral'
+                  }"
+                ></span>
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="font-semibold text-white text-sm" x-text="step.name"></span>
+                  <span
+                    x-show="step.status"
+                    class="badge text-[11px]"
+                    :class="step.status?.badgeClass"
+                    x-text="step.status?.label"
+                  ></span>
+                  <span class="text-xs text-slate-500" x-text="formatDate(step.time)"></span>
+                </div>
+                <div
+                  x-show="isMeaningful(step.description)"
+                  class="text-xs text-slate-400 mt-1"
+                  x-text="step.description"
+                ></div>
+                <div
+                  class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-[11px] text-slate-500"
+                >
+                  <span x-show="step.location" class="flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                      />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                    </svg>
+                    <span x-text="step.location"></span>
+                  </span>
+                  <span x-show="step.decisionProcess" class="flex items-center gap-1">
+                    <span class="text-slate-600">via</span>
+                    <span class="text-indigo-300" x-text="step.decisionProcess"></span>
+                  </span>
+                  <span x-show="step.evidence" x-text="step.evidence + ' evidence'"></span>
+                </div>
+                <div x-show="step.performers.length" class="flex flex-wrap gap-1.5 mt-2">
+                  <template x-for="name in step.performers" :key="name">
+                    <span
+                      class="badge text-[10px] bg-lime-500/15 text-lime-300"
+                      x-text="name"
+                    ></span>
+                  </template>
+                </div>
+              </div>
+            </li>
+          </template>
+        </ol>
+
+        <div
+          x-show="supplyChainLifecycleSteps.length === 0"
+          class="text-center py-12 text-slate-500 text-sm"
+        >
+          No state transitions recorded
+        </div>
+      </section>
+    </template>
+  </div>
+
+  <!-- ==================================================================== -->
+  <!-- ROUTE MAP                                                             -->
+  <!-- ==================================================================== -->
+  <div x-show="supplyChainViewMode === 'map'" class="space-y-4">
+    <template x-if="mountedViews.supplychain && supplyChainViewMode === 'map'">
+      <section class="space-y-3">
+        <div class="flex flex-wrap items-center gap-3">
+          <div class="text-sm font-semibold text-white">Route map</div>
+          <div class="text-xs text-slate-500">The product's physical journey across locations.</div>
+          <div class="ml-auto flex items-center gap-2">
+            <span
+              x-show="supplyChainRouteMap.totalDistanceKm"
+              class="badge text-[11px] bg-slate-700/70 text-slate-300"
+              x-text="Math.round(supplyChainRouteMap.totalDistanceKm).toLocaleString() + ' km'"
+            ></span>
+            <span
+              x-show="supplyChainRouteMap.totalCarbonKg"
+              class="badge text-[11px] bg-emerald-500/15 text-emerald-300"
+              x-text="formatCarbonKg(supplyChainRouteMap.totalCarbonKg)"
+            ></span>
+          </div>
+        </div>
+
+        <!-- Rendered as an x-html string: Alpine <template x-for> cannot live
+             inside <svg> (foreign content breaks Vite's HTML parser), and a
+             computed SVG string is cleaner for a diagram anyway. Clicks are
+             delegated from the container to the stop/leg <g data-sc-*> nodes. -->
+        <div
+          class="card p-0 overflow-hidden"
+          x-show="supplyChainRouteMap.stops.length"
+          @click="supplyChainMapClick($event)"
+          x-html="supplyChainRouteMapSvg"
+        ></div>
+
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-slate-500">
+          <span class="flex items-center gap-1.5"
+            ><span class="w-3 h-0.5 rounded-full" style="background: #22d3ee"></span> Road</span
+          >
+          <span class="flex items-center gap-1.5"
+            ><span class="w-3 h-0.5 rounded-full" style="background: #a78bfa"></span> Air</span
+          >
+          <span class="flex items-center gap-1.5"
+            ><span class="w-3 h-0.5 rounded-full" style="background: #fbbf24"></span> Rail</span
+          >
+          <span class="flex items-center gap-1.5"
+            ><span class="w-3 h-0.5 rounded-full" style="background: #38bdf8"></span> Sea</span
+          >
+          <span x-show="!supplyChainRouteMap.projected" class="text-slate-600"
+            >Schematic layout: locations could not be geocoded, so order follows the journey.</span
+          >
+        </div>
+
+        <div
+          x-show="supplyChainRouteMap.stops.length === 0"
+          class="text-center py-12 text-slate-500 text-sm"
+        >
+          No locations recorded for this supply chain
+        </div>
+      </section>
+    </template>
+  </div>
 </div>
