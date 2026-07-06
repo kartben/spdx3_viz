@@ -26,30 +26,33 @@ Options:
 
 ## Mapping
 
-| CycloneDX                                                       | SPDX 3.0.1                                                                                            |
-| --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `metadata.tools.components[]`                                   | `Tool` (referenced from `CreationInfo.createdUsing`)                                                  |
-| tool `manufacturer` / `metadata.component.supplier`             | `Organization` (`CreationInfo.createdBy`)                                                             |
-| `metadata.component`                                            | root `software_Package`, used as the SBOM `rootElement`                                               |
-| `components[]`                                                  | `software_Package` with a `software_SoftwarePurpose` from the component `type`                        |
-| `components[].purl`                                             | `ExternalIdentifier(packageUrl)` + `software_packageUrl`                                              |
-| `components[].cpe`                                              | `ExternalIdentifier(cpe22 / cpe23)`                                                                   |
-| `components[].supplier`                                         | `suppliedBy` → `Organization`                                                                         |
-| `components[].hashes[]`                                         | `Hash` (`verifiedUsing`)                                                                              |
-| `components[].licenses[].license.id` / `.expression`            | `simplelicensing_LicenseExpression` via `hasDeclaredLicense`                                          |
-| `components[].licenses[].license.name` (non-SPDX)               | `expandedlicensing_CustomLicense` via `hasDeclaredLicense`                                            |
-| `components[].properties[]` (e.g. Trivy metadata)               | `extension_CdxPropertiesExtension` (lossless)                                                         |
-| `dependencies[].dependsOn`                                      | `Relationship(dependsOn)` (`completeness = complete`)                                                 |
-| `dependencies[].provides`                                       | `Relationship(hasProvidedDependency)`                                                                 |
-| `vulnerabilities[]`                                             | `security_Vulnerability`                                                                              |
-| `vulnerabilities[].id`                                          | `ExternalIdentifier(cve / securityOther)`                                                             |
-| `vulnerabilities[].cwes[]`                                      | `ExternalRef(cwe)`                                                                                    |
-| `vulnerabilities[].advisories[]` / `.source`                    | `ExternalRef(securityAdvisory)`                                                                       |
-| `vulnerabilities[].ratings[]` (CVSS v2/v3/v3.1/v4)              | `security_Cvss{V2,V3,V4}VulnAssessmentRelationship` (`hasAssessmentFor`)                              |
-| `vulnerabilities[].ratings[]` (severity only, no vector)        | recorded as a note on the `security_Vulnerability`                                                    |
-| `vulnerabilities[].affects[]` (VEX status)                      | `security_Vex{Affected,NotAffected,Fixed,UnderInvestigation}VulnAssessmentRelationship`               |
-| `vulnerabilities[].recommendation`                              | VEX `security_actionStatement`                                                                        |
-| `.analysis` (`state` / `justification` / `response` / `detail`) | VEX status class + `security_justificationType` / `security_impactStatement` / `security_statusNotes` |
+| CycloneDX                                                                                                | SPDX 3.0.1                                                                                            |
+| -------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `metadata.tools.components[]`                                                                            | `Tool` (referenced from `CreationInfo.createdUsing`)                                                  |
+| tool `manufacturer` / `metadata.component.supplier`                                                      | `Organization` (`CreationInfo.createdBy`)                                                             |
+| `metadata.component`                                                                                     | root `software_Package`, used as the SBOM `rootElement`                                               |
+| `components[]` (`type != "file"`)                                                                        | `software_Package` with a `software_SoftwarePurpose` from the component `type`                        |
+| `components[].type == "file"`                                                                            | `software_File` (`software_fileKind = file`, `primaryPurpose = file`)                                 |
+| nested `components[]` (sub-libraries / files)                                                            | same mapping, recursively + a `Relationship(contains)` from parent to child                           |
+| `components[].purl`                                                                                      | `ExternalIdentifier(packageUrl)` + `software_packageUrl`                                              |
+| `components[].cpe`                                                                                       | `ExternalIdentifier(cpe22 / cpe23)`                                                                   |
+| `components[].group`                                                                                     | `extension_CdxPropertiesExtension` entry (`cdx:group`)                                                |
+| `components[].supplier`                                                                                  | `suppliedBy` → `Organization`                                                                         |
+| `components[].hashes[]`                                                                                  | `Hash` (`verifiedUsing`)                                                                              |
+| `components[].licenses[].license.id` / `.expression`                                                     | `simplelicensing_LicenseExpression` via `hasDeclaredLicense`                                          |
+| `components[].licenses[].license.name` (non-SPDX)                                                        | `expandedlicensing_CustomLicense` via `hasDeclaredLicense`                                            |
+| `components[].properties[]` (Trivy metadata; GraalVM per-file `class` / `method` / `field` reachability) | `extension_CdxPropertiesExtension` (lossless)                                                         |
+| `dependencies[].dependsOn`                                                                               | `Relationship(dependsOn)` (`completeness = complete`)                                                 |
+| `dependencies[].provides`                                                                                | `Relationship(hasProvidedDependency)`                                                                 |
+| `vulnerabilities[]`                                                                                      | `security_Vulnerability`                                                                              |
+| `vulnerabilities[].id`                                                                                   | `ExternalIdentifier(cve / securityOther)`                                                             |
+| `vulnerabilities[].cwes[]`                                                                               | `ExternalRef(cwe)`                                                                                    |
+| `vulnerabilities[].advisories[]` / `.source`                                                             | `ExternalRef(securityAdvisory)`                                                                       |
+| `vulnerabilities[].ratings[]` (CVSS v2/v3/v3.1/v4)                                                       | `security_Cvss{V2,V3,V4}VulnAssessmentRelationship` (`hasAssessmentFor`)                              |
+| `vulnerabilities[].ratings[]` (severity only, no vector)                                                 | recorded as a note on the `security_Vulnerability`                                                    |
+| `vulnerabilities[].affects[]` (VEX status)                                                               | `security_Vex{Affected,NotAffected,Fixed,UnderInvestigation}VulnAssessmentRelationship`               |
+| `vulnerabilities[].recommendation`                                                                       | VEX `security_actionStatement`                                                                        |
+| `.analysis` (`state` / `justification` / `response` / `detail`)                                          | VEX status class + `security_justificationType` / `security_impactStatement` / `security_statusNotes` |
 
 ### Notes
 
@@ -59,6 +62,14 @@ Options:
 - CVSS relationships require a score **and** a vector string; ratings that carry
   only a qualitative severity label (e.g. a distro's own rating) are preserved as
   a note on the vulnerability instead of being dropped.
+- Nested components (a GraalVM native-image SBOM records `library` modules that
+  each contain `file` components for their reachable Java sources) are converted
+  recursively and stitched together with `contains` relationships. Because these
+  nested components carry no `bom-ref`, their spdxIds are derived from the
+  ancestor path and de-duplicated so name clashes (e.g. every Maven package nests
+  an "unnamed module") cannot collide.
+- The SBOM `element` set lists every package and file; `rootElement` is the
+  scanned `metadata.component` when present, otherwise the top-level components.
 - The output validates by round-tripping through the model's `JSONLDDeserializer`.
 
 ## Declared profiles

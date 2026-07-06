@@ -8,12 +8,19 @@ document as possible, mapping it onto native SPDX 3 concepts:
   * ``metadata.tools`` / ``metadata.component.supplier`` -> Tool / Organization + CreationInfo
   * ``metadata.component``                              -> root software_Package (the scanned image)
   * ``components[]``                                    -> software_Package (with SoftwarePurpose)
+  * ``components[].type == "file"``                     -> software_File (fileKind=file), e.g. the
+                                                          Java source files a GraalVM native-image
+                                                          SBOM records per module
+  * nested ``components[]`` (sub-libraries / files)     -> the same mapping applied recursively, with a
+                                                          ``contains`` Relationship from parent to child
+  * ``components[].group``                              -> CdxPropertiesExtension entry (``cdx:group``)
   * ``components[].licenses``                           -> hasDeclaredLicense relationships to
                                                           LicenseExpression / CustomLicense elements
   * ``components[].hashes``                             -> Hash (verifiedUsing)
   * ``components[].supplier``                           -> suppliedBy Organization
   * ``components[].purl``                               -> ExternalIdentifier(packageUrl) + packageUrl
-  * ``components[].properties`` (e.g. Trivy metadata)   -> CdxPropertiesExtension (lossless)
+  * ``components[].properties`` (e.g. Trivy metadata,   -> CdxPropertiesExtension (lossless); GraalVM
+    GraalVM class/method/field reachability data)          records per-file reachable members this way
   * ``dependencies[]``                                  -> dependsOn Relationship
   * ``vulnerabilities[]``                               -> security_Vulnerability
   * ``vulnerabilities[].ratings``                       -> Cvss{V2,V3,V4}VulnAssessmentRelationship
@@ -191,9 +198,12 @@ class Converter:
         self.ns = (namespace or f"https://spdx.org/spdxdocs/cdx2spdx-{serial}").rstrip("/")
 
         self.objects = []          # every Element we mint (gets serialized)
-        self.ref_to_pkg = {}       # CycloneDX bom-ref -> software_Package
+        self.ref_to_pkg = {}       # CycloneDX bom-ref/purl -> software element
         self.orgs = {}             # supplier name -> Organization
         self.licenses = {}         # cache key -> AnyLicenseInfo element
+        self.software_elements = []  # every Package/File (the SBOM `element` set)
+        self.top_elements = []     # depth-0 components (SBOM `rootElement` fallback)
+        self._used_iris = set()    # guards against duplicate spdxIds
         self._seq = 0
 
         self.creation_info = None  # shared CreationInfo for every element
@@ -206,6 +216,23 @@ class Converter:
     def seq_iri(self, kind):
         self._seq += 1
         return f"{self.ns}/{kind}/{self._seq}"
+
+    def unique_iri(self, kind, key):
+        """Like ``iri`` but guarantees the result is not already in use.
+
+        Nested CycloneDX components (GraalVM modules, source files) carry no
+        ``bom-ref``, and many share a name (e.g. every Maven package nests an
+        "unnamed module"), so deriving an IRI from the name alone would collide.
+        On a clash we append a counter until the id is free.
+        """
+        base = self.iri(kind, key)
+        candidate = base
+        n = 2
+        while candidate in self._used_iris:
+            candidate = f"{base}-{n}"
+            n += 1
+        self._used_iris.add(candidate)
+        return candidate
 
     def new(self, cls, spdx_id):
         """Instantiate an Element, wire up creationInfo + spdxId, and register it."""
@@ -321,24 +348,95 @@ class Converter:
 
     # -- extensions (lossless CycloneDX property carry-over) ---------------- #
 
-    def properties_extension(self, properties):
-        if not properties:
-            return None
-        ext = spdx.extension_CdxPropertiesExtension()
+    def apply_extension(self, elem, comp):
+        """Attach a CdxPropertiesExtension carrying every CycloneDX property
+        that has no native SPDX home.
+
+        This covers the component's own ``properties[]`` (Trivy metadata, and the
+        per-file ``class`` / ``method`` / ``field`` / ``constructor`` reachability
+        entries a GraalVM native-image SBOM records) plus the ``group`` field,
+        which SPDX has no dedicated slot for.
+        """
         entries = []
-        for prop in properties:
+
+        group = comp.get("group")
+        if group:
+            group_entry = spdx.extension_CdxPropertyEntry()
+            group_entry.extension_cdxPropName = "cdx:group"
+            group_entry.extension_cdxPropValue = str(group)
+            entries.append(group_entry)
+
+        for prop in comp.get("properties", []):
             entry = spdx.extension_CdxPropertyEntry()
             entry.extension_cdxPropName = prop.get("name", "")
             entry.extension_cdxPropValue = prop.get("value", "")
             entries.append(entry)
+
+        if not entries:
+            return
+        ext = spdx.extension_CdxPropertiesExtension()
         ext.extension_cdxProperty = entries
-        return ext
+        elem.extension = [ext]
 
-    # -- packages ----------------------------------------------------------- #
+    def build_hashes(self, comp):
+        hashes = []
+        for h in comp.get("hashes", []):
+            alg = HASH_MAP.get(h.get("alg"))
+            if alg is None:
+                continue
+            hobj = spdx.Hash()
+            hobj.algorithm = alg
+            hobj.hashValue = h.get("content", "")
+            hashes.append(hobj)
+        return hashes
 
-    def build_package(self, comp):
-        ref = comp.get("bom-ref") or comp.get("purl") or comp.get("name")
-        pkg = self.new(spdx.software_Package, self.iri("Package", ref))
+    def apply_licenses(self, elem, comp):
+        """Emit hasDeclaredLicense relationship(s) for a component's licenses."""
+        lic_targets = [self.license_element(e) for e in comp.get("licenses", [])]
+        lic_targets = [x for x in lic_targets if x is not None]
+        if lic_targets:
+            rel = self.new(spdx.Relationship, self.seq_iri("Relationship"))
+            rel.from_ = elem
+            rel.relationshipType = spdx.RelationshipType.hasDeclaredLicense
+            rel.to = lic_targets
+
+    # -- components (packages, files, and their nesting) -------------------- #
+
+    def build_component(self, comp, path=()):
+        """Build a Package or File for a CycloneDX component, recursing into any
+        nested ``components[]`` and wiring a ``contains`` Relationship to them.
+
+        ``path`` is the chain of ancestor names, used only to mint stable,
+        collision-free spdxIds for the nested elements that carry no bom-ref.
+        """
+        name = comp.get("name", "")
+        # Prefer a real CycloneDX identifier; fall back to the ancestry path so
+        # that name-only nested components still get a unique, readable id.
+        key = comp.get("bom-ref") or comp.get("purl") or "/".join(path + (name,)) or name
+
+        if comp.get("type") == "file":
+            elem = self.build_file(comp, key)
+        else:
+            elem = self.build_package(comp, key)
+
+        # Only components with a genuine ref participate in dependency resolution.
+        ref = comp.get("bom-ref") or comp.get("purl")
+        if ref:
+            self.ref_to_pkg[ref] = elem
+        self.software_elements.append(elem)
+
+        child_path = path + (name,)
+        children = [self.build_component(sub, child_path) for sub in comp.get("components", [])]
+        if children:
+            rel = self.new(spdx.Relationship, self.seq_iri("Relationship"))
+            rel.from_ = elem
+            rel.relationshipType = spdx.RelationshipType.contains
+            rel.to = children
+
+        return elem
+
+    def build_package(self, comp, key):
+        pkg = self.new(spdx.software_Package, self.unique_iri("Package", key))
         pkg.name = comp.get("name", "")
         if comp.get("version"):
             pkg.software_packageVersion = comp["version"]
@@ -374,34 +472,31 @@ class Converter:
         if supplier:
             pkg.suppliedBy = self.organization(supplier)
 
-        hashes = []
-        for h in comp.get("hashes", []):
-            alg = HASH_MAP.get(h.get("alg"))
-            if alg is None:
-                continue
-            hobj = spdx.Hash()
-            hobj.algorithm = alg
-            hobj.hashValue = h.get("content", "")
-            hashes.append(hobj)
+        hashes = self.build_hashes(comp)
         if hashes:
             pkg.verifiedUsing = hashes
 
-        ext = self.properties_extension(comp.get("properties"))
-        if ext is not None:
-            pkg.extension = [ext]
-
-        self.ref_to_pkg[ref] = pkg
-
-        # licenses -> hasDeclaredLicense relationship(s)
-        lic_targets = [self.license_element(e) for e in comp.get("licenses", [])]
-        lic_targets = [x for x in lic_targets if x is not None]
-        if lic_targets:
-            rel = self.new(spdx.Relationship, self.seq_iri("Relationship"))
-            rel.from_ = pkg
-            rel.relationshipType = spdx.RelationshipType.hasDeclaredLicense
-            rel.to = lic_targets
-
+        self.apply_extension(pkg, comp)
+        self.apply_licenses(pkg, comp)
         return pkg
+
+    def build_file(self, comp, key):
+        """Map a CycloneDX ``file`` component to a native SPDX software_File."""
+        f = self.new(spdx.software_File, self.unique_iri("File", key))
+        f.name = comp.get("name", "")
+        f.software_primaryPurpose = spdx.software_SoftwarePurpose.file
+        f.software_fileKind = spdx.software_FileKindType.file
+
+        if comp.get("description"):
+            f.description = comp["description"]
+
+        hashes = self.build_hashes(comp)
+        if hashes:
+            f.verifiedUsing = hashes
+
+        self.apply_extension(f, comp)
+        self.apply_licenses(f, comp)
+        return f
 
     # -- dependencies ------------------------------------------------------- #
 
@@ -605,13 +700,14 @@ class Converter:
     def convert(self):
         self.build_creation_info()
 
-        # Root component (the scanned artifact / image).
+        # Root component (the scanned artifact / image), plus every top-level
+        # component. build_component recurses into nested components (GraalVM
+        # modules and their source files), minting `contains` relationships.
         meta_comp = self.cdx.get("metadata", {}).get("component")
-        root_pkg = self.build_package(meta_comp) if meta_comp else None
+        root_pkg = self.build_component(meta_comp) if meta_comp else None
 
-        # All components.
         for comp in self.cdx.get("components", []):
-            self.build_package(comp)
+            self.top_elements.append(self.build_component(comp))
 
         dep_count = self.build_dependencies()
 
@@ -622,13 +718,15 @@ class Converter:
             self.build_assessments(vuln, velem)
             vuln_count += 1
 
-        # SBOM element grouping (software artifacts only).
-        pkg_elems = list(self.ref_to_pkg.values())
+        # SBOM element grouping: every software artifact (packages *and* files).
+        # rootElement points at the scanned component when present, otherwise the
+        # depth-0 components (never the whole flattened file list).
+        pkg_elems = list(self.software_elements)
         sbom = self.new(spdx.software_Sbom, self.iri("Sbom", "sbom"))
         sbom.name = (meta_comp or {}).get("name", "CycloneDX SBOM")
         sbom.software_sbomType = [spdx.software_SbomType.analyzed]
         sbom.element = pkg_elems
-        sbom.rootElement = [root_pkg] if root_pkg else pkg_elems
+        sbom.rootElement = [root_pkg] if root_pkg else list(self.top_elements)
         sbom.profileConformance = [
             spdx.ProfileIdentifierType.core,
             spdx.ProfileIdentifierType.software,
@@ -647,9 +745,11 @@ class Converter:
         nm.namespace = self.ns + "/"
         doc.namespaceMap = [nm]
 
+        files = sum(1 for e in self.software_elements if isinstance(e, spdx.software_File))
         return {
             "objects": self.objects,
-            "packages": len(pkg_elems),
+            "packages": len(pkg_elems) - files,
+            "files": files,
             "dependencies": dep_count,
             "vulnerabilities": vuln_count,
         }
@@ -695,6 +795,7 @@ def main(argv=None):
         f"Wrote {output}\n"
         f"  elements       : {len(result['objects'])}\n"
         f"  packages       : {result['packages']}\n"
+        f"  files          : {result['files']}\n"
         f"  dependency rels: {result['dependencies']}\n"
         f"  vulnerabilities: {result['vulnerabilities']}",
         file=sys.stderr,
