@@ -476,6 +476,10 @@ export const navigationMixin = {
   // budget is generous because a heavy list view's first render after a deep
   // link can take well over half a second to mount the target card.
   scrollToNavTarget(kind, id) {
+    // Center synchronously so the reactive re-render is scheduled before the
+    // first attempt (deferred via $nextTick + rAF) runs, letting a fast device
+    // find the card on the first try with no artificial delay.
+    this._windowToNavTarget(kind, id);
     const seq = ++this._scrollNavSeq;
     const attempt = (retriesLeft) => {
       if (seq !== this._scrollNavSeq) return; // superseded by a newer navigation
