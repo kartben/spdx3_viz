@@ -134,6 +134,86 @@ test('parseGraph categorizes SPDX 3.1 SupplyChain actions, processes, and states
   );
 });
 
+test('SupplyChain view model exposes lifecycle, custody, and exception structures', () => {
+  const graph = JSON.parse(
+    readFileSync('public/samples/supply-chain/arborlink-sg1-supply-chain.spdx3.jsonld', 'utf8')
+  )['@graph'];
+  const parsed = parseGraph(graph);
+  const indexes = buildRelationshipIndexes(parsed.relationships);
+  const app = spdxApp();
+  Object.assign(app, parsed, indexes);
+
+  assert.deepEqual(app.supplyChainCounts, {
+    actions: 25,
+    processes: 14,
+    states: 9,
+    transports: 2,
+    custody: 2,
+    inspections: 1,
+    tests: 1,
+    exceptions: 1,
+    resolutions: 1
+  });
+
+  assert.deepEqual(
+    app.supplyChainStateTransitions.map((row) => [
+      row.action.name,
+      row.previous?.name || null,
+      row.state?.name || null,
+      row.decisionProcess?.name || null
+    ]),
+    [
+      [
+        'Mark device firmware provisioned',
+        null,
+        'Firmware provisioned',
+        'Factory provisioning process'
+      ],
+      [
+        'Place SG-1 in out-of-spec quarantine',
+        'Firmware provisioned',
+        'Out-of-spec quarantine',
+        'Quarantine decision process'
+      ],
+      [
+        'Mark SG-1 accepted for deployment',
+        'Out-of-spec quarantine',
+        'Accepted for deployment',
+        'Quarantine decision process'
+      ],
+      [
+        'Mark SG-1 deployed with retirement plan',
+        'Accepted for deployment',
+        'Deployed',
+        'Decommissioning plan process'
+      ]
+    ]
+  );
+
+  assert.deepEqual(
+    app.supplyChainActionLanes.map((lane) => [lane.key, lane.items.length]),
+    [
+      ['create', 6],
+      ['move', 6],
+      ['verify', 6],
+      ['exception', 2],
+      ['operate', 12]
+    ]
+  );
+  assert.equal(app.supplyChainTransportLegs.length, 2);
+  assert.equal(app.supplyChainTransportLegs[0].route.includes('Austin secure staging'), true);
+  assert.equal(app.supplyChainCustodyHandoffs.length, 2);
+  assert.equal(app.supplyChainCustodyHandoffs[1].category, 'ownership');
+
+  assert.equal(app.supplyChainExceptionChains.length, 1);
+  assert.equal(app.supplyChainExceptionChains[0].resolutions.length, 1);
+  assert.equal(
+    app.supplyChainExceptionChains[0].resolutions[0].name,
+    'Resolve shipment shock excursion'
+  );
+  assert.equal(app.supplyChainExceptionChains[0].evidenceCount, 4);
+});
+
 test('parseBuildParameters groups Zephyr-style build_parameter entries', () => {
   const groups = parseBuildParameters({
     build_parameter: [

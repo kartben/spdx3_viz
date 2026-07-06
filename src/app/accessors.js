@@ -224,6 +224,117 @@ export const accessorsMixin = {
     );
   },
 
+  supplyChainFamily(el) {
+    const t = el?.type || '';
+    if (
+      isA(t, CLASS.supplychain_CreateAction) ||
+      isA(t, CLASS.supplychain_ManufactureAction) ||
+      isA(t, CLASS.supplychain_AssemblyAction) ||
+      isA(t, CLASS.supplychain_HarvestAction) ||
+      isA(t, CLASS.supplychain_ReproduceAction)
+    ) {
+      return 'create';
+    }
+    if (
+      isA(t, CLASS.supplychain_TransportAction) ||
+      isA(t, CLASS.supplychain_StorageAction) ||
+      isA(t, CLASS.supplychain_ResponsibilityChangeAction) ||
+      isA(t, CLASS.supplychain_BoundaryCrossingAction)
+    ) {
+      return 'move';
+    }
+    if (
+      isA(t, CLASS.supplychain_InspectionAction) ||
+      isA(t, CLASS.supplychain_TestAction) ||
+      isA(t, CLASS.supplychain_StateAction)
+    ) {
+      return 'verify';
+    }
+    if (isA(t, CLASS.supplychain_OutOfSpecAction) || isA(t, CLASS.supplychain_ResolutionAction)) {
+      return 'exception';
+    }
+    if (
+      isA(t, CLASS.supplychain_UseAction) ||
+      isA(t, CLASS.supplychain_PlanAction) ||
+      isA(t, CLASS.supplychain_DestroyAction)
+    ) {
+      return 'operate';
+    }
+    if (this.supplyChainKind(el) === 'process') return 'process';
+    if (this.supplyChainKind(el) === 'state') return 'state';
+    return 'other';
+  },
+
+  supplyChainFamilyMeta(el) {
+    const meta = {
+      create: {
+        label: 'Create / make',
+        dot: 'bg-sky-400',
+        iconBg: 'bg-sky-500/15',
+        text: 'text-sky-300',
+        border: 'border-sky-500/35',
+        ring: 'ring-sky-500/20'
+      },
+      move: {
+        label: 'Move / custody',
+        dot: 'bg-cyan-400',
+        iconBg: 'bg-cyan-500/15',
+        text: 'text-cyan-300',
+        border: 'border-cyan-500/35',
+        ring: 'ring-cyan-500/20'
+      },
+      verify: {
+        label: 'Inspect / test',
+        dot: 'bg-violet-400',
+        iconBg: 'bg-violet-500/15',
+        text: 'text-violet-300',
+        border: 'border-violet-500/35',
+        ring: 'ring-violet-500/20'
+      },
+      exception: {
+        label: 'Exception path',
+        dot: 'bg-rose-400',
+        iconBg: 'bg-rose-500/15',
+        text: 'text-rose-300',
+        border: 'border-rose-500/35',
+        ring: 'ring-rose-500/20'
+      },
+      operate: {
+        label: 'Use / retire',
+        dot: 'bg-emerald-400',
+        iconBg: 'bg-emerald-500/15',
+        text: 'text-emerald-300',
+        border: 'border-emerald-500/35',
+        ring: 'ring-emerald-500/20'
+      },
+      process: {
+        label: 'Defined process',
+        dot: 'bg-indigo-400',
+        iconBg: 'bg-indigo-500/15',
+        text: 'text-indigo-300',
+        border: 'border-indigo-500/35',
+        ring: 'ring-indigo-500/20'
+      },
+      state: {
+        label: 'State',
+        dot: 'bg-teal-400',
+        iconBg: 'bg-teal-500/15',
+        text: 'text-teal-300',
+        border: 'border-teal-500/35',
+        ring: 'ring-teal-500/20'
+      },
+      other: {
+        label: 'Supply chain',
+        dot: 'bg-slate-400',
+        iconBg: 'bg-slate-500/15',
+        text: 'text-slate-300',
+        border: 'border-slate-500/35',
+        ring: 'ring-slate-500/20'
+      }
+    };
+    return meta[this.supplyChainFamily(el)] || meta.other;
+  },
+
   supplyChainExceptionStatus(el) {
     if (!el) return null;
     if (isA(el.type, CLASS.supplychain_OutOfSpecAction)) {
@@ -290,6 +401,22 @@ export const accessorsMixin = {
       .filter(Boolean);
   },
 
+  supplyChainTargets(el, relationshipType) {
+    return this.outgoingRels(el?.spdxId)
+      .filter((rel) => rel.relationshipType === relationshipType)
+      .flatMap((rel) => (Array.isArray(rel.to) ? rel.to : [rel.to]))
+      .map((id) => this.elementMap.get(id))
+      .filter(Boolean);
+  },
+
+  supplyChainTargetNames(el, relationshipType, limit = 2) {
+    const names = this.supplyChainTargets(el, relationshipType)
+      .map((target) => target.name || this.cleanName(target.spdxId))
+      .filter(Boolean);
+    if (names.length <= limit) return names.join(', ');
+    return `${names.slice(0, limit).join(', ')} +${names.length - limit}`;
+  },
+
   supplyChainEvidenceCount(el) {
     return this.outgoingRels(el?.spdxId)
       .filter((rel) => rel.relationshipType === 'hasEvidence')
@@ -321,6 +448,28 @@ export const accessorsMixin = {
     }
     push('SPDX ID', el?.spdxId, true);
     return rows;
+  },
+
+  supplyChainCardFacts(el) {
+    const facts = [];
+    const push = (label, value) => {
+      if (this.isMeaningful(value)) facts.push({ label, value });
+    };
+    push('When', this.supplyChainTimeRange(el));
+    push('Where', this.supplyChainRoute(el));
+    push('State', this.supplyChainStateName(el));
+    const responsibility = this.supplyChainResponsibility(el);
+    if (responsibility) {
+      push('Handoff', `${responsibility.previous || '—'} → ${responsibility.current || '—'}`);
+      push('Product', responsibility.product);
+    }
+    push('Outputs', this.supplyChainTargetNames(el, 'hasOutput'));
+    push('Affects', this.supplyChainTargetNames(el, 'affects'));
+    push(
+      'Evidence',
+      this.supplyChainEvidenceCount(el) ? `${this.supplyChainEvidenceCount(el)} artifact(s)` : ''
+    );
+    return facts.slice(0, 4);
   },
 
   getBuildConfigFor(targetSpdxId) {

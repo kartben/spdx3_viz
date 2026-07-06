@@ -192,17 +192,183 @@ export const derivedMixin = {
   },
 
   get supplyChainCounts() {
-    const c = { actions: 0, processes: 0, states: 0, exceptions: 0, resolutions: 0 };
+    const c = {
+      actions: 0,
+      processes: 0,
+      states: 0,
+      transports: 0,
+      custody: 0,
+      inspections: 0,
+      tests: 0,
+      exceptions: 0,
+      resolutions: 0
+    };
     this.supplyChain.forEach((el) => {
       const kind = this.supplyChainKind(el);
       if (kind === 'action') c.actions++;
       else if (kind === 'process') c.processes++;
       else if (kind === 'state') c.states++;
+      if (isA(el.type, CLASS.supplychain_TransportAction)) c.transports++;
+      if (isA(el.type, CLASS.supplychain_ResponsibilityChangeAction)) c.custody++;
+      if (isA(el.type, CLASS.supplychain_InspectionAction)) c.inspections++;
+      if (isA(el.type, CLASS.supplychain_TestAction)) c.tests++;
       const status = this.supplyChainExceptionStatus(el);
       if (status?.key === 'exception') c.exceptions++;
       if (status?.key === 'resolved') c.resolutions++;
     });
     return c;
+  },
+
+  get supplyChainActions() {
+    return this.supplyChain
+      .filter((el) => this.supplyChainKind(el) === 'action')
+      .sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
+  },
+
+  get supplyChainProcesses() {
+    return this.supplyChain
+      .filter((el) => this.supplyChainKind(el) === 'process')
+      .sort((a, b) =>
+        (a.name || this.cleanName(a.spdxId)).localeCompare(b.name || this.cleanName(b.spdxId))
+      );
+  },
+
+  get supplyChainStates() {
+    return this.supplyChain
+      .filter((el) => this.supplyChainKind(el) === 'state')
+      .sort((a, b) =>
+        (a.name || this.cleanName(a.spdxId)).localeCompare(b.name || this.cleanName(b.spdxId))
+      );
+  },
+
+  get supplyChainStateTransitions() {
+    return this.supplyChainActions
+      .filter((el) => isA(el.type, CLASS.supplychain_StateAction))
+      .map((action, index, list) => ({
+        action,
+        index,
+        previous: index > 0 ? this.elementMap.get(list[index - 1].supplychain_currentState) : null,
+        state: this.elementMap.get(action.supplychain_currentState) || null,
+        decisionProcess: this.elementMap.get(action.supplychain_decisionProcess) || null,
+        status: this.supplyChainExceptionStatus(action)
+      }));
+  },
+
+  get supplyChainCustodyHandoffs() {
+    return this.supplyChainActions
+      .filter((el) => isA(el.type, CLASS.supplychain_ResponsibilityChangeAction))
+      .map((action) => ({
+        action,
+        previous: this.elementMap.get(action.supplychain_previous) || null,
+        current: this.elementMap.get(action.supplychain_current) || null,
+        product: this.elementMap.get(action.supplychain_responsibilityChangedOn) || null,
+        category: action.supplychain_responsibilityCategory || '',
+        location: this.elementMap.get(action.actionLocation) || null
+      }));
+  },
+
+  get supplyChainTransportLegs() {
+    return this.supplyChainActions
+      .filter((el) => isA(el.type, CLASS.supplychain_TransportAction))
+      .map((action) => ({
+        action,
+        pickup: this.elementMap.get(action.supplychain_pickupLocation) || null,
+        dropoff: this.elementMap.get(action.supplychain_dropoffLocation) || null,
+        route: action.supplychain_transportRoute || ''
+      }));
+  },
+
+  get supplyChainExceptionChains() {
+    return this.supplyChainActions
+      .filter((el) => isA(el.type, CLASS.supplychain_OutOfSpecAction))
+      .map((exception) => {
+        const seenResolutionIds = new Set();
+        const resolutions = this.relationships
+          .filter(
+            (rel) =>
+              (rel.relationshipType === 'resolved' || rel.relationshipType === 'hasResolution') &&
+              (Array.isArray(rel.to) ? rel.to : [rel.to]).includes(exception.spdxId)
+          )
+          .map((rel) => this.elementMap.get(rel.from))
+          .filter((resolution) => {
+            if (!resolution || seenResolutionIds.has(resolution.spdxId)) return false;
+            seenResolutionIds.add(resolution.spdxId);
+            return true;
+          });
+        return {
+          exception,
+          resolutions,
+          evidenceCount:
+            this.supplyChainEvidenceCount(exception) +
+            resolutions.reduce(
+              (total, resolution) => total + this.supplyChainEvidenceCount(resolution),
+              0
+            )
+        };
+      });
+  },
+
+  get supplyChainActionLanes() {
+    const lanes = [
+      {
+        key: 'create',
+        label: 'Create / make',
+        color: '#38bdf8',
+        items: this.supplyChainActions.filter(
+          (el) =>
+            isA(el.type, CLASS.supplychain_CreateAction) ||
+            isA(el.type, CLASS.supplychain_ManufactureAction) ||
+            isA(el.type, CLASS.supplychain_AssemblyAction) ||
+            isA(el.type, CLASS.supplychain_HarvestAction) ||
+            isA(el.type, CLASS.supplychain_ReproduceAction)
+        )
+      },
+      {
+        key: 'move',
+        label: 'Move / custody',
+        color: '#22d3ee',
+        items: this.supplyChainActions.filter(
+          (el) =>
+            isA(el.type, CLASS.supplychain_TransportAction) ||
+            isA(el.type, CLASS.supplychain_StorageAction) ||
+            isA(el.type, CLASS.supplychain_ResponsibilityChangeAction) ||
+            isA(el.type, CLASS.supplychain_BoundaryCrossingAction)
+        )
+      },
+      {
+        key: 'verify',
+        label: 'Inspect / test / decide',
+        color: '#a78bfa',
+        items: this.supplyChainActions.filter(
+          (el) =>
+            isA(el.type, CLASS.supplychain_InspectionAction) ||
+            isA(el.type, CLASS.supplychain_TestAction) ||
+            isA(el.type, CLASS.supplychain_StateAction)
+        )
+      },
+      {
+        key: 'exception',
+        label: 'Exception / resolution',
+        color: '#fb7185',
+        items: this.supplyChainActions.filter(
+          (el) =>
+            isA(el.type, CLASS.supplychain_OutOfSpecAction) ||
+            isA(el.type, CLASS.supplychain_ResolutionAction)
+        )
+      },
+      {
+        key: 'operate',
+        label: 'Use / retire',
+        color: '#34d399',
+        items: this.supplyChainActions.filter(
+          (el) =>
+            isA(el.type, CLASS.supplychain_UseAction) ||
+            isA(el.type, CLASS.supplychain_PlanAction) ||
+            isA(el.type, CLASS.supplychain_DestroyAction)
+        )
+      }
+    ];
+    return lanes.filter((lane) => lane.items.length);
   },
 
   get filteredSupplyChain() {
