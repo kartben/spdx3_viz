@@ -14,6 +14,7 @@ import {
   getElementBadgeClass,
   elementIconSvg as elementIconMarkup,
   typeIconSvg as typeIconMarkup,
+  iconSvg as iconMarkup,
   parseCompileFlags as parseBuildConfigFlags,
   parseBuildParameters as parseBuildParameterGroups,
   getToolUsageCount,
@@ -525,6 +526,11 @@ export const accessorsMixin = {
   },
   nodeTypeIconSvg(nodeType, className = 'w-3.5 h-3.5') {
     return typeIconMarkup(nodeType, className);
+  },
+  // Inline Material-icon <svg> for a raw ICON_PATHS key (toolbar toggles, etc.),
+  // for callers that aren't rendering an SPDX element/node type.
+  uiIconSvg(iconKey, className = 'w-3.5 h-3.5') {
+    return iconMarkup(iconKey, className);
   },
 
   // Flattened AI-profile / Dataset-profile fields for an element (ai_AIPackage

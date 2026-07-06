@@ -64,7 +64,11 @@ const ICONS = {
   view_graph: 'hub',
   view_security: 'security',
   view_raw: 'data_object',
-  view_statistics: { symbol: 'monitoring' }
+  view_statistics: { symbol: 'monitoring' },
+  // Graph toolbar toggle glyphs (not tied to an SPDX element type).
+  toggle_icons: 'image',
+  toggle_aggregate: 'workspaces',
+  toggle_hide_orphans: 'visibility_off'
 };
 
 const here = dirname(fileURLToPath(import.meta.url));
