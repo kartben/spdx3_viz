@@ -171,6 +171,8 @@
       <div class="rounded-xl border border-slate-700/60 bg-slate-800/40 p-2">
         <template x-for="row in safetyTreeRows" :key="row.id">
           <div
+            x-data="{ status: null }"
+            x-effect="status = requirementSafetyStatus(row.el)"
             class="flex items-center gap-2 py-1.5 pr-2 rounded-lg hover:bg-slate-800/70"
             :style="`padding-left:${row.depth * 22 + 4}px`"
           >
@@ -213,15 +215,14 @@
               x-text="row.el?.name || cleanName(row.id)"
             ></button>
             <!-- Compact verification status, kept at the row's right edge. -->
-            <template x-if="requirementSafetyStatus(row.el)">
-              <span
-                class="w-6 h-6 rounded-full inline-flex items-center justify-center flex-shrink-0"
-                :class="requirementSafetyStatus(row.el).badgeClass"
-                :title="requirementSafetyStatus(row.el).label"
-                :aria-label="requirementSafetyStatus(row.el).label"
-                x-html="uiIconSvg(requirementSafetyStatus(row.el).iconKey, 'w-4 h-4')"
-              ></span>
-            </template>
+            <span
+              x-show="status"
+              class="w-6 h-6 rounded-full inline-flex items-center justify-center flex-shrink-0"
+              :class="status?.badgeClass"
+              :title="status?.label"
+              :aria-label="status?.label"
+              x-html="uiIconSvg(status?.iconKey, 'w-4 h-4')"
+            ></span>
             <span
               x-show="row.hasChildren"
               class="text-[10px] text-slate-500 flex-shrink-0 tabular-nums"
@@ -239,6 +240,8 @@
     :key="req.spdxId"
   >
     <div
+      x-data="{ statusMeta: null }"
+      x-effect="statusMeta = requirementSafetyStatus(req) || evaluationResultMeta(req)"
       class="card cursor-pointer"
       data-nav-kind="requirement"
       :data-nav-id="req.spdxId"
@@ -285,12 +288,12 @@
         </div>
         <!-- Outcome belongs at the right edge, separate from descriptive badges. -->
         <span
-          x-show="requirementSafetyStatus(req) || evaluationResultMeta(req)"
+          x-show="statusMeta"
           class="w-8 h-8 rounded-full inline-flex items-center justify-center flex-shrink-0"
-          :class="(requirementSafetyStatus(req) || evaluationResultMeta(req))?.badgeClass"
-          :title="(requirementSafetyStatus(req) || evaluationResultMeta(req))?.label"
-          :aria-label="(requirementSafetyStatus(req) || evaluationResultMeta(req))?.label"
-          x-html="uiIconSvg((requirementSafetyStatus(req) || evaluationResultMeta(req))?.iconKey, 'w-5 h-5')"
+          :class="statusMeta?.badgeClass"
+          :title="statusMeta?.label"
+          :aria-label="statusMeta?.label"
+          x-html="uiIconSvg(statusMeta?.iconKey, 'w-5 h-5')"
         ></span>
         <svg
           class="w-4 h-4 text-slate-500 transition-transform flex-shrink-0"
@@ -417,6 +420,8 @@
                   </div>
                   <template x-for="v in requirementVerifications(req)" :key="v.id">
                     <div
+                      x-data="{ evaluationMeta: null }"
+                      x-effect="evaluationMeta = evaluationResultMeta(v.evaluation)"
                       class="rounded-lg bg-slate-900/40 border border-slate-700/50 p-3 space-y-2"
                     >
                       <div class="flex items-center gap-2 flex-wrap">
@@ -435,12 +440,12 @@
                           ></span>
                         </template>
                         <span
-                          x-show="evaluationResultMeta(v.evaluation)"
+                          x-show="evaluationMeta"
                           class="ml-auto w-7 h-7 rounded-full inline-flex items-center justify-center flex-shrink-0"
-                          :class="evaluationResultMeta(v.evaluation)?.badgeClass"
-                          :title="evaluationResultMeta(v.evaluation)?.label"
-                          :aria-label="evaluationResultMeta(v.evaluation)?.label"
-                          x-html="uiIconSvg(evaluationResultMeta(v.evaluation)?.iconKey, 'w-4 h-4')"
+                          :class="evaluationMeta?.badgeClass"
+                          :title="evaluationMeta?.label"
+                          :aria-label="evaluationMeta?.label"
+                          x-html="uiIconSvg(evaluationMeta?.iconKey, 'w-4 h-4')"
                         ></span>
                       </div>
                       <div
@@ -501,6 +506,8 @@
                   <div class="space-y-1 ml-3">
                     <template x-for="item in section.group.items" :key="item.id">
                       <div
+                        x-data="{ evaluationMeta: null }"
+                        x-effect="evaluationMeta = evaluationResultMeta(elementMap.get(item.id))"
                         class="detail-rel-item group"
                         @click.stop="item.multiRange ? openSnippetRanges(item.snippetIds) : navigateTo(item.id)"
                       >
@@ -516,12 +523,12 @@
                         ></span>
                         <span class="flex-1 truncate" x-text="item.displayName"></span>
                         <span
-                          x-show="evaluationResultMeta(elementMap.get(item.id))"
+                          x-show="evaluationMeta"
                           class="w-6 h-6 rounded-full inline-flex items-center justify-center flex-shrink-0"
-                          :class="evaluationResultMeta(elementMap.get(item.id))?.badgeClass"
-                          :title="`Evaluation: ${evaluationResultMeta(elementMap.get(item.id))?.label}`"
-                          :aria-label="`Evaluation: ${evaluationResultMeta(elementMap.get(item.id))?.label}`"
-                          x-html="uiIconSvg(evaluationResultMeta(elementMap.get(item.id))?.iconKey, 'w-4 h-4')"
+                          :class="evaluationMeta?.badgeClass"
+                          :title="evaluationMeta ? `Evaluation: ${evaluationMeta.label}` : null"
+                          :aria-label="evaluationMeta ? `Evaluation: ${evaluationMeta.label}` : null"
+                          x-html="uiIconSvg(evaluationMeta?.iconKey, 'w-4 h-4')"
                         ></span>
                         <svg
                           class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors flex-shrink-0"
