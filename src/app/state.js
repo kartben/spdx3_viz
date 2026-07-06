@@ -235,7 +235,7 @@ export function createState() {
     // the base node/edge draw.
     graphHeatMode: 'off',
     graphHeatMenuOpen: false, // the toolbar heat-mode picker popover
-    graphHeatModeList: [], // applicable modes + live counts, recomputed when the menu opens
+    graphHeatModeList: [], // applicable modes + live counts, refreshed after loading and on menu open
     graphRecomputeHeat: null, // set by the graph renderer; repaints the heat layer without a rebuild
     expandedClusters: new Set(), // cluster keys the user has drilled into
     graphExpandedCount: 0, // reactive mirror of expandedClusters.size (Set mutations aren't tracked)

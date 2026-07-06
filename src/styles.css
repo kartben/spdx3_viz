@@ -144,35 +144,6 @@
   cursor: grabbing;
 }
 
-/* Heatmap toolbar toggle: a gentle flame flicker while an overlay is active, so
-   the control reads as "live". Disabled under reduced-motion. */
-.heat-flicker {
-  animation: heatFlicker 2.4s ease-in-out infinite;
-  transform-origin: center bottom;
-}
-
-@keyframes heatFlicker {
-  0%,
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  45% {
-    opacity: 0.75;
-    transform: scale(0.94);
-  }
-  70% {
-    opacity: 0.9;
-    transform: scale(1.04);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .heat-flicker {
-    animation: none;
-  }
-}
-
 .graph-container .node {
   cursor: pointer;
   transition: opacity 0.15s;

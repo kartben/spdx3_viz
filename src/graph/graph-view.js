@@ -1013,7 +1013,7 @@ export function renderGraph(app, retry = 0) {
   //     base graph is untouched and toggling a mode only repaints.
   let heatNodes = []; // render nodes carrying heat, precomputed for the draw loop
   const HEAT_MIN_PX = 26; // screen-space glow floor so heat still pools when zoomed out
-  const HEAT_GLOW_ALPHA = 0.5; // peak core alpha before additive accumulation
+  const HEAT_GLOW_ALPHA = 0.6; // peak core alpha before additive accumulation
   const heatGradientCache = new Map(); // `${color}|${level}` -> unit radial gradient
   const heatGradient = (color, level) => {
     const key = color + '|' + level;
