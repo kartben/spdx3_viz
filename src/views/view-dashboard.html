@@ -1,22 +1,14 @@
-<div x-show="currentView === 'dashboard'" class="fade-in space-y-6 max-w-6xl">
-  <!-- Document metadata -->
-  <div class="card">
-    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+<div x-show="currentView === 'dashboard'" class="fade-in space-y-5 max-w-6xl">
+  <!-- Document identity and the two most useful next actions. -->
+  <section class="card overflow-hidden relative">
+    <div
+      class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-blue-500/0 via-blue-400/70 to-purple-500/0"
+    ></div>
+    <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
       <div class="min-w-0">
-        <h3 class="text-lg font-semibold text-white mb-1" x-text="docName"></h3>
-        <p class="text-sm text-slate-400 mb-1 break-words" x-text="docNamespace"></p>
-        <p x-show="loadedFiles.length > 1" class="text-xs text-slate-500 mb-3">
-          Merged from
-          <span class="text-slate-300 font-medium" x-text="loadedFiles.length"></span>
-          files:
-          <span x-text="loadedFiles.map(f => f.name).join(', ')"></span>
-        </p>
-        <p x-show="loadedFiles.length <= 1" class="mb-3"></p>
-        <div class="flex flex-wrap gap-2">
+        <div class="flex flex-wrap items-center gap-2 mb-2">
           <template x-for="t in sbomTypes" :key="t">
-            <span class="badge bg-indigo-500/15 text-indigo-400">
-              <span x-text="t + ' SBOM'"></span>
-            </span>
+            <span class="badge bg-indigo-500/15 text-indigo-300" x-text="t + ' SBOM'"></span>
           </template>
           <template x-for="p in profileConformance" :key="p">
             <span class="badge bg-emerald-500/15 text-emerald-400">
@@ -32,267 +24,243 @@
             </span>
           </template>
         </div>
-      </div>
-      <div class="text-left sm:text-right text-sm flex-shrink-0">
-        <div class="text-slate-400">
-          Spec <span class="text-white font-medium" x-text="specVersion"></span>
-        </div>
-        <div class="text-slate-400 mt-1">
-          Created
-          <span class="text-white font-medium" x-text="formatDate(createdDate)"></span>
-        </div>
-        <div
-          class="text-slate-400 mt-1 flex flex-wrap items-center gap-x-1 gap-y-0.5 sm:justify-end"
-          x-show="creators.length"
-        >
-          <span>By</span>
-          <template x-for="(c, i) in creators" :key="c.id">
-            <span class="inline-flex items-center">
-              <button
-                @click="navigateTo(c.id)"
-                class="text-white font-medium hover:text-red-300 hover:underline decoration-slate-600 underline-offset-2 transition-colors"
-                :title="'View agent: ' + c.name"
-                x-text="c.name"
-              ></button>
-              <span x-show="i < creators.length - 1" class="text-slate-500">,</span>
-            </span>
-          </template>
-        </div>
-        <div class="text-slate-400 mt-1" x-show="creatorTools.length">
-          Using
+        <h2
+          class="text-xl sm:text-2xl font-semibold text-white tracking-tight break-words"
+          x-text="docName"
+        ></h2>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1 break-all" x-text="docNamespace"></p>
+
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-4 text-xs text-slate-400">
           <span
-            class="text-white font-medium"
-            x-text="creatorTools.map(t => t.name).join(', ')"
+            >SPDX <strong class="text-slate-200 font-medium" x-text="specVersion"></strong
+          ></span>
+          <span
+            >Created
+            <strong class="text-slate-200 font-medium" x-text="formatDate(createdDate)"></strong
+          ></span>
+          <span x-show="creators.length">
+            By
+            <button
+              @click="navigateTo(creators[0].id)"
+              class="text-slate-200 font-medium hover:text-blue-300 transition-colors"
+              x-text="creators[0]?.name"
+            ></button>
+            <span x-show="creators.length > 1" x-text="` +${creators.length - 1}`"></span>
+          </span>
+          <span
+            x-show="loadedFiles.length > 1"
+            x-text="`${loadedFiles.length} merged files`"
+          ></span>
+          <span
+            x-show="dataLicenseLabel"
+            class="badge bg-pink-500/15 text-pink-400"
+            x-text="dataLicenseLabel"
           ></span>
         </div>
-        <div
-          class="text-slate-400 mt-1"
-          x-show="externalRefStats.total"
-          title="Elements referenced via SPDX 3 ExternalMap imports (defined outside this document)"
-        >
-          Imports
-          <span class="text-white font-medium" x-text="formatCount(externalRefStats.total)"></span>
-          <span
-            x-show="externalRefStats.unresolved"
-            class="text-amber-400/80"
-            x-text="'(' + formatCount(externalRefStats.unresolved) + ' unresolved)'"
-          ></span>
-        </div>
-        <div class="mt-2" x-show="dataLicenseLabel">
-          <span class="badge bg-pink-500/15 text-pink-400" x-text="dataLicenseLabel"></span>
-        </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Stats grid (order matches sidebar nav) -->
-  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-    <button
-      type="button"
-      x-show="plainPackages.length > 0"
-      @click="switchView('packages')"
-      class="card stat-card stat-card-link blue hover:border-blue-500/50"
-    >
-      <div class="text-2xl font-bold text-white" x-text="plainPackages.length"></div>
-      <div class="text-sm text-slate-400 mt-1">Packages</div>
-      <div class="w-8 h-8 mt-2 rounded-lg bg-blue-500/15 flex items-center justify-center">
-        <span
-          class="flex items-center justify-center text-blue-400"
-          x-html="nodeTypeIconSvg('package', 'w-4 h-4')"
-        ></span>
-      </div>
-    </button>
-    <button
-      type="button"
-      x-show="files.length > 0"
-      @click="switchView('files')"
-      class="card stat-card stat-card-link green hover:border-emerald-500/50"
-    >
-      <div class="text-2xl font-bold text-white" x-text="files.length"></div>
-      <div class="text-sm text-slate-400 mt-1">Files</div>
-      <div class="w-8 h-8 mt-2 rounded-lg bg-emerald-500/15 flex items-center justify-center">
-        <span
-          class="flex items-center justify-center text-emerald-400"
-          x-html="nodeTypeIconSvg('file', 'w-4 h-4')"
-        ></span>
-      </div>
-    </button>
-    <button
-      type="button"
-      x-show="hardware.length > 0"
-      @click="switchView('hardware')"
-      class="card stat-card stat-card-link lime hover:border-lime-500/50"
-    >
-      <div class="text-2xl font-bold text-white" x-text="hardware.length"></div>
-      <div class="text-sm text-slate-400 mt-1">Hardware</div>
-      <div class="w-8 h-8 mt-2 rounded-lg bg-lime-500/15 flex items-center justify-center">
-        <span
-          class="flex items-center justify-center text-lime-400"
-          x-html="nodeTypeIconSvg('hardware', 'w-4 h-4')"
-        ></span>
-      </div>
-    </button>
-    <button
-      type="button"
-      x-show="requirements.length > 0"
-      @click="switchView('requirements')"
-      class="card stat-card stat-card-link gold hover:border-yellow-500/50"
-    >
-      <div class="text-2xl font-bold text-white" x-text="requirements.length"></div>
-      <div class="text-sm text-slate-400 mt-1">Functional Safety</div>
-      <div class="w-8 h-8 mt-2 rounded-lg bg-yellow-500/15 flex items-center justify-center">
-        <span
-          class="flex items-center justify-center text-yellow-400"
-          x-html="nodeTypeIconSvg('requirement', 'w-4 h-4')"
-        ></span>
-      </div>
-    </button>
-    <button
-      type="button"
-      x-show="licenses.length > 0"
-      @click="switchView('licenses')"
-      class="card stat-card stat-card-link pink hover:border-pink-500/50"
-    >
-      <div class="text-2xl font-bold text-white" x-text="licenses.length"></div>
-      <div class="text-sm text-slate-400 mt-1">Licenses</div>
-      <div class="w-8 h-8 mt-2 rounded-lg bg-pink-500/15 flex items-center justify-center">
-        <span
-          class="flex items-center justify-center text-pink-400"
-          x-html="nodeTypeIconSvg('license', 'w-4 h-4')"
-        ></span>
-      </div>
-    </button>
-    <button
-      type="button"
-      x-show="buildConfigs.length > 0"
-      @click="switchView('configs')"
-      class="card stat-card stat-card-link teal hover:border-teal-500/50"
-    >
-      <div class="text-2xl font-bold text-white" x-text="buildConfigs.length"></div>
-      <div class="text-sm text-slate-400 mt-1">Build Configs</div>
-      <div class="w-8 h-8 mt-2 rounded-lg bg-teal-500/15 flex items-center justify-center">
-        <span
-          class="flex items-center justify-center text-teal-400"
-          x-html="nodeTypeIconSvg('config', 'w-4 h-4')"
-        ></span>
-      </div>
-    </button>
-    <button
-      type="button"
-      x-show="builds.length > 0 || tools.length > 0"
-      @click="switchView('build')"
-      class="card stat-card stat-card-link purple hover:border-purple-500/50"
-    >
-      <div class="text-2xl font-bold text-white" x-text="builds.length"></div>
-      <div class="text-sm text-slate-400 mt-1">Build</div>
-      <div class="w-8 h-8 mt-2 rounded-lg bg-purple-500/15 flex items-center justify-center">
-        <span
-          class="flex items-center justify-center text-purple-400"
-          x-html="nodeTypeIconSvg('build', 'w-4 h-4')"
-        ></span>
-      </div>
-    </button>
-  </div>
-
-  <!-- Security / VEX summary -->
-  <div x-show="vulnerabilities.length > 0" class="card">
-    <div class="flex items-center gap-2 mb-4">
-      <div class="w-8 h-8 rounded-lg bg-rose-500/15 flex items-center justify-center flex-shrink-0">
-        <span
-          class="flex items-center justify-center text-rose-400"
-          x-html="nodeTypeIconSvg('vulnerability', 'w-4 h-4')"
-        ></span>
-      </div>
-      <h3 class="text-sm font-semibold text-white">Security &amp; VEX</h3>
-      <span
-        class="text-xs text-slate-400"
-        x-text="`${formatCount(securitySummary.total)} vulnerabilities`"
-      ></span>
-      <button
-        @click="switchView('security')"
-        class="ml-auto text-xs text-rose-300 hover:text-rose-200 inline-flex items-center gap-1"
-      >
-        View all
-        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-        </svg>
-      </button>
-    </div>
-    <!-- Stacked status bar -->
-    <div class="flex h-2.5 w-full rounded-full overflow-hidden bg-slate-700 mb-3">
-      <template x-for="s in securityStatusOrder" :key="s">
-        <div
-          class="h-full first:rounded-l-full last:rounded-r-full"
-          :style="`width:${(securitySummary.counts[s] / securitySummary.total) * 100}%; background:${vexStatusMeta(s).color}`"
-          :title="`${vexStatusMeta(s).label}: ${securitySummary.counts[s]}`"
-        ></div>
-      </template>
-    </div>
-    <!-- Status chips (click to open the security view filtered by status) -->
-    <div class="flex flex-wrap gap-2">
-      <template x-for="s in securityStatusOrder" :key="s">
+      <div class="flex flex-wrap gap-2 flex-shrink-0">
         <button
-          @click="securityStatusFilter = s; securitySearch = ''; restreamView('security'); switchView('security')"
-          class="badge hover:brightness-125 transition"
-          :class="vexStatusMeta(s).badgeClass"
-          :title="`Show ${vexStatusMeta(s).label} vulnerabilities`"
+          type="button"
+          @click="switchView('graph')"
+          class="inline-flex items-center gap-2 rounded-lg bg-blue-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-400 transition-colors shadow-lg shadow-blue-950/30"
         >
-          <span class="w-1.5 h-1.5 rounded-full mr-1.5" :class="vexStatusMeta(s).dotClass"></span>
-          <span x-text="vexStatusMeta(s).label"></span>
-          <span class="ml-1.5 font-semibold" x-text="formatCount(securitySummary.counts[s])"></span>
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <circle cx="5" cy="6" r="2" stroke-width="2"></circle>
+            <circle cx="19" cy="6" r="2" stroke-width="2"></circle>
+            <circle cx="12" cy="18" r="2" stroke-width="2"></circle>
+            <path d="M7 7l4 9m6-9l-4 9M7 6h10" stroke-width="2"></path>
+          </svg>
+          Explore graph
+        </button>
+        <button
+          type="button"
+          @click="switchView('raw')"
+          class="inline-flex items-center gap-2 rounded-lg border border-slate-600 bg-slate-800/60 px-3.5 py-2.5 text-sm font-medium text-slate-300 hover:border-slate-500 hover:text-white transition-colors"
+        >
+          View source
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- High-signal summaries. Each card links to the view where the user can act. -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <button
+      type="button"
+      @click="switchView('statistics')"
+      class="card text-left group hover:border-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+    >
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">
+            Completeness
+          </div>
+          <div class="flex items-baseline gap-2 mt-2">
+            <span
+              class="text-3xl font-bold text-white tabular-nums"
+              x-text="qualityReport.overall.score"
+            ></span>
+            <span class="text-sm text-slate-500">/ 100</span>
+            <span
+              class="badge ml-1"
+              :class="qualityGradeMeta(qualityReport.overall.grade).badgeClass"
+              x-text="'Grade ' + qualityReport.overall.grade"
+            ></span>
+          </div>
+        </div>
+        <div
+          class="relative w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+          :style="qualityRingStyle(qualityReport.overall.score, qualityGradeMeta(qualityReport.overall.grade).color)"
+        >
+          <div class="absolute inset-1.5 rounded-full bg-slate-800"></div>
+        </div>
+      </div>
+      <p class="text-xs text-slate-400 mt-4 leading-relaxed">
+        Metadata, licensing, provenance, integrity and structural coverage.
+      </p>
+      <span
+        class="inline-flex items-center gap-1 text-xs text-blue-300 mt-3 group-hover:text-blue-200"
+      >
+        See quality details <span aria-hidden="true">→</span>
+      </span>
+    </button>
+
+    <button
+      type="button"
+      @click="vulnerabilities.length && switchView('security')"
+      class="card text-left group focus:outline-none focus:ring-2 focus:ring-rose-500/50"
+      :class="vulnerabilities.length ? 'cursor-pointer hover:border-slate-500' : 'cursor-default'"
+    >
+      <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">
+        Security &amp; VEX
+      </div>
+      <template x-if="vulnerabilities.length">
+        <div>
+          <div class="flex items-baseline gap-2 mt-2">
+            <span
+              class="text-3xl font-bold text-white tabular-nums"
+              x-text="formatCount(securitySummary.total)"
+            ></span>
+            <span class="text-sm text-slate-400">vulnerabilities</span>
+          </div>
+          <div class="flex h-1.5 w-full rounded-full overflow-hidden bg-slate-700 mt-4">
+            <template x-for="s in securityStatusOrder" :key="s">
+              <span
+                :style="`width:${(securitySummary.counts[s] / securitySummary.total) * 100}%; background:${vexStatusMeta(s).color}`"
+                :title="`${vexStatusMeta(s).label}: ${securitySummary.counts[s]}`"
+              ></span>
+            </template>
+          </div>
+          <div class="flex flex-wrap gap-x-3 gap-y-1 mt-3 text-xs">
+            <span x-show="securitySummary.counts.affected" class="text-rose-300">
+              <strong x-text="formatCount(securitySummary.counts.affected)"></strong> affected
+            </span>
+            <span x-show="securitySummary.counts.under_investigation" class="text-amber-300">
+              <strong x-text="formatCount(securitySummary.counts.under_investigation)"></strong>
+              investigating
+            </span>
+            <span
+              x-show="securitySummary.counts.fixed + securitySummary.counts.not_affected"
+              class="text-emerald-300"
+            >
+              <strong
+                x-text="formatCount(securitySummary.counts.fixed + securitySummary.counts.not_affected)"
+              ></strong>
+              resolved
+            </span>
+          </div>
+          <span
+            class="inline-flex items-center gap-1 text-xs text-rose-300 mt-3 group-hover:text-rose-200"
+          >
+            Review findings <span aria-hidden="true">→</span>
+          </span>
+        </div>
+      </template>
+      <template x-if="!vulnerabilities.length">
+        <div>
+          <div class="text-xl font-semibold text-slate-200 mt-2">No vulnerability data</div>
+          <p class="text-xs text-slate-400 mt-3 leading-relaxed">
+            This document does not include vulnerability or VEX records. This is not a clean bill of
+            health.
+          </p>
+        </div>
+      </template>
+    </button>
+
+    <button
+      type="button"
+      @click="switchView('graph')"
+      class="card text-left group hover:border-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+    >
+      <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">Structure</div>
+      <div class="flex items-baseline gap-2 mt-2">
+        <span
+          class="text-3xl font-bold text-white tabular-nums"
+          x-text="formatCount(elementMap.size)"
+        ></span>
+        <span class="text-sm text-slate-400">elements</span>
+      </div>
+      <div class="grid grid-cols-2 gap-3 mt-4">
+        <div>
+          <div
+            class="text-lg font-semibold text-slate-200 tabular-nums"
+            x-text="formatCount(relationships.length)"
+          ></div>
+          <div class="text-[11px] text-slate-500">relationships</div>
+        </div>
+        <div>
+          <div
+            class="text-lg font-semibold tabular-nums"
+            :class="externalRefStats.unresolved ? 'text-amber-300' : 'text-slate-200'"
+            x-text="formatCount(externalRefStats.unresolved)"
+          ></div>
+          <div class="text-[11px] text-slate-500">unresolved imports</div>
+        </div>
+      </div>
+      <span
+        class="inline-flex items-center gap-1 text-xs text-purple-300 mt-3 group-hover:text-purple-200"
+      >
+        Map connections <span aria-hidden="true">→</span>
+      </span>
+    </button>
+  </div>
+
+  <!-- A compact inventory adapts to software, hardware, AI, build and safety SBOMs. -->
+  <section class="card">
+    <div class="flex items-center justify-between gap-3 mb-4">
+      <div>
+        <h3 class="text-sm font-semibold text-white">Browse this SBOM</h3>
+        <p class="text-xs text-slate-500 mt-0.5">Only data present in this document is shown.</p>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5">
+      <template x-for="item in dashboardInventory" :key="item.view">
+        <button
+          type="button"
+          @click="switchView(item.view)"
+          class="flex items-center gap-3 rounded-lg border border-slate-700/70 bg-slate-900/30 px-3 py-3 text-left hover:bg-slate-700/30 hover:border-slate-600 transition-colors min-w-0"
+        >
+          <span
+            class="w-8 h-8 rounded-lg bg-slate-700/50 flex items-center justify-center flex-shrink-0"
+            :style="`color:${nodeTypeColor(item.type)}`"
+            x-html="nodeTypeIconSvg(item.type, 'w-4 h-4')"
+          ></span>
+          <span class="min-w-0">
+            <strong
+              class="block text-base text-white tabular-nums leading-none"
+              x-text="formatCount(item.count)"
+            ></strong>
+            <span class="block text-xs text-slate-400 mt-1 truncate" x-text="item.label"></span>
+          </span>
         </button>
       </template>
     </div>
-
-    <!-- CVSS severity breakdown (only when the SBOM carries CVSS assessments) -->
-    <div x-show="hasCvssData" class="mt-4 pt-4 border-t border-slate-700/50">
-      <div class="flex items-center justify-between mb-2">
-        <span class="text-xs font-medium text-slate-400">CVSS severity</span>
-        <span
-          class="text-[10px] text-slate-500"
-          x-text="`${formatCount(securitySeveritySummary.scored)} scored`"
-        ></span>
-      </div>
-      <div class="flex flex-wrap gap-2">
-        <template x-for="s in securitySeverityOrder" :key="s">
-          <button
-            @click="securitySeverityFilter = s; securityStatusFilter = ''; securitySearch = ''; securitySort = 'cvss'; restreamView('security'); switchView('security')"
-            class="flex items-center gap-2 rounded-lg bg-slate-900/40 border border-slate-700/50 px-3 py-2 hover:border-slate-600 transition"
-            :title="`Show ${cvssSeverityMeta(s).label}-severity vulnerabilities`"
-          >
-            <span
-              class="w-2 h-2 rounded-full"
-              :style="`background:${cvssSeverityMeta(s).color}`"
-            ></span>
-            <span
-              class="text-lg font-bold text-white tabular-nums"
-              x-text="securitySeveritySummary.counts[s]"
-            ></span>
-            <span class="text-xs text-slate-400" x-text="cvssSeverityMeta(s).label"></span>
-          </button>
-        </template>
-      </div>
-    </div>
-  </div>
-
-  <!-- Relationship breakdown -->
-  <div class="card">
-    <h3 class="text-sm font-semibold text-white mb-4">Relationship Types</h3>
-    <div class="space-y-3">
-      <template x-for="rt in relTypeCounts" :key="rt.type">
-        <div>
-          <div class="flex items-center justify-between text-sm mb-1">
-            <span class="text-slate-300" x-text="rt.type"></span>
-            <span class="text-slate-400" x-text="rt.count"></span>
-          </div>
-          <div class="h-2 bg-slate-700 rounded-full overflow-hidden">
-            <div
-              class="h-full rounded-full transition-all duration-500"
-              :style="`width: ${rt.pct}%; background-color: ${rt.color}`"
-            ></div>
-          </div>
-        </div>
-      </template>
-    </div>
-  </div>
+  </section>
 </div>
