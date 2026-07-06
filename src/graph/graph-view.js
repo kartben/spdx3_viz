@@ -49,6 +49,9 @@ function dashPatternFor(type, lineWidth, k) {
     case 'evaluationBasedOn':
       // Dash-dot-dot: one dash longer beat than assumes' dash-dot.
       return [8 / k, 3 / k, lineWidth, 3 / k, lineWidth, 3 / k];
+    case 'tracedToDetail':
+      // Long-dash-dot: a longer lead dash than assumes' dash-dot keeps the two apart.
+      return [12 / k, 4 / k, lineWidth, 4 / k];
     case 'createdBy':
     case 'suppliedBy':
     case 'originatedBy':

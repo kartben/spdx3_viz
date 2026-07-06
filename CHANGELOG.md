@@ -10,6 +10,7 @@ via the "What's new" link.
 - **Improved:** Graph auto-fits to view on changes; reset zoom frames it all.
 - **Improved:** Multiple snippet ranges of one file collapse into a single link.
 - **Improved:** Snippet source viewer folds away code between covered ranges.
+- **Fixed:** Graph now shows `tracedToDetail` requirement decomposition edges.
 
 ## [0.0.6] - 2026-07-06
 
