@@ -89,6 +89,22 @@
       <!-- Expanded detail — built lazily via x-if (only for the open card) -->
       <template x-if="expandedFile === f.spdxId">
         <div class="mt-4 pt-4 border-t border-slate-700 space-y-3 sm:pl-11 fade-in" @click.stop>
+          <!-- Summary / description -->
+          <div x-show="isMeaningful(f.summary)">
+            <div class="text-xs text-slate-500 mb-1">Summary</div>
+            <div
+              class="text-xs text-slate-300 whitespace-pre-wrap break-words"
+              x-text="f.summary"
+            ></div>
+          </div>
+          <div x-show="isMeaningful(f.description) && f.description !== f.summary">
+            <div class="text-xs text-slate-500 mb-1">Description</div>
+            <div
+              class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-32 overflow-y-auto"
+              x-text="f.description"
+            ></div>
+          </div>
+
           <!-- Licenses -->
           <div x-show="elementLicenses(f.spdxId).length > 0">
             <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">

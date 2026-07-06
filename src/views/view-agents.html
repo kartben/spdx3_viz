@@ -89,6 +89,20 @@
         <div class="sm:pl-11 space-y-4">
           <!-- Identity: spdxId + email -->
           <div class="space-y-3">
+            <div x-show="isMeaningful(agent.summary)">
+              <div class="text-xs text-slate-500 mb-1">Summary</div>
+              <div
+                class="text-xs text-slate-300 whitespace-pre-wrap break-words"
+                x-text="agent.summary"
+              ></div>
+            </div>
+            <div x-show="isMeaningful(agent.description) && agent.description !== agent.summary">
+              <div class="text-xs text-slate-500 mb-1">Description</div>
+              <div
+                class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-32 overflow-y-auto"
+                x-text="agent.description"
+              ></div>
+            </div>
             <div>
               <div class="text-xs text-slate-500 mb-1">SPDX ID</div>
               <code

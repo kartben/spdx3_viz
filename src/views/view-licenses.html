@@ -81,6 +81,29 @@
         x-collapse
         class="mt-4 pt-4 border-t border-slate-700"
       >
+        <!-- Summary / description from the underlying license element, when present -->
+        <div
+          class="space-y-3 mb-4 sm:pl-11"
+          x-show="isMeaningful(elementMap.get(lic.id)?.summary) || isMeaningful(elementMap.get(lic.id)?.description)"
+        >
+          <div x-show="isMeaningful(elementMap.get(lic.id)?.summary)">
+            <div class="text-xs text-slate-500 mb-1">Summary</div>
+            <div
+              class="text-xs text-slate-300 whitespace-pre-wrap break-words"
+              x-text="elementMap.get(lic.id)?.summary"
+            ></div>
+          </div>
+          <div
+            x-show="isMeaningful(elementMap.get(lic.id)?.description) && elementMap.get(lic.id)?.description !== elementMap.get(lic.id)?.summary"
+          >
+            <div class="text-xs text-slate-500 mb-1">Description</div>
+            <div
+              class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-32 overflow-y-auto"
+              x-text="elementMap.get(lic.id)?.description"
+            ></div>
+          </div>
+        </div>
+
         <div class="flex flex-wrap items-center gap-2 mb-4 sm:pl-11">
           <button
             type="button"

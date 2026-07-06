@@ -75,7 +75,19 @@
           <!-- Summary -->
           <div x-show="isMeaningful(hw.summary)">
             <div class="text-xs text-slate-500 mb-1">Summary</div>
-            <div class="text-xs text-slate-300 break-words" x-text="hw.summary"></div>
+            <div
+              class="text-xs text-slate-300 whitespace-pre-wrap break-words"
+              x-text="hw.summary"
+            ></div>
+          </div>
+
+          <!-- Description -->
+          <div x-show="isMeaningful(hw.description) && hw.description !== hw.summary">
+            <div class="text-xs text-slate-500 mb-1">Description</div>
+            <div
+              class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-32 overflow-y-auto"
+              x-text="hw.description"
+            ></div>
           </div>
 
           <!-- Spec sheet -->

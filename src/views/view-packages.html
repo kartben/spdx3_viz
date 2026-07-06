@@ -159,7 +159,10 @@
             <!-- Summary / description -->
             <div x-show="isMeaningful(pkg.summary)">
               <div class="text-xs text-slate-500 mb-1">Summary</div>
-              <div class="text-xs text-slate-300 break-words" x-text="pkg.summary"></div>
+              <div
+                class="text-xs text-slate-300 whitespace-pre-wrap break-words"
+                x-text="pkg.summary"
+              ></div>
             </div>
             <div x-show="isMeaningful(pkg.description) && pkg.description !== pkg.summary">
               <div class="text-xs text-slate-500 mb-1">Description</div>

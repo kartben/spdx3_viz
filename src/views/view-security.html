@@ -171,6 +171,24 @@
         x-collapse
         class="mt-4 pt-4 border-t border-slate-700 sm:pl-11 space-y-3"
       >
+        <!-- Summary / description from the SPDX vulnerability element -->
+        <div x-show="isMeaningful(vuln.el?.summary)">
+          <div class="text-xs text-slate-500 mb-1">Summary</div>
+          <div
+            class="text-xs text-slate-300 whitespace-pre-wrap break-words"
+            x-text="vuln.el?.summary"
+          ></div>
+        </div>
+        <div
+          x-show="isMeaningful(vuln.el?.description) && vuln.el?.description !== vuln.el?.summary"
+        >
+          <div class="text-xs text-slate-500 mb-1">Description</div>
+          <div
+            class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-32 overflow-y-auto"
+            x-text="vuln.el?.description"
+          ></div>
+        </div>
+
         <!-- In-SBOM risk assessment (CVSS/EPSS/exploit), straight from the document -->
         <div
           x-show="vuln.cvss || vuln.epss || vuln.kev"

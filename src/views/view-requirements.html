@@ -321,7 +321,7 @@
               <span x-text="req.type === 'Requirement' ? 'Requirement' : 'Statement'"></span>
             </div>
             <div
-              class="text-sm text-slate-200 break-words leading-relaxed"
+              class="text-sm text-slate-200 whitespace-pre-wrap break-words leading-relaxed"
               x-text="req.requirementStatement || req.functionalsafety_assumptionStatement"
             ></div>
           </div>
@@ -329,7 +329,19 @@
           <!-- Summary -->
           <div x-show="isMeaningful(req.summary) && req.summary !== req.name">
             <div class="text-xs text-slate-500 mb-1">Summary</div>
-            <div class="text-xs text-slate-300 break-words" x-text="req.summary"></div>
+            <div
+              class="text-xs text-slate-300 whitespace-pre-wrap break-words"
+              x-text="req.summary"
+            ></div>
+          </div>
+
+          <!-- Description -->
+          <div x-show="isMeaningful(req.description) && req.description !== req.summary">
+            <div class="text-xs text-slate-500 mb-1">Description</div>
+            <div
+              class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-32 overflow-y-auto"
+              x-text="req.description"
+            ></div>
           </div>
 
           <!-- Note -->
