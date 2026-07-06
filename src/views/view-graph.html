@@ -76,42 +76,56 @@
         title="Too many nodes to show flat — showing the aggregated view. Double-click a cluster to drill in."
         >auto-aggregated</span
       >
-      <label
-        class="flex items-center gap-1.5 cursor-pointer"
-        title="Represent each node with its type's icon (folder, package, chip, …) instead of a plain coloured dot."
-      >
-        <input
-          type="checkbox"
-          x-model="graphUseIcons"
-          @change="toggleGraphIcons()"
-          class="rounded border-slate-600 bg-slate-700 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5"
-        />
-        <span class="text-xs text-slate-300">Icons</span>
-      </label>
-      <label
-        class="flex items-center gap-1.5 cursor-pointer"
-        title="Collapse files into their package/directory and build steps into their root build. Double-click a cluster to expand it."
-      >
-        <input
-          type="checkbox"
-          x-model="graphAggregate"
-          @change="updateGraph()"
-          class="rounded border-slate-600 bg-slate-700 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5"
-        />
-        <span class="text-xs text-slate-300">Aggregate</span>
-      </label>
-      <label
-        class="flex items-center gap-1.5 cursor-pointer"
-        title="Hide nodes left with no edges once every other filter is applied."
-      >
-        <input
-          type="checkbox"
-          x-model="graphHideOrphans"
-          @change="updateGraph()"
-          class="rounded border-slate-600 bg-slate-700 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5"
-        />
-        <span class="text-xs text-slate-300">Hide orphans</span>
-      </label>
+      <div class="flex items-center gap-0.5 bg-slate-800 border border-slate-700 rounded-md p-0.5">
+        <button
+          type="button"
+          @click="graphUseIcons = !graphUseIcons; toggleGraphIcons()"
+          :class="graphUseIcons ? 'bg-blue-500/20 text-blue-400' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700'"
+          class="p-1.5 rounded transition-colors"
+          title="Represent each node with its type's icon (folder, package, chip, …) instead of a plain coloured dot."
+        >
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M14 8h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+            />
+          </svg>
+        </button>
+        <button
+          type="button"
+          @click="graphAggregate = !graphAggregate; updateGraph()"
+          :class="graphAggregate ? 'bg-blue-500/20 text-blue-400' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700'"
+          class="p-1.5 rounded transition-colors"
+          title="Collapse files into their package/directory and build steps into their root build. Double-click a cluster to expand it."
+        >
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"
+            />
+          </svg>
+        </button>
+        <button
+          type="button"
+          @click="graphHideOrphans = !graphHideOrphans; updateGraph()"
+          :class="graphHideOrphans ? 'bg-blue-500/20 text-blue-400' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700'"
+          class="p-1.5 rounded transition-colors"
+          title="Hide nodes left with no edges once every other filter is applied."
+        >
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"
+            />
+          </svg>
+        </button>
+      </div>
       <button
         x-show="graphAggregate"
         @click="collapseAllClusters()"
