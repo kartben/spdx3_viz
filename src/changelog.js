@@ -6,6 +6,16 @@
  */
 export const CHANGELOG = [
   {
+    version: 'Unreleased',
+    date: null,
+    items: [
+      {
+        tag: 'Improved',
+        text: 'Multiple snippet ranges of one file collapse into a single link.'
+      }
+    ]
+  },
+  {
     version: '0.0.6',
     date: '2026-07-06',
     items: [

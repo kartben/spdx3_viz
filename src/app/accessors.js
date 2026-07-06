@@ -20,6 +20,7 @@ import {
   getExternalIdentifiers,
   getPurlLink,
   getCdxProperties,
+  snippetFileRef,
   isMeaningfulValue,
   enumValue,
   formatByteSize,
@@ -310,7 +311,10 @@ export const accessorsMixin = {
           sortOrder: this.relSortOrder(relType, direction),
           items: [],
           total: 0,
-          hiddenCount: 0
+          hiddenCount: 0,
+          // fileId → { ref, direction, snippetIds:[] }: snippet endpoints held
+          // aside and folded in at the end (see below), one row per source file.
+          snippetBuckets: new Map()
         };
         groups.set(key, group);
         seen.set(key, new Set());
@@ -318,25 +322,75 @@ export const accessorsMixin = {
       return group;
     };
 
-    // Records one deduped endpoint in a group, materializing its row only while
-    // the group is still under the preview cap.
+    // Materializes one row into a group, respecting the preview cap.
+    const pushItem = (group, item) => {
+      group.total++;
+      if (group.items.length < DETAIL_REL_CAP) group.items.push(item);
+      else group.hiddenCount++;
+    };
+
+    // Records one deduped endpoint in a group. Snippet endpoints are set aside
+    // per source file (see the fold-in step after collection) so several ranges
+    // of one file collapse into a single "N ranges" row; everything else
+    // materializes a row immediately (up to the preview cap).
     const add = (key, endpointId, direction, scope) => {
       const set = seen.get(key);
       if (set.has(endpointId)) return;
       set.add(endpointId);
       const group = groups.get(key);
-      group.total++;
-      if (group.items.length < DETAIL_REL_CAP) {
-        group.items.push({
-          id: endpointId,
-          displayName: this.relTargetDisplayName(endpointId),
-          direction,
-          // LifecycleScopedRelationship scope (build / runtime / test / …)
-          scope: scope || ''
-        });
-      } else {
-        group.hiddenCount++;
+
+      const el = this.elementMap.get(endpointId);
+      if (el?.type === 'software_Snippet') {
+        const ref = snippetFileRef(el, this.elementMap);
+        const fileKey = ref?.fileId || endpointId;
+        let bucket = group.snippetBuckets.get(fileKey);
+        if (!bucket) {
+          bucket = { ref, direction, snippetIds: [] };
+          group.snippetBuckets.set(fileKey, bucket);
+        }
+        bucket.snippetIds.push(endpointId);
+        return;
       }
+
+      pushItem(group, {
+        id: endpointId,
+        displayName: this.relTargetDisplayName(endpointId),
+        direction,
+        // LifecycleScopedRelationship scope (build / runtime / test / …)
+        scope: scope || ''
+      });
+    };
+
+    // Folds a file's snippet endpoints into a single row. One snippet reads as a
+    // plain link into the file; several become one "N ranges" row that opens the
+    // source popup with every range highlighted (see openSnippetRanges).
+    const snippetRow = (bucket) => {
+      const ids = bucket.snippetIds;
+      if (ids.length === 1) {
+        return {
+          id: ids[0],
+          displayName: this.relTargetDisplayName(ids[0]),
+          direction: bucket.direction,
+          scope: ''
+        };
+      }
+      const ordered = ids
+        .map((id) => ({ id, el: this.elementMap.get(id) }))
+        .sort(
+          (a, b) =>
+            (a.el?.software_lineRange?.beginIntegerRange ?? 0) -
+            (b.el?.software_lineRange?.beginIntegerRange ?? 0)
+        )
+        .map((s) => s.id);
+      const base = bucket.ref?.baseName || 'snippet';
+      return {
+        id: ordered[0],
+        displayName: `${base} › ${ordered.length} ranges`,
+        direction: bucket.direction,
+        scope: '',
+        multiRange: true,
+        snippetIds: ordered
+      };
     };
 
     // Outgoing: this element → targets
@@ -357,6 +411,12 @@ export const accessorsMixin = {
       ensure(key, rel.relationshipType, 'in');
       add(key, rel.from, 'in', rel.scope);
     });
+
+    // Fold each group's set-aside snippet endpoints into rows (one per file).
+    for (const group of groups.values()) {
+      for (const bucket of group.snippetBuckets.values()) pushItem(group, snippetRow(bucket));
+      delete group.snippetBuckets;
+    }
 
     return [...groups.values()].sort((a, b) => a.sortOrder - b.sortOrder);
   },
