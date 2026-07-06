@@ -115,8 +115,8 @@ test('parseGraph categorizes SPDX 3.1 SupplyChain actions, processes, and states
   const indexes = buildRelationshipIndexes(parsed.relationships);
 
   assert.equal(parsed.profileConformance.includes('supplyChain'), true);
-  assert.equal(parsed.supplyChain.length, 48);
-  assert.equal(parsed.supplyChain.filter((el) => el.type.endsWith('Action')).length, 25);
+  assert.equal(parsed.supplyChain.length, 53);
+  assert.equal(parsed.supplyChain.filter((el) => el.type.endsWith('Action')).length, 30);
   assert.equal(parsed.supplyChain.filter((el) => el.type.endsWith('Process')).length, 14);
   assert.equal(parsed.supplyChain.filter((el) => el.type === 'supplychain_State').length, 9);
   assert.equal(parsed.presentNodeTypes.includes('supplychain'), true);
@@ -181,7 +181,7 @@ test('SupplyChain view model exposes lifecycle, custody, and exception structure
   Object.assign(app, parsed, indexes);
 
   assert.deepEqual(app.supplyChainCounts, {
-    actions: 25,
+    actions: 30,
     processes: 14,
     states: 9,
     transports: 2,
@@ -200,27 +200,47 @@ test('SupplyChain view model exposes lifecycle, custody, and exception structure
       row.decisionProcess?.name || null
     ]),
     [
+      ['Mark critical component lots received', null, 'Components received', null],
+      [
+        'Mark SG-1 mechanically and electrically assembled',
+        'Components received',
+        'Assembled',
+        null
+      ],
       [
         'Mark device firmware provisioned',
-        null,
+        'Assembled',
         'Firmware provisioned',
         'Factory provisioning process'
       ],
+      ['Mark SG-1 in transit under carrier custody', 'Firmware provisioned', 'In transit', null],
       [
         'Place SG-1 in out-of-spec quarantine',
-        'Firmware provisioned',
+        'In transit',
         'Out-of-spec quarantine',
+        'Quarantine decision process'
+      ],
+      [
+        'Mark SG-1 receiving inspection passed',
+        'Out-of-spec quarantine',
+        'Inspection passed',
         'Quarantine decision process'
       ],
       [
         'Mark SG-1 accepted for deployment',
-        'Out-of-spec quarantine',
+        'Inspection passed',
         'Accepted for deployment',
         'Quarantine decision process'
       ],
       [
-        'Mark SG-1 deployed with retirement plan',
+        'Mark SG-1 retirement plan in place',
         'Accepted for deployment',
+        'Retirement planned',
+        'Decommissioning plan process'
+      ],
+      [
+        'Mark SG-1 deployed with retirement plan',
+        'Retirement planned',
         'Deployed',
         'Decommissioning plan process'
       ]
@@ -232,16 +252,16 @@ test('SupplyChain view model exposes lifecycle, custody, and exception structure
     [
       ['create', 6],
       ['move', 6],
-      ['verify', 6],
+      ['verify', 11],
       ['exception', 2],
-      ['operate', 12]
+      ['operate', 17]
     ]
   );
   assert.equal(app.supplyChainTransportLegs.length, 2);
   assert.equal(app.supplyChainTransportLegs[0].route.includes('Austin secure staging'), true);
   assert.equal(app.supplyChainCustodyHandoffs.length, 2);
   assert.equal(app.supplyChainCustodyHandoffs[1].category, 'ownership');
-  assert.equal(app.supplyChainTimelineRows.length, 48);
+  assert.equal(app.supplyChainTimelineRows.length, 53);
   assert.deepEqual(
     app.supplyChainTimelineRows.slice(0, 2).map((row) => [row.kind, row.item.name]),
     [
@@ -280,8 +300,26 @@ test('SupplyChain view model exposes lifecycle, custody, and exception structure
   assert.deepEqual(
     app.supplyChainCarbonSummary.rows.map((row) => [row.kg, row.distanceKm, row.mode, row.pct]),
     [
-      [186.4, 2380, 'road+air+road', 100],
+      [186.4, 3300, 'road+air+road', 100],
       [42.1, 542, 'road', 23]
+    ]
+  );
+
+  // Route map reads coordinates from each PhysicalLocation's ISO 6709
+  // geographicPointLocation, and collapses same-city facilities to one pin.
+  assert.deepEqual(app.parseGeoPoint('+30.2672-097.7431/'), { lat: 30.2672, lng: -97.7431 });
+  const hq = app.elementMap.get(
+    'https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/hq'
+  );
+  assert.deepEqual(app.supplyChainGeocode(hq), { lat: 30.2672, lng: -97.7431 });
+  assert.equal(app.supplyChainRouteMap.projected, true);
+  assert.deepEqual(
+    app.supplyChainRouteMap.stops.map((stop) => [stop.order, stop.place, stop.role.label]),
+    [
+      [1, 'Austin, TX, USA', 'Storage'],
+      [2, 'Los Angeles, CA, USA', 'Transit hub'],
+      [3, 'Denver, CO, USA', 'Inspection lab'],
+      [4, 'Rawlins, WY, USA', 'Deployment site']
     ]
   );
 

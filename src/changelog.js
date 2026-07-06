@@ -20,6 +20,10 @@ export const CHANGELOG = [
       {
         tag: 'Added',
         text: 'Package cards show supplier and origin agents.'
+      },
+      {
+        tag: 'Added',
+        text: 'Supply Chain view with timeline, custody, lifecycle, and route-map angles.'
       }
     ]
   },
