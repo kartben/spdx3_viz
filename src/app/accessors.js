@@ -443,6 +443,67 @@ export const accessorsMixin = {
     return this.formatDate(el.startTime || el.endTime);
   },
 
+  supplyChainDurationSeconds(el) {
+    if (!el?.startTime || !el?.endTime) return 0;
+    const start = Date.parse(el.startTime);
+    const end = Date.parse(el.endTime);
+    if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return 0;
+    return Math.max(1, Math.round((end - start) / 1000));
+  },
+
+  supplyChainDurationMinutes(el) {
+    const seconds = this.supplyChainDurationSeconds(el);
+    return seconds ? Math.max(1, Math.round(seconds / 60)) : 0;
+  },
+
+  supplyChainDurationLabel(el) {
+    const seconds = this.supplyChainDurationSeconds(el);
+    if (!seconds) return '';
+    if (seconds < 60) return `${seconds} second${seconds === 1 ? '' : 's'}`;
+    const minutes = Math.round(seconds / 60);
+    if (!minutes) return '';
+    if (minutes < 60) return `${minutes} minute${minutes === 1 ? '' : 's'}`;
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    if (hours < 24) return mins ? `${hours}h ${mins}m` : `${hours}h`;
+    const days = Math.floor(hours / 24);
+    const remHours = hours % 24;
+    return remHours ? `${days}d ${remHours}h` : `${days}d`;
+  },
+
+  supplyChainTimeFactLabel(el) {
+    const duration = this.supplyChainDurationLabel(el);
+    return duration ? `Start time (${duration})` : 'Start time';
+  },
+
+  supplyChainCdxProperty(el, pattern) {
+    const prop = this.cdxProperties(el).find((entry) => pattern.test(entry.name));
+    return prop?.value || '';
+  },
+
+  supplyChainCdxNumber(el, pattern) {
+    const raw = this.supplyChainCdxProperty(el, pattern);
+    const number = Number.parseFloat(String(raw).replace(/,/g, ''));
+    return Number.isFinite(number) ? number : 0;
+  },
+
+  supplyChainCarbonKg(el) {
+    return this.supplyChainCdxNumber(el, /(?:co2e|co2|carbon).*kg/i);
+  },
+
+  supplyChainDistanceKm(el) {
+    return this.supplyChainCdxNumber(el, /distance.*km/i);
+  },
+
+  supplyChainTransportMode(el) {
+    return this.supplyChainCdxProperty(el, /transport\.mode|mode/i);
+  },
+
+  formatCarbonKg(value) {
+    if (!value) return '';
+    return `${new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(value)} kg CO₂e`;
+  },
+
   supplyChainRefName(id) {
     return id ? this.relTargetDisplayName(id) : '';
   },
@@ -504,11 +565,14 @@ export const accessorsMixin = {
     const push = (label, value, mono = false) => {
       if (this.isMeaningful(value)) rows.push({ label, value, mono });
     };
-    push('Time', this.supplyChainTimeRange(el));
+    push(this.supplyChainTimeFactLabel(el), this.supplyChainTimeRange(el));
     push('Location', this.supplyChainRefName(el?.actionLocation));
     push('Route', el?.supplychain_transportRoute);
     push('Pickup', this.supplyChainRefName(el?.supplychain_pickupLocation));
     push('Dropoff', this.supplyChainRefName(el?.supplychain_dropoffLocation));
+    push('Distance', this.supplyChainDistanceKm(el) ? `${this.supplyChainDistanceKm(el)} km` : '');
+    push('CO₂e', this.formatCarbonKg(this.supplyChainCarbonKg(el)));
+    push('Transport mode', this.supplyChainTransportMode(el));
     push('Current state', this.supplyChainStateName(el));
     push('Decision process', this.supplyChainRefName(el?.supplychain_decisionProcess));
     push('Boundary parameter', this.supplyChainRefName(el?.supplychain_boundaryParameter));
@@ -559,8 +623,9 @@ export const accessorsMixin = {
       push('SPDX ID', el?.spdxId);
       return facts.slice(0, 4);
     }
-    push('When', this.supplyChainTimeRange(el));
+    push(this.supplyChainTimeFactLabel(el), this.supplyChainTimeRange(el));
     push('Where', this.supplyChainRoute(el));
+    push('CO₂e', this.formatCarbonKg(this.supplyChainCarbonKg(el)));
     push('State', this.supplyChainStateName(el));
     const responsibility = this.supplyChainResponsibility(el);
     if (responsibility) {
@@ -604,6 +669,11 @@ export const accessorsMixin = {
         'evidence',
         this.supplyChainEvidenceCount(el),
         'bg-amber-500/15 text-amber-200 ring-1 ring-amber-500/25'
+      );
+      push(
+        'kg CO₂e',
+        this.supplyChainCarbonKg(el),
+        'bg-emerald-500/15 text-emerald-200 ring-1 ring-emerald-500/25'
       );
       push(
         'affected',

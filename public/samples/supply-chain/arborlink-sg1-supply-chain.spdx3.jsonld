@@ -1588,6 +1588,33 @@
       "supplychain_pickupLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/austin-warehouse",
       "supplychain_dropoffLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/denver-lab",
       "supplychain_transportRoute": "Austin secure staging → LAX air-freight hub → Denver receiving lab",
+      "extension": [
+        {
+          "type": "extension_CdxPropertiesExtension",
+          "extension_cdxProperty": [
+            {
+              "type": "extension_CdxPropertyEntry",
+              "extension_cdxPropName": "arborlink:transport.mode",
+              "extension_cdxPropValue": "road+air+road"
+            },
+            {
+              "type": "extension_CdxPropertyEntry",
+              "extension_cdxPropName": "arborlink:distance.km",
+              "extension_cdxPropValue": "2380"
+            },
+            {
+              "type": "extension_CdxPropertyEntry",
+              "extension_cdxPropName": "arborlink:co2e.kg",
+              "extension_cdxPropValue": "186.4"
+            },
+            {
+              "type": "extension_CdxPropertyEntry",
+              "extension_cdxPropName": "arborlink:co2e.method",
+              "extension_cdxPropValue": "Synthetic lane estimate from road/air distance factors"
+            }
+          ]
+        }
+      ],
       "summary": "Controlled-lane shipment with carrier custody, shock telemetry, and evidence package."
     },
     {
@@ -1679,6 +1706,33 @@
       "supplychain_pickupLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/denver-lab",
       "supplychain_dropoffLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/wyoming-site",
       "supplychain_transportRoute": "Denver receiving lab → EdgeOps Red Mesa wind-farm substation",
+      "extension": [
+        {
+          "type": "extension_CdxPropertiesExtension",
+          "extension_cdxProperty": [
+            {
+              "type": "extension_CdxPropertyEntry",
+              "extension_cdxPropName": "arborlink:transport.mode",
+              "extension_cdxPropValue": "road"
+            },
+            {
+              "type": "extension_CdxPropertyEntry",
+              "extension_cdxPropName": "arborlink:distance.km",
+              "extension_cdxPropValue": "542"
+            },
+            {
+              "type": "extension_CdxPropertyEntry",
+              "extension_cdxPropName": "arborlink:co2e.kg",
+              "extension_cdxPropValue": "42.1"
+            },
+            {
+              "type": "extension_CdxPropertyEntry",
+              "extension_cdxPropName": "arborlink:co2e.method",
+              "extension_cdxPropValue": "Synthetic road freight estimate for final-mile controlled lane"
+            }
+          ]
+        }
+      ],
       "summary": "Final controlled-lane movement from acceptance lab to deployment site."
     },
     {

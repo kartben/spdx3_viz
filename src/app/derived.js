@@ -278,6 +278,43 @@ export const derivedMixin = {
       }));
   },
 
+  get supplyChainTimelineRows() {
+    return this.supplyChainActions.map((action, index) => ({
+      action,
+      index,
+      family: this.supplyChainFamily(action),
+      status: this.supplyChainExceptionStatus(action),
+      duration: this.supplyChainDurationLabel(action),
+      route: this.supplyChainRoute(action),
+      state: this.supplyChainStateName(action),
+      carbonKg: this.supplyChainCarbonKg(action),
+      distanceKm: this.supplyChainDistanceKm(action),
+      mode: this.supplyChainTransportMode(action)
+    }));
+  },
+
+  get supplyChainCarbonSummary() {
+    const rows = this.supplyChainActions
+      .map((action) => ({
+        action,
+        kg: this.supplyChainCarbonKg(action),
+        distanceKm: this.supplyChainDistanceKm(action),
+        mode: this.supplyChainTransportMode(action),
+        route: this.supplyChainRoute(action)
+      }))
+      .filter((row) => row.kg > 0);
+    const totalKg = rows.reduce((total, row) => total + row.kg, 0);
+    const maxKg = rows.reduce((max, row) => Math.max(max, row.kg), 0);
+    return {
+      rows: rows.map((row) => ({
+        ...row,
+        pct: maxKg ? Math.max(4, Math.round((row.kg / maxKg) * 100)) : 0
+      })),
+      totalKg,
+      maxKg
+    };
+  },
+
   get supplyChainExceptionChains() {
     return this.supplyChainActions
       .filter((el) => isA(el.type, CLASS.supplychain_OutOfSpecAction))
