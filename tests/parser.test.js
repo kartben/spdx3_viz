@@ -996,6 +996,46 @@ test('detailRelGroupsFor collapses same-file snippet endpoints into one N-ranges
   assert.ok(!single.snippetIds);
 });
 
+test('_collapseSource keeps ranges with context and folds the gaps between them', () => {
+  const app = spdxApp();
+  const lines = Array.from({ length: 200 }, (_, i) => ({ lineNum: i + 1, html: `line ${i + 1}` }));
+  const ranges = [
+    { start: 50, end: 55 },
+    { start: 120, end: 122 }
+  ];
+  const segs = app._collapseSource(lines, ranges, {});
+
+  // Two big stretches are collapsed: 1..(50-context-1) and the middle gap.
+  const gaps = segs.filter((s) => s.kind === 'gap');
+  assert.equal(gaps.length, 3, 'leading, middle, and trailing gaps');
+  // Covered lines are flagged; context lines around them are shown but not covered.
+  const code = segs.filter((s) => s.kind === 'code');
+  const shown = new Set(code.map((c) => c.lineNum));
+  assert.ok(shown.has(50) && shown.has(55), 'first range shown');
+  assert.ok(shown.has(44) && shown.has(61), 'context around the first range shown');
+  assert.ok(!shown.has(30), 'far-away lines are collapsed away');
+  assert.equal(code.find((c) => c.lineNum === 52).covered, true, 'in-range line marked covered');
+  assert.equal(
+    code.find((c) => c.lineNum === 44).covered,
+    false,
+    'context line not marked covered'
+  );
+
+  // Expanding the middle gap reveals a chunk without disturbing the ranges.
+  const middleKey = gaps[1].key;
+  const expanded = app._collapseSource(lines, ranges, { [middleKey]: 40 });
+  const shownAfter = new Set(expanded.filter((s) => s.kind === 'code').map((c) => c.lineNum));
+  assert.ok(shownAfter.size > shown.size, 'expanding a gap reveals more lines');
+});
+
+test('_collapseSource shows the whole file when there are no line ranges', () => {
+  const app = spdxApp();
+  const lines = Array.from({ length: 10 }, (_, i) => ({ lineNum: i + 1, html: '' }));
+  const segs = app._collapseSource(lines, [{ start: null, end: null }], {});
+  assert.equal(segs.length, 10);
+  assert.ok(segs.every((s) => s.kind === 'code'));
+});
+
 test('parseGraph reports present lifecycle scopes in lifecycle order with unscoped last', () => {
   const graph = [
     { type: 'software_Package', spdxId: 'pkg:app', name: 'app' },

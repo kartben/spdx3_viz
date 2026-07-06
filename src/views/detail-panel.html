@@ -1379,27 +1379,52 @@
         Source not available for this file.
       </div>
 
-      <template x-if="fileSourceCache[detailSnippet?.fileId]?.lines">
+      <template x-if="detailSnippetSegments">
         <div
           id="detail-snippet-source"
           class="source-viewer sv-detail flex-1 min-h-0 rounded-lg border border-slate-700/50"
         >
           <div class="sv-detail-lines">
             <template
-              x-for="line in fileSourceCache[detailSnippet?.fileId].lines"
-              :key="line.lineNum"
+              x-for="seg in detailSnippetSegments"
+              :key="seg.kind === 'gap' ? 'g' + seg.key : 'l' + seg.lineNum"
             >
-              <div
-                class="sv-line"
-                :data-line="line.lineNum"
-                :class="{
-                  highlighted:
-                    line.lineNum >= detailSnippet?.start &&
-                    line.lineNum <= (detailSnippet?.end ?? detailSnippet?.start)
-                }"
-              >
-                <span class="sv-lnum" x-text="line.lineNum"></span>
-                <span class="sv-code" x-html="line.html || '​'"></span>
+              <div>
+                <template x-if="seg.kind === 'gap'">
+                  <button
+                    type="button"
+                    class="sv-gap sv-gap-btn w-full"
+                    @click="expandDetailSnippetGap(seg.key)"
+                    :title="'Show more lines'"
+                  >
+                    <span class="sv-gap-line"></span>
+                    <svg
+                      class="h-3 w-3 flex-shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 9l-7 7-7-7M5 5h14"
+                      />
+                    </svg>
+                    <span x-text="formatCount(seg.hidden) + ' lines hidden'"></span>
+                    <span class="sv-gap-line"></span>
+                  </button>
+                </template>
+                <template x-if="seg.kind === 'code'">
+                  <div
+                    class="sv-line"
+                    :data-line="seg.lineNum"
+                    :class="{ highlighted: seg.covered }"
+                  >
+                    <span class="sv-lnum" x-text="seg.lineNum"></span>
+                    <span class="sv-code" x-html="seg.html || '​'"></span>
+                  </div>
+                </template>
               </div>
             </template>
           </div>

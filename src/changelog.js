@@ -12,6 +12,10 @@ export const CHANGELOG = [
       {
         tag: 'Improved',
         text: 'Multiple snippet ranges of one file collapse into a single link.'
+      },
+      {
+        tag: 'Improved',
+        text: 'Snippet source viewer folds away code between covered ranges.'
       }
     ]
   },

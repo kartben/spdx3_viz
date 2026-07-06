@@ -6,6 +6,7 @@ via the "What's new" link.
 ## Unreleased
 
 - **Improved:** Multiple snippet ranges of one file collapse into a single link.
+- **Improved:** Snippet source viewer folds away code between covered ranges.
 
 ## [0.0.6] - 2026-07-06
 
