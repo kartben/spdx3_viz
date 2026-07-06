@@ -3,7 +3,7 @@
 All notable changes to this project are documented here. Also viewable in-app
 via the "What's new" link.
 
-## Unreleased
+## [0.0.6] - 2026-07-06
 
 - **Added:** Snippet source viewer, with requirement-to-code traceability.
 - **Added:** Ansible Automation Platform 2.6 sample (~40k packages) with VEX overlay.
