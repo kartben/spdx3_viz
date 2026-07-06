@@ -272,9 +272,9 @@ export const COLORS = {
   buildInput: '#f97316',
   buildOutput: '#22c55e',
   buildLineage: '#a78bfa',
-  agent: '#6366f1',
+  agent: '#4d7c0f',
   // "createdBy" provenance edges tint to the agent colour they point at.
-  createdBy: '#6366f1',
+  createdBy: '#4d7c0f',
   config: '#14b8a6',
   license: '#ec4899',
   distribution: '#38bdf8',
