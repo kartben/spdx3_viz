@@ -10,6 +10,10 @@ export const CHANGELOG = [
     date: null,
     items: [
       {
+        tag: 'Added',
+        text: '"Hide orphans" graph toggle, to declutter disconnected nodes.'
+      },
+      {
         tag: 'Improved',
         text: 'Multiple snippet ranges of one file collapse into a single link.'
       },
