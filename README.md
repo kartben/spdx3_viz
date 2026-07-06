@@ -4,6 +4,8 @@ A browser-based tool for exploring [SPDX 3](https://spdx.dev/) SBOMs
 (both SPDX 3.0 and 3.1). Drop one or more JSON-LD files and navigate the
 relationships between packages, files, tools, builds, agents, etc. as an interactive graph.
 
+Created by [Benjamin Cabé](https://github.com/kartben) in 2026.
+
 ## Features
 
 - Easily load SPDX 3 (3.0 / 3.1) SBOMs by drag-and-drop, file picker, or the bundled samples.
