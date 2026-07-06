@@ -55,6 +55,13 @@ export const graphMixin = {
   get graphHeatAvailable() {
     return this.vulnerabilities.length > 0 || this.safetyCounts.requirements > 0;
   },
+  // Whether a lens even applies to the loaded data (the underlying feature is
+  // present), independent of whether it currently has any hot elements.
+  _heatModeApplicable(mode) {
+    if (mode === 'vuln') return this.vulnerabilities.length > 0;
+    if (mode === 'failed' || mode === 'unverified') return this.safetyCounts.requirements > 0;
+    return false;
+  },
   heatModeMeta(key) {
     return heatModeMeta(key);
   },
@@ -76,9 +83,10 @@ export const graphMixin = {
   // reactive tick, since it walks the vulnerability/requirement lists.
   _computeHeatModeList() {
     const inputs = this._graphHeatInputs();
-    return HEAT_MODES.filter((m) =>
-      m.key === 'vuln' ? this.vulnerabilities.length > 0 : this.safetyCounts.requirements > 0
-    ).map((m) => ({ ...m, count: computeHeatIndex(m.key, inputs).size }));
+    return HEAT_MODES.filter((m) => this._heatModeApplicable(m.key)).map((m) => ({
+      ...m,
+      count: computeHeatIndex(m.key, inputs).size
+    }));
   },
   toggleHeatMenu() {
     this.graphHeatMenuOpen = !this.graphHeatMenuOpen;
@@ -102,5 +110,16 @@ export const graphMixin = {
   _repaintHeat() {
     if (this.graphRecomputeHeat) this.graphRecomputeHeat();
     else this.renderGraph();
+  },
+  // Fresh SBOM: drop a heat selection the new data can't honour (e.g. a
+  // requirement lens after loading an SBOM with no requirements) so the overlay
+  // never lingers on a signal that no longer exists, and reset the picker. The
+  // renderer reads graphHeatMode on its next build, so no repaint is needed here.
+  _resetGraphHeat() {
+    this.graphHeatMenuOpen = false;
+    this.graphHeatModeList = [];
+    if (this.graphHeatActive && !this._heatModeApplicable(this.graphHeatMode)) {
+      this.graphHeatMode = 'off';
+    }
   }
 };
