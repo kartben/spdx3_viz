@@ -231,7 +231,11 @@ export const derivedMixin = {
     return [...items].sort((a, b) => {
       const at = a.startTime || a.endTime || '';
       const bt = b.startTime || b.endTime || '';
-      if (at || bt) return at.localeCompare(bt) || this.supplyChainTypeLabel(a).localeCompare(this.supplyChainTypeLabel(b));
+      if (at || bt)
+        return (
+          at.localeCompare(bt) ||
+          this.supplyChainTypeLabel(a).localeCompare(this.supplyChainTypeLabel(b))
+        );
       return (
         (kindRank[this.supplyChainKind(a)] ?? 9) - (kindRank[this.supplyChainKind(b)] ?? 9) ||
         (a.name || this.cleanName(a.spdxId)).localeCompare(b.name || this.cleanName(b.spdxId))

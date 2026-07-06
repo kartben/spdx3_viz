@@ -4,10 +4,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const OUTPUT = resolve(
-  ROOT,
-  'public/samples/supply-chain/arborlink-sg1-supply-chain.spdx3.jsonld'
-);
+const OUTPUT = resolve(ROOT, 'public/samples/supply-chain/arborlink-sg1-supply-chain.spdx3.jsonld');
 const NS = 'https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain';
 const CREATED = '2026-07-06T09:30:00Z';
 const CREATION_INFO = '_:arborlink-sg1-creation-info';
@@ -159,30 +156,53 @@ const tools = [
     name: 'Syft',
     version: '1.28.0',
     summary: 'Container and filesystem SBOM scanner used in the fictional build pipeline.',
-    externalRef: [{ type: 'ExternalRef', externalRefType: 'altWebPage', locator: ['https://github.com/anchore/syft'] }]
+    externalRef: [
+      {
+        type: 'ExternalRef',
+        externalRefType: 'altWebPage',
+        locator: ['https://github.com/anchore/syft']
+      }
+    ]
   }),
   element('Tool', 'tool/trivy', {
     name: 'Trivy',
     version: '0.63.0',
     summary: 'Vulnerability scanner used to enrich the fictional release SBOM.',
-    externalRef: [{ type: 'ExternalRef', externalRefType: 'altWebPage', locator: ['https://github.com/aquasecurity/trivy'] }]
+    externalRef: [
+      {
+        type: 'ExternalRef',
+        externalRefType: 'altWebPage',
+        locator: ['https://github.com/aquasecurity/trivy']
+      }
+    ]
   }),
   element('Tool', 'tool/slsa-provenance-generator', {
     name: 'SLSA provenance generator',
     version: '2.1.0',
-    summary: 'Build provenance emitter used to model where, when, and how release artifacts were produced.',
-    externalRef: [{ type: 'ExternalRef', externalRefType: 'documentation', locator: ['https://slsa.dev/spec/v1.2/build-provenance'] }]
+    summary:
+      'Build provenance emitter used to model where, when, and how release artifacts were produced.',
+    externalRef: [
+      {
+        type: 'ExternalRef',
+        externalRefType: 'documentation',
+        locator: ['https://slsa.dev/spec/v1.2/build-provenance']
+      }
+    ]
   }),
   element('Tool', 'tool/in-toto-run', {
     name: 'in-toto-run',
     version: '3.0.0',
-    summary: 'Link metadata capture tool used in the fictional provisioning and acceptance workflow.',
-    externalRef: [{ type: 'ExternalRef', externalRefType: 'documentation', locator: ['https://in-toto.io/'] }]
+    summary:
+      'Link metadata capture tool used in the fictional provisioning and acceptance workflow.',
+    externalRef: [
+      { type: 'ExternalRef', externalRefType: 'documentation', locator: ['https://in-toto.io/'] }
+    ]
   }),
   element('Tool', 'tool/secure-boot-attester', {
     name: 'SG-1 secure-boot attester',
     version: '2026.07',
-    summary: 'Fictional factory and receiving-lab attestation tool for secure boot, signer, and tamper state.'
+    summary:
+      'Fictional factory and receiving-lab attestation tool for secure boot, signer, and tamper state.'
   })
 ];
 
@@ -209,44 +229,95 @@ const locations = [
   })
 );
 
-const loc = Object.fromEntries(locations.map((location) => [location.spdxId.split('#')[1], location.spdxId]));
+const loc = Object.fromEntries(
+  locations.map((location) => [location.spdxId.split('#')[1], location.spdxId])
+);
 
 const specifications = [
   element('Specification', 'spec/nist-sp-800-161r1', {
     name: 'NIST SP 800-161 Rev. 1 C-SCRM reference',
     summary: 'Reference for supply-chain risk management concepts used by this synthetic sample.',
     specType: 'formalStandard',
-    externalRef: [{ type: 'ExternalRef', externalRefType: 'documentation', locator: ['https://csrc.nist.gov/pubs/sp/800/161/r1/upd1/final'] }]
+    externalRef: [
+      {
+        type: 'ExternalRef',
+        externalRefType: 'documentation',
+        locator: ['https://csrc.nist.gov/pubs/sp/800/161/r1/upd1/final']
+      }
+    ]
   }),
   element('Specification', 'spec/cisa-2025-sbom-min-elements', {
     name: 'CISA 2025 SBOM Minimum Elements reference',
-    summary: 'Reference for hashes, licensing, tool name, generation context, and delivery practices.',
+    summary:
+      'Reference for hashes, licensing, tool name, generation context, and delivery practices.',
     specType: 'guidance',
-    externalRef: [{ type: 'ExternalRef', externalRefType: 'documentation', locator: ['https://www.cisa.gov/resources-tools/resources/2025-minimum-elements-software-bill-materials-sbom'] }]
+    externalRef: [
+      {
+        type: 'ExternalRef',
+        externalRefType: 'documentation',
+        locator: [
+          'https://www.cisa.gov/resources-tools/resources/2025-minimum-elements-software-bill-materials-sbom'
+        ]
+      }
+    ]
   }),
   element('Specification', 'spec/slsa-provenance-v1-2', {
     name: 'SLSA v1.2 Build Provenance reference',
-    summary: 'Reference for build provenance describing where, when, and how software artifacts were produced.',
+    summary:
+      'Reference for build provenance describing where, when, and how software artifacts were produced.',
     specType: 'guidance',
-    externalRef: [{ type: 'ExternalRef', externalRefType: 'documentation', locator: ['https://slsa.dev/spec/v1.2/build-provenance'] }]
+    externalRef: [
+      {
+        type: 'ExternalRef',
+        externalRefType: 'documentation',
+        locator: ['https://slsa.dev/spec/v1.2/build-provenance']
+      }
+    ]
   }),
   element('Specification', 'spec/arborlink-supply-chain-plan', {
     name: 'ArborLink SG-1 supply-chain assurance plan ASCAP-2026.07',
-    summary: 'Fictional plan defining procurement, custody, exception handling, and acceptance gates.',
+    summary:
+      'Fictional plan defining procurement, custody, exception handling, and acceptance gates.',
     specType: 'specification',
     externalIdentifier: [externalId('ASCAP-2026.07', 'Fictional supply-chain assurance plan')]
   })
 ];
 
-const specId = Object.fromEntries(specifications.map((spec) => [spec.spdxId.split('/').pop(), spec.spdxId]));
+const specId = Object.fromEntries(
+  specifications.map((spec) => [spec.spdxId.split('/').pop(), spec.spdxId])
+);
 
 const requirements = [
-  ['req/provenance', 'SCRM-REQ-01 provenance', 'Every critical hardware and software component shall carry origin, supplier, generation tool, and integrity metadata.'],
-  ['req/custody', 'SCRM-REQ-02 chain of custody', 'Every custody and ownership transfer shall record previous/current responsible parties, product, time window, and location.'],
-  ['req/tamper', 'SCRM-REQ-03 tamper handling', 'Any shipment shock, seal, signer, or secure-boot deviation shall enter quarantine until independent resolution.'],
-  ['req/signed-firmware', 'SCRM-REQ-04 signed firmware', 'Production firmware shall be built from controlled inputs, signed by the release signer, and verified during provisioning and receiving inspection.'],
-  ['req/sbom-delivery', 'SCRM-REQ-05 SBOM delivery', 'The delivered device shall include a machine-readable SBOM with component hashes, licenses, tools, and generation context.'],
-  ['req/decommission', 'SCRM-REQ-06 decommissioning', 'End-of-life planning shall preserve custody, data-erasure evidence, and secure-destruction accountability.']
+  [
+    'req/provenance',
+    'SCRM-REQ-01 provenance',
+    'Every critical hardware and software component shall carry origin, supplier, generation tool, and integrity metadata.'
+  ],
+  [
+    'req/custody',
+    'SCRM-REQ-02 chain of custody',
+    'Every custody and ownership transfer shall record previous/current responsible parties, product, time window, and location.'
+  ],
+  [
+    'req/tamper',
+    'SCRM-REQ-03 tamper handling',
+    'Any shipment shock, seal, signer, or secure-boot deviation shall enter quarantine until independent resolution.'
+  ],
+  [
+    'req/signed-firmware',
+    'SCRM-REQ-04 signed firmware',
+    'Production firmware shall be built from controlled inputs, signed by the release signer, and verified during provisioning and receiving inspection.'
+  ],
+  [
+    'req/sbom-delivery',
+    'SCRM-REQ-05 SBOM delivery',
+    'The delivered device shall include a machine-readable SBOM with component hashes, licenses, tools, and generation context.'
+  ],
+  [
+    'req/decommission',
+    'SCRM-REQ-06 decommissioning',
+    'End-of-life planning shall preserve custody, data-erasure evidence, and secure-destruction accountability.'
+  ]
 ].map(([fragment, name, statement]) =>
   element('Requirement', fragment, {
     name,
@@ -256,7 +327,9 @@ const requirements = [
   })
 );
 
-const reqId = Object.fromEntries(requirements.map((req) => [req.spdxId.split('/').pop(), req.spdxId]));
+const reqId = Object.fromEntries(
+  requirements.map((req) => [req.spdxId.split('/').pop(), req.spdxId])
+);
 
 const licenseExpressions = [
   element('simplelicensing_LicenseExpression', 'license/mit', {
@@ -287,7 +360,8 @@ const licenseId = Object.fromEntries(
 
 const productSpec = element('hardware_ProductSpecification', 'hardware/spec/sg1', {
   name: 'ArborLink SG-1 secure industrial edge gateway specification',
-  summary: 'Fictional product specification for a DIN-rail industrial gateway with secure boot, TPM-backed identity, and tamper evidence.',
+  summary:
+    'Fictional product specification for a DIN-rail industrial gateway with secure boot, TPM-backed identity, and tamper evidence.',
   hardware_partNumber: 'ARB-SG1-IND-4G-POE',
   hardware_category: 'industrial edge gateway'
 });
@@ -304,7 +378,8 @@ const hardware = [
   dimensions,
   element('hardware_PhysicalHardware', 'hardware/device/sg1-sn-26-000042', {
     name: 'ArborLink SG-1 gateway SN SG1-26-000042',
-    summary: 'Serialized finished device tracked across assembly, transport, quarantine, resolution, delivery, deployment, and retirement planning.',
+    summary:
+      'Serialized finished device tracked across assembly, transport, quarantine, resolution, delivery, deployment, and retirement planning.',
     hardware_partNumber: 'ARB-SG1-IND-4G-POE',
     hardware_serialNumber: 'SG1-26-000042',
     hardware_category: 'finished device',
@@ -335,7 +410,8 @@ const hardware = [
   }),
   element('hardware_BulkHardware', 'hardware/lot/secure-element-se9-26h1', {
     name: 'Secure element lot SE9-26H1',
-    summary: 'Fictional secure element lot carrying wafer, personalization, and certificate-chain references.',
+    summary:
+      'Fictional secure element lot carrying wafer, personalization, and certificate-chain references.',
     hardware_partNumber: 'SFC-SE9-TPM',
     hardware_batchNumber: 'SE9-26H1',
     hardware_bulkQuantity: 1000,
@@ -355,7 +431,8 @@ const hardware = [
   }),
   element('hardware_PhysicalHardware', 'hardware/tamper-seal/ts-9f42', {
     name: 'Tamper-evident seal TS-9F42',
-    summary: 'Serialized tamper seal affixed after provisioning and checked at receiving inspection.',
+    summary:
+      'Serialized tamper seal affixed after provisioning and checked at receiving inspection.',
     hardware_partNumber: 'SSL-TAMPER-VOID-13',
     hardware_serialNumber: 'TS-9F42',
     hardware_category: 'tamper evidence',
@@ -367,14 +444,70 @@ const hardware = [
 const hwId = Object.fromEntries(hardware.map((hw) => [hw.spdxId.split('/').pop(), hw.spdxId]));
 
 const packages = [
-  ['pkg/firmware', 'ArborLink SG-1 firmware image', '2026.07.0', 'firmware', 'pkg:generic/arbor/arborlink-sg1-firmware@2026.07.0', orgId['arbor-devices'], licenseId.proprietary],
-  ['pkg/bootloader', 'SentinelBoot secure bootloader', '3.4.2', 'firmware', 'pkg:generic/arbor/sentinelboot@3.4.2', orgId['arbor-devices'], licenseId.proprietary],
-  ['pkg/linux-image', 'Arbor industrial Linux image', '6.12.31-arbor1', 'operatingSystem', 'pkg:generic/arbor/industrial-linux@6.12.31-arbor1', orgId['arbor-devices'], licenseId['gpl-2.0-only']],
-  ['pkg/gateway-agent', 'Arbor gateway-agent container', '2026.07.0', 'container', 'pkg:oci/gateway-agent@sha256:8d6d8bf8b56a91dbb70f4ca2e2efb4d3', orgId['arbor-devices'], licenseId.proprietary],
-  ['pkg/openssl', 'OpenSSL', '3.5.1', 'library', 'pkg:generic/openssl@3.5.1', 'https://spdx.org/rdf/3.1/terms/Core/NoAssertionElement', licenseId['apache-2.0']],
-  ['pkg/busybox', 'BusyBox', '1.37.0', 'application', 'pkg:generic/busybox@1.37.0', 'https://spdx.org/rdf/3.1/terms/Core/NoAssertionElement', licenseId['gpl-2.0-only']],
-  ['pkg/libmosquitto', 'Eclipse Mosquitto client library', '2.0.22', 'library', 'pkg:generic/eclipse/mosquitto@2.0.22', 'https://spdx.org/rdf/3.1/terms/Core/NoAssertionElement', licenseId['epl-2.0'] || licenseId.mit]
-].map(([fragment, name, version, purpose, purl, supplier, declaredLicense]) =>
+  [
+    'pkg/firmware',
+    'ArborLink SG-1 firmware image',
+    '2026.07.0',
+    'firmware',
+    'pkg:generic/arbor/arborlink-sg1-firmware@2026.07.0',
+    orgId['arbor-devices'],
+    licenseId.proprietary
+  ],
+  [
+    'pkg/bootloader',
+    'SentinelBoot secure bootloader',
+    '3.4.2',
+    'firmware',
+    'pkg:generic/arbor/sentinelboot@3.4.2',
+    orgId['arbor-devices'],
+    licenseId.proprietary
+  ],
+  [
+    'pkg/linux-image',
+    'Arbor industrial Linux image',
+    '6.12.31-arbor1',
+    'operatingSystem',
+    'pkg:generic/arbor/industrial-linux@6.12.31-arbor1',
+    orgId['arbor-devices'],
+    licenseId['gpl-2.0-only']
+  ],
+  [
+    'pkg/gateway-agent',
+    'Arbor gateway-agent container',
+    '2026.07.0',
+    'container',
+    'pkg:oci/gateway-agent@sha256:8d6d8bf8b56a91dbb70f4ca2e2efb4d3',
+    orgId['arbor-devices'],
+    licenseId.proprietary
+  ],
+  [
+    'pkg/openssl',
+    'OpenSSL',
+    '3.5.1',
+    'library',
+    'pkg:generic/openssl@3.5.1',
+    'https://spdx.org/rdf/3.1/terms/Core/NoAssertionElement',
+    licenseId['apache-2.0']
+  ],
+  [
+    'pkg/busybox',
+    'BusyBox',
+    '1.37.0',
+    'application',
+    'pkg:generic/busybox@1.37.0',
+    'https://spdx.org/rdf/3.1/terms/Core/NoAssertionElement',
+    licenseId['gpl-2.0-only']
+  ],
+  [
+    'pkg/libmosquitto',
+    'Eclipse Mosquitto client library',
+    '2.0.22',
+    'library',
+    'pkg:generic/eclipse/mosquitto@2.0.22',
+    'https://spdx.org/rdf/3.1/terms/Core/NoAssertionElement',
+    licenseId['epl-2.0'] || licenseId.mit
+  ]
+].map(([fragment, name, version, purpose, purl, supplier, _declaredLicense]) =>
   element('software_Package', fragment, {
     name,
     software_packageVersion: version,
@@ -383,26 +516,106 @@ const packages = [
     suppliedBy: [supplier],
     verifiedUsing: [hash(fragment)],
     summary: `${name} included in the fictional ArborLink SG-1 software bill of materials.`,
-    externalIdentifier: [externalId(purl, 'Package URL identifier', 'https://github.com/package-url/purl-spec')]
+    externalIdentifier: [
+      externalId(purl, 'Package URL identifier', 'https://github.com/package-url/purl-spec')
+    ]
   })
 );
 
 const pkgId = Object.fromEntries(packages.map((pkg) => [pkg.spdxId.split('/').pop(), pkg.spdxId]));
 
 const files = [
-  ['file/release/firmware-swu', 'dist/arborlink-sg1-2026.07.0.swu', 'firmware', 'application/octet-stream', 29360128],
-  ['file/release/gateway-agent-oci', 'dist/gateway-agent-2026.07.0-linux-arm64.oci.tar', 'container', 'application/vnd.oci.image.manifest.v1+json', 73400320],
-  ['file/build/slsa-provenance', 'attestations/arborlink-sg1-2026.07.0.intoto.jsonl', 'evidence', 'application/vnd.in-toto+json', 32768],
-  ['file/build/sbom-generation-log', 'evidence/sbom-generation-log.json', 'evidence', 'application/json', 12044],
-  ['file/supply-chain/component-coc', 'evidence/component-chain-of-custody.pdf', 'evidence', 'application/pdf', 258901],
-  ['file/supply-chain/shock-telemetry', 'evidence/futura-shock-telemetry-SG1-26-000042.csv', 'evidence', 'text/csv', 18421],
-  ['file/supply-chain/inspection-record', 'evidence/receiving-inspection-SG1-26-000042.pdf', 'evidence', 'application/pdf', 384122],
-  ['file/supply-chain/secure-boot-test', 'evidence/secure-boot-attestation-SG1-26-000042.json', 'evidence', 'application/json', 19008],
-  ['file/supply-chain/resolution-record', 'evidence/quarantine-resolution-SG1-26-000042.pdf', 'evidence', 'application/pdf', 204944],
-  ['file/supply-chain/acceptance-pack', 'delivery/arborlink-sg1-acceptance-pack.zip', 'archive', 'application/zip', 8126464],
-  ['file/config/build-recipe', '.github/workflows/release-gateway.yml', 'configuration', 'text/yaml', 9544],
-  ['file/config/provisioning-manifest', 'factory/provisioning-manifest-SG1-26-000042.json', 'configuration', 'application/json', 7422],
-  ['file/config/retirement-plan', 'operations/retirement-plan-SG1-26-000042.md', 'documentation', 'text/markdown', 6112]
+  [
+    'file/release/firmware-swu',
+    'dist/arborlink-sg1-2026.07.0.swu',
+    'firmware',
+    'application/octet-stream',
+    29360128
+  ],
+  [
+    'file/release/gateway-agent-oci',
+    'dist/gateway-agent-2026.07.0-linux-arm64.oci.tar',
+    'container',
+    'application/vnd.oci.image.manifest.v1+json',
+    73400320
+  ],
+  [
+    'file/build/slsa-provenance',
+    'attestations/arborlink-sg1-2026.07.0.intoto.jsonl',
+    'evidence',
+    'application/vnd.in-toto+json',
+    32768
+  ],
+  [
+    'file/build/sbom-generation-log',
+    'evidence/sbom-generation-log.json',
+    'evidence',
+    'application/json',
+    12044
+  ],
+  [
+    'file/supply-chain/component-coc',
+    'evidence/component-chain-of-custody.pdf',
+    'evidence',
+    'application/pdf',
+    258901
+  ],
+  [
+    'file/supply-chain/shock-telemetry',
+    'evidence/futura-shock-telemetry-SG1-26-000042.csv',
+    'evidence',
+    'text/csv',
+    18421
+  ],
+  [
+    'file/supply-chain/inspection-record',
+    'evidence/receiving-inspection-SG1-26-000042.pdf',
+    'evidence',
+    'application/pdf',
+    384122
+  ],
+  [
+    'file/supply-chain/secure-boot-test',
+    'evidence/secure-boot-attestation-SG1-26-000042.json',
+    'evidence',
+    'application/json',
+    19008
+  ],
+  [
+    'file/supply-chain/resolution-record',
+    'evidence/quarantine-resolution-SG1-26-000042.pdf',
+    'evidence',
+    'application/pdf',
+    204944
+  ],
+  [
+    'file/supply-chain/acceptance-pack',
+    'delivery/arborlink-sg1-acceptance-pack.zip',
+    'archive',
+    'application/zip',
+    8126464
+  ],
+  [
+    'file/config/build-recipe',
+    '.github/workflows/release-gateway.yml',
+    'configuration',
+    'text/yaml',
+    9544
+  ],
+  [
+    'file/config/provisioning-manifest',
+    'factory/provisioning-manifest-SG1-26-000042.json',
+    'configuration',
+    'application/json',
+    7422
+  ],
+  [
+    'file/config/retirement-plan',
+    'operations/retirement-plan-SG1-26-000042.md',
+    'documentation',
+    'text/markdown',
+    6112
+  ]
 ].map(([fragment, name, purpose, contentType, size]) =>
   element('software_File', fragment, {
     name,
@@ -422,13 +635,22 @@ const build = element('build_Build', 'build/release-2026-07-0', {
   build_buildType: 'https://slsa.dev/container-based-build/v1',
   build_buildStartTime: '2026-07-01T14:20:00Z',
   build_buildEndTime: '2026-07-01T14:44:31Z',
-  build_configSourceUri: 'git+https://example.invalid/arbor/arborlink-gateway.git@refs/tags/v2026.07.0',
+  build_configSourceUri:
+    'git+https://example.invalid/arbor/arborlink-gateway.git@refs/tags/v2026.07.0',
   build_configSourceDigest: [hash('git-tag-v2026.07.0')],
   build_configSourceEntrypoint: '.github/workflows/release-gateway.yml',
   build_environment: [
-    { type: 'DictionaryEntry', key: 'runner:image', value: 'ubuntu-26.04-arm64-secure-build-20260615' },
+    {
+      type: 'DictionaryEntry',
+      key: 'runner:image',
+      value: 'ubuntu-26.04-arm64-secure-build-20260615'
+    },
     { type: 'DictionaryEntry', key: 'slsa:build-level', value: 'L3-like controls (synthetic)' },
-    { type: 'DictionaryEntry', key: 'signing:key-policy', value: 'offline HSM release signer ARB-SIGN-2026-07' }
+    {
+      type: 'DictionaryEntry',
+      key: 'signing:key-policy',
+      value: 'offline HSM release signer ARB-SIGN-2026-07'
+    }
   ],
   build_parameter: [
     { type: 'DictionaryEntry', key: 'target:hardware', value: 'ARB-SG1-IND-4G-POE' },
@@ -439,15 +661,47 @@ const build = element('build_Build', 'build/release-2026-07-0', {
 });
 
 const states = [
-  ['state/received', 'Components received', 'Critical component lots are received and awaiting incoming inspection.'],
-  ['state/assembled', 'Assembled', 'The serialized gateway has been mechanically and electrically assembled.'],
-  ['state/provisioned', 'Firmware provisioned', 'Signed firmware, device identity, and tamper seal are provisioned.'],
-  ['state/in-transit', 'In transit', 'The gateway is under carrier custody and moving between controlled locations.'],
-  ['state/quarantine', 'Out-of-spec quarantine', 'The gateway is isolated because shock telemetry exceeded the lane threshold.'],
-  ['state/inspection-passed', 'Inspection passed', 'Independent receiving inspection found no tamper or integrity deviation.'],
-  ['state/accepted', 'Accepted for deployment', 'Customer acceptance is complete and custody has transferred to the operator.'],
+  [
+    'state/received',
+    'Components received',
+    'Critical component lots are received and awaiting incoming inspection.'
+  ],
+  [
+    'state/assembled',
+    'Assembled',
+    'The serialized gateway has been mechanically and electrically assembled.'
+  ],
+  [
+    'state/provisioned',
+    'Firmware provisioned',
+    'Signed firmware, device identity, and tamper seal are provisioned.'
+  ],
+  [
+    'state/in-transit',
+    'In transit',
+    'The gateway is under carrier custody and moving between controlled locations.'
+  ],
+  [
+    'state/quarantine',
+    'Out-of-spec quarantine',
+    'The gateway is isolated because shock telemetry exceeded the lane threshold.'
+  ],
+  [
+    'state/inspection-passed',
+    'Inspection passed',
+    'Independent receiving inspection found no tamper or integrity deviation.'
+  ],
+  [
+    'state/accepted',
+    'Accepted for deployment',
+    'Customer acceptance is complete and custody has transferred to the operator.'
+  ],
   ['state/deployed', 'Deployed', 'The gateway is installed at the EdgeOps Red Mesa site.'],
-  ['state/retirement-planned', 'Retirement planned', 'End-of-life custody, data erasure, and destruction path are defined.']
+  [
+    'state/retirement-planned',
+    'Retirement planned',
+    'End-of-life custody, data erasure, and destruction path are defined.'
+  ]
 ].map(([fragment, name, description]) =>
   element('supplychain_State', fragment, {
     name,
@@ -456,23 +710,95 @@ const states = [
   })
 );
 
-const stateId = Object.fromEntries(states.map((state) => [state.spdxId.split('/').pop(), state.spdxId]));
+const stateId = Object.fromEntries(
+  states.map((state) => [state.spdxId.split('/').pop(), state.spdxId])
+);
 
 const processes = [
-  ['supplychain_BoundaryDefinitionProcess', 'process/define-custody-boundary', 'Define shipment custody boundary', 'Defines product, evidence, location, and telemetry criteria for each custody boundary.'],
-  ['supplychain_HarvestProcess', 'process/recycled-aluminum-intake', 'Recycled aluminum intake process', 'Captures the enclosure feedstock intake and batch evidence.'],
-  ['supplychain_ManufactureProcess', 'process/critical-component-manufacture', 'Critical component manufacture process', 'Manufactures and attests compute-module, secure-element, PCBA, and enclosure lots.'],
-  ['supplychain_AssemblyProcess', 'process/final-assembly', 'Final assembly process', 'Assembles serialized gateway hardware from qualified component lots.'],
-  ['supplychain_ReproduceProcess', 'process/release-bundle-reproduction', 'Release bundle reproduction process', 'Reproduces the signed release bundle into the factory provisioning cache.'],
-  ['supplychain_ChangeProcess', 'process/factory-provisioning', 'Factory provisioning process', 'Installs signed firmware, device identity, and production configuration.'],
-  ['supplychain_StorageProcess', 'process/secure-staging-storage', 'Secure staging storage process', 'Stores provisioned units with seal and environmental monitoring before shipment.'],
-  ['supplychain_TransportProcess', 'process/controlled-lane-transport', 'Controlled-lane transport process', 'Moves devices between approved locations with custody and shock telemetry.'],
-  ['supplychain_ResponsibilityChangeProcess', 'process/custody-transfer', 'Custody and ownership transfer process', 'Records previous/current responsible parties and products affected by responsibility change.'],
-  ['supplychain_InspectionProcess', 'process/receiving-inspection', 'Receiving inspection process', 'Performs visual tamper, seal, serial, and evidence package inspection.'],
-  ['supplychain_TestProcess', 'process/secure-boot-acceptance-test', 'Secure-boot acceptance test process', 'Verifies firmware hash, signer, secure boot, and device identity at receiving.'],
-  ['supplychain_DefinedStateProcess', 'process/quarantine-decision', 'Quarantine decision process', 'Maps telemetry and inspection evidence to accepted, quarantined, or rejected states.'],
-  ['supplychain_PlanProcess', 'process/decommission-plan', 'Decommissioning plan process', 'Plans data erasure, secure destruction, recycling, and custody evidence.'],
-  ['supplychain_DestroyProcess', 'process/secure-destruction', 'Secure destruction process', 'Destroys retired tamper seals and storage media under controlled evidence capture.']
+  [
+    'supplychain_BoundaryDefinitionProcess',
+    'process/define-custody-boundary',
+    'Define shipment custody boundary',
+    'Defines product, evidence, location, and telemetry criteria for each custody boundary.'
+  ],
+  [
+    'supplychain_HarvestProcess',
+    'process/recycled-aluminum-intake',
+    'Recycled aluminum intake process',
+    'Captures the enclosure feedstock intake and batch evidence.'
+  ],
+  [
+    'supplychain_ManufactureProcess',
+    'process/critical-component-manufacture',
+    'Critical component manufacture process',
+    'Manufactures and attests compute-module, secure-element, PCBA, and enclosure lots.'
+  ],
+  [
+    'supplychain_AssemblyProcess',
+    'process/final-assembly',
+    'Final assembly process',
+    'Assembles serialized gateway hardware from qualified component lots.'
+  ],
+  [
+    'supplychain_ReproduceProcess',
+    'process/release-bundle-reproduction',
+    'Release bundle reproduction process',
+    'Reproduces the signed release bundle into the factory provisioning cache.'
+  ],
+  [
+    'supplychain_ChangeProcess',
+    'process/factory-provisioning',
+    'Factory provisioning process',
+    'Installs signed firmware, device identity, and production configuration.'
+  ],
+  [
+    'supplychain_StorageProcess',
+    'process/secure-staging-storage',
+    'Secure staging storage process',
+    'Stores provisioned units with seal and environmental monitoring before shipment.'
+  ],
+  [
+    'supplychain_TransportProcess',
+    'process/controlled-lane-transport',
+    'Controlled-lane transport process',
+    'Moves devices between approved locations with custody and shock telemetry.'
+  ],
+  [
+    'supplychain_ResponsibilityChangeProcess',
+    'process/custody-transfer',
+    'Custody and ownership transfer process',
+    'Records previous/current responsible parties and products affected by responsibility change.'
+  ],
+  [
+    'supplychain_InspectionProcess',
+    'process/receiving-inspection',
+    'Receiving inspection process',
+    'Performs visual tamper, seal, serial, and evidence package inspection.'
+  ],
+  [
+    'supplychain_TestProcess',
+    'process/secure-boot-acceptance-test',
+    'Secure-boot acceptance test process',
+    'Verifies firmware hash, signer, secure boot, and device identity at receiving.'
+  ],
+  [
+    'supplychain_DefinedStateProcess',
+    'process/quarantine-decision',
+    'Quarantine decision process',
+    'Maps telemetry and inspection evidence to accepted, quarantined, or rejected states.'
+  ],
+  [
+    'supplychain_PlanProcess',
+    'process/decommission-plan',
+    'Decommissioning plan process',
+    'Plans data erasure, secure destruction, recycling, and custody evidence.'
+  ],
+  [
+    'supplychain_DestroyProcess',
+    'process/secure-destruction',
+    'Secure destruction process',
+    'Destroys retired tamper seals and storage media under controlled evidence capture.'
+  ]
 ].map(([type, fragment, name, description]) =>
   element(type, fragment, {
     name,
@@ -482,7 +808,9 @@ const processes = [
   })
 );
 
-const processId = Object.fromEntries(processes.map((process) => [process.spdxId.split('/').pop(), process.spdxId]));
+const processId = Object.fromEntries(
+  processes.map((process) => [process.spdxId.split('/').pop(), process.spdxId])
+);
 
 const actions = [];
 function action(type, fragment, props, rels) {
@@ -492,7 +820,7 @@ function action(type, fragment, props, rels) {
   return actionEl;
 }
 
-const boundaryDefinition = action(
+action(
   'supplychain_BoundaryDefinitionAction',
   'action/001-define-shipment-boundary',
   {
@@ -501,7 +829,8 @@ const boundaryDefinition = action(
     endTime: '2026-06-28T10:30:00Z',
     actionLocation: loc['loc/hq'],
     supplychain_boundaryParameter: reqId.custody,
-    summary: 'Defines the custody boundary: serialized device, tamper seal, evidence package, telemetry logger, and accepted lane limits.'
+    summary:
+      'Defines the custody boundary: serialized device, tamper seal, evidence package, telemetry logger, and accepted lane limits.'
   },
   [
     ['performedBy', [personId['mira-patel'], orgId['arbor-devices']]],
@@ -510,7 +839,7 @@ const boundaryDefinition = action(
   ]
 );
 
-const harvest = action(
+action(
   'supplychain_HarvestAction',
   'action/002-recycled-aluminum-intake',
   {
@@ -528,7 +857,7 @@ const harvest = action(
   ]
 );
 
-const manufactureModules = action(
+action(
   'supplychain_ManufactureAction',
   'action/003-manufacture-critical-lots',
   {
@@ -540,13 +869,17 @@ const manufactureModules = action(
   },
   [
     ['performedBy', [orgId.siliconforge]],
-    ['hasOutput', [hwId['compute-module-cm7-26h1'], hwId['secure-element-se9-26h1']], { scope: 'build' }],
+    [
+      'hasOutput',
+      [hwId['compute-module-cm7-26h1'], hwId['secure-element-se9-26h1']],
+      { scope: 'build' }
+    ],
     ['hasRequirement', [reqId.provenance]],
     ['hasEvidence', [fileId['component-coc']]]
   ]
 );
 
-const manufacturePcba = action(
+action(
   'supplychain_ManufactureAction',
   'action/004-manufacture-pcba-lot',
   {
@@ -554,18 +887,23 @@ const manufacturePcba = action(
     startTime: '2026-07-01T01:00:00Z',
     endTime: '2026-07-01T13:20:00Z',
     actionLocation: loc['loc/boardfab-penang'],
-    summary: 'Assembles controller boards with lot-level traceability to critical supplied components.'
+    summary:
+      'Assembles controller boards with lot-level traceability to critical supplied components.'
   },
   [
     ['performedBy', [orgId.boardfab]],
-    ['hasInput', [hwId['compute-module-cm7-26h1'], hwId['secure-element-se9-26h1']], { scope: 'build' }],
+    [
+      'hasInput',
+      [hwId['compute-module-cm7-26h1'], hwId['secure-element-se9-26h1']],
+      { scope: 'build' }
+    ],
     ['hasOutput', [hwId['pcba-26-07-a17']], { scope: 'build' }],
     ['hasRequirement', [reqId.provenance]],
     ['hasEvidence', [fileId['component-coc']]]
   ]
 );
 
-const releaseBuild = action(
+action(
   'supplychain_CreateAction',
   'action/005-create-release-artifacts',
   {
@@ -573,18 +911,28 @@ const releaseBuild = action(
     startTime: '2026-07-01T14:20:00Z',
     endTime: '2026-07-01T14:44:31Z',
     actionLocation: loc['loc/hq'],
-    summary: 'Creates the release firmware, container image, SBOM log, and SLSA-style provenance attestation.'
+    summary:
+      'Creates the release firmware, container image, SBOM log, and SLSA-style provenance attestation.'
   },
   [
     ['performedBy', [orgId['arbor-devices'], toolId['slsa-provenance-generator']]],
     ['usesTool', [toolId.syft, toolId.trivy, toolId['slsa-provenance-generator']]],
-    ['hasOutput', [fileId['firmware-swu'], fileId['gateway-agent-oci'], fileId['slsa-provenance'], fileId['sbom-generation-log']], { scope: 'build' }],
+    [
+      'hasOutput',
+      [
+        fileId['firmware-swu'],
+        fileId['gateway-agent-oci'],
+        fileId['slsa-provenance'],
+        fileId['sbom-generation-log']
+      ],
+      { scope: 'build' }
+    ],
     ['hasRequirement', [reqId['signed-firmware'], reqId['sbom-delivery']]],
     ['conformsTo', [specId['slsa-provenance-v1-2'], specId['cisa-2025-sbom-min-elements']]]
   ]
 );
 
-const assembly = action(
+action(
   'supplychain_AssemblyAction',
   'action/006-final-assembly',
   {
@@ -603,7 +951,7 @@ const assembly = action(
   ]
 );
 
-const reproduceBundle = action(
+action(
   'supplychain_ReproduceAction',
   'action/007-reproduce-release-bundle',
   {
@@ -615,14 +963,18 @@ const reproduceBundle = action(
   },
   [
     ['performedBy', [toolId['in-toto-run'], orgId['arbor-devices']]],
-    ['hasInput', [fileId['firmware-swu'], fileId['gateway-agent-oci'], fileId['slsa-provenance']], { scope: 'build' }],
+    [
+      'hasInput',
+      [fileId['firmware-swu'], fileId['gateway-agent-oci'], fileId['slsa-provenance']],
+      { scope: 'build' }
+    ],
     ['hasOutput', [fileId['provisioning-manifest']], { scope: 'build' }],
     ['hasRequirement', [reqId['signed-firmware']]],
     ['hasEvidence', [fileId['slsa-provenance']]]
   ]
 );
 
-const provisioning = action(
+action(
   'supplychain_ChangeAction',
   'action/008-provision-firmware-and-seal',
   {
@@ -630,18 +982,29 @@ const provisioning = action(
     startTime: '2026-07-02T19:00:00Z',
     endTime: '2026-07-02T19:36:00Z',
     actionLocation: loc['loc/final-assembly'],
-    summary: 'Changes the serialized device from assembled hardware to provisioned product ready for shipment.'
+    summary:
+      'Changes the serialized device from assembled hardware to provisioned product ready for shipment.'
   },
   [
     ['performedBy', [orgId['arbor-devices'], toolId['secure-boot-attester']]],
-    ['hasInput', [hwId['sg1-sn-26-000042'], hwId['ts-9f42'], fileId['firmware-swu'], fileId['gateway-agent-oci'], fileId['provisioning-manifest']], { scope: 'build' }],
+    [
+      'hasInput',
+      [
+        hwId['sg1-sn-26-000042'],
+        hwId['ts-9f42'],
+        fileId['firmware-swu'],
+        fileId['gateway-agent-oci'],
+        fileId['provisioning-manifest']
+      ],
+      { scope: 'build' }
+    ],
     ['affects', [hwId['sg1-sn-26-000042'], hwId['ts-9f42']]],
     ['hasRequirement', [reqId['signed-firmware'], reqId.tamper]],
     ['hasEvidence', [fileId['secure-boot-test']]]
   ]
 );
 
-const provisionedState = action(
+action(
   'supplychain_StateAction',
   'action/009-state-provisioned',
   {
@@ -660,7 +1023,7 @@ const provisionedState = action(
   ]
 );
 
-const storage = action(
+action(
   'supplychain_StorageAction',
   'action/010-secure-staging-storage',
   {
@@ -668,7 +1031,8 @@ const storage = action(
     startTime: '2026-07-02T20:00:00Z',
     endTime: '2026-07-03T07:45:00Z',
     actionLocation: loc['loc/austin-warehouse'],
-    summary: 'Stores the provisioned unit with seal inspection and environmental monitoring before shipment.'
+    summary:
+      'Stores the provisioned unit with seal inspection and environmental monitoring before shipment.'
   },
   [
     ['performedBy', [orgId['futura-logistics']]],
@@ -677,7 +1041,7 @@ const storage = action(
   ]
 );
 
-const arborToFutura = action(
+action(
   'supplychain_ResponsibilityChangeAction',
   'action/011-transfer-custody-to-carrier',
   {
@@ -698,7 +1062,7 @@ const arborToFutura = action(
   ]
 );
 
-const boundaryCrossing = action(
+action(
   'supplychain_BoundaryCrossingAction',
   'action/012-cross-factory-carrier-boundary',
   {
@@ -716,7 +1080,7 @@ const boundaryCrossing = action(
   ]
 );
 
-const transport1 = action(
+action(
   'supplychain_TransportAction',
   'action/013-transport-austin-lax-denver',
   {
@@ -726,7 +1090,8 @@ const transport1 = action(
     actionLocation: loc['loc/austin-warehouse'],
     supplychain_pickupLocation: loc['loc/austin-warehouse'],
     supplychain_dropoffLocation: loc['loc/denver-lab'],
-    supplychain_transportRoute: 'Austin secure staging → LAX air-freight hub → Denver receiving lab',
+    supplychain_transportRoute:
+      'Austin secure staging → LAX air-freight hub → Denver receiving lab',
     summary: 'Controlled-lane shipment with carrier custody, shock telemetry, and evidence package.'
   },
   [
@@ -745,7 +1110,8 @@ const outOfSpec = action(
     startTime: '2026-07-04T02:14:08Z',
     endTime: '2026-07-04T02:14:10Z',
     actionLocation: loc['loc/lax-hub'],
-    summary: 'Shock logger records 18.4 g for 14 ms, above the fictional 15 g lane threshold; product enters quarantine until resolved.'
+    summary:
+      'Shock logger records 18.4 g for 14 ms, above the fictional 15 g lane threshold; product enters quarantine until resolved.'
   },
   [
     ['performedBy', [orgId['futura-logistics']]],
@@ -755,7 +1121,7 @@ const outOfSpec = action(
   ]
 );
 
-const quarantineState = action(
+action(
   'supplychain_StateAction',
   'action/015-state-quarantine',
   {
@@ -775,7 +1141,7 @@ const quarantineState = action(
   ]
 );
 
-const inspection = action(
+action(
   'supplychain_InspectionAction',
   'action/016-receiving-inspection',
   {
@@ -783,7 +1149,8 @@ const inspection = action(
     startTime: '2026-07-05T09:00:00Z',
     endTime: '2026-07-05T10:15:00Z',
     actionLocation: loc['loc/denver-lab'],
-    summary: 'Receiving inspection checks tamper seal, enclosure, serial numbers, custody records, and component evidence.'
+    summary:
+      'Receiving inspection checks tamper seal, enclosure, serial numbers, custody records, and component evidence.'
   },
   [
     ['performedBy', [orgId['assurance-lab'], personId['samir-ali']]],
@@ -793,7 +1160,7 @@ const inspection = action(
   ]
 );
 
-const acceptanceTest = action(
+action(
   'supplychain_TestAction',
   'action/017-secure-boot-acceptance-test',
   {
@@ -801,10 +1168,14 @@ const acceptanceTest = action(
     startTime: '2026-07-05T10:30:00Z',
     endTime: '2026-07-05T11:20:00Z',
     actionLocation: loc['loc/denver-lab'],
-    summary: 'Verifies secure boot, release signer, firmware hash, device identity, and measured boot evidence after the shock excursion.'
+    summary:
+      'Verifies secure boot, release signer, firmware hash, device identity, and measured boot evidence after the shock excursion.'
   },
   [
-    ['performedBy', [orgId['assurance-lab'], toolId['secure-boot-attester'], personId['claire-dubois']]],
+    [
+      'performedBy',
+      [orgId['assurance-lab'], toolId['secure-boot-attester'], personId['claire-dubois']]
+    ],
     ['usesTool', [toolId['secure-boot-attester'], toolId['in-toto-run']]],
     ['affects', [hwId['sg1-sn-26-000042'], fileId['firmware-swu']]],
     ['hasRequirement', [reqId['signed-firmware'], reqId.tamper]],
@@ -820,7 +1191,8 @@ const resolution = action(
     startTime: '2026-07-05T12:00:00Z',
     endTime: '2026-07-05T13:05:00Z',
     actionLocation: loc['loc/denver-lab'],
-    summary: 'Independent lab accepts the unit after seal, enclosure, secure-boot, and firmware-integrity checks find no deviation.'
+    summary:
+      'Independent lab accepts the unit after seal, enclosure, secure-boot, and firmware-integrity checks find no deviation.'
   },
   [
     ['performedBy', [orgId['assurance-lab'], personId['claire-dubois']]],
@@ -828,11 +1200,14 @@ const resolution = action(
     ['hasResolution', [outOfSpec.spdxId]],
     ['affects', [hwId['sg1-sn-26-000042']]],
     ['hasRequirement', [reqId.tamper]],
-    ['hasEvidence', [fileId['resolution-record'], fileId['inspection-record'], fileId['secure-boot-test']]]
+    [
+      'hasEvidence',
+      [fileId['resolution-record'], fileId['inspection-record'], fileId['secure-boot-test']]
+    ]
   ]
 );
 
-const acceptedState = action(
+action(
   'supplychain_StateAction',
   'action/019-state-accepted',
   {
@@ -851,7 +1226,7 @@ const acceptedState = action(
   ]
 );
 
-const futuraToEdgeOps = action(
+action(
   'supplychain_ResponsibilityChangeAction',
   'action/020-transfer-ownership-to-edgeops',
   {
@@ -872,7 +1247,7 @@ const futuraToEdgeOps = action(
   ]
 );
 
-const transport2 = action(
+action(
   'supplychain_TransportAction',
   'action/021-transport-denver-wyoming',
   {
@@ -893,7 +1268,7 @@ const transport2 = action(
   ]
 );
 
-const use = action(
+action(
   'supplychain_UseAction',
   'action/022-commission-at-site',
   {
@@ -911,7 +1286,7 @@ const use = action(
   ]
 );
 
-const plan = action(
+action(
   'supplychain_PlanAction',
   'action/023-plan-retirement',
   {
@@ -919,7 +1294,8 @@ const plan = action(
     startTime: '2026-07-06T10:45:00Z',
     endTime: '2026-07-06T11:15:00Z',
     actionLocation: loc['loc/wyoming-site'],
-    summary: 'Defines end-of-life custody, data erasure evidence, and destruction partner handoff before deployment begins.'
+    summary:
+      'Defines end-of-life custody, data erasure evidence, and destruction partner handoff before deployment begins.'
   },
   [
     ['performedBy', [orgId.edgeops, orgId['circular-recoveries']]],
@@ -930,7 +1306,7 @@ const plan = action(
   ]
 );
 
-const destroy = action(
+action(
   'supplychain_DestroyAction',
   'action/024-destroy-retired-tamper-seal',
   {
@@ -939,7 +1315,8 @@ const destroy = action(
     endTime: '2026-07-06T11:28:00Z',
     actionLocation: loc['loc/wyoming-site'],
     supplychain_destructionPerformedBy: orgId.edgeops,
-    summary: 'Destroys the removed factory seal coupon after customer acceptance while preserving evidence for the device record.'
+    summary:
+      'Destroys the removed factory seal coupon after customer acceptance while preserving evidence for the device record.'
   },
   [
     ['performedBy', [orgId.edgeops]],
@@ -949,7 +1326,7 @@ const destroy = action(
   ]
 );
 
-const deployedState = action(
+action(
   'supplychain_StateAction',
   'action/025-state-deployed',
   {
@@ -970,24 +1347,54 @@ const deployedState = action(
 
 // Static product, software, build, and compliance relationships.
 relationship('describes', id('sbom/arborlink-sg1'), hwId['sg1-sn-26-000042']);
-relationship('contains', hwId['sg1-sn-26-000042'], [hwId['pcba-26-07-a17'], hwId['compute-module-cm7-26h1'], hwId['secure-element-se9-26h1'], hwId['enclosure-26-07-k2'], hwId['ts-9f42']]);
+relationship('contains', hwId['sg1-sn-26-000042'], [
+  hwId['pcba-26-07-a17'],
+  hwId['compute-module-cm7-26h1'],
+  hwId['secure-element-se9-26h1'],
+  hwId['enclosure-26-07-k2'],
+  hwId['ts-9f42']
+]);
 relationship('runsOn', pkgId.firmware, hwId['sg1-sn-26-000042']);
 relationship('runsOn', pkgId['gateway-agent'], hwId['sg1-sn-26-000042']);
-scoped('dependsOn', pkgId.firmware, [pkgId.bootloader, pkgId['linux-image'], pkgId.openssl, pkgId.busybox], 'runtime');
+scoped(
+  'dependsOn',
+  pkgId.firmware,
+  [pkgId.bootloader, pkgId['linux-image'], pkgId.openssl, pkgId.busybox],
+  'runtime'
+);
 scoped('dependsOn', pkgId['gateway-agent'], [pkgId.openssl, pkgId.libmosquitto], 'runtime');
 scoped('hasDistributionArtifact', pkgId.firmware, fileId['firmware-swu'], 'build');
 scoped('hasDistributionArtifact', pkgId['gateway-agent'], fileId['gateway-agent-oci'], 'build');
 scoped('hasInput', build.spdxId, fileId['build-recipe'], 'build');
-scoped('hasOutput', build.spdxId, [fileId['firmware-swu'], fileId['gateway-agent-oci'], fileId['slsa-provenance'], fileId['sbom-generation-log']], 'build');
-relationship('usesTool', build.spdxId, [toolId.syft, toolId.trivy, toolId['slsa-provenance-generator']]);
+scoped(
+  'hasOutput',
+  build.spdxId,
+  [
+    fileId['firmware-swu'],
+    fileId['gateway-agent-oci'],
+    fileId['slsa-provenance'],
+    fileId['sbom-generation-log']
+  ],
+  'build'
+);
+relationship('usesTool', build.spdxId, [
+  toolId.syft,
+  toolId.trivy,
+  toolId['slsa-provenance-generator']
+]);
 relationship('hasDeclaredLicense', pkgId.firmware, licenseId.proprietary);
 relationship('hasConcludedLicense', pkgId.firmware, licenseId.proprietary);
 relationship('hasDeclaredLicense', pkgId['linux-image'], licenseId['gpl-2.0-only']);
 relationship('hasDeclaredLicense', pkgId.openssl, licenseId['apache-2.0']);
 relationship('hasDeclaredLicense', pkgId.busybox, licenseId['gpl-2.0-only']);
 relationship('hasDeclaredLicense', pkgId.libmosquitto, licenseId.mit);
-for (const req of requirements) relationship('conformsTo', req.spdxId, [specId['arborlink-supply-chain-plan']]);
-relationship('hasRequirement', hwId['sg1-sn-26-000042'], requirements.map((r) => r.spdxId));
+for (const req of requirements)
+  relationship('conformsTo', req.spdxId, [specId['arborlink-supply-chain-plan']]);
+relationship(
+  'hasRequirement',
+  hwId['sg1-sn-26-000042'],
+  requirements.map((r) => r.spdxId)
+);
 relationship('hasEvidence', hwId['sg1-sn-26-000042'], [
   fileId['component-coc'],
   fileId['shock-telemetry'],
@@ -997,40 +1404,61 @@ relationship('hasEvidence', hwId['sg1-sn-26-000042'], [
   fileId['acceptance-pack']
 ]);
 
-const vulnerability = element('security_Vulnerability', 'vulnerability/synthetic-openssl-config-hardening', {
-  name: 'SYNTHETIC-SG1-OPENSSL-CONFIG-HARDENING',
-  summary: 'Synthetic vulnerability record used to exercise SPDX Security/VEX relationships. It does not correspond to a real CVE.',
-  description: 'A fictional OpenSSL configuration hardening advisory. SG-1 firmware is not affected because the vulnerable provider is not built into the image.',
-  externalIdentifier: [
-    externalId('SYNTHETIC-SG1-OPENSSL-CONFIG-HARDENING', 'Synthetic advisory identifier', 'https://example.invalid/advisories/SYNTHETIC-SG1-OPENSSL-CONFIG-HARDENING')
-  ]
-});
+const vulnerability = element(
+  'security_Vulnerability',
+  'vulnerability/synthetic-openssl-config-hardening',
+  {
+    name: 'SYNTHETIC-SG1-OPENSSL-CONFIG-HARDENING',
+    summary:
+      'Synthetic vulnerability record used to exercise SPDX Security/VEX relationships. It does not correspond to a real CVE.',
+    description:
+      'A fictional OpenSSL configuration hardening advisory. SG-1 firmware is not affected because the vulnerable provider is not built into the image.',
+    externalIdentifier: [
+      externalId(
+        'SYNTHETIC-SG1-OPENSSL-CONFIG-HARDENING',
+        'Synthetic advisory identifier',
+        'https://example.invalid/advisories/SYNTHETIC-SG1-OPENSSL-CONFIG-HARDENING'
+      )
+    ]
+  }
+);
 
-const vex = element('security_VexNotAffectedVulnAssessmentRelationship', 'vex/openssl-config-not-affected', {
-  from: vulnerability.spdxId,
-  relationshipType: 'doesNotAffect',
-  to: [pkgId.firmware, pkgId.openssl],
-  security_justificationType: 'vulnerableCodeNotInExecutePath',
-  security_impactStatement: 'The fictional vulnerable OpenSSL provider is excluded from the ArborLink SG-1 image and not reachable at runtime.',
-  security_impactStatementTime: '2026-07-01T16:20:00Z',
-  security_statusNotes: 'Synthetic VEX assessment generated to demonstrate enriched SBOM consumption.',
-  security_vexVersion: '1.0'
-});
+const vex = element(
+  'security_VexNotAffectedVulnAssessmentRelationship',
+  'vex/openssl-config-not-affected',
+  {
+    from: vulnerability.spdxId,
+    relationshipType: 'doesNotAffect',
+    to: [pkgId.firmware, pkgId.openssl],
+    security_justificationType: 'vulnerableCodeNotInExecutePath',
+    security_impactStatement:
+      'The fictional vulnerable OpenSSL provider is excluded from the ArborLink SG-1 image and not reachable at runtime.',
+    security_impactStatementTime: '2026-07-01T16:20:00Z',
+    security_statusNotes:
+      'Synthetic VEX assessment generated to demonstrate enriched SBOM consumption.',
+    security_vexVersion: '1.0'
+  }
+);
 
-const cvss = element('security_CvssV3VulnAssessmentRelationship', 'vuln-assessment/openssl-config-cvss', {
-  from: vulnerability.spdxId,
-  relationshipType: 'affects',
-  to: [pkgId.openssl],
-  security_score: 7.1,
-  security_severity: 'high',
-  security_vectorString: 'CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:L/A:N'
-});
+const cvss = element(
+  'security_CvssV3VulnAssessmentRelationship',
+  'vuln-assessment/openssl-config-cvss',
+  {
+    from: vulnerability.spdxId,
+    relationshipType: 'affects',
+    to: [pkgId.openssl],
+    security_score: 7.1,
+    security_severity: 'high',
+    security_vectorString: 'CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:L/A:N'
+  }
+);
 
 const sbom = element('software_Sbom', 'sbom/arborlink-sg1', {
   name: 'ArborLink SG-1 supply-chain, hardware, software, and security BOM',
   software_sbomType: ['design', 'build', 'deployed'],
   rootElement: [hwId['sg1-sn-26-000042'], pkgId.firmware, build.spdxId],
-  summary: 'Synthetic SPDX 3.1 sample demonstrating SupplyChain lifecycle actions integrated with Core, Hardware, Software, Build, Security, and SimpleLicensing data.'
+  summary:
+    'Synthetic SPDX 3.1 sample demonstrating SupplyChain lifecycle actions integrated with Core, Hardware, Software, Build, Security, and SimpleLicensing data.'
 });
 
 const creationInfo = {
@@ -1040,7 +1468,8 @@ const creationInfo = {
   created: CREATED,
   createdBy: [orgId['arbor-devices'], personId['mira-patel']],
   createdUsing: [toolId['synthetic-supply-chain-generator']],
-  comment: 'Synthetic, deterministic sample. No real product, shipment, person, or vulnerability is represented.'
+  comment:
+    'Synthetic, deterministic sample. No real product, shipment, person, or vulnerability is represented.'
 };
 
 const document = element('SpdxDocument', 'document', {
@@ -1057,7 +1486,8 @@ const document = element('SpdxDocument', 'document', {
     'supplyChain'
   ],
   rootElement: [sbom.spdxId, hwId['sg1-sn-26-000042']],
-  summary: 'Demonstrates SPDX 3.1 SupplyChain concepts across creation, transport, use, exception handling, resolution, and decommission planning.'
+  summary:
+    'Demonstrates SPDX 3.1 SupplyChain concepts across creation, transport, use, exception handling, resolution, and decommission planning.'
 });
 
 graph.push(
@@ -1125,7 +1555,11 @@ function validateGraph() {
     checkRefs(owner, 'supplychain_boundaryParameter', item.supplychain_boundaryParameter);
     checkRefs(owner, 'supplychain_current', item.supplychain_current);
     checkRefs(owner, 'supplychain_previous', item.supplychain_previous);
-    checkRefs(owner, 'supplychain_responsibilityChangedOn', item.supplychain_responsibilityChangedOn);
+    checkRefs(
+      owner,
+      'supplychain_responsibilityChangedOn',
+      item.supplychain_responsibilityChangedOn
+    );
     checkRefs(owner, 'supplychain_currentState', item.supplychain_currentState);
     checkRefs(owner, 'supplychain_decisionProcess', item.supplychain_decisionProcess);
     checkRefs(owner, 'supplychain_destructionPerformedBy', item.supplychain_destructionPerformedBy);
@@ -1158,7 +1592,9 @@ function validateGraph() {
     if (!a.supplychain_transportRoute) errors.push(`${a.spdxId} missing route`);
   }
 
-  for (const a of actions.filter((item) => item.type === 'supplychain_ResponsibilityChangeAction')) {
+  for (const a of actions.filter(
+    (item) => item.type === 'supplychain_ResponsibilityChangeAction'
+  )) {
     for (const prop of [
       'supplychain_current',
       'supplychain_responsibilityChangedOn',
@@ -1171,7 +1607,11 @@ function validateGraph() {
   }
 
   const resolutionRels = relationships.filter((rel) => rel.relationshipType === 'resolved');
-  if (!resolutionRels.some((rel) => rel.from === resolution.spdxId && rel.to.includes(outOfSpec.spdxId))) {
+  if (
+    !resolutionRels.some(
+      (rel) => rel.from === resolution.spdxId && rel.to.includes(outOfSpec.spdxId)
+    )
+  ) {
     errors.push('ResolutionAction does not resolve the OutOfSpecAction');
   }
 
@@ -1180,7 +1620,9 @@ function validateGraph() {
   }
 
   if (errors.length) {
-    throw new Error(`Supply-chain sample validation failed:\n${errors.map((e) => `- ${e}`).join('\n')}`);
+    throw new Error(
+      `Supply-chain sample validation failed:\n${errors.map((e) => `- ${e}`).join('\n')}`
+    );
   }
 }
 

@@ -109,10 +109,7 @@ test('buildRelationshipIndexes indexes SPDX build relationships and unresolved e
 
 test('parseGraph categorizes SPDX 3.1 SupplyChain actions, processes, and states', () => {
   const graph = JSON.parse(
-    readFileSync(
-      'public/samples/supply-chain/arborlink-sg1-supply-chain.spdx3.jsonld',
-      'utf8'
-    )
+    readFileSync('public/samples/supply-chain/arborlink-sg1-supply-chain.spdx3.jsonld', 'utf8')
   )['@graph'];
   const parsed = parseGraph(graph);
   const indexes = buildRelationshipIndexes(parsed.relationships);
