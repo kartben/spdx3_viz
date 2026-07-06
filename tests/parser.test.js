@@ -205,6 +205,22 @@ test('SupplyChain view model exposes lifecycle, custody, and exception structure
   assert.equal(app.supplyChainCustodyHandoffs.length, 2);
   assert.equal(app.supplyChainCustodyHandoffs[1].category, 'ownership');
 
+  const transportProcess = parsed.supplyChain.find(
+    (el) => el.name === 'Controlled-lane transport process'
+  );
+  const manufactureProcess = parsed.supplyChain.find(
+    (el) => el.name === 'Critical component manufacture process'
+  );
+  assert.equal(app.supplyChainFamily(transportProcess), 'move');
+  assert.equal(app.supplyChainFamily(manufactureProcess), 'create');
+  assert.equal(app.supplyChainProcessActions(transportProcess).length, 2);
+  assert.equal(
+    app
+      .supplyChainCardFacts(transportProcess)
+      .some((fact) => fact.label === 'Observed actions' && fact.value === '2 execution(s)'),
+    true
+  );
+
   assert.equal(app.supplyChainExceptionChains.length, 1);
   assert.equal(app.supplyChainExceptionChains[0].resolutions.length, 1);
   assert.equal(

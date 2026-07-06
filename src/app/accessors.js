@@ -228,24 +228,36 @@ export const accessorsMixin = {
     const t = el?.type || '';
     if (
       isA(t, CLASS.supplychain_CreateAction) ||
+      isA(t, CLASS.supplychain_CreateProcess) ||
       isA(t, CLASS.supplychain_ManufactureAction) ||
+      isA(t, CLASS.supplychain_ManufactureProcess) ||
       isA(t, CLASS.supplychain_AssemblyAction) ||
+      isA(t, CLASS.supplychain_AssemblyProcess) ||
       isA(t, CLASS.supplychain_HarvestAction) ||
+      isA(t, CLASS.supplychain_HarvestProcess) ||
+      isA(t, CLASS.supplychain_ReproduceProcess) ||
       isA(t, CLASS.supplychain_ReproduceAction)
     ) {
       return 'create';
     }
     if (
       isA(t, CLASS.supplychain_TransportAction) ||
+      isA(t, CLASS.supplychain_TransportProcess) ||
       isA(t, CLASS.supplychain_StorageAction) ||
+      isA(t, CLASS.supplychain_StorageProcess) ||
       isA(t, CLASS.supplychain_ResponsibilityChangeAction) ||
+      isA(t, CLASS.supplychain_ResponsibilityChangeProcess) ||
+      isA(t, CLASS.supplychain_BoundaryDefinitionProcess) ||
       isA(t, CLASS.supplychain_BoundaryCrossingAction)
     ) {
       return 'move';
     }
     if (
       isA(t, CLASS.supplychain_InspectionAction) ||
+      isA(t, CLASS.supplychain_InspectionProcess) ||
       isA(t, CLASS.supplychain_TestAction) ||
+      isA(t, CLASS.supplychain_TestProcess) ||
+      isA(t, CLASS.supplychain_DefinedStateProcess) ||
       isA(t, CLASS.supplychain_StateAction)
     ) {
       return 'verify';
@@ -255,7 +267,10 @@ export const accessorsMixin = {
     }
     if (
       isA(t, CLASS.supplychain_UseAction) ||
+      isA(t, CLASS.supplychain_UseProcess) ||
       isA(t, CLASS.supplychain_PlanAction) ||
+      isA(t, CLASS.supplychain_PlanProcess) ||
+      isA(t, CLASS.supplychain_DestroyProcess) ||
       isA(t, CLASS.supplychain_DestroyAction)
     ) {
       return 'operate';
@@ -273,7 +288,11 @@ export const accessorsMixin = {
         iconBg: 'bg-sky-500/15',
         text: 'text-sky-300',
         border: 'border-sky-500/35',
-        ring: 'ring-sky-500/20'
+        ring: 'ring-sky-500/20',
+        surface: 'bg-sky-500/[0.07]',
+        hover: 'hover:bg-sky-500/[0.11]',
+        panel: 'bg-sky-950/30 border-sky-500/20',
+        chip: 'bg-sky-500/15 text-sky-200 ring-1 ring-sky-500/25'
       },
       move: {
         label: 'Move / custody',
@@ -281,7 +300,11 @@ export const accessorsMixin = {
         iconBg: 'bg-cyan-500/15',
         text: 'text-cyan-300',
         border: 'border-cyan-500/35',
-        ring: 'ring-cyan-500/20'
+        ring: 'ring-cyan-500/20',
+        surface: 'bg-cyan-500/[0.07]',
+        hover: 'hover:bg-cyan-500/[0.11]',
+        panel: 'bg-cyan-950/30 border-cyan-500/20',
+        chip: 'bg-cyan-500/15 text-cyan-200 ring-1 ring-cyan-500/25'
       },
       verify: {
         label: 'Inspect / test',
@@ -289,7 +312,11 @@ export const accessorsMixin = {
         iconBg: 'bg-violet-500/15',
         text: 'text-violet-300',
         border: 'border-violet-500/35',
-        ring: 'ring-violet-500/20'
+        ring: 'ring-violet-500/20',
+        surface: 'bg-violet-500/[0.07]',
+        hover: 'hover:bg-violet-500/[0.11]',
+        panel: 'bg-violet-950/30 border-violet-500/20',
+        chip: 'bg-violet-500/15 text-violet-200 ring-1 ring-violet-500/25'
       },
       exception: {
         label: 'Exception path',
@@ -297,7 +324,11 @@ export const accessorsMixin = {
         iconBg: 'bg-rose-500/15',
         text: 'text-rose-300',
         border: 'border-rose-500/35',
-        ring: 'ring-rose-500/20'
+        ring: 'ring-rose-500/20',
+        surface: 'bg-rose-500/[0.07]',
+        hover: 'hover:bg-rose-500/[0.11]',
+        panel: 'bg-rose-950/30 border-rose-500/20',
+        chip: 'bg-rose-500/15 text-rose-200 ring-1 ring-rose-500/25'
       },
       operate: {
         label: 'Use / retire',
@@ -305,7 +336,11 @@ export const accessorsMixin = {
         iconBg: 'bg-emerald-500/15',
         text: 'text-emerald-300',
         border: 'border-emerald-500/35',
-        ring: 'ring-emerald-500/20'
+        ring: 'ring-emerald-500/20',
+        surface: 'bg-emerald-500/[0.07]',
+        hover: 'hover:bg-emerald-500/[0.11]',
+        panel: 'bg-emerald-950/30 border-emerald-500/20',
+        chip: 'bg-emerald-500/15 text-emerald-200 ring-1 ring-emerald-500/25'
       },
       process: {
         label: 'Defined process',
@@ -313,7 +348,11 @@ export const accessorsMixin = {
         iconBg: 'bg-indigo-500/15',
         text: 'text-indigo-300',
         border: 'border-indigo-500/35',
-        ring: 'ring-indigo-500/20'
+        ring: 'ring-indigo-500/20',
+        surface: 'bg-indigo-500/[0.07]',
+        hover: 'hover:bg-indigo-500/[0.11]',
+        panel: 'bg-indigo-950/30 border-indigo-500/20',
+        chip: 'bg-indigo-500/15 text-indigo-200 ring-1 ring-indigo-500/25'
       },
       state: {
         label: 'State',
@@ -321,7 +360,11 @@ export const accessorsMixin = {
         iconBg: 'bg-teal-500/15',
         text: 'text-teal-300',
         border: 'border-teal-500/35',
-        ring: 'ring-teal-500/20'
+        ring: 'ring-teal-500/20',
+        surface: 'bg-teal-500/[0.07]',
+        hover: 'hover:bg-teal-500/[0.11]',
+        panel: 'bg-teal-950/30 border-teal-500/20',
+        chip: 'bg-teal-500/15 text-teal-200 ring-1 ring-teal-500/25'
       },
       other: {
         label: 'Supply chain',
@@ -329,10 +372,43 @@ export const accessorsMixin = {
         iconBg: 'bg-slate-500/15',
         text: 'text-slate-300',
         border: 'border-slate-500/35',
-        ring: 'ring-slate-500/20'
+        ring: 'ring-slate-500/20',
+        surface: 'bg-slate-500/[0.06]',
+        hover: 'hover:bg-slate-500/[0.10]',
+        panel: 'bg-slate-900/70 border-slate-700/60',
+        chip: 'bg-slate-700/80 text-slate-200 ring-1 ring-slate-600/40'
       }
     };
     return meta[this.supplyChainFamily(el)] || meta.other;
+  },
+
+  supplyChainProcessActionClass(process) {
+    const type = process?.type || '';
+    if (!type.endsWith('Process')) return '';
+    if (type === CLASS.supplychain_DefinedStateProcess) return CLASS.supplychain_StateAction;
+    return type.replace(/Process$/, 'Action');
+  },
+
+  supplyChainProcessActions(process) {
+    const actionClass = this.supplyChainProcessActionClass(process);
+    const matches = new Map();
+    if (actionClass) {
+      this.supplyChainActions
+        .filter((action) => isA(action.type, actionClass))
+        .forEach((action) => matches.set(action.spdxId, action));
+    }
+    this.supplyChainActions
+      .filter((action) => action.supplychain_decisionProcess === process?.spdxId)
+      .forEach((action) => matches.set(action.spdxId, action));
+    return [...matches.values()].sort((a, b) =>
+      (a.startTime || '').localeCompare(b.startTime || '')
+    );
+  },
+
+  supplyChainStateActions(state) {
+    return this.supplyChainActions.filter(
+      (action) => action.supplychain_currentState === state?.spdxId
+    );
   },
 
   supplyChainExceptionStatus(el) {
@@ -455,6 +531,34 @@ export const accessorsMixin = {
     const push = (label, value) => {
       if (this.isMeaningful(value)) facts.push({ label, value });
     };
+    if (this.supplyChainKind(el) === 'process') {
+      const actions = this.supplyChainProcessActions(el);
+      const decisions = actions.filter(
+        (action) => action.supplychain_decisionProcess === el.spdxId
+      );
+      push('Process class', this.supplyChainTypeLabel(el));
+      push(
+        'Observed actions',
+        actions.length ? `${actions.length} execution(s)` : 'Definition only'
+      );
+      push('Used for decisions', decisions.length ? `${decisions.length} state transition(s)` : '');
+      push(
+        'Representative action',
+        actions[0] ? actions[0].name || this.cleanName(actions[0].spdxId) : ''
+      );
+      return facts.slice(0, 4);
+    }
+    if (this.supplyChainKind(el) === 'state') {
+      const stateActions = this.supplyChainStateActions(el);
+      push('State class', this.supplyChainTypeLabel(el));
+      push('Reached by', stateActions.length ? `${stateActions.length} transition(s)` : '');
+      push(
+        'Transition action',
+        stateActions[0] ? stateActions[0].name || this.cleanName(stateActions[0].spdxId) : ''
+      );
+      push('SPDX ID', el?.spdxId);
+      return facts.slice(0, 4);
+    }
     push('When', this.supplyChainTimeRange(el));
     push('Where', this.supplyChainRoute(el));
     push('State', this.supplyChainStateName(el));
@@ -470,6 +574,51 @@ export const accessorsMixin = {
       this.supplyChainEvidenceCount(el) ? `${this.supplyChainEvidenceCount(el)} artifact(s)` : ''
     );
     return facts.slice(0, 4);
+  },
+
+  supplyChainConceptChips(el) {
+    const chips = [];
+    const push = (label, count, className = '') => {
+      if (count > 0) chips.push({ label, count, className });
+    };
+    const meta = this.supplyChainFamilyMeta(el);
+    const kind = this.supplyChainKind(el);
+    if (kind === 'process') {
+      push('actions', this.supplyChainProcessActions(el).length, meta.chip);
+      push(
+        'decisions',
+        this.supplyChainProcessActions(el).filter(
+          (action) => action.supplychain_decisionProcess === el.spdxId
+        ).length,
+        'bg-teal-500/15 text-teal-200 ring-1 ring-teal-500/25'
+      );
+    } else if (kind === 'state') {
+      push('transitions', this.supplyChainStateActions(el).length, meta.chip);
+    } else {
+      push(
+        'performers',
+        this.supplyChainPerformerNames(el).length,
+        'bg-lime-500/15 text-lime-200 ring-1 ring-lime-500/25'
+      );
+      push(
+        'evidence',
+        this.supplyChainEvidenceCount(el),
+        'bg-amber-500/15 text-amber-200 ring-1 ring-amber-500/25'
+      );
+      push(
+        'affected',
+        this.supplyChainTargets(el, 'affects').length,
+        'bg-cyan-500/15 text-cyan-200 ring-1 ring-cyan-500/25'
+      );
+      push(
+        'requirements',
+        this.supplyChainTargets(el, 'hasRequirement').length,
+        'bg-violet-500/15 text-violet-200 ring-1 ring-violet-500/25'
+      );
+    }
+    const relCount = this.outgoingRels(el?.spdxId).length + this.incomingRels(el?.spdxId).length;
+    push('links', relCount, 'bg-slate-700/80 text-slate-200 ring-1 ring-slate-600/40');
+    return chips.slice(0, 4);
   },
 
   getBuildConfigFor(targetSpdxId) {
