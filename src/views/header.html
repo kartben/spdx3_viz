@@ -71,10 +71,17 @@
         />
       </svg>
       <span class="hidden sm:inline">Search</span>
-      <kbd
-        class="hidden md:inline px-1 py-0.5 text-[10px] font-medium bg-slate-700/60 border border-slate-600/50 rounded"
-        ><span x-text="isMac ? '⌘' : 'Ctrl'"></span>K</kbd
-      >
+      <span class="hidden md:inline-flex items-center gap-1 font-mono">
+        <kbd
+          class="px-1.5 py-0.5 text-[10px] font-medium bg-slate-700/60 border border-slate-600/50 rounded"
+          x-text="isMac ? '⌘' : 'Ctrl'"
+        ></kbd>
+        <span class="text-[10px] text-slate-500">+</span>
+        <kbd
+          class="px-1.5 py-0.5 text-[10px] font-medium bg-slate-700/60 border border-slate-600/50 rounded"
+          >K</kbd
+        >
+      </span>
     </button>
     <!-- Global search: fuzzy jump-to-anything across every element -->
     <div class="relative" x-show="currentView !== 'graph'" @click.outside="closeSearch()">
@@ -128,9 +135,19 @@
         type="button"
         title="Open command palette"
         aria-label="Open command palette"
-        class="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-medium text-slate-500 bg-slate-700/50 border border-slate-600/50 rounded hover:text-slate-300 hover:border-slate-500 transition-colors"
+        class="group hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 items-center gap-1 font-mono"
       >
-        <span x-text="isMac ? '⌘' : 'Ctrl'"></span>K
+        <kbd
+          class="px-1.5 py-0.5 text-[10px] font-medium text-slate-500 bg-slate-700/50 border border-slate-600/50 rounded group-hover:text-slate-300 group-hover:border-slate-500 transition-colors"
+          x-text="isMac ? '⌘' : 'Ctrl'"
+        ></kbd>
+        <span class="text-[10px] text-slate-600 group-hover:text-slate-400 transition-colors"
+          >+</span
+        >
+        <kbd
+          class="px-1.5 py-0.5 text-[10px] font-medium text-slate-500 bg-slate-700/50 border border-slate-600/50 rounded group-hover:text-slate-300 group-hover:border-slate-500 transition-colors"
+          >K</kbd
+        >
       </button>
 
       <!-- Results dropdown -->
