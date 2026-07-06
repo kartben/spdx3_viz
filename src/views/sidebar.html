@@ -67,16 +67,25 @@
     </template>
   </nav>
 
-  <div
-    class="px-4 py-3 border-t border-slate-700/50 flex items-center justify-between gap-2 flex-shrink-0"
-  >
-    <span class="text-[11px] text-slate-500" x-text="'v' + appVersion"></span>
-    <button
-      type="button"
-      @click="openChangelogModal()"
-      class="text-[11px] text-slate-500 hover:text-slate-300 underline decoration-slate-700 hover:decoration-slate-500 transition-colors"
+  <div class="px-4 py-3 border-t border-slate-700/50 flex-shrink-0">
+    <a
+      href="https://github.com/kartben"
+      target="_blank"
+      rel="author noopener noreferrer"
+      class="block text-[11px] text-slate-500 hover:text-slate-300 transition-colors truncate focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded"
+      title="Created by Benjamin Cabé"
     >
-      What's new
-    </button>
+      By Benjamin Cabé
+    </a>
+    <div class="mt-1.5 flex items-center justify-between gap-2">
+      <span class="text-[11px] text-slate-500" x-text="'v' + appVersion"></span>
+      <button
+        type="button"
+        @click="openChangelogModal()"
+        class="text-[11px] text-slate-500 hover:text-slate-300 underline decoration-slate-700 hover:decoration-slate-500 transition-colors"
+      >
+        What's new
+      </button>
+    </div>
   </div>
 </aside>

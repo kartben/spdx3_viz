@@ -40,6 +40,21 @@ function htmlPartials() {
   };
 }
 
+// Keep the Apache NOTICE with every production build, including the static
+// dist/ bundle published to GitHub Pages or redistributed on its own.
+function legalNotice() {
+  return {
+    name: 'legal-notice',
+    generateBundle() {
+      this.emitFile({
+        type: 'asset',
+        fileName: 'NOTICE',
+        source: readFileSync(resolve(import.meta.dirname, 'NOTICE'), 'utf8')
+      });
+    }
+  };
+}
+
 // Static site: emitted with relative asset URLs (base './') so it works whether
 // served from the GitHub Pages project subpath (/spdx3_viz/), a custom domain,
 // or `python3 -m http.server` on the built `dist/` folder. Files under public/
@@ -47,7 +62,7 @@ function htmlPartials() {
 // paths, so the runtime `fetch('samples/samples.json')` still resolves.
 export default defineConfig({
   base: './',
-  plugins: [htmlPartials()],
+  plugins: [htmlPartials(), legalNotice()],
   build: {
     outDir: 'dist',
     chunkSizeWarningLimit: 1500
