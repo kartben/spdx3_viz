@@ -262,7 +262,11 @@ test('SupplyChain view model exposes lifecycle, custody, and exception structure
   const shockExcursion = parsed.supplyChain.find(
     (el) => el.name === 'Shock telemetry exceeds SG-1 shipment threshold'
   );
-  assert.equal(app.supplyChainTimeFactLabel(shockExcursion), 'Start time (2 seconds)');
+  assert.equal(app.supplyChainDurationLabel(shockExcursion), '2 seconds');
+  assert.equal(
+    app.supplyChainCardFacts(shockExcursion).some((fact) => fact.label === 'Time'),
+    true
+  );
 
   assert.equal(app.supplyChainCarbonSummary.rows.length, 2);
   assert.equal(app.supplyChainCarbonSummary.totalKg, 228.5);

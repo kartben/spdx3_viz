@@ -471,11 +471,6 @@ export const accessorsMixin = {
     return remHours ? `${days}d ${remHours}h` : `${days}d`;
   },
 
-  supplyChainTimeFactLabel(el) {
-    const duration = this.supplyChainDurationLabel(el);
-    return duration ? `Start time (${duration})` : 'Start time';
-  },
-
   supplyChainCdxProperty(el, pattern) {
     const prop = this.cdxProperties(el).find((entry) => pattern.test(entry.name));
     return prop?.value || '';
@@ -565,7 +560,7 @@ export const accessorsMixin = {
     const push = (label, value, mono = false) => {
       if (this.isMeaningful(value)) rows.push({ label, value, mono });
     };
-    push(this.supplyChainTimeFactLabel(el), this.supplyChainTimeRange(el));
+    push('Time', this.supplyChainTimeRange(el));
     push('Location', this.supplyChainRefName(el?.actionLocation));
     push('Route', el?.supplychain_transportRoute);
     push('Pickup', this.supplyChainRefName(el?.supplychain_pickupLocation));
@@ -623,7 +618,7 @@ export const accessorsMixin = {
       push('SPDX ID', el?.spdxId);
       return facts.slice(0, 4);
     }
-    push(this.supplyChainTimeFactLabel(el), this.supplyChainTimeRange(el));
+    push('Time', this.supplyChainTimeRange(el));
     push('Where', this.supplyChainRoute(el));
     push('CO₂e', this.formatCarbonKg(this.supplyChainCarbonKg(el)));
     push('State', this.supplyChainStateName(el));

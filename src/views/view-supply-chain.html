@@ -212,8 +212,8 @@
                     <span
                       class="text-[10px] uppercase tracking-wider"
                       :class="supplyChainFamilyMeta(row.action).text"
-                      x-text="supplyChainTimeFactLabel(row.action)"
-                    ></span>
+                      >Start</span
+                    >
                     <span
                       x-show="row.status"
                       class="badge text-xs"
@@ -224,6 +224,11 @@
                       x-show="row.carbonKg"
                       class="badge text-xs bg-emerald-500/15 text-emerald-200"
                       x-text="formatCarbonKg(row.carbonKg)"
+                    ></span>
+                    <span
+                      x-show="row.duration"
+                      class="badge text-xs bg-slate-700/80 text-slate-200"
+                      x-text="`Duration ${row.duration}`"
                     ></span>
                   </div>
                   <div
@@ -253,6 +258,7 @@
                   </div>
                 </div>
                 <div class="text-right text-xs text-slate-500 flex-shrink-0">
+                  <div class="uppercase tracking-wider text-[10px]">Duration</div>
                   <div x-text="row.duration || 'instant'"></div>
                   <div x-show="row.distanceKm" x-text="`${row.distanceKm} km`"></div>
                 </div>
