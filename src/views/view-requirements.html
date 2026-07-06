@@ -467,14 +467,14 @@
                         ></div>
                       </div>
                       <div
-                        x-show="v.evaluation && isMeaningful(v.evaluation.rationale || v.evaluation.functionalsafety_rationale)"
+                        x-show="v.evaluation && isMeaningful(v.evaluation.rationale || v.evaluation.functionalsafety_rationale || v.evaluation.functionalsafety_evaluationRationale)"
                       >
                         <span class="text-[10px] text-slate-500 uppercase tracking-wider"
                           >Evaluation rationale</span
                         >
                         <div
                           class="text-xs text-slate-300 break-words"
-                          x-text="v.evaluation.rationale || v.evaluation.functionalsafety_rationale"
+                          x-text="v.evaluation.rationale || v.evaluation.functionalsafety_rationale || v.evaluation.functionalsafety_evaluationRationale"
                         ></div>
                       </div>
                     </div>
