@@ -2,6 +2,7 @@ import {
   renderGraph as renderGraphView,
   resetGraphZoom as resetGraphViewZoom
 } from '../graph/graph-view.js';
+import { computeHeatIndex, heatModeMeta, HEAT_MODES } from '../lib/index.js';
 
 /* Force graph: thin bridge between the Alpine component and the D3 renderer in
    graph-view.js, plus selecting a node into the detail panel. */
@@ -41,5 +42,65 @@ export const graphMixin = {
   },
   resetGraphZoom() {
     resetGraphViewZoom(this);
+  },
+
+  // --- Heatmap overlay ---------------------------------------------------
+
+  // True while a heat mode is selected (drives the toolbar highlight + legend).
+  get graphHeatActive() {
+    return !!this.graphHeatMode && this.graphHeatMode !== 'off';
+  },
+  // Cheap gate for whether the heat control is worth showing at all: the SBOM
+  // must carry vulnerabilities or requirements for any lens to have data.
+  get graphHeatAvailable() {
+    return this.vulnerabilities.length > 0 || this.safetyCounts.requirements > 0;
+  },
+  heatModeMeta(key) {
+    return heatModeMeta(key);
+  },
+  // The per-element heat map for the active mode, consumed by the renderer.
+  // Callbacks are bound here so the pure lib stays DOM/state-free.
+  graphHeatData() {
+    return computeHeatIndex(this.graphHeatMode, this._graphHeatInputs());
+  },
+  _graphHeatInputs() {
+    return {
+      vulnerabilities: this.vulnerabilities,
+      requirements: this.requirements,
+      requirementStatus: (r) => this.requirementSafetyStatus(r),
+      implementedByCount: (id) => this.implementedByCount(id)
+    };
+  },
+  // Modes applicable to the loaded data, each with its live hot-element count.
+  // Recomputed when the picker opens (cheap, and only then) rather than on every
+  // reactive tick, since it walks the vulnerability/requirement lists.
+  _computeHeatModeList() {
+    const inputs = this._graphHeatInputs();
+    return HEAT_MODES.filter((m) =>
+      m.key === 'vuln' ? this.vulnerabilities.length > 0 : this.safetyCounts.requirements > 0
+    ).map((m) => ({ ...m, count: computeHeatIndex(m.key, inputs).size }));
+  },
+  toggleHeatMenu() {
+    this.graphHeatMenuOpen = !this.graphHeatMenuOpen;
+    if (this.graphHeatMenuOpen) this.graphHeatModeList = this._computeHeatModeList();
+  },
+  closeHeatMenu() {
+    this.graphHeatMenuOpen = false;
+  },
+  // Pick a mode (clicking the active one turns it off). Heat is a pure overlay,
+  // so repaint the settled canvas instead of rebuilding + relaying out the graph.
+  setGraphHeatMode(mode) {
+    this.graphHeatMode = this.graphHeatMode === mode ? 'off' : mode;
+    this.graphHeatMenuOpen = false;
+    this._repaintHeat();
+  },
+  clearGraphHeat() {
+    this.graphHeatMode = 'off';
+    this.graphHeatMenuOpen = false;
+    this._repaintHeat();
+  },
+  _repaintHeat() {
+    if (this.graphRecomputeHeat) this.graphRecomputeHeat();
+    else this.renderGraph();
   }
 };

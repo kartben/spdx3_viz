@@ -70,7 +70,8 @@ const ICONS = {
   toggle_aggregate: 'workspaces',
   toggle_hide_orphans: 'visibility_off',
   collapse_clusters: 'unfold_less',
-  reset_zoom: 'crop_free'
+  reset_zoom: 'crop_free',
+  toggle_heatmap: 'local_fire_department'
 };
 
 const here = dirname(fileURLToPath(import.meta.url));

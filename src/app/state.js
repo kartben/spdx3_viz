@@ -230,6 +230,13 @@ export function createState() {
     graphAggregate: false,
     graphUseIcons: false, // draw nodes as their type's Material icon instead of a plain dot
     graphHideOrphans: false, // hide nodes left with no edges once every other filter is applied
+    // Heatmap overlay: 'off' or a HEAT_MODES key (vuln / failed / unverified).
+    // Blooms a glow over the elements carrying that risk signal without touching
+    // the base node/edge draw.
+    graphHeatMode: 'off',
+    graphHeatMenuOpen: false, // the toolbar heat-mode picker popover
+    graphHeatModeList: [], // applicable modes + live counts, recomputed when the menu opens
+    graphRecomputeHeat: null, // set by the graph renderer; repaints the heat layer without a rebuild
     expandedClusters: new Set(), // cluster keys the user has drilled into
     graphExpandedCount: 0, // reactive mirror of expandedClusters.size (Set mutations aren't tracked)
     graphNodeCount: 0, // live readout of rendered nodes/edges

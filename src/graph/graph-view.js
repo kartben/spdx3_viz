@@ -1007,6 +1007,104 @@ export function renderGraph(app, retry = 0) {
     ctx.lineDashOffset = 0;
   };
 
+  // 6c. Heatmap overlay: fold the app's per-element heat index onto render nodes
+  //     (a collapsed cluster inherits its hottest member) and bloom a glow over
+  //     the hot regions. Purely additive layers around the normal draw, so the
+  //     base graph is untouched and toggling a mode only repaints.
+  let heatNodes = []; // render nodes carrying heat, precomputed for the draw loop
+  const HEAT_MIN_PX = 26; // screen-space glow floor so heat still pools when zoomed out
+  const HEAT_GLOW_ALPHA = 0.5; // peak core alpha before additive accumulation
+  const heatGradientCache = new Map(); // `${color}|${level}` -> unit radial gradient
+  const heatGradient = (color, level) => {
+    const key = color + '|' + level;
+    let g = heatGradientCache.get(key);
+    if (!g) {
+      // A unit gradient at the origin, drawn via translate+scale, so one object
+      // serves every hot node of this colour/intensity band (no per-frame alloc).
+      g = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
+      const c = d3.color(color) || d3.color('#f43f5e');
+      const a = HEAT_GLOW_ALPHA * level;
+      const at = (alpha) => {
+        c.opacity = alpha;
+        return c.toString();
+      };
+      g.addColorStop(0, at(a));
+      g.addColorStop(0.45, at(a * 0.45));
+      g.addColorStop(1, at(0));
+      heatGradientCache.set(key, g);
+    }
+    return g;
+  };
+
+  const buildHeat = () => {
+    renderNodes.forEach((d) => {
+      d._heat = null;
+    });
+    const index = app.graphHeatActive ? app.graphHeatData() : null;
+    if (!index || !index.size) {
+      heatNodes = [];
+      return;
+    }
+    index.forEach((h, id) => {
+      const node = renderById.get(renderKeyOf.get(id));
+      if (!node) return;
+      if (!node._heat || h.intensity > node._heat.intensity) {
+        node._heat = { intensity: h.intensity, color: h.color };
+      }
+    });
+    heatNodes = renderNodes.filter((d) => d._heat);
+  };
+
+  // Soft additive glow behind edges/nodes: neighbouring hot nodes pool into one
+  // hotter region, and a lone hot node still blooms visibly.
+  const drawHeatGlow = () => {
+    if (!heatNodes.length) return;
+    const k = currentTransform.k;
+    const minR = HEAT_MIN_PX / k;
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    heatNodes.forEach((d) => {
+      if (d.x == null) return;
+      const h = d._heat;
+      const level = Math.max(0.15, Math.round(h.intensity * 10) / 10);
+      const R = Math.max(minR, radiusFor(d) * 2.6) * (0.7 + 0.6 * h.intensity);
+      // Cull by the glow's own extent so a big blob just off-screen still bleeds in.
+      if (d.x + R < view.x0 || d.x - R > view.x1 || d.y + R < view.y0 || d.y - R > view.y1) {
+        return;
+      }
+      ctx.save();
+      ctx.translate(d.x, d.y);
+      ctx.scale(R, R);
+      ctx.fillStyle = heatGradient(h.color, level);
+      ctx.beginPath();
+      ctx.arc(0, 0, 1, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.restore();
+    });
+    ctx.restore();
+  };
+
+  // A crisp ring in the heat colour on top of each hot node, so individual
+  // relevant elements stay pinpointable even where the glow is faint. Tracks
+  // search/hover emphasis so it fades with the node it marks.
+  const drawHeatMarkers = () => {
+    if (!heatNodes.length) return;
+    const k = currentTransform.k;
+    ctx.lineWidth = 2 / k;
+    heatNodes.forEach((d) => {
+      if (d.x == null || !nodeInView(d)) return;
+      if (nodeSearchStyle(d.id).hidden) return;
+      ctx.globalAlpha = 0.9;
+      ctx.strokeStyle = d._heat.color;
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, radiusFor(d) + 2.5 / k, 0, 2 * Math.PI);
+      ctx.stroke();
+    });
+    ctx.globalAlpha = 1;
+  };
+
+  buildHeat();
+
   const drawCanvas = () => {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, width, height);
@@ -1022,6 +1120,8 @@ export function renderGraph(app, retry = 0) {
     ctx.translate(currentTransform.x, currentTransform.y);
     ctx.scale(k, k);
     ctx.lineCap = 'round';
+
+    drawHeatGlow(); // behind edges/nodes so hot regions read as ambient warmth
 
     if (searchActive) {
       // Links touching a match are emphasised; the rest stay faint.
@@ -1045,6 +1145,7 @@ export function renderGraph(app, retry = 0) {
       drawLinkGroups(groupedLinks, 0.22, 0.85 / k);
     }
     drawNodes();
+    drawHeatMarkers(); // crisp rings on top so each hot element stays pinpointable
 
     ctx.restore();
     ctx.globalAlpha = 1;
@@ -1426,6 +1527,12 @@ export function renderGraph(app, retry = 0) {
   // A pure redraw (no re-layout) so visual-only toggles like icon mode can flip
   // a flag and repaint the settled canvas instead of restarting the simulation.
   app.graphRedraw = queueDraw;
+  // Re-fold the heat index onto the settled layout and repaint, so switching heat
+  // mode never restarts the force simulation.
+  app.graphRecomputeHeat = () => {
+    buildHeat();
+    queueDraw();
+  };
   recomputeSearch();
   setFlow();
 
