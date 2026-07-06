@@ -6,6 +6,16 @@
  */
 export const CHANGELOG = [
   {
+    version: 'Unreleased',
+    date: null,
+    items: [
+      {
+        tag: 'Added',
+        text: 'Command palette (⌘K / Ctrl-K) to search and jump anywhere.'
+      }
+    ]
+  },
+  {
     version: '0.1.0',
     date: '2026-07-06',
     items: [

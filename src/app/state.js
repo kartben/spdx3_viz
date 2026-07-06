@@ -83,6 +83,12 @@ export function createState() {
     searchQuery: '', // header global-search box (cross-cutting jump-to-anything)
     searchOpen: false, // whether the global-search results dropdown is showing
     searchActiveIndex: 0, // keyboard-highlighted result row in the dropdown
+    isMac: /Mac|iPhone|iPad|iPod/.test(
+      (typeof navigator !== 'undefined' && (navigator.platform || navigator.userAgent)) || ''
+    ), // picks the ⌘ vs Ctrl glyph for the palette hint
+    paletteOpen: false, // ⌘K / Ctrl-K command palette overlay
+    paletteQuery: '', // the palette's search box
+    paletteActiveIndex: 0, // keyboard-highlighted palette row
     packageSearch: '', // in-view filter for the Packages / AI / Datasets lists
     fileSearch: '', // in-view filter for the Files list
     hardwareSearch: '', // in-view filter for the Hardware list

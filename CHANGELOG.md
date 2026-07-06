@@ -5,6 +5,8 @@ via the "What's new" link.
 
 ## Unreleased
 
+- **Added:** Command palette (⌘K / Ctrl-K) to search and jump anywhere.
+
 ## [0.1.0] - 2026-07-06
 
 - **Improved:** Redesigned SBOM overview page.

@@ -5,6 +5,7 @@ import { accessorsMixin } from './app/accessors.js';
 import { navigationMixin } from './app/navigation.js';
 import { detailPanelMixin } from './app/detail-panel.js';
 import { searchMixin } from './app/search.js';
+import { paletteMixin } from './app/palette.js';
 import { securityMixin } from './app/security.js';
 import { licensesMixin } from './app/licenses.js';
 import { graphMixin } from './app/graph.js';
@@ -31,6 +32,15 @@ const lifecycleMixin = {
       if (e.state) this._applyNavState(e.state);
       else if (this.dataLoaded) this.goHome();
     });
+    // ⌘K / Ctrl-K opens the command palette from anywhere (once a document is
+    // loaded), including the Graph view where the inline header search is hidden.
+    window.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) {
+        if (!this.dataLoaded) return;
+        e.preventDefault();
+        this.togglePalette();
+      }
+    });
     this.loadSampleManifest().then(() => this._maybeLoadFromUrl());
   }
 };
@@ -46,6 +56,7 @@ const mixins = [
   navigationMixin,
   detailPanelMixin,
   searchMixin,
+  paletteMixin,
   securityMixin,
   licensesMixin,
   graphMixin,
