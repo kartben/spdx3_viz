@@ -344,6 +344,22 @@ const reqId = Object.fromEntries(
   requirements.map((req) => [req.spdxId.split('/').pop(), req.spdxId])
 );
 
+const proprietaryLicenseText = element(
+  'simplelicensing_SimpleLicensingText',
+  'license/text/arbor-proprietary',
+  {
+    name: 'Arbor Devices proprietary firmware license text',
+    simplelicensing_licenseText: [
+      'Arbor Devices Proprietary Firmware License (Synthetic Sample)',
+      '',
+      'This fictional license text is embedded only to demonstrate SPDX custom license handling.',
+      'Permission is granted to install and operate the ArborLink SG-1 firmware solely on the serialized device identified by this SBOM.',
+      'Redistribution, reverse engineering, sublicensing, and use on non-ArborLink hardware are not permitted without written authorization from Arbor Devices.',
+      'The firmware is provided for synthetic demonstration purposes only, without warranty, support obligation, or representation of a real product or legal agreement.'
+    ].join('\n')
+  }
+);
+
 const licenseExpressions = [
   element('simplelicensing_LicenseExpression', 'license/mit', {
     name: 'MIT license expression',
@@ -363,7 +379,14 @@ const licenseExpressions = [
   element('simplelicensing_LicenseExpression', 'license/proprietary', {
     name: 'LicenseRef-Arbor-Proprietary expression',
     simplelicensing_licenseExpression: 'LicenseRef-Arbor-Proprietary',
-    simplelicensing_licenseListVersion: '3.26'
+    simplelicensing_licenseListVersion: '3.26',
+    simplelicensing_customIdToUri: [
+      {
+        type: 'DictionaryEntry',
+        key: 'LicenseRef-Arbor-Proprietary',
+        value: proprietaryLicenseText.spdxId
+      }
+    ]
   })
 ];
 
@@ -1524,6 +1547,7 @@ graph.push(
   ...locations,
   ...specifications,
   ...requirements,
+  proprietaryLicenseText,
   ...licenseExpressions,
   ...hardware,
   ...packages,

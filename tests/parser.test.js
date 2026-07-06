@@ -134,6 +134,43 @@ test('parseGraph categorizes SPDX 3.1 SupplyChain actions, processes, and states
   );
 });
 
+test('SupplyChain sample embeds LicenseRef-Arbor-Proprietary text', async () => {
+  const graph = JSON.parse(
+    readFileSync('public/samples/supply-chain/arborlink-sg1-supply-chain.spdx3.jsonld', 'utf8')
+  )['@graph'];
+  const parsed = parseGraph(graph);
+  const indexes = buildRelationshipIndexes(parsed.relationships);
+  const app = spdxApp();
+  Object.assign(app, parsed, indexes);
+
+  const proprietaryLicenseId =
+    'https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#license/proprietary';
+  const proprietaryTextId =
+    'https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#license/text/arbor-proprietary';
+  const proprietaryLicense = app.elementMap.get(proprietaryLicenseId);
+  const proprietaryText = app.elementMap.get(proprietaryTextId);
+
+  assert.equal(app.licenseExpressionFor(proprietaryLicenseId), 'LicenseRef-Arbor-Proprietary');
+  assert.deepEqual(proprietaryLicense.simplelicensing_customIdToUri, [
+    {
+      type: 'DictionaryEntry',
+      key: 'LicenseRef-Arbor-Proprietary',
+      value: proprietaryTextId
+    }
+  ]);
+  assert.equal(proprietaryText.type, 'simplelicensing_SimpleLicensingText');
+  assert.match(
+    proprietaryText.simplelicensing_licenseText,
+    /Arbor Devices Proprietary Firmware License/
+  );
+
+  await app.showLicenseText(proprietaryLicenseId);
+  assert.equal(app.licenseModalParts.length, 1);
+  assert.equal(app.licenseModalParts[0].kind, 'inline');
+  assert.equal(app.licenseModalParts[0].loaded, true);
+  assert.match(app.licenseModalText(), /Redistribution, reverse engineering, sublicensing/);
+});
+
 test('SupplyChain view model exposes lifecycle, custody, and exception structures', () => {
   const graph = JSON.parse(
     readFileSync('public/samples/supply-chain/arborlink-sg1-supply-chain.spdx3.jsonld', 'utf8')
