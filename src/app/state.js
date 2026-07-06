@@ -231,6 +231,7 @@ export function createState() {
     graphUseIcons: false, // draw nodes as their type's Material icon instead of a plain dot
     graphHideOrphans: false, // hide nodes left with no edges once every other filter is applied
     expandedClusters: new Set(), // cluster keys the user has drilled into
+    graphExpandedCount: 0, // reactive mirror of expandedClusters.size (Set mutations aren't tracked)
     graphNodeCount: 0, // live readout of rendered nodes/edges
     graphEdgeCount: 0,
     graphTruncated: false, // true when the guard rail capped an un-aggregated render

@@ -440,9 +440,11 @@ export function renderGraph(app, retry = 0) {
   const renderNodes = [];
   const renderKeyOf = new Map(); // underlying id -> render node id
 
+  let expandedClusterCount = 0; // drilled-into clusters actually present this render
   clusters.forEach((c) => {
-    const collapsed =
-      aggregate && c.members.length > 1 && c.kind !== 'self' && !expanded.has(c.key);
+    const expandable = aggregate && c.members.length > 1 && c.kind !== 'self';
+    const collapsed = expandable && !expanded.has(c.key);
+    if (expandable && !collapsed) expandedClusterCount += 1;
 
     if (collapsed) {
       const node = {
@@ -468,6 +470,9 @@ export function renderGraph(app, retry = 0) {
       });
     }
   });
+  // Mirror into reactive state so the "collapse all" control shows only while
+  // at least one cluster is drilled in (Set mutations aren't Alpine-tracked).
+  app.graphExpandedCount = expandedClusterCount;
 
   // 5. Remap links onto render nodes, drop self-loops, dedupe, weight.
   const linkMap = new Map();
