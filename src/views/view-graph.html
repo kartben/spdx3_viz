@@ -85,7 +85,7 @@
              disabled control. Hovering the span still works in that state. -->
         <span
           class="g-tip flex items-center"
-          :data-tip="graphTruncated ? 'Too many nodes to show flat, so aggregation is on automatically. Double-click a cluster to drill in.' : 'Aggregate: group files into their package/directory and build steps into their root build. Double-click a cluster to drill in.'"
+          :data-tip="graphTruncated ? 'Too many nodes or edges to show flat, so aggregation is on automatically. Double-click a cluster to drill in.' : 'Aggregate: group files into their package/directory and build steps into their root build. Double-click a cluster to drill in.'"
         >
           <button
             type="button"
@@ -119,9 +119,10 @@
         <button
           type="button"
           @click="resetGraphZoom()"
-          class="g-tip p-1.5 rounded transition-colors text-slate-400 hover:text-slate-200 hover:bg-slate-700"
+          :class="graphAutoFit ? 'bg-blue-500/20 text-blue-400' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700'"
+          class="g-tip p-1.5 rounded transition-colors"
           aria-label="Reset zoom"
-          data-tip="Reset the pan and zoom to fit the whole graph."
+          :data-tip="graphAutoFit ? 'Auto-fit is on: the graph reframes to fit on every change. Pan or zoom to take manual control.' : 'Reset the pan and zoom to fit the whole graph, and re-enable auto-fit.'"
           x-html="uiIconSvg('reset_zoom')"
         ></button>
       </div>

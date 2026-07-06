@@ -19,6 +19,10 @@ export const CHANGELOG = [
       },
       {
         tag: 'Improved',
+        text: 'Graph auto-fits to view on changes; reset zoom frames it all.'
+      },
+      {
+        tag: 'Improved',
         text: 'Multiple snippet ranges of one file collapse into a single link.'
       },
       {
