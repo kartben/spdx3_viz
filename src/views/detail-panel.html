@@ -244,27 +244,29 @@
 
     <!-- FunctionalSafety profile: evaluation outcome + spec-sheet fields -->
     <div
-      x-show="requirementSafetyStatus(detailElement) || evaluationResultMeta(detailElement) || safetyFields(detailElement).length > 0"
+      x-data="{ status: null, evaluationMeta: null }"
+      x-effect="status = requirementSafetyStatus(detailElement); evaluationMeta = evaluationResultMeta(detailElement)"
+      x-show="status || evaluationMeta || safetyFields(detailElement).length > 0"
       class="space-y-3"
     >
-      <div class="flex items-center gap-2" x-show="requirementSafetyStatus(detailElement)">
+      <div class="flex items-center gap-2" x-show="status">
         <span class="text-xs text-slate-500 flex-shrink-0">Safety status</span>
         <span
           class="w-7 h-7 rounded-full inline-flex items-center justify-center"
-          :class="requirementSafetyStatus(detailElement)?.badgeClass"
-          :title="requirementSafetyStatus(detailElement)?.label"
-          :aria-label="requirementSafetyStatus(detailElement)?.label"
-          x-html="uiIconSvg(requirementSafetyStatus(detailElement)?.iconKey, 'w-4 h-4')"
+          :class="status?.badgeClass"
+          :title="status?.label"
+          :aria-label="status?.label"
+          x-html="uiIconSvg(status?.iconKey, 'w-4 h-4')"
         ></span>
       </div>
-      <div class="flex items-center gap-2" x-show="evaluationResultMeta(detailElement)">
+      <div class="flex items-center gap-2" x-show="evaluationMeta">
         <span class="text-xs text-slate-500 flex-shrink-0">Evaluation</span>
         <span
           class="w-7 h-7 rounded-full inline-flex items-center justify-center"
-          :class="evaluationResultMeta(detailElement)?.badgeClass"
-          :title="evaluationResultMeta(detailElement)?.label"
-          :aria-label="evaluationResultMeta(detailElement)?.label"
-          x-html="uiIconSvg(evaluationResultMeta(detailElement)?.iconKey, 'w-4 h-4')"
+          :class="evaluationMeta?.badgeClass"
+          :title="evaluationMeta?.label"
+          :aria-label="evaluationMeta?.label"
+          x-html="uiIconSvg(evaluationMeta?.iconKey, 'w-4 h-4')"
         ></span>
       </div>
       <template x-for="field in safetyFields(detailElement)" :key="field.label">
@@ -1260,6 +1262,8 @@
         <div class="space-y-1 ml-3">
           <template x-for="item in group.items" :key="item.id">
             <div
+              x-data="{ evaluationMeta: null }"
+              x-effect="evaluationMeta = evaluationResultMeta(elementMap.get(item.id))"
               class="detail-rel-item group"
               @click="item.multiRange ? openSnippetRanges(item.snippetIds) : selectGraphNode(item.id)"
             >
@@ -1275,12 +1279,12 @@
               ></span>
               <span class="flex-1 truncate" x-text="item.displayName"></span>
               <span
-                x-show="evaluationResultMeta(elementMap.get(item.id))"
+                x-show="evaluationMeta"
                 class="w-6 h-6 rounded-full inline-flex items-center justify-center flex-shrink-0"
-                :class="evaluationResultMeta(elementMap.get(item.id))?.badgeClass"
-                :title="`Evaluation: ${evaluationResultMeta(elementMap.get(item.id))?.label}`"
-                :aria-label="`Evaluation: ${evaluationResultMeta(elementMap.get(item.id))?.label}`"
-                x-html="uiIconSvg(evaluationResultMeta(elementMap.get(item.id))?.iconKey, 'w-4 h-4')"
+                :class="evaluationMeta?.badgeClass"
+                :title="evaluationMeta ? `Evaluation: ${evaluationMeta.label}` : null"
+                :aria-label="evaluationMeta ? `Evaluation: ${evaluationMeta.label}` : null"
+                x-html="uiIconSvg(evaluationMeta?.iconKey, 'w-4 h-4')"
               ></span>
               <span
                 x-show="item.scope"
