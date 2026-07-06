@@ -22,8 +22,8 @@ const INPUT_LAYOUT_LINKS_PER_BUILD = 8;
 // Above this many underlying nodes or edges, force-collapse into clusters for
 // readability (a flat graph of many thousands of nodes or a hairball of edges
 // is unusable) and surface a hint.
-const MAX_FLAT_NODES = 4000;
-const MAX_FLAT_EDGES = 8000;
+const MAX_FLAT_NODES = 5000;
+const MAX_FLAT_EDGES = 15000;
 // Only draw labels past this zoom level, capped per frame, since they become noise when zoomed out.
 const LABEL_ZOOM_THRESHOLD = 1.1;
 const MAX_LABELS = 400;
