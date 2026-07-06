@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const OUTPUT = resolve(ROOT, 'public/samples/supply-chain/arborlink-sg1-supply-chain.spdx3.jsonld');
 const NS = 'https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain';
-const CREATED = '2026-07-06T09:30:00Z';
+const CREATED = '2026-07-06T12:15:00Z';
 const CREATION_INFO = '_:arborlink-sg1-creation-info';
 
 const id = (fragment) => `${NS}#${fragment}`;
@@ -221,24 +221,83 @@ const tools = [
 
 const toolId = Object.fromEntries(tools.map((tool) => [tool.spdxId.split('/').pop(), tool.spdxId]));
 
+// geographicPointLocation carries GPS coordinates in ISO 6709:2022 string form
+// (signed decimal latitude then longitude, terminated by a solidus), so
+// consumers read the real point from the SBOM instead of geocoding a city name.
 const locations = [
-  ['loc/hq', 'Arbor Devices supply-chain control tower', 'Austin', 'TX', 'USA'],
-  ['loc/final-assembly', 'Arbor Devices final assembly cell A3', 'Austin', 'TX', 'USA'],
-  ['loc/siliconforge-hsinchu', 'SiliconForge Hsinchu secure element line', 'Hsinchu', '', 'TWN'],
-  ['loc/boardfab-penang', 'BoardFab Penang SMT line 7', 'Penang', '', 'MYS'],
-  ['loc/secureseal-ohio', 'SecureSeal enclosure plant', 'Dayton', 'OH', 'USA'],
-  ['loc/austin-warehouse', 'Futura Austin secure staging warehouse', 'Austin', 'TX', 'USA'],
-  ['loc/lax-hub', 'Futura LAX air-freight hub', 'Los Angeles', 'CA', 'USA'],
-  ['loc/denver-lab', 'Independent Assurance Lab receiving bay', 'Denver', 'CO', 'USA'],
-  ['loc/wyoming-site', 'EdgeOps Red Mesa wind-farm substation', 'Rawlins', 'WY', 'USA'],
-  ['loc/phoenix-recovery', 'Circular Recoveries secure destruction room', 'Phoenix', 'AZ', 'USA']
-].map(([fragment, name, city, provinceStateCode, country]) =>
+  [
+    'loc/hq',
+    'Arbor Devices supply-chain control tower',
+    'Austin',
+    'TX',
+    'USA',
+    '+30.2672-097.7431/'
+  ],
+  [
+    'loc/final-assembly',
+    'Arbor Devices final assembly cell A3',
+    'Austin',
+    'TX',
+    'USA',
+    '+30.3901-097.7102/'
+  ],
+  [
+    'loc/siliconforge-hsinchu',
+    'SiliconForge Hsinchu secure element line',
+    'Hsinchu',
+    '',
+    'TWN',
+    '+24.7756+120.9967/'
+  ],
+  ['loc/boardfab-penang', 'BoardFab Penang SMT line 7', 'Penang', '', 'MYS', '+05.2945+100.2760/'],
+  [
+    'loc/secureseal-ohio',
+    'SecureSeal enclosure plant',
+    'Dayton',
+    'OH',
+    'USA',
+    '+39.7589-084.1916/'
+  ],
+  [
+    'loc/austin-warehouse',
+    'Futura Austin secure staging warehouse',
+    'Austin',
+    'TX',
+    'USA',
+    '+30.1988-097.6670/'
+  ],
+  ['loc/lax-hub', 'Futura LAX air-freight hub', 'Los Angeles', 'CA', 'USA', '+33.9416-118.4085/'],
+  [
+    'loc/denver-lab',
+    'Independent Assurance Lab receiving bay',
+    'Denver',
+    'CO',
+    'USA',
+    '+39.7392-104.9903/'
+  ],
+  [
+    'loc/wyoming-site',
+    'EdgeOps Red Mesa wind-farm substation',
+    'Rawlins',
+    'WY',
+    'USA',
+    '+41.7911-107.2387/'
+  ],
+  [
+    'loc/phoenix-recovery',
+    'Circular Recoveries secure destruction room',
+    'Phoenix',
+    'AZ',
+    'USA',
+    '+33.4484-112.0740/'
+  ]
+].map(([fragment, name, city, provinceStateCode, country, point]) =>
   element('PhysicalLocation', fragment, {
     name,
     city,
     ...(provinceStateCode ? { provinceStateCode } : {}),
     country,
-    locationHint: name
+    geographicPointLocation: [point]
   })
 );
 
@@ -374,6 +433,11 @@ const licenseExpressions = [
   element('simplelicensing_LicenseExpression', 'license/gpl-2.0-only', {
     name: 'GPL-2.0-only license expression',
     simplelicensing_licenseExpression: 'GPL-2.0-only',
+    simplelicensing_licenseListVersion: '3.26'
+  }),
+  element('simplelicensing_LicenseExpression', 'license/epl-2.0', {
+    name: 'EPL-2.0 OR EDL-1.0 license expression',
+    simplelicensing_licenseExpression: 'EPL-2.0 OR EDL-1.0',
     simplelicensing_licenseListVersion: '3.26'
   }),
   element('simplelicensing_LicenseExpression', 'license/proprietary', {
@@ -512,7 +576,7 @@ const packages = [
     'Arbor gateway-agent container',
     '2026.07.0',
     'container',
-    'pkg:oci/gateway-agent@sha256:8d6d8bf8b56a91dbb70f4ca2e2efb4d3',
+    'pkg:oci/gateway-agent@sha256:8d6d8bf8b56a91dbb70f4ca2e2efb4d39c1e0f2a3b4c5d6e7f8091a2b3c4d5e6',
     orgId['arbor-devices'],
     licenseId.proprietary
   ],
@@ -541,7 +605,7 @@ const packages = [
     'library',
     'pkg:generic/eclipse/mosquitto@2.0.22',
     'https://spdx.org/rdf/3.1/terms/Core/NoAssertionElement',
-    licenseId['epl-2.0'] || licenseId.mit
+    licenseId['epl-2.0']
   ]
 ].map(([fragment, name, version, purpose, purl, supplier, _declaredLicense]) =>
   element('software_Package', fragment, {
@@ -1130,9 +1194,12 @@ action(
       'Austin secure staging → LAX air-freight hub → Denver receiving lab',
     ...cdxProperties([
       ['arborlink:transport.mode', 'road+air+road'],
-      ['arborlink:distance.km', '2380'],
+      ['arborlink:distance.km', '3300'],
       ['arborlink:co2e.kg', '186.4'],
-      ['arborlink:co2e.method', 'Synthetic lane estimate from road/air distance factors']
+      [
+        'arborlink:co2e.method',
+        'Synthetic whole-vehicle allocation across road and air legs via the LAX consolidation hub'
+      ]
     ]),
     summary: 'Controlled-lane shipment with carrier custody, shock telemetry, and evidence package.'
   },
@@ -1304,7 +1371,10 @@ action(
       ['arborlink:transport.mode', 'road'],
       ['arborlink:distance.km', '542'],
       ['arborlink:co2e.kg', '42.1'],
-      ['arborlink:co2e.method', 'Synthetic road freight estimate for final-mile controlled lane']
+      [
+        'arborlink:co2e.method',
+        'Synthetic whole-vehicle allocation for the dedicated final-mile secure lane'
+      ]
     ]),
     summary: 'Final controlled-lane movement from acceptance lab to deployment site.'
   },
@@ -1393,6 +1463,100 @@ action(
   ]
 );
 
+// Additional state transitions so every declared State is reached by a
+// StateAction, giving the lifecycle a complete spine (received → deployed).
+action(
+  'supplychain_StateAction',
+  'action/026-state-received',
+  {
+    name: 'Mark critical component lots received',
+    startTime: '2026-07-02T14:30:00Z',
+    endTime: '2026-07-02T14:35:00Z',
+    actionLocation: loc['loc/final-assembly'],
+    supplychain_currentState: stateId.received,
+    summary: 'Records that qualified component lots are received and staged for assembly.'
+  },
+  [
+    ['performedBy', [orgId['arbor-devices'], personId['owen-ross']]],
+    ['affects', [hwId['pcba-26-07-a17'], hwId['enclosure-26-07-k2']]],
+    ['hasEvidence', [fileId['component-coc']]]
+  ]
+);
+
+action(
+  'supplychain_StateAction',
+  'action/027-state-assembled',
+  {
+    name: 'Mark SG-1 mechanically and electrically assembled',
+    startTime: '2026-07-02T18:12:00Z',
+    endTime: '2026-07-02T18:15:00Z',
+    actionLocation: loc['loc/final-assembly'],
+    supplychain_currentState: stateId.assembled,
+    summary: 'Records the state transition after the serialized gateway is assembled.'
+  },
+  [
+    ['performedBy', [personId['owen-ross']]],
+    ['affects', [hwId['sg1-sn-26-000042']]],
+    ['hasEvidence', [fileId['component-coc']]]
+  ]
+);
+
+action(
+  'supplychain_StateAction',
+  'action/028-state-in-transit',
+  {
+    name: 'Mark SG-1 in transit under carrier custody',
+    startTime: '2026-07-03T08:30:00Z',
+    endTime: '2026-07-03T08:33:00Z',
+    actionLocation: loc['loc/austin-warehouse'],
+    supplychain_currentState: stateId['in-transit'],
+    summary: 'Records the state transition as the sealed unit enters the controlled transport lane.'
+  },
+  [
+    ['performedBy', [orgId['futura-logistics'], personId['nina-cho']]],
+    ['affects', [hwId['sg1-sn-26-000042']]],
+    ['hasRequirement', [reqId.custody]]
+  ]
+);
+
+action(
+  'supplychain_StateAction',
+  'action/029-state-inspection-passed',
+  {
+    name: 'Mark SG-1 receiving inspection passed',
+    startTime: '2026-07-05T11:25:00Z',
+    endTime: '2026-07-05T11:30:00Z',
+    actionLocation: loc['loc/denver-lab'],
+    supplychain_currentState: stateId['inspection-passed'],
+    supplychain_decisionProcess: processId['quarantine-decision'],
+    summary: 'Records that independent inspection and secure-boot testing found no deviation.'
+  },
+  [
+    ['performedBy', [orgId['assurance-lab'], personId['claire-dubois']]],
+    ['affects', [hwId['sg1-sn-26-000042']]],
+    ['hasEvidence', [fileId['inspection-record'], fileId['secure-boot-test']]]
+  ]
+);
+
+action(
+  'supplychain_StateAction',
+  'action/030-state-retirement-planned',
+  {
+    name: 'Mark SG-1 retirement plan in place',
+    startTime: '2026-07-06T11:16:00Z',
+    endTime: '2026-07-06T11:19:00Z',
+    actionLocation: loc['loc/wyoming-site'],
+    supplychain_currentState: stateId['retirement-planned'],
+    supplychain_decisionProcess: processId['decommission-plan'],
+    summary: 'Records that the end-of-life custody, erasure, and destruction path is defined.'
+  },
+  [
+    ['performedBy', [orgId.edgeops, orgId['circular-recoveries']]],
+    ['affects', [hwId['sg1-sn-26-000042']]],
+    ['hasEvidence', [fileId['retirement-plan']]]
+  ]
+);
+
 // Static product, software, build, and compliance relationships.
 relationship('describes', id('sbom/arborlink-sg1'), hwId['sg1-sn-26-000042']);
 relationship('contains', hwId['sg1-sn-26-000042'], [
@@ -1435,7 +1599,7 @@ relationship('hasConcludedLicense', pkgId.firmware, licenseId.proprietary);
 relationship('hasDeclaredLicense', pkgId['linux-image'], licenseId['gpl-2.0-only']);
 relationship('hasDeclaredLicense', pkgId.openssl, licenseId['apache-2.0']);
 relationship('hasDeclaredLicense', pkgId.busybox, licenseId['gpl-2.0-only']);
-relationship('hasDeclaredLicense', pkgId.libmosquitto, licenseId.mit);
+relationship('hasDeclaredLicense', pkgId.libmosquitto, licenseId['epl-2.0']);
 for (const req of requirements)
   relationship('conformsTo', req.spdxId, [specId['arborlink-supply-chain-plan']]);
 relationship(
