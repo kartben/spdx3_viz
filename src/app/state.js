@@ -31,6 +31,7 @@ export function createState() {
       dataset: false,
       files: false,
       hardware: false,
+      supplychain: false,
       requirements: false,
       licenses: false,
       security: false,
@@ -52,6 +53,7 @@ export function createState() {
       dataset: 0,
       files: 0,
       hardware: 0,
+      supplychain: 0,
       requirements: 0,
       licenses: 0,
       security: 0,
@@ -67,6 +69,7 @@ export function createState() {
       dataset: 0,
       files: 0,
       hardware: 0,
+      supplychain: 0,
       requirements: 0,
       licenses: 0,
       security: 0,
@@ -89,6 +92,9 @@ export function createState() {
     packageSearch: '', // in-view filter for the Packages / AI / Datasets lists
     fileSearch: '', // in-view filter for the Files list
     hardwareSearch: '', // in-view filter for the Hardware list
+    supplyChainSearch: '', // in-view filter for the Supply Chain list
+    supplyChainKindFilter: '', // '' = all, else action | process | state
+    supplyChainExceptionFilter: '', // '' = all, 'exception' | 'resolved'
     requirementSearch: '', // in-view filter for the Functional Safety list
     requirementKindFilter: '', // '' = all, else an FS element type to show only
     requirementStatusFilter: '', // '' = all, else a verification-status key or 'noimpl'
@@ -100,6 +106,7 @@ export function createState() {
     expandedPkg: null,
     expandedFile: null,
     expandedHardware: null,
+    expandedSupplyChain: null,
     expandedRequirement: null,
     expandedConfig: null,
     expandedBuild: null,
@@ -168,6 +175,7 @@ export function createState() {
     tools: [],
     hardware: [], // hardware profile elements (SPDX 3.1)
     requirements: [], // requirements + FunctionalSafety artifacts (SPDX 3.1)
+    supplyChain: [], // supplychain actions, processes, and states (SPDX 3.1)
     relationships: [],
     builds: [],
     buildInfo: null,

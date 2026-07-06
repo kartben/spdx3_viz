@@ -27,6 +27,23 @@ export function getNodeType(item) {
   if (isA(t, CLASS.dataset_DatasetPackage)) return 'dataset';
   if (isA(t, CLASS.software_Package)) return 'package';
   if (isA(t, CLASS.hardware_Hardware)) return 'hardware';
+  if (
+    isA(t, CLASS.supplychain_State) ||
+    isA(t, CLASS.supplychain_CreateAction) ||
+    isA(t, CLASS.supplychain_ModifyAction) ||
+    isA(t, CLASS.supplychain_UseAction) ||
+    isA(t, CLASS.supplychain_BoundaryDefinitionAction) ||
+    isA(t, CLASS.supplychain_ResponsibilityChangeAction) ||
+    isA(t, CLASS.supplychain_DestroyAction) ||
+    isA(t, CLASS.supplychain_CreateProcess) ||
+    isA(t, CLASS.supplychain_ModifyProcess) ||
+    isA(t, CLASS.supplychain_UseProcess) ||
+    isA(t, CLASS.supplychain_BoundaryDefinitionProcess) ||
+    isA(t, CLASS.supplychain_ResponsibilityChangeProcess) ||
+    isA(t, CLASS.supplychain_DestroyProcess)
+  ) {
+    return 'supplychain';
+  }
   // The Requirement and its FunctionalSafety lifecycle artifacts share one type.
   if (
     isA(t, CLASS.Requirement) ||
@@ -74,6 +91,7 @@ export function getNodeTypeColor(nodeType) {
     file: COLORS.file,
     snippet: COLORS.snippet,
     hardware: COLORS.hardware,
+    supplychain: COLORS.supplychain,
     requirement: COLORS.requirement,
     tool: COLORS.tool,
     build: COLORS.build,
@@ -100,6 +118,26 @@ export function getElementBadgeClass(type) {
     hardware_PhysicalHardware: 'bg-lime-500/15 text-lime-400',
     hardware_BulkHardware: 'bg-lime-500/15 text-lime-400',
     hardware_VirtualHardware: 'bg-lime-500/15 text-lime-400',
+    supplychain_State: 'bg-cyan-500/15 text-cyan-300',
+    supplychain_AssemblyAction: 'bg-cyan-500/15 text-cyan-300',
+    supplychain_BoundaryCrossingAction: 'bg-cyan-500/15 text-cyan-300',
+    supplychain_BoundaryDefinitionAction: 'bg-cyan-500/15 text-cyan-300',
+    supplychain_ChangeAction: 'bg-cyan-500/15 text-cyan-300',
+    supplychain_CreateAction: 'bg-cyan-500/15 text-cyan-300',
+    supplychain_DestroyAction: 'bg-cyan-500/15 text-cyan-300',
+    supplychain_HarvestAction: 'bg-cyan-500/15 text-cyan-300',
+    supplychain_InspectionAction: 'bg-cyan-500/15 text-cyan-300',
+    supplychain_ManufactureAction: 'bg-cyan-500/15 text-cyan-300',
+    supplychain_OutOfSpecAction: 'bg-rose-500/15 text-rose-300',
+    supplychain_PlanAction: 'bg-cyan-500/15 text-cyan-300',
+    supplychain_ReproduceAction: 'bg-cyan-500/15 text-cyan-300',
+    supplychain_ResolutionAction: 'bg-emerald-500/15 text-emerald-300',
+    supplychain_ResponsibilityChangeAction: 'bg-cyan-500/15 text-cyan-300',
+    supplychain_StateAction: 'bg-cyan-500/15 text-cyan-300',
+    supplychain_StorageAction: 'bg-cyan-500/15 text-cyan-300',
+    supplychain_TestAction: 'bg-cyan-500/15 text-cyan-300',
+    supplychain_TransportAction: 'bg-cyan-500/15 text-cyan-300',
+    supplychain_UseAction: 'bg-cyan-500/15 text-cyan-300',
     Requirement: 'bg-yellow-500/15 text-yellow-400',
     functionalsafety_RequirementVerification: 'bg-yellow-500/15 text-yellow-400',
     functionalsafety_Assumption: 'bg-yellow-500/15 text-yellow-400',

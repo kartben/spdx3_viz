@@ -107,6 +107,36 @@ test('buildRelationshipIndexes indexes SPDX build relationships and unresolved e
   assert.deepEqual(indexes.distributedByIndex.get('file:dist'), ['pkg:kernel']);
 });
 
+test('parseGraph categorizes SPDX 3.1 SupplyChain actions, processes, and states', () => {
+  const graph = JSON.parse(
+    readFileSync(
+      'public/samples/supply-chain/arborlink-sg1-supply-chain.spdx3.jsonld',
+      'utf8'
+    )
+  )['@graph'];
+  const parsed = parseGraph(graph);
+  const indexes = buildRelationshipIndexes(parsed.relationships);
+
+  assert.equal(parsed.profileConformance.includes('supplyChain'), true);
+  assert.equal(parsed.supplyChain.length, 48);
+  assert.equal(parsed.supplyChain.filter((el) => el.type.endsWith('Action')).length, 25);
+  assert.equal(parsed.supplyChain.filter((el) => el.type.endsWith('Process')).length, 14);
+  assert.equal(parsed.supplyChain.filter((el) => el.type === 'supplychain_State').length, 9);
+  assert.equal(parsed.presentNodeTypes.includes('supplychain'), true);
+  assert.equal(parsed.presentRelTypes.includes('resolved'), true);
+  assert.equal(parsed.presentRelTypes.includes('hasResolution'), true);
+
+  const transport = parsed.supplyChain.find((el) => el.type === 'supplychain_TransportAction');
+  assert.ok(transport.supplychain_pickupLocation);
+  assert.ok(transport.supplychain_dropoffLocation);
+
+  const resolution = parsed.supplyChain.find((el) => el.type === 'supplychain_ResolutionAction');
+  assert.deepEqual(
+    indexes.relFromIndex.get(resolution.spdxId).map((rel) => rel.relationshipType),
+    ['performedBy', 'resolved', 'hasResolution', 'affects', 'hasRequirement', 'hasEvidence']
+  );
+});
+
 test('parseBuildParameters groups Zephyr-style build_parameter entries', () => {
   const groups = parseBuildParameters({
     build_parameter: [

@@ -1,0 +1,243 @@
+<div x-show="currentView === 'supplychain'" class="fade-in space-y-3 max-w-5xl">
+  <div class="list-sticky space-y-3">
+    <div class="flex flex-wrap items-center gap-3">
+      <span class="text-sm text-slate-400 flex-shrink-0">
+        <span x-text="filteredSupplyChain.length"></span> supply-chain elements
+        <template x-if="supplyChainCounts.actions">
+          <span
+            ><span class="text-slate-600"> · </span
+            ><span x-text="supplyChainCounts.actions"></span> actions</span
+          >
+        </template>
+        <template x-if="supplyChainCounts.states">
+          <span
+            ><span class="text-slate-600"> · </span
+            ><span x-text="supplyChainCounts.states"></span> states</span
+          >
+        </template>
+        <template x-if="supplyChainCounts.processes">
+          <span
+            ><span class="text-slate-600"> · </span
+            ><span x-text="supplyChainCounts.processes"></span> processes</span
+          >
+        </template>
+      </span>
+      <input
+        x-model="supplyChainSearch"
+        @input.debounce.150ms="restreamView('supplychain')"
+        type="text"
+        placeholder="Filter supply chain…"
+        class="ml-auto bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-cyan-500 w-44 sm:w-64"
+      />
+    </div>
+
+    <div class="flex flex-wrap items-center gap-1.5">
+      <template
+        x-for="chip in [
+          { key: '', label: 'All', n: supplyChain.length },
+          { key: 'action', label: 'Actions', n: supplyChainCounts.actions },
+          { key: 'state', label: 'States', n: supplyChainCounts.states },
+          { key: 'process', label: 'Processes', n: supplyChainCounts.processes }
+        ].filter(c => c.key === '' || c.n > 0)"
+        :key="chip.key"
+      >
+        <button
+          type="button"
+          @click="supplyChainKindFilter = chip.key; restreamView('supplychain')"
+          class="px-2.5 py-1 rounded-full text-xs border transition-colors"
+          :class="supplyChainKindFilter === chip.key
+            ? 'bg-cyan-500/15 text-cyan-300 border-cyan-500/40'
+            : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200'"
+        >
+          <span x-text="chip.label"></span>
+          <span class="text-slate-500" x-text="`(${chip.n})`"></span>
+        </button>
+      </template>
+      <span
+        x-show="supplyChainCounts.exceptions || supplyChainCounts.resolutions"
+        class="mx-1 text-slate-600"
+        >·</span
+      >
+      <button
+        x-show="supplyChainCounts.exceptions"
+        type="button"
+        @click="supplyChainExceptionFilter = supplyChainExceptionFilter === 'exception' ? '' : 'exception'; restreamView('supplychain')"
+        class="px-2.5 py-1 rounded-full text-xs border transition-colors"
+        :class="supplyChainExceptionFilter === 'exception'
+          ? 'bg-rose-500/15 text-rose-300 border-rose-500/40'
+          : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200'"
+      >
+        Out-of-spec
+        <span class="text-slate-500" x-text="`(${supplyChainCounts.exceptions})`"></span>
+      </button>
+      <button
+        x-show="supplyChainCounts.resolutions"
+        type="button"
+        @click="supplyChainExceptionFilter = supplyChainExceptionFilter === 'resolved' ? '' : 'resolved'; restreamView('supplychain')"
+        class="px-2.5 py-1 rounded-full text-xs border transition-colors"
+        :class="supplyChainExceptionFilter === 'resolved'
+          ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40'
+          : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200'"
+      >
+        Resolutions
+        <span class="text-slate-500" x-text="`(${supplyChainCounts.resolutions})`"></span>
+      </button>
+    </div>
+  </div>
+
+  <template
+    x-for="item in (mountedViews.supplychain ? renderSlice('supplychain', filteredSupplyChain) : [])"
+    :key="item.spdxId"
+  >
+    <div
+      x-data="{ kind: '', status: null }"
+      x-effect="kind = supplyChainKind(item); status = supplyChainExceptionStatus(item)"
+      class="card cursor-pointer"
+      data-nav-kind="supplychain"
+      :data-nav-id="item.spdxId"
+      :class="isNavTarget('supplychain', item.spdxId) && 'target-focus'"
+      @click="toggleSupplyChain(item.spdxId)"
+    >
+      <div class="flex items-start gap-3">
+        <div
+          class="w-8 h-8 rounded-lg bg-cyan-500/15 flex items-center justify-center flex-shrink-0 mt-0.5"
+        >
+          <span
+            class="flex items-center justify-center text-cyan-300"
+            x-html="elementIcon(item, 'w-4 h-4')"
+          ></span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex flex-wrap items-center gap-2">
+            <div
+              class="font-medium text-white text-sm truncate"
+              x-text="item.name || cleanName(item.spdxId)"
+            ></div>
+            <span class="badge text-xs" :class="supplyChainKindBadge(kind)">
+              <span x-text="supplyChainKindLabel(kind)"></span>
+            </span>
+            <span
+              x-show="status"
+              class="badge text-xs"
+              :class="status?.badgeClass"
+              x-text="status?.label"
+            ></span>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 mt-1">
+            <span
+              class="badge text-xs bg-slate-700 text-slate-300"
+              x-text="supplyChainTypeLabel(item)"
+            ></span>
+            <span
+              x-show="supplyChainTimeRange(item)"
+              class="text-xs text-slate-500"
+              x-text="supplyChainTimeRange(item)"
+            ></span>
+            <span
+              x-show="supplyChainRoute(item)"
+              class="text-xs text-cyan-300 truncate max-w-full"
+              x-text="supplyChainRoute(item)"
+            ></span>
+            <span
+              x-show="supplyChainStateName(item)"
+              class="badge text-xs bg-emerald-500/15 text-emerald-300"
+              x-text="supplyChainStateName(item)"
+            ></span>
+          </div>
+          <div
+            x-show="isMeaningful(item.summary || item.description)"
+            class="text-xs text-slate-400 mt-2 line-clamp-2"
+            x-text="item.summary || item.description"
+          ></div>
+        </div>
+        <svg
+          class="w-4 h-4 text-slate-500 transition-transform flex-shrink-0 mt-2"
+          :class="expandedSupplyChain === item.spdxId && 'rotate-180'"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
+      </div>
+
+      <template x-if="expandedSupplyChain === item.spdxId">
+        <div class="mt-4 pt-4 border-t border-slate-700 space-y-3 sm:pl-11 fade-in" @click.stop>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
+            <template x-for="row in supplyChainSpecRows(item)" :key="row.label">
+              <div>
+                <div
+                  class="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5"
+                  x-text="row.label"
+                ></div>
+                <span
+                  class="text-xs text-slate-300 break-words"
+                  :class="row.mono && 'font-mono break-all'"
+                  x-text="row.value"
+                ></span>
+              </div>
+            </template>
+          </div>
+
+          <div x-show="supplyChainPerformerNames(item).length" class="flex flex-wrap gap-2">
+            <span class="text-xs text-slate-500">Performed by</span>
+            <template x-for="name in supplyChainPerformerNames(item)" :key="name">
+              <span class="badge text-xs bg-lime-500/15 text-lime-300" x-text="name"></span>
+            </template>
+          </div>
+
+          <div x-show="isMeaningful(item.description) && item.description !== item.summary">
+            <div class="text-xs text-slate-500 mb-1">Description</div>
+            <div class="text-xs text-slate-300 whitespace-pre-wrap" x-text="item.description"></div>
+          </div>
+
+          <template x-for="group in detailRelGroupsFor(item)" :key="group.key">
+            <div class="detail-rel-section">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="detail-rel-line" :style="`background: ${group.color}`"></span>
+                <span
+                  class="text-xs font-semibold uppercase tracking-wider"
+                  :style="`color: ${group.color}`"
+                  x-text="group.label"
+                ></span>
+                <span class="text-[10px] text-slate-500" x-text="'(' + group.total + ')'"></span>
+              </div>
+              <div class="space-y-1 ml-3">
+                <template x-for="rel in group.items" :key="rel.id">
+                  <div class="detail-rel-item group" @click.stop="navigateTo(rel.id)">
+                    <span
+                      class="detail-rel-arrow"
+                      :style="`color: ${group.color}`"
+                      x-text="rel.direction === 'out' ? '→' : '←'"
+                    ></span>
+                    <span
+                      class="flex items-center flex-shrink-0"
+                      :style="`color: ${nodeTypeColor(getNodeType(elementMap.get(rel.id) || {}))}`"
+                      x-html="elementIcon(elementMap.get(rel.id) || { spdxId: rel.id }, 'w-3.5 h-3.5')"
+                    ></span>
+                    <span class="flex-1 truncate" x-text="rel.displayName"></span>
+                    <span
+                      x-show="rel.scope"
+                      class="text-[10px] px-1.5 py-0.5 rounded bg-slate-700/60 text-slate-400 flex-shrink-0"
+                      x-text="rel.scope"
+                    ></span>
+                  </div>
+                </template>
+                <div
+                  x-show="group.hiddenCount > 0"
+                  class="text-[10px] text-slate-500 italic pl-1"
+                  x-text="'+' + formatCount(group.hiddenCount) + ' more'"
+                ></div>
+              </div>
+            </div>
+          </template>
+        </div>
+      </template>
+    </div>
+  </template>
+</div>

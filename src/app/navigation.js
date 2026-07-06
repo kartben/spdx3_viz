@@ -12,6 +12,7 @@ const expandedFieldByView = {
   dataset: 'expandedPkg',
   files: 'expandedFile',
   hardware: 'expandedHardware',
+  supplychain: 'expandedSupplyChain',
   requirements: 'expandedRequirement',
   configs: 'expandedConfig',
   build: 'expandedBuild',
@@ -47,6 +48,7 @@ const viewListProps = {
   dataset: 'filteredDatasetPackages',
   files: 'filteredFiles',
   hardware: 'filteredHardware',
+  supplychain: 'filteredSupplyChain',
   requirements: 'filteredRequirements',
   licenses: 'filteredLicenses',
   security: 'filteredVulnerabilities',
@@ -62,6 +64,7 @@ const navKindListInfo = {
   dataset: { view: 'dataset', list: 'filteredDatasetPackages', idField: 'spdxId' },
   file: { view: 'files', list: 'filteredFiles', idField: 'spdxId' },
   hardware: { view: 'hardware', list: 'filteredHardware', idField: 'spdxId' },
+  supplychain: { view: 'supplychain', list: 'filteredSupplyChain', idField: 'spdxId' },
   requirement: { view: 'requirements', list: 'filteredRequirements', idField: 'spdxId' },
   license: { view: 'licenses', list: 'filteredLicenses', idField: 'id' },
   vuln: { view: 'security', list: 'filteredVulnerabilities', idField: 'spdxId' },
@@ -83,6 +86,7 @@ export const navigationMixin = {
       expandedPkg: this.expandedPkg,
       expandedFile: this.expandedFile,
       expandedHardware: this.expandedHardware,
+      expandedSupplyChain: this.expandedSupplyChain,
       expandedRequirement: this.expandedRequirement,
       expandedConfig: this.expandedConfig,
       expandedBuild: this.expandedBuild,
@@ -139,6 +143,7 @@ export const navigationMixin = {
       expandedPkg: null,
       expandedFile: null,
       expandedHardware: null,
+      expandedSupplyChain: null,
       expandedRequirement: null,
       expandedConfig: null,
       expandedBuild: null,
@@ -172,6 +177,7 @@ export const navigationMixin = {
     this.expandedPkg = state.expandedPkg;
     this.expandedFile = state.expandedFile;
     this.expandedHardware = state.expandedHardware;
+    this.expandedSupplyChain = state.expandedSupplyChain;
     this.expandedRequirement = state.expandedRequirement;
     this.expandedConfig = state.expandedConfig;
     this.expandedBuild = state.expandedBuild;
@@ -196,6 +202,7 @@ export const navigationMixin = {
       dataset: ['dataset', this.expandedPkg],
       files: ['file', this.expandedFile],
       hardware: ['hardware', this.expandedHardware],
+      supplychain: ['supplychain', this.expandedSupplyChain],
       requirements: ['requirement', this.expandedRequirement],
       configs: ['config', this.expandedConfig],
       build: ['build', this.expandedBuild],
@@ -231,6 +238,7 @@ export const navigationMixin = {
     this.expandedPkg = null;
     this.expandedFile = null;
     this.expandedHardware = null;
+    this.expandedSupplyChain = null;
     this.expandedRequirement = null;
     this.expandedConfig = null;
     this.expandedBuild = null;
@@ -428,6 +436,10 @@ export const navigationMixin = {
     this.expandedHardware = this.expandedHardware === id ? null : id;
     this._scheduleNavPush();
   },
+  toggleSupplyChain(id) {
+    this.expandedSupplyChain = this.expandedSupplyChain === id ? null : id;
+    this._scheduleNavPush();
+  },
   toggleRequirement(id) {
     this.expandedRequirement = this.expandedRequirement === id ? null : id;
     this._scheduleNavPush();
@@ -535,6 +547,8 @@ export const navigationMixin = {
       case 'hardware_BulkHardware':
       case 'hardware_VirtualHardware':
         return { label: 'Hardware' };
+      case 'supplychain_State':
+        return { label: 'Supply Chain' };
       case 'Requirement':
       case 'functionalsafety_RequirementVerification':
       case 'functionalsafety_Assumption':
@@ -561,6 +575,10 @@ export const navigationMixin = {
     // Agents route by node type so every subclass lands in the Agents tab.
     if (this.getNodeType(el) === 'agent') {
       this.navigateToAgent(spdxId);
+      return;
+    }
+    if (this.getNodeType(el) === 'supplychain') {
+      this.navigateToSupplyChain(spdxId);
       return;
     }
     // A snippet isn't a page of its own: open it in a popup showing its file's
@@ -870,6 +888,14 @@ export const navigationMixin = {
     this.switchView('hardware');
     this.expandedHardware = spdxId;
     this.scrollToNavTarget('hardware', spdxId);
+  },
+  navigateToSupplyChain(spdxId) {
+    this.supplyChainSearch = '';
+    this.supplyChainKindFilter = '';
+    this.supplyChainExceptionFilter = '';
+    this.switchView('supplychain');
+    this.expandedSupplyChain = spdxId;
+    this.scrollToNavTarget('supplychain', spdxId);
   },
   navigateToRequirement(spdxId) {
     this.requirementSearch = '';

@@ -55,6 +55,7 @@ const ICONS = {
   external: 'open_in_new',
   vulnerability: 'bug_report',
   hardware: 'memory',
+  supplychain: 'route',
   requirement: 'assignment',
   requirement_verification: 'fact_check',
   assumption: 'help',

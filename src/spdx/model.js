@@ -45,6 +45,7 @@ export const BUCKET = Object.freeze({
   VULNERABILITIES: 'vulnerabilities',
   VEX: 'vex',
   VULN_ASSESSMENT: 'vulnAssessment', // non-VEX assessments, not surfaced
+  SUPPLY_CHAIN: 'supplyChain',
   AGENTS: 'agents',
   SBOMS: 'sboms',
   DOCUMENTS: 'documents',
@@ -103,6 +104,22 @@ const BUCKET_RULES = [
   // Non-VEX vuln assessments (CVSS, EPSS, …) aren't surfaced; catch the base so
   // they don't fall into the generic Relationship bucket.
   [CLASS.security_VulnAssessmentRelationship, BUCKET.VULN_ASSESSMENT],
+  // SupplyChain profile: actions, defined processes and state artifacts. Do not
+  // bucket the generic Core Action / DefinedProcess classes here; only the
+  // profile-specific subclasses belong in the Supply Chain view.
+  [CLASS.supplychain_State, BUCKET.SUPPLY_CHAIN],
+  [CLASS.supplychain_CreateAction, BUCKET.SUPPLY_CHAIN],
+  [CLASS.supplychain_ModifyAction, BUCKET.SUPPLY_CHAIN],
+  [CLASS.supplychain_UseAction, BUCKET.SUPPLY_CHAIN],
+  [CLASS.supplychain_BoundaryDefinitionAction, BUCKET.SUPPLY_CHAIN],
+  [CLASS.supplychain_ResponsibilityChangeAction, BUCKET.SUPPLY_CHAIN],
+  [CLASS.supplychain_DestroyAction, BUCKET.SUPPLY_CHAIN],
+  [CLASS.supplychain_CreateProcess, BUCKET.SUPPLY_CHAIN],
+  [CLASS.supplychain_ModifyProcess, BUCKET.SUPPLY_CHAIN],
+  [CLASS.supplychain_UseProcess, BUCKET.SUPPLY_CHAIN],
+  [CLASS.supplychain_BoundaryDefinitionProcess, BUCKET.SUPPLY_CHAIN],
+  [CLASS.supplychain_ResponsibilityChangeProcess, BUCKET.SUPPLY_CHAIN],
+  [CLASS.supplychain_DestroyProcess, BUCKET.SUPPLY_CHAIN],
   [CLASS.build_Build, BUCKET.BUILDS],
   [CLASS.Tool, BUCKET.TOOLS],
   [CLASS.software_Sbom, BUCKET.SBOMS],
