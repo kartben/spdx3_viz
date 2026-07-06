@@ -436,18 +436,23 @@
       :key="item.spdxId"
     >
       <div
-        x-data="{ kind: '', status: null, meta: null }"
-        x-effect="kind = supplyChainKind(item); status = supplyChainExceptionStatus(item); meta = supplyChainFamilyMeta(item)"
-        class="card cursor-pointer overflow-hidden relative"
+        x-data="{ kind: '', family: '', status: null, meta: null }"
+        x-effect="kind = supplyChainKind(item); family = supplyChainFamily(item); status = supplyChainExceptionStatus(item); meta = supplyChainFamilyMeta(item)"
+        class="card supply-card cursor-pointer overflow-hidden relative"
         data-nav-kind="supplychain"
         :data-nav-id="item.spdxId"
-        :class="[isNavTarget('supplychain', item.spdxId) && 'target-focus', meta?.border, meta?.ring]"
+        :class="[isNavTarget('supplychain', item.spdxId) && 'target-focus', meta?.border, meta?.ring, `supply-card-${family}`]"
         @click="toggleSupplyChain(item.spdxId)"
       >
-        <div class="absolute left-0 top-0 bottom-0 w-1" :class="meta?.dot"></div>
-        <div class="flex items-start gap-3 pl-1">
+        <div class="absolute inset-0 pointer-events-none supply-card-glow"></div>
+        <div class="absolute right-5 top-4 opacity-[0.04] pointer-events-none">
+          <span x-html="elementIcon(item, 'w-28 h-28')"></span>
+        </div>
+        <div class="absolute left-0 top-0 bottom-0 w-1.5" :class="meta?.dot"></div>
+
+        <div class="flex items-start gap-4 pl-1 relative">
           <div
-            class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5"
+            class="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 mt-0.5 shadow-lg ring-1 ring-white/10"
             :class="meta?.iconBg"
           >
             <span
@@ -457,29 +462,57 @@
             ></span>
           </div>
           <div class="flex-1 min-w-0">
-            <div class="flex flex-wrap items-center gap-2">
-              <div
-                class="font-semibold text-white text-sm truncate"
-                x-text="item.name || cleanName(item.spdxId)"
-              ></div>
-              <span class="badge text-xs" :class="supplyChainKindBadge(kind)">
-                <span x-text="supplyChainKindLabel(kind)"></span>
-              </span>
-              <span
-                class="badge text-xs bg-slate-700/80 text-slate-300"
-                x-text="meta?.label"
-              ></span>
-              <span
-                x-show="status"
-                class="badge text-xs"
-                :class="status?.badgeClass"
-                x-text="status?.label"
-              ></span>
+            <div class="flex flex-wrap items-start gap-3">
+              <div class="min-w-0 flex-1">
+                <div
+                  class="font-semibold text-white text-base leading-snug truncate"
+                  x-text="item.name || cleanName(item.spdxId)"
+                ></div>
+                <div class="mt-1 flex flex-wrap items-center gap-2">
+                  <span class="badge text-xs" :class="supplyChainKindBadge(kind)">
+                    <span x-text="supplyChainKindLabel(kind)"></span>
+                  </span>
+                  <span class="badge text-xs" :class="meta?.chip" x-text="meta?.label"></span>
+                  <span
+                    class="badge text-xs bg-slate-700/80 text-slate-300"
+                    x-text="supplyChainTypeLabel(item)"
+                  ></span>
+                  <span
+                    x-show="status"
+                    class="badge text-xs"
+                    :class="status?.badgeClass"
+                    x-text="status?.label"
+                  ></span>
+                </div>
+              </div>
+              <div class="hidden lg:flex items-center gap-1.5 pt-1">
+                <template
+                  x-for="segment in ['create', 'move', 'verify', 'exception', 'operate']"
+                  :key="segment"
+                >
+                  <span
+                    class="h-1.5 w-8 rounded-full bg-slate-700/70 transition"
+                    :class="family === segment && meta?.dot"
+                  ></span>
+                </template>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2 mt-3">
+              <template x-for="chip in supplyChainConceptChips(item)" :key="chip.label">
+                <span
+                  class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium"
+                  :class="chip.className"
+                >
+                  <span class="text-white/90" x-text="chip.count"></span>
+                  <span x-text="chip.label"></span>
+                </span>
+              </template>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 mt-3">
               <template x-for="fact in supplyChainCardFacts(item)" :key="fact.label">
-                <div class="rounded-lg bg-slate-900/70 border border-slate-700/60 px-2.5 py-2">
+                <div class="rounded-lg border px-2.5 py-2" :class="meta?.panel">
                   <div
                     class="text-[10px] text-slate-500 uppercase tracking-wider"
                     x-text="fact.label"
@@ -496,7 +529,7 @@
             ></div>
           </div>
           <svg
-            class="w-4 h-4 text-slate-500 transition-transform flex-shrink-0 mt-3"
+            class="w-4 h-4 text-slate-500 transition-transform flex-shrink-0 mt-4 relative"
             :class="expandedSupplyChain === item.spdxId && 'rotate-180'"
             fill="none"
             stroke="currentColor"
