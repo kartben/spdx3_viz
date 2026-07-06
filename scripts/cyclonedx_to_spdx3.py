@@ -50,7 +50,11 @@ except ImportError:  # pragma: no cover - dependency hint
 # --------------------------------------------------------------------------- #
 
 def parse_dt(value):
-    """Parse an ISO-8601 timestamp into a timezone-aware datetime (or None)."""
+    """Parse an ISO-8601 timestamp into a UTC datetime (or None).
+
+    SPDX 3.0.1 DateTimeStamp properties require ``YYYY-MM-DDTHH:MM:SSZ``;
+    CycloneDX often uses local offsets (e.g. ``+02:00``), so normalize to UTC.
+    """
     if not value:
         return None
     try:
@@ -58,8 +62,8 @@ def parse_dt(value):
     except (ValueError, AttributeError):
         return None
     if dt.tzinfo is None:
-        dt = dt.replace(tzinfo=timezone.utc)
-    return dt
+        return dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
 
 
 def slug(text, maxlen=100):
