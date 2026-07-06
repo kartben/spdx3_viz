@@ -3,8 +3,10 @@ name: Release
 # One-shot, manually triggered release. From the Actions tab pick a bump level
 # (or type an exact version), and this workflow will: run the full CI gate, cut
 # the release commit (version + dated changelog), tag it, reopen the next dev
-# cycle, push both commits and the tag to main, and publish a GitHub Release.
-# Publishing the release triggers deploy-pages.yml to ship the tagged version.
+# cycle, push both commits and the tag to main, publish a GitHub Release, and
+# deploy the tagged release to GitHub Pages. (Events raised by GITHUB_TOKEN do
+# not trigger other workflows, so deploy is invoked directly here rather than
+# relying on the release:published trigger in deploy-pages.yml.)
 on:
   workflow_dispatch:
     inputs:
@@ -43,6 +45,8 @@ jobs:
     name: Cut release
     needs: ci
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
 
     steps:
       - name: Checkout
@@ -119,3 +123,14 @@ jobs:
             --title '${{ steps.version.outputs.tag }}' \
             --notes-file release-notes.md \
             --target "$(git rev-parse '${{ steps.version.outputs.tag }}^{commit}')"
+
+  deploy:
+    name: Deploy release to Pages
+    needs: release
+    uses: ./.github/workflows/pages.yml
+    with:
+      ref: ${{ needs.release.outputs.tag }}
+    permissions:
+      contents: read
+      pages: write
+      id-token: write

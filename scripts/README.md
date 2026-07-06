@@ -80,9 +80,10 @@ under `## Unreleased` in [`CHANGELOG.md`](../CHANGELOG.md).
 3. Run. The workflow runs the full CI gate, then in one go: sets the version,
    dates the `## Unreleased` section, tags `vX.Y.Z`, reopens the next `-dev`
    cycle, pushes both commits and the tag to `main`, and publishes a GitHub
-   Release. Publishing the release triggers a Pages deploy of the tagged
-   version (a push to `main` may also deploy the reopened `-dev` head first;
-   the release deploy wins via the shared `pages` concurrency group).
+   Release, and deploy the tagged release to GitHub Pages. (The push to `main`
+   does not trigger deploy-pages when performed by `GITHUB_TOKEN`; the release
+   workflow calls the Pages deploy directly. Manual releases via the GitHub UI
+   are handled by the `release: published` trigger in deploy-pages.yml.)
 
 > The workflow pushes to `main`. If `main` is protected, allow the
 > `github-actions[bot]` actor to push (or run the release from a maintainer PAT).
