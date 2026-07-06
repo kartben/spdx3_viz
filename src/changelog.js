@@ -11,6 +11,10 @@ export const CHANGELOG = [
     items: [
       {
         tag: 'Added',
+        text: 'Graph heatmap overlay for vulnerabilities, failing and unverified requirements.'
+      },
+      {
+        tag: 'Added',
         text: '"Hide orphans" graph toggle, to declutter disconnected nodes.'
       },
       {
