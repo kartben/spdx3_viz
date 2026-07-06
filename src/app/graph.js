@@ -30,6 +30,7 @@ export const graphMixin = {
   },
   collapseAllClusters() {
     this.expandedClusters = new Set();
+    this.graphExpandedCount = 0;
     this.renderGraph();
   },
   // Icon mode is purely visual, so repaint the settled canvas rather than

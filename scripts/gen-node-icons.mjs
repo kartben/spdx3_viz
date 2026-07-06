@@ -68,7 +68,9 @@ const ICONS = {
   // Graph toolbar toggle glyphs (not tied to an SPDX element type).
   toggle_icons: 'image',
   toggle_aggregate: 'workspaces',
-  toggle_hide_orphans: 'visibility_off'
+  toggle_hide_orphans: 'visibility_off',
+  collapse_clusters: 'unfold_less',
+  reset_zoom: 'crop_free'
 };
 
 const here = dirname(fileURLToPath(import.meta.url));

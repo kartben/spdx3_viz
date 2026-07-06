@@ -70,12 +70,6 @@
         class="text-xs text-slate-400 whitespace-nowrap"
         x-text="`${formatCount(graphNodeCount)} nodes · ${formatCount(graphEdgeCount)} edges`"
       ></span>
-      <span
-        x-show="graphTruncated"
-        class="text-xs text-amber-400 whitespace-nowrap"
-        title="Too many nodes to show flat — showing the aggregated view. Double-click a cluster to drill in."
-        >auto-aggregated</span
-      >
       <div class="flex items-center gap-0.5 bg-slate-800 border border-slate-700 rounded-md p-0.5">
         <button
           type="button"
@@ -87,10 +81,11 @@
         ></button>
         <button
           type="button"
+          :disabled="graphTruncated"
           @click="graphAggregate = !graphAggregate; updateGraph()"
-          :class="graphAggregate ? 'bg-blue-500/20 text-blue-400' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700'"
-          class="p-1.5 rounded transition-colors"
-          title="Collapse files into their package/directory and build steps into their root build. Double-click a cluster to expand it."
+          :class="(graphAggregate || graphTruncated) ? 'bg-blue-500/20 text-blue-400' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700'"
+          class="p-1.5 rounded transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+          :title="graphTruncated ? 'Too many nodes to show flat, so aggregation is on automatically. Double-click a cluster to drill in.' : 'Aggregate: group files into their package/directory and build steps into their root build. Double-click a cluster to drill in.'"
           x-html="uiIconSvg('toggle_aggregate')"
         ></button>
         <button
@@ -101,20 +96,23 @@
           title="Hide nodes left with no edges once every other filter is applied."
           x-html="uiIconSvg('toggle_hide_orphans')"
         ></button>
+        <div class="w-px self-stretch bg-slate-700 mx-0.5"></div>
+        <button
+          type="button"
+          x-show="graphExpandedCount"
+          @click="collapseAllClusters()"
+          class="p-1.5 rounded transition-colors text-slate-400 hover:text-slate-200 hover:bg-slate-700"
+          title="Collapse every drilled-in cluster back to its aggregated bubble."
+          x-html="uiIconSvg('collapse_clusters')"
+        ></button>
+        <button
+          type="button"
+          @click="resetGraphZoom()"
+          class="p-1.5 rounded transition-colors text-slate-400 hover:text-slate-200 hover:bg-slate-700"
+          title="Reset the pan and zoom to fit the whole graph."
+          x-html="uiIconSvg('reset_zoom')"
+        ></button>
       </div>
-      <button
-        x-show="graphAggregate"
-        @click="collapseAllClusters()"
-        class="text-xs px-2.5 py-1 bg-slate-700 hover:bg-slate-600 rounded-md transition-colors text-slate-300"
-      >
-        Collapse all
-      </button>
-      <button
-        @click="resetGraphZoom()"
-        class="text-xs px-2.5 py-1 bg-slate-700 hover:bg-slate-600 rounded-md transition-colors text-slate-300"
-      >
-        Reset Zoom
-      </button>
     </div>
   </div>
   <!-- Graph canvas -->
