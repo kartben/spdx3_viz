@@ -32,6 +32,40 @@ export const derivedMixin = {
     return computeRelationshipTypeCounts(this.relationships);
   },
 
+  // Compact, type-aware inventory for the overview. Empty kinds are omitted so
+  // the same landing page works for software, hardware, AI, build and safety
+  // documents without reserving space for irrelevant sections.
+  get dashboardInventory() {
+    return [
+      { view: 'packages', label: 'Packages', count: this.plainPackages.length, type: 'package' },
+      { view: 'ai', label: 'AI models', count: this.aiPackages.length, type: 'ai' },
+      { view: 'dataset', label: 'Datasets', count: this.datasetPackages.length, type: 'dataset' },
+      { view: 'files', label: 'Files', count: this.files.length, type: 'file' },
+      { view: 'hardware', label: 'Hardware', count: this.hardware.length, type: 'hardware' },
+      {
+        view: 'requirements',
+        label: 'Safety elements',
+        count: this.requirements.length,
+        type: 'requirement'
+      },
+      { view: 'licenses', label: 'Licenses', count: this.licenses.length, type: 'license' },
+      {
+        view: 'security',
+        label: 'Vulnerabilities',
+        count: this.vulnerabilities.length,
+        type: 'vulnerability'
+      },
+      { view: 'configs', label: 'Build configs', count: this.buildConfigs.length, type: 'config' },
+      {
+        view: 'build',
+        label: 'Builds & tools',
+        count: this.builds.length + this.tools.length,
+        type: 'build'
+      },
+      { view: 'agents', label: 'Agents', count: this.agents.length, type: 'agent' }
+    ].filter((item) => item.count > 0);
+  },
+
   // AI models and dataset packages are software_Package subclasses (AI profile)
   // and get their own tabs, so the Packages tab lists only plain packages. All
   // three read the same search box + sort control (see _filterSortPackages).
