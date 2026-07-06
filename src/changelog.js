@@ -24,6 +24,10 @@ export const CHANGELOG = [
       {
         tag: 'Improved',
         text: 'Snippet source viewer folds away code between covered ranges.'
+      },
+      {
+        tag: 'Fixed',
+        text: 'Graph now shows `tracedToDetail` requirement decomposition edges.'
       }
     ]
   },

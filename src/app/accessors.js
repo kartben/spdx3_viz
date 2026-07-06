@@ -271,6 +271,8 @@ export const accessorsMixin = {
         return `background-image: repeating-linear-gradient(to right, ${c} 0 5px, transparent 5px 7px, ${c} 7px 8px, transparent 8px 10px)`;
       case 'dashdotdot':
         return `background-image: repeating-linear-gradient(to right, ${c} 0 5px, transparent 5px 7px, ${c} 7px 8px, transparent 8px 9px, ${c} 9px 10px, transparent 10px 12px)`;
+      case 'longdashdot':
+        return `background-image: repeating-linear-gradient(to right, ${c} 0 8px, transparent 8px 10px, ${c} 10px 11px, transparent 11px 13px)`;
       default:
         return `background:${c}`;
     }

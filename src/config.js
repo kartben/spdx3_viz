@@ -51,6 +51,8 @@ export const RELATIONSHIP_TYPES = {
   HAS_EVIDENCE: 'hasEvidence',
   ASSUMES: 'assumes',
   CONFORMS_TO: 'conformsTo',
+  // FunctionalSafety profile: a higher-level Requirement decomposes into more detailed ones.
+  TRACED_TO_DETAIL: 'tracedToDetail',
   // Synthesized by the parser from EvaluationResult.evaluationBasedOn so the evaluation ↔
   // verification link appears as a graph edge like any other relationship.
   EVALUATION_BASED_ON: 'evaluationBasedOn',
@@ -468,8 +470,8 @@ export function createGraphFilters() {
       lineStyle: 'dotted'
     },
     // FunctionalSafety profile relationship edges. All share the same yellow
-    // (they're one profile), so each gets its own dash pattern below —
-    // otherwise seven relationship types would be indistinguishable on the
+    // (they're one profile), so each gets its own dash pattern below,
+    // otherwise these relationship types would be indistinguishable on the
     // graph canvas (see dashPatternFor in graph-view.js, which draws these
     // patterns; keep the two in sync).
     {
@@ -526,6 +528,14 @@ export function createGraphFilters() {
       active: true,
       isRel: true,
       lineStyle: 'dashdotdot'
+    },
+    {
+      key: 'tracedToDetail',
+      label: 'tracedToDetail',
+      color: COLORS.requirement,
+      active: true,
+      isRel: true,
+      lineStyle: 'longdashdot'
     },
     // Explicit relationship (not synthesized) naming who carried out a
     // verification/evaluation; tinted the agent colour like the other
@@ -707,6 +717,8 @@ export const RELATIONSHIP_LABELS = {
   'assumes:in': 'Assumed by',
   'conformsTo:out': 'Conforms to',
   'conformsTo:in': 'Conformed to by',
+  'tracedToDetail:out': 'Traced to detail',
+  'tracedToDetail:in': 'Detail of',
   'evaluationBasedOn:out': 'Based on',
   'evaluationBasedOn:in': 'Evaluated by',
   'trainedOn:out': 'Trained on',
@@ -841,6 +853,8 @@ export const RELATIONSHIP_SORT_ORDER = {
   'conformsTo:in': 48,
   'evaluationBasedOn:out': 49,
   'evaluationBasedOn:in': 50,
+  'tracedToDetail:out': 41.5,
+  'tracedToDetail:in': 41.6,
   'performedBy:out': 51,
   'performedBy:in': 52,
   'trainedOn:out': 31,

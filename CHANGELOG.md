@@ -9,6 +9,7 @@ via the "What's new" link.
 - **Added:** "Hide orphans" graph toggle, to declutter disconnected nodes.
 - **Improved:** Multiple snippet ranges of one file collapse into a single link.
 - **Improved:** Snippet source viewer folds away code between covered ranges.
+- **Fixed:** Graph now shows `tracedToDetail` requirement decomposition edges.
 
 ## [0.0.6] - 2026-07-06
 
