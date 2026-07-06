@@ -1,10 +1,8 @@
-/* Global header search: a fuzzy-ranked lookup across every navigable element in
-   the loaded document, surfacing the top matches in a command-palette dropdown
-   where picking one navigates to its list card. Distinct from the per-view
-   filter boxes. */
-
-const SEARCH_LIMIT = 10; // top-N matches surfaced in the dropdown
-const MIN_QUERY = 1; // characters before we bother scoring
+/* Search corpus + fuzzy scoring, shared by the ⌘K command palette (see
+   app/palette.js). Builds a flat, pre-lowercased index of every navigable
+   element in the loaded document and scores a query against it, and exposes the
+   match-highlight helper the palette uses to render result names. Distinct from
+   the per-view filter boxes and the graph's own in-canvas node search. */
 
 // Human label per node type, shown as the chip on the right of a result row.
 const SEARCH_TYPE_LABELS = {
@@ -26,20 +24,14 @@ const SEARCH_TYPE_LABELS = {
 // changes (i.e. a fresh document is parsed); kept off the reactive state.
 let searchCorpusKey = null;
 let searchCorpusVal = [];
-// Memo for the last scored result set, so unrelated reactive churn (e.g. hover
-// state changing while the dropdown is open) doesn't re-score the whole corpus.
-let searchResultsQuery = null;
-let searchResultsCorpus = null;
-let searchResultsVal = [];
 
 export const searchMixin = {
   _resetSearchMemos() {
     searchCorpusKey = null;
-    searchResultsQuery = null;
   },
 
-  // Flat, pre-lowercased index of everything the header search can jump to. Each
-  // entry carries what the dropdown needs to render (name/sub/nodeType) plus the
+  // Flat, pre-lowercased index of everything the palette can jump to. Each entry
+  // carries what a result row needs to render (name/sub/nodeType) plus the
   // lowercased haystacks used for scoring.
   get searchCorpus() {
     const key = [
@@ -163,34 +155,6 @@ export const searchMixin = {
     return Math.max(this._fieldScore(entry._n, q, 1), this._fieldScore(entry._e, q, 0.55));
   },
 
-  // Top matches for the current query, best first. Memoized on (query, corpus)
-  // so it only recomputes when the text or the underlying document changes.
-  get searchResults() {
-    const q = (this.searchQuery || '').trim().toLowerCase();
-    const corpus = this.searchCorpus;
-    if (q.length < MIN_QUERY) return [];
-    if (q === searchResultsQuery && corpus === searchResultsCorpus) return searchResultsVal;
-
-    const scored = [];
-    for (const entry of corpus) {
-      const score = this._entryScore(entry, q);
-      if (score > 0) scored.push({ entry, score });
-    }
-    // Rank by score, then shorter name (tighter match), then alphabetical.
-    scored.sort(
-      (a, b) =>
-        b.score - a.score ||
-        a.entry._n.length - b.entry._n.length ||
-        a.entry._n.localeCompare(b.entry._n)
-    );
-    const results = scored.slice(0, SEARCH_LIMIT).map((s) => s.entry);
-
-    searchResultsQuery = q;
-    searchResultsCorpus = corpus;
-    searchResultsVal = results;
-    return results;
-  },
-
   _escapeHtml(str) {
     return String(str).replace(
       /[&<>"']/g,
@@ -210,55 +174,5 @@ export const searchMixin = {
     const hit = this._escapeHtml(text.slice(i, i + q.length));
     const after = this._escapeHtml(text.slice(i + q.length));
     return `${before}<span class="search-hl">${hit}</span>${after}`;
-  },
-
-  openSearch() {
-    if ((this.searchQuery || '').trim()) this.searchOpen = true;
-    this.searchActiveIndex = 0;
-  },
-  closeSearch() {
-    this.searchOpen = false;
-  },
-  clearSearch() {
-    this.searchQuery = '';
-    this.searchOpen = false;
-    this.searchActiveIndex = 0;
-  },
-
-  // Jump to a result's list card and dismiss the dropdown. Licenses are keyed by
-  // their (possibly non-element) id, so route them explicitly; everything else
-  // routes by spdxId through the shared navigateTo dispatcher.
-  selectSearchResult(result) {
-    if (!result) return;
-    this.searchOpen = false;
-    this.searchQuery = '';
-    this.searchActiveIndex = 0;
-    if (result.nodeType === 'license') {
-      this.navigateToLicense(result.id);
-    } else {
-      this.navigateTo(result.id);
-    }
-  },
-
-  // Arrow-key / Enter handling for the results list.
-  searchKeydown(event) {
-    const results = this.searchResults;
-    if (event.key === 'ArrowDown') {
-      if (!results.length) return;
-      event.preventDefault();
-      this.searchOpen = true;
-      this.searchActiveIndex = (this.searchActiveIndex + 1) % results.length;
-    } else if (event.key === 'ArrowUp') {
-      if (!results.length) return;
-      event.preventDefault();
-      this.searchActiveIndex = (this.searchActiveIndex - 1 + results.length) % results.length;
-    } else if (event.key === 'Enter') {
-      if (!results.length) return;
-      event.preventDefault();
-      this.selectSearchResult(results[this.searchActiveIndex] || results[0]);
-      event.target.blur();
-    } else if (event.key === 'Escape') {
-      this.closeSearch();
-    }
   }
 };

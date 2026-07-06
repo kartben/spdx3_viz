@@ -52,17 +52,16 @@
     </div>
   </div>
   <div class="flex items-center gap-2 md:gap-3 flex-shrink-0">
-    <!-- Graph view hides the inline search box (the canvas has its own); this
-         button keeps the command palette reachable there without the keyboard. -->
+    <!-- Global search + command palette trigger: an input-styled button that
+         opens the ⌘K palette. Identical on every view (the palette is the one
+         global search), so the header never changes shape as you navigate. -->
     <button
-      x-show="currentView === 'graph'"
       @click="openPalette()"
       type="button"
-      title="Search & commands"
-      aria-label="Open command palette"
-      class="inline-flex items-center gap-2 pl-2.5 pr-2 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-slate-400 hover:text-slate-200 hover:border-slate-600 transition-colors text-xs"
+      aria-label="Search elements or jump to a view"
+      class="group flex items-center gap-2 w-44 sm:w-56 md:w-72 pl-3 pr-2 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-slate-500 hover:border-slate-600 hover:text-slate-400 transition-colors"
     >
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
           stroke-linecap="round"
           stroke-linejoin="round"
@@ -70,150 +69,21 @@
           d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
         />
       </svg>
-      <span class="hidden sm:inline">Search</span>
+      <span class="flex-1 text-left text-sm truncate">Search anything…</span>
       <span class="hidden md:inline-flex items-center gap-1 font-mono">
         <kbd
           class="px-1.5 py-0.5 text-[10px] font-medium bg-slate-700/60 border border-slate-600/50 rounded"
           x-text="isMac ? '⌘' : 'Ctrl'"
         ></kbd>
-        <span class="text-[10px] text-slate-500">+</span>
+        <span class="text-[10px] text-slate-600 group-hover:text-slate-500 transition-colors"
+          >+</span
+        >
         <kbd
           class="px-1.5 py-0.5 text-[10px] font-medium bg-slate-700/60 border border-slate-600/50 rounded"
           >K</kbd
         >
       </span>
     </button>
-    <!-- Global search: fuzzy jump-to-anything across every element -->
-    <div class="relative" x-show="currentView !== 'graph'" @click.outside="closeSearch()">
-      <svg
-        class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-        />
-      </svg>
-      <input
-        type="text"
-        x-model="searchQuery"
-        @focus="openSearch()"
-        @input="openSearch()"
-        @keydown="searchKeydown($event)"
-        placeholder="Search anything…"
-        role="combobox"
-        aria-autocomplete="list"
-        aria-label="Search all elements"
-        :aria-expanded="searchOpen"
-        class="w-40 sm:w-56 md:w-72 pl-9 pr-8 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
-      />
-      <!-- Clear -->
-      <button
-        x-show="searchQuery"
-        @click="clearSearch()"
-        type="button"
-        title="Clear search"
-        class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-200 transition-colors"
-      >
-        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M6 18L18 6M6 6l12 12"
-          />
-        </svg>
-      </button>
-      <!-- ⌘K hint: opens the full command palette (search + actions) from anywhere -->
-      <button
-        x-show="!searchQuery"
-        @click="openPalette()"
-        type="button"
-        title="Open command palette"
-        aria-label="Open command palette"
-        class="group hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 items-center gap-1 font-mono"
-      >
-        <kbd
-          class="px-1.5 py-0.5 text-[10px] font-medium text-slate-500 bg-slate-700/50 border border-slate-600/50 rounded group-hover:text-slate-300 group-hover:border-slate-500 transition-colors"
-          x-text="isMac ? '⌘' : 'Ctrl'"
-        ></kbd>
-        <span class="text-[10px] text-slate-600 group-hover:text-slate-400 transition-colors"
-          >+</span
-        >
-        <kbd
-          class="px-1.5 py-0.5 text-[10px] font-medium text-slate-500 bg-slate-700/50 border border-slate-600/50 rounded group-hover:text-slate-300 group-hover:border-slate-500 transition-colors"
-          >K</kbd
-        >
-      </button>
-
-      <!-- Results dropdown -->
-      <div
-        x-show="searchOpen && searchQuery.trim().length > 0"
-        x-cloak
-        class="search-dropdown absolute right-0 mt-2 z-50 w-[20rem] sm:w-[24rem] max-w-[calc(100vw-2rem)] max-h-[70vh] overflow-y-auto bg-slate-800 border border-slate-700 rounded-xl shadow-2xl shadow-black/50 py-1"
-      >
-        <!-- No matches -->
-        <div
-          x-show="searchResults.length === 0"
-          class="px-4 py-6 text-center text-sm text-slate-500"
-        >
-          No matches for “<span class="text-slate-300" x-text="searchQuery.trim()"></span>”
-        </div>
-        <!-- Result rows -->
-        <template x-for="(r, i) in searchResults" :key="r.nodeType + ':' + r.id">
-          <button
-            type="button"
-            @click="selectSearchResult(r)"
-            @mousemove="searchActiveIndex = i"
-            :class="i === searchActiveIndex ? 'bg-slate-700/70' : 'hover:bg-slate-700/40'"
-            class="w-full flex items-center gap-3 px-3 py-2 text-left transition-colors"
-          >
-            <span
-              class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-              :style="`background:${nodeTypeColor(r.nodeType)}26`"
-            >
-              <span
-                class="flex items-center justify-center"
-                :style="`color:${nodeTypeColor(r.nodeType)}`"
-                x-html="nodeTypeIconSvg(r.nodeType, 'w-4 h-4')"
-              ></span>
-            </span>
-            <span class="min-w-0 flex-1">
-              <span
-                class="block text-sm text-slate-200 truncate"
-                x-html="searchHighlight(r.name, searchQuery)"
-              ></span>
-              <span
-                x-show="r.sub"
-                class="block text-xs text-slate-500 truncate"
-                x-text="r.sub"
-              ></span>
-            </span>
-            <span
-              class="text-[10px] font-medium px-1.5 py-0.5 rounded-full flex-shrink-0"
-              :style="`background:${nodeTypeColor(r.nodeType)}1f;color:${nodeTypeColor(r.nodeType)}`"
-              x-text="r.typeLabel"
-            ></span>
-          </button>
-        </template>
-        <!-- Footer hint -->
-        <div
-          x-show="searchResults.length > 0"
-          class="px-3 pt-1.5 mt-1 text-[11px] text-slate-500 border-t border-slate-700/60"
-        >
-          Top <span x-text="searchResults.length"></span> match<span
-            x-show="searchResults.length !== 1"
-            >es</span
-          >
-          · <span class="text-slate-400">↵</span> opens the first ·
-          <span class="text-slate-400">↑↓</span> to navigate
-        </div>
-      </div>
-    </div>
     <!-- Copy share link (sample-loaded sessions only: dropped files can't be re-fetched) -->
     <button
       x-show="loadedSampleId"

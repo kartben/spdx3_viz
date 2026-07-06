@@ -80,9 +80,6 @@ export function createState() {
     // secondary lists (a license used by every package, a build's tens of
     // thousands of generated artifacts) from mounting all at once on view open.
     listReveal: {},
-    searchQuery: '', // header global-search box (cross-cutting jump-to-anything)
-    searchOpen: false, // whether the global-search results dropdown is showing
-    searchActiveIndex: 0, // keyboard-highlighted result row in the dropdown
     isMac: /Mac|iPhone|iPad|iPod/.test(
       (typeof navigator !== 'undefined' && (navigator.platform || navigator.userAgent)) || ''
     ), // picks the ⌘ vs Ctrl glyph for the palette hint
