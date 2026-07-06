@@ -40,6 +40,19 @@ const element = (type, fragment, properties = {}) => ({
   ...properties
 });
 
+const cdxProperties = (entries) => ({
+  extension: [
+    {
+      type: 'extension_CdxPropertiesExtension',
+      extension_cdxProperty: entries.map(([name, value]) => ({
+        type: 'extension_CdxPropertyEntry',
+        extension_cdxPropName: name,
+        extension_cdxPropValue: String(value)
+      }))
+    }
+  ]
+});
+
 const graph = [];
 const relationships = [];
 let relationshipSequence = 0;
@@ -1092,6 +1105,12 @@ action(
     supplychain_dropoffLocation: loc['loc/denver-lab'],
     supplychain_transportRoute:
       'Austin secure staging → LAX air-freight hub → Denver receiving lab',
+    ...cdxProperties([
+      ['arborlink:transport.mode', 'road+air+road'],
+      ['arborlink:distance.km', '2380'],
+      ['arborlink:co2e.kg', '186.4'],
+      ['arborlink:co2e.method', 'Synthetic lane estimate from road/air distance factors']
+    ]),
     summary: 'Controlled-lane shipment with carrier custody, shock telemetry, and evidence package.'
   },
   [
@@ -1258,6 +1277,12 @@ action(
     supplychain_pickupLocation: loc['loc/denver-lab'],
     supplychain_dropoffLocation: loc['loc/wyoming-site'],
     supplychain_transportRoute: 'Denver receiving lab → EdgeOps Red Mesa wind-farm substation',
+    ...cdxProperties([
+      ['arborlink:transport.mode', 'road'],
+      ['arborlink:distance.km', '542'],
+      ['arborlink:co2e.kg', '42.1'],
+      ['arborlink:co2e.method', 'Synthetic road freight estimate for final-mile controlled lane']
+    ]),
     summary: 'Final controlled-lane movement from acceptance lab to deployment site.'
   },
   [

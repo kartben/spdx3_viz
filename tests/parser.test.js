@@ -204,6 +204,7 @@ test('SupplyChain view model exposes lifecycle, custody, and exception structure
   assert.equal(app.supplyChainTransportLegs[0].route.includes('Austin secure staging'), true);
   assert.equal(app.supplyChainCustodyHandoffs.length, 2);
   assert.equal(app.supplyChainCustodyHandoffs[1].category, 'ownership');
+  assert.equal(app.supplyChainTimelineRows.length, 25);
 
   const transportProcess = parsed.supplyChain.find(
     (el) => el.name === 'Controlled-lane transport process'
@@ -219,6 +220,21 @@ test('SupplyChain view model exposes lifecycle, custody, and exception structure
       .supplyChainCardFacts(transportProcess)
       .some((fact) => fact.label === 'Observed actions' && fact.value === '2 execution(s)'),
     true
+  );
+
+  const shockExcursion = parsed.supplyChain.find(
+    (el) => el.name === 'Shock telemetry exceeds SG-1 shipment threshold'
+  );
+  assert.equal(app.supplyChainTimeFactLabel(shockExcursion), 'Start time (2 seconds)');
+
+  assert.equal(app.supplyChainCarbonSummary.rows.length, 2);
+  assert.equal(app.supplyChainCarbonSummary.totalKg, 228.5);
+  assert.deepEqual(
+    app.supplyChainCarbonSummary.rows.map((row) => [row.kg, row.distanceKm, row.mode, row.pct]),
+    [
+      [186.4, 2380, 'road+air+road', 100],
+      [42.1, 542, 'road', 23]
+    ]
   );
 
   assert.equal(app.supplyChainExceptionChains.length, 1);
