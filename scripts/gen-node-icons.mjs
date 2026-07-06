@@ -59,6 +59,11 @@ const ICONS = {
   requirement_verification: 'fact_check',
   assumption: 'help',
   evaluation: 'assessment',
+  status_pass: 'check_circle',
+  status_fail: 'cancel',
+  status_inconclusive: 'help',
+  status_unverified: 'pending',
+  status_verified: 'verified',
   // Sidebar view glyphs that don't map onto an SPDX element type.
   view_dashboard: 'dashboard',
   view_graph: 'hub',

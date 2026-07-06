@@ -142,6 +142,7 @@ export const SAFETY_STATUSES = {
     color: '#f43f5e',
     badgeClass: 'bg-rose-500/15 text-rose-300 ring-1 ring-rose-500/30',
     dotClass: 'bg-rose-500',
+    iconKey: 'status_fail',
     rank: 5
   },
   inconclusive: {
@@ -150,6 +151,7 @@ export const SAFETY_STATUSES = {
     color: '#f59e0b',
     badgeClass: 'bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/30',
     dotClass: 'bg-amber-500',
+    iconKey: 'status_inconclusive',
     rank: 4
   },
   unverified: {
@@ -158,6 +160,7 @@ export const SAFETY_STATUSES = {
     color: '#64748b',
     badgeClass: 'bg-slate-600/20 text-slate-300 ring-1 ring-slate-500/30',
     dotClass: 'bg-slate-500',
+    iconKey: 'status_unverified',
     rank: 3
   },
   verified: {
@@ -166,6 +169,7 @@ export const SAFETY_STATUSES = {
     color: '#38bdf8',
     badgeClass: 'bg-sky-500/15 text-sky-300 ring-1 ring-sky-500/30',
     dotClass: 'bg-sky-500',
+    iconKey: 'status_verified',
     rank: 2
   },
   passed: {
@@ -174,6 +178,7 @@ export const SAFETY_STATUSES = {
     color: '#10b981',
     badgeClass: 'bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30',
     dotClass: 'bg-emerald-500',
+    iconKey: 'status_pass',
     rank: 1
   }
 };

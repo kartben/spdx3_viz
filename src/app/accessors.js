@@ -729,38 +729,22 @@ export const accessorsMixin = {
     if (!el || el.type !== 'Requirement') return null;
     const vers = this.requirementVerifications(el);
     if (!vers.length) {
-      return {
-        key: 'unverified',
-        label: 'Unverified',
-        badgeClass: 'bg-slate-600/20 text-slate-400'
-      };
+      return SAFETY_STATUSES.unverified;
     }
     const evals = vers.map((v) =>
       enumValue(v.evaluation?.functionalsafety_evaluation).toLowerCase()
     );
     if (evals.includes('fail')) {
-      return {
-        key: 'failed',
-        label: 'Verification failed',
-        badgeClass: 'bg-rose-500/15 text-rose-400'
-      };
+      return { ...SAFETY_STATUSES.failed, label: 'Verification failed' };
     }
     const decided = evals.filter(Boolean);
     if (decided.length && decided.every((e) => e === 'pass')) {
-      return {
-        key: 'passed',
-        label: 'Verified · pass',
-        badgeClass: 'bg-emerald-500/15 text-emerald-400'
-      };
+      return { ...SAFETY_STATUSES.passed, label: 'Verified · pass' };
     }
     if (evals.includes('inconclusive')) {
-      return {
-        key: 'inconclusive',
-        label: 'Inconclusive',
-        badgeClass: 'bg-amber-500/15 text-amber-400'
-      };
+      return SAFETY_STATUSES.inconclusive;
     }
-    return { key: 'verified', label: 'Verified', badgeClass: 'bg-sky-500/15 text-sky-400' };
+    return SAFETY_STATUSES.verified;
   },
 
   // Presentation metadata ({label, color, dotClass, badgeClass}) for a
@@ -841,11 +825,33 @@ export const accessorsMixin = {
     const token = enumValue(v);
     const key = token.toLowerCase();
     const map = {
-      pass: { label: 'Pass', badgeClass: 'bg-emerald-500/15 text-emerald-400' },
-      fail: { label: 'Fail', badgeClass: 'bg-rose-500/15 text-rose-400' },
-      inconclusive: { label: 'Inconclusive', badgeClass: 'bg-amber-500/15 text-amber-400' }
+      pass: {
+        key: 'pass',
+        label: 'Pass',
+        iconKey: 'status_pass',
+        badgeClass: 'bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/30'
+      },
+      fail: {
+        key: 'fail',
+        label: 'Fail',
+        iconKey: 'status_fail',
+        badgeClass: 'bg-rose-500/15 text-rose-400 ring-1 ring-rose-500/30'
+      },
+      inconclusive: {
+        key: 'inconclusive',
+        label: 'Inconclusive',
+        iconKey: 'status_inconclusive',
+        badgeClass: 'bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/30'
+      }
     };
-    return map[key] || { label: token, badgeClass: 'bg-slate-600/20 text-slate-300' };
+    return (
+      map[key] || {
+        key,
+        label: token,
+        iconKey: 'status_unverified',
+        badgeClass: 'bg-slate-600/20 text-slate-300 ring-1 ring-slate-500/30'
+      }
+    );
   },
 
   // Normalize an SPDX enumerated (vocab) value for display in a template. Kept
