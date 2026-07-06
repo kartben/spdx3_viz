@@ -52,6 +52,30 @@
     </div>
   </div>
   <div class="flex items-center gap-2 md:gap-3 flex-shrink-0">
+    <!-- Graph view hides the inline search box (the canvas has its own); this
+         button keeps the command palette reachable there without the keyboard. -->
+    <button
+      x-show="currentView === 'graph'"
+      @click="openPalette()"
+      type="button"
+      title="Search & commands"
+      aria-label="Open command palette"
+      class="inline-flex items-center gap-2 pl-2.5 pr-2 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-slate-400 hover:text-slate-200 hover:border-slate-600 transition-colors text-xs"
+    >
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+        />
+      </svg>
+      <span class="hidden sm:inline">Search</span>
+      <kbd
+        class="hidden md:inline px-1 py-0.5 text-[10px] font-medium bg-slate-700/60 border border-slate-600/50 rounded"
+        ><span x-text="isMac ? '⌘' : 'Ctrl'"></span>K</kbd
+      >
+    </button>
     <!-- Global search: fuzzy jump-to-anything across every element -->
     <div class="relative" x-show="currentView !== 'graph'" @click.outside="closeSearch()">
       <svg
@@ -96,6 +120,17 @@
             d="M6 18L18 6M6 6l12 12"
           />
         </svg>
+      </button>
+      <!-- ⌘K hint: opens the full command palette (search + actions) from anywhere -->
+      <button
+        x-show="!searchQuery"
+        @click="openPalette()"
+        type="button"
+        title="Open command palette"
+        aria-label="Open command palette"
+        class="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-medium text-slate-500 bg-slate-700/50 border border-slate-600/50 rounded hover:text-slate-300 hover:border-slate-500 transition-colors"
+      >
+        <span x-text="isMac ? '⌘' : 'Ctrl'"></span>K
       </button>
 
       <!-- Results dropdown -->
