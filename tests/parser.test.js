@@ -241,7 +241,14 @@ test('SupplyChain view model exposes lifecycle, custody, and exception structure
   assert.equal(app.supplyChainTransportLegs[0].route.includes('Austin secure staging'), true);
   assert.equal(app.supplyChainCustodyHandoffs.length, 2);
   assert.equal(app.supplyChainCustodyHandoffs[1].category, 'ownership');
-  assert.equal(app.supplyChainTimelineRows.length, 25);
+  assert.equal(app.supplyChainTimelineRows.length, 48);
+  assert.deepEqual(
+    app.supplyChainTimelineRows.slice(0, 2).map((row) => [row.kind, row.item.name]),
+    [
+      ['action', 'Define SG-1 shipment custody boundary'],
+      ['action', 'Intake recycled aluminum feedstock for enclosure lot']
+    ]
+  );
 
   const transportProcess = parsed.supplyChain.find(
     (el) => el.name === 'Controlled-lane transport process'

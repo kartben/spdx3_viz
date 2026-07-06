@@ -279,17 +279,20 @@ export const derivedMixin = {
   },
 
   get supplyChainTimelineRows() {
-    return this.supplyChainActions.map((action, index) => ({
-      action,
+    return this.filteredSupplyChain.map((item, index) => ({
+      item,
+      action: item,
       index,
-      family: this.supplyChainFamily(action),
-      status: this.supplyChainExceptionStatus(action),
-      duration: this.supplyChainDurationLabel(action),
-      route: this.supplyChainRoute(action),
-      state: this.supplyChainStateName(action),
-      carbonKg: this.supplyChainCarbonKg(action),
-      distanceKm: this.supplyChainDistanceKm(action),
-      mode: this.supplyChainTransportMode(action)
+      kind: this.supplyChainKind(item),
+      family: this.supplyChainFamily(item),
+      status: this.supplyChainExceptionStatus(item),
+      duration: this.supplyChainDurationLabel(item),
+      route: this.supplyChainRoute(item),
+      state: this.supplyChainStateName(item),
+      carbonKg: this.supplyChainCarbonKg(item),
+      distanceKm: this.supplyChainDistanceKm(item),
+      mode: this.supplyChainTransportMode(item),
+      time: item.startTime || item.endTime || ''
     }));
   },
 
@@ -434,11 +437,14 @@ export const derivedMixin = {
     return [...items].sort((a, b) => {
       const at = a.startTime || a.endTime || '';
       const bt = b.startTime || b.endTime || '';
-      if (at || bt)
+      if (at && !bt) return -1;
+      if (!at && bt) return 1;
+      if (at && bt) {
         return (
           at.localeCompare(bt) ||
           this.supplyChainTypeLabel(a).localeCompare(this.supplyChainTypeLabel(b))
         );
+      }
       return (
         (kindRank[this.supplyChainKind(a)] ?? 9) - (kindRank[this.supplyChainKind(b)] ?? 9) ||
         (a.name || this.cleanName(a.spdxId)).localeCompare(b.name || this.cleanName(b.spdxId))

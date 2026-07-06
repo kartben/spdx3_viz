@@ -212,63 +212,6 @@
   border-color: #475569;
 }
 
-.supply-card {
-  isolation: isolate;
-}
-
-.supply-card-glow {
-  z-index: -1;
-  opacity: 0.95;
-}
-
-.supply-card-create {
-  background:
-    radial-gradient(circle at 10% 10%, rgba(56, 189, 248, 0.22), transparent 34%),
-    linear-gradient(135deg, rgba(14, 165, 233, 0.12), rgba(15, 23, 42, 0.9) 46%, #1e293b);
-}
-
-.supply-card-move {
-  background:
-    radial-gradient(circle at 10% 10%, rgba(34, 211, 238, 0.24), transparent 34%),
-    linear-gradient(135deg, rgba(8, 145, 178, 0.14), rgba(15, 23, 42, 0.9) 46%, #1e293b);
-}
-
-.supply-card-verify {
-  background:
-    radial-gradient(circle at 10% 10%, rgba(167, 139, 250, 0.24), transparent 34%),
-    linear-gradient(135deg, rgba(124, 58, 237, 0.14), rgba(15, 23, 42, 0.9) 46%, #1e293b);
-}
-
-.supply-card-exception {
-  background:
-    radial-gradient(circle at 10% 10%, rgba(251, 113, 133, 0.26), transparent 34%),
-    linear-gradient(135deg, rgba(225, 29, 72, 0.14), rgba(15, 23, 42, 0.9) 46%, #1e293b);
-}
-
-.supply-card-operate {
-  background:
-    radial-gradient(circle at 10% 10%, rgba(52, 211, 153, 0.22), transparent 34%),
-    linear-gradient(135deg, rgba(5, 150, 105, 0.13), rgba(15, 23, 42, 0.9) 46%, #1e293b);
-}
-
-.supply-card-process {
-  background:
-    radial-gradient(circle at 10% 10%, rgba(129, 140, 248, 0.22), transparent 34%),
-    linear-gradient(135deg, rgba(79, 70, 229, 0.13), rgba(15, 23, 42, 0.9) 46%, #1e293b);
-}
-
-.supply-card-state {
-  background:
-    radial-gradient(circle at 10% 10%, rgba(45, 212, 191, 0.22), transparent 34%),
-    linear-gradient(135deg, rgba(13, 148, 136, 0.13), rgba(15, 23, 42, 0.9) 46%, #1e293b);
-}
-
-.supply-card-other {
-  background:
-    radial-gradient(circle at 10% 10%, rgba(148, 163, 184, 0.18), transparent 34%),
-    linear-gradient(135deg, rgba(71, 85, 105, 0.13), rgba(15, 23, 42, 0.9) 46%, #1e293b);
-}
-
 .target-focus {
   border-color: #60a5fa !important;
   box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.35);
