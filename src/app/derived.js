@@ -279,12 +279,13 @@ export const derivedMixin = {
   },
 
   get supplyChainTimelineRows() {
-    return this.filteredSupplyChain.map((item, index) => ({
+    const rows = this.filteredSupplyChain.map((item, index) => ({
       item,
       action: item,
       index,
       kind: this.supplyChainKind(item),
       family: this.supplyChainFamily(item),
+      phase: this.supplyChainFamilyMeta(item).label,
       status: this.supplyChainExceptionStatus(item),
       duration: this.supplyChainDurationLabel(item),
       route: this.supplyChainRoute(item),
@@ -294,6 +295,26 @@ export const derivedMixin = {
       mode: this.supplyChainTransportMode(item),
       time: item.startTime || item.endTime || ''
     }));
+    // Day dividers and elapsed-time markers add breathing room and temporal
+    // orientation to the chronological list. Computed over the filtered set so
+    // gaps reflect only the events actually shown.
+    let prevDay = null;
+    let prevMs = null;
+    for (const row of rows) {
+      const ms = row.time ? Date.parse(row.time) : NaN;
+      const day = Number.isFinite(ms) ? row.time.slice(0, 10) : null;
+      row.newDay = Boolean(day) && day !== prevDay;
+      row.dayLabel = row.newDay ? this.supplyChainDayHeading(row.time) : '';
+      row.gapLabel =
+        Number.isFinite(ms) && Number.isFinite(prevMs)
+          ? this.supplyChainElapsedLabel(prevMs, ms)
+          : '';
+      if (Number.isFinite(ms)) {
+        prevDay = day;
+        prevMs = ms;
+      }
+    }
+    return rows;
   },
 
   get supplyChainCarbonSummary() {
@@ -409,6 +430,321 @@ export const derivedMixin = {
       }
     ];
     return lanes.filter((lane) => lane.items.length);
+  },
+
+  // Chain-of-custody relay: the ordered list of parties responsible for the
+  // tracked product, each with the transport legs and checkpoints that happened
+  // on their watch. Seeds the first holder from the earliest handoff's previous
+  // party, then advances at each ResponsibilityChangeAction.
+  get supplyChainCustodyJourney() {
+    const handoffs = this.supplyChainCustodyHandoffs;
+    const actions = this.supplyChainActions;
+    if (!handoffs.length || !actions.length) return [];
+    const firstTime = actions[0].startTime || actions[0].endTime || '';
+    const last = actions[actions.length - 1];
+    const lastTime = last.endTime || last.startTime || '';
+    const points = [
+      { holder: handoffs[0].previous, category: '', gainedVia: null, start: firstTime },
+      ...handoffs.map((h) => ({
+        holder: h.current,
+        category: h.category,
+        gainedVia: h,
+        start: h.action.endTime || h.action.startTime || ''
+      }))
+    ];
+    return points.map((p, i) => {
+      const next = points[i + 1];
+      const end = next ? next.gainedVia.action.startTime || next.start : lastTime;
+      const inWindow = (a) => {
+        const t = a.startTime || a.endTime || '';
+        if (!t || t < p.start) return false;
+        return next ? t < end : true;
+      };
+      const windowActions = actions.filter(inWindow);
+      const legs = windowActions
+        .filter((a) => isA(a.type, CLASS.supplychain_TransportAction))
+        .map((a) => ({
+          action: a,
+          route: this.supplyChainRoute(a),
+          mode: this.supplyChainTransportMode(a),
+          distanceKm: this.supplyChainDistanceKm(a),
+          carbonKg: this.supplyChainCarbonKg(a),
+          duration: this.supplyChainDurationLabel(a)
+        }));
+      const checkpoints = windowActions
+        .filter(
+          (a) =>
+            !isA(a.type, CLASS.supplychain_TransportAction) &&
+            !isA(a.type, CLASS.supplychain_StateAction) &&
+            !isA(a.type, CLASS.supplychain_ResponsibilityChangeAction) &&
+            !isA(a.type, CLASS.supplychain_BoundaryDefinitionAction)
+        )
+        .map((a) => ({
+          action: a,
+          family: this.supplyChainFamily(a),
+          meta: this.supplyChainFamilyMeta(a),
+          status: this.supplyChainExceptionStatus(a)
+        }));
+      const startMs = Date.parse(p.start);
+      const endMs = Date.parse(end);
+      return {
+        holder: p.holder,
+        name: p.holder ? p.holder.name || this.cleanName(p.holder.spdxId) : 'Unassigned',
+        summary: p.holder?.summary || '',
+        role: i === 0 ? 'origin' : p.category || 'custody',
+        gainedVia: p.gainedVia,
+        handoffLocation: p.gainedVia
+          ? this.supplyChainRefName(p.gainedVia.action.actionLocation)
+          : '',
+        start: p.start,
+        end,
+        duration: this.supplyChainElapsedLabel(startMs, endMs),
+        legs,
+        checkpoints,
+        exceptions: checkpoints.filter((c) => c.status?.key === 'exception').length,
+        distanceKm: legs.reduce((s, l) => s + (l.distanceKm || 0), 0),
+        carbonKg: legs.reduce((s, l) => s + (l.carbonKg || 0), 0),
+        index: i
+      };
+    });
+  },
+
+  // Product lifecycle as an ordered set of state transitions (StateActions), each
+  // enriched with the state's meaning, when/where it happened, the decision
+  // process that drove it, and a tone (positive / exception / neutral) for the
+  // stepper node colour.
+  get supplyChainLifecycleSteps() {
+    return this.supplyChainStateTransitions.map((t) => {
+      const name = t.state
+        ? t.state.name || this.cleanName(t.state.spdxId)
+        : this.supplyChainStateName(t.action) || '—';
+      let tone = 'neutral';
+      if (/quarantine|out.?of.?spec|reject|fail|hold/i.test(name)) tone = 'exception';
+      else if (/accept|pass|deploy|resolv|complete|provision/i.test(name)) tone = 'positive';
+      return {
+        action: t.action,
+        state: t.state,
+        name,
+        description: t.state?.description || t.state?.summary || '',
+        time: t.action.startTime || t.action.endTime || '',
+        location: this.supplyChainRefName(t.action.actionLocation),
+        decisionProcess: t.decisionProcess
+          ? t.decisionProcess.name || this.cleanName(t.decisionProcess.spdxId)
+          : '',
+        performers: this.supplyChainPerformerNames(t.action),
+        evidence: this.supplyChainEvidenceCount(t.action),
+        status: t.status,
+        tone
+      };
+    });
+  },
+
+  // Route map geometry: ordered stops (transport pickup/dropoff spine plus any
+  // other action locations) projected onto an equirectangular viewBox, with the
+  // transport legs as bowed connectors coloured by mode. Falls back to a
+  // schematic left-to-right layout when fewer than two stops can be geocoded.
+  get supplyChainRouteMap() {
+    const legs = this.supplyChainTransportLegs;
+    const actions = this.supplyChainActions;
+    // Distinct places, keyed by city (so several facilities in one city collapse
+    // to a single pin even when their geographicPointLocation coordinates
+    // differ), falling back to coordinate or id. The route follows the tracked
+    // product's handling, so component-origin (create/manufacture/harvest)
+    // locations are left off the route; they belong to the custody and timeline
+    // angles.
+    const placeKey = (loc) => {
+      const c = this.supplyChainGeocode(loc);
+      const city = String(loc.city || '')
+        .trim()
+        .toLowerCase();
+      const key = city
+        ? `${city}|${String(loc.country || '').toLowerCase()}`
+        : c
+          ? `${c.lat},${c.lng}`
+          : loc.spdxId;
+      return { key, coord: c };
+    };
+    const spdxToKey = new Map();
+    const keyInfo = new Map();
+    const keyOrder = [];
+    const consider = (loc) => {
+      if (!loc) return;
+      const { key, coord } = placeKey(loc);
+      spdxToKey.set(loc.spdxId, key);
+      if (!keyInfo.has(key)) {
+        keyInfo.set(key, { loc, coord });
+        keyOrder.push(key);
+      }
+    };
+    for (const leg of legs) {
+      consider(leg.pickup);
+      consider(leg.dropoff);
+    }
+    for (const a of actions) {
+      if (this.supplyChainFamily(a) === 'create') continue;
+      consider(this.elementMap.get(a.actionLocation));
+    }
+    if (!keyOrder.length) {
+      return { stops: [], connectors: [], projected: false, viewBox: '0 0 1000 460' };
+    }
+    // Order pins by when the product first reaches each place.
+    const timeByKey = new Map();
+    for (const a of actions) {
+      if (this.supplyChainFamily(a) === 'create') continue;
+      const loc = this.elementMap.get(a.actionLocation);
+      if (!loc) continue;
+      const key = spdxToKey.get(loc.spdxId);
+      const t = a.startTime || a.endTime || '';
+      if (t && (!timeByKey.has(key) || t < timeByKey.get(key))) timeByKey.set(key, t);
+    }
+    const geo = keyOrder
+      .map((key) => ({ key, ...keyInfo.get(key) }))
+      .sort((a, b) => {
+        const ta = timeByKey.get(a.key) || '';
+        const tb = timeByKey.get(b.key) || '';
+        if (ta && tb) return ta.localeCompare(tb);
+        if (ta) return -1;
+        if (tb) return 1;
+        return 0;
+      });
+
+    const W = 1000;
+    const H = 460;
+    const padX = 90;
+    const padY = 70;
+    const geocoded = geo.filter((g) => g.coord);
+    const projected = geocoded.length >= 2;
+
+    let placed;
+    if (projected) {
+      const lats = geocoded.map((g) => g.coord.lat);
+      const lngs = geocoded.map((g) => g.coord.lng);
+      let minLat = Math.min(...lats);
+      let maxLat = Math.max(...lats);
+      let minLng = Math.min(...lngs);
+      let maxLng = Math.max(...lngs);
+      const latPad = Math.max(0.5, (maxLat - minLat) * 0.14);
+      const lngPad = Math.max(0.5, (maxLng - minLng) * 0.14);
+      minLat -= latPad;
+      maxLat += latPad;
+      minLng -= lngPad;
+      maxLng += lngPad;
+      const project = (c) => ({
+        x: padX + ((c.lng - minLng) / (maxLng - minLng)) * (W - 2 * padX),
+        y: padY + ((maxLat - c.lat) / (maxLat - minLat)) * (H - 2 * padY)
+      });
+      placed = geo.map((g, i) =>
+        g.coord
+          ? { key: g.key, loc: g.loc, ...project(g.coord), geocoded: true }
+          : {
+              key: g.key,
+              loc: g.loc,
+              x: padX + (i / Math.max(1, geo.length - 1)) * (W - 2 * padX),
+              y: H / 2,
+              geocoded: false
+            }
+      );
+    } else {
+      placed = geo.map((g, i) => ({
+        key: g.key,
+        loc: g.loc,
+        x: padX + (i / Math.max(1, geo.length - 1)) * (W - 2 * padX),
+        y: H / 2 + (i % 2 ? 30 : -30),
+        geocoded: false
+      }));
+    }
+
+    const posByKey = new Map(placed.map((p) => [p.key, p]));
+    const stops = placed.map((p, i) => ({
+      spdxId: p.loc.spdxId,
+      x: Number(p.x.toFixed(1)),
+      y: Number(p.y.toFixed(1)),
+      order: i + 1,
+      geocoded: p.geocoded,
+      name: p.loc.name || this.cleanName(p.loc.spdxId),
+      place: this.supplyChainPlaceLabel(p.loc),
+      role: this.supplyChainStopRole(p.loc)
+    }));
+
+    const connectors = legs
+      .map((leg) => {
+        const a = leg.pickup ? posByKey.get(spdxToKey.get(leg.pickup.spdxId)) : null;
+        const b = leg.dropoff ? posByKey.get(spdxToKey.get(leg.dropoff.spdxId)) : null;
+        if (!a || !b) return null;
+        const mx = (a.x + b.x) / 2;
+        const my = (a.y + b.y) / 2;
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const len = Math.hypot(dx, dy) || 1;
+        const bow = Math.min(90, len * 0.24);
+        const cx = mx + (-dy / len) * bow;
+        const cy = my + (dx / len) * bow;
+        return {
+          id: leg.action.spdxId,
+          action: leg.action,
+          d: `M ${a.x.toFixed(1)} ${a.y.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${b.x.toFixed(1)} ${b.y.toFixed(1)}`,
+          labelX: Number(cx.toFixed(1)),
+          labelY: Number(cy.toFixed(1)),
+          mode: this.supplyChainTransportMode(leg.action),
+          color: this.supplyChainModeColor(this.supplyChainTransportMode(leg.action)),
+          distanceKm: this.supplyChainDistanceKm(leg.action),
+          carbonKg: this.supplyChainCarbonKg(leg.action),
+          route: leg.route
+        };
+      })
+      .filter(Boolean);
+
+    return {
+      stops,
+      connectors,
+      projected,
+      viewBox: `0 0 ${W} ${H}`,
+      totalDistanceKm: connectors.reduce((s, c) => s + (c.distanceKm || 0), 0),
+      totalCarbonKg: connectors.reduce((s, c) => s + (c.carbonKg || 0), 0)
+    };
+  },
+
+  // The route map as a self-contained SVG string for x-html. Kept a string (not
+  // inline template markup) because Alpine's <template x-for> is illegal inside
+  // <svg> foreign content. Stops/legs carry data-sc-* ids for delegated clicks.
+  get supplyChainRouteMapSvg() {
+    const map = this.supplyChainRouteMap;
+    if (!map.stops.length) return '';
+    const esc = (v) =>
+      String(v == null ? '' : v).replace(
+        /[&<>"]/g,
+        (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]
+      );
+    const km = (v) => `${Math.round(v).toLocaleString()} km`;
+    const grid =
+      [92, 184, 276, 368].map((y) => `<line x1="0" y1="${y}" x2="1000" y2="${y}"/>`).join('') +
+      [200, 400, 600, 800].map((x) => `<line x1="${x}" y1="0" x2="${x}" y2="460"/>`).join('');
+    const conns = map.connectors
+      .map((c) => {
+        const label = this.formatCarbonKg(c.carbonKg) || (c.distanceKm ? km(c.distanceKm) : c.mode);
+        return (
+          `<path d="${c.d}" fill="none" stroke="${c.color}" stroke-width="2.5" stroke-linecap="round" class="sc-flow" opacity="0.9"/>` +
+          `<g class="cursor-pointer" data-sc-action="${esc(c.action.spdxId)}">` +
+          `<rect x="${c.labelX - 36}" y="${c.labelY - 10}" width="72" height="18" rx="9" fill="#0f172a" stroke="#334155"/>` +
+          `<text x="${c.labelX}" y="${c.labelY + 3}" text-anchor="middle" font-size="10" font-weight="600" fill="${c.color}">${esc(label)}</text></g>`
+        );
+      })
+      .join('');
+    const stops = map.stops
+      .map(
+        (s) =>
+          `<g class="cursor-pointer" data-sc-loc="${esc(s.spdxId)}">` +
+          `<circle cx="${s.x}" cy="${s.y}" r="12" fill="none" stroke="${s.role.color}" stroke-width="1" opacity="0.4"/>` +
+          `<circle cx="${s.x}" cy="${s.y}" r="6.5" fill="${s.role.color}" stroke="#0b1220" stroke-width="2"/>` +
+          `<text x="${s.x}" y="${s.y - 16}" text-anchor="middle" font-size="11.5" font-weight="600" fill="#e2e8f0">${esc(s.place || s.name)}</text>` +
+          `<text x="${s.x}" y="${s.y + 23}" text-anchor="middle" font-size="9.5" fill="${s.role.color}">${esc(`#${s.order} · ${s.role.label}`)}</text></g>`
+      )
+      .join('');
+    return (
+      `<svg viewBox="${map.viewBox}" class="w-full block" preserveAspectRatio="xMidYMid meet" style="aspect-ratio:1000/460">` +
+      `<rect x="0" y="0" width="1000" height="460" fill="#0b1220"/>` +
+      `<g stroke="#152033" stroke-width="1">${grid}</g>${conns}${stops}</svg>`
+    );
   },
 
   get filteredSupplyChain() {

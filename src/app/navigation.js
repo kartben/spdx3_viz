@@ -893,6 +893,7 @@ export const navigationMixin = {
     this.supplyChainSearch = '';
     this.supplyChainKindFilter = '';
     this.supplyChainExceptionFilter = '';
+    this.supplyChainViewMode = 'timeline'; // the expanded card lives in the timeline list
     this.switchView('supplychain');
     this.expandedSupplyChain = spdxId;
     this.scrollToNavTarget('supplychain', spdxId);

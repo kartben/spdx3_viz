@@ -43,6 +43,72 @@ import hljs from '../lib/highlight.js';
 // via a "+N more" indicator (mirrors agentLinkGroups' CAP).
 const DETAIL_REL_CAP = 50;
 
+// Coarse gazetteer for the Supply Chain route map. SPDX PhysicalLocation carries
+// city / country (ISO 3166-1 alpha-3) but no coordinates, so we resolve a rough
+// lat/lng from the city name, falling back to a country centroid. Anything we
+// cannot place drops to a schematic left-to-right layout, so this list only has
+// to cover common places well; it never needs to be exhaustive.
+const CITY_GAZETTEER = {
+  austin: { lat: 30.27, lng: -97.74 },
+  dayton: { lat: 39.76, lng: -84.19 },
+  hsinchu: { lat: 24.8, lng: 120.97 },
+  penang: { lat: 5.41, lng: 100.33 },
+  'george town': { lat: 5.41, lng: 100.33 },
+  'los angeles': { lat: 34.05, lng: -118.24 },
+  denver: { lat: 39.74, lng: -104.99 },
+  rawlins: { lat: 41.79, lng: -107.24 },
+  phoenix: { lat: 33.45, lng: -112.07 },
+  'new york': { lat: 40.71, lng: -74.01 },
+  'san francisco': { lat: 37.77, lng: -122.42 },
+  seattle: { lat: 47.61, lng: -122.33 },
+  chicago: { lat: 41.88, lng: -87.63 },
+  boston: { lat: 42.36, lng: -71.06 },
+  london: { lat: 51.51, lng: -0.13 },
+  paris: { lat: 48.85, lng: 2.35 },
+  berlin: { lat: 52.52, lng: 13.4 },
+  munich: { lat: 48.14, lng: 11.58 },
+  tokyo: { lat: 35.68, lng: 139.69 },
+  shanghai: { lat: 31.23, lng: 121.47 },
+  shenzhen: { lat: 22.54, lng: 114.06 },
+  taipei: { lat: 25.03, lng: 121.57 },
+  singapore: { lat: 1.35, lng: 103.82 },
+  bangalore: { lat: 12.97, lng: 77.59 },
+  bengaluru: { lat: 12.97, lng: 77.59 },
+  sydney: { lat: -33.87, lng: 151.21 },
+  toronto: { lat: 43.65, lng: -79.38 }
+};
+const COUNTRY_CENTROID = {
+  usa: { lat: 39.5, lng: -98.35 },
+  us: { lat: 39.5, lng: -98.35 },
+  twn: { lat: 23.7, lng: 121.0 },
+  mys: { lat: 4.2, lng: 102.0 },
+  chn: { lat: 35.0, lng: 103.0 },
+  jpn: { lat: 36.2, lng: 138.3 },
+  deu: { lat: 51.2, lng: 10.4 },
+  gbr: { lat: 54.0, lng: -2.0 },
+  fra: { lat: 46.2, lng: 2.2 },
+  ind: { lat: 21.0, lng: 78.0 },
+  kor: { lat: 36.5, lng: 127.8 },
+  sgp: { lat: 1.35, lng: 103.8 },
+  can: { lat: 56.1, lng: -106.3 },
+  mex: { lat: 23.6, lng: -102.5 },
+  bra: { lat: -14.2, lng: -51.9 },
+  aus: { lat: -25.3, lng: 133.8 }
+};
+
+// Role of a location on the route map, inferred from its name. Drives the marker
+// colour/label so origins, hubs, labs and destinations read at a glance.
+const STOP_ROLES = [
+  [/control tower|hq|headquarter/i, { label: 'Control tower', color: '#38bdf8' }],
+  [/assembly|final assembl/i, { label: 'Assembly', color: '#818cf8' }],
+  [/fab|line|smt|wafer|foundry|element/i, { label: 'Manufacturing', color: '#a78bfa' }],
+  [/warehouse|staging|storage/i, { label: 'Storage', color: '#2dd4bf' }],
+  [/hub|air-freight|airport|port|terminal/i, { label: 'Transit hub', color: '#22d3ee' }],
+  [/lab|inspection|receiving/i, { label: 'Inspection lab', color: '#c084fc' }],
+  [/site|substation|farm|plant|deploy/i, { label: 'Deployment site', color: '#34d399' }],
+  [/recovery|destruction|recycl/i, { label: 'Recovery', color: '#fb7185' }]
+];
+
 export const accessorsMixin = {
   cleanName(spdxId) {
     return formatSpdxName(spdxId);
@@ -499,8 +565,165 @@ export const accessorsMixin = {
     return `${new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(value)} kg CO₂e`;
   },
 
+  // Compact elapsed-time label between two epoch-ms instants, for timeline gap
+  // markers and custody-segment durations ("45m", "3h 20m", "1d 4h", "2 days").
+  supplyChainElapsedLabel(fromMs, toMs) {
+    if (!Number.isFinite(fromMs) || !Number.isFinite(toMs)) return '';
+    const secs = Math.round((toMs - fromMs) / 1000);
+    if (secs <= 0) return '';
+    if (secs < 60) return `${secs}s`;
+    const mins = Math.round(secs / 60);
+    if (mins < 60) return `${mins}m`;
+    const hours = Math.floor(mins / 60);
+    const remMins = mins % 60;
+    if (hours < 24) return remMins ? `${hours}h ${remMins}m` : `${hours}h`;
+    const days = Math.floor(hours / 24);
+    const remHours = hours % 24;
+    if (days < 3) return remHours ? `${days}d ${remHours}h` : `${days}d`;
+    return `${days} days`;
+  },
+
+  // Day divider heading for the timeline ("Sat, 28 Jun 2026").
+  supplyChainDayHeading(dateStr) {
+    const ms = Date.parse(dateStr);
+    if (!Number.isFinite(ms)) return '';
+    try {
+      return new Date(ms).toLocaleDateString(undefined, {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      });
+    } catch {
+      return String(dateStr).slice(0, 10);
+    }
+  },
+
+  // Colour for a transport mode on the route map / custody legs. A mixed mode
+  // ("road+air+road") takes the colour of its "highest" leg (air > sea > rail > road).
+  supplyChainModeColor(mode) {
+    const m = String(mode || '').toLowerCase();
+    if (/air|flight/.test(m)) return '#a78bfa';
+    if (/sea|ocean|ship|vessel/.test(m)) return '#38bdf8';
+    if (/rail|train/.test(m)) return '#fbbf24';
+    if (/road|truck|van|freight/.test(m)) return '#22d3ee';
+    return '#94a3b8';
+  },
+
+  // "Austin, TX, USA" style place label from a PhysicalLocation's parts.
+  supplyChainPlaceLabel(loc) {
+    if (!loc) return '';
+    return [loc.city, loc.provinceStateCode, loc.country].filter(Boolean).join(', ');
+  },
+
+  // Inferred role of a route-map stop (origin / hub / lab / destination …).
+  supplyChainStopRole(loc) {
+    const text = loc?.name || '';
+    for (const [pattern, meta] of STOP_ROLES) {
+      if (pattern.test(text)) return meta;
+    }
+    return { label: 'Location', color: '#94a3b8' };
+  },
+
+  // Parses an ISO 6709:2022 point string (signed decimal latitude then
+  // longitude, e.g. "+30.2672-097.7431/") into { lat, lng }, or null.
+  parseGeoPoint(value) {
+    const m = /([+-]\d{1,3}(?:\.\d+)?)([+-]\d{1,3}(?:\.\d+)?)/.exec(String(value || ''));
+    if (!m) return null;
+    const lat = Number.parseFloat(m[1]);
+    const lng = Number.parseFloat(m[2]);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+    if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
+    return { lat, lng };
+  },
+
+  // lat/lng for a PhysicalLocation: the SBOM's own geographicPointLocation
+  // (ISO 6709) first, then a coarse city / country-centroid fallback for
+  // documents that omit coordinates. null when nothing resolves.
+  supplyChainGeocode(loc) {
+    if (!loc) return null;
+    const point = Array.isArray(loc.geographicPointLocation)
+      ? loc.geographicPointLocation[0]
+      : loc.geographicPointLocation;
+    const fromPoint = this.parseGeoPoint(point);
+    if (fromPoint) return fromPoint;
+    const city = String(loc.city || '')
+      .trim()
+      .toLowerCase();
+    if (city && CITY_GAZETTEER[city]) return CITY_GAZETTEER[city];
+    const country = String(loc.country || '')
+      .trim()
+      .toLowerCase();
+    if (country && COUNTRY_CENTROID[country]) return COUNTRY_CENTROID[country];
+    return null;
+  },
+
+  // Compact clock label for a timeline card header. Within a single day the date
+  // is redundant (the day divider shows it), so we render just the times; a
+  // cross-day action keeps the full range.
+  supplyChainClock(el) {
+    if (!el?.startTime && !el?.endTime) return '';
+    const time = (s) => {
+      const ms = Date.parse(s);
+      if (!Number.isFinite(ms)) return '';
+      try {
+        return new Date(ms).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+      } catch {
+        return '';
+      }
+    };
+    if (el.startTime && el.endTime && el.startTime !== el.endTime) {
+      const sameDay = el.startTime.slice(0, 10) === el.endTime.slice(0, 10);
+      if (sameDay) return `${time(el.startTime)} → ${time(el.endTime)}`;
+      return `${this.formatDate(el.startTime)} → ${this.formatDate(el.endTime)}`;
+    }
+    return this.formatDate(el.startTime || el.endTime);
+  },
+
+  // Delegated click for the x-html route map: a leg opens its transport action,
+  // a stop opens its location.
+  supplyChainMapClick(e) {
+    const el = e?.target?.closest?.('[data-sc-action],[data-sc-loc]');
+    if (!el) return;
+    if (el.dataset.scAction) this.navigateToSupplyChain(el.dataset.scAction);
+    else if (el.dataset.scLoc) this.navigateTo(el.dataset.scLoc);
+  },
+
+  // Inline stroke icon for the Supply Chain angle switcher.
+  supplyChainModeIcon(key) {
+    const d = {
+      timeline: 'M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01',
+      custody: 'M7 16V4m0 0L4 7m3-3l3 3M17 8v12m0 0l3-3m-3 3l-3-3',
+      lifecycle:
+        'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4',
+      map: 'M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 4m0 13V4m0 0L9 7'
+    }[key];
+    if (!d) return '';
+    return `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${d}"/></svg>`;
+  },
+
   supplyChainRefName(id) {
     return id ? this.relTargetDisplayName(id) : '';
+  },
+
+  // BoundaryDefinitionAction.boundaryParameter is a set of DictionaryEntry
+  // values ("key=value"). Older data may instead carry a single element
+  // reference, so fall back to a ref-name lookup for a plain string.
+  supplyChainBoundaryParamLabel(el) {
+    const bp = el?.supplychain_boundaryParameter;
+    if (!bp) return '';
+    const entries = Array.isArray(bp) ? bp : [bp];
+    return entries
+      .map((entry) => {
+        if (entry && typeof entry === 'object') {
+          const key = entry.key ?? '';
+          const value = entry.value ?? '';
+          return key ? `${key}=${value}` : String(value);
+        }
+        return this.supplyChainRefName(entry);
+      })
+      .filter(Boolean)
+      .join(' · ');
   },
 
   supplyChainRoute(el) {
@@ -570,7 +793,7 @@ export const accessorsMixin = {
     push('Transport mode', this.supplyChainTransportMode(el));
     push('Current state', this.supplyChainStateName(el));
     push('Decision process', this.supplyChainRefName(el?.supplychain_decisionProcess));
-    push('Boundary parameter', this.supplyChainRefName(el?.supplychain_boundaryParameter));
+    push('Boundary parameter', this.supplyChainBoundaryParamLabel(el));
     push('Destruction by', this.supplyChainRefName(el?.supplychain_destructionPerformedBy));
     const responsibility = this.supplyChainResponsibility(el);
     if (responsibility) {
