@@ -1,0 +1,3147 @@
+{
+  "@context": "https://spdx.github.io/spdx-spec/v3.1/rdf/spdx-context.jsonld",
+  "@graph": [
+    {
+      "type": "SpdxDocument",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#document",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "ArborLink SG-1 synthetic SPDX 3.1 SupplyChain sample",
+      "dataLicense": "https://spdx.org/licenses/CC0-1.0",
+      "namespaceMap": [
+        {
+          "type": "NamespaceMap",
+          "prefix": "arborlink",
+          "namespace": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#"
+        }
+      ],
+      "profileConformance": [
+        "core",
+        "software",
+        "hardware",
+        "build",
+        "security",
+        "simpleLicensing",
+        "supplyChain"
+      ],
+      "rootElement": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#sbom/arborlink-sg1",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/device/sg1-sn-26-000042"
+      ],
+      "summary": "Demonstrates SPDX 3.1 SupplyChain concepts across creation, transport, use, exception handling, resolution, and decommission planning."
+    },
+    {
+      "type": "CreationInfo",
+      "@id": "_:arborlink-sg1-creation-info",
+      "specVersion": "3.1",
+      "created": "2026-07-06T09:30:00Z",
+      "createdBy": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/arbor-devices",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/person/mira-patel"
+      ],
+      "createdUsing": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#tool/synthetic-supply-chain-generator"
+      ],
+      "comment": "Synthetic, deterministic sample. No real product, shipment, person, or vulnerability is represented."
+    },
+    {
+      "type": "Organization",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/arbor-devices",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Arbor Devices, Inc. (fictional)",
+      "summary": "Fictional secure industrial gateway producer and SBOM author.",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "email",
+          "identifier": "arbor-devices@example.invalid",
+          "issuingAuthority": "Arbor Devices (fictional)",
+          "comment": "Synthetic contact address"
+        }
+      ]
+    },
+    {
+      "type": "Organization",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/siliconforge",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "SiliconForge Components (fictional)",
+      "summary": "Fictional supplier of compute modules and secure elements.",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "email",
+          "identifier": "siliconforge@example.invalid",
+          "issuingAuthority": "Arbor Devices (fictional)",
+          "comment": "Synthetic contact address"
+        }
+      ]
+    },
+    {
+      "type": "Organization",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/boardfab",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "BoardFab EMS Malaysia (fictional)",
+      "summary": "Fictional electronics manufacturing services partner.",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "email",
+          "identifier": "boardfab@example.invalid",
+          "issuingAuthority": "Arbor Devices (fictional)",
+          "comment": "Synthetic contact address"
+        }
+      ]
+    },
+    {
+      "type": "Organization",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/secureseal",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "SecureSeal Enclosures (fictional)",
+      "summary": "Fictional enclosure and tamper-seal manufacturer.",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "email",
+          "identifier": "secureseal@example.invalid",
+          "issuingAuthority": "Arbor Devices (fictional)",
+          "comment": "Synthetic contact address"
+        }
+      ]
+    },
+    {
+      "type": "Organization",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/futura-logistics",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Futura Logistics (fictional)",
+      "summary": "Fictional carrier providing custody, storage, and lane telemetry.",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "email",
+          "identifier": "futura-logistics@example.invalid",
+          "issuingAuthority": "Arbor Devices (fictional)",
+          "comment": "Synthetic contact address"
+        }
+      ]
+    },
+    {
+      "type": "Organization",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/assurance-lab",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Independent Assurance Lab Denver (fictional)",
+      "summary": "Fictional receiving inspection and security test laboratory.",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "email",
+          "identifier": "assurance-lab@example.invalid",
+          "issuingAuthority": "Arbor Devices (fictional)",
+          "comment": "Synthetic contact address"
+        }
+      ]
+    },
+    {
+      "type": "Organization",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/edgeops",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "EdgeOps Energy (fictional)",
+      "summary": "Fictional operator deploying the gateway at an industrial site.",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "email",
+          "identifier": "edgeops@example.invalid",
+          "issuingAuthority": "Arbor Devices (fictional)",
+          "comment": "Synthetic contact address"
+        }
+      ]
+    },
+    {
+      "type": "Organization",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/circular-recoveries",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Circular Recoveries LLC (fictional)",
+      "summary": "Fictional recycling and secure-destruction partner.",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "email",
+          "identifier": "circular-recoveries@example.invalid",
+          "issuingAuthority": "Arbor Devices (fictional)",
+          "comment": "Synthetic contact address"
+        }
+      ]
+    },
+    {
+      "type": "Person",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/person/mira-patel",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Mira Patel",
+      "summary": "Supply-chain security lead in the fictional ArborLink SG-1 program.",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "email",
+          "identifier": "mira-patel@arbor.example.invalid",
+          "issuingAuthority": "Arbor Devices (fictional)",
+          "comment": "Synthetic person contact address"
+        }
+      ]
+    },
+    {
+      "type": "Person",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/person/owen-ross",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Owen Ross",
+      "summary": "Manufacturing quality engineer in the fictional ArborLink SG-1 program.",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "email",
+          "identifier": "owen-ross@arbor.example.invalid",
+          "issuingAuthority": "Arbor Devices (fictional)",
+          "comment": "Synthetic person contact address"
+        }
+      ]
+    },
+    {
+      "type": "Person",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/person/nina-cho",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Nina Cho",
+      "summary": "Logistics coordinator in the fictional ArborLink SG-1 program.",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "email",
+          "identifier": "nina-cho@arbor.example.invalid",
+          "issuingAuthority": "Arbor Devices (fictional)",
+          "comment": "Synthetic person contact address"
+        }
+      ]
+    },
+    {
+      "type": "Person",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/person/samir-ali",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Samir Ali",
+      "summary": "Receiving inspection lead in the fictional ArborLink SG-1 program.",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "email",
+          "identifier": "samir-ali@arbor.example.invalid",
+          "issuingAuthority": "Arbor Devices (fictional)",
+          "comment": "Synthetic person contact address"
+        }
+      ]
+    },
+    {
+      "type": "Person",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/person/claire-dubois",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Claire Dubois",
+      "summary": "Product security engineer in the fictional ArborLink SG-1 program.",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "email",
+          "identifier": "claire-dubois@arbor.example.invalid",
+          "issuingAuthority": "Arbor Devices (fictional)",
+          "comment": "Synthetic person contact address"
+        }
+      ]
+    },
+    {
+      "type": "Tool",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#tool/synthetic-supply-chain-generator",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Synthetic SPDX 3.1 SupplyChain sample generator",
+      "version": "1.0.0",
+      "summary": "Deterministic generator for the ArborLink SG-1 synthetic supply-chain sample."
+    },
+    {
+      "type": "Tool",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#tool/syft",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Syft",
+      "version": "1.28.0",
+      "summary": "Container and filesystem SBOM scanner used in the fictional build pipeline.",
+      "externalRef": [
+        {
+          "type": "ExternalRef",
+          "externalRefType": "altWebPage",
+          "locator": [
+            "https://github.com/anchore/syft"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Tool",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#tool/trivy",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Trivy",
+      "version": "0.63.0",
+      "summary": "Vulnerability scanner used to enrich the fictional release SBOM.",
+      "externalRef": [
+        {
+          "type": "ExternalRef",
+          "externalRefType": "altWebPage",
+          "locator": [
+            "https://github.com/aquasecurity/trivy"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Tool",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#tool/slsa-provenance-generator",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "SLSA provenance generator",
+      "version": "2.1.0",
+      "summary": "Build provenance emitter used to model where, when, and how release artifacts were produced.",
+      "externalRef": [
+        {
+          "type": "ExternalRef",
+          "externalRefType": "documentation",
+          "locator": [
+            "https://slsa.dev/spec/v1.2/build-provenance"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Tool",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#tool/in-toto-run",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "in-toto-run",
+      "version": "3.0.0",
+      "summary": "Link metadata capture tool used in the fictional provisioning and acceptance workflow.",
+      "externalRef": [
+        {
+          "type": "ExternalRef",
+          "externalRefType": "documentation",
+          "locator": [
+            "https://in-toto.io/"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Tool",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#tool/secure-boot-attester",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "SG-1 secure-boot attester",
+      "version": "2026.07",
+      "summary": "Fictional factory and receiving-lab attestation tool for secure boot, signer, and tamper state."
+    },
+    {
+      "type": "PhysicalLocation",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/hq",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Arbor Devices supply-chain control tower",
+      "city": "Austin",
+      "provinceStateCode": "TX",
+      "country": "USA",
+      "locationHint": "Arbor Devices supply-chain control tower"
+    },
+    {
+      "type": "PhysicalLocation",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/final-assembly",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Arbor Devices final assembly cell A3",
+      "city": "Austin",
+      "provinceStateCode": "TX",
+      "country": "USA",
+      "locationHint": "Arbor Devices final assembly cell A3"
+    },
+    {
+      "type": "PhysicalLocation",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/siliconforge-hsinchu",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "SiliconForge Hsinchu secure element line",
+      "city": "Hsinchu",
+      "country": "TWN",
+      "locationHint": "SiliconForge Hsinchu secure element line"
+    },
+    {
+      "type": "PhysicalLocation",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/boardfab-penang",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "BoardFab Penang SMT line 7",
+      "city": "Penang",
+      "country": "MYS",
+      "locationHint": "BoardFab Penang SMT line 7"
+    },
+    {
+      "type": "PhysicalLocation",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/secureseal-ohio",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "SecureSeal enclosure plant",
+      "city": "Dayton",
+      "provinceStateCode": "OH",
+      "country": "USA",
+      "locationHint": "SecureSeal enclosure plant"
+    },
+    {
+      "type": "PhysicalLocation",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/austin-warehouse",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Futura Austin secure staging warehouse",
+      "city": "Austin",
+      "provinceStateCode": "TX",
+      "country": "USA",
+      "locationHint": "Futura Austin secure staging warehouse"
+    },
+    {
+      "type": "PhysicalLocation",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/lax-hub",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Futura LAX air-freight hub",
+      "city": "Los Angeles",
+      "provinceStateCode": "CA",
+      "country": "USA",
+      "locationHint": "Futura LAX air-freight hub"
+    },
+    {
+      "type": "PhysicalLocation",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/denver-lab",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Independent Assurance Lab receiving bay",
+      "city": "Denver",
+      "provinceStateCode": "CO",
+      "country": "USA",
+      "locationHint": "Independent Assurance Lab receiving bay"
+    },
+    {
+      "type": "PhysicalLocation",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/wyoming-site",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "EdgeOps Red Mesa wind-farm substation",
+      "city": "Rawlins",
+      "provinceStateCode": "WY",
+      "country": "USA",
+      "locationHint": "EdgeOps Red Mesa wind-farm substation"
+    },
+    {
+      "type": "PhysicalLocation",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/phoenix-recovery",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Circular Recoveries secure destruction room",
+      "city": "Phoenix",
+      "provinceStateCode": "AZ",
+      "country": "USA",
+      "locationHint": "Circular Recoveries secure destruction room"
+    },
+    {
+      "type": "Specification",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#spec/nist-sp-800-161r1",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "NIST SP 800-161 Rev. 1 C-SCRM reference",
+      "summary": "Reference for supply-chain risk management concepts used by this synthetic sample.",
+      "specType": "formalStandard",
+      "externalRef": [
+        {
+          "type": "ExternalRef",
+          "externalRefType": "documentation",
+          "locator": [
+            "https://csrc.nist.gov/pubs/sp/800/161/r1/upd1/final"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Specification",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#spec/cisa-2025-sbom-min-elements",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "CISA 2025 SBOM Minimum Elements reference",
+      "summary": "Reference for hashes, licensing, tool name, generation context, and delivery practices.",
+      "specType": "guidance",
+      "externalRef": [
+        {
+          "type": "ExternalRef",
+          "externalRefType": "documentation",
+          "locator": [
+            "https://www.cisa.gov/resources-tools/resources/2025-minimum-elements-software-bill-materials-sbom"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Specification",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#spec/slsa-provenance-v1-2",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "SLSA v1.2 Build Provenance reference",
+      "summary": "Reference for build provenance describing where, when, and how software artifacts were produced.",
+      "specType": "guidance",
+      "externalRef": [
+        {
+          "type": "ExternalRef",
+          "externalRefType": "documentation",
+          "locator": [
+            "https://slsa.dev/spec/v1.2/build-provenance"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Specification",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#spec/arborlink-supply-chain-plan",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "ArborLink SG-1 supply-chain assurance plan ASCAP-2026.07",
+      "summary": "Fictional plan defining procurement, custody, exception handling, and acceptance gates.",
+      "specType": "specification",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "other",
+          "identifier": "ASCAP-2026.07",
+          "issuingAuthority": "Arbor Devices (fictional)",
+          "comment": "Fictional supply-chain assurance plan"
+        }
+      ]
+    },
+    {
+      "type": "Requirement",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/provenance",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "SCRM-REQ-01 provenance",
+      "requirementStatement": "Every critical hardware and software component shall carry origin, supplier, generation tool, and integrity metadata.",
+      "requirementUID": "SCRM-REQ-01",
+      "summary": "Fictional supply-chain assurance requirement for the ArborLink SG-1 sample."
+    },
+    {
+      "type": "Requirement",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/custody",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "SCRM-REQ-02 chain of custody",
+      "requirementStatement": "Every custody and ownership transfer shall record previous/current responsible parties, product, time window, and location.",
+      "requirementUID": "SCRM-REQ-02",
+      "summary": "Fictional supply-chain assurance requirement for the ArborLink SG-1 sample."
+    },
+    {
+      "type": "Requirement",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/tamper",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "SCRM-REQ-03 tamper handling",
+      "requirementStatement": "Any shipment shock, seal, signer, or secure-boot deviation shall enter quarantine until independent resolution.",
+      "requirementUID": "SCRM-REQ-03",
+      "summary": "Fictional supply-chain assurance requirement for the ArborLink SG-1 sample."
+    },
+    {
+      "type": "Requirement",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/signed-firmware",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "SCRM-REQ-04 signed firmware",
+      "requirementStatement": "Production firmware shall be built from controlled inputs, signed by the release signer, and verified during provisioning and receiving inspection.",
+      "requirementUID": "SCRM-REQ-04",
+      "summary": "Fictional supply-chain assurance requirement for the ArborLink SG-1 sample."
+    },
+    {
+      "type": "Requirement",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/sbom-delivery",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "SCRM-REQ-05 SBOM delivery",
+      "requirementStatement": "The delivered device shall include a machine-readable SBOM with component hashes, licenses, tools, and generation context.",
+      "requirementUID": "SCRM-REQ-05",
+      "summary": "Fictional supply-chain assurance requirement for the ArborLink SG-1 sample."
+    },
+    {
+      "type": "Requirement",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/decommission",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "SCRM-REQ-06 decommissioning",
+      "requirementStatement": "End-of-life planning shall preserve custody, data-erasure evidence, and secure-destruction accountability.",
+      "requirementUID": "SCRM-REQ-06",
+      "summary": "Fictional supply-chain assurance requirement for the ArborLink SG-1 sample."
+    },
+    {
+      "type": "simplelicensing_LicenseExpression",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#license/mit",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "MIT license expression",
+      "simplelicensing_licenseExpression": "MIT",
+      "simplelicensing_licenseListVersion": "3.26"
+    },
+    {
+      "type": "simplelicensing_LicenseExpression",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#license/apache-2.0",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Apache-2.0 license expression",
+      "simplelicensing_licenseExpression": "Apache-2.0",
+      "simplelicensing_licenseListVersion": "3.26"
+    },
+    {
+      "type": "simplelicensing_LicenseExpression",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#license/gpl-2.0-only",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "GPL-2.0-only license expression",
+      "simplelicensing_licenseExpression": "GPL-2.0-only",
+      "simplelicensing_licenseListVersion": "3.26"
+    },
+    {
+      "type": "simplelicensing_LicenseExpression",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#license/proprietary",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "LicenseRef-Arbor-Proprietary expression",
+      "simplelicensing_licenseExpression": "LicenseRef-Arbor-Proprietary",
+      "simplelicensing_licenseListVersion": "3.26"
+    },
+    {
+      "type": "hardware_ProductSpecification",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/spec/sg1",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "ArborLink SG-1 secure industrial edge gateway specification",
+      "summary": "Fictional product specification for a DIN-rail industrial gateway with secure boot, TPM-backed identity, and tamper evidence.",
+      "hardware_partNumber": "ARB-SG1-IND-4G-POE",
+      "hardware_category": "industrial edge gateway"
+    },
+    {
+      "type": "hardware_Dimensions",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/dimensions/sg1",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "ArborLink SG-1 envelope dimensions",
+      "hardware_xAxisLength": {
+        "type": "MeasureOfLength",
+        "quantity": 156,
+        "unitQUDT": "MilliM"
+      },
+      "hardware_yAxisLength": {
+        "type": "MeasureOfLength",
+        "quantity": 124,
+        "unitQUDT": "MilliM"
+      },
+      "hardware_zAxisLength": {
+        "type": "MeasureOfLength",
+        "quantity": 48,
+        "unitQUDT": "MilliM"
+      }
+    },
+    {
+      "type": "hardware_PhysicalHardware",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/device/sg1-sn-26-000042",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "ArborLink SG-1 gateway SN SG1-26-000042",
+      "summary": "Serialized finished device tracked across assembly, transport, quarantine, resolution, delivery, deployment, and retirement planning.",
+      "hardware_partNumber": "ARB-SG1-IND-4G-POE",
+      "hardware_serialNumber": "SG1-26-000042",
+      "hardware_category": "finished device",
+      "hardware_productAgent": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/arbor-devices"
+      ],
+      "hardware_dimensions": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/dimensions/sg1",
+      "hardware_mass": {
+        "type": "MeasureOfMass",
+        "quantity": 0.84,
+        "unitQUDT": "KiloGM"
+      },
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "97caf5d76f9e5c28f83731cf4e2ab1ec530027b078249f087a180e8da187774d"
+        }
+      ]
+    },
+    {
+      "type": "hardware_BulkHardware",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/lot/pcba-26-07-a17",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "SG-1 PCB assembly lot PCBA-26-07-A17",
+      "summary": "Fictional SMT assembly lot containing SG-1 controller boards.",
+      "hardware_partNumber": "ARB-SG1-PCBA-REV-C",
+      "hardware_batchNumber": "PCBA-26-07-A17",
+      "hardware_bulkQuantity": 240,
+      "hardware_category": "printed circuit board assembly",
+      "hardware_productAgent": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/boardfab"
+      ],
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "99ee20bf29c0013efb4660758be94db91bcbcb63c61f1d171679cebc1d1f825f"
+        }
+      ]
+    },
+    {
+      "type": "hardware_BulkHardware",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/lot/compute-module-cm7-26h1",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Compute module lot CM7-26H1",
+      "summary": "Fictional compute-module lot with lot-level supplier attestation.",
+      "hardware_partNumber": "SFC-CM7-8G-IND",
+      "hardware_batchNumber": "CM7-26H1",
+      "hardware_bulkQuantity": 500,
+      "hardware_category": "compute module",
+      "hardware_productAgent": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/siliconforge"
+      ],
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "11bf60059a77df93a0d5315a794945cb870228a45bbd06cfcc6288ec232ca58d"
+        }
+      ]
+    },
+    {
+      "type": "hardware_BulkHardware",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/lot/secure-element-se9-26h1",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Secure element lot SE9-26H1",
+      "summary": "Fictional secure element lot carrying wafer, personalization, and certificate-chain references.",
+      "hardware_partNumber": "SFC-SE9-TPM",
+      "hardware_batchNumber": "SE9-26H1",
+      "hardware_bulkQuantity": 1000,
+      "hardware_category": "secure element",
+      "hardware_productAgent": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/siliconforge"
+      ],
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "3ba6d55029c7bad5c42eb4be2745d39370c6fcb964ff9de139c06942532d141c"
+        }
+      ]
+    },
+    {
+      "type": "hardware_BulkHardware",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/lot/enclosure-26-07-k2",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Powder-coated enclosure lot ENC-26-07-K2",
+      "summary": "Fictional enclosure lot made from recycled aluminum feedstock.",
+      "hardware_partNumber": "SSL-ENC-SG1-IP54",
+      "hardware_batchNumber": "ENC-26-07-K2",
+      "hardware_bulkQuantity": 300,
+      "hardware_category": "enclosure",
+      "hardware_productAgent": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/secureseal"
+      ],
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "81e2723fb8d30c3c6ceae89c16ef8940d96391c17a9ac673f51834937799d00c"
+        }
+      ]
+    },
+    {
+      "type": "hardware_PhysicalHardware",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/tamper-seal/ts-9f42",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Tamper-evident seal TS-9F42",
+      "summary": "Serialized tamper seal affixed after provisioning and checked at receiving inspection.",
+      "hardware_partNumber": "SSL-TAMPER-VOID-13",
+      "hardware_serialNumber": "TS-9F42",
+      "hardware_category": "tamper evidence",
+      "hardware_productAgent": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/secureseal"
+      ],
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "09ce437394c8b3974865e4816304afc738d82006278f4220342e51f24eb8dfe3"
+        }
+      ]
+    },
+    {
+      "type": "software_Package",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#pkg/firmware",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "ArborLink SG-1 firmware image",
+      "software_packageVersion": "2026.07.0",
+      "software_primaryPurpose": "firmware",
+      "software_packageUrl": "pkg:generic/arbor/arborlink-sg1-firmware@2026.07.0",
+      "suppliedBy": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/arbor-devices"
+      ],
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "ba3812292b83d1499372ed72679373b1dc17342570f2dd1b7be3c3be7d235f77"
+        }
+      ],
+      "summary": "ArborLink SG-1 firmware image included in the fictional ArborLink SG-1 software bill of materials.",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "email",
+          "identifier": "pkg:generic/arbor/arborlink-sg1-firmware@2026.07.0",
+          "issuingAuthority": "Arbor Devices (fictional)",
+          "comment": "Package URL identifier",
+          "identifierLocator": [
+            "https://github.com/package-url/purl-spec"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "software_Package",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#pkg/bootloader",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "SentinelBoot secure bootloader",
+      "software_packageVersion": "3.4.2",
+      "software_primaryPurpose": "firmware",
+      "software_packageUrl": "pkg:generic/arbor/sentinelboot@3.4.2",
+      "suppliedBy": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/arbor-devices"
+      ],
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "757234f04a4c6536f1b17f51721e537362833fbdfdaae7de67a98fb343078f73"
+        }
+      ],
+      "summary": "SentinelBoot secure bootloader included in the fictional ArborLink SG-1 software bill of materials.",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "email",
+          "identifier": "pkg:generic/arbor/sentinelboot@3.4.2",
+          "issuingAuthority": "Arbor Devices (fictional)",
+          "comment": "Package URL identifier",
+          "identifierLocator": [
+            "https://github.com/package-url/purl-spec"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "software_Package",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#pkg/linux-image",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Arbor industrial Linux image",
+      "software_packageVersion": "6.12.31-arbor1",
+      "software_primaryPurpose": "operatingSystem",
+      "software_packageUrl": "pkg:generic/arbor/industrial-linux@6.12.31-arbor1",
+      "suppliedBy": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/arbor-devices"
+      ],
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "98999cbd27c25c2ddccf91c9698a3df5befdc7045ff17cdb1d4e25d87786b207"
+        }
+      ],
+      "summary": "Arbor industrial Linux image included in the fictional ArborLink SG-1 software bill of materials.",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "email",
+          "identifier": "pkg:generic/arbor/industrial-linux@6.12.31-arbor1",
+          "issuingAuthority": "Arbor Devices (fictional)",
+          "comment": "Package URL identifier",
+          "identifierLocator": [
+            "https://github.com/package-url/purl-spec"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "software_Package",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#pkg/gateway-agent",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Arbor gateway-agent container",
+      "software_packageVersion": "2026.07.0",
+      "software_primaryPurpose": "container",
+      "software_packageUrl": "pkg:oci/gateway-agent@sha256:8d6d8bf8b56a91dbb70f4ca2e2efb4d3",
+      "suppliedBy": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/arbor-devices"
+      ],
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "0e2890040fbcb0fbf13c4604810e73574785622603b03e94ecdc4957479b3bc6"
+        }
+      ],
+      "summary": "Arbor gateway-agent container included in the fictional ArborLink SG-1 software bill of materials.",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "email",
+          "identifier": "pkg:oci/gateway-agent@sha256:8d6d8bf8b56a91dbb70f4ca2e2efb4d3",
+          "issuingAuthority": "Arbor Devices (fictional)",
+          "comment": "Package URL identifier",
+          "identifierLocator": [
+            "https://github.com/package-url/purl-spec"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "software_Package",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#pkg/openssl",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "OpenSSL",
+      "software_packageVersion": "3.5.1",
+      "software_primaryPurpose": "library",
+      "software_packageUrl": "pkg:generic/openssl@3.5.1",
+      "suppliedBy": [
+        "https://spdx.org/rdf/3.1/terms/Core/NoAssertionElement"
+      ],
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "f65fc68dae5d5b5ef080d6f8ae01df6c83aa945828a13dde7ca41e6dfa413381"
+        }
+      ],
+      "summary": "OpenSSL included in the fictional ArborLink SG-1 software bill of materials.",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "email",
+          "identifier": "pkg:generic/openssl@3.5.1",
+          "issuingAuthority": "Arbor Devices (fictional)",
+          "comment": "Package URL identifier",
+          "identifierLocator": [
+            "https://github.com/package-url/purl-spec"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "software_Package",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#pkg/busybox",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "BusyBox",
+      "software_packageVersion": "1.37.0",
+      "software_primaryPurpose": "application",
+      "software_packageUrl": "pkg:generic/busybox@1.37.0",
+      "suppliedBy": [
+        "https://spdx.org/rdf/3.1/terms/Core/NoAssertionElement"
+      ],
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "d4afd08353e8a7a4c6ab3ec468af52079f20f8f354021ec789f0c630d5b83800"
+        }
+      ],
+      "summary": "BusyBox included in the fictional ArborLink SG-1 software bill of materials.",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "email",
+          "identifier": "pkg:generic/busybox@1.37.0",
+          "issuingAuthority": "Arbor Devices (fictional)",
+          "comment": "Package URL identifier",
+          "identifierLocator": [
+            "https://github.com/package-url/purl-spec"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "software_Package",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#pkg/libmosquitto",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Eclipse Mosquitto client library",
+      "software_packageVersion": "2.0.22",
+      "software_primaryPurpose": "library",
+      "software_packageUrl": "pkg:generic/eclipse/mosquitto@2.0.22",
+      "suppliedBy": [
+        "https://spdx.org/rdf/3.1/terms/Core/NoAssertionElement"
+      ],
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "55a0322905e137286e01f6817bd6cdbe574a152e4d06ce9a85cd10817084da94"
+        }
+      ],
+      "summary": "Eclipse Mosquitto client library included in the fictional ArborLink SG-1 software bill of materials.",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "email",
+          "identifier": "pkg:generic/eclipse/mosquitto@2.0.22",
+          "issuingAuthority": "Arbor Devices (fictional)",
+          "comment": "Package URL identifier",
+          "identifierLocator": [
+            "https://github.com/package-url/purl-spec"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "build_Build",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#build/release-2026-07-0",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "ArborLink SG-1 release build 2026.07.0",
+      "build_buildId": "github-actions/arborlink-gateway/release/2026.07.0/run/884211",
+      "build_buildType": "https://slsa.dev/container-based-build/v1",
+      "build_buildStartTime": "2026-07-01T14:20:00Z",
+      "build_buildEndTime": "2026-07-01T14:44:31Z",
+      "build_configSourceUri": "git+https://example.invalid/arbor/arborlink-gateway.git@refs/tags/v2026.07.0",
+      "build_configSourceDigest": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "b61c44e437e6723ebfc09f5f4c90e57c81fb209d8e859b9e337358dd97bebcaa"
+        }
+      ],
+      "build_configSourceEntrypoint": ".github/workflows/release-gateway.yml",
+      "build_environment": [
+        {
+          "type": "DictionaryEntry",
+          "key": "runner:image",
+          "value": "ubuntu-26.04-arm64-secure-build-20260615"
+        },
+        {
+          "type": "DictionaryEntry",
+          "key": "slsa:build-level",
+          "value": "L3-like controls (synthetic)"
+        },
+        {
+          "type": "DictionaryEntry",
+          "key": "signing:key-policy",
+          "value": "offline HSM release signer ARB-SIGN-2026-07"
+        }
+      ],
+      "build_parameter": [
+        {
+          "type": "DictionaryEntry",
+          "key": "target:hardware",
+          "value": "ARB-SG1-IND-4G-POE"
+        },
+        {
+          "type": "DictionaryEntry",
+          "key": "secure-boot:enforced",
+          "value": "true"
+        },
+        {
+          "type": "DictionaryEntry",
+          "key": "sbom:format",
+          "value": "SPDX-3.1 JSON-LD"
+        }
+      ],
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "7763f6f010a2140777250794f7e9c8cf40c26e16e628ce7d1fdaa6b0f138d414"
+        }
+      ]
+    },
+    {
+      "type": "software_File",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/release/firmware-swu",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "dist/arborlink-sg1-2026.07.0.swu",
+      "software_primaryPurpose": "firmware",
+      "contentType": "application/octet-stream",
+      "software_artifactSize": 29360128,
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "6738689b26502a9857bec42b4261e0fcdfbd01e60d36de8d04550b996deb95e4"
+        }
+      ],
+      "summary": "Synthetic firmware artifact for the ArborLink SG-1 supply-chain sample."
+    },
+    {
+      "type": "software_File",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/release/gateway-agent-oci",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "dist/gateway-agent-2026.07.0-linux-arm64.oci.tar",
+      "software_primaryPurpose": "container",
+      "contentType": "application/vnd.oci.image.manifest.v1+json",
+      "software_artifactSize": 73400320,
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "bfaee937938f60a6f78bc5fda57d5927b739ae0ba5f8c8b46bd64454da41c5ff"
+        }
+      ],
+      "summary": "Synthetic container artifact for the ArborLink SG-1 supply-chain sample."
+    },
+    {
+      "type": "software_File",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/build/slsa-provenance",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "attestations/arborlink-sg1-2026.07.0.intoto.jsonl",
+      "software_primaryPurpose": "evidence",
+      "contentType": "application/vnd.in-toto+json",
+      "software_artifactSize": 32768,
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "a2f4e56c5626f9c55d7602a75794057c5d90453248a3cb3366beae44295d6191"
+        }
+      ],
+      "summary": "Synthetic evidence artifact for the ArborLink SG-1 supply-chain sample."
+    },
+    {
+      "type": "software_File",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/build/sbom-generation-log",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "evidence/sbom-generation-log.json",
+      "software_primaryPurpose": "evidence",
+      "contentType": "application/json",
+      "software_artifactSize": 12044,
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "b4660afcf75bc53f6bdd526805cb759fb4640683b6cc05f48ad4aac2f74b589f"
+        }
+      ],
+      "summary": "Synthetic evidence artifact for the ArborLink SG-1 supply-chain sample."
+    },
+    {
+      "type": "software_File",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/component-coc",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "evidence/component-chain-of-custody.pdf",
+      "software_primaryPurpose": "evidence",
+      "contentType": "application/pdf",
+      "software_artifactSize": 258901,
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "567a45adeea540889ab6d935adec54f0766b5777ed0c357bacd8ddff86f2dd9b"
+        }
+      ],
+      "summary": "Synthetic evidence artifact for the ArborLink SG-1 supply-chain sample."
+    },
+    {
+      "type": "software_File",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/shock-telemetry",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "evidence/futura-shock-telemetry-SG1-26-000042.csv",
+      "software_primaryPurpose": "evidence",
+      "contentType": "text/csv",
+      "software_artifactSize": 18421,
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "062750e1ffa565c6002e15fd8e5a150f1ca86435407db44ee831a4ff3e62630c"
+        }
+      ],
+      "summary": "Synthetic evidence artifact for the ArborLink SG-1 supply-chain sample."
+    },
+    {
+      "type": "software_File",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/inspection-record",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "evidence/receiving-inspection-SG1-26-000042.pdf",
+      "software_primaryPurpose": "evidence",
+      "contentType": "application/pdf",
+      "software_artifactSize": 384122,
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "f5ebdf376bb90830d7effb31ee5f5e6714ce0fba918fbd5b9fa844f80e4fd154"
+        }
+      ],
+      "summary": "Synthetic evidence artifact for the ArborLink SG-1 supply-chain sample."
+    },
+    {
+      "type": "software_File",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/secure-boot-test",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "evidence/secure-boot-attestation-SG1-26-000042.json",
+      "software_primaryPurpose": "evidence",
+      "contentType": "application/json",
+      "software_artifactSize": 19008,
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "95ef93d4c9d20032cca8a683352ada3af722a16d3396c85cbb3b309dfcb17f16"
+        }
+      ],
+      "summary": "Synthetic evidence artifact for the ArborLink SG-1 supply-chain sample."
+    },
+    {
+      "type": "software_File",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/resolution-record",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "evidence/quarantine-resolution-SG1-26-000042.pdf",
+      "software_primaryPurpose": "evidence",
+      "contentType": "application/pdf",
+      "software_artifactSize": 204944,
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "7495635e030d3739020f6f67eb4703d8486249bd1fae563e900a99c512fcf031"
+        }
+      ],
+      "summary": "Synthetic evidence artifact for the ArborLink SG-1 supply-chain sample."
+    },
+    {
+      "type": "software_File",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/acceptance-pack",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "delivery/arborlink-sg1-acceptance-pack.zip",
+      "software_primaryPurpose": "archive",
+      "contentType": "application/zip",
+      "software_artifactSize": 8126464,
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "f6da944c979b08d2ebeb9201e3f7e2d33e3d4ef739cb8a6874fe4b1824ef00d1"
+        }
+      ],
+      "summary": "Synthetic archive artifact for the ArborLink SG-1 supply-chain sample."
+    },
+    {
+      "type": "software_File",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/config/build-recipe",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": ".github/workflows/release-gateway.yml",
+      "software_primaryPurpose": "configuration",
+      "contentType": "text/yaml",
+      "software_artifactSize": 9544,
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "ed36e6e0ee8ebde15cf80229e35c3d820d4a6227aeaeabb2605dbeca205fbc69"
+        }
+      ],
+      "summary": "Synthetic configuration artifact for the ArborLink SG-1 supply-chain sample."
+    },
+    {
+      "type": "software_File",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/config/provisioning-manifest",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "factory/provisioning-manifest-SG1-26-000042.json",
+      "software_primaryPurpose": "configuration",
+      "contentType": "application/json",
+      "software_artifactSize": 7422,
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "6adedf7dd5059e99cd15004933b381adfec97839d0186872840282d8f5555d04"
+        }
+      ],
+      "summary": "Synthetic configuration artifact for the ArborLink SG-1 supply-chain sample."
+    },
+    {
+      "type": "software_File",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/config/retirement-plan",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "operations/retirement-plan-SG1-26-000042.md",
+      "software_primaryPurpose": "documentation",
+      "contentType": "text/markdown",
+      "software_artifactSize": 6112,
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "249b49360ac8d8e49722a823e7a24af2f45ac96b0743446fc504b27bdc45eb97"
+        }
+      ],
+      "summary": "Synthetic documentation artifact for the ArborLink SG-1 supply-chain sample."
+    },
+    {
+      "type": "supplychain_State",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#state/received",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Components received",
+      "description": "Critical component lots are received and awaiting incoming inspection.",
+      "summary": "Critical component lots are received and awaiting incoming inspection."
+    },
+    {
+      "type": "supplychain_State",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#state/assembled",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Assembled",
+      "description": "The serialized gateway has been mechanically and electrically assembled.",
+      "summary": "The serialized gateway has been mechanically and electrically assembled."
+    },
+    {
+      "type": "supplychain_State",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#state/provisioned",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Firmware provisioned",
+      "description": "Signed firmware, device identity, and tamper seal are provisioned.",
+      "summary": "Signed firmware, device identity, and tamper seal are provisioned."
+    },
+    {
+      "type": "supplychain_State",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#state/in-transit",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "In transit",
+      "description": "The gateway is under carrier custody and moving between controlled locations.",
+      "summary": "The gateway is under carrier custody and moving between controlled locations."
+    },
+    {
+      "type": "supplychain_State",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#state/quarantine",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Out-of-spec quarantine",
+      "description": "The gateway is isolated because shock telemetry exceeded the lane threshold.",
+      "summary": "The gateway is isolated because shock telemetry exceeded the lane threshold."
+    },
+    {
+      "type": "supplychain_State",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#state/inspection-passed",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Inspection passed",
+      "description": "Independent receiving inspection found no tamper or integrity deviation.",
+      "summary": "Independent receiving inspection found no tamper or integrity deviation."
+    },
+    {
+      "type": "supplychain_State",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#state/accepted",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Accepted for deployment",
+      "description": "Customer acceptance is complete and custody has transferred to the operator.",
+      "summary": "Customer acceptance is complete and custody has transferred to the operator."
+    },
+    {
+      "type": "supplychain_State",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#state/deployed",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Deployed",
+      "description": "The gateway is installed at the EdgeOps Red Mesa site.",
+      "summary": "The gateway is installed at the EdgeOps Red Mesa site."
+    },
+    {
+      "type": "supplychain_State",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#state/retirement-planned",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Retirement planned",
+      "description": "End-of-life custody, data erasure, and destruction path are defined.",
+      "summary": "End-of-life custody, data erasure, and destruction path are defined."
+    },
+    {
+      "type": "supplychain_BoundaryDefinitionProcess",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#process/define-custody-boundary",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Define shipment custody boundary",
+      "description": "Defines product, evidence, location, and telemetry criteria for each custody boundary.",
+      "processReadiness": "operational",
+      "summary": "Defines product, evidence, location, and telemetry criteria for each custody boundary."
+    },
+    {
+      "type": "supplychain_HarvestProcess",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#process/recycled-aluminum-intake",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Recycled aluminum intake process",
+      "description": "Captures the enclosure feedstock intake and batch evidence.",
+      "processReadiness": "operational",
+      "summary": "Captures the enclosure feedstock intake and batch evidence."
+    },
+    {
+      "type": "supplychain_ManufactureProcess",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#process/critical-component-manufacture",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Critical component manufacture process",
+      "description": "Manufactures and attests compute-module, secure-element, PCBA, and enclosure lots.",
+      "processReadiness": "operational",
+      "summary": "Manufactures and attests compute-module, secure-element, PCBA, and enclosure lots."
+    },
+    {
+      "type": "supplychain_AssemblyProcess",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#process/final-assembly",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Final assembly process",
+      "description": "Assembles serialized gateway hardware from qualified component lots.",
+      "processReadiness": "operational",
+      "summary": "Assembles serialized gateway hardware from qualified component lots."
+    },
+    {
+      "type": "supplychain_ReproduceProcess",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#process/release-bundle-reproduction",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Release bundle reproduction process",
+      "description": "Reproduces the signed release bundle into the factory provisioning cache.",
+      "processReadiness": "operational",
+      "summary": "Reproduces the signed release bundle into the factory provisioning cache."
+    },
+    {
+      "type": "supplychain_ChangeProcess",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#process/factory-provisioning",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Factory provisioning process",
+      "description": "Installs signed firmware, device identity, and production configuration.",
+      "processReadiness": "operational",
+      "summary": "Installs signed firmware, device identity, and production configuration."
+    },
+    {
+      "type": "supplychain_StorageProcess",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#process/secure-staging-storage",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Secure staging storage process",
+      "description": "Stores provisioned units with seal and environmental monitoring before shipment.",
+      "processReadiness": "operational",
+      "summary": "Stores provisioned units with seal and environmental monitoring before shipment."
+    },
+    {
+      "type": "supplychain_TransportProcess",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#process/controlled-lane-transport",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Controlled-lane transport process",
+      "description": "Moves devices between approved locations with custody and shock telemetry.",
+      "processReadiness": "operational",
+      "summary": "Moves devices between approved locations with custody and shock telemetry."
+    },
+    {
+      "type": "supplychain_ResponsibilityChangeProcess",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#process/custody-transfer",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Custody and ownership transfer process",
+      "description": "Records previous/current responsible parties and products affected by responsibility change.",
+      "processReadiness": "operational",
+      "summary": "Records previous/current responsible parties and products affected by responsibility change."
+    },
+    {
+      "type": "supplychain_InspectionProcess",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#process/receiving-inspection",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Receiving inspection process",
+      "description": "Performs visual tamper, seal, serial, and evidence package inspection.",
+      "processReadiness": "operational",
+      "summary": "Performs visual tamper, seal, serial, and evidence package inspection."
+    },
+    {
+      "type": "supplychain_TestProcess",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#process/secure-boot-acceptance-test",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Secure-boot acceptance test process",
+      "description": "Verifies firmware hash, signer, secure boot, and device identity at receiving.",
+      "processReadiness": "operational",
+      "summary": "Verifies firmware hash, signer, secure boot, and device identity at receiving."
+    },
+    {
+      "type": "supplychain_DefinedStateProcess",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#process/quarantine-decision",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Quarantine decision process",
+      "description": "Maps telemetry and inspection evidence to accepted, quarantined, or rejected states.",
+      "processReadiness": "operational",
+      "summary": "Maps telemetry and inspection evidence to accepted, quarantined, or rejected states."
+    },
+    {
+      "type": "supplychain_PlanProcess",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#process/decommission-plan",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Decommissioning plan process",
+      "description": "Plans data erasure, secure destruction, recycling, and custody evidence.",
+      "processReadiness": "operational",
+      "summary": "Plans data erasure, secure destruction, recycling, and custody evidence."
+    },
+    {
+      "type": "supplychain_DestroyProcess",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#process/secure-destruction",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Secure destruction process",
+      "description": "Destroys retired tamper seals and storage media under controlled evidence capture.",
+      "processReadiness": "operational",
+      "summary": "Destroys retired tamper seals and storage media under controlled evidence capture."
+    },
+    {
+      "type": "supplychain_BoundaryDefinitionAction",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/001-define-shipment-boundary",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Define SG-1 shipment custody boundary",
+      "startTime": "2026-06-28T09:00:00Z",
+      "endTime": "2026-06-28T10:30:00Z",
+      "actionLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/hq",
+      "supplychain_boundaryParameter": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/custody",
+      "summary": "Defines the custody boundary: serialized device, tamper seal, evidence package, telemetry logger, and accepted lane limits."
+    },
+    {
+      "type": "supplychain_HarvestAction",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/002-recycled-aluminum-intake",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Intake recycled aluminum feedstock for enclosure lot",
+      "startTime": "2026-06-29T08:00:00Z",
+      "endTime": "2026-06-29T11:20:00Z",
+      "actionLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/secureseal-ohio",
+      "summary": "Records recycled aluminum feedstock intake before enclosure manufacture."
+    },
+    {
+      "type": "supplychain_ManufactureAction",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/003-manufacture-critical-lots",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Manufacture attested compute and secure-element lots",
+      "startTime": "2026-06-30T02:00:00Z",
+      "endTime": "2026-06-30T18:45:00Z",
+      "actionLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/siliconforge-hsinchu",
+      "summary": "Creates supplier-attested component lots that feed the SG-1 assembly."
+    },
+    {
+      "type": "supplychain_ManufactureAction",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/004-manufacture-pcba-lot",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Manufacture SG-1 PCBA lot",
+      "startTime": "2026-07-01T01:00:00Z",
+      "endTime": "2026-07-01T13:20:00Z",
+      "actionLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/boardfab-penang",
+      "summary": "Assembles controller boards with lot-level traceability to critical supplied components."
+    },
+    {
+      "type": "supplychain_CreateAction",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/005-create-release-artifacts",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Create signed SG-1 release artifacts",
+      "startTime": "2026-07-01T14:20:00Z",
+      "endTime": "2026-07-01T14:44:31Z",
+      "actionLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/hq",
+      "summary": "Creates the release firmware, container image, SBOM log, and SLSA-style provenance attestation."
+    },
+    {
+      "type": "supplychain_AssemblyAction",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/006-final-assembly",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Assemble ArborLink SG-1 SN SG1-26-000042",
+      "startTime": "2026-07-02T15:00:00Z",
+      "endTime": "2026-07-02T18:10:00Z",
+      "actionLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/final-assembly",
+      "summary": "Builds the serialized finished gateway from qualified component lots."
+    },
+    {
+      "type": "supplychain_ReproduceAction",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/007-reproduce-release-bundle",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Reproduce release bundle into factory cache",
+      "startTime": "2026-07-02T18:20:00Z",
+      "endTime": "2026-07-02T18:45:00Z",
+      "actionLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/final-assembly",
+      "summary": "Copies the signed release bundle to the provisioning station with hash verification."
+    },
+    {
+      "type": "supplychain_ChangeAction",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/008-provision-firmware-and-seal",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Provision signed firmware, device identity, and tamper seal",
+      "startTime": "2026-07-02T19:00:00Z",
+      "endTime": "2026-07-02T19:36:00Z",
+      "actionLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/final-assembly",
+      "summary": "Changes the serialized device from assembled hardware to provisioned product ready for shipment."
+    },
+    {
+      "type": "supplychain_StateAction",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/009-state-provisioned",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Mark device firmware provisioned",
+      "startTime": "2026-07-02T19:37:00Z",
+      "endTime": "2026-07-02T19:40:00Z",
+      "actionLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/final-assembly",
+      "supplychain_currentState": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#state/provisioned",
+      "supplychain_decisionProcess": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#process/factory-provisioning",
+      "summary": "Records the state transition after successful provisioning and seal attachment."
+    },
+    {
+      "type": "supplychain_StorageAction",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/010-secure-staging-storage",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Store provisioned gateway in secure staging",
+      "startTime": "2026-07-02T20:00:00Z",
+      "endTime": "2026-07-03T07:45:00Z",
+      "actionLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/austin-warehouse",
+      "summary": "Stores the provisioned unit with seal inspection and environmental monitoring before shipment."
+    },
+    {
+      "type": "supplychain_ResponsibilityChangeAction",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/011-transfer-custody-to-carrier",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Transfer custody from Arbor Devices to Futura Logistics",
+      "startTime": "2026-07-03T08:00:00Z",
+      "endTime": "2026-07-03T08:20:00Z",
+      "actionLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/austin-warehouse",
+      "supplychain_previous": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/arbor-devices",
+      "supplychain_current": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/futura-logistics",
+      "supplychain_responsibilityChangedOn": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/device/sg1-sn-26-000042",
+      "supplychain_responsibilityCategory": "custody",
+      "summary": "Records physical custody transfer at outbound pickup."
+    },
+    {
+      "type": "supplychain_BoundaryCrossingAction",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/012-cross-factory-carrier-boundary",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Cross factory-to-carrier custody boundary",
+      "startTime": "2026-07-03T08:21:00Z",
+      "endTime": "2026-07-03T08:25:00Z",
+      "actionLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/austin-warehouse",
+      "summary": "Device leaves Arbor controlled staging and enters carrier-controlled transport lane."
+    },
+    {
+      "type": "supplychain_TransportAction",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/013-transport-austin-lax-denver",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Transport SG-1 from Austin through LAX to Denver receiving lab",
+      "startTime": "2026-07-03T08:30:00Z",
+      "endTime": "2026-07-04T17:10:00Z",
+      "actionLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/austin-warehouse",
+      "supplychain_pickupLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/austin-warehouse",
+      "supplychain_dropoffLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/denver-lab",
+      "supplychain_transportRoute": "Austin secure staging → LAX air-freight hub → Denver receiving lab",
+      "summary": "Controlled-lane shipment with carrier custody, shock telemetry, and evidence package."
+    },
+    {
+      "type": "supplychain_OutOfSpecAction",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/014-shock-excursion-out-of-spec",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Shock telemetry exceeds SG-1 shipment threshold",
+      "startTime": "2026-07-04T02:14:08Z",
+      "endTime": "2026-07-04T02:14:10Z",
+      "actionLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/lax-hub",
+      "summary": "Shock logger records 18.4 g for 14 ms, above the fictional 15 g lane threshold; product enters quarantine until resolved."
+    },
+    {
+      "type": "supplychain_StateAction",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/015-state-quarantine",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Place SG-1 in out-of-spec quarantine",
+      "startTime": "2026-07-04T17:20:00Z",
+      "endTime": "2026-07-04T17:35:00Z",
+      "actionLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/denver-lab",
+      "supplychain_currentState": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#state/quarantine",
+      "supplychain_decisionProcess": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#process/quarantine-decision",
+      "summary": "Independent lab holds the unit pending inspection and secure-boot acceptance testing."
+    },
+    {
+      "type": "supplychain_InspectionAction",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/016-receiving-inspection",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Inspect seal, enclosure, serials, and evidence package",
+      "startTime": "2026-07-05T09:00:00Z",
+      "endTime": "2026-07-05T10:15:00Z",
+      "actionLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/denver-lab",
+      "summary": "Receiving inspection checks tamper seal, enclosure, serial numbers, custody records, and component evidence."
+    },
+    {
+      "type": "supplychain_TestAction",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/017-secure-boot-acceptance-test",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Run secure-boot and firmware-integrity acceptance test",
+      "startTime": "2026-07-05T10:30:00Z",
+      "endTime": "2026-07-05T11:20:00Z",
+      "actionLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/denver-lab",
+      "summary": "Verifies secure boot, release signer, firmware hash, device identity, and measured boot evidence after the shock excursion."
+    },
+    {
+      "type": "supplychain_ResolutionAction",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/018-resolve-shock-excursion",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Resolve shipment shock excursion",
+      "startTime": "2026-07-05T12:00:00Z",
+      "endTime": "2026-07-05T13:05:00Z",
+      "actionLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/denver-lab",
+      "summary": "Independent lab accepts the unit after seal, enclosure, secure-boot, and firmware-integrity checks find no deviation."
+    },
+    {
+      "type": "supplychain_StateAction",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/019-state-accepted",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Mark SG-1 accepted for deployment",
+      "startTime": "2026-07-05T13:15:00Z",
+      "endTime": "2026-07-05T13:25:00Z",
+      "actionLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/denver-lab",
+      "supplychain_currentState": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#state/accepted",
+      "supplychain_decisionProcess": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#process/quarantine-decision",
+      "summary": "Records the state transition from quarantine to accepted-for-deployment."
+    },
+    {
+      "type": "supplychain_ResponsibilityChangeAction",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/020-transfer-ownership-to-edgeops",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Transfer ownership and custody to EdgeOps Energy",
+      "startTime": "2026-07-05T14:00:00Z",
+      "endTime": "2026-07-05T14:20:00Z",
+      "actionLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/denver-lab",
+      "supplychain_previous": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/futura-logistics",
+      "supplychain_current": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/edgeops",
+      "supplychain_responsibilityChangedOn": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/device/sg1-sn-26-000042",
+      "supplychain_responsibilityCategory": "ownership",
+      "summary": "Records customer acceptance and responsibility transfer after resolution."
+    },
+    {
+      "type": "supplychain_TransportAction",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/021-transport-denver-wyoming",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Transport accepted SG-1 to EdgeOps Red Mesa site",
+      "startTime": "2026-07-05T15:00:00Z",
+      "endTime": "2026-07-06T08:40:00Z",
+      "actionLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/denver-lab",
+      "supplychain_pickupLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/denver-lab",
+      "supplychain_dropoffLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/wyoming-site",
+      "supplychain_transportRoute": "Denver receiving lab → EdgeOps Red Mesa wind-farm substation",
+      "summary": "Final controlled-lane movement from acceptance lab to deployment site."
+    },
+    {
+      "type": "supplychain_UseAction",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/022-commission-at-site",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Commission SG-1 at Red Mesa substation",
+      "startTime": "2026-07-06T09:00:00Z",
+      "endTime": "2026-07-06T10:30:00Z",
+      "actionLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/wyoming-site",
+      "summary": "Installs and commissions the accepted gateway for operational telemetry ingestion."
+    },
+    {
+      "type": "supplychain_PlanAction",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/023-plan-retirement",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Plan SG-1 retirement, erasure, and destruction path",
+      "startTime": "2026-07-06T10:45:00Z",
+      "endTime": "2026-07-06T11:15:00Z",
+      "actionLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/wyoming-site",
+      "summary": "Defines end-of-life custody, data erasure evidence, and destruction partner handoff before deployment begins."
+    },
+    {
+      "type": "supplychain_DestroyAction",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/024-destroy-retired-tamper-seal",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Destroy removed factory tamper-seal coupon",
+      "startTime": "2026-07-06T11:20:00Z",
+      "endTime": "2026-07-06T11:28:00Z",
+      "actionLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/wyoming-site",
+      "supplychain_destructionPerformedBy": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/edgeops",
+      "summary": "Destroys the removed factory seal coupon after customer acceptance while preserving evidence for the device record."
+    },
+    {
+      "type": "supplychain_StateAction",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/025-state-deployed",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "Mark SG-1 deployed with retirement plan",
+      "startTime": "2026-07-06T11:30:00Z",
+      "endTime": "2026-07-06T11:35:00Z",
+      "actionLocation": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#loc/wyoming-site",
+      "supplychain_currentState": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#state/deployed",
+      "supplychain_decisionProcess": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#process/decommission-plan",
+      "summary": "Records operational deployment with an associated retirement plan."
+    },
+    {
+      "type": "software_Sbom",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#sbom/arborlink-sg1",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "ArborLink SG-1 supply-chain, hardware, software, and security BOM",
+      "software_sbomType": [
+        "design",
+        "build",
+        "deployed"
+      ],
+      "rootElement": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/device/sg1-sn-26-000042",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#pkg/firmware",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#build/release-2026-07-0"
+      ],
+      "summary": "Synthetic SPDX 3.1 sample demonstrating SupplyChain lifecycle actions integrated with Core, Hardware, Software, Build, Security, and SimpleLicensing data."
+    },
+    {
+      "type": "security_Vulnerability",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#vulnerability/synthetic-openssl-config-hardening",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "name": "SYNTHETIC-SG1-OPENSSL-CONFIG-HARDENING",
+      "summary": "Synthetic vulnerability record used to exercise SPDX Security/VEX relationships. It does not correspond to a real CVE.",
+      "description": "A fictional OpenSSL configuration hardening advisory. SG-1 firmware is not affected because the vulnerable provider is not built into the image.",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "other",
+          "identifier": "SYNTHETIC-SG1-OPENSSL-CONFIG-HARDENING",
+          "issuingAuthority": "Arbor Devices (fictional)",
+          "comment": "Synthetic advisory identifier",
+          "identifierLocator": [
+            "https://example.invalid/advisories/SYNTHETIC-SG1-OPENSSL-CONFIG-HARDENING"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "security_VexNotAffectedVulnAssessmentRelationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#vex/openssl-config-not-affected",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#vulnerability/synthetic-openssl-config-hardening",
+      "relationshipType": "doesNotAffect",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#pkg/firmware",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#pkg/openssl"
+      ],
+      "security_justificationType": "vulnerableCodeNotInExecutePath",
+      "security_impactStatement": "The fictional vulnerable OpenSSL provider is excluded from the ArborLink SG-1 image and not reachable at runtime.",
+      "security_impactStatementTime": "2026-07-01T16:20:00Z",
+      "security_statusNotes": "Synthetic VEX assessment generated to demonstrate enriched SBOM consumption.",
+      "security_vexVersion": "1.0"
+    },
+    {
+      "type": "security_CvssV3VulnAssessmentRelationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#vuln-assessment/openssl-config-cvss",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#vulnerability/synthetic-openssl-config-hardening",
+      "relationshipType": "affects",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#pkg/openssl"
+      ],
+      "security_score": 7.1,
+      "security_severity": "high",
+      "security_vectorString": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:L/A:N"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/001-performedby",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/001-define-shipment-boundary",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/person/mira-patel",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/arbor-devices"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/002-hasrequirement",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/001-define-shipment-boundary",
+      "relationshipType": "hasRequirement",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/custody",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/tamper"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/003-conformsto",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/001-define-shipment-boundary",
+      "relationshipType": "conformsTo",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#spec/arborlink-supply-chain-plan",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#spec/nist-sp-800-161r1"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/004-performedby",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/002-recycled-aluminum-intake",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/secureseal"
+      ]
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/005-hasoutput",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/002-recycled-aluminum-intake",
+      "relationshipType": "hasOutput",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/lot/enclosure-26-07-k2"
+      ],
+      "scope": "build"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/006-hasrequirement",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/002-recycled-aluminum-intake",
+      "relationshipType": "hasRequirement",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/provenance"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/007-hasevidence",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/002-recycled-aluminum-intake",
+      "relationshipType": "hasEvidence",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/component-coc"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/008-performedby",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/003-manufacture-critical-lots",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/siliconforge"
+      ]
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/009-hasoutput",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/003-manufacture-critical-lots",
+      "relationshipType": "hasOutput",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/lot/compute-module-cm7-26h1",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/lot/secure-element-se9-26h1"
+      ],
+      "scope": "build"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/010-hasrequirement",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/003-manufacture-critical-lots",
+      "relationshipType": "hasRequirement",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/provenance"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/011-hasevidence",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/003-manufacture-critical-lots",
+      "relationshipType": "hasEvidence",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/component-coc"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/012-performedby",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/004-manufacture-pcba-lot",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/boardfab"
+      ]
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/013-hasinput",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/004-manufacture-pcba-lot",
+      "relationshipType": "hasInput",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/lot/compute-module-cm7-26h1",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/lot/secure-element-se9-26h1"
+      ],
+      "scope": "build"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/014-hasoutput",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/004-manufacture-pcba-lot",
+      "relationshipType": "hasOutput",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/lot/pcba-26-07-a17"
+      ],
+      "scope": "build"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/015-hasrequirement",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/004-manufacture-pcba-lot",
+      "relationshipType": "hasRequirement",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/provenance"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/016-hasevidence",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/004-manufacture-pcba-lot",
+      "relationshipType": "hasEvidence",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/component-coc"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/017-performedby",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/005-create-release-artifacts",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/arbor-devices",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#tool/slsa-provenance-generator"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/018-usestool",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/005-create-release-artifacts",
+      "relationshipType": "usesTool",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#tool/syft",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#tool/trivy",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#tool/slsa-provenance-generator"
+      ]
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/019-hasoutput",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/005-create-release-artifacts",
+      "relationshipType": "hasOutput",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/release/firmware-swu",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/release/gateway-agent-oci",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/build/slsa-provenance",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/build/sbom-generation-log"
+      ],
+      "scope": "build"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/020-hasrequirement",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/005-create-release-artifacts",
+      "relationshipType": "hasRequirement",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/signed-firmware",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/sbom-delivery"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/021-conformsto",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/005-create-release-artifacts",
+      "relationshipType": "conformsTo",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#spec/slsa-provenance-v1-2",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#spec/cisa-2025-sbom-min-elements"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/022-performedby",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/006-final-assembly",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/arbor-devices",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/person/owen-ross"
+      ]
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/023-hasinput",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/006-final-assembly",
+      "relationshipType": "hasInput",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/lot/pcba-26-07-a17",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/lot/enclosure-26-07-k2"
+      ],
+      "scope": "build"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/024-hasoutput",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/006-final-assembly",
+      "relationshipType": "hasOutput",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/device/sg1-sn-26-000042"
+      ],
+      "scope": "build"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/025-hasrequirement",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/006-final-assembly",
+      "relationshipType": "hasRequirement",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/provenance"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/026-hasevidence",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/006-final-assembly",
+      "relationshipType": "hasEvidence",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/component-coc"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/027-performedby",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/007-reproduce-release-bundle",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#tool/in-toto-run",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/arbor-devices"
+      ]
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/028-hasinput",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/007-reproduce-release-bundle",
+      "relationshipType": "hasInput",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/release/firmware-swu",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/release/gateway-agent-oci",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/build/slsa-provenance"
+      ],
+      "scope": "build"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/029-hasoutput",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/007-reproduce-release-bundle",
+      "relationshipType": "hasOutput",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/config/provisioning-manifest"
+      ],
+      "scope": "build"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/030-hasrequirement",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/007-reproduce-release-bundle",
+      "relationshipType": "hasRequirement",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/signed-firmware"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/031-hasevidence",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/007-reproduce-release-bundle",
+      "relationshipType": "hasEvidence",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/build/slsa-provenance"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/032-performedby",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/008-provision-firmware-and-seal",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/arbor-devices",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#tool/secure-boot-attester"
+      ]
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/033-hasinput",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/008-provision-firmware-and-seal",
+      "relationshipType": "hasInput",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/device/sg1-sn-26-000042",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/tamper-seal/ts-9f42",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/release/firmware-swu",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/release/gateway-agent-oci",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/config/provisioning-manifest"
+      ],
+      "scope": "build"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/034-affects",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/008-provision-firmware-and-seal",
+      "relationshipType": "affects",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/device/sg1-sn-26-000042",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/tamper-seal/ts-9f42"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/035-hasrequirement",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/008-provision-firmware-and-seal",
+      "relationshipType": "hasRequirement",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/signed-firmware",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/tamper"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/036-hasevidence",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/008-provision-firmware-and-seal",
+      "relationshipType": "hasEvidence",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/secure-boot-test"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/037-performedby",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/009-state-provisioned",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/person/owen-ross"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/038-affects",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/009-state-provisioned",
+      "relationshipType": "affects",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/device/sg1-sn-26-000042"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/039-hasevidence",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/009-state-provisioned",
+      "relationshipType": "hasEvidence",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/secure-boot-test"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/040-performedby",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/010-secure-staging-storage",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/futura-logistics"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/041-affects",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/010-secure-staging-storage",
+      "relationshipType": "affects",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/device/sg1-sn-26-000042"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/042-hasrequirement",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/010-secure-staging-storage",
+      "relationshipType": "hasRequirement",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/custody",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/tamper"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/043-performedby",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/011-transfer-custody-to-carrier",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/person/nina-cho",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/futura-logistics"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/044-hasrequirement",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/011-transfer-custody-to-carrier",
+      "relationshipType": "hasRequirement",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/custody"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/045-hasevidence",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/011-transfer-custody-to-carrier",
+      "relationshipType": "hasEvidence",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/component-coc"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/046-performedby",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/012-cross-factory-carrier-boundary",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/futura-logistics"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/047-affects",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/012-cross-factory-carrier-boundary",
+      "relationshipType": "affects",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/device/sg1-sn-26-000042"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/048-hasrequirement",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/012-cross-factory-carrier-boundary",
+      "relationshipType": "hasRequirement",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/custody"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/049-hasevidence",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/012-cross-factory-carrier-boundary",
+      "relationshipType": "hasEvidence",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/component-coc"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/050-performedby",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/013-transport-austin-lax-denver",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/futura-logistics"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/051-affects",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/013-transport-austin-lax-denver",
+      "relationshipType": "affects",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/device/sg1-sn-26-000042"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/052-hasrequirement",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/013-transport-austin-lax-denver",
+      "relationshipType": "hasRequirement",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/custody",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/tamper"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/053-hasevidence",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/013-transport-austin-lax-denver",
+      "relationshipType": "hasEvidence",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/shock-telemetry"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/054-performedby",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/014-shock-excursion-out-of-spec",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/futura-logistics"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/055-affects",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/014-shock-excursion-out-of-spec",
+      "relationshipType": "affects",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/device/sg1-sn-26-000042"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/056-hasrequirement",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/014-shock-excursion-out-of-spec",
+      "relationshipType": "hasRequirement",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/tamper"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/057-hasevidence",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/014-shock-excursion-out-of-spec",
+      "relationshipType": "hasEvidence",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/shock-telemetry"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/058-performedby",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/015-state-quarantine",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/assurance-lab",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/person/samir-ali"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/059-affects",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/015-state-quarantine",
+      "relationshipType": "affects",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/device/sg1-sn-26-000042"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/060-hasrequirement",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/015-state-quarantine",
+      "relationshipType": "hasRequirement",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/tamper"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/061-hasevidence",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/015-state-quarantine",
+      "relationshipType": "hasEvidence",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/shock-telemetry"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/062-performedby",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/016-receiving-inspection",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/assurance-lab",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/person/samir-ali"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/063-affects",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/016-receiving-inspection",
+      "relationshipType": "affects",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/device/sg1-sn-26-000042",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/tamper-seal/ts-9f42"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/064-hasrequirement",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/016-receiving-inspection",
+      "relationshipType": "hasRequirement",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/tamper",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/custody"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/065-hasevidence",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/016-receiving-inspection",
+      "relationshipType": "hasEvidence",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/inspection-record",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/component-coc"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/066-performedby",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/017-secure-boot-acceptance-test",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/assurance-lab",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#tool/secure-boot-attester",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/person/claire-dubois"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/067-usestool",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/017-secure-boot-acceptance-test",
+      "relationshipType": "usesTool",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#tool/secure-boot-attester",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#tool/in-toto-run"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/068-affects",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/017-secure-boot-acceptance-test",
+      "relationshipType": "affects",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/device/sg1-sn-26-000042",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/release/firmware-swu"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/069-hasrequirement",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/017-secure-boot-acceptance-test",
+      "relationshipType": "hasRequirement",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/signed-firmware",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/tamper"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/070-hasevidence",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/017-secure-boot-acceptance-test",
+      "relationshipType": "hasEvidence",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/secure-boot-test"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/071-performedby",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/018-resolve-shock-excursion",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/assurance-lab",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/person/claire-dubois"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/072-resolved",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/018-resolve-shock-excursion",
+      "relationshipType": "resolved",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/014-shock-excursion-out-of-spec"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/073-hasresolution",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/018-resolve-shock-excursion",
+      "relationshipType": "hasResolution",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/014-shock-excursion-out-of-spec"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/074-affects",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/018-resolve-shock-excursion",
+      "relationshipType": "affects",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/device/sg1-sn-26-000042"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/075-hasrequirement",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/018-resolve-shock-excursion",
+      "relationshipType": "hasRequirement",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/tamper"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/076-hasevidence",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/018-resolve-shock-excursion",
+      "relationshipType": "hasEvidence",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/resolution-record",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/inspection-record",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/secure-boot-test"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/077-performedby",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/019-state-accepted",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/assurance-lab"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/078-affects",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/019-state-accepted",
+      "relationshipType": "affects",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/device/sg1-sn-26-000042"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/079-hasevidence",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/019-state-accepted",
+      "relationshipType": "hasEvidence",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/resolution-record"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/080-performedby",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/020-transfer-ownership-to-edgeops",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/edgeops",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/futura-logistics"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/081-hasrequirement",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/020-transfer-ownership-to-edgeops",
+      "relationshipType": "hasRequirement",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/custody"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/082-hasevidence",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/020-transfer-ownership-to-edgeops",
+      "relationshipType": "hasEvidence",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/acceptance-pack"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/083-performedby",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/021-transport-denver-wyoming",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/edgeops"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/084-affects",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/021-transport-denver-wyoming",
+      "relationshipType": "affects",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/device/sg1-sn-26-000042"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/085-hasrequirement",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/021-transport-denver-wyoming",
+      "relationshipType": "hasRequirement",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/custody"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/086-hasevidence",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/021-transport-denver-wyoming",
+      "relationshipType": "hasEvidence",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/acceptance-pack"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/087-performedby",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/022-commission-at-site",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/edgeops"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/088-affects",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/022-commission-at-site",
+      "relationshipType": "affects",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/device/sg1-sn-26-000042"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/089-hasrequirement",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/022-commission-at-site",
+      "relationshipType": "hasRequirement",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/sbom-delivery"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/090-hasevidence",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/022-commission-at-site",
+      "relationshipType": "hasEvidence",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/acceptance-pack"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/091-performedby",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/023-plan-retirement",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/edgeops",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/circular-recoveries"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/092-affects",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/023-plan-retirement",
+      "relationshipType": "affects",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/device/sg1-sn-26-000042"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/093-hasrequirement",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/023-plan-retirement",
+      "relationshipType": "hasRequirement",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/decommission"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/094-hasoutput",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/023-plan-retirement",
+      "relationshipType": "hasOutput",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/config/retirement-plan"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/095-conformsto",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/023-plan-retirement",
+      "relationshipType": "conformsTo",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#spec/arborlink-supply-chain-plan"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/096-performedby",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/024-destroy-retired-tamper-seal",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/edgeops"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/097-affects",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/024-destroy-retired-tamper-seal",
+      "relationshipType": "affects",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/tamper-seal/ts-9f42"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/098-hasrequirement",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/024-destroy-retired-tamper-seal",
+      "relationshipType": "hasRequirement",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/decommission"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/099-hasevidence",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/024-destroy-retired-tamper-seal",
+      "relationshipType": "hasEvidence",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/config/retirement-plan"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/100-performedby",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/025-state-deployed",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#agent/org/edgeops"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/101-affects",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/025-state-deployed",
+      "relationshipType": "affects",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/device/sg1-sn-26-000042"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/102-hasevidence",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#action/025-state-deployed",
+      "relationshipType": "hasEvidence",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/acceptance-pack",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/config/retirement-plan"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/103-describes",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#sbom/arborlink-sg1",
+      "relationshipType": "describes",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/device/sg1-sn-26-000042"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/104-contains",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/device/sg1-sn-26-000042",
+      "relationshipType": "contains",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/lot/pcba-26-07-a17",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/lot/compute-module-cm7-26h1",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/lot/secure-element-se9-26h1",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/lot/enclosure-26-07-k2",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/tamper-seal/ts-9f42"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/105-runson",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#pkg/firmware",
+      "relationshipType": "runsOn",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/device/sg1-sn-26-000042"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/106-runson",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#pkg/gateway-agent",
+      "relationshipType": "runsOn",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/device/sg1-sn-26-000042"
+      ]
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/107-dependson",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#pkg/firmware",
+      "relationshipType": "dependsOn",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#pkg/bootloader",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#pkg/linux-image",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#pkg/openssl",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#pkg/busybox"
+      ],
+      "scope": "runtime"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/108-dependson",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#pkg/gateway-agent",
+      "relationshipType": "dependsOn",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#pkg/openssl",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#pkg/libmosquitto"
+      ],
+      "scope": "runtime"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/109-hasdistributionartifact",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#pkg/firmware",
+      "relationshipType": "hasDistributionArtifact",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/release/firmware-swu"
+      ],
+      "scope": "build"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/110-hasdistributionartifact",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#pkg/gateway-agent",
+      "relationshipType": "hasDistributionArtifact",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/release/gateway-agent-oci"
+      ],
+      "scope": "build"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/111-hasinput",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#build/release-2026-07-0",
+      "relationshipType": "hasInput",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/config/build-recipe"
+      ],
+      "scope": "build"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/112-hasoutput",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#build/release-2026-07-0",
+      "relationshipType": "hasOutput",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/release/firmware-swu",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/release/gateway-agent-oci",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/build/slsa-provenance",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/build/sbom-generation-log"
+      ],
+      "scope": "build"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/113-usestool",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#build/release-2026-07-0",
+      "relationshipType": "usesTool",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#tool/syft",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#tool/trivy",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#tool/slsa-provenance-generator"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/114-hasdeclaredlicense",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#pkg/firmware",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#license/proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/115-hasconcludedlicense",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#pkg/firmware",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#license/proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/116-hasdeclaredlicense",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#pkg/linux-image",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#license/gpl-2.0-only"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/117-hasdeclaredlicense",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#pkg/openssl",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#license/apache-2.0"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/118-hasdeclaredlicense",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#pkg/busybox",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#license/gpl-2.0-only"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/119-hasdeclaredlicense",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#pkg/libmosquitto",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#license/mit"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/120-conformsto",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/provenance",
+      "relationshipType": "conformsTo",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#spec/arborlink-supply-chain-plan"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/121-conformsto",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/custody",
+      "relationshipType": "conformsTo",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#spec/arborlink-supply-chain-plan"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/122-conformsto",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/tamper",
+      "relationshipType": "conformsTo",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#spec/arborlink-supply-chain-plan"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/123-conformsto",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/signed-firmware",
+      "relationshipType": "conformsTo",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#spec/arborlink-supply-chain-plan"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/124-conformsto",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/sbom-delivery",
+      "relationshipType": "conformsTo",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#spec/arborlink-supply-chain-plan"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/125-conformsto",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/decommission",
+      "relationshipType": "conformsTo",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#spec/arborlink-supply-chain-plan"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/126-hasrequirement",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/device/sg1-sn-26-000042",
+      "relationshipType": "hasRequirement",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/provenance",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/custody",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/tamper",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/signed-firmware",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/sbom-delivery",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#req/decommission"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#relationship/127-hasevidence",
+      "creationInfo": "_:arborlink-sg1-creation-info",
+      "from": "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#hardware/device/sg1-sn-26-000042",
+      "relationshipType": "hasEvidence",
+      "to": [
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/component-coc",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/shock-telemetry",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/inspection-record",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/secure-boot-test",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/resolution-record",
+        "https://spdx.org/spdxdocs/arborlink-sg1-2026.07-supply-chain#file/supply-chain/acceptance-pack"
+      ]
+    }
+  ]
+}

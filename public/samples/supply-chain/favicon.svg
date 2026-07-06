@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Supply chain sample">
+  <defs>
+    <linearGradient id="g" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#22c55e"/>
+      <stop offset="1" stop-color="#38bdf8"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#0f172a"/>
+  <path d="M18 22h12v12H18zM34 14h12v12H34zM34 38h12v12H34z" fill="url(#g)" opacity=".95"/>
+  <path d="M30 28l8-5M30 31l8 12" fill="none" stroke="#e2e8f0" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="18" cy="22" r="3" fill="#f59e0b"/>
+  <circle cx="46" cy="14" r="3" fill="#f59e0b"/>
+  <circle cx="46" cy="50" r="3" fill="#f59e0b"/>
+</svg>
