@@ -662,7 +662,10 @@ export const accessorsMixin = {
       push('Based on', v?.name || this.cleanName(el.functionalsafety_evaluationBasedOn));
     }
     // Shared: the reasoning behind the requirement / verification / evaluation
-    push('Rationale', el.rationale || el.functionalsafety_rationale);
+    push(
+      'Rationale',
+      el.rationale || el.functionalsafety_rationale || el.functionalsafety_evaluationRationale
+    );
     return out;
   },
 
