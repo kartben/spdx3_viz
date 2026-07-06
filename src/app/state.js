@@ -112,12 +112,18 @@ export function createState() {
     // A link into a snippet opens this popup: the file's source with the
     // snippet's lines highlighted. Data is retained while the popup fades out
     // (visibility is driven by snippetModalOpen) so the header doesn't flash.
-    snippetModal: null, // { snippetId, fileId, fileName, baseName, name, start, end, sourceUrl }
+    // { snippetId, fileId, fileName, baseName, name, start, end, ranges, rangeCount,
+    //   sourceUrl, expanded } — `expanded` maps a collapsed-gap key to the number
+    //   of extra lines the user has revealed there (see _collapseSource).
+    snippetModal: null,
     snippetModalOpen: false,
     _scrollSnippetSeq: 0, // invalidates pending _scrollSnippetModal retries
     // Graph detail panel: the snippet whose source is currently shown inline, so
     // its highlighted lines are only scrolled into view once per selection.
     _detailSnippetId: null,
+    // gap key -> revealed line count for the detail panel's inline snippet source
+    // (mirrors snippetModal.expanded; reset when the selected snippet changes).
+    detailSnippetExpanded: {},
     _scrollDetailSnippetSeq: 0, // invalidates pending _scrollDetailSnippet retries
     configSearch: '',
     buildSearch: '',

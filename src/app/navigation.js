@@ -681,7 +681,8 @@ export const navigationMixin = {
       end: effective[0].end,
       ranges: effective,
       rangeCount: ranges.length,
-      sourceUrl: this.fileSourceIndex.get(fileId) || ''
+      sourceUrl: this.fileSourceIndex.get(fileId) || '',
+      expanded: {} // gap key -> revealed line count (see _collapseSource)
     };
     this.snippetModalOpen = true;
     this.loadFileSource(fileId);
@@ -716,6 +717,106 @@ export const navigationMixin = {
     this.$nextTick(() => requestAnimationFrame(() => attempt(30)));
   },
 
+  // Collapses a file's full line list down to just the covered ranges plus a few
+  // lines of context, folding the long stretches in between into clickable "N
+  // lines hidden" gaps, so a link into a file shows the important code directly
+  // instead of the whole file. Returns a flat list of segments the source
+  // viewers render: { kind:'code', lineNum, html, covered } | { kind:'gap',
+  // key, hidden }. `expanded` maps a gap key to how many extra lines the user
+  // has revealed there (see expandSnippetGap); over-revealing simply opens the
+  // gap fully. With no line ranges the whole file is shown, nothing collapsed.
+  _collapseSource(lines, ranges, expanded) {
+    const total = lines.length;
+    const valid = (ranges || []).filter((r) => Number.isFinite(r.start));
+    if (!valid.length) {
+      return lines.map((l) => ({
+        kind: 'code',
+        lineNum: l.lineNum,
+        html: l.html,
+        covered: false
+      }));
+    }
+    const CONTEXT = 6; // lines of surrounding code kept around each range
+    const MIN_GAP = 4; // shorter stretches aren't worth collapsing
+    const clamp = (n) => Math.max(1, Math.min(total, n));
+    const isCovered = (n) => valid.some((r) => n >= r.start && n <= (r.end ?? r.start));
+
+    // Each range grows to a context window; overlapping/near windows merge so
+    // adjacent ranges read as one block rather than a seam of tiny gaps.
+    const windows = [];
+    valid
+      .map((r) => ({ start: clamp(r.start - CONTEXT), end: clamp((r.end ?? r.start) + CONTEXT) }))
+      .sort((a, b) => a.start - b.start)
+      .forEach((w) => {
+        const last = windows[windows.length - 1];
+        if (last && w.start <= last.end + MIN_GAP) last.end = Math.max(last.end, w.end);
+        else windows.push({ ...w });
+      });
+    // Absorb tiny head/tail stretches rather than showing a 1-3 line gap.
+    if (windows[0].start - 1 < MIN_GAP) windows[0].start = 1;
+    const lastWin = windows[windows.length - 1];
+    if (total - lastWin.end < MIN_GAP) lastWin.end = total;
+
+    // Reveal: each gap opens toward the window that follows it (the trailing gap
+    // extends the last window's tail), clamped so it never crosses a neighbour.
+    const exp = expanded || {};
+    windows.forEach((w, i) => {
+      const rev = exp[i] || 0;
+      if (rev) w.start = Math.max((i > 0 ? windows[i - 1].end : 0) + 1, w.start - rev);
+    });
+    if (exp[windows.length]) lastWin.end = Math.min(total, lastWin.end + exp[windows.length]);
+
+    const segments = [];
+    let cursor = 1;
+    windows.forEach((w, i) => {
+      if (w.start > cursor) segments.push({ kind: 'gap', key: i, hidden: w.start - cursor });
+      for (let n = w.start; n <= w.end; n++) {
+        segments.push({
+          kind: 'code',
+          lineNum: n,
+          html: lines[n - 1]?.html ?? '',
+          covered: isCovered(n)
+        });
+      }
+      cursor = w.end + 1;
+    });
+    if (cursor <= total)
+      segments.push({ kind: 'gap', key: windows.length, hidden: total - cursor + 1 });
+    return segments;
+  },
+
+  // Collapsed source segments for the snippet popup (all its ranges) and the
+  // detail panel's inline viewer (the one selected snippet). null until the
+  // file's source has loaded.
+  get snippetModalSegments() {
+    const m = this.snippetModal;
+    const cache = m && this.fileSourceCache[m.fileId];
+    if (!m || !cache?.lines) return null;
+    return this._collapseSource(cache.lines, m.ranges || [], m.expanded || {});
+  },
+  get detailSnippetSegments() {
+    const ref = this.detailSnippet;
+    const cache = ref && this.fileSourceCache[ref.fileId];
+    if (!ref || !cache?.lines) return null;
+    return this._collapseSource(
+      cache.lines,
+      [{ start: ref.start, end: ref.end }],
+      this.detailSnippetExpanded
+    );
+  },
+  // Reveal a collapsed gap by a chunk (over-revealing opens it fully).
+  expandSnippetGap(key) {
+    const m = this.snippetModal;
+    if (!m) return;
+    m.expanded = { ...(m.expanded || {}), [key]: (m.expanded?.[key] || 0) + 40 };
+  },
+  expandDetailSnippetGap(key) {
+    this.detailSnippetExpanded = {
+      ...this.detailSnippetExpanded,
+      [key]: (this.detailSnippetExpanded?.[key] || 0) + 40
+    };
+  },
+
   // True when the graph-selected element is a snippet, gating the inline source
   // viewer in the detail panel.
   get isSnippetDetail() {
@@ -737,6 +838,7 @@ export const navigationMixin = {
     this.loadFileSource(ref.fileId);
     if (this._detailSnippetId !== el.spdxId) {
       this._detailSnippetId = el.spdxId;
+      this.detailSnippetExpanded = {}; // fresh collapse state per snippet
       this._scrollDetailSnippet(ref.start);
     }
   },

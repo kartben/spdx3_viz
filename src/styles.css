@@ -747,6 +747,40 @@ body.detail-resizing {
   color: #adbac7;
 }
 
+/* Collapsed stretch between covered ranges: a slim, full-width divider that
+   reveals more lines on click. */
+.source-viewer .sv-gap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 3px 12px;
+  font-size: 11px;
+  color: #3d4f63;
+  background: #0a0e13;
+  border: none;
+  border-top: 1px solid #1c2533;
+  border-bottom: 1px solid #1c2533;
+}
+
+.source-viewer .sv-gap .sv-gap-line {
+  flex: 1;
+  height: 1px;
+  background: #1c2533;
+}
+
+.source-viewer .sv-gap-btn {
+  cursor: pointer;
+  transition:
+    background 0.12s,
+    color 0.12s;
+}
+
+.source-viewer .sv-gap-btn:hover {
+  background: #111822;
+  color: #5b7a99;
+}
+
 /* In the snippet popup the modal body owns the scroll, so the viewer fills it. */
 .source-viewer.sv-modal {
   max-height: none;
