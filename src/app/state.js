@@ -223,13 +223,16 @@ export function createState() {
     graphSvg: null,
     graphCanvasSel: null,
     graphZoom: null,
+    graphTransform: null, // last pan/zoom, so a rebuild can restore the user's view
+    graphAutoFit: true, // reframe to fit on every rebuild until the user pans/zooms manually
+
     graphFilters: createGraphFilters(),
     // Lifecycle-scope filters (build / runtime / …). All active by default, so
     // the graph is unchanged until the user narrows to a scope.
     scopeFilters: createScopeFilters(),
     graphAggregate: false,
     graphUseIcons: false, // draw nodes as their type's Material icon instead of a plain dot
-    graphHideOrphans: false, // hide nodes left with no edges once every other filter is applied
+    graphHideOrphans: true, // hide nodes left with no edges once every other filter is applied
     // Heatmap overlay: 'off' or a HEAT_MODES key (vuln / failed / unverified).
     // Blooms a glow over the elements carrying that risk signal without touching
     // the base node/edge draw.

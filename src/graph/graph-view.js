@@ -1330,9 +1330,35 @@ export function renderGraph(app, retry = 0) {
     return hitTree.find(wx, wy, r);
   };
 
+  // Auto-fit keeps the whole layout framed while it settles, so any rebuild
+  // (filters, hide orphans, aggregate, expand, first load) reframes without the
+  // user waiting for the force sim to fully cool. It runs live (instant, no
+  // transition) during the build's own settle only: `building` gates it off once
+  // the layout first ends, so a later reheat (dragging a node) does not yank the
+  // view, and `dragging` suppresses it mid-drag. A user who has panned/zoomed
+  // (auto-fit off) is left alone. `app.graphFitView` is defined further below but
+  // only ever called here asynchronously, by which point it is assigned.
+  let building = true;
+  let dragging = false;
+  let lastFitAt = 0;
+  const autoFitTick = () => {
+    if (!building || dragging || app.graphAutoFit === false || !app.graphFitView) return;
+    const now = performance.now();
+    if (now - lastFitAt < 90) return; // throttle so we reframe ~10x/s, not every tick
+    lastFitAt = now;
+    app.graphFitView(0);
+  };
+
   sim.on('tick', () => {
     hitTreeDirty = true;
     queueDraw();
+    autoFitTick();
+  });
+
+  sim.on('end', () => {
+    if (!building) return; // ignore reheats (e.g. node drag) after the first settle
+    building = false;
+    if (app.graphAutoFit !== false && app.graphFitView) app.graphFitView();
   });
 
   // 8. Interaction: zoom/pan, node drag, hover, click, double-click expand; hit-testing via findNode().
@@ -1411,6 +1437,11 @@ export function renderGraph(app, retry = 0) {
     })
     .on('zoom', (event) => {
       currentTransform = event.transform;
+      app.graphTransform = event.transform; // remembered so a rebuild can restore the user's view
+      // A real gesture (wheel/pan) means the user is driving the view, so stop
+      // auto-fitting on rebuilds until they hit "reset zoom" again. Programmatic
+      // transforms (fit/restore) have no sourceEvent and must not flip this.
+      if (event.sourceEvent) app.graphAutoFit = false;
       queueDraw();
     });
 
@@ -1426,6 +1457,7 @@ export function renderGraph(app, retry = 0) {
     })
     .on('start', (event) => {
       if (!event.subject) return;
+      dragging = true; // hold auto-fit while the user repositions a node
       if (!event.active) sim.alphaTarget(0.3).restart();
       event.subject.fx = event.subject.x;
       event.subject.fy = event.subject.y;
@@ -1438,6 +1470,7 @@ export function renderGraph(app, retry = 0) {
     })
     .on('end', (event) => {
       if (!event.subject) return;
+      dragging = false;
       if (!event.active) sim.alphaTarget(0);
       event.subject.fx = null;
       event.subject.fy = null;
@@ -1445,6 +1478,13 @@ export function renderGraph(app, retry = 0) {
 
   sel.call(app.graphZoom).on('dblclick.zoom', null);
   sel.call(drag);
+
+  // A rebuild makes a fresh canvas at identity. If the user is driving the view
+  // (auto-fit off), restore their last pan/zoom so toggling a filter doesn't yank
+  // them back; otherwise leave identity and let the settle handler fit the layout.
+  if (app.graphAutoFit === false && app.graphTransform) {
+    sel.call(app.graphZoom.transform, app.graphTransform);
+  }
 
   canvas.addEventListener('mousemove', (event) => {
     const found = pointerNode(event);
@@ -1529,6 +1569,40 @@ export function renderGraph(app, retry = 0) {
   // A pure redraw (no re-layout) so visual-only toggles like icon mode can flip
   // a flag and repaint the settled canvas instead of restarting the simulation.
   app.graphRedraw = queueDraw;
+  // Frame the whole (visible) layout in the viewport: the "reset zoom" control
+  // fits the graph rather than snapping to a 1:1 identity view that leaves most
+  // of a spread-out layout off-screen. Skips search-hidden nodes so a focused
+  // search reframes to the matches.
+  app.graphFitView = (duration = 500) => {
+    const pts = renderNodes.filter((d) => !nodeSearchStyle(d.id).hidden);
+    if (!pts.length) return;
+    // Fitting (the "reset zoom" control) opts back into auto-fit on rebuilds.
+    app.graphAutoFit = true;
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+    for (const d of pts) {
+      const r = radiusFor(d);
+      if (d.x - r < minX) minX = d.x - r;
+      if (d.y - r < minY) minY = d.y - r;
+      if (d.x + r > maxX) maxX = d.x + r;
+      if (d.y + r > maxY) maxY = d.y + r;
+    }
+    const bw = Math.max(maxX - minX, 1);
+    const bh = Math.max(maxY - minY, 1);
+    const cx = (minX + maxX) / 2;
+    const cy = (minY + maxY) / 2;
+    const [minK, maxK] = app.graphZoom.scaleExtent();
+    // 0.9 keeps a small margin; cap at 1 so a tiny graph stays 1:1 rather than
+    // ballooning to fill the canvas.
+    const k = Math.max(minK, Math.min(maxK, 1, 0.9 * Math.min(width / bw, height / bh)));
+    const t = d3.zoomIdentity.translate(width / 2 - k * cx, height / 2 - k * cy).scale(k);
+    const target = duration
+      ? app.graphCanvasSel.transition().duration(duration)
+      : app.graphCanvasSel;
+    target.call(app.graphZoom.transform, t);
+  };
   // Re-fold the heat index onto the settled layout and repaint, so switching heat
   // mode never restarts the force simulation.
   app.graphRecomputeHeat = () => {
@@ -1552,7 +1626,8 @@ export function renderGraph(app, retry = 0) {
 }
 
 export function resetGraphZoom(app) {
-  if (app.graphCanvasSel && app.graphZoom) {
+  if (app.graphFitView) app.graphFitView();
+  else if (app.graphCanvasSel && app.graphZoom) {
     app.graphCanvasSel.transition().duration(500).call(app.graphZoom.transform, d3.zoomIdentity);
   }
 }

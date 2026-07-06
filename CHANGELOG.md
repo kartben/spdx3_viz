@@ -7,6 +7,7 @@ via the "What's new" link.
 
 - **Added:** Graph heatmap overlay for vulnerabilities, failing and unverified requirements.
 - **Added:** "Hide orphans" graph toggle, to declutter disconnected nodes.
+- **Improved:** Graph auto-fits to view on changes; reset zoom frames it all.
 - **Improved:** Multiple snippet ranges of one file collapse into a single link.
 - **Improved:** Snippet source viewer folds away code between covered ranges.
 
