@@ -19,9 +19,11 @@ const ICON_SPAN = 1.2;
 const ICON_HALO_ALPHA = 0.22;
 
 const INPUT_LAYOUT_LINKS_PER_BUILD = 8;
-// Above this many underlying nodes, force-collapse into clusters for readability (a flat
-// graph of many thousands of nodes is an unreadable hairball) and surface a hint.
+// Above this many underlying nodes or edges, force-collapse into clusters for
+// readability (a flat graph of many thousands of nodes or a hairball of edges
+// is unusable) and surface a hint.
 const MAX_FLAT_NODES = 4000;
+const MAX_FLAT_EDGES = 8000;
 // Only draw labels past this zoom level, capped per frame, since they become noise when zoomed out.
 const LABEL_ZOOM_THRESHOLD = 1.1;
 const MAX_LABELS = 400;
@@ -372,7 +374,7 @@ export function renderGraph(app, retry = 0) {
   //    build steps into their root build; everything else is its own node.
   let aggregate = app.graphAggregate;
   app.graphTruncated = false;
-  if (!aggregate && uNodes.length > MAX_FLAT_NODES) {
+  if (!aggregate && (uNodes.length > MAX_FLAT_NODES || uLinks.length > MAX_FLAT_EDGES)) {
     aggregate = true;
     app.graphTruncated = true;
   }
