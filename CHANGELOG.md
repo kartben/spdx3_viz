@@ -3,6 +3,8 @@
 All notable changes to this project are documented here. Also viewable in-app
 via the "What's new" link.
 
+## Unreleased
+
 ## [0.0.6] - 2026-07-06
 
 - **Added:** Snippet source viewer, with requirement-to-code traceability.
