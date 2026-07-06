@@ -9737,7 +9737,7 @@
       "namespaceMap": [
         {
           "type": "NamespaceMap",
-          "namespace": "http://spdx.org/spdxdocs/zephyr-420cd902-f8fc-4e8e-9b9b-2eae2dd7ade5/",
+          "namespace": "http://spdx.org/spdxdocs/zephyr-7c418ee5-8392-445f-b5c6-7c4122363404/",
           "prefix": "zephyr"
         }
       ],
@@ -11290,7 +11290,7 @@
     {
       "type": "CreationInfo",
       "@id": "zephyr:creationinfo",
-      "created": "2026-07-06T08:57:31Z",
+      "created": "2026-07-06T11:55:41Z",
       "createdBy": [
         "zephyr:agents/west-spdx-agent"
       ],
