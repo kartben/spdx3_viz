@@ -644,21 +644,47 @@ export const navigationMixin = {
   // carved from, with the snippet's lines highlighted and scrolled into view,
   // plus a link to open the full file in the Files view.
   openSnippet(snippetId) {
-    const snip = this.elementMap.get(snippetId);
-    const ref = snippetFileRef(snip, this.elementMap);
-    if (!ref?.fileId) return;
+    this._openSnippetModal([snippetId]);
+  },
+  // Open several ranges of the same file in one popup, highlighting every range
+  // and scrolling to the first. Backs the collapsed "N ranges" relationship row
+  // (see snippetRow in accessors.js).
+  openSnippetRanges(snippetIds) {
+    this._openSnippetModal(Array.isArray(snippetIds) ? snippetIds : [snippetIds]);
+  },
+  // Shared popup builder for one or more snippets. The ranges are confined to
+  // the first snippet's file (a collapsed range row always shares one file),
+  // sorted by start line so the highlights and the scroll target read top-down.
+  _openSnippetModal(snippetIds) {
+    const refs = (snippetIds || [])
+      .map((id) => ({ id, ref: snippetFileRef(this.elementMap.get(id), this.elementMap) }))
+      .filter((s) => s.ref?.fileId);
+    if (!refs.length) return;
+    const fileId = refs[0].ref.fileId;
+    const first = refs[0].ref;
+    const ranges = refs
+      .filter((s) => s.ref.fileId === fileId && s.ref.start != null)
+      .map((s) => ({ start: s.ref.start, end: s.ref.end ?? s.ref.start }))
+      .sort((a, b) => a.start - b.start);
+    // Fall back to a single (possibly line-less) range so the header/highlight
+    // bindings always have something to read.
+    const effective = ranges.length
+      ? ranges
+      : [{ start: first.start, end: first.end ?? first.start }];
     this.snippetModal = {
-      snippetId,
-      fileId: ref.fileId,
-      fileName: ref.fileName,
-      baseName: ref.baseName,
-      name: ref.name,
-      start: ref.start,
-      end: ref.end,
-      sourceUrl: this.fileSourceIndex.get(ref.fileId) || ''
+      snippetId: refs[0].id,
+      fileId,
+      fileName: first.fileName,
+      baseName: first.baseName,
+      name: refs.length === 1 ? first.name : '',
+      start: effective[0].start,
+      end: effective[0].end,
+      ranges: effective,
+      rangeCount: ranges.length,
+      sourceUrl: this.fileSourceIndex.get(fileId) || ''
     };
     this.snippetModalOpen = true;
-    this.loadFileSource(ref.fileId);
+    this.loadFileSource(fileId);
     this._scrollSnippetModal();
   },
   closeSnippetModal() {

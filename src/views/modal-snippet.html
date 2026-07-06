@@ -37,7 +37,9 @@
       <span
         x-show="snippetModal?.start != null"
         class="badge flex-shrink-0 bg-amber-400/10 text-xs text-amber-300"
-        x-text="'L' + snippetModal?.start + (snippetModal?.end && snippetModal?.end !== snippetModal?.start ? '-' + snippetModal?.end : '')"
+        x-text="snippetModal?.rangeCount > 1
+          ? snippetModal.rangeCount + ' ranges'
+          : 'L' + snippetModal?.start + (snippetModal?.end && snippetModal?.end !== snippetModal?.start ? '-' + snippetModal?.end : '')"
       ></span>
       <button
         type="button"
@@ -122,9 +124,8 @@
                   class="sv-line"
                   :data-line="line.lineNum"
                   :class="{
-                    highlighted:
-                      line.lineNum >= snippetModal.start &&
-                      line.lineNum <= (snippetModal.end ?? snippetModal.start)
+                    highlighted: (snippetModal.ranges || [{ start: snippetModal.start, end: snippetModal.end }])
+                      .some(r => line.lineNum >= r.start && line.lineNum <= (r.end ?? r.start))
                   }"
                 >
                   <span class="sv-lnum" x-text="line.lineNum"></span>

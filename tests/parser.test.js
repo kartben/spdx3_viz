@@ -938,6 +938,64 @@ test('detailRelGroupsFor surfaces lifecycle-scoped relationships with their scop
   assert.equal(dyn.items[0].scope, 'runtime');
 });
 
+test('detailRelGroupsFor collapses same-file snippet endpoints into one N-ranges row', () => {
+  const app = spdxApp();
+  const graph = [
+    { type: 'Requirement', spdxId: 'req:1', name: 'REQ-1' },
+    { type: 'software_File', spdxId: 'file:a', name: 'thread.c' },
+    { type: 'software_File', spdxId: 'file:b', name: 'sched.c' },
+    {
+      type: 'software_Snippet',
+      spdxId: 'snip:a2',
+      software_snippetFromFile: 'file:a',
+      software_lineRange: { beginIntegerRange: 200, endIntegerRange: 210 }
+    },
+    {
+      type: 'software_Snippet',
+      spdxId: 'snip:a1',
+      software_snippetFromFile: 'file:a',
+      software_lineRange: { beginIntegerRange: 10, endIntegerRange: 20 }
+    },
+    {
+      type: 'software_Snippet',
+      spdxId: 'snip:b1',
+      software_snippetFromFile: 'file:b',
+      software_lineRange: { beginIntegerRange: 5, endIntegerRange: 8 }
+    },
+    {
+      type: 'Relationship',
+      spdxId: 'rel:1',
+      relationshipType: 'implementedBy',
+      from: 'req:1',
+      to: ['snip:a1', 'snip:a2', 'snip:b1']
+    }
+  ];
+  const parsed = parseGraph(graph);
+  const indexes = buildRelationshipIndexes(parsed.relationships);
+  app.elementMap = parsed.elementMap;
+  app.relFromIndex = indexes.relFromIndex;
+  app.relToIndex = indexes.relToIndex;
+
+  const group = app
+    .detailRelGroupsFor({ spdxId: 'req:1' })
+    .find((g) => g.key === 'implementedBy:out');
+  assert.ok(group, 'expected an implementedBy:out group');
+  // Two files → two rows (three snippets collapsed), not three snippet rows.
+  assert.equal(group.total, 2);
+  assert.equal(group.items.length, 2);
+
+  const multi = group.items.find((i) => i.multiRange);
+  assert.ok(multi, 'expected a collapsed multi-range row for thread.c');
+  assert.match(multi.displayName, /thread\.c › 2 ranges/);
+  // Snippet ids ordered by start line so the popup opens at the first range.
+  assert.deepEqual(multi.snippetIds, ['snip:a1', 'snip:a2']);
+
+  // The lone snippet for sched.c stays a normal single-snippet row.
+  const single = group.items.find((i) => !i.multiRange);
+  assert.equal(single.id, 'snip:b1');
+  assert.ok(!single.snippetIds);
+});
+
 test('parseGraph reports present lifecycle scopes in lifecycle order with unscoped last', () => {
   const graph = [
     { type: 'software_Package', spdxId: 'pkg:app', name: 'app' },

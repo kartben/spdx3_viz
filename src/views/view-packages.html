@@ -554,7 +554,10 @@
               </div>
               <div class="space-y-1 ml-3">
                 <template x-for="item in group.items" :key="item.id">
-                  <div class="detail-rel-item group" @click.stop="navigateTo(item.id)">
+                  <div
+                    class="detail-rel-item group"
+                    @click.stop="item.multiRange ? openSnippetRanges(item.snippetIds) : navigateTo(item.id)"
+                  >
                     <span
                       class="detail-rel-arrow"
                       :style="`color: ${group.color}`"
