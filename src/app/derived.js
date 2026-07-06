@@ -43,6 +43,12 @@ export const derivedMixin = {
       { view: 'files', label: 'Files', count: this.files.length, type: 'file' },
       { view: 'hardware', label: 'Hardware', count: this.hardware.length, type: 'hardware' },
       {
+        view: 'supplychain',
+        label: 'Supply chain',
+        count: this.supplyChain.length,
+        type: 'supplychain'
+      },
+      {
         view: 'requirements',
         label: 'Safety elements',
         count: this.requirements.length,
@@ -183,6 +189,54 @@ export const derivedMixin = {
     return [...hw].sort((a, b) =>
       (a.name || this.cleanName(a.spdxId)).localeCompare(b.name || this.cleanName(b.spdxId))
     );
+  },
+
+  get supplyChainCounts() {
+    const c = { actions: 0, processes: 0, states: 0, exceptions: 0, resolutions: 0 };
+    this.supplyChain.forEach((el) => {
+      const kind = this.supplyChainKind(el);
+      if (kind === 'action') c.actions++;
+      else if (kind === 'process') c.processes++;
+      else if (kind === 'state') c.states++;
+      const status = this.supplyChainExceptionStatus(el);
+      if (status?.key === 'exception') c.exceptions++;
+      if (status?.key === 'resolved') c.resolutions++;
+    });
+    return c;
+  },
+
+  get filteredSupplyChain() {
+    let items = this.supplyChain;
+    if (this.supplyChainKindFilter) {
+      items = items.filter((el) => this.supplyChainKind(el) === this.supplyChainKindFilter);
+    }
+    if (this.supplyChainExceptionFilter) {
+      items = items.filter(
+        (el) => this.supplyChainExceptionStatus(el)?.key === this.supplyChainExceptionFilter
+      );
+    }
+    if (this.supplyChainSearch) {
+      const q = this.supplyChainSearch.toLowerCase();
+      items = items.filter(
+        (el) =>
+          (el.name || '').toLowerCase().includes(q) ||
+          this.cleanName(el.spdxId).toLowerCase().includes(q) ||
+          (el.description || '').toLowerCase().includes(q) ||
+          (el.summary || '').toLowerCase().includes(q) ||
+          (el.supplychain_transportRoute || '').toLowerCase().includes(q) ||
+          this.supplyChainTypeLabel(el).toLowerCase().includes(q)
+      );
+    }
+    const kindRank = { action: 0, state: 1, process: 2 };
+    return [...items].sort((a, b) => {
+      const at = a.startTime || a.endTime || '';
+      const bt = b.startTime || b.endTime || '';
+      if (at || bt) return at.localeCompare(bt) || this.supplyChainTypeLabel(a).localeCompare(this.supplyChainTypeLabel(b));
+      return (
+        (kindRank[this.supplyChainKind(a)] ?? 9) - (kindRank[this.supplyChainKind(b)] ?? 9) ||
+        (a.name || this.cleanName(a.spdxId)).localeCompare(b.name || this.cleanName(b.spdxId))
+      );
+    });
   },
 
   // Breakdown of the functional-safety elements by kind, for the tab header

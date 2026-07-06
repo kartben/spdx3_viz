@@ -58,6 +58,9 @@ export const RELATIONSHIP_TYPES = {
   EVALUATION_BASED_ON: 'evaluationBasedOn',
   // FunctionalSafety profile: names the agent who carried out a verification/evaluation activity.
   PERFORMED_BY: 'performedBy',
+  // SupplyChain profile: exception handling / resolution relationships.
+  RESOLVED: 'resolved',
+  HAS_RESOLUTION: 'hasResolution',
   // AI profile relationship types (AI model ↔ training/test dataset).
   TRAINED_ON: 'trainedOn',
   TESTED_ON: 'testedOn',
@@ -272,6 +275,8 @@ export const COLORS = {
   snippet: '#34d399',
   // Hardware profile node type + runsOn edges.
   hardware: '#a3e635',
+  // SupplyChain profile node type and exception/resolution lifecycle edges.
+  supplychain: '#06b6d4',
   // FunctionalSafety profile: Requirement node type + its safety relationship edges.
   requirement: '#eab308',
   tool: '#f59e0b',
@@ -363,6 +368,7 @@ export function createGraphFilters() {
     { key: 'dataset', label: 'Datasets', color: COLORS.dataset, active: true },
     { key: 'file', label: 'Files', color: COLORS.file, active: true },
     { key: 'hardware', label: 'Hardware', color: COLORS.hardware, active: true },
+    { key: 'supplychain', label: 'Supply Chain', color: COLORS.supplychain, active: true },
     { key: 'requirement', label: 'Functional Safety', color: COLORS.requirement, active: true },
     { key: 'tool', label: 'Tools', color: COLORS.tool, active: true },
     { key: 'build', label: 'Build', color: COLORS.build, active: true },
@@ -553,6 +559,22 @@ export function createGraphFilters() {
       isRel: true,
       lineStyle: 'dashed'
     },
+    {
+      key: 'resolved',
+      label: 'resolved',
+      color: COLORS.buildOutput,
+      active: true,
+      isRel: true,
+      lineStyle: 'longdash'
+    },
+    {
+      key: 'hasResolution',
+      label: 'hasResolution',
+      color: COLORS.buildOutput,
+      active: true,
+      isRel: true,
+      lineStyle: 'longdashdot'
+    },
     { key: 'trainedOn', label: 'trainedOn', color: COLORS.ai, active: true, isRel: true },
     {
       key: 'testedOn',
@@ -602,6 +624,7 @@ const VIEW_ICON_KEYS = {
   dataset: 'dataset',
   files: 'file',
   hardware: 'hardware',
+  supplychain: 'supplychain',
   requirements: 'requirement',
   licenses: 'license',
   security: 'view_security',
@@ -643,6 +666,7 @@ export function createViews() {
     { id: 'dataset', label: 'Datasets', icon: VIEW_ICONS.dataset, count: null },
     { id: 'files', label: 'Files', icon: VIEW_ICONS.files, count: null },
     { id: 'hardware', label: 'Hardware', icon: VIEW_ICONS.hardware, count: null },
+    { id: 'supplychain', label: 'Supply Chain', icon: VIEW_ICONS.supplychain, count: null },
     { id: 'requirements', label: 'Functional Safety', icon: VIEW_ICONS.requirements, count: null },
     { id: 'licenses', label: 'Licenses', icon: VIEW_ICONS.licenses, count: null },
     { id: 'security', label: 'Security', icon: VIEW_ICONS.security, count: null },
@@ -743,7 +767,11 @@ export const RELATIONSHIP_LABELS = {
   'manufacturedBy:out': 'Manufactured by',
   'manufacturedBy:in': 'Manufacturer of',
   'performedBy:out': 'Performed by',
-  'performedBy:in': 'Performer of'
+  'performedBy:in': 'Performer of',
+  'resolved:out': 'Resolves',
+  'resolved:in': 'Resolved by',
+  'hasResolution:out': 'Resolution for',
+  'hasResolution:in': 'Has resolution'
 };
 
 /**
@@ -862,6 +890,10 @@ export const RELATIONSHIP_SORT_ORDER = {
   'tracedToDetail:in': 42.6,
   'performedBy:out': 51,
   'performedBy:in': 52,
+  'resolved:out': 53,
+  'resolved:in': 54,
+  'hasResolution:out': 55,
+  'hasResolution:in': 56,
   'trainedOn:out': 31,
   'trainedOn:in': 32,
   'testedOn:out': 33,

@@ -31,6 +31,7 @@ const TYPE_ICON = {
   file: 'file',
   snippet: 'source',
   hardware: 'hardware',
+  supplychain: 'supplychain',
   requirement: 'requirement',
   tool: 'tool',
   build: 'build',

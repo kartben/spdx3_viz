@@ -30,6 +30,7 @@ import {
   licenseIndividualDescription
 } from '../lib/index.js';
 import { COLORS, getScopeColor, SAFETY_STATUSES, SAFETY_NO_IMPL_META } from '../config.js';
+import { CLASS, isA } from '../spdx/model.js';
 import hljs from '../lib/highlight.js';
 
 /* Element accessors and display helpers: thin lookups into the relationship
@@ -183,6 +184,140 @@ export const accessorsMixin = {
 
   formatCount(count) {
     return new Intl.NumberFormat().format(count || 0);
+  },
+
+  supplyChainKind(el) {
+    const t = el?.type || '';
+    if (!t) return '';
+    if (isA(t, CLASS.supplychain_State)) return 'state';
+    if (
+      isA(t, CLASS.supplychain_CreateProcess) ||
+      isA(t, CLASS.supplychain_ModifyProcess) ||
+      isA(t, CLASS.supplychain_UseProcess) ||
+      isA(t, CLASS.supplychain_BoundaryDefinitionProcess) ||
+      isA(t, CLASS.supplychain_ResponsibilityChangeProcess) ||
+      isA(t, CLASS.supplychain_DestroyProcess)
+    ) {
+      return 'process';
+    }
+    return 'action';
+  },
+
+  supplyChainTypeLabel(el) {
+    const raw = (el?.type || '')
+      .replace(/^supplychain_/, '')
+      .replace(/([a-z0-9])([A-Z])/g, '$1 $2');
+    return raw || 'Supply chain element';
+  },
+
+  supplyChainKindLabel(kind) {
+    return { action: 'Action', process: 'Process', state: 'State' }[kind] || 'Element';
+  },
+
+  supplyChainKindBadge(kind) {
+    return (
+      {
+        action: 'bg-cyan-500/15 text-cyan-300 ring-1 ring-cyan-500/30',
+        process: 'bg-indigo-500/15 text-indigo-300 ring-1 ring-indigo-500/30',
+        state: 'bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30'
+      }[kind] || 'bg-slate-700 text-slate-300'
+    );
+  },
+
+  supplyChainExceptionStatus(el) {
+    if (!el) return null;
+    if (isA(el.type, CLASS.supplychain_OutOfSpecAction)) {
+      return {
+        key: 'exception',
+        label: 'Out of spec',
+        badgeClass: 'bg-rose-500/15 text-rose-300 ring-1 ring-rose-500/30',
+        color: COLORS.vulnerability
+      };
+    }
+    if (
+      isA(el.type, CLASS.supplychain_ResolutionAction) ||
+      this.outgoingRels(el.spdxId).some((rel) => rel.relationshipType === 'resolved')
+    ) {
+      return {
+        key: 'resolved',
+        label: 'Resolved',
+        badgeClass: 'bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30',
+        color: COLORS.buildOutput
+      };
+    }
+    return null;
+  },
+
+  supplyChainTimeRange(el) {
+    if (!el?.startTime && !el?.endTime) return '';
+    if (el.startTime && el.endTime && el.startTime !== el.endTime) {
+      return `${this.formatDate(el.startTime)} → ${this.formatDate(el.endTime)}`;
+    }
+    return this.formatDate(el.startTime || el.endTime);
+  },
+
+  supplyChainRefName(id) {
+    return id ? this.relTargetDisplayName(id) : '';
+  },
+
+  supplyChainRoute(el) {
+    if (!el) return '';
+    const from = this.supplyChainRefName(el.supplychain_pickupLocation);
+    const to = this.supplyChainRefName(el.supplychain_dropoffLocation);
+    if (from && to) return `${from} → ${to}`;
+    return from || to || this.supplyChainRefName(el.actionLocation);
+  },
+
+  supplyChainStateName(el) {
+    return this.supplyChainRefName(el?.supplychain_currentState);
+  },
+
+  supplyChainResponsibility(el) {
+    if (!el?.supplychain_responsibilityChangedOn) return null;
+    return {
+      previous: this.supplyChainRefName(el.supplychain_previous),
+      current: this.supplyChainRefName(el.supplychain_current),
+      product: this.supplyChainRefName(el.supplychain_responsibilityChangedOn),
+      category: el.supplychain_responsibilityCategory || ''
+    };
+  },
+
+  supplyChainPerformerNames(el) {
+    return this.outgoingRels(el?.spdxId)
+      .filter((rel) => rel.relationshipType === 'performedBy')
+      .flatMap((rel) => (Array.isArray(rel.to) ? rel.to : [rel.to]))
+      .map((id) => this.supplyChainRefName(id))
+      .filter(Boolean);
+  },
+
+  supplyChainEvidenceCount(el) {
+    return this.outgoingRels(el?.spdxId)
+      .filter((rel) => rel.relationshipType === 'hasEvidence')
+      .reduce((n, rel) => n + (Array.isArray(rel.to) ? rel.to.length : rel.to ? 1 : 0), 0);
+  },
+
+  supplyChainSpecRows(el) {
+    const rows = [];
+    const push = (label, value, mono = false) => {
+      if (this.isMeaningful(value)) rows.push({ label, value, mono });
+    };
+    push('Time', this.supplyChainTimeRange(el));
+    push('Location', this.supplyChainRefName(el?.actionLocation));
+    push('Route', el?.supplychain_transportRoute);
+    push('Pickup', this.supplyChainRefName(el?.supplychain_pickupLocation));
+    push('Dropoff', this.supplyChainRefName(el?.supplychain_dropoffLocation));
+    push('Current state', this.supplyChainStateName(el));
+    push('Decision process', this.supplyChainRefName(el?.supplychain_decisionProcess));
+    push('Boundary parameter', this.supplyChainRefName(el?.supplychain_boundaryParameter));
+    push('Destruction by', this.supplyChainRefName(el?.supplychain_destructionPerformedBy));
+    const responsibility = this.supplyChainResponsibility(el);
+    if (responsibility) {
+      push('Responsibility', `${responsibility.previous || '—'} → ${responsibility.current || '—'}`);
+      push('Changed on', responsibility.product);
+      push('Category', responsibility.category);
+    }
+    push('SPDX ID', el?.spdxId, true);
+    return rows;
   },
 
   getBuildConfigFor(targetSpdxId) {

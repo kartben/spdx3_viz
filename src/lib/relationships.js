@@ -47,6 +47,8 @@ export function getRelationshipColor(relType) {
     conformsTo: COLORS.requirement,
     evaluationBasedOn: COLORS.requirement,
     tracedToDetail: COLORS.requirement,
+    resolved: COLORS.buildOutput,
+    hasResolution: COLORS.buildOutput,
     configures: COLORS.config,
     createdBy: COLORS.createdBy,
     suppliedBy: COLORS.createdBy,

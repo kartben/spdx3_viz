@@ -53,6 +53,7 @@ function makeThrottledReporter(onProgress, total) {
  * @property {Array<Object>} builds - Build elements
  * @property {Array<Object>} hardware - Hardware profile elements (SPDX 3.1)
  * @property {Array<Object>} requirements - Requirements + FunctionalSafety artifacts (SPDX 3.1)
+ * @property {Array<Object>} supplyChain - SupplyChain actions, processes, and states (SPDX 3.1)
  * @property {Array<Object>} buildConfigs - Build configuration elements
  * @property {Object|null} buildInfo - Build information element
  * @property {Object|null} agentInfo - Agent information element (SoftwareAgent, Organization or Person)
@@ -163,6 +164,9 @@ export function parseGraph(graph, onProgress) {
 
   /** @type {Array<Object>} - Requirements + FunctionalSafety artifacts (SPDX 3.1) */
   const requirements = [];
+
+  /** @type {Array<Object>} - SupplyChain actions, processes, and states (SPDX 3.1) */
+  const supplyChain = [];
 
   /** @type {Array<Object>} */
   const vulnerabilities = [];
@@ -276,6 +280,10 @@ export function parseGraph(graph, onProgress) {
             to: [item.functionalsafety_evaluationBasedOn]
           });
         }
+        break;
+
+      case BUCKET.SUPPLY_CHAIN:
+        supplyChain.push(item);
         break;
 
       case BUCKET.TOOLS:
@@ -514,6 +522,7 @@ export function parseGraph(graph, onProgress) {
     regularFiles,
     hardware,
     requirements,
+    supplyChain,
     tools,
     builds,
     buildConfigs,
@@ -534,6 +543,7 @@ export function parseGraph(graph, onProgress) {
     tools,
     hardware,
     requirements,
+    supplyChain,
     relationships,
     builds,
     buildConfigs,
@@ -806,6 +816,7 @@ function computePresentTypes(data) {
   if (data.regularFiles.length) nodeTypes.add('file');
   if (data.hardware.length) nodeTypes.add('hardware');
   if (data.requirements.length) nodeTypes.add('requirement');
+  if (data.supplyChain?.length) nodeTypes.add('supplychain');
   if (data.tools.length) nodeTypes.add('tool');
   if (data.builds.length) nodeTypes.add('build');
   if (data.buildConfigs.length) nodeTypes.add('config');
@@ -836,6 +847,7 @@ function computePresentTypes(data) {
     ...data.regularFiles,
     ...data.hardware,
     ...data.requirements,
+    ...(data.supplyChain || []),
     ...data.tools,
     ...data.builds,
     ...data.buildConfigs
