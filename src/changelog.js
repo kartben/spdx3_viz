@@ -10,6 +10,10 @@ export const CHANGELOG = [
     date: null,
     items: [
       {
+        tag: 'Improved',
+        text: 'Redesigned SBOM overview page.'
+      },
+      {
         tag: 'Added',
         text: 'Graph heatmap overlay for vulnerabilities, failing and unverified requirements.'
       },
