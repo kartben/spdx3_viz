@@ -50,10 +50,13 @@ export const graphMixin = {
   get graphHeatActive() {
     return !!this.graphHeatMode && this.graphHeatMode !== 'off';
   },
-  // Cheap gate for whether the heat control is worth showing at all: the SBOM
-  // must carry vulnerabilities or requirements for any lens to have data.
+  // Do not advertise a control that cannot change the graph. The list is cached
+  // after loading so this reactive getter stays cheap even for large SBOMs.
   get graphHeatAvailable() {
-    return this.vulnerabilities.length > 0 || this.safetyCounts.requirements > 0;
+    return this.graphHeatModeList.some((m) => m.count > 0);
+  },
+  get graphHeatCount() {
+    return this.graphHeatModeList.find((m) => m.key === this.graphHeatMode)?.count || 0;
   },
   // Whether a lens even applies to the loaded data (the underlying feature is
   // present), independent of whether it currently has any hot elements.
@@ -98,6 +101,7 @@ export const graphMixin = {
   // Pick a mode (clicking the active one turns it off). Heat is a pure overlay,
   // so repaint the settled canvas instead of rebuilding + relaying out the graph.
   setGraphHeatMode(mode) {
+    if (!this.graphHeatModeList.some((m) => m.key === mode && m.count > 0)) return;
     this.graphHeatMode = this.graphHeatMode === mode ? 'off' : mode;
     this.graphHeatMenuOpen = false;
     this._repaintHeat();
@@ -117,8 +121,11 @@ export const graphMixin = {
   // renderer reads graphHeatMode on its next build, so no repaint is needed here.
   _resetGraphHeat() {
     this.graphHeatMenuOpen = false;
-    this.graphHeatModeList = [];
-    if (this.graphHeatActive && !this._heatModeApplicable(this.graphHeatMode)) {
+    this.graphHeatModeList = this._computeHeatModeList();
+    if (
+      this.graphHeatActive &&
+      !this.graphHeatModeList.some((m) => m.key === this.graphHeatMode && m.count > 0)
+    ) {
       this.graphHeatMode = 'off';
     }
   }

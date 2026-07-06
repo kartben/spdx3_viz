@@ -71,7 +71,7 @@ const ICONS = {
   toggle_hide_orphans: 'visibility_off',
   collapse_clusters: 'unfold_less',
   reset_zoom: 'crop_free',
-  toggle_heatmap: 'local_fire_department'
+  toggle_heatmap: { symbol: 'mode_heat' }
 };
 
 const here = dirname(fileURLToPath(import.meta.url));
