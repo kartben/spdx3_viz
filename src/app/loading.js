@@ -297,6 +297,7 @@ export const loadingMixin = {
       // Fresh data: re-enable every lifecycle scope so a previous SBOM's
       // narrowed-to-runtime view doesn't silently hide edges in the new one.
       this.scopeFilters.forEach((f) => (f.active = true));
+      this.relationshipScopeFilter = 'all';
 
       this.views.find((v) => v.id === 'packages').count = this.plainPackages.length;
       this.views.find((v) => v.id === 'ai').count = this.aiPackages.length;

@@ -5,6 +5,8 @@ via the "What's new" link.
 
 ## Unreleased
 
+- **Added:** Relationship Repartition chart in Statistics, with lifecycle scope chips and graph drill-down by relationship type.
+
 ## [0.2.0] - 2026-07-07
 
 - **Added:** Command palette (⌘K / Ctrl-K) to search and jump anywhere.
