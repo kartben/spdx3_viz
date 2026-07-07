@@ -10,6 +10,7 @@ import { bucketOf, isA, CLASS, BUCKET } from '../spdx/model.js';
 import {
   displayLicenseExpression,
   renderLicenseExpression,
+  licenseIndividualLabel,
   getRelationshipColor,
   getVulnerabilityId,
   getVulnerabilityLocators,
@@ -897,9 +898,8 @@ function resolveLicenseLabel(id, elementMap) {
   if (spdxLicenseMatch) {
     return spdxLicenseMatch[1];
   }
-  if (id.includes('NoAssertion')) {
-    return 'NoAssertion';
-  }
+  const individual = licenseIndividualLabel(id);
+  if (individual) return individual;
   if (el?.name) return el.name;
   return id;
 }

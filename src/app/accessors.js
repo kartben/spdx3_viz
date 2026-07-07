@@ -26,7 +26,8 @@ import {
   enumValue,
   formatByteSize,
   normalizeUrl,
-  copyToClipboard
+  copyToClipboard,
+  licenseIndividualDescription
 } from '../lib/index.js';
 import { COLORS, getScopeColor, SAFETY_STATUSES, SAFETY_NO_IMPL_META } from '../config.js';
 import hljs from '../lib/highlight.js';
@@ -502,6 +503,11 @@ export const accessorsMixin = {
   },
   relTargetDisplayName(spdxId) {
     return getRelationshipTargetDisplayName(spdxId, this.elementMap);
+  },
+  // Tooltip explaining the ExpandedLicensing NoAssertion / None individuals;
+  // '' (no tooltip) for every other relationship target.
+  relTargetTooltip(spdxId) {
+    return licenseIndividualDescription(spdxId);
   },
   elementDisplayName(element) {
     return getElementDisplayName(element, this.elementMap);

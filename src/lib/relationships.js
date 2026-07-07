@@ -113,8 +113,7 @@ export function getRelationshipTargetDisplayName(spdxId, elementMap) {
   // ExpandedLicensing individual licenses (NoAssertionLicense / NoneLicense).
   // These named singletons aren't real elements, so they'd otherwise fall
   // through to cleanName (rendering "expandedlicensing NoAssertionLicense") or
-  // the raw-IRI fallback (for the full-term-URL form). Show the idiom the rest
-  // of the app uses instead.
+  // the raw-IRI fallback (for the full-term-URL form). Show the human label.
   const individualLicense = licenseIndividualLabel(spdxId);
   if (individualLicense) return individualLicense;
 

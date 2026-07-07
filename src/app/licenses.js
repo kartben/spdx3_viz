@@ -1,6 +1,7 @@
 import {
   displayLicenseExpression,
   renderLicenseExpression,
+  licenseIndividualLabel,
   extractSpdxLicenseId,
   resolveLicenseExpression,
   extractLicenseExpressionParts,
@@ -32,7 +33,8 @@ export const licensesMixin = {
     if (id.startsWith('https://spdx.org/licenses/')) {
       return id.replace('https://spdx.org/licenses/', '');
     }
-    if (id.includes('NoAssertion')) return 'NoAssertion';
+    const individual = licenseIndividualLabel(id);
+    if (individual) return individual;
     if (el?.name) return el.name;
     return this.cleanName(id);
   },
