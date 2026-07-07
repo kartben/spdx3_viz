@@ -129,6 +129,7 @@
           <div
             x-show="isMeaningful(pkg.software_packageVersion) ||
                               artifactSize(pkg) ||
+                              packageSuppliers(pkg).length > 0 ||
                               isMeaningful(pkg.software_downloadLocation) ||
                               isMeaningful(pkg.software_homePage) ||
                               isMeaningful(pkg.summary) ||
@@ -154,6 +155,44 @@
                 class="text-xs px-2 py-0.5 rounded-md bg-slate-700 text-slate-300 tabular-nums"
                 x-text="artifactSize(pkg)"
               ></span>
+            </div>
+
+            <!-- Supplier(s) (Artifact.suppliedBy / software_suppliedBy) -->
+            <div x-show="packageSuppliers(pkg).length > 0">
+              <div
+                class="text-xs text-slate-500 mb-1"
+                x-text="packageSuppliers(pkg).length > 1 ? 'Suppliers' : 'Supplier'"
+              ></div>
+              <div class="space-y-1">
+                <template x-for="sup in packageSuppliers(pkg)" :key="sup.id || sup.displayName">
+                  <div
+                    class="detail-rel-item group"
+                    :class="!sup.id && 'cursor-default hover:bg-transparent'"
+                    @click.stop="sup.id && navigateTo(sup.id)"
+                  >
+                    <span
+                      class="flex items-center flex-shrink-0"
+                      :style="`color: ${nodeTypeColor(getNodeType(elementMap.get(sup.id) || {}))}`"
+                      x-html="elementIcon(elementMap.get(sup.id) || { spdxId: sup.id }, 'w-3.5 h-3.5')"
+                    ></span>
+                    <span class="flex-1 truncate" x-text="sup.displayName"></span>
+                    <svg
+                      x-show="sup.id"
+                      class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors flex-shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </div>
+                </template>
+              </div>
             </div>
 
             <!-- Summary / description -->

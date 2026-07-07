@@ -496,6 +496,34 @@ export const accessorsMixin = {
     return groups;
   },
 
+  // Agent(s) that supplied this package (Artifact.suppliedBy /
+  // software_suppliedBy). Each reference is resolved to a display row so the
+  // expanded package card can name and link to its supplier(s), mirroring the
+  // "Supplier of" links shown from the Agent side. Self-references and
+  // NoAssertion are dropped; inline agents with no spdxId render unlinked.
+  packageSuppliers(pkg) {
+    const raw = pkg?.suppliedBy ?? pkg?.software_suppliedBy;
+    const arr = Array.isArray(raw) ? raw : raw == null || raw === '' ? [] : [raw];
+    const out = [];
+    const seen = new Set();
+    for (const ref of arr) {
+      let id = null;
+      let name = '';
+      if (typeof ref === 'string') {
+        id = ref;
+      } else if (ref && typeof ref === 'object') {
+        id = ref.spdxId || null;
+        name = ref.name || '';
+      }
+      if (id && (id === pkg?.spdxId || String(id).includes('NoAssertion'))) continue;
+      const dedupKey = id || name;
+      if (!dedupKey || seen.has(dedupKey)) continue;
+      seen.add(dedupKey);
+      out.push({ id, displayName: id ? this.relTargetDisplayName(id) : name });
+    }
+    return out;
+  },
+
   // Sort order for relationship groups (most relevant first)
   relSortOrder(type, dir) {
     return getRelationshipSortOrder(type, dir);
