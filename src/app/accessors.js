@@ -283,9 +283,9 @@ export const accessorsMixin = {
   supplyChainKindBadge(kind) {
     return (
       {
-        action: 'bg-cyan-500/15 text-cyan-300 ring-1 ring-cyan-500/30',
-        process: 'bg-indigo-500/15 text-indigo-300 ring-1 ring-indigo-500/30',
-        state: 'bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30'
+        action: 'bg-slate-700/70 text-slate-200 ring-1 ring-slate-600/40',
+        process: 'bg-slate-800 text-slate-300 ring-1 ring-slate-600/40',
+        state: 'bg-slate-800 text-slate-300 ring-1 ring-slate-600/40'
       }[kind] || 'bg-slate-700 text-slate-300'
     );
   },
@@ -350,39 +350,39 @@ export const accessorsMixin = {
     const meta = {
       create: {
         label: 'Create / make',
-        dot: 'bg-sky-400',
-        iconBg: 'bg-sky-500/15',
-        text: 'text-sky-300',
-        border: 'border-sky-500/35',
+        dot: 'bg-slate-500',
+        iconBg: 'bg-slate-700/60',
+        text: 'text-slate-300',
+        border: 'border-slate-700',
         ring: 'ring-sky-500/20',
-        surface: 'bg-sky-500/[0.07]',
-        hover: 'hover:bg-sky-500/[0.11]',
-        panel: 'bg-sky-950/30 border-sky-500/20',
-        chip: 'bg-sky-500/15 text-sky-200 ring-1 ring-sky-500/25'
+        surface: 'bg-slate-900/50',
+        hover: 'hover:bg-slate-800/70',
+        panel: 'bg-slate-900/70 border-slate-700/60',
+        chip: 'bg-slate-700/70 text-slate-200 ring-1 ring-slate-600/40'
       },
       move: {
         label: 'Move / custody',
-        dot: 'bg-cyan-400',
-        iconBg: 'bg-cyan-500/15',
-        text: 'text-cyan-300',
-        border: 'border-cyan-500/35',
+        dot: 'bg-slate-500',
+        iconBg: 'bg-slate-700/60',
+        text: 'text-slate-300',
+        border: 'border-slate-700',
         ring: 'ring-cyan-500/20',
-        surface: 'bg-cyan-500/[0.07]',
-        hover: 'hover:bg-cyan-500/[0.11]',
-        panel: 'bg-cyan-950/30 border-cyan-500/20',
-        chip: 'bg-cyan-500/15 text-cyan-200 ring-1 ring-cyan-500/25'
+        surface: 'bg-slate-900/50',
+        hover: 'hover:bg-slate-800/70',
+        panel: 'bg-slate-900/70 border-slate-700/60',
+        chip: 'bg-slate-700/70 text-slate-200 ring-1 ring-slate-600/40'
       },
       verify: {
         label: 'Inspect / test',
-        dot: 'bg-violet-400',
-        iconBg: 'bg-violet-500/15',
-        text: 'text-violet-300',
-        border: 'border-violet-500/35',
+        dot: 'bg-slate-500',
+        iconBg: 'bg-slate-700/60',
+        text: 'text-slate-300',
+        border: 'border-slate-700',
         ring: 'ring-violet-500/20',
-        surface: 'bg-violet-500/[0.07]',
-        hover: 'hover:bg-violet-500/[0.11]',
-        panel: 'bg-violet-950/30 border-violet-500/20',
-        chip: 'bg-violet-500/15 text-violet-200 ring-1 ring-violet-500/25'
+        surface: 'bg-slate-900/50',
+        hover: 'hover:bg-slate-800/70',
+        panel: 'bg-slate-900/70 border-slate-700/60',
+        chip: 'bg-slate-700/70 text-slate-200 ring-1 ring-slate-600/40'
       },
       exception: {
         label: 'Exception path',
@@ -398,39 +398,39 @@ export const accessorsMixin = {
       },
       operate: {
         label: 'Use / retire',
-        dot: 'bg-emerald-400',
-        iconBg: 'bg-emerald-500/15',
-        text: 'text-emerald-300',
-        border: 'border-emerald-500/35',
+        dot: 'bg-slate-500',
+        iconBg: 'bg-slate-700/60',
+        text: 'text-slate-300',
+        border: 'border-slate-700',
         ring: 'ring-emerald-500/20',
-        surface: 'bg-emerald-500/[0.07]',
-        hover: 'hover:bg-emerald-500/[0.11]',
-        panel: 'bg-emerald-950/30 border-emerald-500/20',
-        chip: 'bg-emerald-500/15 text-emerald-200 ring-1 ring-emerald-500/25'
+        surface: 'bg-slate-900/50',
+        hover: 'hover:bg-slate-800/70',
+        panel: 'bg-slate-900/70 border-slate-700/60',
+        chip: 'bg-slate-700/70 text-slate-200 ring-1 ring-slate-600/40'
       },
       process: {
         label: 'Defined process',
-        dot: 'bg-indigo-400',
-        iconBg: 'bg-indigo-500/15',
-        text: 'text-indigo-300',
-        border: 'border-indigo-500/35',
+        dot: 'bg-slate-500',
+        iconBg: 'bg-slate-700/60',
+        text: 'text-slate-300',
+        border: 'border-slate-700',
         ring: 'ring-indigo-500/20',
-        surface: 'bg-indigo-500/[0.07]',
-        hover: 'hover:bg-indigo-500/[0.11]',
-        panel: 'bg-indigo-950/30 border-indigo-500/20',
-        chip: 'bg-indigo-500/15 text-indigo-200 ring-1 ring-indigo-500/25'
+        surface: 'bg-slate-900/50',
+        hover: 'hover:bg-slate-800/70',
+        panel: 'bg-slate-900/70 border-slate-700/60',
+        chip: 'bg-slate-700/70 text-slate-200 ring-1 ring-slate-600/40'
       },
       state: {
         label: 'State',
-        dot: 'bg-teal-400',
-        iconBg: 'bg-teal-500/15',
-        text: 'text-teal-300',
-        border: 'border-teal-500/35',
+        dot: 'bg-slate-500',
+        iconBg: 'bg-slate-700/60',
+        text: 'text-slate-300',
+        border: 'border-slate-700',
         ring: 'ring-teal-500/20',
-        surface: 'bg-teal-500/[0.07]',
-        hover: 'hover:bg-teal-500/[0.11]',
-        panel: 'bg-teal-950/30 border-teal-500/20',
-        chip: 'bg-teal-500/15 text-teal-200 ring-1 ring-teal-500/25'
+        surface: 'bg-slate-900/50',
+        hover: 'hover:bg-slate-800/70',
+        panel: 'bg-slate-900/70 border-slate-700/60',
+        chip: 'bg-slate-700/70 text-slate-200 ring-1 ring-slate-600/40'
       },
       other: {
         label: 'Supply chain',

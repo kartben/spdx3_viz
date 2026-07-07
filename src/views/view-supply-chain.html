@@ -1,29 +1,15 @@
-<div x-show="currentView === 'supplychain'" class="fade-in space-y-4 max-w-5xl">
-  <div class="list-sticky space-y-3">
-    <div class="flex flex-wrap items-center gap-3">
-      <span class="text-sm text-slate-400 flex-shrink-0">
-        <span x-text="supplyChain.length"></span> supply-chain elements<template
-          x-if="supplyChainCounts.actions"
-          ><span
-            ><span class="text-slate-600"> · </span
-            ><span x-text="supplyChainCounts.actions"></span> actions</span
-          ></template
-        ><template x-if="supplyChainCounts.states"
-          ><span
-            ><span class="text-slate-600"> · </span
-            ><span x-text="supplyChainCounts.states"></span> states</span
-          ></template
-        ><template x-if="supplyChainCounts.processes"
-          ><span
-            ><span class="text-slate-600"> · </span
-            ><span x-text="supplyChainCounts.processes"></span> processes</span
-          ></template
-        >
-      </span>
+<div x-show="currentView === 'supplychain'" class="fade-in space-y-5 max-w-6xl">
+  <div class="list-sticky">
+    <div class="flex flex-wrap items-start gap-3">
+      <div class="min-w-0">
+        <h2 class="text-base font-semibold text-white">Supply Chain</h2>
+        <p class="mt-0.5 text-sm text-slate-400">
+          Events, handoffs, states, evidence, and exceptions for the tracked product.
+        </p>
+      </div>
 
-      <!-- Angle switcher: the supply chain reads several ways, not just a timeline. -->
       <div
-        class="ml-auto flex items-center gap-0.5 bg-slate-800 border border-slate-700 rounded-lg p-0.5 flex-shrink-0"
+        class="ml-auto flex items-center gap-0.5 bg-slate-900/70 border border-slate-700 rounded-lg p-0.5 flex-shrink-0"
       >
         <template
           x-for="mode in [
@@ -53,26 +39,25 @@
     </div>
   </div>
 
-  <!-- Shared summary cards -->
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-    <div class="rounded-xl border border-slate-700 bg-slate-800/40 p-3">
-      <div class="text-lg font-semibold text-white" x-text="supplyChainCounts.actions"></div>
-      <div class="text-xs text-slate-500">Actions</div>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+    <div class="rounded-lg border border-slate-700 bg-slate-900/50 px-3 py-2.5">
+      <div class="text-xl font-semibold text-white" x-text="supplyChainCounts.actions"></div>
+      <div class="text-xs text-slate-400">Actions observed</div>
     </div>
-    <div class="rounded-xl border border-slate-700 bg-slate-800/40 p-3">
-      <div class="text-lg font-semibold text-white" x-text="supplyChainCounts.processes"></div>
-      <div class="text-xs text-slate-500">Processes</div>
+    <div class="rounded-lg border border-slate-700 bg-slate-900/50 px-3 py-2.5">
+      <div class="text-xl font-semibold text-white" x-text="supplyChainCounts.processes"></div>
+      <div class="text-xs text-slate-400">Processes defined</div>
     </div>
-    <div class="rounded-xl border border-slate-700 bg-slate-800/40 p-3">
-      <div class="text-lg font-semibold text-white" x-text="supplyChainCounts.states"></div>
-      <div class="text-xs text-slate-500">States</div>
+    <div class="rounded-lg border border-slate-700 bg-slate-900/50 px-3 py-2.5">
+      <div class="text-xl font-semibold text-white" x-text="supplyChainCounts.states"></div>
+      <div class="text-xs text-slate-400">Product states</div>
     </div>
-    <div class="rounded-xl border border-slate-700 bg-slate-800/40 p-3">
+    <div class="rounded-lg border border-slate-700 bg-slate-900/50 px-3 py-2.5">
       <div
-        class="text-lg font-semibold text-white"
+        class="text-xl font-semibold text-white"
         x-text="formatCarbonKg(supplyChainCarbonSummary.totalKg) || '—'"
       ></div>
-      <div class="text-xs text-slate-500">Transport CO₂e</div>
+      <div class="text-xs text-slate-400">Transport CO₂e</div>
     </div>
   </div>
 
@@ -140,39 +125,6 @@
       />
     </div>
 
-    <section class="card" x-show="supplyChainCarbonSummary.rows.length">
-      <div class="flex items-center gap-3 mb-3">
-        <div class="text-sm font-semibold text-white">Transport CO₂e</div>
-        <div class="text-xs text-slate-500">
-          From CdxPropertiesExtension values attached to transport actions.
-        </div>
-      </div>
-      <div class="space-y-2">
-        <template x-for="row in supplyChainCarbonSummary.rows" :key="row.action.spdxId">
-          <button
-            type="button"
-            @click="navigateToSupplyChain(row.action.spdxId)"
-            class="w-full text-left rounded-lg border border-slate-700 bg-slate-900/40 px-3 py-2 hover:bg-slate-800/70 transition"
-          >
-            <div class="flex flex-wrap items-center gap-2">
-              <div
-                class="text-xs font-medium text-white min-w-0 flex-1 truncate"
-                x-text="row.action.name || cleanName(row.action.spdxId)"
-              ></div>
-              <span class="badge text-xs bg-slate-700 text-slate-300" x-text="row.mode"></span>
-              <span
-                class="badge text-xs bg-emerald-500/15 text-emerald-300"
-                x-text="formatCarbonKg(row.kg)"
-              ></span>
-            </div>
-            <div class="mt-2 h-2 rounded-full bg-slate-800 overflow-hidden">
-              <div class="h-full rounded-full bg-emerald-400" :style="`width:${row.pct}%`"></div>
-            </div>
-          </button>
-        </template>
-      </div>
-    </section>
-
     <section class="space-y-3">
       <div class="flex items-center gap-3">
         <div class="text-sm font-semibold text-white">Timeline</div>
@@ -182,10 +134,8 @@
         ></div>
       </div>
 
-      <div class="relative pl-6">
-        <div
-          class="absolute left-[0.7rem] top-2 bottom-2 w-px bg-gradient-to-b from-slate-700 via-slate-700 to-transparent"
-        ></div>
+      <div class="relative pl-5">
+        <div class="absolute left-[0.55rem] top-2 bottom-2 w-px bg-slate-800"></div>
         <template
           x-for="row in (mountedViews.supplychain ? renderSlice('supplychain', supplyChainTimelineRows) : [])"
           :key="row.item.spdxId"
@@ -208,28 +158,27 @@
             </div>
 
             <div
-              x-data="{ item: row.item, kind: '', status: null, meta: null }"
-              x-effect="kind = supplyChainKind(item); status = supplyChainExceptionStatus(item); meta = supplyChainFamilyMeta(item)"
+              x-data="{ item: row.item, kind: '', status: null }"
+              x-effect="kind = supplyChainKind(item); status = supplyChainExceptionStatus(item)"
               class="relative pb-5"
               data-nav-kind="supplychain"
               :data-nav-id="item.spdxId"
             >
               <span
-                class="absolute left-[-1.45rem] top-6 w-3 h-3 rounded-full ring-4 ring-slate-900"
-                :class="meta?.dot"
+                class="absolute left-[-1.17rem] top-7 w-2.5 h-2.5 rounded-full ring-4 ring-slate-900"
+                :class="status?.key === 'exception' ? 'bg-rose-400' : status?.key === 'resolved' ? 'bg-emerald-400' : 'bg-slate-600'"
               ></span>
               <div
                 class="card cursor-pointer relative overflow-hidden"
                 :class="isNavTarget('supplychain', item.spdxId) && 'target-focus'"
                 @click="toggleSupplyChain(item.spdxId)"
               >
-                <span class="absolute left-0 top-0 bottom-0 w-1" :class="meta?.dot"></span>
                 <div class="flex items-start gap-3">
                   <div
-                    class="w-8 h-8 rounded-lg bg-cyan-500/15 flex items-center justify-center flex-shrink-0 mt-0.5"
+                    class="w-8 h-8 rounded-lg bg-slate-700/60 flex items-center justify-center flex-shrink-0 mt-0.5"
                   >
                     <span
-                      class="flex items-center justify-center text-cyan-300"
+                      class="flex items-center justify-center text-slate-300"
                       x-html="elementIcon(item, 'w-4 h-4')"
                     ></span>
                   </div>
@@ -242,10 +191,6 @@
                       <span class="badge text-xs" :class="supplyChainKindBadge(kind)">
                         <span x-text="supplyChainKindLabel(kind)"></span>
                       </span>
-                      <span
-                        class="badge text-xs bg-slate-700 text-slate-300"
-                        x-text="supplyChainTypeLabel(item)"
-                      ></span>
                       <span
                         x-show="status"
                         class="badge text-xs"
@@ -267,17 +212,22 @@
                       ></span>
                       <span
                         x-show="row.route"
-                        class="text-xs text-cyan-300 truncate max-w-full"
+                        class="text-xs text-slate-300 truncate max-w-full"
                         x-text="row.route"
                       ></span>
                       <span
                         x-show="row.state"
-                        class="badge text-xs bg-teal-500/15 text-teal-300"
+                        class="text-xs text-slate-300"
                         x-text="row.state"
                       ></span>
                       <span
+                        x-show="row.evidence"
+                        class="text-xs text-slate-500"
+                        x-text="row.evidence + ' evidence'"
+                      ></span>
+                      <span
                         x-show="row.carbonKg"
-                        class="badge text-xs bg-emerald-500/15 text-emerald-300"
+                        class="text-xs text-slate-500"
                         x-text="formatCarbonKg(row.carbonKg)"
                       ></span>
                     </div>
@@ -472,11 +422,7 @@
               <div class="card relative overflow-hidden">
                 <span
                   class="absolute left-0 top-0 bottom-0 w-1"
-                  :class="{
-                    'bg-sky-400': seg.role === 'origin',
-                    'bg-cyan-400': seg.role === 'custody',
-                    'bg-violet-400': seg.role === 'ownership'
-                  }"
+                  :class="seg.exceptions ? 'bg-rose-400' : 'bg-slate-600'"
                 ></span>
                 <div class="flex items-start gap-3">
                   <div
@@ -488,11 +434,7 @@
                       <span class="font-semibold text-white text-sm" x-text="seg.name"></span>
                       <span
                         class="badge text-[11px]"
-                        :class="{
-                          'bg-sky-500/15 text-sky-300 ring-1 ring-sky-500/30': seg.role === 'origin',
-                          'bg-cyan-500/15 text-cyan-300 ring-1 ring-cyan-500/30': seg.role === 'custody',
-                          'bg-violet-500/15 text-violet-300 ring-1 ring-violet-500/30': seg.role === 'ownership'
-                        }"
+                        :class="seg.exceptions ? 'bg-rose-500/15 text-rose-300 ring-1 ring-rose-500/30' : 'bg-slate-700/70 text-slate-300 ring-1 ring-slate-600/40'"
                         x-text="seg.role === 'origin' ? 'Origin & build' : seg.role"
                       ></span>
                       <span
@@ -538,7 +480,7 @@
                           class="w-full text-left flex flex-wrap items-center gap-2 rounded-lg border border-slate-700 bg-slate-900/40 px-2.5 py-1.5 hover:bg-slate-800/70 transition"
                         >
                           <svg
-                            class="w-3.5 h-3.5 text-cyan-300 flex-shrink-0"
+                            class="w-3.5 h-3.5 text-slate-400 flex-shrink-0"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -624,7 +566,7 @@
                 :class="{
                   'bg-emerald-500/20 text-emerald-300': step.tone === 'positive',
                   'bg-rose-500/20 text-rose-300': step.tone === 'exception',
-                  'bg-cyan-500/20 text-cyan-300': step.tone === 'neutral'
+                  'bg-slate-700/80 text-slate-300': step.tone === 'neutral'
                 }"
                 x-text="i + 1"
               ></span>
@@ -634,11 +576,7 @@
               >
                 <span
                   class="absolute left-0 top-0 bottom-0 w-1"
-                  :class="{
-                    'bg-emerald-400': step.tone === 'positive',
-                    'bg-rose-400': step.tone === 'exception',
-                    'bg-cyan-400': step.tone === 'neutral'
-                  }"
+                  :class="step.tone === 'positive' ? 'bg-emerald-400' : step.tone === 'exception' ? 'bg-rose-400' : 'bg-slate-600'"
                 ></span>
                 <div class="flex flex-wrap items-center gap-2">
                   <span class="font-semibold text-white text-sm" x-text="step.name"></span>
