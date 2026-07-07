@@ -91,9 +91,11 @@ export function createState() {
     hardwareSearch: '', // in-view filter for the Hardware list
     requirementSearch: '', // in-view filter for the Functional Safety list
     requirementKindFilter: '', // '' = all, else an FS element type to show only
-    requirementStatusFilter: '', // '' = all, else a verification-status key or 'noimpl'
-    requirementLayout: 'list', // Functional Safety tab: 'list' | 'tree' (tracedToDetail decomposition)
+    requirementStatusFilter: '', // '' = all, else a verification-status key or safety gap key
+    requirementLayout: 'list', // Functional Safety tab: list/tree/coverage/allocation/assurance
     collapsedReqs: {}, // decomposition tree: spdxId -> true for collapsed subtrees
+    expandedSafetyAllocationGroups: {}, // allocation group key -> true for expanded cards
+    expandedSafetyAssuranceGroups: {}, // assurance root id -> true for expanded cards
     sidebarOpen: false, // mobile off-canvas nav drawer (ignored at md+ where the sidebar is static)
     detailElement: null,
     detailPanelWidth: storedDetailPanelWidth(), // graph detail panel width (px) at md+, drag-resizable

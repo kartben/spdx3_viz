@@ -310,6 +310,9 @@ export const loadingMixin = {
       this.views.find((v) => v.id === 'build').count = this.builds.length;
       this.views.find((v) => v.id === 'agents').count = this.agents.length;
       this.expandedClusters = new Set(); // fresh data: start fully collapsed
+      this.collapsedReqs = {};
+      this.expandedSafetyAllocationGroups = {};
+      this.expandedSafetyAssuranceGroups = {};
       this._resetGraphHeat(); // drop a heat lens the new SBOM can't honour
       this.cveDetails = {}; // drop cached CVE fetches from the previous SBOM
       this.impactFocus = null; // drop any Impact-tab focus from the previous SBOM

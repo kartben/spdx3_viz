@@ -1,4 +1,4 @@
-<div x-show="currentView === 'requirements'" class="fade-in space-y-3 max-w-4xl">
+<div x-show="currentView === 'requirements'" class="fade-in space-y-3 max-w-6xl">
   <div class="list-sticky space-y-3">
     <div class="flex flex-wrap items-center gap-3">
       <!-- Breakdown summary of the folded-in FunctionalSafety elements -->
@@ -21,35 +21,29 @@
           ></template
         >
       </span>
-      <!-- Layout toggle: flat list vs. tracedToDetail decomposition tree -->
+      <!-- Layout toggle: list, tracedToDetail tree, and safety-case rollup views -->
       <div
-        x-show="hasSafetyDecomposition"
+        x-show="safetyCounts.requirements > 0"
         class="ml-auto inline-flex rounded-lg border border-slate-700 overflow-hidden text-xs"
       >
-        <button
-          type="button"
-          @click="requirementLayout = 'list'"
-          class="px-3 py-1.5 transition-colors"
-          :class="requirementLayout === 'list' ? 'bg-slate-700 text-white' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
-        >
-          List
-        </button>
-        <button
-          type="button"
-          @click="requirementLayout = 'tree'; requirementStatusFilter = ''"
-          class="px-3 py-1.5 transition-colors"
-          :class="requirementLayout === 'tree' ? 'bg-slate-700 text-white' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
-        >
-          Decomposition
-        </button>
+        <template x-for="layout in safetyRequirementLayouts" :key="layout.key">
+          <button
+            type="button"
+            @click="setRequirementLayout(layout.key)"
+            class="px-3 py-1.5 transition-colors"
+            :class="requirementLayout === layout.key ? 'bg-slate-700 text-white' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
+          >
+            <span x-text="layout.label"></span>
+          </button>
+        </template>
       </div>
       <input
-        x-show="requirementLayout === 'list'"
+        x-show="requirementLayout !== 'tree'"
         x-model="requirementSearch"
-        @input.debounce.150ms="restreamView('requirements')"
+        @input.debounce.150ms="requirementLayout === 'list' && restreamView('requirements')"
         type="text"
-        placeholder="Filter…"
-        :class="!hasSafetyDecomposition && 'ml-auto'"
+        placeholder="Filter..."
+        :class="safetyCounts.requirements === 0 && 'ml-auto'"
         class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-yellow-500 w-44 sm:w-56"
       />
     </div>
@@ -83,7 +77,7 @@
           <template x-for="s in safetyStatusOrder" :key="s">
             <button
               type="button"
-              @click="requirementStatusFilter = (requirementStatusFilter === s ? '' : s); requirementKindFilter = 'Requirement'; requirementLayout = 'list'; restreamView('requirements')"
+              @click="requirementStatusFilter = (requirementStatusFilter === s ? '' : s); requirementKindFilter = 'Requirement'; if (requirementLayout === 'tree') requirementLayout = 'list'; if (requirementLayout === 'list') restreamView('requirements')"
               class="badge transition"
               :class="requirementStatusFilter === s ? safetyStatusMeta(s).badgeClass + ' brightness-125' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
               :title="`Show ${safetyStatusMeta(s).label} requirements`"
@@ -103,7 +97,7 @@
           <template x-if="safetyStatusSummary.noImpl > 0">
             <button
               type="button"
-              @click="requirementStatusFilter = (requirementStatusFilter === 'noimpl' ? '' : 'noimpl'); requirementKindFilter = 'Requirement'; requirementLayout = 'list'; restreamView('requirements')"
+              @click="requirementStatusFilter = (requirementStatusFilter === 'noimpl' ? '' : 'noimpl'); requirementKindFilter = 'Requirement'; if (requirementLayout === 'tree') requirementLayout = 'list'; if (requirementLayout === 'list') restreamView('requirements')"
               class="badge transition"
               :class="requirementStatusFilter === 'noimpl' ? safetyStatusMeta('noimpl').badgeClass + ' brightness-125' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
               title="Requirements with no implementedBy link"
@@ -116,6 +110,26 @@
               <span
                 class="ml-1.5 font-semibold"
                 x-text="formatCount(safetyStatusSummary.noImpl)"
+              ></span>
+            </button>
+          </template>
+          <!-- Traceability gap: requirements whose verification chain has no hasEvidence target -->
+          <template x-if="safetyStatusSummary.noEvidence > 0">
+            <button
+              type="button"
+              @click="requirementStatusFilter = (requirementStatusFilter === 'noevidence' ? '' : 'noevidence'); requirementKindFilter = 'Requirement'; if (requirementLayout === 'tree') requirementLayout = 'list'; if (requirementLayout === 'list') restreamView('requirements')"
+              class="badge transition"
+              :class="requirementStatusFilter === 'noevidence' ? safetyStatusMeta('noevidence').badgeClass + ' brightness-125' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
+              title="Requirements whose verification chain has no evidence artifact"
+            >
+              <span
+                class="w-1.5 h-1.5 rounded-full mr-1.5"
+                :class="safetyStatusMeta('noevidence').dotClass"
+              ></span>
+              <span x-text="safetyStatusMeta('noevidence').label"></span>
+              <span
+                class="ml-1.5 font-semibold"
+                x-text="formatCount(safetyStatusSummary.noEvidence)"
               ></span>
             </button>
           </template>
@@ -146,6 +160,13 @@
           <span x-show="chip.n !== undefined" class="text-slate-500" x-text="`(${chip.n})`"></span>
         </button>
       </template>
+    </div>
+    <div
+      x-show="safetyCounts.requirements > 0"
+      class="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2 text-xs border-t border-slate-800/80 pt-2"
+    >
+      <span class="font-semibold text-slate-200" x-text="safetyRequirementLayoutIntro.title"></span>
+      <span class="text-slate-500" x-text="safetyRequirementLayoutIntro.description"></span>
     </div>
   </div>
   <!-- Requirement decomposition tree (tracedToDetail: goal → detailed requirement) -->
@@ -231,6 +252,621 @@
             ></span>
           </div>
         </template>
+      </div>
+    </div>
+  </template>
+
+  <!-- Coverage matrix: requirement -> implementation -> verification -> evidence -->
+  <template x-if="requirementLayout === 'coverage'">
+    <div class="space-y-3">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-2">
+        <div class="rounded-lg border border-slate-700/60 bg-slate-800/40 p-3">
+          <div class="text-[10px] uppercase tracking-wider text-slate-500">Complete</div>
+          <div
+            class="text-lg font-semibold text-white tabular-nums"
+            x-text="formatCount(safetyCoverageSummary.complete)"
+          ></div>
+        </div>
+        <div class="rounded-lg border border-slate-700/60 bg-slate-800/40 p-3">
+          <div class="text-[10px] uppercase tracking-wider text-slate-500">Implemented</div>
+          <div
+            class="text-lg font-semibold text-white tabular-nums"
+            x-text="`${formatCount(safetyCoverageSummary.withImplementation)} / ${formatCount(safetyCoverageSummary.total)}`"
+          ></div>
+        </div>
+        <div class="rounded-lg border border-slate-700/60 bg-slate-800/40 p-3">
+          <div class="text-[10px] uppercase tracking-wider text-slate-500">Verified</div>
+          <div
+            class="text-lg font-semibold text-white tabular-nums"
+            x-text="`${formatCount(safetyCoverageSummary.withVerification)} / ${formatCount(safetyCoverageSummary.total)}`"
+          ></div>
+        </div>
+        <div class="rounded-lg border border-slate-700/60 bg-slate-800/40 p-3">
+          <div class="text-[10px] uppercase tracking-wider text-slate-500">Evidenced</div>
+          <div
+            class="text-lg font-semibold text-white tabular-nums"
+            x-text="`${formatCount(safetyCoverageSummary.withEvidence)} / ${formatCount(safetyCoverageSummary.total)}`"
+          ></div>
+        </div>
+      </div>
+      <div class="rounded-xl border border-slate-700/60 bg-slate-800/40 overflow-hidden">
+        <div
+          class="hidden xl:grid grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)] gap-3 px-3 py-2 border-b border-slate-700/60 text-[10px] uppercase tracking-wider text-slate-500"
+        >
+          <span>Requirement</span>
+          <span>Implementation</span>
+          <span>Verification</span>
+          <span>Evidence</span>
+        </div>
+        <template
+          x-for="row in safetyCoverageRows.slice(0, revealLimit('safetyCoverageRows'))"
+          :key="row.id"
+        >
+          <div
+            class="grid grid-cols-1 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)] gap-3 px-3 py-3 border-b border-slate-700/50 last:border-b-0 hover:bg-slate-800/70"
+          >
+            <div class="min-w-0">
+              <div class="flex items-start gap-2">
+                <span
+                  class="mt-0.5 w-7 h-7 rounded-full inline-flex items-center justify-center flex-shrink-0"
+                  :class="row.status?.badgeClass"
+                  :title="row.status?.label"
+                  x-html="uiIconSvg(row.status?.iconKey, 'w-4 h-4')"
+                ></span>
+                <div class="min-w-0">
+                  <button
+                    type="button"
+                    @click="navigateTo(row.id)"
+                    class="text-sm font-medium text-white hover:text-yellow-200 text-left break-words"
+                    x-text="row.name"
+                  ></button>
+                  <div
+                    class="mt-1 text-xs text-slate-400 line-clamp-2"
+                    x-text="row.statement"
+                  ></div>
+                  <div class="mt-2 flex flex-wrap gap-1.5">
+                    <span
+                      class="badge text-xs bg-slate-700 text-slate-300 font-mono"
+                      x-text="row.uid"
+                    ></span>
+                    <template x-for="gap in row.gapKeys" :key="row.id + gap">
+                      <span
+                        class="badge text-xs"
+                        :class="safetyStatusMeta(gap).badgeClass"
+                        x-text="safetyStatusMeta(gap).label"
+                      ></span>
+                    </template>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="min-w-0">
+              <div class="xl:hidden text-[10px] uppercase tracking-wider text-slate-500 mb-1">
+                Implementation
+              </div>
+              <template x-if="row.implementations.length">
+                <div class="space-y-1.5">
+                  <template x-for="target in row.implementations.slice(0, 3)" :key="target.id">
+                    <button
+                      type="button"
+                      @click="navigateTo(target.id)"
+                      class="flex items-center gap-2 text-xs text-slate-300 hover:text-white min-w-0 w-full text-left"
+                    >
+                      <span
+                        class="flex-shrink-0"
+                        :style="`color: ${nodeTypeColor(target.nodeType)}`"
+                        x-html="elementIcon(target.el || { spdxId: target.id }, 'w-3.5 h-3.5')"
+                      ></span>
+                      <span class="truncate" x-text="target.name"></span>
+                    </button>
+                  </template>
+                  <div
+                    x-show="row.implementations.length > 3"
+                    class="text-[10px] text-slate-500"
+                    x-text="`+${formatCount(row.implementations.length - 3)} more`"
+                  ></div>
+                </div>
+              </template>
+              <div x-show="!row.implementations.length" class="text-xs text-slate-500">
+                Not allocated
+              </div>
+            </div>
+            <div class="min-w-0">
+              <div class="xl:hidden text-[10px] uppercase tracking-wider text-slate-500 mb-1">
+                Verification
+              </div>
+              <template x-if="row.verifications.length">
+                <div class="space-y-1.5">
+                  <div class="flex flex-wrap gap-1.5">
+                    <template x-for="method in row.methods.slice(0, 4)" :key="method">
+                      <span
+                        class="badge text-xs bg-slate-700 text-slate-300"
+                        x-text="method"
+                      ></span>
+                    </template>
+                  </div>
+                  <template
+                    x-for="verification in row.verifications.slice(0, 2)"
+                    :key="verification.id"
+                  >
+                    <button
+                      type="button"
+                      @click="navigateTo(verification.id)"
+                      class="flex items-center gap-2 text-xs text-slate-300 hover:text-white min-w-0 w-full text-left"
+                    >
+                      <span
+                        x-show="verification.evaluationMeta"
+                        class="w-5 h-5 rounded-full inline-flex items-center justify-center flex-shrink-0"
+                        :class="verification.evaluationMeta?.badgeClass"
+                        :title="verification.evaluationMeta?.label"
+                        x-html="uiIconSvg(verification.evaluationMeta?.iconKey, 'w-3.5 h-3.5')"
+                      ></span>
+                      <span
+                        x-show="!verification.evaluationMeta"
+                        class="w-5 h-5 rounded-full inline-flex items-center justify-center flex-shrink-0 bg-slate-600/20 text-slate-400 ring-1 ring-slate-500/30"
+                        x-html="uiIconSvg('status_verified', 'w-3.5 h-3.5')"
+                      ></span>
+                      <span class="truncate" x-text="verification.name"></span>
+                    </button>
+                  </template>
+                  <div
+                    x-show="row.verifications.length > 2"
+                    class="text-[10px] text-slate-500"
+                    x-text="`+${formatCount(row.verifications.length - 2)} more`"
+                  ></div>
+                </div>
+              </template>
+              <div x-show="!row.verifications.length" class="text-xs text-slate-500">
+                No verification
+              </div>
+            </div>
+            <div class="min-w-0">
+              <div class="xl:hidden text-[10px] uppercase tracking-wider text-slate-500 mb-1">
+                Evidence
+              </div>
+              <template x-if="row.evidence.length">
+                <div class="space-y-1.5">
+                  <div class="flex flex-wrap gap-1.5">
+                    <template
+                      x-for="category in row.evidenceCategories.slice(0, 4)"
+                      :key="category"
+                    >
+                      <span
+                        class="badge text-xs bg-slate-700 text-slate-300"
+                        x-text="category"
+                      ></span>
+                    </template>
+                  </div>
+                  <template x-for="target in row.evidence.slice(0, 3)" :key="target.id">
+                    <button
+                      type="button"
+                      @click="target.nodeType === 'snippet' ? openSnippetRanges([target.id]) : navigateTo(target.id)"
+                      class="flex items-center gap-2 text-xs text-slate-300 hover:text-white min-w-0 w-full text-left"
+                    >
+                      <span
+                        class="flex-shrink-0"
+                        :style="`color: ${nodeTypeColor(target.nodeType)}`"
+                        x-html="elementIcon(target.el || { spdxId: target.id }, 'w-3.5 h-3.5')"
+                      ></span>
+                      <span class="truncate" x-text="target.name"></span>
+                    </button>
+                  </template>
+                  <div
+                    x-show="row.evidence.length > 3"
+                    class="text-[10px] text-slate-500"
+                    x-text="`+${formatCount(row.evidence.length - 3)} more`"
+                  ></div>
+                </div>
+              </template>
+              <div x-show="!row.evidence.length" class="text-xs text-slate-500">No evidence</div>
+            </div>
+          </div>
+        </template>
+        <div
+          x-show="safetyCoverageRows.length === 0"
+          class="px-3 py-8 text-sm text-slate-500 text-center"
+        >
+          No requirements match the current filters.
+        </div>
+        <button
+          type="button"
+          x-show="safetyCoverageRows.length > revealLimit('safetyCoverageRows')"
+          @click="revealMore('safetyCoverageRows')"
+          class="w-full px-3 py-2 text-xs text-slate-400 hover:text-slate-200 border-t border-slate-700/50"
+          x-text="`Show ${formatCount(Math.min(200, safetyCoverageRows.length - revealLimit('safetyCoverageRows')))} more requirements`"
+        ></button>
+      </div>
+    </div>
+  </template>
+
+  <!-- Allocation view: requirements grouped by implementing component/file/code range -->
+  <template x-if="requirementLayout === 'allocation'">
+    <div class="space-y-3">
+      <div class="flex items-center gap-3 text-xs">
+        <span
+          class="text-slate-500"
+          x-text="`${formatCount(safetyAllocationGroups.length)} allocation groups`"
+        ></span>
+        <button
+          type="button"
+          @click="expandAllSafetyAllocationGroups()"
+          class="text-slate-400 hover:text-slate-200"
+        >
+          Expand all
+        </button>
+        <span class="text-slate-600">·</span>
+        <button
+          type="button"
+          @click="collapseAllSafetyAllocationGroups()"
+          class="text-slate-400 hover:text-slate-200"
+        >
+          Collapse all
+        </button>
+      </div>
+      <template x-for="group in safetyAllocationGroups" :key="group.key">
+        <div class="rounded-xl border border-slate-700/60 bg-slate-800/40 overflow-hidden">
+          <div class="px-3 py-3 border-b border-slate-700/60">
+            <div class="flex items-start gap-3">
+              <span
+                class="w-8 h-8 rounded-lg bg-slate-900/60 flex items-center justify-center flex-shrink-0"
+                :style="group.nodeType ? `color: ${nodeTypeColor(group.nodeType)}` : ''"
+                x-html="group.id ? elementIcon(elementMap.get(group.id) || { spdxId: group.id }, 'w-4 h-4') : uiIconSvg('status_unverified', 'w-4 h-4')"
+              ></span>
+              <div class="min-w-0 flex-1">
+                <button
+                  type="button"
+                  x-show="group.id"
+                  @click="navigateTo(group.id)"
+                  class="text-sm font-semibold text-white hover:text-yellow-200 text-left break-words"
+                  x-text="group.name"
+                ></button>
+                <div
+                  x-show="!group.id"
+                  class="text-sm font-semibold text-white"
+                  x-text="group.name"
+                ></div>
+                <div class="mt-1 flex flex-wrap items-center gap-1.5">
+                  <span
+                    class="badge text-xs bg-yellow-500/15 text-yellow-300"
+                    x-text="`${formatCount(group.requirementCount)} requirements`"
+                  ></span>
+                  <span
+                    x-show="group.snippetCount"
+                    class="badge text-xs bg-slate-700 text-slate-300"
+                    x-text="`${formatCount(group.snippetCount)} ranges`"
+                  ></span>
+                  <template x-for="method in group.methods.slice(0, 3)" :key="group.key + method">
+                    <span class="badge text-xs bg-slate-700 text-slate-300" x-text="method"></span>
+                  </template>
+                  <span
+                    x-show="group.noImpl"
+                    class="badge text-xs"
+                    :class="safetyStatusMeta('noimpl').badgeClass"
+                    x-text="`${safetyStatusMeta('noimpl').label}: ${formatCount(group.noImpl)}`"
+                  ></span>
+                  <span
+                    x-show="group.noEvidence"
+                    class="badge text-xs"
+                    :class="safetyStatusMeta('noevidence').badgeClass"
+                    x-text="`${safetyStatusMeta('noevidence').label}: ${formatCount(group.noEvidence)}`"
+                  ></span>
+                </div>
+              </div>
+              <div class="hidden sm:flex items-center gap-1.5 flex-shrink-0">
+                <template x-for="s in safetyStatusOrder" :key="group.key + s">
+                  <span
+                    x-show="group.statusCounts[s] > 0"
+                    class="badge text-xs"
+                    :class="safetyStatusMeta(s).badgeClass"
+                    x-text="`${safetyStatusMeta(s).label} ${formatCount(group.statusCounts[s])}`"
+                  ></span>
+                </template>
+              </div>
+              <button
+                type="button"
+                @click.stop="toggleSafetyAllocationGroup(group.key)"
+                class="ml-auto sm:ml-0 flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-200 flex-shrink-0"
+                :title="expandedSafetyAllocationGroups[group.key] ? 'Collapse group' : 'Expand group'"
+              >
+                <svg
+                  class="w-3.5 h-3.5 transition-transform"
+                  :class="expandedSafetyAllocationGroups[group.key] && 'rotate-90'"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+                <span
+                  x-text="expandedSafetyAllocationGroups[group.key] ? 'Collapse' : 'Expand'"
+                ></span>
+              </button>
+            </div>
+          </div>
+          <template x-if="expandedSafetyAllocationGroups[group.key]">
+            <div class="divide-y divide-slate-700/50">
+              <template x-for="row in group.rows.slice(0, 8)" :key="group.key + row.id">
+                <div class="px-3 py-2 flex items-start gap-2 hover:bg-slate-800/70">
+                  <span
+                    class="mt-0.5 w-6 h-6 rounded-full inline-flex items-center justify-center flex-shrink-0"
+                    :class="row.status?.badgeClass"
+                    :title="row.status?.label"
+                    x-html="uiIconSvg(row.status?.iconKey, 'w-3.5 h-3.5')"
+                  ></span>
+                  <div class="min-w-0 flex-1">
+                    <button
+                      type="button"
+                      @click="navigateTo(row.id)"
+                      class="text-xs font-medium text-slate-200 hover:text-white text-left break-words"
+                      x-text="row.name"
+                    ></button>
+                    <div class="mt-1 flex flex-wrap gap-1.5">
+                      <span
+                        class="badge text-xs bg-slate-700 text-slate-300 font-mono"
+                        x-text="row.uid"
+                      ></span>
+                      <span
+                        class="badge text-xs bg-slate-700 text-slate-300"
+                        x-text="`${formatCount(row.verificationCount)} verification`"
+                      ></span>
+                      <span
+                        class="badge text-xs bg-slate-700 text-slate-300"
+                        x-text="`${formatCount(row.evidenceCount)} evidence`"
+                      ></span>
+                    </div>
+                  </div>
+                </div>
+              </template>
+              <div
+                x-show="group.rows.length > 8"
+                class="px-3 py-2 text-xs text-slate-500"
+                x-text="`Showing first 8 of ${formatCount(group.rows.length)} requirements`"
+              ></div>
+            </div>
+          </template>
+          <div
+            x-show="!expandedSafetyAllocationGroups[group.key]"
+            class="px-3 py-2 border-t border-slate-700/50 text-xs text-slate-500"
+            x-text="`Collapsed · expand to inspect traced requirements`"
+          ></div>
+        </div>
+      </template>
+      <div
+        x-show="safetyAllocationGroups.length === 0"
+        class="rounded-xl border border-slate-700/60 bg-slate-800/40 px-3 py-8 text-sm text-slate-500 text-center"
+      >
+        No allocation groups match the current filters.
+      </div>
+    </div>
+  </template>
+
+  <!-- Assurance view: decomposition-root rollups with spec/assumption context -->
+  <template x-if="requirementLayout === 'assurance'">
+    <div class="space-y-3">
+      <div class="flex items-center gap-3 text-xs">
+        <span
+          class="text-slate-500"
+          x-text="`${formatCount(safetyAssuranceRoots.length)} assurance groups`"
+        ></span>
+        <button
+          type="button"
+          @click="expandAllSafetyAssuranceGroups()"
+          class="text-slate-400 hover:text-slate-200"
+        >
+          Expand all
+        </button>
+        <span class="text-slate-600">·</span>
+        <button
+          type="button"
+          @click="collapseAllSafetyAssuranceGroups()"
+          class="text-slate-400 hover:text-slate-200"
+        >
+          Collapse all
+        </button>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <div class="rounded-xl border border-slate-700/60 bg-slate-800/40 p-3">
+          <div class="flex items-center justify-between gap-3 mb-2">
+            <div class="text-sm font-semibold text-white">Specifications</div>
+            <span
+              class="text-xs text-slate-500 tabular-nums"
+              x-text="formatCount(safetyAssuranceContext.specifications.length)"
+            ></span>
+          </div>
+          <div class="space-y-1.5 max-h-44 overflow-y-auto pr-1">
+            <template
+              x-for="spec in safetyAssuranceContext.specifications.slice(0, 10)"
+              :key="spec.id"
+            >
+              <div class="flex items-center gap-2 text-xs text-slate-300 min-w-0 w-full">
+                <span
+                  class="flex-shrink-0 text-yellow-400"
+                  x-html="elementIcon(elementMap.get(spec.id) || { spdxId: spec.id }, 'w-3.5 h-3.5')"
+                ></span>
+                <span class="truncate" x-text="spec.name"></span>
+                <span
+                  class="ml-auto text-slate-500 tabular-nums"
+                  x-text="formatCount(spec.requirementCount)"
+                ></span>
+              </div>
+            </template>
+            <div
+              x-show="safetyAssuranceContext.specifications.length === 0"
+              class="text-xs text-slate-500"
+            >
+              No specifications linked by hasRequirement.
+            </div>
+          </div>
+        </div>
+        <div class="rounded-xl border border-slate-700/60 bg-slate-800/40 p-3">
+          <div class="flex items-center justify-between gap-3 mb-2">
+            <div class="text-sm font-semibold text-white">Assumptions</div>
+            <span
+              class="text-xs text-slate-500 tabular-nums"
+              x-text="formatCount(safetyAssuranceContext.assumptions.length)"
+            ></span>
+          </div>
+          <div class="space-y-1.5 max-h-44 overflow-y-auto pr-1">
+            <template
+              x-for="assumption in safetyAssuranceContext.assumptions.slice(0, 10)"
+              :key="assumption.id"
+            >
+              <button
+                type="button"
+                @click="navigateTo(assumption.id)"
+                class="text-xs text-slate-300 hover:text-white min-w-0 w-full text-left"
+              >
+                <div class="truncate" x-text="assumption.name"></div>
+                <div class="text-slate-500 line-clamp-1" x-text="assumption.statement"></div>
+              </button>
+            </template>
+            <div
+              x-show="safetyAssuranceContext.assumptions.length === 0"
+              class="text-xs text-slate-500"
+            >
+              No assumptions linked in this document.
+            </div>
+          </div>
+        </div>
+      </div>
+      <template x-for="root in safetyAssuranceRoots" :key="root.id">
+        <div class="rounded-xl border border-slate-700/60 bg-slate-800/40 overflow-hidden">
+          <div class="px-3 py-3 border-b border-slate-700/60">
+            <div class="flex items-start gap-3">
+              <span
+                class="mt-0.5 w-8 h-8 rounded-full inline-flex items-center justify-center flex-shrink-0"
+                :class="root.root?.status?.badgeClass"
+                :title="root.root?.status?.label"
+                x-html="uiIconSvg(root.root?.status?.iconKey, 'w-4 h-4')"
+              ></span>
+              <div class="min-w-0 flex-1">
+                <button
+                  type="button"
+                  @click="navigateTo(root.id)"
+                  class="text-sm font-semibold text-white hover:text-yellow-200 text-left break-words"
+                  x-text="root.root?.name"
+                ></button>
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span
+                    class="badge text-xs bg-yellow-500/15 text-yellow-300"
+                    x-text="`${formatCount(root.requirementCount)} requirements`"
+                  ></span>
+                  <span
+                    class="badge text-xs bg-emerald-500/15 text-emerald-300"
+                    x-text="`${formatCount(root.implementationCount)} allocations`"
+                  ></span>
+                  <span
+                    class="badge text-xs bg-slate-700 text-slate-300"
+                    x-text="`${formatCount(root.evidenceCount)} evidence`"
+                  ></span>
+                  <span
+                    x-show="root.noImpl"
+                    class="badge text-xs"
+                    :class="safetyStatusMeta('noimpl').badgeClass"
+                    x-text="`${safetyStatusMeta('noimpl').label}: ${formatCount(root.noImpl)}`"
+                  ></span>
+                  <span
+                    x-show="root.noEvidence"
+                    class="badge text-xs"
+                    :class="safetyStatusMeta('noevidence').badgeClass"
+                    x-text="`${safetyStatusMeta('noevidence').label}: ${formatCount(root.noEvidence)}`"
+                  ></span>
+                </div>
+              </div>
+              <div class="hidden sm:flex items-center gap-1.5 flex-shrink-0">
+                <template x-for="s in safetyStatusOrder" :key="root.id + s">
+                  <span
+                    x-show="root.statusCounts[s] > 0"
+                    class="badge text-xs"
+                    :class="safetyStatusMeta(s).badgeClass"
+                    x-text="`${safetyStatusMeta(s).label} ${formatCount(root.statusCounts[s])}`"
+                  ></span>
+                </template>
+              </div>
+              <button
+                type="button"
+                @click.stop="toggleSafetyAssuranceGroup(root.id)"
+                class="ml-auto sm:ml-0 flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-200 flex-shrink-0"
+                :title="expandedSafetyAssuranceGroups[root.id] ? 'Collapse group' : 'Expand group'"
+              >
+                <svg
+                  class="w-3.5 h-3.5 transition-transform"
+                  :class="expandedSafetyAssuranceGroups[root.id] && 'rotate-90'"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+                <span
+                  x-text="expandedSafetyAssuranceGroups[root.id] ? 'Collapse' : 'Expand'"
+                ></span>
+              </button>
+            </div>
+          </div>
+          <template x-if="expandedSafetyAssuranceGroups[root.id]">
+            <div>
+              <div class="px-3 py-2 border-b border-slate-700/50 flex flex-wrap gap-1.5">
+                <template x-for="spec in root.specs.slice(0, 4)" :key="root.id + spec.id">
+                  <span class="badge text-xs bg-slate-700 text-slate-300" x-text="spec.name"></span>
+                </template>
+                <template x-for="method in root.methods.slice(0, 4)" :key="root.id + method">
+                  <span class="badge text-xs bg-slate-700 text-slate-300" x-text="method"></span>
+                </template>
+              </div>
+              <div class="divide-y divide-slate-700/50">
+                <template x-for="row in root.rows.slice(0, 8)" :key="root.id + row.id">
+                  <div class="px-3 py-2 flex items-start gap-2 hover:bg-slate-800/70">
+                    <span
+                      class="mt-0.5 w-6 h-6 rounded-full inline-flex items-center justify-center flex-shrink-0"
+                      :class="row.status?.badgeClass"
+                      :title="row.status?.label"
+                      x-html="uiIconSvg(row.status?.iconKey, 'w-3.5 h-3.5')"
+                    ></span>
+                    <div class="min-w-0 flex-1">
+                      <button
+                        type="button"
+                        @click="navigateTo(row.id)"
+                        class="text-xs font-medium text-slate-200 hover:text-white text-left break-words"
+                        x-text="row.name"
+                      ></button>
+                      <div
+                        class="mt-1 text-xs text-slate-500 line-clamp-1"
+                        x-text="row.statement"
+                      ></div>
+                    </div>
+                  </div>
+                </template>
+                <div
+                  x-show="root.rows.length > 8"
+                  class="px-3 py-2 text-xs text-slate-500"
+                  x-text="`Showing first 8 of ${formatCount(root.rows.length)} requirements`"
+                ></div>
+              </div>
+            </div>
+          </template>
+          <div
+            x-show="!expandedSafetyAssuranceGroups[root.id]"
+            class="px-3 py-2 border-t border-slate-700/50 text-xs text-slate-500"
+            x-text="`Collapsed · expand to inspect decomposition evidence and requirements`"
+          ></div>
+        </div>
+      </template>
+      <div
+        x-show="safetyAssuranceRoots.length === 0"
+        class="rounded-xl border border-slate-700/60 bg-slate-800/40 px-3 py-8 text-sm text-slate-500 text-center"
+      >
+        No assurance groups match the current filters.
       </div>
     </div>
   </template>

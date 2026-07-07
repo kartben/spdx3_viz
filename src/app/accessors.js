@@ -28,7 +28,14 @@ import {
   normalizeUrl,
   copyToClipboard
 } from '../lib/index.js';
-import { COLORS, getScopeColor, SAFETY_STATUSES, SAFETY_NO_IMPL_META } from '../config.js';
+import {
+  COLORS,
+  getScopeColor,
+  SAFETY_STATUSES,
+  SAFETY_NO_IMPL_META,
+  SAFETY_NO_EVIDENCE_META,
+  SAFETY_NO_EVALUATION_META
+} from '../config.js';
 import hljs from '../lib/highlight.js';
 
 /* Element accessors and display helpers: thin lookups into the relationship
@@ -747,6 +754,8 @@ export const accessorsMixin = {
 
   // The EvaluationResult whose evaluationBasedOn points at a given verification.
   evaluationFor(verificationId) {
+    const byVerification = this.safetyEvaluationByVerificationMap;
+    if (byVerification) return byVerification.get(verificationId) || null;
     return (
       this.requirements.find(
         (r) =>
@@ -788,6 +797,8 @@ export const accessorsMixin = {
   // status-filter chips, mirroring vexStatusMeta for the security view.
   safetyStatusMeta(key) {
     if (key === SAFETY_NO_IMPL_META.key) return SAFETY_NO_IMPL_META;
+    if (key === SAFETY_NO_EVIDENCE_META.key) return SAFETY_NO_EVIDENCE_META;
+    if (key === SAFETY_NO_EVALUATION_META.key) return SAFETY_NO_EVALUATION_META;
     return (
       SAFETY_STATUSES[key] || {
         key: key || 'unknown',
@@ -820,6 +831,58 @@ export const accessorsMixin = {
   // Decomposition tree: expand everything.
   expandAllReqs() {
     this.collapsedReqs = {};
+  },
+
+  setRequirementLayout(layout) {
+    this.requirementLayout = layout;
+    if (layout === 'tree') this.requirementStatusFilter = '';
+    if (layout === 'list') {
+      this.restreamView('requirements');
+      return;
+    }
+    this.$nextTick?.(() => {
+      if (typeof document !== 'undefined') {
+        document.getElementById('mainContent')?.scrollTo({ top: 0 });
+      }
+    });
+  },
+
+  toggleSafetyAllocationGroup(key) {
+    const next = { ...this.expandedSafetyAllocationGroups };
+    if (next[key]) delete next[key];
+    else next[key] = true;
+    this.expandedSafetyAllocationGroups = next;
+  },
+
+  expandAllSafetyAllocationGroups() {
+    const next = {};
+    this.safetyAllocationGroups.forEach((group) => {
+      next[group.key] = true;
+    });
+    this.expandedSafetyAllocationGroups = next;
+  },
+
+  collapseAllSafetyAllocationGroups() {
+    this.expandedSafetyAllocationGroups = {};
+  },
+
+  toggleSafetyAssuranceGroup(id) {
+    const next = { ...this.expandedSafetyAssuranceGroups };
+    if (next[id]) delete next[id];
+    else next[id] = true;
+    this.expandedSafetyAssuranceGroups = next;
+  },
+
+  expandAllSafetyAssuranceGroups() {
+    const next = {};
+    this.safetyAssuranceRoots.forEach((root) => {
+      next[root.id] = true;
+    });
+    this.expandedSafetyAssuranceGroups = next;
+  },
+
+  collapseAllSafetyAssuranceGroups() {
+    this.expandedSafetyAssuranceGroups = {};
   },
 
   // Friendly kind label for a functional-safety element, for the card/detail

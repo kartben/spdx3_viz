@@ -197,6 +197,30 @@ export const SAFETY_NO_IMPL_META = {
 };
 
 /**
+ * FunctionalSafety profile: chip metadata for requirements whose verification
+ * chain reaches no evidence artifact through EvaluationResult.hasEvidence.
+ */
+export const SAFETY_NO_EVIDENCE_META = {
+  key: 'noevidence',
+  label: 'No evidence',
+  color: '#a855f7',
+  badgeClass: 'bg-purple-500/15 text-purple-300 ring-1 ring-purple-500/30',
+  dotClass: 'bg-purple-500'
+};
+
+/**
+ * FunctionalSafety profile: chip metadata for requirements that point at a
+ * verification activity with no corresponding EvaluationResult.
+ */
+export const SAFETY_NO_EVALUATION_META = {
+  key: 'noevaluation',
+  label: 'No evaluation',
+  color: '#94a3b8',
+  badgeClass: 'bg-slate-600/20 text-slate-300 ring-1 ring-slate-500/30',
+  dotClass: 'bg-slate-500'
+};
+
+/**
  * Presentation metadata for each CVSS qualitative severity, sourced directly
  * from the SBOM's own CVSS assessment relationships. `rank` orders them from
  * most to least severe (used to sort/filter the security view and to size the

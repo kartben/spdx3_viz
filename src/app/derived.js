@@ -1,5 +1,7 @@
 import { computeRelationshipTypeCounts } from '../parser/parser.js';
 import { isA, CLASS } from '../spdx/model.js';
+import { enumValue, snippetFileRef } from '../lib/index.js';
+import { SAFETY_NO_EVIDENCE_META, SAFETY_NO_IMPL_META } from '../config.js';
 
 /* Derived data: computed getters over the parsed model — filtered/sorted list
    views, the security summary, and the counts/labels templates read. */
@@ -14,6 +16,65 @@ let filteredVulnsCacheKey = null;
 let filteredVulnsCacheVal = [];
 let filteredFilesCacheKey = null;
 let filteredFilesCacheVal = [];
+const safetyModelCache = new WeakMap();
+
+const SAFETY_STATUS_KEYS = ['failed', 'inconclusive', 'unverified', 'verified', 'passed'];
+
+function asArray(value) {
+  return Array.isArray(value) ? value : value == null || value === '' ? [] : [value];
+}
+
+function uniqueValues(values) {
+  return [...new Set(values.filter(Boolean))];
+}
+
+function uniqueById(rows) {
+  const seen = new Set();
+  const out = [];
+  for (const row of rows) {
+    if (!row?.id || seen.has(row.id)) continue;
+    seen.add(row.id);
+    out.push(row);
+  }
+  return out;
+}
+
+function emptySafetyCounts() {
+  return Object.fromEntries(SAFETY_STATUS_KEYS.map((key) => [key, 0]));
+}
+
+function incrementSafetyCount(counts, key) {
+  if (Object.hasOwn(counts, key)) counts[key]++;
+}
+
+function safetySortScore(row) {
+  const counts = row.statusCounts || {};
+  return (
+    (counts.failed || 0) * 100000 +
+    (row.noImpl || 0) * 50000 +
+    (counts.inconclusive || 0) * 10000 +
+    (counts.unverified || 0) * 1000 +
+    (row.noEvidence || 0) * 100
+  );
+}
+
+function safetyCacheKey(app) {
+  const requirements = app.requirements || [];
+  const relationships = app.relationships || [];
+  const firstReq = requirements[0]?.spdxId || '';
+  const lastReq = requirements.at(-1)?.spdxId || '';
+  const firstRel = relationships[0]?.spdxId || '';
+  const lastRel = relationships.at(-1)?.spdxId || '';
+  return [
+    requirements.length,
+    relationships.length,
+    app.elementMap?.size || 0,
+    firstReq,
+    lastReq,
+    firstRel,
+    lastRel
+  ].join('|');
+}
 
 export const derivedMixin = {
   // Clears the build + vulnerability sort memos. Called when fresh data is
@@ -22,6 +83,28 @@ export const derivedMixin = {
     filteredBuildsCacheKey = null;
     filteredVulnsCacheKey = null;
     filteredFilesCacheKey = null;
+    safetyModelCache.delete(this);
+  },
+
+  _safetyModelCache() {
+    const key = safetyCacheKey(this);
+    let entry = safetyModelCache.get(this);
+    if (!entry || entry.key !== key) {
+      entry = {
+        key,
+        evaluationByVerification: null,
+        coverageBaseRows: null,
+        coverageRowsCache: new Map(),
+        coverageSummaryCache: new Map(),
+        allocationGroupsCache: new Map(),
+        assuranceContext: null,
+        assuranceRootsCache: new Map(),
+        decomposition: null,
+        statusSummary: null
+      };
+      safetyModelCache.set(this, entry);
+    }
+    return entry;
   },
 
   get currentViewLabel() {
@@ -198,27 +281,492 @@ export const derivedMixin = {
     return c;
   },
 
+  get safetyRequirementLayouts() {
+    const layouts = [{ key: 'list', label: 'List' }];
+    if (this.hasSafetyDecomposition) layouts.push({ key: 'tree', label: 'Decomposition' });
+    layouts.push(
+      { key: 'coverage', label: 'Coverage' },
+      { key: 'allocation', label: 'Allocation' },
+      { key: 'assurance', label: 'Assurance' }
+    );
+    return layouts;
+  },
+
+  get safetyRequirementLayoutIntro() {
+    const intros = {
+      list: {
+        title: 'Artifact list',
+        description:
+          'Inspect individual requirements, verifications, evaluations, assumptions, and their detailed relationships.'
+      },
+      tree: {
+        title: 'Decomposition',
+        description:
+          'Review how high-level safety goals break down into detailed requirements through tracedToDetail links.'
+      },
+      coverage: {
+        title: 'Coverage matrix',
+        description:
+          'Check that each requirement has an implementation, verification result, and evidence artifact.'
+      },
+      allocation: {
+        title: 'Allocation',
+        description:
+          'Find which component, file, or code range owns each requirement and where allocation gaps remain.'
+      },
+      assurance: {
+        title: 'Assurance rollup',
+        description:
+          'Review safety-goal level assurance, including decomposition coverage, evidence depth, linked specifications, and assumptions.'
+      }
+    };
+    return intros[this.requirementLayout] || intros.list;
+  },
+
+  get safetyEvaluationByVerificationMap() {
+    const entry = this._safetyModelCache();
+    if (!entry.evaluationByVerification) {
+      const map = new Map();
+      this.requirements.forEach((r) => {
+        if (
+          r.type === CLASS.functionalsafety_EvaluationResult &&
+          r.functionalsafety_evaluationBasedOn
+        ) {
+          map.set(r.functionalsafety_evaluationBasedOn, r);
+        }
+      });
+      entry.evaluationByVerification = map;
+    }
+    return entry.evaluationByVerification;
+  },
+
+  _safetyTargetRows(ids) {
+    return uniqueValues(asArray(ids))
+      .map((id) => {
+        const el = this.elementMap.get(id);
+        const ref = el?.type === 'software_Snippet' ? snippetFileRef(el, this.elementMap) : null;
+        const nodeType = this.getNodeType(el || { spdxId: id });
+        return {
+          id,
+          el,
+          type: el?.type || '',
+          nodeType,
+          name: this.relTargetDisplayName(id),
+          fileId: ref?.fileId || '',
+          fileName: ref?.fileName || '',
+          baseName: ref?.baseName || '',
+          lineLabel:
+            ref?.start == null
+              ? ''
+              : ref.end != null && ref.end !== ref.start
+                ? `L${ref.start}-${ref.end}`
+                : `L${ref.start}`,
+          ref
+        };
+      })
+      .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+  },
+
+  _safetyRelationshipTargets(spdxId, relationshipType, direction = 'out') {
+    const rels = direction === 'in' ? this.incomingRels(spdxId) : this.outgoingRels(spdxId);
+    const ids = [];
+    rels.forEach((rel) => {
+      if (rel.relationshipType !== relationshipType) return;
+      if (direction === 'in') ids.push(rel.from);
+      else asArray(rel.to).forEach((target) => ids.push(target));
+    });
+    return this._safetyTargetRows(ids);
+  },
+
+  _safetyEvidenceFrom(spdxId) {
+    const evidenceIds = [];
+    const categories = [];
+    (this.outgoingRels(spdxId) || []).forEach((rel) => {
+      if (rel.relationshipType !== 'hasEvidence') return;
+      asArray(rel.to).forEach((target) => evidenceIds.push(target));
+      asArray(rel.functionalsafety_evidenceCategory)
+        .map(enumValue)
+        .forEach((category) => categories.push(category));
+    });
+    return {
+      evidence: this._safetyTargetRows(evidenceIds),
+      categories: uniqueValues(categories)
+    };
+  },
+
+  _safetyCoverageRowFor(req) {
+    const implementations = this._safetyRelationshipTargets(req.spdxId, 'implementedBy');
+    const specifications = this._safetyRelationshipTargets(req.spdxId, 'hasRequirement', 'in');
+    const parents = this._safetyRelationshipTargets(req.spdxId, 'tracedToDetail', 'in');
+    const children = this._safetyRelationshipTargets(req.spdxId, 'tracedToDetail');
+    const verifications = this.requirementVerifications(req).map((v) => {
+      const evidenceInfo = v.evaluation ? this._safetyEvidenceFrom(v.evaluation.spdxId) : null;
+      return {
+        id: v.id,
+        verification: v.verification,
+        name: v.verification.name || this.cleanName(v.id),
+        methods: uniqueValues(
+          asArray(v.verification.functionalsafety_verificationMethod).map(enumValue)
+        ),
+        evaluation: v.evaluation,
+        evaluationMeta: this.evaluationResultMeta(v.evaluation),
+        evidence: evidenceInfo?.evidence || [],
+        evidenceCategories: evidenceInfo?.categories || []
+      };
+    });
+    const directEvidence = this._safetyEvidenceFrom(req.spdxId);
+    const evidence = uniqueById([
+      ...verifications.flatMap((verification) => verification.evidence),
+      ...directEvidence.evidence
+    ]);
+    const evidenceCategories = uniqueValues([
+      ...verifications.flatMap((verification) => verification.evidenceCategories),
+      ...directEvidence.categories
+    ]);
+    const methods = uniqueValues(verifications.flatMap((verification) => verification.methods));
+    const status = this.requirementSafetyStatus(req);
+    const gapKeys = [];
+    if (!implementations.length) gapKeys.push(SAFETY_NO_IMPL_META.key);
+    if (verifications.length && verifications.some((verification) => !verification.evaluation)) {
+      gapKeys.push('noevaluation');
+    }
+    if (!evidence.length) gapKeys.push(SAFETY_NO_EVIDENCE_META.key);
+
+    const identifiers = this.externalIdentifiers(req);
+    const uid =
+      identifiers.find((identifier) => !identifier.identifier.startsWith('status:'))?.identifier ||
+      req.requirementUID?.identifier ||
+      this.cleanName(req.spdxId);
+    const statement = req.requirementStatement || '';
+    const searchText = [
+      uid,
+      req.name,
+      this.cleanName(req.spdxId),
+      statement,
+      req.summary,
+      req.description,
+      req.comment,
+      ...identifiers.map((identifier) => identifier.identifier),
+      ...implementations.map((target) => target.name),
+      ...specifications.map((target) => target.name),
+      ...methods,
+      ...evidenceCategories,
+      ...evidence.map((target) => target.name)
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
+
+    return {
+      id: req.spdxId,
+      el: req,
+      uid,
+      name: req.name || this.cleanName(req.spdxId),
+      statement,
+      status,
+      statusKey: status?.key || 'unverified',
+      implementations,
+      implementationCount: implementations.length,
+      verifications,
+      verificationCount: verifications.length,
+      methods,
+      evidence,
+      evidenceCount: evidence.length,
+      evidenceCategories,
+      specifications,
+      parents,
+      children,
+      gapKeys,
+      searchText
+    };
+  },
+
+  get safetyCoverageBaseRows() {
+    const entry = this._safetyModelCache();
+    if (!entry.coverageBaseRows) {
+      entry.coverageBaseRows = this.requirements
+        .filter((r) => isA(r.type, CLASS.Requirement))
+        .map((req) => this._safetyCoverageRowFor(req))
+        .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+    }
+    return entry.coverageBaseRows;
+  },
+
+  get safetyCoverageRows() {
+    const entry = this._safetyModelCache();
+    const cacheKey = `${this.requirementStatusFilter}\n${this.requirementSearch}`;
+    if (entry.coverageRowsCache.has(cacheKey)) return entry.coverageRowsCache.get(cacheKey);
+
+    let rows = this.safetyCoverageBaseRows;
+    if (this.requirementStatusFilter === SAFETY_NO_IMPL_META.key) {
+      rows = rows.filter((row) => row.gapKeys.includes(SAFETY_NO_IMPL_META.key));
+    } else if (this.requirementStatusFilter === SAFETY_NO_EVIDENCE_META.key) {
+      rows = rows.filter((row) => row.gapKeys.includes(SAFETY_NO_EVIDENCE_META.key));
+    } else if (this.requirementStatusFilter) {
+      rows = rows.filter((row) => row.statusKey === this.requirementStatusFilter);
+    }
+    if (this.requirementSearch) {
+      const q = this.requirementSearch.toLowerCase();
+      rows = rows.filter((row) => row.searchText.includes(q));
+    }
+    entry.coverageRowsCache.set(cacheKey, rows);
+    return rows;
+  },
+
+  get safetyCoverageSummary() {
+    const entry = this._safetyModelCache();
+    const cacheKey = `${this.requirementStatusFilter}\n${this.requirementSearch}`;
+    if (entry.coverageSummaryCache.has(cacheKey)) return entry.coverageSummaryCache.get(cacheKey);
+
+    const rows = this.safetyCoverageRows;
+    const counts = emptySafetyCounts();
+    rows.forEach((row) => incrementSafetyCount(counts, row.statusKey));
+    const withImplementation = rows.filter((row) => row.implementationCount > 0).length;
+    const withEvidence = rows.filter((row) => row.evidenceCount > 0).length;
+    const withVerification = rows.filter((row) => row.verificationCount > 0).length;
+    const complete = rows.filter(
+      (row) => row.statusKey === 'passed' && row.implementationCount > 0 && row.evidenceCount > 0
+    ).length;
+    const summary = {
+      total: rows.length,
+      counts,
+      withImplementation,
+      withEvidence,
+      withVerification,
+      complete,
+      gaps: rows.filter((row) => row.gapKeys.length > 0).length
+    };
+    entry.coverageSummaryCache.set(cacheKey, summary);
+    return summary;
+  },
+
+  get safetyAllocationGroups() {
+    const entry = this._safetyModelCache();
+    const cacheKey = `${this.requirementStatusFilter}\n${this.requirementSearch}`;
+    if (entry.allocationGroupsCache.has(cacheKey)) return entry.allocationGroupsCache.get(cacheKey);
+
+    const groups = new Map();
+    const ensureGroup = (target) => {
+      const key = target.key || target.id;
+      let group = groups.get(key);
+      if (!group) {
+        group = {
+          key,
+          id: target.id || '',
+          name: target.name,
+          type: target.type || '',
+          nodeType: target.nodeType || '',
+          rows: [],
+          requirementIds: new Set(),
+          statusCounts: emptySafetyCounts(),
+          noImpl: 0,
+          noEvidence: 0,
+          methods: new Set(),
+          evidenceCategories: new Set(),
+          snippetCount: 0
+        };
+        groups.set(key, group);
+      }
+      return group;
+    };
+
+    this.safetyCoverageRows.forEach((row) => {
+      const targets = row.implementations.length
+        ? row.implementations
+        : [
+            {
+              key: '__unallocated__',
+              id: '',
+              name: 'Unallocated',
+              type: '',
+              nodeType: ''
+            }
+          ];
+      targets.forEach((target) => {
+        const groupedTarget =
+          target.type === 'software_Snippet' && target.fileId
+            ? {
+                key: target.fileId,
+                id: target.fileId,
+                name: target.fileName || target.baseName || target.name,
+                type: 'software_File',
+                nodeType: 'file'
+              }
+            : target;
+        const group = ensureGroup(groupedTarget);
+        if (target.type === 'software_Snippet') group.snippetCount++;
+        if (group.requirementIds.has(row.id)) return;
+        group.requirementIds.add(row.id);
+        group.rows.push(row);
+        incrementSafetyCount(group.statusCounts, row.statusKey);
+        if (row.gapKeys.includes(SAFETY_NO_IMPL_META.key)) group.noImpl++;
+        if (row.gapKeys.includes(SAFETY_NO_EVIDENCE_META.key)) group.noEvidence++;
+        row.methods.forEach((method) => group.methods.add(method));
+        row.evidenceCategories.forEach((category) => group.evidenceCategories.add(category));
+      });
+    });
+
+    const allocationGroups = [...groups.values()]
+      .map((group) => ({
+        key: group.key,
+        id: group.id,
+        name: group.name,
+        type: group.type,
+        nodeType: group.nodeType,
+        rows: group.rows.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true })),
+        requirementCount: group.rows.length,
+        statusCounts: group.statusCounts,
+        noImpl: group.noImpl,
+        noEvidence: group.noEvidence,
+        methods: [...group.methods].sort(),
+        evidenceCategories: [...group.evidenceCategories].sort(),
+        snippetCount: group.snippetCount
+      }))
+      .sort((a, b) => {
+        if (a.key === '__unallocated__') return -1;
+        if (b.key === '__unallocated__') return 1;
+        return (
+          safetySortScore(b) - safetySortScore(a) ||
+          b.requirementCount - a.requirementCount ||
+          a.name.localeCompare(b.name, undefined, { numeric: true })
+        );
+      });
+    entry.allocationGroupsCache.set(cacheKey, allocationGroups);
+    return allocationGroups;
+  },
+
+  get safetyAssuranceContext() {
+    const entry = this._safetyModelCache();
+    if (entry.assuranceContext) return entry.assuranceContext;
+
+    const specifications = new Map();
+    this.relationships.forEach((rel) => {
+      if (rel.relationshipType !== 'hasRequirement') return;
+      const reqIds = asArray(rel.to).filter((id) =>
+        isA(this.elementMap.get(id)?.type, CLASS.Requirement)
+      );
+      if (!reqIds.length) return;
+      const el = this.elementMap.get(rel.from);
+      const row = specifications.get(rel.from) || {
+        id: rel.from,
+        name: el?.name || this.cleanName(rel.from),
+        type: el?.type || '',
+        requirementIds: new Set()
+      };
+      reqIds.forEach((id) => row.requirementIds.add(id));
+      specifications.set(rel.from, row);
+    });
+    const assumptions = this.requirements
+      .filter((r) => isA(r.type, CLASS.functionalsafety_Assumption))
+      .map((assumption) => ({
+        id: assumption.spdxId,
+        name: assumption.name || this.cleanName(assumption.spdxId),
+        statement: assumption.functionalsafety_assumptionStatement || assumption.summary || ''
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+
+    entry.assuranceContext = {
+      specifications: [...specifications.values()]
+        .map((spec) => ({
+          id: spec.id,
+          name: spec.name,
+          type: spec.type,
+          requirementCount: spec.requirementIds.size
+        }))
+        .sort(
+          (a, b) =>
+            b.requirementCount - a.requirementCount ||
+            a.name.localeCompare(b.name, undefined, { numeric: true })
+        ),
+      assumptions
+    };
+    return entry.assuranceContext;
+  },
+
+  get safetyAssuranceRoots() {
+    const entry = this._safetyModelCache();
+    const cacheKey = `${this.requirementStatusFilter}\n${this.requirementSearch}`;
+    if (entry.assuranceRootsCache.has(cacheKey)) return entry.assuranceRootsCache.get(cacheKey);
+
+    const { childrenOf, roots } = this.safetyDecomposition;
+    const visibleRows = new Map(this.safetyCoverageRows.map((row) => [row.id, row]));
+    const baseRows = new Map(this.safetyCoverageBaseRows.map((row) => [row.id, row]));
+    const collectIds = (rootId) => {
+      const ids = [];
+      const visit = (id, ancestry) => {
+        if (ancestry.has(id)) return;
+        ids.push(id);
+        const next = new Set(ancestry).add(id);
+        (childrenOf.get(id) || []).forEach((childId) => visit(childId, next));
+      };
+      visit(rootId, new Set());
+      return ids;
+    };
+
+    const assuranceRoots = roots
+      .map((rootId) => {
+        const ids = collectIds(rootId);
+        const rows = ids.map((id) => visibleRows.get(id)).filter(Boolean);
+        if (!rows.length) return null;
+        const statusCounts = emptySafetyCounts();
+        rows.forEach((row) => incrementSafetyCount(statusCounts, row.statusKey));
+        const specs = uniqueById(rows.flatMap((row) => row.specifications));
+        const methods = uniqueValues(rows.flatMap((row) => row.methods));
+        const evidenceCategories = uniqueValues(rows.flatMap((row) => row.evidenceCategories));
+        const noImpl = rows.filter((row) => row.gapKeys.includes(SAFETY_NO_IMPL_META.key)).length;
+        const noEvidence = rows.filter((row) =>
+          row.gapKeys.includes(SAFETY_NO_EVIDENCE_META.key)
+        ).length;
+        return {
+          id: rootId,
+          root: visibleRows.get(rootId) || baseRows.get(rootId),
+          rows,
+          requirementCount: rows.length,
+          statusCounts,
+          noImpl,
+          noEvidence,
+          implementationCount: uniqueById(rows.flatMap((row) => row.implementations)).length,
+          evidenceCount: uniqueById(rows.flatMap((row) => row.evidence)).length,
+          specs,
+          methods,
+          evidenceCategories
+        };
+      })
+      .filter(Boolean)
+      .sort(
+        (a, b) =>
+          safetySortScore(b) - safetySortScore(a) ||
+          b.requirementCount - a.requirementCount ||
+          a.root.name.localeCompare(b.root.name, undefined, { numeric: true })
+      );
+    entry.assuranceRootsCache.set(cacheKey, assuranceRoots);
+    return assuranceRoots;
+  },
+
   // Rollup of every Requirement's overall verification outcome, for the
   // safety-case status bar and status-filter chips. `noImpl` counts requirements
   // carrying no implementedBy link (a traceability gap), and `verifiedPct` is the
   // share that reached a passing verification.
   get safetyStatusSummary() {
-    const counts = { failed: 0, inconclusive: 0, unverified: 0, verified: 0, passed: 0 };
-    let total = 0;
-    let noImpl = 0;
-    this.requirements.forEach((r) => {
-      if (!isA(r.type, CLASS.Requirement)) return;
-      total++;
-      const status = this.requirementSafetyStatus(r);
-      if (status && Object.hasOwn(counts, status.key)) counts[status.key]++;
-      if (!this.implementedByCount(r.spdxId)) noImpl++;
-    });
-    return {
+    const entry = this._safetyModelCache();
+    if (entry.statusSummary) return entry.statusSummary;
+
+    const counts = emptySafetyCounts();
+    const rows = this.safetyCoverageBaseRows;
+    rows.forEach((row) => incrementSafetyCount(counts, row.statusKey));
+    const noImpl = rows.filter((row) => row.gapKeys.includes(SAFETY_NO_IMPL_META.key)).length;
+    const noEvidence = rows.filter((row) =>
+      row.gapKeys.includes(SAFETY_NO_EVIDENCE_META.key)
+    ).length;
+    const total = rows.length;
+    entry.statusSummary = {
       total,
       counts,
       noImpl,
+      noEvidence,
       verifiedPct: total ? Math.round((counts.passed / total) * 100) : 0
     };
+    return entry.statusSummary;
   },
 
   // Verification statuses that actually occur, gaps-first, so the rollup bar and
@@ -234,6 +782,9 @@ export const derivedMixin = {
   // appearing as a child become roots, so isolated requirements still show. Only
   // Requirement-typed endpoints are kept (verifications/assumptions are excluded).
   get safetyDecomposition() {
+    const entry = this._safetyModelCache();
+    if (entry.decomposition) return entry.decomposition;
+
     const reqIds = new Set();
     this.requirements.forEach((r) => {
       if (isA(r.type, CLASS.Requirement)) reqIds.add(r.spdxId);
@@ -252,7 +803,8 @@ export const derivedMixin = {
       childrenOf.set(rel.from, kids);
     });
     const roots = [...reqIds].filter((id) => !isChild.has(id));
-    return { childrenOf, roots, hasDecomposition: childrenOf.size > 0 };
+    entry.decomposition = { childrenOf, roots, hasDecomposition: childrenOf.size > 0 };
+    return entry.decomposition;
   },
 
   get hasSafetyDecomposition() {
@@ -297,11 +849,18 @@ export const derivedMixin = {
       reqs = reqs.filter((r) => r.type === this.requirementKindFilter);
     }
     // Verification-status rollup chips filter Requirements by their outcome, or
-    // by the 'noimpl' traceability gap (no implementedBy link).
-    if (this.requirementStatusFilter === 'noimpl') {
+    // by traceability gaps such as missing implementation/evidence links.
+    if (this.requirementStatusFilter === SAFETY_NO_IMPL_META.key) {
       reqs = reqs.filter(
         (r) => isA(r.type, CLASS.Requirement) && !this.implementedByCount(r.spdxId)
       );
+    } else if (this.requirementStatusFilter === SAFETY_NO_EVIDENCE_META.key) {
+      const noEvidenceIds = new Set(
+        this.safetyCoverageBaseRows
+          .filter((row) => row.gapKeys.includes(SAFETY_NO_EVIDENCE_META.key))
+          .map((row) => row.id)
+      );
+      reqs = reqs.filter((r) => isA(r.type, CLASS.Requirement) && noEvidenceIds.has(r.spdxId));
     } else if (this.requirementStatusFilter) {
       reqs = reqs.filter(
         (r) =>
