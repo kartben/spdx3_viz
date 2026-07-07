@@ -225,6 +225,29 @@ export const derivedMixin = {
       .sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
   },
 
+  // Timeline events: the actions that genuinely happen at a point in time.
+  // StateActions are excluded here because they are the transitions of the
+  // product state machine, which has its own States angle; keeping them out
+  // leaves the timeline focused on the substantive supply-chain events.
+  get supplyChainEvents() {
+    return this.supplyChainActions.filter((el) => !isA(el.type, CLASS.supplychain_StateAction));
+  },
+
+  // Action families present among the timeline events, in phase order, each with
+  // its count. Drives the timeline's filter chips (replacing the old
+  // action/state/process kind chips, which mixed three different concepts).
+  get supplyChainEventFamilies() {
+    const order = ['create', 'modify', 'move', 'verify', 'exception', 'operate', 'other'];
+    const counts = {};
+    this.supplyChainEvents.forEach((el) => {
+      const family = this.supplyChainFamily(el);
+      counts[family] = (counts[family] || 0) + 1;
+    });
+    return order
+      .filter((key) => counts[key])
+      .map((key) => ({ key, label: this.supplyChainFamilyLabel(key), n: counts[key] }));
+  },
+
   get supplyChainProcesses() {
     return this.supplyChain
       .filter((el) => this.supplyChainKind(el) === 'process')
@@ -540,6 +563,63 @@ export const derivedMixin = {
     });
   },
 
+  // The product state machine as Mermaid stateDiagram-v2 source. Nodes follow
+  // the StateAction trajectory (received -> ... -> deployed), transitions carry
+  // their decision process as a label, and exception / positive states get a
+  // themed class. Rendered lazily by renderSupplyChainStateDiagram().
+  get supplyChainStateMermaid() {
+    const steps = this.supplyChainLifecycleSteps;
+    if (!steps.length) return '';
+    const esc = (value) =>
+      String(value || '')
+        .replace(/[:<>"\n\r]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    const lines = [
+      'stateDiagram-v2',
+      // Every state is explicitly classed: Mermaid's base theme leaves the
+      // default state label the same tone as the node fill, which is unreadable
+      // on the dark surface, so even neutral states carry an explicit colour.
+      'classDef neutral fill:#1e293b,stroke:#475569,color:#e2e8f0',
+      'classDef exception fill:#4c0519,stroke:#fb7185,color:#fecdd3',
+      'classDef positive fill:#053e30,stroke:#34d399,color:#a7f3d0',
+      '[*] --> s0'
+    ];
+    steps.forEach((step, i) => lines.push(`s${i} : ${esc(step.name) || 'State'}`));
+    steps.forEach((step, i) => {
+      if (i === 0) return;
+      const label = esc((step.decisionProcess || '').replace(/\s*process$/i, ''));
+      lines.push(label ? `s${i - 1} --> s${i} : ${label}` : `s${i - 1} --> s${i}`);
+    });
+    lines.push(`s${steps.length - 1} --> [*]`);
+    steps.forEach((step, i) => {
+      const cls =
+        step.tone === 'exception' ? 'exception' : step.tone === 'positive' ? 'positive' : 'neutral';
+      lines.push(`class s${i} ${cls}`);
+    });
+    return lines.join('\n');
+  },
+
+  // Defined processes (the plans) grouped by lifecycle phase, for the Processes
+  // playbook. Each process keeps the actions that executed it so the plan ->
+  // doing relationship stays visible.
+  get supplyChainProcessGroups() {
+    const order = ['create', 'modify', 'move', 'verify', 'operate', 'process', 'other'];
+    const groups = new Map();
+    this.supplyChainProcesses.forEach((proc) => {
+      const key = this.supplyChainFamily(proc);
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(proc);
+    });
+    return order
+      .filter((key) => groups.has(key))
+      .map((key) => ({
+        key,
+        label: this.supplyChainFamilyLabel(key),
+        processes: groups.get(key)
+      }));
+  },
+
   // Route map geometry: ordered stops (transport pickup/dropoff spine plus any
   // other action locations) projected onto an equirectangular viewBox, with the
   // transport legs as bowed connectors coloured by mode. Falls back to a
@@ -749,9 +829,9 @@ export const derivedMixin = {
   },
 
   get filteredSupplyChain() {
-    let items = this.supplyChain;
-    if (this.supplyChainKindFilter) {
-      items = items.filter((el) => this.supplyChainKind(el) === this.supplyChainKindFilter);
+    let items = this.supplyChainEvents;
+    if (this.supplyChainFamilyFilter) {
+      items = items.filter((el) => this.supplyChainFamily(el) === this.supplyChainFamilyFilter);
     }
     if (this.supplyChainExceptionFilter) {
       items = items.filter(
@@ -770,7 +850,6 @@ export const derivedMixin = {
           this.supplyChainTypeLabel(el).toLowerCase().includes(q)
       );
     }
-    const kindRank = { action: 0, state: 1, process: 2 };
     return [...items].sort((a, b) => {
       const at = a.startTime || a.endTime || '';
       const bt = b.startTime || b.endTime || '';
@@ -782,10 +861,7 @@ export const derivedMixin = {
           this.supplyChainTypeLabel(a).localeCompare(this.supplyChainTypeLabel(b))
         );
       }
-      return (
-        (kindRank[this.supplyChainKind(a)] ?? 9) - (kindRank[this.supplyChainKind(b)] ?? 9) ||
-        (a.name || this.cleanName(a.spdxId)).localeCompare(b.name || this.cleanName(b.spdxId))
-      );
+      return (a.name || this.cleanName(a.spdxId)).localeCompare(b.name || this.cleanName(b.spdxId));
     });
   },
 

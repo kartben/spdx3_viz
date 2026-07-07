@@ -3,9 +3,16 @@
     <div class="flex flex-wrap items-start gap-3">
       <div class="min-w-0">
         <h2 class="text-base font-semibold text-white">Supply Chain</h2>
-        <p class="mt-0.5 text-sm text-slate-400">
-          Events, handoffs, states, evidence, and exceptions for the tracked product.
-        </p>
+        <p
+          class="mt-0.5 text-sm text-slate-400"
+          x-text="{
+            timeline: 'What happened to the tracked product, in order.',
+            states: 'The product lifecycle as a state machine, driven by StateActions.',
+            processes: 'The defined plans that govern the chain, and the actions that ran them.',
+            custody: 'Who held the product, for how long, and what happened on their watch.',
+            map: 'The product physical journey across locations.'
+          }[supplyChainViewMode]"
+        ></p>
       </div>
 
       <div
@@ -14,15 +21,16 @@
         <template
           x-for="mode in [
             { key: 'timeline', label: 'Timeline' },
+            { key: 'states', label: 'States' },
+            { key: 'processes', label: 'Processes' },
             { key: 'custody', label: 'Custody' },
-            { key: 'lifecycle', label: 'Lifecycle' },
             { key: 'map', label: 'Route map' }
           ]"
           :key="mode.key"
         >
           <button
             type="button"
-            @click="supplyChainViewMode = mode.key"
+            @click="supplyChainViewMode = mode.key; if (mode.key === 'states') renderSupplyChainStateDiagram()"
             class="px-2.5 py-1 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5"
             :class="supplyChainViewMode === mode.key
               ? 'bg-cyan-500/20 text-cyan-300'
@@ -40,18 +48,33 @@
   </div>
 
   <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-    <div class="rounded-lg border border-slate-700 bg-slate-900/50 px-3 py-2.5">
+    <button
+      type="button"
+      @click="supplyChainViewMode = 'timeline'"
+      class="text-left rounded-lg border border-slate-700 bg-slate-900/50 px-3 py-2.5 transition-colors hover:border-slate-600"
+      :class="supplyChainViewMode === 'timeline' && 'ring-1 ring-cyan-500/40'"
+    >
       <div class="text-xl font-semibold text-white" x-text="supplyChainCounts.actions"></div>
       <div class="text-xs text-slate-400">Actions observed</div>
-    </div>
-    <div class="rounded-lg border border-slate-700 bg-slate-900/50 px-3 py-2.5">
+    </button>
+    <button
+      type="button"
+      @click="supplyChainViewMode = 'processes'"
+      class="text-left rounded-lg border border-slate-700 bg-slate-900/50 px-3 py-2.5 transition-colors hover:border-slate-600"
+      :class="supplyChainViewMode === 'processes' && 'ring-1 ring-cyan-500/40'"
+    >
       <div class="text-xl font-semibold text-white" x-text="supplyChainCounts.processes"></div>
       <div class="text-xs text-slate-400">Processes defined</div>
-    </div>
-    <div class="rounded-lg border border-slate-700 bg-slate-900/50 px-3 py-2.5">
+    </button>
+    <button
+      type="button"
+      @click="supplyChainViewMode = 'states'; renderSupplyChainStateDiagram()"
+      class="text-left rounded-lg border border-slate-700 bg-slate-900/50 px-3 py-2.5 transition-colors hover:border-slate-600"
+      :class="supplyChainViewMode === 'states' && 'ring-1 ring-cyan-500/40'"
+    >
       <div class="text-xl font-semibold text-white" x-text="supplyChainCounts.states"></div>
       <div class="text-xs text-slate-400">Product states</div>
-    </div>
+    </button>
     <div class="rounded-lg border border-slate-700 bg-slate-900/50 px-3 py-2.5">
       <div
         class="text-xl font-semibold text-white"
@@ -67,19 +90,14 @@
   <div x-show="supplyChainViewMode === 'timeline'" class="space-y-4">
     <div class="flex flex-wrap items-center gap-1.5">
       <template
-        x-for="chip in [
-          { key: '', label: 'All', n: supplyChain.length },
-          { key: 'action', label: 'Actions', n: supplyChainCounts.actions },
-          { key: 'state', label: 'States', n: supplyChainCounts.states },
-          { key: 'process', label: 'Processes', n: supplyChainCounts.processes }
-        ].filter(c => c.key === '' || c.n > 0)"
+        x-for="chip in [{ key: '', label: 'All', n: supplyChainEvents.length }, ...supplyChainEventFamilies]"
         :key="chip.key"
       >
         <button
           type="button"
-          @click="supplyChainKindFilter = chip.key; restreamView('supplychain')"
+          @click="supplyChainFamilyFilter = chip.key; restreamView('supplychain')"
           class="px-2.5 py-1 rounded-full text-xs border transition-colors"
-          :class="supplyChainKindFilter === chip.key
+          :class="supplyChainFamilyFilter === chip.key
             ? 'bg-cyan-500/15 text-cyan-300 border-cyan-500/40'
             : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200'"
         >
@@ -158,8 +176,8 @@
             </div>
 
             <div
-              x-data="{ item: row.item, kind: '', status: null }"
-              x-effect="kind = supplyChainKind(item); status = supplyChainExceptionStatus(item)"
+              x-data="{ item: row.item, family: '', familyLabel: '', status: null }"
+              x-effect="family = supplyChainFamily(item); familyLabel = supplyChainFamilyLabel(family); status = supplyChainExceptionStatus(item)"
               class="relative pb-5"
               data-nav-kind="supplychain"
               :data-nav-id="item.spdxId"
@@ -188,9 +206,11 @@
                         class="font-medium text-white text-sm truncate"
                         x-text="item.name || cleanName(item.spdxId)"
                       ></div>
-                      <span class="badge text-xs" :class="supplyChainKindBadge(kind)">
-                        <span x-text="supplyChainKindLabel(kind)"></span>
-                      </span>
+                      <span
+                        x-show="family !== 'exception'"
+                        class="badge text-xs bg-slate-700/70 text-slate-200 ring-1 ring-slate-600/40"
+                        x-text="familyLabel"
+                      ></span>
                       <span
                         x-show="status"
                         class="badge text-xs"
@@ -235,7 +255,7 @@
                     <div
                       x-show="!supplyChainClock(item)"
                       class="text-xs text-slate-500 mt-1"
-                      x-text="kind === 'process' ? 'Defined process' : kind === 'state' ? 'Product state' : 'Supply-chain element'"
+                      x-text="'Supply-chain event'"
                     ></div>
                     <div
                       x-show="isMeaningful(item.summary || item.description)"
@@ -547,14 +567,46 @@
   <!-- ==================================================================== -->
   <!-- LIFECYCLE STATES                                                      -->
   <!-- ==================================================================== -->
-  <div x-show="supplyChainViewMode === 'lifecycle'" class="space-y-4">
-    <template x-if="mountedViews.supplychain && supplyChainViewMode === 'lifecycle'">
+  <div x-show="supplyChainViewMode === 'states'" class="space-y-4">
+    <template x-if="mountedViews.supplychain && supplyChainViewMode === 'states'">
       <section class="space-y-3">
         <div class="flex items-center gap-3">
-          <div class="text-sm font-semibold text-white">Lifecycle states</div>
+          <div class="text-sm font-semibold text-white">State machine</div>
           <div class="text-xs text-slate-500">
-            The product's state machine, driven by StateActions and their decision processes.
+            Each StateAction moves the product into a state; transitions are labelled with their
+            decision process.
           </div>
+        </div>
+
+        <!-- Product state machine, rendered lazily with Mermaid. The stepper
+             below carries the same detail, so if Mermaid fails to load the view
+             still works. -->
+        <div x-show="supplyChainStateMermaid" class="card p-4 overflow-x-auto">
+          <div
+            id="sc-state-diagram"
+            class="flex justify-center min-h-[6rem]"
+            x-effect="supplyChainStateMermaid; renderSupplyChainStateDiagram()"
+          ></div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-slate-500 px-0.5">
+          <span class="flex items-center gap-1.5"
+            ><span class="w-2.5 h-2.5 rounded-sm bg-slate-700 ring-1 ring-slate-500"></span>
+            state</span
+          >
+          <span class="flex items-center gap-1.5"
+            ><span class="w-2.5 h-2.5 rounded-sm bg-rose-500/20 ring-1 ring-rose-400"></span>
+            out-of-spec</span
+          >
+          <span class="flex items-center gap-1.5"
+            ><span class="w-2.5 h-2.5 rounded-sm bg-emerald-500/20 ring-1 ring-emerald-400"></span>
+            positive step</span
+          >
+          <span class="text-slate-600">Click a state to jump to its step below.</span>
+        </div>
+
+        <div class="text-xs font-semibold uppercase tracking-wider text-slate-400 pt-2">
+          Trajectory
         </div>
 
         <ol class="relative pl-7 space-y-4">
@@ -572,7 +624,10 @@
               ></span>
               <div
                 class="card cursor-pointer relative overflow-hidden"
-                @click="navigateToSupplyChain(step.action.spdxId)"
+                data-nav-kind="supplychain"
+                :data-nav-id="step.action.spdxId"
+                :class="isNavTarget('supplychain', step.action.spdxId) && 'target-focus'"
+                @click="selectGraphNode(step.action.spdxId)"
               >
                 <span
                   class="absolute left-0 top-0 bottom-0 w-1"
@@ -637,6 +692,119 @@
           class="text-center py-12 text-slate-500 text-sm"
         >
           No state transitions recorded
+        </div>
+      </section>
+    </template>
+  </div>
+
+  <!-- ==================================================================== -->
+  <!-- PROCESSES (PLAYBOOK)                                                  -->
+  <!-- ==================================================================== -->
+  <div x-show="supplyChainViewMode === 'processes'" class="space-y-4">
+    <template x-if="mountedViews.supplychain && supplyChainViewMode === 'processes'">
+      <section class="space-y-5">
+        <div class="flex items-center gap-3">
+          <div class="text-sm font-semibold text-white">Defined processes</div>
+          <div class="text-xs text-slate-500">
+            The plans that say how each phase should be done. Actions execute them.
+          </div>
+        </div>
+
+        <template x-for="group in supplyChainProcessGroups" :key="group.key">
+          <div class="space-y-2.5">
+            <div class="flex items-center gap-2">
+              <span
+                class="text-[11px] font-semibold uppercase tracking-wider text-slate-400"
+                x-text="group.label"
+              ></span>
+              <span class="h-px flex-1 bg-slate-800"></span>
+              <span class="text-[10px] text-slate-500" x-text="group.processes.length"></span>
+            </div>
+
+            <template x-for="proc in group.processes" :key="proc.spdxId">
+              <div
+                class="card relative overflow-hidden"
+                data-nav-kind="supplychain"
+                :data-nav-id="proc.spdxId"
+                :class="isNavTarget('supplychain', proc.spdxId) && 'target-focus'"
+                x-data="{ acts: supplyChainProcessActions(proc) }"
+              >
+                <div class="flex items-start gap-3">
+                  <div
+                    class="w-8 h-8 rounded-lg bg-slate-700/60 flex items-center justify-center flex-shrink-0 mt-0.5 text-slate-300"
+                    x-html="elementIcon(proc, 'w-4 h-4')"
+                  ></div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        class="font-medium text-white text-sm text-left hover:text-cyan-300 transition-colors"
+                        @click="selectGraphNode(proc.spdxId)"
+                        x-text="proc.name || cleanName(proc.spdxId)"
+                      ></button>
+                      <span
+                        class="badge text-[11px] bg-slate-800 text-slate-300 ring-1 ring-slate-600/40"
+                        x-text="supplyChainTypeLabel(proc)"
+                      ></span>
+                    </div>
+                    <div
+                      x-show="isMeaningful(proc.summary || proc.description)"
+                      class="text-xs text-slate-400 mt-1.5"
+                      x-text="proc.summary || proc.description"
+                    ></div>
+
+                    <!-- Actions that executed this plan -->
+                    <div x-show="acts.length" class="mt-3">
+                      <div class="text-[10px] text-slate-500 uppercase tracking-wider mb-1.5">
+                        <span x-text="acts.length"></span>
+                        <span
+                          x-text="acts.length === 1 ? 'action ran this plan' : 'actions ran this plan'"
+                        ></span>
+                      </div>
+                      <div class="space-y-1.5">
+                        <template x-for="act in acts" :key="act.spdxId">
+                          <button
+                            type="button"
+                            @click="navigateToSupplyChain(act.spdxId)"
+                            class="w-full text-left flex flex-wrap items-center gap-2 rounded-lg border border-slate-700 bg-slate-900/40 px-2.5 py-1.5 hover:bg-slate-800/70 transition"
+                          >
+                            <span
+                              class="flex items-center flex-shrink-0 text-slate-400"
+                              x-html="elementIcon(act, 'w-3.5 h-3.5')"
+                            ></span>
+                            <span
+                              class="text-xs text-slate-200 min-w-0 flex-1 truncate"
+                              x-text="act.name || cleanName(act.spdxId)"
+                            ></span>
+                            <span
+                              x-show="act.supplychain_decisionProcess === proc.spdxId"
+                              class="badge text-[10px] bg-teal-500/15 text-teal-200 ring-1 ring-teal-500/25"
+                              >decision</span
+                            >
+                            <span
+                              x-show="supplyChainClock(act)"
+                              class="text-[10px] text-slate-500 flex-shrink-0"
+                              x-text="formatDate(act.startTime || act.endTime)"
+                            ></span>
+                          </button>
+                        </template>
+                      </div>
+                    </div>
+                    <div x-show="!acts.length" class="text-[11px] text-slate-600 mt-2 italic">
+                      Definition only: no matching action observed in this dataset.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </div>
+        </template>
+
+        <div
+          x-show="supplyChainProcessGroups.length === 0"
+          class="text-center py-12 text-slate-500 text-sm"
+        >
+          No defined processes recorded
         </div>
       </section>
     </template>

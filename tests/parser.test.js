@@ -261,7 +261,15 @@ test('SupplyChain view model exposes lifecycle, custody, and exception structure
   assert.equal(app.supplyChainTransportLegs[0].route.includes('Austin secure staging'), true);
   assert.equal(app.supplyChainCustodyHandoffs.length, 2);
   assert.equal(app.supplyChainCustodyHandoffs[1].category, 'ownership');
-  assert.equal(app.supplyChainTimelineRows.length, 53);
+  // The timeline lists actions that happen at a point in time. StateActions are
+  // excluded (they drive the state machine, shown in the States angle), leaving
+  // the 30 actions minus 9 StateActions = 21 events.
+  assert.equal(app.supplyChainEvents.length, 21);
+  assert.equal(
+    app.supplyChainEvents.some((el) => el.type === 'supplychain_StateAction'),
+    false
+  );
+  assert.equal(app.supplyChainTimelineRows.length, 21);
   assert.deepEqual(
     app.supplyChainTimelineRows.slice(0, 2).map((row) => [row.kind, row.item.name]),
     [
@@ -269,6 +277,32 @@ test('SupplyChain view model exposes lifecycle, custody, and exception structure
       ['action', 'Intake recycled aluminum feedstock for enclosure lot']
     ]
   );
+
+  // Timeline filter chips are the action families present among the events.
+  assert.deepEqual(
+    app.supplyChainEventFamilies.map((f) => f.key),
+    ['create', 'modify', 'move', 'verify', 'exception', 'operate']
+  );
+
+  // Processes are grouped into a playbook by lifecycle phase.
+  assert.deepEqual(
+    app.supplyChainProcessGroups.map((g) => [g.key, g.processes.length]),
+    [
+      ['create', 4],
+      ['modify', 2],
+      ['move', 3],
+      ['verify', 3],
+      ['operate', 2]
+    ]
+  );
+
+  // The state machine renders as Mermaid stateDiagram-v2 source following the
+  // StateAction trajectory, with a labelled decision-process transition.
+  const mermaid = app.supplyChainStateMermaid;
+  assert.match(mermaid, /^stateDiagram-v2/);
+  assert.match(mermaid, /\[\*\] --> s0/);
+  assert.match(mermaid, /s1 --> s2 : Factory provisioning/);
+  assert.match(mermaid, /class s4 exception/);
 
   const transportProcess = parsed.supplyChain.find(
     (el) => el.name === 'Controlled-lane transport process'

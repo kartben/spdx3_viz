@@ -8,7 +8,7 @@ via the "What's new" link.
 - **Added:** Command palette (⌘K / Ctrl-K) to search and jump anywhere.
 - **Added:** Per-element NTIA minimum-elements breakdown in Statistics.
 - **Added:** Package cards show supplier and origin agents.
-- **Added:** Supply Chain view with timeline, custody, lifecycle, and route-map angles.
+- **Added:** Supply Chain view with timeline, state-machine, processes, custody, and route-map angles.
 
 ## [0.1.0] - 2026-07-06
 

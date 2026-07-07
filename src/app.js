@@ -21,6 +21,15 @@ const lifecycleMixin = {
   init() {
     this.$watch('currentView', (v) => {
       if (v === 'graph') this.$nextTick(() => this.renderGraph());
+      if (v === 'supplychain' && this.supplyChainViewMode === 'states') {
+        this.renderSupplyChainStateDiagram();
+      }
+    });
+    // The Supply Chain state machine is drawn with Mermaid, which is imported
+    // lazily; (re)render it whenever the States angle becomes visible. The
+    // render method retries until its host element is in the DOM.
+    this.$watch('supplyChainViewMode', (mode) => {
+      if (mode === 'states') this.renderSupplyChainStateDiagram();
     });
     this.$watch('dataLoaded', (loaded) => {
       if (loaded) this._initNavHistory();
