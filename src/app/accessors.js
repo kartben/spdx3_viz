@@ -519,7 +519,14 @@ export const accessorsMixin = {
       const dedupKey = id || name;
       if (!dedupKey || seen.has(dedupKey)) continue;
       seen.add(dedupKey);
-      out.push({ id, displayName: id ? this.relTargetDisplayName(id) : name });
+      // Prefer an inline name when the referenced agent isn't in the graph:
+      // relTargetDisplayName would otherwise fall back to the raw/cleaned id.
+      const displayName = !id
+        ? name
+        : name && !this.elementMap.has(id)
+          ? name
+          : this.relTargetDisplayName(id);
+      out.push({ id, displayName });
     }
     return out;
   },
