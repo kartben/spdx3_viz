@@ -39,7 +39,7 @@
           <button
             type="button"
             class="font-semibold text-pink-200 text-sm font-mono break-words text-left hover:text-pink-100 hover:underline decoration-pink-500/50 underline-offset-2"
-            :title="canShowLicenseText(lic.id) ? licenseTextActionLabel(lic.id) : lic.label"
+            :title="canShowLicenseText(lic.id) ? licenseTextActionLabel(lic.id) : (licenseIndividualTooltip(lic.id) || lic.label)"
             @click.stop="showLicenseText(lic.id)"
             x-text="lic.label"
           ></button>
