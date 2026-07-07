@@ -16,6 +16,7 @@
       ],
       "profileConformance": [
         "core",
+        "dataset",
         "hardware",
         "simpleLicensing",
         "supplyChain"
@@ -23,13 +24,13 @@
       "rootElement": [
         "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/paper-airplane"
       ],
-      "summary": "Demonstrates a minimalistic paper airplane supply chain tracking design, build, and test stages."
+      "summary": "A friendly end-to-end origami supply chain: plan, design, fold, inspect, quarantine, re-fold, flight-test, demonstrate, and archive a single paper airplane."
     },
     {
       "type": "CreationInfo",
       "@id": "_:paper-plane-creation-info",
       "specVersion": "3.1",
-      "created": "2026-07-06T12:00:00Z",
+      "created": "2026-07-07T12:00:00Z",
       "createdBy": [
         "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/person/alice-designer",
         "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/org/origami-studio"
@@ -37,7 +38,7 @@
       "createdUsing": [
         "https://spdx.org/spdxdocs/paper-plane-supply-chain#tool/origami-cad-attester"
       ],
-      "comment": "Synthetic minimalistic paper plane sample."
+      "comment": "Synthetic paper plane sample walking the full SPDX supply chain lifecycle."
     },
     {
       "type": "Organization",
@@ -89,6 +90,22 @@
     },
     {
       "type": "Person",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/person/dana-inspector",
+      "creationInfo": "_:paper-plane-creation-info",
+      "name": "Dana",
+      "summary": "Quality inspector who measures every crease before a glider is cleared to fly.",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "email",
+          "identifier": "dana@example.invalid",
+          "issuingAuthority": "Origami Studio (fictional)",
+          "comment": "Synthetic person contact address"
+        }
+      ]
+    },
+    {
+      "type": "Person",
       "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/person/charlie-pilot",
       "creationInfo": "_:paper-plane-creation-info",
       "name": "Charlie",
@@ -109,7 +126,7 @@
       "creationInfo": "_:paper-plane-creation-info",
       "name": "Origami Flight-Spec CAD Tool & Folding Attester",
       "version": "3.1.0",
-      "summary": "Fictional design specification helper and folding validator tool."
+      "summary": "Fictional design specification helper, crease-angle gauge, and folding validator tool."
     },
     {
       "type": "PhysicalLocation",
@@ -145,25 +162,102 @@
       ]
     },
     {
+      "type": "PhysicalLocation",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#loc/museum",
+      "creationInfo": "_:paper-plane-creation-info",
+      "name": "Amsterdam Paper Flight Museum",
+      "city": "Amsterdam",
+      "country": "NLD",
+      "geographicPointLocation": [
+        "+52.3676+004.9041/"
+      ]
+    },
+    {
       "type": "Requirement",
       "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#req/glide-distance",
       "creationInfo": "_:paper-plane-creation-info",
       "name": "GLIDE-REQ-01 distance",
-      "requirementStatement": "The paper plane shall fly at least 5 meters in a straight line.",
+      "requirementStatement": "The paper plane shall glide at least 5 meters in a straight line.",
       "requirementUID": "GLIDE-REQ-01",
-      "summary": "Fictional glide distance verification requirement."
+      "summary": "Fictional glide distance acceptance requirement."
+    },
+    {
+      "type": "Requirement",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#req/wing-symmetry",
+      "creationInfo": "_:paper-plane-creation-info",
+      "name": "SYMM-REQ-01 wing symmetry",
+      "requirementStatement": "Both wing tips shall sit within ±2 mm of the fuselage centerline when the glider rests level.",
+      "requirementUID": "SYMM-REQ-01",
+      "summary": "Fictional wing symmetry tolerance checked during inspection."
+    },
+    {
+      "type": "hardware_ProductSpecification",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/spec/glider-a1",
+      "creationInfo": "_:paper-plane-creation-info",
+      "name": "Super-Glide Model A-1 specification",
+      "summary": "Fictional folding specification: 11-step classic dart, symmetric dihedral wings, single fuselage keel, no adhesive.",
+      "hardware_partNumber": "GLIDER-A1",
+      "hardware_category": "finished device"
+    },
+    {
+      "type": "hardware_Dimensions",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/dimensions/paper-sheet",
+      "creationInfo": "_:paper-plane-creation-info",
+      "name": "A4 sheet envelope dimensions",
+      "hardware_xAxisLength": {
+        "type": "MeasureOfLength",
+        "quantity": 210,
+        "unitQUDT": "MilliM"
+      },
+      "hardware_yAxisLength": {
+        "type": "MeasureOfLength",
+        "quantity": 297,
+        "unitQUDT": "MilliM"
+      },
+      "hardware_zAxisLength": {
+        "type": "MeasureOfLength",
+        "quantity": 0.1,
+        "unitQUDT": "MilliM"
+      }
+    },
+    {
+      "type": "hardware_Dimensions",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/dimensions/paper-airplane",
+      "creationInfo": "_:paper-plane-creation-info",
+      "name": "Model A-1 folded envelope dimensions",
+      "hardware_xAxisLength": {
+        "type": "MeasureOfLength",
+        "quantity": 148,
+        "unitQUDT": "MilliM"
+      },
+      "hardware_yAxisLength": {
+        "type": "MeasureOfLength",
+        "quantity": 280,
+        "unitQUDT": "MilliM"
+      },
+      "hardware_zAxisLength": {
+        "type": "MeasureOfLength",
+        "quantity": 38,
+        "unitQUDT": "MilliM"
+      }
     },
     {
       "type": "hardware_PhysicalHardware",
       "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/paper-sheet",
       "creationInfo": "_:paper-plane-creation-info",
       "name": "A4 Origami Paper Sheet",
-      "summary": "Premium 80gsm white folding paper.",
+      "summary": "Premium 80 gsm white folding paper, the sole raw material of the glider.",
       "hardware_partNumber": "ORIGAMI-PAPER-A4-W",
       "hardware_category": "raw material",
       "hardware_productAgent": [
         "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/org/origami-studio"
       ],
+      "hardware_dimensions": "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/dimensions/paper-sheet",
+      "hardware_mass": {
+        "type": "MeasureOfMass",
+        "quantity": 5,
+        "unitQUDT": "GM"
+      },
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -177,13 +271,19 @@
       "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/paper-airplane",
       "creationInfo": "_:paper-plane-creation-info",
       "name": "Super-Glide Paper Airplane (Model A-1)",
-      "summary": "Attested hand-folded high-performance paper airplane.",
+      "summary": "Attested hand-folded high-performance paper airplane, serialized and flight-certified.",
       "hardware_partNumber": "GLIDER-A1",
       "hardware_serialNumber": "PP-2026-000001",
       "hardware_category": "finished device",
       "hardware_productAgent": [
         "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/org/origami-studio"
       ],
+      "hardware_dimensions": "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/dimensions/paper-airplane",
+      "hardware_mass": {
+        "type": "MeasureOfMass",
+        "quantity": 5,
+        "unitQUDT": "GM"
+      },
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -194,11 +294,47 @@
     },
     {
       "type": "dataset_DatasetPackage",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#dataset/inspection-pre",
+      "creationInfo": "_:paper-plane-creation-info",
+      "name": "Wing-symmetry inspection record (pre-correction)",
+      "summary": "Left wing tip measured 5 mm proud of centerline, exceeding the ±2 mm tolerance.",
+      "description": "Gauge readout and photos captured during the first post-fold inspection.",
+      "suppliedBy": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/person/dana-inspector"
+      ],
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "090d6833bb4f2029596f6a044f3b9f36b09d2db08fb84522652d8422a4cf3cfb"
+        }
+      ]
+    },
+    {
+      "type": "dataset_DatasetPackage",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#dataset/inspection-post",
+      "creationInfo": "_:paper-plane-creation-info",
+      "name": "Wing-symmetry inspection record (post-correction)",
+      "summary": "Both wing tips measured within 0.5 mm of centerline, comfortably inside tolerance.",
+      "description": "Re-inspection evidence confirming SYMM-REQ-01 after the corrective re-fold.",
+      "suppliedBy": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/person/dana-inspector"
+      ],
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "29b9f49fc7c1b66c7c99034cbc88de5394bd30a86a55e3b9e154d7dc5a4aa754"
+        }
+      ]
+    },
+    {
+      "type": "dataset_DatasetPackage",
       "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#dataset/flight-telemetry",
       "creationInfo": "_:paper-plane-creation-info",
-      "name": "Flight Telemetry Log",
-      "summary": "Recorded flight trajectory, wind speed, and glide distance (6.2 meters).",
-      "description": "Flight data confirming successful 6.2 meter glide, satisfying GLIDE-REQ-01.",
+      "name": "Flight telemetry log",
+      "summary": "Recorded flight trajectory, launch force, wind speed, and glide distance (6.2 meters).",
+      "description": "Flight data confirming a 6.2 meter glide, satisfying GLIDE-REQ-01 with margin.",
       "suppliedBy": [
         "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/person/charlie-pilot"
       ],
@@ -224,7 +360,15 @@
       "creationInfo": "_:paper-plane-creation-info",
       "name": "Standard origami assembly process",
       "processReadiness": "operational",
-      "summary": "Folding process following precision specs without adhesive."
+      "summary": "Precision folding process following the Model A-1 spec, no adhesive."
+    },
+    {
+      "type": "supplychain_InspectionProcess",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#process/inspection-process",
+      "creationInfo": "_:paper-plane-creation-info",
+      "name": "Crease and symmetry inspection process",
+      "processReadiness": "operational",
+      "summary": "Gauge-based inspection verifying wing symmetry before flight clearance."
     },
     {
       "type": "supplychain_TestProcess",
@@ -232,7 +376,15 @@
       "creationInfo": "_:paper-plane-creation-info",
       "name": "Flight acceptance testing process",
       "processReadiness": "operational",
-      "summary": "Test flight validation process checking glide distance."
+      "summary": "Test-flight validation process measuring glide distance."
+    },
+    {
+      "type": "supplychain_DefinedStateProcess",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#process/lifecycle-process",
+      "creationInfo": "_:paper-plane-creation-info",
+      "name": "Glider operational lifecycle process",
+      "processReadiness": "operational",
+      "summary": "Governs the in-service and archival states after certification."
     },
     {
       "type": "supplychain_State",
@@ -247,38 +399,64 @@
       "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#state/quarantine",
       "creationInfo": "_:paper-plane-creation-info",
       "name": "Folding quarantine",
-      "summary": "Glider wing alignment deviation detected.",
-      "description": "Visual quality check failed: left wing tip misaligned by 5mm. Quarantined for corrective refolding."
+      "summary": "Glider held back for a wing alignment deviation.",
+      "description": "Inspection failed: left wing tip 5 mm out of tolerance. Quarantined for corrective refolding."
     },
     {
       "type": "supplychain_State",
       "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#state/folded",
       "creationInfo": "_:paper-plane-creation-info",
-      "name": "Assembled and Folded",
-      "summary": "Sheet of paper transformed into airplane.",
-      "description": "Folding action is complete and ready for flight testing."
+      "name": "Assembled and folded",
+      "summary": "Sheet of paper transformed into an airplane and cleared by re-inspection.",
+      "description": "Folding is complete, symmetry verified, and the glider is ready for flight testing."
     },
     {
       "type": "supplychain_State",
       "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#state/tested",
       "creationInfo": "_:paper-plane-creation-info",
-      "name": "Tested and Certified",
+      "name": "Tested and certified",
       "summary": "Flight validation successful.",
-      "description": "Paper plane has met or exceeded the 5-meter glide requirement."
+      "description": "The paper plane met and exceeded the 5-meter glide requirement."
+    },
+    {
+      "type": "supplychain_State",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#state/in-service",
+      "creationInfo": "_:paper-plane-creation-info",
+      "name": "In service",
+      "summary": "Flown publicly at least once.",
+      "description": "The certified glider has completed its demonstration flight and is in active use."
+    },
+    {
+      "type": "supplychain_State",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#state/archived",
+      "creationInfo": "_:paper-plane-creation-info",
+      "name": "Archived",
+      "summary": "Retired to the museum vitrine.",
+      "description": "The glider is preserved under climate control with its full provenance record."
+    },
+    {
+      "type": "supplychain_PlanAction",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/001-plan",
+      "creationInfo": "_:paper-plane-creation-info",
+      "name": "Plan the Model A-1 folding run",
+      "startTime": "2026-06-30T09:00:00Z",
+      "endTime": "2026-06-30T10:30:00Z",
+      "actionLocation": "https://spdx.org/spdxdocs/paper-plane-supply-chain#loc/design-studio",
+      "summary": "Sets the production plan, acceptance targets, and stage-by-stage custody chain."
     },
     {
       "type": "supplychain_BoundaryDefinitionAction",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/001-design",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/002-design",
       "creationInfo": "_:paper-plane-creation-info",
       "name": "Design glider parameters and flight requirements",
       "startTime": "2026-07-01T09:00:00Z",
       "endTime": "2026-07-01T10:00:00Z",
       "actionLocation": "https://spdx.org/spdxdocs/paper-plane-supply-chain#loc/design-studio",
-      "summary": "Finalizes paper airplane design requirements."
+      "summary": "Finalizes the Super-Glide Model A-1 specification and its acceptance requirements."
     },
     {
       "type": "supplychain_StateAction",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/002-state-designed",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/003-state-designed",
       "creationInfo": "_:paper-plane-creation-info",
       "name": "Mark design complete",
       "startTime": "2026-07-01T10:01:00Z",
@@ -290,7 +468,7 @@
     },
     {
       "type": "supplychain_TransportAction",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/003-transport-paper",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/004-transport-paper",
       "creationInfo": "_:paper-plane-creation-info",
       "name": "Ship origami paper lot from Paris to London workshop",
       "startTime": "2026-07-01T11:00:00Z",
@@ -321,16 +499,16 @@
             {
               "type": "extension_CdxPropertyEntry",
               "extension_cdxPropName": "paperplane:co2e.method",
-              "extension_cdxPropValue": "Calculated based on standard Eurostar rail freight emission factors."
+              "extension_cdxPropValue": "Calculated from standard Eurostar rail freight emission factors."
             }
           ]
         }
       ],
-      "summary": "Eco-friendly transport of high-quality paper lot."
+      "summary": "Low-carbon rail transport of the premium paper lot."
     },
     {
       "type": "supplychain_ResponsibilityChangeAction",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/004-handoff-paper",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/005-handoff-paper",
       "creationInfo": "_:paper-plane-creation-info",
       "name": "Handoff paper feedstock custody to folding builder",
       "startTime": "2026-07-01T15:30:00Z",
@@ -340,35 +518,45 @@
       "supplychain_current": "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/person/bob-folder",
       "supplychain_responsibilityChangedOn": "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/paper-sheet",
       "supplychain_responsibilityCategory": "custody",
-      "summary": "Bob receives the premium white A4 paper sheet at London workshop."
+      "summary": "Bob receives the premium white A4 paper sheet at the London workshop."
     },
     {
       "type": "supplychain_AssemblyAction",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/005-fold-airplane",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/006-fold-airplane",
       "creationInfo": "_:paper-plane-creation-info",
       "name": "Fold sheet into Model A-1 glider",
       "startTime": "2026-07-02T10:00:00Z",
       "endTime": "2026-07-02T10:15:00Z",
       "actionLocation": "https://spdx.org/spdxdocs/paper-plane-supply-chain#loc/workshop",
-      "summary": "Folding process of the paper plane."
+      "summary": "Eleven precision folds turn a flat sheet into a Model A-1 dart."
+    },
+    {
+      "type": "supplychain_InspectionAction",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/007-inspect-fold",
+      "creationInfo": "_:paper-plane-creation-info",
+      "name": "Post-fold wing-symmetry inspection",
+      "startTime": "2026-07-02T10:20:00Z",
+      "endTime": "2026-07-02T10:35:00Z",
+      "actionLocation": "https://spdx.org/spdxdocs/paper-plane-supply-chain#loc/workshop",
+      "summary": "Dana gauges both wing tips against the centerline and logs the readings."
     },
     {
       "type": "supplychain_OutOfSpecAction",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/006-out-of-spec-folding",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/008-out-of-spec",
       "creationInfo": "_:paper-plane-creation-info",
-      "name": "Fold alignment error detected",
-      "startTime": "2026-07-02T10:20:00Z",
-      "endTime": "2026-07-02T10:30:00Z",
+      "name": "Wing alignment out of tolerance",
+      "startTime": "2026-07-02T10:36:00Z",
+      "endTime": "2026-07-02T10:40:00Z",
       "actionLocation": "https://spdx.org/spdxdocs/paper-plane-supply-chain#loc/workshop",
-      "summary": "Visual check failed: left wing tip is misaligned by 5mm."
+      "summary": "Left wing tip sits 5 mm proud of centerline, failing SYMM-REQ-01."
     },
     {
       "type": "supplychain_StateAction",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/006a-state-quarantine",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/009-state-quarantine",
       "creationInfo": "_:paper-plane-creation-info",
-      "name": "Quarantine paper plane for fold deviation",
-      "startTime": "2026-07-02T10:31:00Z",
-      "endTime": "2026-07-02T10:34:00Z",
+      "name": "Quarantine glider for fold deviation",
+      "startTime": "2026-07-02T10:41:00Z",
+      "endTime": "2026-07-02T10:44:00Z",
       "actionLocation": "https://spdx.org/spdxdocs/paper-plane-supply-chain#loc/workshop",
       "supplychain_currentState": "https://spdx.org/spdxdocs/paper-plane-supply-chain#state/quarantine",
       "supplychain_decisionProcess": "https://spdx.org/spdxdocs/paper-plane-supply-chain#process/build-process",
@@ -376,29 +564,39 @@
     },
     {
       "type": "supplychain_ResolutionAction",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/007-resolve-folding",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/010-resolve-folding",
       "creationInfo": "_:paper-plane-creation-info",
-      "name": "Re-fold and adjust wing creases",
-      "startTime": "2026-07-02T10:35:00Z",
-      "endTime": "2026-07-02T10:45:00Z",
+      "name": "Re-crease and realign left wing",
+      "startTime": "2026-07-02T10:45:00Z",
+      "endTime": "2026-07-02T10:55:00Z",
       "actionLocation": "https://spdx.org/spdxdocs/paper-plane-supply-chain#loc/workshop",
-      "summary": "Refolded left wing to align perfectly with the fuselage."
+      "summary": "Bob sharpens the wing crease so the tip lines up with the fuselage keel."
+    },
+    {
+      "type": "supplychain_InspectionAction",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/011-reinspect-fold",
+      "creationInfo": "_:paper-plane-creation-info",
+      "name": "Re-inspection after correction",
+      "startTime": "2026-07-02T11:00:00Z",
+      "endTime": "2026-07-02T11:15:00Z",
+      "actionLocation": "https://spdx.org/spdxdocs/paper-plane-supply-chain#loc/workshop",
+      "summary": "Dana re-measures the corrected glider and clears it: 0.5 mm, well within tolerance."
     },
     {
       "type": "supplychain_StateAction",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/008-state-folded",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/012-state-folded",
       "creationInfo": "_:paper-plane-creation-info",
       "name": "Mark airplane folded",
-      "startTime": "2026-07-02T11:00:00Z",
-      "endTime": "2026-07-02T11:05:00Z",
+      "startTime": "2026-07-02T11:20:00Z",
+      "endTime": "2026-07-02T11:25:00Z",
       "actionLocation": "https://spdx.org/spdxdocs/paper-plane-supply-chain#loc/workshop",
       "supplychain_currentState": "https://spdx.org/spdxdocs/paper-plane-supply-chain#state/folded",
       "supplychain_decisionProcess": "https://spdx.org/spdxdocs/paper-plane-supply-chain#process/build-process",
-      "summary": "Transitions product state to Assembled and Folded."
+      "summary": "Transitions product state to Assembled and folded."
     },
     {
       "type": "supplychain_TransportAction",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/009-transport-plane",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/013-transport-plane",
       "creationInfo": "_:paper-plane-creation-info",
       "name": "Transport folded paper airplane to Berlin flight hangar",
       "startTime": "2026-07-03T09:00:00Z",
@@ -429,16 +627,16 @@
             {
               "type": "extension_CdxPropertyEntry",
               "extension_cdxPropName": "paperplane:co2e.method",
-              "extension_cdxPropValue": "Road courier delivery allocation based on package mass."
+              "extension_cdxPropValue": "Road courier allocation based on package mass."
             }
           ]
         }
       ],
-      "summary": "Secured transport of folded plane in a rigid envelope."
+      "summary": "Secured transport of the folded glider in a rigid protective envelope."
     },
     {
       "type": "supplychain_ResponsibilityChangeAction",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/010-handoff-plane",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/014-handoff-plane",
       "creationInfo": "_:paper-plane-creation-info",
       "name": "Handoff paper plane custody to test pilot",
       "startTime": "2026-07-04T13:00:00Z",
@@ -448,21 +646,21 @@
       "supplychain_current": "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/person/charlie-pilot",
       "supplychain_responsibilityChangedOn": "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/paper-airplane",
       "supplychain_responsibilityCategory": "custody",
-      "summary": "Charlie receives the folded plane at Berlin flight hangar."
+      "summary": "Charlie receives the folded glider at the Berlin flight hangar."
     },
     {
       "type": "supplychain_TestAction",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/011-flight-test",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/015-flight-test",
       "creationInfo": "_:paper-plane-creation-info",
       "name": "Perform glide distance validation flight",
       "startTime": "2026-07-05T14:00:00Z",
       "endTime": "2026-07-05T14:15:00Z",
       "actionLocation": "https://spdx.org/spdxdocs/paper-plane-supply-chain#loc/flight-zone",
-      "summary": "Airplane thrown with standardized force; glide distance measured."
+      "summary": "Glider launched with standardized force; glide distance measured at 6.2 meters."
     },
     {
       "type": "supplychain_StateAction",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/012-state-tested",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/016-state-tested",
       "creationInfo": "_:paper-plane-creation-info",
       "name": "Mark flight tested and certified",
       "startTime": "2026-07-05T15:00:00Z",
@@ -470,13 +668,71 @@
       "actionLocation": "https://spdx.org/spdxdocs/paper-plane-supply-chain#loc/flight-zone",
       "supplychain_currentState": "https://spdx.org/spdxdocs/paper-plane-supply-chain#state/tested",
       "supplychain_decisionProcess": "https://spdx.org/spdxdocs/paper-plane-supply-chain#process/test-process",
-      "summary": "Transitions product state to Tested and Certified."
+      "summary": "Transitions product state to Tested and certified."
+    },
+    {
+      "type": "supplychain_ResponsibilityChangeAction",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/017-handoff-museum",
+      "creationInfo": "_:paper-plane-creation-info",
+      "name": "Transfer custody from test pilot to the studio curator",
+      "startTime": "2026-07-06T10:00:00Z",
+      "endTime": "2026-07-06T10:05:00Z",
+      "actionLocation": "https://spdx.org/spdxdocs/paper-plane-supply-chain#loc/museum",
+      "supplychain_previous": "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/person/charlie-pilot",
+      "supplychain_current": "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/org/origami-studio",
+      "supplychain_responsibilityChangedOn": "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/paper-airplane",
+      "supplychain_responsibilityCategory": "ownership",
+      "summary": "The studio takes ownership for public exhibition at the Paper Flight Museum."
+    },
+    {
+      "type": "supplychain_UseAction",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/018-demo-flight",
+      "creationInfo": "_:paper-plane-creation-info",
+      "name": "Fly the glider at the museum opening demonstration",
+      "startTime": "2026-07-06T11:00:00Z",
+      "endTime": "2026-07-06T11:20:00Z",
+      "actionLocation": "https://spdx.org/spdxdocs/paper-plane-supply-chain#loc/museum",
+      "summary": "A single ceremonial demonstration flight for museum visitors."
+    },
+    {
+      "type": "supplychain_StateAction",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/019-state-in-service",
+      "creationInfo": "_:paper-plane-creation-info",
+      "name": "Mark glider in service",
+      "startTime": "2026-07-06T11:25:00Z",
+      "endTime": "2026-07-06T11:30:00Z",
+      "actionLocation": "https://spdx.org/spdxdocs/paper-plane-supply-chain#loc/museum",
+      "supplychain_currentState": "https://spdx.org/spdxdocs/paper-plane-supply-chain#state/in-service",
+      "supplychain_decisionProcess": "https://spdx.org/spdxdocs/paper-plane-supply-chain#process/lifecycle-process",
+      "summary": "Transitions product state to In service."
+    },
+    {
+      "type": "supplychain_StorageAction",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/020-archive",
+      "creationInfo": "_:paper-plane-creation-info",
+      "name": "Archive the certified glider in the museum vitrine",
+      "startTime": "2026-07-07T09:00:00Z",
+      "endTime": "2026-07-07T09:30:00Z",
+      "actionLocation": "https://spdx.org/spdxdocs/paper-plane-supply-chain#loc/museum",
+      "summary": "Places the glider under climate-controlled glass with its full provenance record."
+    },
+    {
+      "type": "supplychain_StateAction",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/021-state-archived",
+      "creationInfo": "_:paper-plane-creation-info",
+      "name": "Mark glider archived",
+      "startTime": "2026-07-07T09:35:00Z",
+      "endTime": "2026-07-07T09:40:00Z",
+      "actionLocation": "https://spdx.org/spdxdocs/paper-plane-supply-chain#loc/museum",
+      "supplychain_currentState": "https://spdx.org/spdxdocs/paper-plane-supply-chain#state/archived",
+      "supplychain_decisionProcess": "https://spdx.org/spdxdocs/paper-plane-supply-chain#process/lifecycle-process",
+      "summary": "Transitions product state to Archived."
     },
     {
       "type": "Relationship",
       "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/001-performedby",
       "creationInfo": "_:paper-plane-creation-info",
-      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/001-design",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/001-plan",
       "relationshipType": "performedBy",
       "to": [
         "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/person/alice-designer",
@@ -485,9 +741,61 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/002-conformsto",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/002-hasrequirement",
       "creationInfo": "_:paper-plane-creation-info",
-      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/001-design",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/001-plan",
+      "relationshipType": "hasRequirement",
+      "to": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#req/glide-distance",
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#req/wing-symmetry"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/003-conformsto",
+      "creationInfo": "_:paper-plane-creation-info",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/001-plan",
+      "relationshipType": "conformsTo",
+      "to": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#process/lifecycle-process"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/004-performedby",
+      "creationInfo": "_:paper-plane-creation-info",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/002-design",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/person/alice-designer",
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/org/origami-studio"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/005-usestool",
+      "creationInfo": "_:paper-plane-creation-info",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/002-design",
+      "relationshipType": "usesTool",
+      "to": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#tool/origami-cad-attester"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/006-hasoutput",
+      "creationInfo": "_:paper-plane-creation-info",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/002-design",
+      "relationshipType": "hasOutput",
+      "to": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/spec/glider-a1"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/007-conformsto",
+      "creationInfo": "_:paper-plane-creation-info",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/002-design",
       "relationshipType": "conformsTo",
       "to": [
         "https://spdx.org/spdxdocs/paper-plane-supply-chain#process/design-process"
@@ -495,79 +803,19 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/003-performedby",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/008-describes",
       "creationInfo": "_:paper-plane-creation-info",
-      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/003-transport-paper",
-      "relationshipType": "performedBy",
-      "to": [
-        "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/person/bob-folder"
-      ]
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/004-hasinput",
-      "creationInfo": "_:paper-plane-creation-info",
-      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/003-transport-paper",
-      "relationshipType": "hasInput",
-      "to": [
-        "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/paper-sheet"
-      ]
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/005-hasoutput",
-      "creationInfo": "_:paper-plane-creation-info",
-      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/003-transport-paper",
-      "relationshipType": "hasOutput",
-      "to": [
-        "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/paper-sheet"
-      ]
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/006-performedby",
-      "creationInfo": "_:paper-plane-creation-info",
-      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/005-fold-airplane",
-      "relationshipType": "performedBy",
-      "to": [
-        "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/person/bob-folder"
-      ]
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/007-hasinput",
-      "creationInfo": "_:paper-plane-creation-info",
-      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/005-fold-airplane",
-      "relationshipType": "hasInput",
-      "to": [
-        "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/paper-sheet"
-      ]
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/008-hasoutput",
-      "creationInfo": "_:paper-plane-creation-info",
-      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/005-fold-airplane",
-      "relationshipType": "hasOutput",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/spec/glider-a1",
+      "relationshipType": "describes",
       "to": [
         "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/paper-airplane"
       ]
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/009-conformsto",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/009-performedby",
       "creationInfo": "_:paper-plane-creation-info",
-      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/005-fold-airplane",
-      "relationshipType": "conformsTo",
-      "to": [
-        "https://spdx.org/spdxdocs/paper-plane-supply-chain#process/build-process"
-      ]
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/010-performedby",
-      "creationInfo": "_:paper-plane-creation-info",
-      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/006-out-of-spec-folding",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/004-transport-paper",
       "relationshipType": "performedBy",
       "to": [
         "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/person/bob-folder"
@@ -575,19 +823,29 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/011-hasinput",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/010-hasinput",
       "creationInfo": "_:paper-plane-creation-info",
-      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/006-out-of-spec-folding",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/004-transport-paper",
       "relationshipType": "hasInput",
       "to": [
-        "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/paper-airplane"
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/paper-sheet"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/011-hasoutput",
+      "creationInfo": "_:paper-plane-creation-info",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/004-transport-paper",
+      "relationshipType": "hasOutput",
+      "to": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/paper-sheet"
       ]
     },
     {
       "type": "Relationship",
       "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/012-performedby",
       "creationInfo": "_:paper-plane-creation-info",
-      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/007-resolve-folding",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/006-fold-airplane",
       "relationshipType": "performedBy",
       "to": [
         "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/person/bob-folder"
@@ -597,17 +855,17 @@
       "type": "Relationship",
       "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/013-hasinput",
       "creationInfo": "_:paper-plane-creation-info",
-      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/007-resolve-folding",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/006-fold-airplane",
       "relationshipType": "hasInput",
       "to": [
-        "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/paper-airplane"
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/paper-sheet"
       ]
     },
     {
       "type": "Relationship",
       "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/014-hasoutput",
       "creationInfo": "_:paper-plane-creation-info",
-      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/007-resolve-folding",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/006-fold-airplane",
       "relationshipType": "hasOutput",
       "to": [
         "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/paper-airplane"
@@ -615,29 +873,99 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/015-resolved",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/015-conformsto",
       "creationInfo": "_:paper-plane-creation-info",
-      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/007-resolve-folding",
-      "relationshipType": "resolved",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/006-fold-airplane",
+      "relationshipType": "conformsTo",
       "to": [
-        "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/006-out-of-spec-folding"
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#process/build-process"
       ]
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/016-hasresolution",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/016-performedby",
       "creationInfo": "_:paper-plane-creation-info",
-      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/007-resolve-folding",
-      "relationshipType": "hasResolution",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/007-inspect-fold",
+      "relationshipType": "performedBy",
       "to": [
-        "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/006-out-of-spec-folding"
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/person/dana-inspector"
       ]
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/017-performedby",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/017-usestool",
       "creationInfo": "_:paper-plane-creation-info",
-      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/009-transport-plane",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/007-inspect-fold",
+      "relationshipType": "usesTool",
+      "to": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#tool/origami-cad-attester"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/018-hasinput",
+      "creationInfo": "_:paper-plane-creation-info",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/007-inspect-fold",
+      "relationshipType": "hasInput",
+      "to": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/paper-airplane"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/019-hasrequirement",
+      "creationInfo": "_:paper-plane-creation-info",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/007-inspect-fold",
+      "relationshipType": "hasRequirement",
+      "to": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#req/wing-symmetry"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/020-hasevidence",
+      "creationInfo": "_:paper-plane-creation-info",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/007-inspect-fold",
+      "relationshipType": "hasEvidence",
+      "to": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#dataset/inspection-pre"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/021-conformsto",
+      "creationInfo": "_:paper-plane-creation-info",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/007-inspect-fold",
+      "relationshipType": "conformsTo",
+      "to": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#process/inspection-process"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/022-performedby",
+      "creationInfo": "_:paper-plane-creation-info",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/008-out-of-spec",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/person/dana-inspector"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/023-hasinput",
+      "creationInfo": "_:paper-plane-creation-info",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/008-out-of-spec",
+      "relationshipType": "hasInput",
+      "to": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/paper-airplane"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/024-performedby",
+      "creationInfo": "_:paper-plane-creation-info",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/010-resolve-folding",
       "relationshipType": "performedBy",
       "to": [
         "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/person/bob-folder"
@@ -645,9 +973,9 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/018-hasinput",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/025-hasinput",
       "creationInfo": "_:paper-plane-creation-info",
-      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/009-transport-plane",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/010-resolve-folding",
       "relationshipType": "hasInput",
       "to": [
         "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/paper-airplane"
@@ -655,9 +983,9 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/019-hasoutput",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/026-hasoutput",
       "creationInfo": "_:paper-plane-creation-info",
-      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/009-transport-plane",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/010-resolve-folding",
       "relationshipType": "hasOutput",
       "to": [
         "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/paper-airplane"
@@ -665,19 +993,39 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/020-performedby",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/027-resolved",
       "creationInfo": "_:paper-plane-creation-info",
-      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/011-flight-test",
-      "relationshipType": "performedBy",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/010-resolve-folding",
+      "relationshipType": "resolved",
       "to": [
-        "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/person/charlie-pilot"
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/008-out-of-spec"
       ]
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/021-hasinput",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/028-performedby",
       "creationInfo": "_:paper-plane-creation-info",
-      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/011-flight-test",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/011-reinspect-fold",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/person/dana-inspector"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/029-usestool",
+      "creationInfo": "_:paper-plane-creation-info",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/011-reinspect-fold",
+      "relationshipType": "usesTool",
+      "to": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#tool/origami-cad-attester"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/030-hasinput",
+      "creationInfo": "_:paper-plane-creation-info",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/011-reinspect-fold",
       "relationshipType": "hasInput",
       "to": [
         "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/paper-airplane"
@@ -685,9 +1033,89 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/022-hasrequirement",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/031-hasrequirement",
       "creationInfo": "_:paper-plane-creation-info",
-      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/011-flight-test",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/011-reinspect-fold",
+      "relationshipType": "hasRequirement",
+      "to": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#req/wing-symmetry"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/032-hasevidence",
+      "creationInfo": "_:paper-plane-creation-info",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/011-reinspect-fold",
+      "relationshipType": "hasEvidence",
+      "to": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#dataset/inspection-post"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/033-conformsto",
+      "creationInfo": "_:paper-plane-creation-info",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/011-reinspect-fold",
+      "relationshipType": "conformsTo",
+      "to": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#process/inspection-process"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/034-performedby",
+      "creationInfo": "_:paper-plane-creation-info",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/013-transport-plane",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/person/bob-folder"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/035-hasinput",
+      "creationInfo": "_:paper-plane-creation-info",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/013-transport-plane",
+      "relationshipType": "hasInput",
+      "to": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/paper-airplane"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/036-hasoutput",
+      "creationInfo": "_:paper-plane-creation-info",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/013-transport-plane",
+      "relationshipType": "hasOutput",
+      "to": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/paper-airplane"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/037-performedby",
+      "creationInfo": "_:paper-plane-creation-info",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/015-flight-test",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/person/charlie-pilot"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/038-hasinput",
+      "creationInfo": "_:paper-plane-creation-info",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/015-flight-test",
+      "relationshipType": "hasInput",
+      "to": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/paper-airplane"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/039-hasrequirement",
+      "creationInfo": "_:paper-plane-creation-info",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/015-flight-test",
       "relationshipType": "hasRequirement",
       "to": [
         "https://spdx.org/spdxdocs/paper-plane-supply-chain#req/glide-distance"
@@ -695,9 +1123,9 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/023-hasevidence",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/040-hasevidence",
       "creationInfo": "_:paper-plane-creation-info",
-      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/011-flight-test",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/015-flight-test",
       "relationshipType": "hasEvidence",
       "to": [
         "https://spdx.org/spdxdocs/paper-plane-supply-chain#dataset/flight-telemetry"
@@ -705,12 +1133,63 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/024-conformsto",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/041-conformsto",
       "creationInfo": "_:paper-plane-creation-info",
-      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/011-flight-test",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/015-flight-test",
       "relationshipType": "conformsTo",
       "to": [
         "https://spdx.org/spdxdocs/paper-plane-supply-chain#process/test-process"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/042-performedby",
+      "creationInfo": "_:paper-plane-creation-info",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/018-demo-flight",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/person/charlie-pilot",
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/org/origami-studio"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/043-hasinput",
+      "creationInfo": "_:paper-plane-creation-info",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/018-demo-flight",
+      "relationshipType": "hasInput",
+      "to": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/paper-airplane"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/044-hasevidence",
+      "creationInfo": "_:paper-plane-creation-info",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/018-demo-flight",
+      "relationshipType": "hasEvidence",
+      "to": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#dataset/flight-telemetry"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/045-performedby",
+      "creationInfo": "_:paper-plane-creation-info",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/020-archive",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/org/origami-studio"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/046-hasinput",
+      "creationInfo": "_:paper-plane-creation-info",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/020-archive",
+      "relationshipType": "hasInput",
+      "to": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/paper-airplane"
       ]
     }
   ]
