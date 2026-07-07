@@ -110,7 +110,43 @@ test('computeQualityReport renormalizes category weights when a category has no 
     report.categories.filter((c) => c.applicable).map((c) => c.key),
     ['ntia', 'structural']
   );
-  // ntia = 100 (doc-level author+timestamp only, no packages to check),
-  // structural = 75 (3/4 external refs resolved), weighted 0.3/0.1 -> 93.75.
-  assert.equal(report.overall.score, 94);
+  // ntia = 6/7 ≈ 85.7: with no packages the four component elements pass
+  // vacuously and author + timestamp pass, but no dependency relationship is
+  // asserted. structural = 75 (3/4 external refs resolved). Weighted 0.3/0.1:
+  // (85.71*0.3 + 75*0.1) / 0.4 ≈ 83.
+  assert.equal(report.overall.score, 83);
+});
+
+test('computeQualityReport builds a detailed NTIA report mirroring the reference tool', () => {
+  const parsed = parseGraph(mixedGraph);
+  const indexes = buildRelationshipIndexes(parsed.relationships);
+  const { ntia } = computeQualityReport({ ...parsed, ...indexes });
+
+  const el = Object.fromEntries([...ntia.elements, ...ntia.fsct].map((e) => [e.key, e]));
+
+  assert.equal(ntia.totalComponents, 3);
+  assert.equal(ntia.isConformant, false);
+
+  // Component-level coverage.
+  assert.equal(el.name.missing.total, 0);
+  assert.deepEqual(
+    el.version.missing.sample.map((o) => o.id),
+    ['pkg:bare']
+  );
+  assert.deepEqual(
+    el.supplier.missing.sample.map((o) => o.id),
+    ['pkg:other', 'pkg:bare']
+  );
+  assert.equal(el.identifier.covered, 1); // only pkg:good has a PURL
+
+  // Document-level: a dependsOn relationship exists, but this fixture has no
+  // creator or timestamp.
+  assert.equal(el.dependency.present, true);
+  assert.equal(el.author.present, false);
+  assert.equal(el.timestamp.present, false);
+
+  // CISA FSCT3 extension: only the fully documented package has license +
+  // copyright.
+  assert.equal(el.concludedLicense.covered, 1);
+  assert.equal(el.copyrightText.covered, 1);
 });

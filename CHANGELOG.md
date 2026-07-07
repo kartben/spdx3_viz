@@ -6,6 +6,7 @@ via the "What's new" link.
 ## Unreleased
 
 - **Added:** Command palette (⌘K / Ctrl-K) to search and jump anywhere.
+- **Added:** Per-element NTIA minimum-elements breakdown in Statistics.
 
 ## [0.1.0] - 2026-07-06
 

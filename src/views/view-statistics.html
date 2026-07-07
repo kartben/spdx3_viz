@@ -33,6 +33,213 @@
     </div>
   </div>
 
+  <!-- NTIA minimum elements: per-element conformance detail -->
+  <div
+    class="card"
+    x-data="{
+      expandedNtia: '',
+      ntiaStatus(el) {
+        if (el.level === 'document') return el.present ? 'pass' : 'fail';
+        if (el.missing.total === 0) return 'pass';
+        return el.covered > 0 ? 'partial' : 'fail';
+      },
+      ntiaStatusColor(s) {
+        return s === 'pass' ? '#34d399' : s === 'partial' ? '#fbbf24' : '#fb7185';
+      },
+      ntiaCoveragePct(el) {
+        return el.total > 0 ? (el.covered / el.total) * 100 : 100;
+      }
+    }"
+  >
+    <div class="flex items-start justify-between gap-3 flex-wrap">
+      <div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <h3 class="text-sm font-semibold text-white">NTIA Minimum Elements</h3>
+          <span
+            class="badge"
+            :class="qualityReport.ntia.isConformant ? 'bg-emerald-500/15 text-emerald-400' : 'bg-rose-500/15 text-rose-400'"
+            x-text="qualityReport.ntia.isConformant ? 'Conformant' : 'Not conformant'"
+          ></span>
+        </div>
+        <div class="flex items-center gap-2 mt-1.5">
+          <span
+            x-show="qualityReport.ntia.specVersion"
+            class="text-[11px] font-mono bg-slate-700/40 text-slate-300 px-2 py-0.5 rounded"
+            x-text="(String(qualityReport.ntia.specVersion).toUpperCase().startsWith('SPDX') ? '' : 'SPDX ') + qualityReport.ntia.specVersion"
+          ></span>
+          <span
+            class="text-xs text-slate-500"
+            x-text="formatCount(qualityReport.ntia.totalComponents) + ' components'"
+          ></span>
+        </div>
+      </div>
+      <div class="flex items-center gap-1.5 text-[11px] text-emerald-400/90 max-w-[230px]">
+        <svg
+          class="w-3.5 h-3.5 flex-shrink-0"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 12l2 2 4-4m6 0a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <span
+          >Cross-checked with
+          <span class="font-mono text-sky-300">spdx/ntia-conformance-checker</span> in CI</span
+        >
+      </div>
+    </div>
+
+    <div class="border-t border-slate-700/60 mt-4 mb-1"></div>
+
+    <template
+      x-for="section in [
+        { key: 'ntia', title: '', items: qualityReport.ntia.elements },
+        { key: 'fsct', title: 'CISA FSCT3 extension', subtitle: 'license + copyright, beyond the NTIA baseline', items: qualityReport.ntia.fsct }
+      ]"
+      :key="section.key"
+    >
+      <div>
+        <div x-show="section.title" class="flex items-center gap-2 mt-4 mb-1">
+          <span class="text-xs font-medium text-slate-400" x-text="section.title"></span>
+          <span class="text-[11px] text-slate-600" x-text="section.subtitle"></span>
+        </div>
+        <template x-for="el in section.items" :key="el.key">
+          <div>
+            <div
+              class="flex items-center gap-3 py-2 rounded-lg px-2 -mx-2 transition"
+              :class="(el.level === 'component' && el.missing.total > 0) ? 'cursor-pointer hover:bg-slate-700/40' : ''"
+              @click="(el.level === 'component' && el.missing.total > 0) && (expandedNtia = expandedNtia === el.key ? '' : el.key)"
+            >
+              <span
+                class="flex-shrink-0 flex items-center"
+                :style="`color:${ntiaStatusColor(ntiaStatus(el))}`"
+              >
+                <svg
+                  x-show="ntiaStatus(el) === 'pass'"
+                  class="w-[18px] h-[18px]"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12l2 2 4-4m6 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <svg
+                  x-show="ntiaStatus(el) === 'partial'"
+                  class="w-[18px] h-[18px]"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+                  />
+                </svg>
+                <svg
+                  x-show="ntiaStatus(el) === 'fail'"
+                  class="w-[18px] h-[18px]"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <circle cx="12" cy="12" r="9" />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 9l-6 6M9 9l6 6"
+                  />
+                </svg>
+              </span>
+              <div class="flex-1 min-w-0 flex items-center gap-1.5">
+                <span class="text-sm text-slate-200" x-text="el.label"></span>
+                <span x-show="el.level === 'document'" class="text-xs text-slate-500"
+                  >(document level)</span
+                >
+                <svg
+                  x-show="el.level === 'component' && el.missing.total > 0"
+                  class="w-3.5 h-3.5 text-slate-500 transition-transform"
+                  :class="expandedNtia === el.key && 'rotate-180'"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </div>
+              <template x-if="el.level === 'component'">
+                <div class="w-28 flex-shrink-0">
+                  <div class="flex items-center justify-between text-[11px] mb-1">
+                    <span
+                      :class="el.missing.total > 0 ? 'text-amber-500/90' : 'text-slate-500'"
+                      x-text="el.missing.total > 0 ? formatCount(el.missing.total) + ' missing' : 'coverage'"
+                    ></span>
+                    <span
+                      class="text-slate-400 tabular-nums"
+                      x-text="formatCount(el.covered) + ' / ' + formatCount(el.total)"
+                    ></span>
+                  </div>
+                  <div class="h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                    <div
+                      class="h-full rounded-full"
+                      :style="`width:${ntiaCoveragePct(el)}%; background-color:${qualityScoreColor(ntiaCoveragePct(el))}`"
+                    ></div>
+                  </div>
+                </div>
+              </template>
+              <template x-if="el.level === 'document'">
+                <span
+                  class="badge flex-shrink-0"
+                  :class="el.present ? 'bg-emerald-500/15 text-emerald-400' : 'bg-rose-500/15 text-rose-400'"
+                  x-text="el.present ? 'Present' : 'Missing'"
+                ></span>
+              </template>
+            </div>
+            <div x-show="el.level === 'component' && expandedNtia === el.key" x-collapse>
+              <div class="flex flex-wrap gap-1.5 ml-8 mt-1 mb-2">
+                <template x-for="o in el.missing.sample" :key="o.id">
+                  <button
+                    @click="navigateTo(o.id)"
+                    class="inline-flex items-center gap-1.5 rounded-md border border-slate-700 bg-slate-900/50 px-2 py-1 text-xs text-slate-300 hover:bg-slate-700/40 transition"
+                  >
+                    <span
+                      class="flex items-center justify-center flex-shrink-0"
+                      :style="`color:${nodeTypeColor(getNodeType(o))}`"
+                      x-html="nodeTypeIconSvg(getNodeType(o), 'w-3 h-3')"
+                    ></span>
+                    <span class="truncate max-w-[160px]" x-text="o.name"></span>
+                  </button>
+                </template>
+                <span
+                  x-show="el.missing.total > el.missing.sample.length"
+                  class="text-xs text-slate-500 px-1 py-1"
+                  x-text="`+ ${formatCount(el.missing.total - el.missing.sample.length)} more`"
+                ></span>
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
+    </template>
+  </div>
+
   <!-- Category breakdown -->
   <div class="card">
     <h3 class="text-sm font-semibold text-white mb-4">Category Breakdown</h3>
