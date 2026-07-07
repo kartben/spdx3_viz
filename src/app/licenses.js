@@ -2,6 +2,7 @@ import {
   displayLicenseExpression,
   renderLicenseExpression,
   licenseIndividualLabel,
+  licenseIndividualInfo,
   extractSpdxLicenseId,
   resolveLicenseExpression,
   extractLicenseExpressionParts,
@@ -104,6 +105,7 @@ export const licensesMixin = {
       : 'View license text';
   },
   licenseModalHeadingLabel() {
+    if (this.licenseModalActivePart()?.kind === 'individual') return 'SPDX definition';
     return this.licenseModalParts.length > 1 ? 'Licenses text' : 'License text';
   },
   licenseModalMainPageUrl() {
@@ -111,6 +113,7 @@ export const licensesMixin = {
     const part = this.licenseModalParts[0];
     if (part.kind === 'license') return spdxLicensePageUrl(part.id);
     if (part.kind === 'exception') return spdxLicenseExceptionPageUrl(part.id);
+    if (part.kind === 'individual') return part.docUrl || '';
     return '';
   },
   closeLicenseModal() {
@@ -186,6 +189,31 @@ export const licensesMixin = {
     }
   },
   async showLicenseText(licenseRef) {
+    // ExpandedLicensing individuals (NoAssertion / None) have no license text;
+    // show their verbatim SPDX definition instead of failing to parse them.
+    const individual = licenseIndividualInfo(licenseRef);
+    if (individual) {
+      this.licenseModalOpen = true;
+      this.licenseModalRef = licenseRef;
+      this.licenseModalExpression = individual.label;
+      this.licenseModalActiveIndex = 0;
+      this.licenseModalParts = [
+        {
+          id: '',
+          kind: 'individual',
+          withLicense: '',
+          label: individual.label,
+          name: individual.summary,
+          text: individual.detail,
+          docUrl: individual.docUrl,
+          error: '',
+          loading: false,
+          loaded: true
+        }
+      ];
+      return;
+    }
+
     // Text embedded in the SBOM: show it directly, no expression parsing/fetching.
     const inlineText = this.inlineLicenseText(licenseRef);
     if (inlineText) {
