@@ -21,6 +21,7 @@ const lifecycleMixin = {
   init() {
     this.$watch('currentView', (v) => {
       if (v === 'graph') this.$nextTick(() => this.renderGraph());
+      if (v === 'statistics') this.$nextTick(() => this.renderStatisticsCharts());
       if (v === 'supplychain' && this.supplyChainViewMode === 'states') {
         this.renderSupplyChainStateDiagram();
       }

@@ -6,6 +6,16 @@
  */
 export const CHANGELOG = [
   {
+    version: 'Unreleased',
+    date: null,
+    items: [
+      {
+        tag: 'Added',
+        text: 'Relationship Repartition chart in Statistics, with lifecycle scope chips and graph drill-down by relationship type.'
+      }
+    ]
+  },
+  {
     version: '0.2.0',
     date: '2026-07-07',
     items: [
