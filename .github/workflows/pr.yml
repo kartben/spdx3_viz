@@ -1,0 +1,26 @@
+name: PR checks
+
+# The full pull-request gate. Fans out to the reusable ci.yml (format, lint,
+# typecheck, test, build) and ntia-parity.yml (reference-tool parity). Keeping
+# the heavy lifting in reusable workflows means release.yml, push-to-main, and
+# this workflow all stay in lockstep.
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+# Least privilege: the gate only needs to read the checked-out code.
+permissions:
+  contents: read
+
+# Only keep the latest run per PR; supersede in-flight runs on new pushes.
+concurrency:
+  group: pr-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  ntia-parity:
+    uses: ./.github/workflows/ntia-parity.yml
