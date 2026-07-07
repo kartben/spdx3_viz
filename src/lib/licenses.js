@@ -39,21 +39,40 @@ export function displayLicenseExpression(element, elementMap) {
 // See https://spdx.github.io/spdx-spec/v3.0.1/model/ExpandedLicensing/Individuals/
 const LICENSE_INDIVIDUAL_RE = /(?:^|[/#_])(NoAssertionLicense|NoneLicense)$/;
 
+// Where the SPDX spec documents these individuals.
+const SPDX_INDIVIDUAL_DOC_BASE =
+  'https://spdx.github.io/spdx-spec/v3.0.1/model/ExpandedLicensing/Individuals/';
+
 // The two ExpandedLicensing individuals, each with: the SPDX-expression token
 // used when composing license expression strings, the human label shown in the
-// UI, and a short explanation of the individual's meaning (used as a tooltip).
+// UI, a short paraphrase for tooltips, and the verbatim spec summary/detail
+// (quoted from SPDX 3.0.1) plus a link back to its definition, shown in place of
+// license text (these individuals have none).
 const LICENSE_INDIVIDUALS = {
   NoAssertionLicense: {
     token: 'NoAssertion',
     label: 'No assertion',
     description:
       'No license asserted: the SPDX creator could not determine it, did not ' +
-      'attempt to, or intentionally left it unspecified.'
+      'attempt to, or intentionally left it unspecified.',
+    summary:
+      'An Individual Value for License when no assertion can be made about its actual value.',
+    detail:
+      'NoAssertionLicense should be used if:\n' +
+      '  • the SPDX creator has attempted to but cannot reach a reasonable objective determination;\n' +
+      '  • the SPDX creator has made no attempt to determine this field; or\n' +
+      '  • the SPDX creator has intentionally provided no information (no meaning should be implied by doing so).',
+    docUrl: `${SPDX_INDIVIDUAL_DOC_BASE}NoAssertionLicense/`
   },
   NoneLicense: {
     token: 'NONE',
     label: 'None',
-    description: 'The SPDX creator asserts that no license applies.'
+    description: 'The SPDX creator asserts that no license applies.',
+    summary:
+      'An Individual Value for License where the SPDX data creator determines that no license is present.',
+    detail:
+      'NoneLicense should be used if the SPDX creator determines there is no license available for this Artifact.',
+    docUrl: `${SPDX_INDIVIDUAL_DOC_BASE}NoneLicense/`
   }
 };
 
@@ -94,6 +113,26 @@ export function licenseIndividualLabel(ref) {
  */
 export function licenseIndividualDescription(ref) {
   return matchLicenseIndividual(ref)?.description || '';
+}
+
+/**
+ * @typedef {{ label: string, summary: string, detail: string, docUrl: string }} LicenseIndividualInfo
+ */
+
+/**
+ * Full presentation info for an ExpandedLicensing individual license (label,
+ * verbatim SPDX summary/detail, and a link to its spec definition), or null
+ * when the ref isn't one of the individuals. Used to show a meaningful
+ * definition where a listed license would show its license text.
+ *
+ * @param {string} ref - A license reference (spdxId, CURIE, or term IRI)
+ * @returns {LicenseIndividualInfo|null}
+ */
+export function licenseIndividualInfo(ref) {
+  const individual = matchLicenseIndividual(ref);
+  if (!individual) return null;
+  const { label, summary, detail, docUrl } = individual;
+  return { label, summary, detail, docUrl };
 }
 
 // Renders SPDX 3 ExpandedLicensing operator classes (license sets and
