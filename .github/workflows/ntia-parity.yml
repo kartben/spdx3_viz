@@ -4,11 +4,13 @@ name: NTIA parity
 # sample SBOMs and asserts this app's native NTIA scoring agrees with it on the
 # elements that share a definition. See scripts/check-ntia-parity.mjs.
 
+# Reusable so pr.yml can fold it into the PR gate; also self-triggers on
+# push-to-main and manual dispatch.
 on:
   push:
     branches: [main]
-  pull_request:
   workflow_dispatch:
+  workflow_call:
 
 permissions:
   contents: read
