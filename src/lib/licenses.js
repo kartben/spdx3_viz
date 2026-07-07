@@ -30,6 +30,29 @@ export function displayLicenseExpression(element, elementMap) {
     }, String(expr));
 }
 
+// The ExpandedLicensing profile defines two named "individual" licenses,
+// NoAssertionLicense and NoneLicense, each a singleton with a canonical term
+// IRI (e.g. https://spdx.org/rdf/3.0.1/terms/ExpandedLicensing/NoAssertionLicense)
+// that the JSON-LD context also compacts to `expandedlicensing_NoAssertionLicense`.
+// Match the individual by its trailing token in either form, so it never leaks
+// out as a raw id/IRI in the UI.
+// See https://spdx.github.io/spdx-spec/v3.0.1/model/ExpandedLicensing/Individuals/
+const LICENSE_INDIVIDUAL_RE = /(?:^|[/#_])(NoAssertionLicense|NoneLicense)$/;
+
+/**
+ * Display label for an ExpandedLicensing individual license reference, matching
+ * the `NoAssertionLicense` / `NoneLicense` singletons in either their term-IRI
+ * or context-compacted form.
+ *
+ * @param {string} ref - A license reference (spdxId, CURIE, or term IRI)
+ * @returns {string} 'NoAssertion', 'NONE', or '' when not one of the individuals
+ */
+export function licenseIndividualLabel(ref) {
+  const match = typeof ref === 'string' && ref.match(LICENSE_INDIVIDUAL_RE);
+  if (!match) return '';
+  return match[1] === 'NoneLicense' ? 'NONE' : 'NoAssertion';
+}
+
 // Renders SPDX 3 ExpandedLicensing operator classes (license sets and
 // operators) as SPDX license expression strings.
 // See https://spdx.github.io/spdx-spec/v3.0.1/model/ExpandedLicensing/
@@ -68,7 +91,8 @@ function renderLicenseRef(ref, elementMap, seen) {
   const listed = listedLicenseId(ref);
   if (listed) return listed;
   const str = String(ref);
-  if (/NoneLicense$/.test(str)) return 'NONE';
+  const individual = licenseIndividualLabel(str);
+  if (individual) return individual;
   if (str.includes('NoAssertion')) return 'NoAssertion';
   const el = elementMap?.get(str);
   return el ? renderLicenseNode(el, elementMap, seen) : '';

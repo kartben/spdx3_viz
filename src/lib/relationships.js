@@ -11,7 +11,11 @@ import {
   RELATIONSHIP_SORT_ORDER
 } from '../config.js';
 import { cleanName } from './format.js';
-import { displayLicenseExpression, renderLicenseExpression } from './licenses.js';
+import {
+  displayLicenseExpression,
+  renderLicenseExpression,
+  licenseIndividualLabel
+} from './licenses.js';
 import { getVulnerabilityId } from './security.js';
 
 /**
@@ -105,6 +109,14 @@ export function getRelationshipTargetDisplayName(spdxId, elementMap) {
   if (spdxId.startsWith('https://spdx.org/licenses/')) {
     return spdxId.replace('https://spdx.org/licenses/', '');
   }
+
+  // ExpandedLicensing individual licenses (NoAssertionLicense / NoneLicense).
+  // These named singletons aren't real elements, so they'd otherwise fall
+  // through to cleanName (rendering "expandedlicensing NoAssertionLicense") or
+  // the raw-IRI fallback (for the full-term-URL form). Show the idiom the rest
+  // of the app uses instead.
+  const individualLicense = licenseIndividualLabel(spdxId);
+  if (individualLicense) return individualLicense;
 
   // Prefer a resolved element's own name/expression before the raw-URL fallback
   // below, since some producers use full http(s) URLs as spdxIds.
