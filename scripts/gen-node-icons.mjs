@@ -60,6 +60,7 @@ const ICONS = {
   assumption: 'help',
   evaluation: 'assessment',
   status_pass: 'check_circle',
+  status_warning: 'warning',
   status_fail: 'cancel',
   status_inconclusive: 'help',
   status_unverified: 'pending',
