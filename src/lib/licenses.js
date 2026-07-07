@@ -33,11 +33,12 @@ export function displayLicenseExpression(element, elementMap) {
 // The ExpandedLicensing profile defines two named "individual" licenses,
 // NoAssertionLicense and NoneLicense, each a singleton with a canonical term
 // IRI (e.g. https://spdx.org/rdf/3.0.1/terms/ExpandedLicensing/NoAssertionLicense)
-// that the JSON-LD context also compacts to `expandedlicensing_NoAssertionLicense`.
-// Match the individual by its trailing token in either form, so it never leaks
-// out as a raw id/IRI in the UI.
+// that the JSON-LD context also compacts to `expandedlicensing_NoAssertionLicense`
+// or the CURIE form `expandedlicensing:NoAssertionLicense`. Match the individual
+// by its trailing token separated by `/`, `#`, `_`, or `:` (or at the start), so
+// it never leaks out as a raw id/IRI/CURIE in the UI.
 // See https://spdx.github.io/spdx-spec/v3.0.1/model/ExpandedLicensing/Individuals/
-const LICENSE_INDIVIDUAL_RE = /(?:^|[/#_])(NoAssertionLicense|NoneLicense)$/;
+const LICENSE_INDIVIDUAL_RE = /(?:^|[/#_:])(NoAssertionLicense|NoneLicense)$/;
 
 // Where the SPDX spec documents these individuals.
 const SPDX_INDIVIDUAL_DOC_BASE =
