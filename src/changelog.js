@@ -6,8 +6,8 @@
  */
 export const CHANGELOG = [
   {
-    version: 'Unreleased',
-    date: null,
+    version: '0.2.0',
+    date: '2026-07-07',
     items: [
       {
         tag: 'Added',

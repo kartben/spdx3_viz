@@ -3,7 +3,7 @@
 All notable changes to this project are documented here. Also viewable in-app
 via the "What's new" link.
 
-## Unreleased
+## [0.2.0] - 2026-07-07
 
 - **Added:** Command palette (⌘K / Ctrl-K) to search and jump anywhere.
 - **Added:** Per-element NTIA minimum-elements breakdown in Statistics.
