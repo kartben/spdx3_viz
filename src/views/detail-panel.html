@@ -1370,7 +1370,11 @@
                 :style="`color: ${nodeTypeColor(getNodeType(elementMap.get(item.id) || {}))}`"
                 x-html="elementIcon(elementMap.get(item.id) || { spdxId: item.id }, 'w-3.5 h-3.5')"
               ></span>
-              <span class="flex-1 truncate" x-text="item.displayName"></span>
+              <span
+                class="flex-1 truncate"
+                x-text="item.displayName"
+                :title="relTargetTooltip(item.id) || null"
+              ></span>
               <span
                 x-show="statusMeta"
                 class="w-6 h-6 rounded-full inline-flex items-center justify-center flex-shrink-0"
