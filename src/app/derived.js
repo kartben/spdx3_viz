@@ -293,6 +293,7 @@ export const derivedMixin = {
       carbonKg: this.supplyChainCarbonKg(item),
       distanceKm: this.supplyChainDistanceKm(item),
       mode: this.supplyChainTransportMode(item),
+      evidence: this.supplyChainEvidenceCount(item),
       time: item.startTime || item.endTime || ''
     }));
     // Day dividers and elapsed-time markers add breathing room and temporal
