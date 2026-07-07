@@ -333,10 +333,33 @@ export const derivedMixin = {
         Number.isFinite(ms) && Number.isFinite(prevMs)
           ? this.supplyChainElapsedLabel(prevMs, ms)
           : '';
+      row.stateChanges = [];
       if (Number.isFinite(ms)) {
         prevDay = day;
         prevMs = ms;
       }
+    }
+    // StateActions are otherwise hidden from the event list (they are the product
+    // state machine's transitions), so it's easy to lose track of when the tracked
+    // product changes state. Surface each transition inline, attached below the
+    // last event that occurred at or before it, so the timeline shows exactly when
+    // the product entered a new state.
+    for (const step of this.supplyChainLifecycleSteps) {
+      if (!rows.length) break;
+      const stepMs = step.time ? Date.parse(step.time) : NaN;
+      let target = null;
+      if (Number.isFinite(stepMs)) {
+        for (const row of rows) {
+          const rowMs = row.time ? Date.parse(row.time) : NaN;
+          if (Number.isFinite(rowMs) && rowMs <= stepMs) target = row;
+        }
+      }
+      (target || rows[0]).stateChanges.push({
+        spdxId: step.action.spdxId,
+        name: step.name,
+        tone: step.tone,
+        time: step.time
+      });
     }
     return rows;
   },

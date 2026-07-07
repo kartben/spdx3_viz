@@ -206,7 +206,10 @@ export function formatHardwareDimensions(dims) {
     const label = QUDT_UNIT_LABELS[unit] || unit;
     return `${nums.join(' × ')} ${label}`;
   }
-  return measures.map((m) => formatQudtMeasure(m)).filter(Boolean).join(' × ');
+  return measures
+    .map((m) => formatQudtMeasure(m))
+    .filter(Boolean)
+    .join(' × ');
 }
 
 /**

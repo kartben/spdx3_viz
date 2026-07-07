@@ -1,11 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import {
-  enumValue,
-  formatHardwareDimensions,
-  formatQudtMeasure
-} from '../src/lib/index.js';
+import { enumValue, formatHardwareDimensions, formatQudtMeasure } from '../src/lib/index.js';
 
 test('enumValue keeps a bare vocab token unchanged', () => {
   assert.equal(enumValue('pass'), 'pass');
@@ -43,10 +39,7 @@ test('enumValue returns empty string for empty/nullish input', () => {
 });
 
 test('formatQudtMeasure renders mass and length measures', () => {
-  assert.equal(
-    formatQudtMeasure({ type: 'MeasureOfMass', quantity: 5, unitQUDT: 'GM' }),
-    '5 g'
-  );
+  assert.equal(formatQudtMeasure({ type: 'MeasureOfMass', quantity: 5, unitQUDT: 'GM' }), '5 g');
   assert.equal(
     formatQudtMeasure({ type: 'MeasureOfMass', quantity: 0.84, unitQUDT: 'KiloGM' }),
     '0.84 kg'
