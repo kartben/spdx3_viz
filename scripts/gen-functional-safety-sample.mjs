@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -35,6 +36,13 @@ const element = (type, fragment, properties) => ({
   ...properties
 });
 
+// Deterministic, real-looking integrity digests derived from a stable seed, so
+// re-generating this synthetic sample always yields the same values.
+const hashes = (seed) => [
+  { type: 'Hash', algorithm: 'sha256', hashValue: createHash('sha256').update(seed).digest('hex') },
+  { type: 'Hash', algorithm: 'sha1', hashValue: createHash('sha1').update(seed).digest('hex') }
+];
+
 const graph = [];
 const relationships = [];
 let relationshipSequence = 0;
@@ -66,6 +74,70 @@ const generator = element('Tool', 'tool/synthetic-safety-case-generator', {
   version: '1.0.0',
   summary: 'Deterministic generator for this fictional SPDX demonstration.'
 });
+
+// Upstream suppliers for the two third-party components. First-party Northstar
+// packages are supplied by the document creator organization above.
+const freertosSupplier = element('Organization', 'agent/amazon-web-services', {
+  name: 'Amazon Web Services, Inc.',
+  summary:
+    'Upstream supplier of the FreeRTOS kernel (referenced only; not affiliated with this fictional demo).'
+});
+const nanopbSupplier = element('Person', 'agent/petteri-aimonen', {
+  name: 'Petteri Aimonen',
+  summary: 'Upstream author of nanopb (referenced only; not affiliated with this fictional demo).'
+});
+
+// A proprietary license shipped inline in the SBOM, applied to the first-party
+// Helios work products. The two third-party packages reference OSI licenses by
+// their SPDX License List URLs instead.
+const proprietaryLicense = element(
+  'expandedlicensing_CustomLicense',
+  'license/LicenseRef-Northstar-Proprietary',
+  {
+    name: 'Northstar Mobility Proprietary License v1.0 (fictional)',
+    expandedlicensing_isOsiApproved: false,
+    expandedlicensing_isFsfLibre: false,
+    simplelicensing_licenseText: [
+      'Northstar Mobility Proprietary License v1.0 (FICTIONAL - FOR DEMONSTRATION ONLY)',
+      '',
+      'Copyright (c) 2024-2026 Northstar Mobility Labs. All rights reserved.',
+      '',
+      '1. Grant. Subject to the terms of a separately executed safety-critical',
+      '   supply agreement, Northstar Mobility Labs grants the licensed vehicle',
+      '   manufacturer a non-exclusive, non-transferable right to integrate the',
+      '   accompanying Helios AEB software into a single vehicle program.',
+      '',
+      '2. Restrictions. The licensee shall not redistribute, sublicense, reverse',
+      '   engineer, or modify the software except as required to fulfil ISO 26262',
+      '   integration and verification obligations documented in the safety case.',
+      '',
+      '3. Safety obligations. The software is delivered as a safety element out of',
+      '   context (SEooC). The integrator remains responsible for validating the',
+      '   assumptions of use recorded in this SBOM against the target item.',
+      '',
+      '4. Warranty. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.',
+      '   This text is entirely fictional and carries no legal effect.'
+    ].join('\n')
+  }
+);
+
+const OSI_LICENSE_URL = {
+  'freertos-kernel': 'https://spdx.org/licenses/MIT',
+  nanopb: 'https://spdx.org/licenses/Zlib'
+};
+const licenseTargetFor = (key) => OSI_LICENSE_URL[key] || proprietaryLicense.spdxId;
+const supplierFor = (key) =>
+  key === 'freertos-kernel'
+    ? freertosSupplier.spdxId
+    : key === 'nanopb'
+      ? nanopbSupplier.spdxId
+      : creator.spdxId;
+const copyrightFor = (key) =>
+  key === 'freertos-kernel'
+    ? 'Copyright (C) 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.'
+    : key === 'nanopb'
+      ? 'Copyright (c) 2011 Petteri Aimonen'
+      : 'Copyright (c) 2024-2026 Northstar Mobility Labs. All rights reserved.';
 
 const teamDefs = [
   ['maya-chen', 'Maya Chen', 'Functional Safety Manager'],
@@ -224,6 +296,9 @@ const packages = packageDefs.map(([key, name, version, purpose]) =>
         : key === 'nanopb'
           ? `pkg:github/nanopb/nanopb@${version}`
           : `pkg:generic/northstar-mobility/${key}@${version}`,
+    suppliedBy: supplierFor(key),
+    software_copyrightText: copyrightFor(key),
+    verifiedUsing: hashes(`pkg:${id(`package/${key}`)}`),
     summary:
       key === 'freertos-kernel' || key === 'nanopb'
         ? 'Third-party package version selected by the fictional release candidate.'
@@ -257,6 +332,7 @@ const sourceFiles = sourceFileDefs.map(([owner, name]) =>
     name,
     software_primaryPurpose: name.includes('generated/') ? 'source' : 'source',
     contentType: 'text/x-c',
+    verifiedUsing: hashes(`file:${id(`file/source/${slug(name)}`)}`),
     summary: `Fictional source artifact owned by ${owner}.`
   })
 );
@@ -267,6 +343,7 @@ const releaseFiles = [
     software_primaryPurpose: 'executable',
     software_artifactSize: 1482752,
     contentType: 'application/x-elf',
+    verifiedUsing: hashes(`file:${id('file/release/helios-aeb.elf')}`),
     summary: 'Fictional target ELF for the release candidate.'
   }),
   element('software_File', 'file/release/helios-aeb.hex', {
@@ -274,6 +351,7 @@ const releaseFiles = [
     software_primaryPurpose: 'firmware',
     software_artifactSize: 917504,
     contentType: 'application/octet-stream',
+    verifiedUsing: hashes(`file:${id('file/release/helios-aeb.hex')}`),
     summary: 'Fictional flash image for the release candidate.'
   }),
   element('software_File', 'file/release/aeb-calibration.arxml', {
@@ -281,6 +359,7 @@ const releaseFiles = [
     software_primaryPurpose: 'configuration',
     software_artifactSize: 18342,
     contentType: 'application/xml',
+    verifiedUsing: hashes(`file:${id('file/release/aeb-calibration.arxml')}`),
     summary: 'Fictional production-intent calibration with controlled safety limits.'
   })
 ];
@@ -353,6 +432,7 @@ const evidenceFiles = evidenceDefs.map(([key, name, , contentType]) =>
     software_primaryPurpose: 'evidence',
     originatedBy: [personId[evidenceOwner[key]]],
     contentType,
+    verifiedUsing: hashes(`file:${id(`file/evidence/${key}`)}`),
     summary: `${name}. Synthetic evidence metadata only; no real report is included.`
   })
 );
@@ -1062,6 +1142,14 @@ relationship('dependsOn', packageId['aeb-application'], [
 ]);
 relationship('dependsOn', packageId['vehicle-gateway'], packageId.nanopb);
 
+// Every package declares and concludes a license: the two third-party packages
+// reference OSI licenses by URL, the rest reference the inline proprietary one.
+for (const [key] of packageDefs) {
+  const licenseTarget = licenseTargetFor(key);
+  relationship('hasDeclaredLicense', packageId[key], licenseTarget);
+  relationship('hasConcludedLicense', packageId[key], licenseTarget);
+}
+
 for (const [owner, name] of sourceFileDefs) {
   relationship('contains', packageId[owner], id(`file/source/${slug(name)}`));
 }
@@ -1129,9 +1217,12 @@ const sbom = element('software_Sbom', 'sbom/helios-aeb-4.7.2-rc3', {
 
 graph.push(
   creator,
+  freertosSupplier,
+  nanopbSupplier,
   ...people,
   ...tools,
   ...specifications,
+  proprietaryLicense,
   ...packages,
   ...sourceFiles,
   ...releaseFiles,

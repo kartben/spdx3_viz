@@ -19,6 +19,8 @@
       "element": [
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#sbom/helios-aeb-4.7.2-rc3",
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/northstar-mobility-labs",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/amazon-web-services",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/petteri-aimonen",
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/person/maya-chen",
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/person/luca-bernard",
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/person/priya-nair",
@@ -41,6 +43,7 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#specification/safety-plan",
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#specification/item-definition",
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#specification/software-architecture",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary",
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/helios-aeb-ecu",
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/aeb-application",
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/threat-estimator",
@@ -498,33 +501,30 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/211",
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/212",
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/213",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/amazon-web-services",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/petteri-aimonen",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/helios-aeb-ecu",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/helios-aeb-ecu",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/aeb-application",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/aeb-application",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/threat-estimator",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/threat-estimator",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/object-fusion",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/object-fusion",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/signal-plausibility",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/signal-plausibility",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/brake-arbitrator",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/brake-arbitrator",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/safety-supervisor",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/safety-supervisor",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/vehicle-gateway",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/vehicle-gateway",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/diagnostics",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/diagnostics",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/safety-work-products",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/safety-work-products",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/freertos-kernel",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/freertos-kernel",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/nanopb",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/nanopb"
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/214",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/215",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/216",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/217",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/218",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/219",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/220",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/221",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/222",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/223",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/224",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/225",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/226",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/227",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/228",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/229",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/230",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/231",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/232",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/233",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/234",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/235",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/236",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/237"
       ]
     },
     {
@@ -539,14 +539,14 @@
       "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/amazon-web-services",
       "creationInfo": "_:helios-aeb-creation-info",
       "name": "Amazon Web Services, Inc.",
-      "summary": "Upstream supplier of the FreeRTOS kernel (referenced, not affiliated with this fictional demo)."
+      "summary": "Upstream supplier of the FreeRTOS kernel (referenced only; not affiliated with this fictional demo)."
     },
     {
       "type": "Person",
       "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/petteri-aimonen",
       "creationInfo": "_:helios-aeb-creation-info",
       "name": "Petteri Aimonen",
-      "summary": "Upstream author of nanopb (referenced, not affiliated with this fictional demo)."
+      "summary": "Upstream author of nanopb (referenced only; not affiliated with this fictional demo)."
     },
     {
       "type": "Person",
@@ -909,7 +909,6 @@
       "software_packageVersion": "4.7.2-rc3",
       "software_primaryPurpose": "firmware",
       "software_packageUrl": "pkg:generic/northstar-mobility/helios-aeb-ecu@4.7.2-rc3",
-      "summary": "Fictional internal package in the synthetic Helios AEB release candidate.",
       "suppliedBy": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/northstar-mobility-labs",
       "software_copyrightText": "Copyright (c) 2024-2026 Northstar Mobility Labs. All rights reserved.",
       "verifiedUsing": [
@@ -923,7 +922,8 @@
           "algorithm": "sha1",
           "hashValue": "28b7fe81c2e7111d1f4ea15f61c339fc34b3854b"
         }
-      ]
+      ],
+      "summary": "Fictional internal package in the synthetic Helios AEB release candidate."
     },
     {
       "type": "software_Package",
@@ -933,7 +933,6 @@
       "software_packageVersion": "4.7.2",
       "software_primaryPurpose": "application",
       "software_packageUrl": "pkg:generic/northstar-mobility/aeb-application@4.7.2",
-      "summary": "Fictional internal package in the synthetic Helios AEB release candidate.",
       "suppliedBy": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/northstar-mobility-labs",
       "software_copyrightText": "Copyright (c) 2024-2026 Northstar Mobility Labs. All rights reserved.",
       "verifiedUsing": [
@@ -947,7 +946,8 @@
           "algorithm": "sha1",
           "hashValue": "dc2eec9be34b64f056b7f72f422019eb7d78206f"
         }
-      ]
+      ],
+      "summary": "Fictional internal package in the synthetic Helios AEB release candidate."
     },
     {
       "type": "software_Package",
@@ -957,7 +957,6 @@
       "software_packageVersion": "4.7.2",
       "software_primaryPurpose": "library",
       "software_packageUrl": "pkg:generic/northstar-mobility/threat-estimator@4.7.2",
-      "summary": "Fictional internal package in the synthetic Helios AEB release candidate.",
       "suppliedBy": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/northstar-mobility-labs",
       "software_copyrightText": "Copyright (c) 2024-2026 Northstar Mobility Labs. All rights reserved.",
       "verifiedUsing": [
@@ -971,7 +970,8 @@
           "algorithm": "sha1",
           "hashValue": "46d8a3f023f1544cce2f80c364db207039af11cf"
         }
-      ]
+      ],
+      "summary": "Fictional internal package in the synthetic Helios AEB release candidate."
     },
     {
       "type": "software_Package",
@@ -981,7 +981,6 @@
       "software_packageVersion": "4.7.2",
       "software_primaryPurpose": "library",
       "software_packageUrl": "pkg:generic/northstar-mobility/object-fusion@4.7.2",
-      "summary": "Fictional internal package in the synthetic Helios AEB release candidate.",
       "suppliedBy": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/northstar-mobility-labs",
       "software_copyrightText": "Copyright (c) 2024-2026 Northstar Mobility Labs. All rights reserved.",
       "verifiedUsing": [
@@ -995,7 +994,8 @@
           "algorithm": "sha1",
           "hashValue": "3f96f10821764c6ba0a6cea8b80403d6ebdb463c"
         }
-      ]
+      ],
+      "summary": "Fictional internal package in the synthetic Helios AEB release candidate."
     },
     {
       "type": "software_Package",
@@ -1005,7 +1005,6 @@
       "software_packageVersion": "4.7.2",
       "software_primaryPurpose": "library",
       "software_packageUrl": "pkg:generic/northstar-mobility/signal-plausibility@4.7.2",
-      "summary": "Fictional internal package in the synthetic Helios AEB release candidate.",
       "suppliedBy": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/northstar-mobility-labs",
       "software_copyrightText": "Copyright (c) 2024-2026 Northstar Mobility Labs. All rights reserved.",
       "verifiedUsing": [
@@ -1019,7 +1018,8 @@
           "algorithm": "sha1",
           "hashValue": "14b25805b40b24d7677d73de97987bcea2b48e87"
         }
-      ]
+      ],
+      "summary": "Fictional internal package in the synthetic Helios AEB release candidate."
     },
     {
       "type": "software_Package",
@@ -1029,7 +1029,6 @@
       "software_packageVersion": "4.7.2",
       "software_primaryPurpose": "library",
       "software_packageUrl": "pkg:generic/northstar-mobility/brake-arbitrator@4.7.2",
-      "summary": "Fictional internal package in the synthetic Helios AEB release candidate.",
       "suppliedBy": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/northstar-mobility-labs",
       "software_copyrightText": "Copyright (c) 2024-2026 Northstar Mobility Labs. All rights reserved.",
       "verifiedUsing": [
@@ -1043,7 +1042,8 @@
           "algorithm": "sha1",
           "hashValue": "e3dd7877151131def406ed495ff61e7519e2b62f"
         }
-      ]
+      ],
+      "summary": "Fictional internal package in the synthetic Helios AEB release candidate."
     },
     {
       "type": "software_Package",
@@ -1053,7 +1053,6 @@
       "software_packageVersion": "4.7.2",
       "software_primaryPurpose": "library",
       "software_packageUrl": "pkg:generic/northstar-mobility/safety-supervisor@4.7.2",
-      "summary": "Fictional internal package in the synthetic Helios AEB release candidate.",
       "suppliedBy": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/northstar-mobility-labs",
       "software_copyrightText": "Copyright (c) 2024-2026 Northstar Mobility Labs. All rights reserved.",
       "verifiedUsing": [
@@ -1067,7 +1066,8 @@
           "algorithm": "sha1",
           "hashValue": "6938f81866d77acd62c6a82a670908d2ab49593b"
         }
-      ]
+      ],
+      "summary": "Fictional internal package in the synthetic Helios AEB release candidate."
     },
     {
       "type": "software_Package",
@@ -1077,7 +1077,6 @@
       "software_packageVersion": "4.7.2",
       "software_primaryPurpose": "library",
       "software_packageUrl": "pkg:generic/northstar-mobility/vehicle-gateway@4.7.2",
-      "summary": "Fictional internal package in the synthetic Helios AEB release candidate.",
       "suppliedBy": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/northstar-mobility-labs",
       "software_copyrightText": "Copyright (c) 2024-2026 Northstar Mobility Labs. All rights reserved.",
       "verifiedUsing": [
@@ -1091,7 +1090,8 @@
           "algorithm": "sha1",
           "hashValue": "d9cc7e1e04372867d55bfd4e3b36e7febe87ff7c"
         }
-      ]
+      ],
+      "summary": "Fictional internal package in the synthetic Helios AEB release candidate."
     },
     {
       "type": "software_Package",
@@ -1101,7 +1101,6 @@
       "software_packageVersion": "4.7.2",
       "software_primaryPurpose": "library",
       "software_packageUrl": "pkg:generic/northstar-mobility/diagnostics@4.7.2",
-      "summary": "Fictional internal package in the synthetic Helios AEB release candidate.",
       "suppliedBy": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/northstar-mobility-labs",
       "software_copyrightText": "Copyright (c) 2024-2026 Northstar Mobility Labs. All rights reserved.",
       "verifiedUsing": [
@@ -1115,7 +1114,8 @@
           "algorithm": "sha1",
           "hashValue": "75be8eef3b3f2a21983524801c5ebcda2778795c"
         }
-      ]
+      ],
+      "summary": "Fictional internal package in the synthetic Helios AEB release candidate."
     },
     {
       "type": "software_Package",
@@ -1125,7 +1125,6 @@
       "software_packageVersion": "4.7.2-rc3",
       "software_primaryPurpose": "documentation",
       "software_packageUrl": "pkg:generic/northstar-mobility/safety-work-products@4.7.2-rc3",
-      "summary": "Fictional internal package in the synthetic Helios AEB release candidate.",
       "suppliedBy": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/northstar-mobility-labs",
       "software_copyrightText": "Copyright (c) 2024-2026 Northstar Mobility Labs. All rights reserved.",
       "verifiedUsing": [
@@ -1139,7 +1138,8 @@
           "algorithm": "sha1",
           "hashValue": "ce968c2a03379e53d6b82cef59758674352de008"
         }
-      ]
+      ],
+      "summary": "Fictional internal package in the synthetic Helios AEB release candidate."
     },
     {
       "type": "software_Package",
@@ -1149,7 +1149,6 @@
       "software_packageVersion": "11.1.0",
       "software_primaryPurpose": "operatingSystem",
       "software_packageUrl": "pkg:github/FreeRTOS/FreeRTOS-Kernel@V11.1.0",
-      "summary": "Third-party package version selected by the fictional release candidate.",
       "suppliedBy": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/amazon-web-services",
       "software_copyrightText": "Copyright (C) 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.",
       "verifiedUsing": [
@@ -1163,7 +1162,8 @@
           "algorithm": "sha1",
           "hashValue": "b1ace586bde930d1cf154685145585daa44b9682"
         }
-      ]
+      ],
+      "summary": "Third-party package version selected by the fictional release candidate."
     },
     {
       "type": "software_Package",
@@ -1173,7 +1173,6 @@
       "software_packageVersion": "0.4.9.1",
       "software_primaryPurpose": "library",
       "software_packageUrl": "pkg:github/nanopb/nanopb@0.4.9.1",
-      "summary": "Third-party package version selected by the fictional release candidate.",
       "suppliedBy": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/petteri-aimonen",
       "software_copyrightText": "Copyright (c) 2011 Petteri Aimonen",
       "verifiedUsing": [
@@ -1187,7 +1186,8 @@
           "algorithm": "sha1",
           "hashValue": "6b798e1d81c79b85399035445b21b65a7fa8033a"
         }
-      ]
+      ],
+      "summary": "Third-party package version selected by the fictional release candidate."
     },
     {
       "type": "software_File",
@@ -1196,7 +1196,6 @@
       "name": "src/aeb_main.c",
       "software_primaryPurpose": "source",
       "contentType": "text/x-c",
-      "summary": "Fictional source artifact owned by aeb-application.",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -1208,7 +1207,8 @@
           "algorithm": "sha1",
           "hashValue": "2810d2bbcd973baa46ee3ec54cf9489fa2aebc67"
         }
-      ]
+      ],
+      "summary": "Fictional source artifact owned by aeb-application."
     },
     {
       "type": "software_File",
@@ -1217,7 +1217,6 @@
       "name": "src/aeb_state_machine.c",
       "software_primaryPurpose": "source",
       "contentType": "text/x-c",
-      "summary": "Fictional source artifact owned by aeb-application.",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -1229,7 +1228,8 @@
           "algorithm": "sha1",
           "hashValue": "5218b3a5295e2049a8a2849e04231dd49e922ad1"
         }
-      ]
+      ],
+      "summary": "Fictional source artifact owned by aeb-application."
     },
     {
       "type": "software_File",
@@ -1238,7 +1238,6 @@
       "name": "src/ttc_estimator.c",
       "software_primaryPurpose": "source",
       "contentType": "text/x-c",
-      "summary": "Fictional source artifact owned by threat-estimator.",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -1250,7 +1249,8 @@
           "algorithm": "sha1",
           "hashValue": "982f636b1338323114c87cddf52e1aac6e8333ac"
         }
-      ]
+      ],
+      "summary": "Fictional source artifact owned by threat-estimator."
     },
     {
       "type": "software_File",
@@ -1259,7 +1259,6 @@
       "name": "src/braking_envelope.c",
       "software_primaryPurpose": "source",
       "contentType": "text/x-c",
-      "summary": "Fictional source artifact owned by threat-estimator.",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -1271,7 +1270,8 @@
           "algorithm": "sha1",
           "hashValue": "101c8ca5aa61656c901eb3c57984dec566e78974"
         }
-      ]
+      ],
+      "summary": "Fictional source artifact owned by threat-estimator."
     },
     {
       "type": "software_File",
@@ -1280,7 +1280,6 @@
       "name": "src/object_track_fusion.c",
       "software_primaryPurpose": "source",
       "contentType": "text/x-c",
-      "summary": "Fictional source artifact owned by object-fusion.",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -1292,7 +1291,8 @@
           "algorithm": "sha1",
           "hashValue": "24657c80f7b2e62340ca51ad5c676c77e83ceb06"
         }
-      ]
+      ],
+      "summary": "Fictional source artifact owned by object-fusion."
     },
     {
       "type": "software_File",
@@ -1301,7 +1301,6 @@
       "name": "src/pedestrian_classifier_adapter.c",
       "software_primaryPurpose": "source",
       "contentType": "text/x-c",
-      "summary": "Fictional source artifact owned by object-fusion.",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -1313,7 +1312,8 @@
           "algorithm": "sha1",
           "hashValue": "5fdaebccd6b18896e6886f65af2d57a095a76e51"
         }
-      ]
+      ],
+      "summary": "Fictional source artifact owned by object-fusion."
     },
     {
       "type": "software_File",
@@ -1322,7 +1322,6 @@
       "name": "src/radar_camera_plausibility.c",
       "software_primaryPurpose": "source",
       "contentType": "text/x-c",
-      "summary": "Fictional source artifact owned by signal-plausibility.",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -1334,7 +1333,8 @@
           "algorithm": "sha1",
           "hashValue": "8180809ef79fc6a9a01854052b2b31471cb6f0ff"
         }
-      ]
+      ],
+      "summary": "Fictional source artifact owned by signal-plausibility."
     },
     {
       "type": "software_File",
@@ -1343,7 +1343,6 @@
       "name": "src/vehicle_signal_monitor.c",
       "software_primaryPurpose": "source",
       "contentType": "text/x-c",
-      "summary": "Fictional source artifact owned by signal-plausibility.",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -1355,7 +1354,8 @@
           "algorithm": "sha1",
           "hashValue": "9d9728d40581938bf2d377dba76b45d1404f94a2"
         }
-      ]
+      ],
+      "summary": "Fictional source artifact owned by signal-plausibility."
     },
     {
       "type": "software_File",
@@ -1364,7 +1364,6 @@
       "name": "src/brake_demand_arbitrator.c",
       "software_primaryPurpose": "source",
       "contentType": "text/x-c",
-      "summary": "Fictional source artifact owned by brake-arbitrator.",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -1376,7 +1375,8 @@
           "algorithm": "sha1",
           "hashValue": "0dc07b40fd6f749f30a8b0a46de303c7ba4fa7ae"
         }
-      ]
+      ],
+      "summary": "Fictional source artifact owned by brake-arbitrator."
     },
     {
       "type": "software_File",
@@ -1385,7 +1385,6 @@
       "name": "src/driver_override.c",
       "software_primaryPurpose": "source",
       "contentType": "text/x-c",
-      "summary": "Fictional source artifact owned by brake-arbitrator.",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -1397,7 +1396,8 @@
           "algorithm": "sha1",
           "hashValue": "e9bf5bf162480d2abd045543d9cf6b8f9b06381c"
         }
-      ]
+      ],
+      "summary": "Fictional source artifact owned by brake-arbitrator."
     },
     {
       "type": "software_File",
@@ -1406,7 +1406,6 @@
       "name": "src/lockstep_monitor.c",
       "software_primaryPurpose": "source",
       "contentType": "text/x-c",
-      "summary": "Fictional source artifact owned by safety-supervisor.",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -1418,7 +1417,8 @@
           "algorithm": "sha1",
           "hashValue": "ed755d22d1e3a12e1deb3a19fc3d8c9690223a0b"
         }
-      ]
+      ],
+      "summary": "Fictional source artifact owned by safety-supervisor."
     },
     {
       "type": "software_File",
@@ -1427,7 +1427,6 @@
       "name": "src/deadline_monitor.c",
       "software_primaryPurpose": "source",
       "contentType": "text/x-c",
-      "summary": "Fictional source artifact owned by safety-supervisor.",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -1439,7 +1438,8 @@
           "algorithm": "sha1",
           "hashValue": "318dcec7d734466f9aec105aaf971500fd48ebf2"
         }
-      ]
+      ],
+      "summary": "Fictional source artifact owned by safety-supervisor."
     },
     {
       "type": "software_File",
@@ -1448,7 +1448,6 @@
       "name": "src/can_e2e_gateway.c",
       "software_primaryPurpose": "source",
       "contentType": "text/x-c",
-      "summary": "Fictional source artifact owned by vehicle-gateway.",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -1460,7 +1459,8 @@
           "algorithm": "sha1",
           "hashValue": "b8a983fbb3fc143707ae63ed414470e5e14b6d39"
         }
-      ]
+      ],
+      "summary": "Fictional source artifact owned by vehicle-gateway."
     },
     {
       "type": "software_File",
@@ -1469,7 +1469,6 @@
       "name": "generated/aeb_messages.pb.c",
       "software_primaryPurpose": "source",
       "contentType": "text/x-c",
-      "summary": "Fictional source artifact owned by vehicle-gateway.",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -1481,7 +1480,8 @@
           "algorithm": "sha1",
           "hashValue": "bf9f89ac2ba8763bc8a2674311d2030b6d7bbb29"
         }
-      ]
+      ],
+      "summary": "Fictional source artifact owned by vehicle-gateway."
     },
     {
       "type": "software_File",
@@ -1490,7 +1490,6 @@
       "name": "src/safety_event_memory.c",
       "software_primaryPurpose": "source",
       "contentType": "text/x-c",
-      "summary": "Fictional source artifact owned by diagnostics.",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -1502,7 +1501,8 @@
           "algorithm": "sha1",
           "hashValue": "7e986b9bdb58f099cf98fd7cd2b6e458342d22aa"
         }
-      ]
+      ],
+      "summary": "Fictional source artifact owned by diagnostics."
     },
     {
       "type": "software_File",
@@ -1511,7 +1511,6 @@
       "name": "src/freeze_frame.c",
       "software_primaryPurpose": "source",
       "contentType": "text/x-c",
-      "summary": "Fictional source artifact owned by diagnostics.",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -1523,7 +1522,8 @@
           "algorithm": "sha1",
           "hashValue": "3da5bfa6f32e3156ca617c64f3455af2d686a64a"
         }
-      ]
+      ],
+      "summary": "Fictional source artifact owned by diagnostics."
     },
     {
       "type": "software_File",
@@ -1533,7 +1533,6 @@
       "software_primaryPurpose": "executable",
       "software_artifactSize": 1482752,
       "contentType": "application/x-elf",
-      "summary": "Fictional target ELF for the release candidate.",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -1545,7 +1544,8 @@
           "algorithm": "sha1",
           "hashValue": "d98145b8237ec48c83378425e8d1ea2dcb0d4d29"
         }
-      ]
+      ],
+      "summary": "Fictional target ELF for the release candidate."
     },
     {
       "type": "software_File",
@@ -1555,7 +1555,6 @@
       "software_primaryPurpose": "firmware",
       "software_artifactSize": 917504,
       "contentType": "application/octet-stream",
-      "summary": "Fictional flash image for the release candidate.",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -1567,7 +1566,8 @@
           "algorithm": "sha1",
           "hashValue": "0c87b64d5d62e421f5a8c1acb81a1b0e7629afc4"
         }
-      ]
+      ],
+      "summary": "Fictional flash image for the release candidate."
     },
     {
       "type": "software_File",
@@ -1577,7 +1577,6 @@
       "software_primaryPurpose": "configuration",
       "software_artifactSize": 18342,
       "contentType": "application/xml",
-      "summary": "Fictional production-intent calibration with controlled safety limits.",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -1589,7 +1588,8 @@
           "algorithm": "sha1",
           "hashValue": "698a086f4823207c56aa40941f6060eab8788287"
         }
-      ]
+      ],
+      "summary": "Fictional production-intent calibration with controlled safety limits."
     },
     {
       "type": "software_File",
@@ -1601,7 +1601,6 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/person/priya-nair"
       ],
       "contentType": "application/pdf",
-      "summary": "HARA and safety goals review report. Synthetic evidence metadata only; no real report is included.",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -1613,7 +1612,8 @@
           "algorithm": "sha1",
           "hashValue": "44da80d6a87ba36dece5297ed0464afa54f65f0c"
         }
-      ]
+      ],
+      "summary": "HARA and safety goals review report. Synthetic evidence metadata only; no real report is included."
     },
     {
       "type": "software_File",
@@ -1625,7 +1625,6 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/person/luca-bernard"
       ],
       "contentType": "application/pdf",
-      "summary": "Functional and technical safety concept review record. Synthetic evidence metadata only; no real report is included.",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -1637,7 +1636,8 @@
           "algorithm": "sha1",
           "hashValue": "b3dbf7b78d006abbd383fe4a65c3b40acee90a30"
         }
-      ]
+      ],
+      "summary": "Functional and technical safety concept review record. Synthetic evidence metadata only; no real report is included."
     },
     {
       "type": "software_File",
@@ -1649,7 +1649,6 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/person/priya-nair"
       ],
       "contentType": "application/pdf",
-      "summary": "Fault-tree and software FMEA report. Synthetic evidence metadata only; no real report is included.",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -1661,7 +1660,8 @@
           "algorithm": "sha1",
           "hashValue": "4f5c26d637310f1aea480ccae69219f1c7c1cc77"
         }
-      ]
+      ],
+      "summary": "Fault-tree and software FMEA report. Synthetic evidence metadata only; no real report is included."
     },
     {
       "type": "software_File",
@@ -1673,7 +1673,6 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/person/tomasz-kowalski"
       ],
       "contentType": "application/pdf",
-      "summary": "AEB system HIL regression report. Synthetic evidence metadata only; no real report is included.",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -1685,7 +1684,8 @@
           "algorithm": "sha1",
           "hashValue": "7eb2dbe75cef124d760cc26cbab6582d649fbfd9"
         }
-      ]
+      ],
+      "summary": "AEB system HIL regression report. Synthetic evidence metadata only; no real report is included."
     },
     {
       "type": "software_File",
@@ -1697,7 +1697,6 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/person/sofia-alvarez"
       ],
       "contentType": "application/pdf",
-      "summary": "Closed-course vehicle validation report. Synthetic evidence metadata only; no real report is included.",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -1709,7 +1708,8 @@
           "algorithm": "sha1",
           "hashValue": "20dfad6108b653f247146e622ff4c58476ce5f1a"
         }
-      ]
+      ],
+      "summary": "Closed-course vehicle validation report. Synthetic evidence metadata only; no real report is included."
     },
     {
       "type": "software_File",
@@ -1721,7 +1721,6 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/person/noah-williams"
       ],
       "contentType": "application/junit+xml",
-      "summary": "Software unit test results. Synthetic evidence metadata only; no real report is included.",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -1733,7 +1732,8 @@
           "algorithm": "sha1",
           "hashValue": "14223f43b620c7e052415b5a3c79735b194bc277"
         }
-      ]
+      ],
+      "summary": "Software unit test results. Synthetic evidence metadata only; no real report is included."
     },
     {
       "type": "software_File",
@@ -1745,7 +1745,6 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/person/aiko-tanaka"
       ],
       "contentType": "text/html",
-      "summary": "Statement, branch, and MC/DC coverage report. Synthetic evidence metadata only; no real report is included.",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -1757,7 +1756,8 @@
           "algorithm": "sha1",
           "hashValue": "802f9c92a70c82d8c551db89f74fb024a2d6ca4d"
         }
-      ]
+      ],
+      "summary": "Statement, branch, and MC/DC coverage report. Synthetic evidence metadata only; no real report is included."
     },
     {
       "type": "software_File",
@@ -1769,7 +1769,6 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/person/aiko-tanaka"
       ],
       "contentType": "application/pdf",
-      "summary": "Static analysis and coding-rule report. Synthetic evidence metadata only; no real report is included.",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -1781,7 +1780,8 @@
           "algorithm": "sha1",
           "hashValue": "27963db20c1efe0239f916b0ef1b8e782f489eba"
         }
-      ]
+      ],
+      "summary": "Static analysis and coding-rule report. Synthetic evidence metadata only; no real report is included."
     },
     {
       "type": "software_File",
@@ -1793,7 +1793,6 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/person/jonah-fischer"
       ],
       "contentType": "application/pdf",
-      "summary": "Independent source review checklist. Synthetic evidence metadata only; no real report is included.",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -1805,7 +1804,8 @@
           "algorithm": "sha1",
           "hashValue": "7292f4714cfdad42020727422f4b1e07bf39c1de"
         }
-      ]
+      ],
+      "summary": "Independent source review checklist. Synthetic evidence metadata only; no real report is included."
     },
     {
       "type": "software_File",
@@ -1817,7 +1817,6 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/person/tomasz-kowalski"
       ],
       "contentType": "text/csv",
-      "summary": "Worst-case execution and end-to-end timing trace. Synthetic evidence metadata only; no real report is included.",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -1829,7 +1828,8 @@
           "algorithm": "sha1",
           "hashValue": "03037afbd23d6f5b69d5a2c4df03c41adb0ce730"
         }
-      ]
+      ],
+      "summary": "Worst-case execution and end-to-end timing trace. Synthetic evidence metadata only; no real report is included."
     },
     {
       "type": "software_File",
@@ -1841,7 +1841,6 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/person/tomasz-kowalski"
       ],
       "contentType": "application/json",
-      "summary": "Sensor, communication, and memory fault-injection log. Synthetic evidence metadata only; no real report is included.",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -1853,7 +1852,8 @@
           "algorithm": "sha1",
           "hashValue": "ce8f19aff7d82924cb42cb5740e798dfa304c415"
         }
-      ]
+      ],
+      "summary": "Sensor, communication, and memory fault-injection log. Synthetic evidence metadata only; no real report is included."
     },
     {
       "type": "software_File",
@@ -1865,7 +1865,6 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/person/sofia-alvarez"
       ],
       "contentType": "video/mp4",
-      "summary": "Night pedestrian target run recording. Synthetic evidence metadata only; no real report is included.",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -1877,7 +1876,8 @@
           "algorithm": "sha1",
           "hashValue": "79196f87ee91a5328a4a2c6d7d12960193e1cd6b"
         }
-      ]
+      ],
+      "summary": "Night pedestrian target run recording. Synthetic evidence metadata only; no real report is included."
     },
     {
       "type": "software_File",
@@ -1889,7 +1889,6 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/person/samuel-okafor"
       ],
       "contentType": "application/pdf",
-      "summary": "Independent release assessment observation. Synthetic evidence metadata only; no real report is included.",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -1901,7 +1900,8 @@
           "algorithm": "sha1",
           "hashValue": "b7f416942a277a46d5fa72c4e029a9bfa83177ee"
         }
-      ]
+      ],
+      "summary": "Independent release assessment observation. Synthetic evidence metadata only; no real report is included."
     },
     {
       "type": "functionalsafety_Assumption",
@@ -7554,6 +7554,246 @@
       "type": "Relationship",
       "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/147",
       "creationInfo": "_:helios-aeb-creation-info",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/helios-aeb-ecu",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/148",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/helios-aeb-ecu",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/149",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/aeb-application",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/150",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/aeb-application",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/151",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/threat-estimator",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/152",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/threat-estimator",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/153",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/object-fusion",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/154",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/object-fusion",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/155",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/signal-plausibility",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/156",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/signal-plausibility",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/157",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/brake-arbitrator",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/158",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/brake-arbitrator",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/159",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/safety-supervisor",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/160",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/safety-supervisor",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/161",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/vehicle-gateway",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/162",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/vehicle-gateway",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/163",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/diagnostics",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/164",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/diagnostics",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/165",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/safety-work-products",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/166",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/safety-work-products",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/167",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/freertos-kernel",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://spdx.org/licenses/MIT"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/168",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/freertos-kernel",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://spdx.org/licenses/MIT"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/169",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/nanopb",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://spdx.org/licenses/Zlib"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/170",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/nanopb",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://spdx.org/licenses/Zlib"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/171",
+      "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/aeb-application",
       "relationshipType": "contains",
       "to": [
@@ -7562,7 +7802,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/148",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/172",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/aeb-application",
       "relationshipType": "contains",
@@ -7572,7 +7812,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/149",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/173",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/threat-estimator",
       "relationshipType": "contains",
@@ -7582,7 +7822,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/150",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/174",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/threat-estimator",
       "relationshipType": "contains",
@@ -7592,7 +7832,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/151",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/175",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/object-fusion",
       "relationshipType": "contains",
@@ -7602,7 +7842,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/152",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/176",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/object-fusion",
       "relationshipType": "contains",
@@ -7612,7 +7852,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/153",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/177",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/signal-plausibility",
       "relationshipType": "contains",
@@ -7622,7 +7862,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/154",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/178",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/signal-plausibility",
       "relationshipType": "contains",
@@ -7632,7 +7872,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/155",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/179",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/brake-arbitrator",
       "relationshipType": "contains",
@@ -7642,7 +7882,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/156",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/180",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/brake-arbitrator",
       "relationshipType": "contains",
@@ -7652,7 +7892,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/157",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/181",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/safety-supervisor",
       "relationshipType": "contains",
@@ -7662,7 +7902,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/158",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/182",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/safety-supervisor",
       "relationshipType": "contains",
@@ -7672,7 +7912,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/159",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/183",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/vehicle-gateway",
       "relationshipType": "contains",
@@ -7682,7 +7922,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/160",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/184",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/vehicle-gateway",
       "relationshipType": "contains",
@@ -7692,7 +7932,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/161",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/185",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/diagnostics",
       "relationshipType": "contains",
@@ -7702,7 +7942,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/162",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/186",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/diagnostics",
       "relationshipType": "contains",
@@ -7712,7 +7952,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/163",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/187",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/safety-work-products",
       "relationshipType": "contains",
@@ -7734,7 +7974,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/164",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/188",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/helios-aeb-ecu",
       "relationshipType": "assumes",
@@ -7751,7 +7991,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/165",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/189",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/helios-aeb-ecu",
       "relationshipType": "hasSpecification",
@@ -7764,7 +8004,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/166",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/190",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#specification/safety-plan",
       "relationshipType": "hasSpecification",
@@ -7775,7 +8015,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/167",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/191",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#specification/item-definition",
       "relationshipType": "hasRequirement",
@@ -7796,7 +8036,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/168",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/192",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#specification/software-architecture",
       "relationshipType": "hasRequirement",
@@ -7841,7 +8081,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/169",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/193",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#specification/safety-plan",
       "relationshipType": "usesTool",
@@ -7852,7 +8092,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/170",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/194",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/sg-03",
       "relationshipType": "usesTool",
@@ -7863,7 +8103,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/171",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/195",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/sg-04",
       "relationshipType": "usesTool",
@@ -7874,7 +8114,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/172",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/196",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/fsr-02",
       "relationshipType": "usesTool",
@@ -7885,7 +8125,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/173",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/197",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/fsr-03",
       "relationshipType": "usesTool",
@@ -7896,7 +8136,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/174",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/198",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/fsr-04",
       "relationshipType": "usesTool",
@@ -7907,7 +8147,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/175",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/199",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/fsr-05",
       "relationshipType": "usesTool",
@@ -7918,7 +8158,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/176",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/200",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/fsr-06",
       "relationshipType": "usesTool",
@@ -7929,7 +8169,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/177",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/201",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/fsr-07",
       "relationshipType": "usesTool",
@@ -7940,7 +8180,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/178",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/202",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/fsr-08",
       "relationshipType": "usesTool",
@@ -7951,7 +8191,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/179",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/203",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/tsr-01",
       "relationshipType": "usesTool",
@@ -7962,7 +8202,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/180",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/204",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/tsr-03",
       "relationshipType": "usesTool",
@@ -7973,7 +8213,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/181",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/205",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/tsr-04",
       "relationshipType": "usesTool",
@@ -7984,7 +8224,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/182",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/206",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/tsr-05",
       "relationshipType": "usesTool",
@@ -7995,7 +8235,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/183",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/207",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/tsr-06",
       "relationshipType": "usesTool",
@@ -8006,7 +8246,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/184",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/208",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/tsr-10",
       "relationshipType": "usesTool",
@@ -8017,7 +8257,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/185",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/209",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/tsr-11",
       "relationshipType": "usesTool",
@@ -8028,7 +8268,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/186",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/210",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/tsr-12",
       "relationshipType": "usesTool",
@@ -8039,7 +8279,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/187",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/211",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/ssr-est-01",
       "relationshipType": "usesTool",
@@ -8050,7 +8290,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/188",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/212",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/ssr-est-02",
       "relationshipType": "usesTool",
@@ -8061,7 +8301,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/189",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/213",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/ssr-est-03",
       "relationshipType": "usesTool",
@@ -8072,7 +8312,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/190",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/214",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/ssr-est-04",
       "relationshipType": "usesTool",
@@ -8083,7 +8323,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/191",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/215",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/ssr-fus-01",
       "relationshipType": "usesTool",
@@ -8094,7 +8334,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/192",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/216",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/ssr-fus-02",
       "relationshipType": "usesTool",
@@ -8105,7 +8345,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/193",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/217",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/ssr-arb-01",
       "relationshipType": "usesTool",
@@ -8116,7 +8356,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/194",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/218",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/ssr-arb-02",
       "relationshipType": "usesTool",
@@ -8127,7 +8367,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/195",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/219",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/ssr-arb-03",
       "relationshipType": "usesTool",
@@ -8138,7 +8378,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/196",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/220",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/ssr-arb-04",
       "relationshipType": "usesTool",
@@ -8149,7 +8389,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/197",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/221",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/ssr-arb-05",
       "relationshipType": "usesTool",
@@ -8160,7 +8400,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/198",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/222",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/ssr-sup-01",
       "relationshipType": "usesTool",
@@ -8171,7 +8411,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/199",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/223",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/ssr-sup-02",
       "relationshipType": "usesTool",
@@ -8182,7 +8422,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/200",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/224",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/ssr-sup-03",
       "relationshipType": "usesTool",
@@ -8193,7 +8433,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/201",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/225",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/ssr-sup-04",
       "relationshipType": "usesTool",
@@ -8204,7 +8444,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/202",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/226",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/ssr-gwy-02",
       "relationshipType": "usesTool",
@@ -8215,7 +8455,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/203",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/227",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/ssr-gwy-03",
       "relationshipType": "usesTool",
@@ -8226,7 +8466,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/204",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/228",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/ssr-gwy-04",
       "relationshipType": "usesTool",
@@ -8237,7 +8477,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/205",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/229",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/ssr-dia-01",
       "relationshipType": "usesTool",
@@ -8248,7 +8488,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/206",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/230",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/ssr-dia-02",
       "relationshipType": "usesTool",
@@ -8259,7 +8499,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/207",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/231",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/ssr-dia-03",
       "relationshipType": "usesTool",
@@ -8270,7 +8510,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/208",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/232",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/fsr-01",
       "relationshipType": "usesTool",
@@ -8281,7 +8521,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/209",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/233",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/tsr-02",
       "relationshipType": "usesTool",
@@ -8292,7 +8532,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/210",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/234",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/tsr-07",
       "relationshipType": "usesTool",
@@ -8303,7 +8543,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/211",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/235",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/tsr-08",
       "relationshipType": "usesTool",
@@ -8314,7 +8554,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/212",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/236",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#verification/ssr-app-01",
       "relationshipType": "usesTool",
@@ -8325,7 +8565,7 @@
     },
     {
       "type": "LifecycleScopedRelationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/213",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/237",
       "creationInfo": "_:helios-aeb-creation-info",
       "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#file/evidence/coverage-report",
       "relationshipType": "usesTool",
@@ -8353,6 +8593,8 @@
       ],
       "element": [
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/northstar-mobility-labs",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/amazon-web-services",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/petteri-aimonen",
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/person/maya-chen",
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/person/luca-bernard",
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/person/priya-nair",
@@ -8375,6 +8617,7 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#specification/safety-plan",
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#specification/item-definition",
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#specification/software-architecture",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary",
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/helios-aeb-ecu",
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/aeb-application",
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/threat-estimator",
@@ -8832,33 +9075,30 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/211",
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/212",
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/213",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/amazon-web-services",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/petteri-aimonen",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/helios-aeb-ecu",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/helios-aeb-ecu",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/aeb-application",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/aeb-application",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/threat-estimator",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/threat-estimator",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/object-fusion",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/object-fusion",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/signal-plausibility",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/signal-plausibility",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/brake-arbitrator",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/brake-arbitrator",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/safety-supervisor",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/safety-supervisor",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/vehicle-gateway",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/vehicle-gateway",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/diagnostics",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/diagnostics",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/safety-work-products",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/safety-work-products",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/freertos-kernel",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/freertos-kernel",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/nanopb",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/nanopb"
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/214",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/215",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/216",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/217",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/218",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/219",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/220",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/221",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/222",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/223",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/224",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/225",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/226",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/227",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/228",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/229",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/230",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/231",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/232",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/233",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/234",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/235",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/236",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/237"
       ]
     },
     {
@@ -9029,246 +9269,6 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#tool/synthetic-safety-case-generator"
       ],
       "comment": "Every product, organization, requirement, result, identifier, and evidence record in this document is synthetic and fictional."
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/helios-aeb-ecu",
-      "creationInfo": "_:helios-aeb-creation-info",
-      "relationshipType": "hasDeclaredLicense",
-      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/helios-aeb-ecu",
-      "to": [
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
-      ]
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/helios-aeb-ecu",
-      "creationInfo": "_:helios-aeb-creation-info",
-      "relationshipType": "hasConcludedLicense",
-      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/helios-aeb-ecu",
-      "to": [
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
-      ]
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/aeb-application",
-      "creationInfo": "_:helios-aeb-creation-info",
-      "relationshipType": "hasDeclaredLicense",
-      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/aeb-application",
-      "to": [
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
-      ]
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/aeb-application",
-      "creationInfo": "_:helios-aeb-creation-info",
-      "relationshipType": "hasConcludedLicense",
-      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/aeb-application",
-      "to": [
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
-      ]
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/threat-estimator",
-      "creationInfo": "_:helios-aeb-creation-info",
-      "relationshipType": "hasDeclaredLicense",
-      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/threat-estimator",
-      "to": [
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
-      ]
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/threat-estimator",
-      "creationInfo": "_:helios-aeb-creation-info",
-      "relationshipType": "hasConcludedLicense",
-      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/threat-estimator",
-      "to": [
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
-      ]
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/object-fusion",
-      "creationInfo": "_:helios-aeb-creation-info",
-      "relationshipType": "hasDeclaredLicense",
-      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/object-fusion",
-      "to": [
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
-      ]
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/object-fusion",
-      "creationInfo": "_:helios-aeb-creation-info",
-      "relationshipType": "hasConcludedLicense",
-      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/object-fusion",
-      "to": [
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
-      ]
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/signal-plausibility",
-      "creationInfo": "_:helios-aeb-creation-info",
-      "relationshipType": "hasDeclaredLicense",
-      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/signal-plausibility",
-      "to": [
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
-      ]
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/signal-plausibility",
-      "creationInfo": "_:helios-aeb-creation-info",
-      "relationshipType": "hasConcludedLicense",
-      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/signal-plausibility",
-      "to": [
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
-      ]
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/brake-arbitrator",
-      "creationInfo": "_:helios-aeb-creation-info",
-      "relationshipType": "hasDeclaredLicense",
-      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/brake-arbitrator",
-      "to": [
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
-      ]
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/brake-arbitrator",
-      "creationInfo": "_:helios-aeb-creation-info",
-      "relationshipType": "hasConcludedLicense",
-      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/brake-arbitrator",
-      "to": [
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
-      ]
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/safety-supervisor",
-      "creationInfo": "_:helios-aeb-creation-info",
-      "relationshipType": "hasDeclaredLicense",
-      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/safety-supervisor",
-      "to": [
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
-      ]
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/safety-supervisor",
-      "creationInfo": "_:helios-aeb-creation-info",
-      "relationshipType": "hasConcludedLicense",
-      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/safety-supervisor",
-      "to": [
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
-      ]
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/vehicle-gateway",
-      "creationInfo": "_:helios-aeb-creation-info",
-      "relationshipType": "hasDeclaredLicense",
-      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/vehicle-gateway",
-      "to": [
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
-      ]
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/vehicle-gateway",
-      "creationInfo": "_:helios-aeb-creation-info",
-      "relationshipType": "hasConcludedLicense",
-      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/vehicle-gateway",
-      "to": [
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
-      ]
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/diagnostics",
-      "creationInfo": "_:helios-aeb-creation-info",
-      "relationshipType": "hasDeclaredLicense",
-      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/diagnostics",
-      "to": [
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
-      ]
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/diagnostics",
-      "creationInfo": "_:helios-aeb-creation-info",
-      "relationshipType": "hasConcludedLicense",
-      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/diagnostics",
-      "to": [
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
-      ]
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/safety-work-products",
-      "creationInfo": "_:helios-aeb-creation-info",
-      "relationshipType": "hasDeclaredLicense",
-      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/safety-work-products",
-      "to": [
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
-      ]
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/safety-work-products",
-      "creationInfo": "_:helios-aeb-creation-info",
-      "relationshipType": "hasConcludedLicense",
-      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/safety-work-products",
-      "to": [
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
-      ]
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/freertos-kernel",
-      "creationInfo": "_:helios-aeb-creation-info",
-      "relationshipType": "hasDeclaredLicense",
-      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/freertos-kernel",
-      "to": [
-        "https://spdx.org/licenses/MIT"
-      ]
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/freertos-kernel",
-      "creationInfo": "_:helios-aeb-creation-info",
-      "relationshipType": "hasConcludedLicense",
-      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/freertos-kernel",
-      "to": [
-        "https://spdx.org/licenses/MIT"
-      ]
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/nanopb",
-      "creationInfo": "_:helios-aeb-creation-info",
-      "relationshipType": "hasDeclaredLicense",
-      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/nanopb",
-      "to": [
-        "https://spdx.org/licenses/Zlib"
-      ]
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/nanopb",
-      "creationInfo": "_:helios-aeb-creation-info",
-      "relationshipType": "hasConcludedLicense",
-      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/nanopb",
-      "to": [
-        "https://spdx.org/licenses/Zlib"
-      ]
     }
   ]
 }
