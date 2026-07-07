@@ -505,9 +505,9 @@ export const accessorsMixin = {
     return getRelationshipTargetDisplayName(spdxId, this.elementMap);
   },
   // Tooltip explaining the ExpandedLicensing NoAssertion / None individuals;
-  // '' (no tooltip) for every other relationship target.
-  relTargetTooltip(spdxId) {
-    return licenseIndividualDescription(spdxId);
+  // '' (no tooltip) for any other license reference or relationship target.
+  licenseIndividualTooltip(ref) {
+    return licenseIndividualDescription(ref);
   },
   elementDisplayName(element) {
     return getElementDisplayName(element, this.elementMap);
