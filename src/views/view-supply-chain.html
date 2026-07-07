@@ -376,6 +376,36 @@
                   </div>
                 </template>
               </div>
+
+              <!-- Product state transitions. StateActions are hidden from the
+                   event cards, so surface the resulting state here (left-aligned,
+                   only when it changes) to make lifecycle switches obvious. -->
+              <template x-for="sc in row.stateChanges" :key="sc.spdxId">
+                <div class="mt-2 flex items-center gap-2">
+                  <button
+                    type="button"
+                    @click.stop="selectGraphNode(sc.spdxId)"
+                    class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors"
+                    :class="{
+                      'border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20': sc.tone === 'positive',
+                      'border-rose-500/30 bg-rose-500/10 text-rose-300 hover:bg-rose-500/20': sc.tone === 'exception',
+                      'border-cyan-500/30 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20': sc.tone === 'neutral'
+                    }"
+                    :title="'Entered state: ' + sc.name"
+                  >
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M5 21V4m0 1h12l-2.5 3.5L17 12H5"
+                      />
+                    </svg>
+                    <span x-text="sc.name"></span>
+                  </button>
+                  <span class="h-px flex-1 bg-slate-800"></span>
+                </div>
+              </template>
             </div>
           </div>
         </template>
