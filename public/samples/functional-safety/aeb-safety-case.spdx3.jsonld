@@ -497,7 +497,34 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/210",
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/211",
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/212",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/213"
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/213",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/amazon-web-services",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/petteri-aimonen",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/helios-aeb-ecu",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/helios-aeb-ecu",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/aeb-application",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/aeb-application",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/threat-estimator",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/threat-estimator",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/object-fusion",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/object-fusion",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/signal-plausibility",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/signal-plausibility",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/brake-arbitrator",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/brake-arbitrator",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/safety-supervisor",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/safety-supervisor",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/vehicle-gateway",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/vehicle-gateway",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/diagnostics",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/diagnostics",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/safety-work-products",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/safety-work-products",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/freertos-kernel",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/freertos-kernel",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/nanopb",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/nanopb"
       ]
     },
     {
@@ -506,6 +533,20 @@
       "creationInfo": "_:helios-aeb-creation-info",
       "name": "Northstar Mobility Labs, Functional Safety Team (fictional)",
       "summary": "Fictional organization used only to create this synthetic demonstration."
+    },
+    {
+      "type": "Organization",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/amazon-web-services",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "name": "Amazon Web Services, Inc.",
+      "summary": "Upstream supplier of the FreeRTOS kernel (referenced, not affiliated with this fictional demo)."
+    },
+    {
+      "type": "Person",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/petteri-aimonen",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "name": "Petteri Aimonen",
+      "summary": "Upstream author of nanopb (referenced, not affiliated with this fictional demo)."
     },
     {
       "type": "Person",
@@ -852,6 +893,15 @@
       ]
     },
     {
+      "type": "expandedlicensing_CustomLicense",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "name": "Northstar Mobility Proprietary License v1.0 (fictional)",
+      "expandedlicensing_isOsiApproved": false,
+      "expandedlicensing_isFsfLibre": false,
+      "simplelicensing_licenseText": "Northstar Mobility Proprietary License v1.0 (FICTIONAL - FOR DEMONSTRATION ONLY)\n\nCopyright (c) 2024-2026 Northstar Mobility Labs. All rights reserved.\n\n1. Grant. Subject to the terms of a separately executed safety-critical\n   supply agreement, Northstar Mobility Labs grants the licensed vehicle\n   manufacturer a non-exclusive, non-transferable right to integrate the\n   accompanying Helios AEB software into a single vehicle program.\n\n2. Restrictions. The licensee shall not redistribute, sublicense, reverse\n   engineer, or modify the software except as required to fulfil ISO 26262\n   integration and verification obligations documented in the safety case.\n\n3. Safety obligations. The software is delivered as a safety element out of\n   context (SEooC). The integrator remains responsible for validating the\n   assumptions of use recorded in this SBOM against the target item.\n\n4. Warranty. THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND.\n   This text is entirely fictional and carries no legal effect."
+    },
+    {
       "type": "software_Package",
       "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/helios-aeb-ecu",
       "creationInfo": "_:helios-aeb-creation-info",
@@ -859,7 +909,21 @@
       "software_packageVersion": "4.7.2-rc3",
       "software_primaryPurpose": "firmware",
       "software_packageUrl": "pkg:generic/northstar-mobility/helios-aeb-ecu@4.7.2-rc3",
-      "summary": "Fictional internal package in the synthetic Helios AEB release candidate."
+      "summary": "Fictional internal package in the synthetic Helios AEB release candidate.",
+      "suppliedBy": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/northstar-mobility-labs",
+      "software_copyrightText": "Copyright (c) 2024-2026 Northstar Mobility Labs. All rights reserved.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "f35ba50b1237f45bb11551b46653410a55bcc66c57109a5b32f8e7654c49208e"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "28b7fe81c2e7111d1f4ea15f61c339fc34b3854b"
+        }
+      ]
     },
     {
       "type": "software_Package",
@@ -869,7 +933,21 @@
       "software_packageVersion": "4.7.2",
       "software_primaryPurpose": "application",
       "software_packageUrl": "pkg:generic/northstar-mobility/aeb-application@4.7.2",
-      "summary": "Fictional internal package in the synthetic Helios AEB release candidate."
+      "summary": "Fictional internal package in the synthetic Helios AEB release candidate.",
+      "suppliedBy": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/northstar-mobility-labs",
+      "software_copyrightText": "Copyright (c) 2024-2026 Northstar Mobility Labs. All rights reserved.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "c8143b2865a38e3b575a2d54aff6add32d4110d905e99785afc33479944825d7"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "dc2eec9be34b64f056b7f72f422019eb7d78206f"
+        }
+      ]
     },
     {
       "type": "software_Package",
@@ -879,7 +957,21 @@
       "software_packageVersion": "4.7.2",
       "software_primaryPurpose": "library",
       "software_packageUrl": "pkg:generic/northstar-mobility/threat-estimator@4.7.2",
-      "summary": "Fictional internal package in the synthetic Helios AEB release candidate."
+      "summary": "Fictional internal package in the synthetic Helios AEB release candidate.",
+      "suppliedBy": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/northstar-mobility-labs",
+      "software_copyrightText": "Copyright (c) 2024-2026 Northstar Mobility Labs. All rights reserved.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "107b32f10e9c71d3f097d1d4edbfd57c6091c182c2a152b88ca282b52737c84b"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "46d8a3f023f1544cce2f80c364db207039af11cf"
+        }
+      ]
     },
     {
       "type": "software_Package",
@@ -889,7 +981,21 @@
       "software_packageVersion": "4.7.2",
       "software_primaryPurpose": "library",
       "software_packageUrl": "pkg:generic/northstar-mobility/object-fusion@4.7.2",
-      "summary": "Fictional internal package in the synthetic Helios AEB release candidate."
+      "summary": "Fictional internal package in the synthetic Helios AEB release candidate.",
+      "suppliedBy": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/northstar-mobility-labs",
+      "software_copyrightText": "Copyright (c) 2024-2026 Northstar Mobility Labs. All rights reserved.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "f843ce8b4bdecee499d81e0d2fd75c19ed23632aa8a2bc843518a22e4268da48"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "3f96f10821764c6ba0a6cea8b80403d6ebdb463c"
+        }
+      ]
     },
     {
       "type": "software_Package",
@@ -899,7 +1005,21 @@
       "software_packageVersion": "4.7.2",
       "software_primaryPurpose": "library",
       "software_packageUrl": "pkg:generic/northstar-mobility/signal-plausibility@4.7.2",
-      "summary": "Fictional internal package in the synthetic Helios AEB release candidate."
+      "summary": "Fictional internal package in the synthetic Helios AEB release candidate.",
+      "suppliedBy": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/northstar-mobility-labs",
+      "software_copyrightText": "Copyright (c) 2024-2026 Northstar Mobility Labs. All rights reserved.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "1b96c681783bbfd08dc3d4926f027fafd367b30e3a31ff6f71531057abdaedce"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "14b25805b40b24d7677d73de97987bcea2b48e87"
+        }
+      ]
     },
     {
       "type": "software_Package",
@@ -909,7 +1029,21 @@
       "software_packageVersion": "4.7.2",
       "software_primaryPurpose": "library",
       "software_packageUrl": "pkg:generic/northstar-mobility/brake-arbitrator@4.7.2",
-      "summary": "Fictional internal package in the synthetic Helios AEB release candidate."
+      "summary": "Fictional internal package in the synthetic Helios AEB release candidate.",
+      "suppliedBy": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/northstar-mobility-labs",
+      "software_copyrightText": "Copyright (c) 2024-2026 Northstar Mobility Labs. All rights reserved.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "0591f81127e269a7734b0e06354ea9a9349a4e812f65a7159f8898b515beeed8"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "e3dd7877151131def406ed495ff61e7519e2b62f"
+        }
+      ]
     },
     {
       "type": "software_Package",
@@ -919,7 +1053,21 @@
       "software_packageVersion": "4.7.2",
       "software_primaryPurpose": "library",
       "software_packageUrl": "pkg:generic/northstar-mobility/safety-supervisor@4.7.2",
-      "summary": "Fictional internal package in the synthetic Helios AEB release candidate."
+      "summary": "Fictional internal package in the synthetic Helios AEB release candidate.",
+      "suppliedBy": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/northstar-mobility-labs",
+      "software_copyrightText": "Copyright (c) 2024-2026 Northstar Mobility Labs. All rights reserved.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "e3781278f0d61963f784e63b201b03f6e9a0d13a06ee353d54c90eb2a3aa001d"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "6938f81866d77acd62c6a82a670908d2ab49593b"
+        }
+      ]
     },
     {
       "type": "software_Package",
@@ -929,7 +1077,21 @@
       "software_packageVersion": "4.7.2",
       "software_primaryPurpose": "library",
       "software_packageUrl": "pkg:generic/northstar-mobility/vehicle-gateway@4.7.2",
-      "summary": "Fictional internal package in the synthetic Helios AEB release candidate."
+      "summary": "Fictional internal package in the synthetic Helios AEB release candidate.",
+      "suppliedBy": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/northstar-mobility-labs",
+      "software_copyrightText": "Copyright (c) 2024-2026 Northstar Mobility Labs. All rights reserved.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "52fdbe43e84e18818f50c24f8adf1addbc39bd358372042c0a1ff9e822e1309e"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "d9cc7e1e04372867d55bfd4e3b36e7febe87ff7c"
+        }
+      ]
     },
     {
       "type": "software_Package",
@@ -939,7 +1101,21 @@
       "software_packageVersion": "4.7.2",
       "software_primaryPurpose": "library",
       "software_packageUrl": "pkg:generic/northstar-mobility/diagnostics@4.7.2",
-      "summary": "Fictional internal package in the synthetic Helios AEB release candidate."
+      "summary": "Fictional internal package in the synthetic Helios AEB release candidate.",
+      "suppliedBy": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/northstar-mobility-labs",
+      "software_copyrightText": "Copyright (c) 2024-2026 Northstar Mobility Labs. All rights reserved.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "8aec49962debacfb3b8027bcd93a4be3932c60e43ba88048b7ee3901d7adf2ae"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "75be8eef3b3f2a21983524801c5ebcda2778795c"
+        }
+      ]
     },
     {
       "type": "software_Package",
@@ -949,7 +1125,21 @@
       "software_packageVersion": "4.7.2-rc3",
       "software_primaryPurpose": "documentation",
       "software_packageUrl": "pkg:generic/northstar-mobility/safety-work-products@4.7.2-rc3",
-      "summary": "Fictional internal package in the synthetic Helios AEB release candidate."
+      "summary": "Fictional internal package in the synthetic Helios AEB release candidate.",
+      "suppliedBy": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/northstar-mobility-labs",
+      "software_copyrightText": "Copyright (c) 2024-2026 Northstar Mobility Labs. All rights reserved.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "a28f552a6de7009e2dc2a3c69fe1ebcc04d6a78817f8c9c5e2e508cbc7c44cd6"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "ce968c2a03379e53d6b82cef59758674352de008"
+        }
+      ]
     },
     {
       "type": "software_Package",
@@ -959,7 +1149,21 @@
       "software_packageVersion": "11.1.0",
       "software_primaryPurpose": "operatingSystem",
       "software_packageUrl": "pkg:github/FreeRTOS/FreeRTOS-Kernel@V11.1.0",
-      "summary": "Third-party package version selected by the fictional release candidate."
+      "summary": "Third-party package version selected by the fictional release candidate.",
+      "suppliedBy": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/amazon-web-services",
+      "software_copyrightText": "Copyright (C) 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "c136bdca10e2246f51838ed4f834fb5ad34a23dd32f9de34443f20dfd99be019"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "b1ace586bde930d1cf154685145585daa44b9682"
+        }
+      ]
     },
     {
       "type": "software_Package",
@@ -969,7 +1173,21 @@
       "software_packageVersion": "0.4.9.1",
       "software_primaryPurpose": "library",
       "software_packageUrl": "pkg:github/nanopb/nanopb@0.4.9.1",
-      "summary": "Third-party package version selected by the fictional release candidate."
+      "summary": "Third-party package version selected by the fictional release candidate.",
+      "suppliedBy": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/petteri-aimonen",
+      "software_copyrightText": "Copyright (c) 2011 Petteri Aimonen",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "31e5cb35b2dd336d5333d21dac890ad0271b56ec7aaf1cab22220af4ad56301a"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "6b798e1d81c79b85399035445b21b65a7fa8033a"
+        }
+      ]
     },
     {
       "type": "software_File",
@@ -978,7 +1196,19 @@
       "name": "src/aeb_main.c",
       "software_primaryPurpose": "source",
       "contentType": "text/x-c",
-      "summary": "Fictional source artifact owned by aeb-application."
+      "summary": "Fictional source artifact owned by aeb-application.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "fcf33d60ce17341a39e990c1722fb1ce89e93ea9921eb75a86cb699bb86ae2ac"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "2810d2bbcd973baa46ee3ec54cf9489fa2aebc67"
+        }
+      ]
     },
     {
       "type": "software_File",
@@ -987,7 +1217,19 @@
       "name": "src/aeb_state_machine.c",
       "software_primaryPurpose": "source",
       "contentType": "text/x-c",
-      "summary": "Fictional source artifact owned by aeb-application."
+      "summary": "Fictional source artifact owned by aeb-application.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "33c2000ea6cf4a1a4935cb4c3971463eedcd156b34cc06ef3b66fe4b05f3fc8c"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "5218b3a5295e2049a8a2849e04231dd49e922ad1"
+        }
+      ]
     },
     {
       "type": "software_File",
@@ -996,7 +1238,19 @@
       "name": "src/ttc_estimator.c",
       "software_primaryPurpose": "source",
       "contentType": "text/x-c",
-      "summary": "Fictional source artifact owned by threat-estimator."
+      "summary": "Fictional source artifact owned by threat-estimator.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "f79b245516265366b02a081da1adc152ef4ca272188425671611c117cbd83186"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "982f636b1338323114c87cddf52e1aac6e8333ac"
+        }
+      ]
     },
     {
       "type": "software_File",
@@ -1005,7 +1259,19 @@
       "name": "src/braking_envelope.c",
       "software_primaryPurpose": "source",
       "contentType": "text/x-c",
-      "summary": "Fictional source artifact owned by threat-estimator."
+      "summary": "Fictional source artifact owned by threat-estimator.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "aa66ac3c8c9bd8d5e897665afc0962de3fefcda177eeb7b21624d5d97681a5ff"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "101c8ca5aa61656c901eb3c57984dec566e78974"
+        }
+      ]
     },
     {
       "type": "software_File",
@@ -1014,7 +1280,19 @@
       "name": "src/object_track_fusion.c",
       "software_primaryPurpose": "source",
       "contentType": "text/x-c",
-      "summary": "Fictional source artifact owned by object-fusion."
+      "summary": "Fictional source artifact owned by object-fusion.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "d4264025246afd21001c72cc9cfad78a0bcf5f8a388156f584ca8bcc1c3a4567"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "24657c80f7b2e62340ca51ad5c676c77e83ceb06"
+        }
+      ]
     },
     {
       "type": "software_File",
@@ -1023,7 +1301,19 @@
       "name": "src/pedestrian_classifier_adapter.c",
       "software_primaryPurpose": "source",
       "contentType": "text/x-c",
-      "summary": "Fictional source artifact owned by object-fusion."
+      "summary": "Fictional source artifact owned by object-fusion.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "6422ea634ad34a5971c00e23f1dea6b714cc724826bdd8390c572bfcdab9c2ac"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "5fdaebccd6b18896e6886f65af2d57a095a76e51"
+        }
+      ]
     },
     {
       "type": "software_File",
@@ -1032,7 +1322,19 @@
       "name": "src/radar_camera_plausibility.c",
       "software_primaryPurpose": "source",
       "contentType": "text/x-c",
-      "summary": "Fictional source artifact owned by signal-plausibility."
+      "summary": "Fictional source artifact owned by signal-plausibility.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "4bc9dd3c7fa4ddce33cbc32cbddcc3074586eabd8f02b0cc0e20994da4592d03"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "8180809ef79fc6a9a01854052b2b31471cb6f0ff"
+        }
+      ]
     },
     {
       "type": "software_File",
@@ -1041,7 +1343,19 @@
       "name": "src/vehicle_signal_monitor.c",
       "software_primaryPurpose": "source",
       "contentType": "text/x-c",
-      "summary": "Fictional source artifact owned by signal-plausibility."
+      "summary": "Fictional source artifact owned by signal-plausibility.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "4be0c53f896bcc03c4575d871f92b42ef40d702dc28baa07918abe248bae06a9"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "9d9728d40581938bf2d377dba76b45d1404f94a2"
+        }
+      ]
     },
     {
       "type": "software_File",
@@ -1050,7 +1364,19 @@
       "name": "src/brake_demand_arbitrator.c",
       "software_primaryPurpose": "source",
       "contentType": "text/x-c",
-      "summary": "Fictional source artifact owned by brake-arbitrator."
+      "summary": "Fictional source artifact owned by brake-arbitrator.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "50a1604f29fba0d6113bf1c40ec20fd96fd7f568d39bcd19c836395236977b97"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "0dc07b40fd6f749f30a8b0a46de303c7ba4fa7ae"
+        }
+      ]
     },
     {
       "type": "software_File",
@@ -1059,7 +1385,19 @@
       "name": "src/driver_override.c",
       "software_primaryPurpose": "source",
       "contentType": "text/x-c",
-      "summary": "Fictional source artifact owned by brake-arbitrator."
+      "summary": "Fictional source artifact owned by brake-arbitrator.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "50604cada3819ab5c8356979b2b3f834dd1aa3e2817541ef40913bdd3d53a7f5"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "e9bf5bf162480d2abd045543d9cf6b8f9b06381c"
+        }
+      ]
     },
     {
       "type": "software_File",
@@ -1068,7 +1406,19 @@
       "name": "src/lockstep_monitor.c",
       "software_primaryPurpose": "source",
       "contentType": "text/x-c",
-      "summary": "Fictional source artifact owned by safety-supervisor."
+      "summary": "Fictional source artifact owned by safety-supervisor.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "858ccea9810bb3465f450d94cf7fb4c8424678c8d266d8f0853745bd22e1d6e9"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "ed755d22d1e3a12e1deb3a19fc3d8c9690223a0b"
+        }
+      ]
     },
     {
       "type": "software_File",
@@ -1077,7 +1427,19 @@
       "name": "src/deadline_monitor.c",
       "software_primaryPurpose": "source",
       "contentType": "text/x-c",
-      "summary": "Fictional source artifact owned by safety-supervisor."
+      "summary": "Fictional source artifact owned by safety-supervisor.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "00133deaa8e8c288539098828f1c5e5940806555d671c1eead84328a5a36fdf7"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "318dcec7d734466f9aec105aaf971500fd48ebf2"
+        }
+      ]
     },
     {
       "type": "software_File",
@@ -1086,7 +1448,19 @@
       "name": "src/can_e2e_gateway.c",
       "software_primaryPurpose": "source",
       "contentType": "text/x-c",
-      "summary": "Fictional source artifact owned by vehicle-gateway."
+      "summary": "Fictional source artifact owned by vehicle-gateway.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "572314c37aaa3568f8e542da8d057082376fdad07e4fb8b64007481d3e27d21c"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "b8a983fbb3fc143707ae63ed414470e5e14b6d39"
+        }
+      ]
     },
     {
       "type": "software_File",
@@ -1095,7 +1469,19 @@
       "name": "generated/aeb_messages.pb.c",
       "software_primaryPurpose": "source",
       "contentType": "text/x-c",
-      "summary": "Fictional source artifact owned by vehicle-gateway."
+      "summary": "Fictional source artifact owned by vehicle-gateway.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "2388cd3997185aa35869343bc84b4aa4b3e905595ce73fd5fb1076588a97c823"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "bf9f89ac2ba8763bc8a2674311d2030b6d7bbb29"
+        }
+      ]
     },
     {
       "type": "software_File",
@@ -1104,7 +1490,19 @@
       "name": "src/safety_event_memory.c",
       "software_primaryPurpose": "source",
       "contentType": "text/x-c",
-      "summary": "Fictional source artifact owned by diagnostics."
+      "summary": "Fictional source artifact owned by diagnostics.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "7bcd472cd0587fc7758c1d5ddc06d2d8bd3e49174c18209d8517139672fee092"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "7e986b9bdb58f099cf98fd7cd2b6e458342d22aa"
+        }
+      ]
     },
     {
       "type": "software_File",
@@ -1113,7 +1511,19 @@
       "name": "src/freeze_frame.c",
       "software_primaryPurpose": "source",
       "contentType": "text/x-c",
-      "summary": "Fictional source artifact owned by diagnostics."
+      "summary": "Fictional source artifact owned by diagnostics.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "d96925c9e696d6d2631ea85e83f0b96fe1fadc973ee8fd51248ff4d5bd9c139b"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "3da5bfa6f32e3156ca617c64f3455af2d686a64a"
+        }
+      ]
     },
     {
       "type": "software_File",
@@ -1123,7 +1533,19 @@
       "software_primaryPurpose": "executable",
       "software_artifactSize": 1482752,
       "contentType": "application/x-elf",
-      "summary": "Fictional target ELF for the release candidate."
+      "summary": "Fictional target ELF for the release candidate.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "de0dd867e067d32cf352cd5286b14b64a5619a3806e0ab13353cbb675b09880d"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "d98145b8237ec48c83378425e8d1ea2dcb0d4d29"
+        }
+      ]
     },
     {
       "type": "software_File",
@@ -1133,7 +1555,19 @@
       "software_primaryPurpose": "firmware",
       "software_artifactSize": 917504,
       "contentType": "application/octet-stream",
-      "summary": "Fictional flash image for the release candidate."
+      "summary": "Fictional flash image for the release candidate.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "69b3c39dce96bb6db8f61cf344d3e9528f5e0cd8f7dc3c776ece07314fec5796"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "0c87b64d5d62e421f5a8c1acb81a1b0e7629afc4"
+        }
+      ]
     },
     {
       "type": "software_File",
@@ -1143,7 +1577,19 @@
       "software_primaryPurpose": "configuration",
       "software_artifactSize": 18342,
       "contentType": "application/xml",
-      "summary": "Fictional production-intent calibration with controlled safety limits."
+      "summary": "Fictional production-intent calibration with controlled safety limits.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "8a0a5323040cd7885b1361811f66cafab6a58863b7e8ae47eee17c48f8ed5c04"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "698a086f4823207c56aa40941f6060eab8788287"
+        }
+      ]
     },
     {
       "type": "software_File",
@@ -1155,7 +1601,19 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/person/priya-nair"
       ],
       "contentType": "application/pdf",
-      "summary": "HARA and safety goals review report. Synthetic evidence metadata only; no real report is included."
+      "summary": "HARA and safety goals review report. Synthetic evidence metadata only; no real report is included.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "6ebebb75001badf2f298e9d641690e03f2e81318d112cb0087e51539d432fabc"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "44da80d6a87ba36dece5297ed0464afa54f65f0c"
+        }
+      ]
     },
     {
       "type": "software_File",
@@ -1167,7 +1625,19 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/person/luca-bernard"
       ],
       "contentType": "application/pdf",
-      "summary": "Functional and technical safety concept review record. Synthetic evidence metadata only; no real report is included."
+      "summary": "Functional and technical safety concept review record. Synthetic evidence metadata only; no real report is included.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "4a3601b77f6c21a642365ac7522549a7e1c87220ab59e76619f45bb016d550b1"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "b3dbf7b78d006abbd383fe4a65c3b40acee90a30"
+        }
+      ]
     },
     {
       "type": "software_File",
@@ -1179,7 +1649,19 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/person/priya-nair"
       ],
       "contentType": "application/pdf",
-      "summary": "Fault-tree and software FMEA report. Synthetic evidence metadata only; no real report is included."
+      "summary": "Fault-tree and software FMEA report. Synthetic evidence metadata only; no real report is included.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "9d31461e0fc1fc44c815f0fff027a8f05e837c9c3d27dfbd44ab4fa1972024c2"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "4f5c26d637310f1aea480ccae69219f1c7c1cc77"
+        }
+      ]
     },
     {
       "type": "software_File",
@@ -1191,7 +1673,19 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/person/tomasz-kowalski"
       ],
       "contentType": "application/pdf",
-      "summary": "AEB system HIL regression report. Synthetic evidence metadata only; no real report is included."
+      "summary": "AEB system HIL regression report. Synthetic evidence metadata only; no real report is included.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "b0b6e601dab3fc0aa7f339ac47ff434df60905202bb2e144350de895d29e61c8"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "7eb2dbe75cef124d760cc26cbab6582d649fbfd9"
+        }
+      ]
     },
     {
       "type": "software_File",
@@ -1203,7 +1697,19 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/person/sofia-alvarez"
       ],
       "contentType": "application/pdf",
-      "summary": "Closed-course vehicle validation report. Synthetic evidence metadata only; no real report is included."
+      "summary": "Closed-course vehicle validation report. Synthetic evidence metadata only; no real report is included.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "ff9b63ec1378ded2b863e691d49087526490b16c76a4d6952aa4bc5664c8ab22"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "20dfad6108b653f247146e622ff4c58476ce5f1a"
+        }
+      ]
     },
     {
       "type": "software_File",
@@ -1215,7 +1721,19 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/person/noah-williams"
       ],
       "contentType": "application/junit+xml",
-      "summary": "Software unit test results. Synthetic evidence metadata only; no real report is included."
+      "summary": "Software unit test results. Synthetic evidence metadata only; no real report is included.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "e926773c6c3ba1d438eb4be4521a5d8013bef9d867c829733e70009b0587f2a2"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "14223f43b620c7e052415b5a3c79735b194bc277"
+        }
+      ]
     },
     {
       "type": "software_File",
@@ -1227,7 +1745,19 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/person/aiko-tanaka"
       ],
       "contentType": "text/html",
-      "summary": "Statement, branch, and MC/DC coverage report. Synthetic evidence metadata only; no real report is included."
+      "summary": "Statement, branch, and MC/DC coverage report. Synthetic evidence metadata only; no real report is included.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "65cb614abb94c5c5c361f12f1a4a631f8c2f40bc3d4c5ee96abbef9986eebccb"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "802f9c92a70c82d8c551db89f74fb024a2d6ca4d"
+        }
+      ]
     },
     {
       "type": "software_File",
@@ -1239,7 +1769,19 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/person/aiko-tanaka"
       ],
       "contentType": "application/pdf",
-      "summary": "Static analysis and coding-rule report. Synthetic evidence metadata only; no real report is included."
+      "summary": "Static analysis and coding-rule report. Synthetic evidence metadata only; no real report is included.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "2aa87cbd9afa79c84648a6bae4cc609f638ecfd5275d05a380582ca008631cc1"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "27963db20c1efe0239f916b0ef1b8e782f489eba"
+        }
+      ]
     },
     {
       "type": "software_File",
@@ -1251,7 +1793,19 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/person/jonah-fischer"
       ],
       "contentType": "application/pdf",
-      "summary": "Independent source review checklist. Synthetic evidence metadata only; no real report is included."
+      "summary": "Independent source review checklist. Synthetic evidence metadata only; no real report is included.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "daf3ca3380773e87b7bfb4360f58cbd1229168038a4e6b59c84a66e519eff620"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "7292f4714cfdad42020727422f4b1e07bf39c1de"
+        }
+      ]
     },
     {
       "type": "software_File",
@@ -1263,7 +1817,19 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/person/tomasz-kowalski"
       ],
       "contentType": "text/csv",
-      "summary": "Worst-case execution and end-to-end timing trace. Synthetic evidence metadata only; no real report is included."
+      "summary": "Worst-case execution and end-to-end timing trace. Synthetic evidence metadata only; no real report is included.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "50c6d9f59fad82a232d80417e8d8ae5a0c2e1963e2ba1e003fff737b26125d20"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "03037afbd23d6f5b69d5a2c4df03c41adb0ce730"
+        }
+      ]
     },
     {
       "type": "software_File",
@@ -1275,7 +1841,19 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/person/tomasz-kowalski"
       ],
       "contentType": "application/json",
-      "summary": "Sensor, communication, and memory fault-injection log. Synthetic evidence metadata only; no real report is included."
+      "summary": "Sensor, communication, and memory fault-injection log. Synthetic evidence metadata only; no real report is included.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "4ec3d28daa0bd47c9d50d9d1cc7cd3640ec338980420361a82b347f19d5e7d47"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "ce8f19aff7d82924cb42cb5740e798dfa304c415"
+        }
+      ]
     },
     {
       "type": "software_File",
@@ -1287,7 +1865,19 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/person/sofia-alvarez"
       ],
       "contentType": "video/mp4",
-      "summary": "Night pedestrian target run recording. Synthetic evidence metadata only; no real report is included."
+      "summary": "Night pedestrian target run recording. Synthetic evidence metadata only; no real report is included.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "9fcdaaf17cbbe49e11730eb96621f0a17eb94b8cc9e1f149a04897034b7c15c1"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "79196f87ee91a5328a4a2c6d7d12960193e1cd6b"
+        }
+      ]
     },
     {
       "type": "software_File",
@@ -1299,7 +1889,19 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/person/samuel-okafor"
       ],
       "contentType": "application/pdf",
-      "summary": "Independent release assessment observation. Synthetic evidence metadata only; no real report is included."
+      "summary": "Independent release assessment observation. Synthetic evidence metadata only; no real report is included.",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "234ff3204fa8408a881c24dcd6cda41371068f03cd29728ef479a8c93445d3d1"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "b7f416942a277a46d5fa72c4e029a9bfa83177ee"
+        }
+      ]
     },
     {
       "type": "functionalsafety_Assumption",
@@ -8229,7 +8831,34 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/210",
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/211",
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/212",
-        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/213"
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/213",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/amazon-web-services",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#agent/petteri-aimonen",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/helios-aeb-ecu",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/helios-aeb-ecu",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/aeb-application",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/aeb-application",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/threat-estimator",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/threat-estimator",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/object-fusion",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/object-fusion",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/signal-plausibility",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/signal-plausibility",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/brake-arbitrator",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/brake-arbitrator",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/safety-supervisor",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/safety-supervisor",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/vehicle-gateway",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/vehicle-gateway",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/diagnostics",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/diagnostics",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/safety-work-products",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/safety-work-products",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/freertos-kernel",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/freertos-kernel",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/nanopb",
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/nanopb"
       ]
     },
     {
@@ -8400,6 +9029,246 @@
         "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#tool/synthetic-safety-case-generator"
       ],
       "comment": "Every product, organization, requirement, result, identifier, and evidence record in this document is synthetic and fictional."
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/helios-aeb-ecu",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "relationshipType": "hasDeclaredLicense",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/helios-aeb-ecu",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/helios-aeb-ecu",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "relationshipType": "hasConcludedLicense",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/helios-aeb-ecu",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/aeb-application",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "relationshipType": "hasDeclaredLicense",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/aeb-application",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/aeb-application",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "relationshipType": "hasConcludedLicense",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/aeb-application",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/threat-estimator",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "relationshipType": "hasDeclaredLicense",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/threat-estimator",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/threat-estimator",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "relationshipType": "hasConcludedLicense",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/threat-estimator",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/object-fusion",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "relationshipType": "hasDeclaredLicense",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/object-fusion",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/object-fusion",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "relationshipType": "hasConcludedLicense",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/object-fusion",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/signal-plausibility",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "relationshipType": "hasDeclaredLicense",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/signal-plausibility",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/signal-plausibility",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "relationshipType": "hasConcludedLicense",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/signal-plausibility",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/brake-arbitrator",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "relationshipType": "hasDeclaredLicense",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/brake-arbitrator",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/brake-arbitrator",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "relationshipType": "hasConcludedLicense",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/brake-arbitrator",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/safety-supervisor",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "relationshipType": "hasDeclaredLicense",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/safety-supervisor",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/safety-supervisor",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "relationshipType": "hasConcludedLicense",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/safety-supervisor",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/vehicle-gateway",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "relationshipType": "hasDeclaredLicense",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/vehicle-gateway",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/vehicle-gateway",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "relationshipType": "hasConcludedLicense",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/vehicle-gateway",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/diagnostics",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "relationshipType": "hasDeclaredLicense",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/diagnostics",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/diagnostics",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "relationshipType": "hasConcludedLicense",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/diagnostics",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/safety-work-products",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "relationshipType": "hasDeclaredLicense",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/safety-work-products",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/safety-work-products",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "relationshipType": "hasConcludedLicense",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/safety-work-products",
+      "to": [
+        "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#license/LicenseRef-Northstar-Proprietary"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/freertos-kernel",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "relationshipType": "hasDeclaredLicense",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/freertos-kernel",
+      "to": [
+        "https://spdx.org/licenses/MIT"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/freertos-kernel",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "relationshipType": "hasConcludedLicense",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/freertos-kernel",
+      "to": [
+        "https://spdx.org/licenses/MIT"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-declared/nanopb",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "relationshipType": "hasDeclaredLicense",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/nanopb",
+      "to": [
+        "https://spdx.org/licenses/Zlib"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#relationship/license-concluded/nanopb",
+      "creationInfo": "_:helios-aeb-creation-info",
+      "relationshipType": "hasConcludedLicense",
+      "from": "https://spdx.org/spdxdocs/helios-aeb-4.7.2-8d0d733c-6e5f-5d9c-9f41-9ef50b713c10#package/nanopb",
+      "to": [
+        "https://spdx.org/licenses/Zlib"
+      ]
     }
   ]
 }
