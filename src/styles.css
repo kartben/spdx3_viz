@@ -624,6 +624,24 @@
   text-align: center;
 }
 
+/* Provenance columns (Origin / Supplier): stack in a narrow container and
+   split into two columns once there's room. Container-query driven so it
+   tracks the width of the (resizable) graph detail panel, not the viewport. */
+.provenance-grid {
+  container-type: inline-size;
+}
+.provenance-cols {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+@container (min-width: 26rem) {
+  .provenance-cols {
+    flex-direction: row;
+    gap: 1rem;
+  }
+}
+
 .detail-promoted-hero {
   padding: 12px 14px;
   border-radius: 10px;
