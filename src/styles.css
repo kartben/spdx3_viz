@@ -20,6 +20,16 @@
 }
 
 /* ==========================================================================
+   Base scale
+   Most spacing/sizing in this app is defined in rem, so bumping the root
+   font-size scales the whole UI (matches how it looks at 110% browser zoom).
+   ========================================================================== */
+
+html {
+  font-size: 110%;
+}
+
+/* ==========================================================================
    Full-viewport height
    `h-screen` (100vh) overshoots the visible area on mobile browsers, whose
    dynamic toolbars are excluded from vh. That pushes the bottom of the UI
