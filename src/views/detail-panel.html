@@ -331,8 +331,8 @@
             >
               <span
                 class="flex items-center flex-shrink-0"
-                :style="`color: ${nodeTypeColor(getNodeType(elementMap.get(sup.id) || {}))}`"
-                x-html="elementIcon(elementMap.get(sup.id) || { spdxId: sup.id }, 'w-3.5 h-3.5')"
+                :style="`color: ${nodeTypeColor(elementMap.get(sup.id) ? getNodeType(elementMap.get(sup.id)) : 'agent')}`"
+                x-html="elementMap.get(sup.id) ? elementIcon(elementMap.get(sup.id), 'w-3.5 h-3.5') : nodeTypeIconSvg('agent', 'w-3.5 h-3.5')"
               ></span>
               <span class="flex-1 truncate" x-text="sup.displayName"></span>
               <svg
