@@ -25,6 +25,8 @@ import {
   isMeaningfulValue,
   enumValue,
   formatByteSize,
+  formatQudtMeasure,
+  formatHardwareDimensions,
   normalizeUrl,
   copyToClipboard,
   licenseIndividualDescription
@@ -1480,7 +1482,11 @@ export const accessorsMixin = {
     push('Serial number', el.hardware_serialNumber, true);
     push('Batch number', el.hardware_batchNumber, true);
     push('Release date', el.hardware_releaseDate && this.formatDate(el.hardware_releaseDate));
-    push('Mass', el.hardware_mass);
+    if (el.hardware_dimensions) {
+      const dims = this.elementMap.get(el.hardware_dimensions);
+      push('Dimensions', formatHardwareDimensions(dims));
+    }
+    push('Mass', formatQudtMeasure(el.hardware_mass));
     push('Bulk quantity', el.hardware_bulkQuantity);
     push('Additional information', el.hardware_additionalInformation);
     return out;

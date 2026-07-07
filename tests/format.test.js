@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { enumValue } from '../src/lib/index.js';
+import {
+  enumValue,
+  formatHardwareDimensions,
+  formatQudtMeasure
+} from '../src/lib/index.js';
 
 test('enumValue keeps a bare vocab token unchanged', () => {
   assert.equal(enumValue('pass'), 'pass');
@@ -36,4 +40,36 @@ test('enumValue returns empty string for empty/nullish input', () => {
   assert.equal(enumValue('   '), '');
   assert.equal(enumValue(null), '');
   assert.equal(enumValue(undefined), '');
+});
+
+test('formatQudtMeasure renders mass and length measures', () => {
+  assert.equal(
+    formatQudtMeasure({ type: 'MeasureOfMass', quantity: 5, unitQUDT: 'GM' }),
+    '5 g'
+  );
+  assert.equal(
+    formatQudtMeasure({ type: 'MeasureOfMass', quantity: 0.84, unitQUDT: 'KiloGM' }),
+    '0.84 kg'
+  );
+  assert.equal(
+    formatQudtMeasure({ type: 'MeasureOfLength', quantity: 210, unitQUDT: 'MilliM' }),
+    '210 mm'
+  );
+});
+
+test('formatQudtMeasure returns empty string for invalid input', () => {
+  assert.equal(formatQudtMeasure(null), '');
+  assert.equal(formatQudtMeasure({ unitQUDT: 'GM' }), '');
+  assert.equal(formatQudtMeasure({ quantity: 'n/a', unitQUDT: 'GM' }), '');
+});
+
+test('formatHardwareDimensions joins axes with a shared unit label', () => {
+  assert.equal(
+    formatHardwareDimensions({
+      hardware_xAxisLength: { quantity: 210, unitQUDT: 'MilliM' },
+      hardware_yAxisLength: { quantity: 297, unitQUDT: 'MilliM' },
+      hardware_zAxisLength: { quantity: 0.1, unitQUDT: 'MilliM' }
+    }),
+    '210 × 297 × 0.1 mm'
+  );
 });

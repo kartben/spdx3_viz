@@ -154,6 +154,61 @@ export function formatByteSize(bytes) {
   return `${rounded} ${units[i]}`;
 }
 
+// SPDX Hardware profile QUDT unit tokens used in sample SBOMs. Unknown tokens fall
+// back to the raw unitQUDT value.
+const QUDT_UNIT_LABELS = {
+  MilliM: 'mm',
+  M: 'm',
+  GM: 'g',
+  KiloGM: 'kg'
+};
+
+function formatMeasureQuantity(quantity) {
+  const n = Number(quantity);
+  if (!Number.isFinite(n)) return '';
+  return Number.isInteger(n) ? String(n) : String(n);
+}
+
+/**
+ * Formats an SPDX UnitOfMeasure value (MeasureOfMass, MeasureOfLength, …) for
+ * display. Returns '' when quantity is missing or not numeric.
+ *
+ * @param {{ quantity?: number, unitQUDT?: string } | null | undefined} measure
+ * @returns {string}
+ */
+export function formatQudtMeasure(measure) {
+  if (!measure || typeof measure !== 'object') return '';
+  const quantity = formatMeasureQuantity(measure.quantity);
+  if (!quantity) return '';
+  const unit = QUDT_UNIT_LABELS[measure.unitQUDT] || measure.unitQUDT || '';
+  return unit ? `${quantity} ${unit}` : quantity;
+}
+
+/**
+ * Formats a hardware_Dimensions element as "X × Y × Z unit" when all axes share
+ * the same QUDT unit, otherwise joins each axis with its own unit label.
+ *
+ * @param {{ hardware_xAxisLength?: object, hardware_yAxisLength?: object, hardware_zAxisLength?: object } | null | undefined} dims
+ * @returns {string}
+ */
+export function formatHardwareDimensions(dims) {
+  if (!dims || typeof dims !== 'object') return '';
+  const measures = [
+    dims.hardware_xAxisLength,
+    dims.hardware_yAxisLength,
+    dims.hardware_zAxisLength
+  ].filter((m) => m && Number.isFinite(Number(m.quantity)));
+  if (!measures.length) return '';
+  const unit = measures[0]?.unitQUDT;
+  const sameUnit = measures.every((m) => m.unitQUDT === unit);
+  if (sameUnit && unit) {
+    const nums = measures.map((m) => formatMeasureQuantity(m.quantity)).filter(Boolean);
+    const label = QUDT_UNIT_LABELS[unit] || unit;
+    return `${nums.join(' × ')} ${label}`;
+  }
+  return measures.map((m) => formatQudtMeasure(m)).filter(Boolean).join(' × ');
+}
+
 /**
  * Normalizes a download/VCS location into a followable http(s) href, stripping a
  * leading `git+`; returns '' for non-web or NOASSERTION locations.
