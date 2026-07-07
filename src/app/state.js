@@ -93,9 +93,9 @@ export function createState() {
     fileSearch: '', // in-view filter for the Files list
     hardwareSearch: '', // in-view filter for the Hardware list
     supplyChainSearch: '', // in-view filter for the Supply Chain list
-    supplyChainKindFilter: '', // '' = all, else action | process | state
+    supplyChainFamilyFilter: '', // '' = all, else a supplyChainFamily key (create, move, …)
     supplyChainExceptionFilter: '', // '' = all, 'exception' | 'resolved'
-    supplyChainViewMode: 'timeline', // Supply Chain angle: timeline | custody | lifecycle | map
+    supplyChainViewMode: 'timeline', // Supply Chain angle: timeline | states | processes | custody | map
     requirementSearch: '', // in-view filter for the Functional Safety list
     requirementKindFilter: '', // '' = all, else an FS element type to show only
     requirementStatusFilter: '', // '' = all, else a verification-status key or 'noimpl'

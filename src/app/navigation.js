@@ -3,6 +3,7 @@
    cards, and the navigateToX drill-downs with scroll-into-view. */
 
 import { buildShareHash, copyToClipboard, snippetFileRef } from '../lib/index.js';
+import { CLASS, isA } from '../spdx/model.js';
 
 // View id -> the nav-snapshot field holding that view's expanded card, for
 // carrying the selection in a share link.
@@ -891,10 +892,36 @@ export const navigationMixin = {
   },
   navigateToSupplyChain(spdxId) {
     this.supplyChainSearch = '';
-    this.supplyChainKindFilter = '';
+    this.supplyChainFamilyFilter = '';
     this.supplyChainExceptionFilter = '';
-    this.supplyChainViewMode = 'timeline'; // the expanded card lives in the timeline list
     this.switchView('supplychain');
+
+    // Route to the angle that actually shows this element: processes live in the
+    // Processes playbook, states (and the StateActions that drive them) in the
+    // States machine, and every other action in the Timeline.
+    const el = this.elementMap.get(spdxId);
+    const kind = this.supplyChainKind(el);
+    if (kind === 'process') {
+      this.supplyChainViewMode = 'processes';
+      this.scrollToNavTarget('supplychain', spdxId);
+      return;
+    }
+    if (kind === 'state') {
+      // A State element itself has no card; land on the StateAction that reached
+      // it so the stepper card highlights.
+      const reachedBy = this.supplyChainStateActions(el)[0];
+      this.supplyChainViewMode = 'states';
+      const target = reachedBy?.spdxId || spdxId;
+      this.scrollToNavTarget('supplychain', target);
+      return;
+    }
+    if (isA(el?.type, CLASS.supplychain_StateAction)) {
+      this.supplyChainViewMode = 'states';
+      this.expandedSupplyChain = spdxId;
+      this.scrollToNavTarget('supplychain', spdxId);
+      return;
+    }
+    this.supplyChainViewMode = 'timeline'; // the expanded card lives in the timeline list
     this.expandedSupplyChain = spdxId;
     this.scrollToNavTarget('supplychain', spdxId);
   },

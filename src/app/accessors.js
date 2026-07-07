@@ -306,6 +306,9 @@ export const accessorsMixin = {
     ) {
       return 'create';
     }
+    // Move must be tested before Modify: SPDX makes Transport/Storage subclasses
+    // of ModifyProcess, but here they belong to the custody/move phase, so the
+    // specific classes win over the generic Modify catch-all below.
     if (
       isA(t, CLASS.supplychain_TransportAction) ||
       isA(t, CLASS.supplychain_TransportProcess) ||
@@ -313,10 +316,17 @@ export const accessorsMixin = {
       isA(t, CLASS.supplychain_StorageProcess) ||
       isA(t, CLASS.supplychain_ResponsibilityChangeAction) ||
       isA(t, CLASS.supplychain_ResponsibilityChangeProcess) ||
-      isA(t, CLASS.supplychain_BoundaryDefinitionProcess) ||
       isA(t, CLASS.supplychain_BoundaryCrossingAction)
     ) {
       return 'move';
+    }
+    if (
+      isA(t, CLASS.supplychain_ModifyAction) ||
+      isA(t, CLASS.supplychain_ModifyProcess) ||
+      isA(t, CLASS.supplychain_BoundaryDefinitionAction) ||
+      isA(t, CLASS.supplychain_BoundaryDefinitionProcess)
+    ) {
+      return 'modify';
     }
     if (
       isA(t, CLASS.supplychain_InspectionAction) ||
@@ -355,6 +365,18 @@ export const accessorsMixin = {
         text: 'text-slate-300',
         border: 'border-slate-700',
         ring: 'ring-sky-500/20',
+        surface: 'bg-slate-900/50',
+        hover: 'hover:bg-slate-800/70',
+        panel: 'bg-slate-900/70 border-slate-700/60',
+        chip: 'bg-slate-700/70 text-slate-200 ring-1 ring-slate-600/40'
+      },
+      modify: {
+        label: 'Modify',
+        dot: 'bg-slate-500',
+        iconBg: 'bg-slate-700/60',
+        text: 'text-slate-300',
+        border: 'border-slate-700',
+        ring: 'ring-amber-500/20',
         surface: 'bg-slate-900/50',
         hover: 'hover:bg-slate-800/70',
         panel: 'bg-slate-900/70 border-slate-700/60',
@@ -446,6 +468,21 @@ export const accessorsMixin = {
       }
     };
     return meta[this.supplyChainFamily(el)] || meta.other;
+  },
+
+  supplyChainFamilyLabel(key) {
+    return (
+      {
+        create: 'Create / make',
+        modify: 'Modify',
+        move: 'Move / custody',
+        verify: 'Inspect & test',
+        exception: 'Exception',
+        operate: 'Use / retire',
+        process: 'Defined process',
+        other: 'Other'
+      }[key] || 'Other'
+    );
   },
 
   supplyChainProcessActionClass(process) {
@@ -693,13 +730,58 @@ export const accessorsMixin = {
   supplyChainModeIcon(key) {
     const d = {
       timeline: 'M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01',
-      custody: 'M7 16V4m0 0L4 7m3-3l3 3M17 8v12m0 0l3-3m-3 3l-3-3',
-      lifecycle:
+      states:
+        'M5 7a2 2 0 012-2h3v4H5V7zm9-2h3a2 2 0 012 2v2h-5V5zM5 15h5v4H7a2 2 0 01-2-2v-2zm9 0h5v2a2 2 0 01-2 2h-3v-4zM10 9h4m-2-2v10',
+      processes:
         'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4',
+      custody: 'M7 16V4m0 0L4 7m3-3l3 3M17 8v12m0 0l3-3m-3 3l-3-3',
       map: 'M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 4m0 13V4m0 0L9 7'
     }[key];
     if (!d) return '';
     return `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${d}"/></svg>`;
+  },
+
+  // Lazily renders the product state machine into the #sc-state-diagram host.
+  // Mermaid is dynamically imported so it stays out of the initial bundle;
+  // failures degrade quietly since the stepper below carries the same detail.
+  // The host lives inside an x-if subtree, so it may not be in the DOM the
+  // instant a trigger fires; retry across a few frames until it appears.
+  async renderSupplyChainStateDiagram(retries = 10) {
+    const host = document.getElementById('sc-state-diagram');
+    if (!host) {
+      if (retries > 0) {
+        requestAnimationFrame(() => this.renderSupplyChainStateDiagram(retries - 1));
+      }
+      return;
+    }
+    const source = this.supplyChainStateMermaid;
+    if (!source) {
+      host.innerHTML = '';
+      delete host.dataset.src;
+      return;
+    }
+    if (host.dataset.src === source) return;
+    host.dataset.src = source;
+    try {
+      const { renderMermaid } = await import('../lib/mermaid.js');
+      const svg = await renderMermaid(source);
+      if (host.dataset.src !== source) return; // superseded while awaiting
+      host.innerHTML = svg;
+      // Best-effort click-through: a state node jumps to its stepper card.
+      this.supplyChainLifecycleSteps.forEach((step, i) => {
+        const node = [...host.querySelectorAll('g[id]')].find((g) =>
+          new RegExp(`(?:^|[-_])s${i}(?:[-_]|$)`).test(g.id)
+        );
+        if (!node) return;
+        node.style.cursor = 'pointer';
+        node.addEventListener('click', () => this.navigateToSupplyChain(step.action.spdxId));
+      });
+    } catch (err) {
+      console.error('Supply chain state diagram render failed', err);
+      host.innerHTML =
+        '<div class="text-xs text-rose-300 px-1 py-3">Could not render the state diagram.</div>';
+      delete host.dataset.src;
+    }
   },
 
   supplyChainRefName(id) {

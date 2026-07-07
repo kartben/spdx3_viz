@@ -23,7 +23,7 @@ export const CHANGELOG = [
       },
       {
         tag: 'Added',
-        text: 'Supply Chain view with timeline, custody, lifecycle, and route-map angles.'
+        text: 'Supply Chain view with timeline, state-machine, processes, custody, and route-map angles.'
       }
     ]
   },
