@@ -196,7 +196,7 @@ export function computeQualityReport(data) {
   const hasAuthor = (data.creators || []).length > 0;
   const hasTimestamp = isMeaningfulValue(data.createdDate);
   const hasDependencyRel = (data.relationships || []).some(
-    (r) => r.relationshipType === RELATIONSHIP_TYPES.DEPENDS_ON
+    (r) => r?.relationshipType === RELATIONSHIP_TYPES.DEPENDS_ON
   );
 
   // --- License & copyright (packages only — file-level licensing is rarely
