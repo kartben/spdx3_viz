@@ -496,13 +496,12 @@ export const accessorsMixin = {
     return groups;
   },
 
-  // Agent(s) that supplied this package (Artifact.suppliedBy /
-  // software_suppliedBy). Each reference is resolved to a display row so the
-  // expanded package card can name and link to its supplier(s), mirroring the
-  // "Supplier of" links shown from the Agent side. Self-references and
-  // NoAssertion are dropped; inline agents with no spdxId render unlinked.
-  packageSuppliers(pkg) {
-    const raw = pkg?.suppliedBy ?? pkg?.software_suppliedBy;
+  // Resolves a package's agent-provenance references (suppliedBy / originatedBy)
+  // into display rows, mirroring the "Supplier of" / "Originator of" links shown
+  // from the Agent side. Each ref may be a bare spdxId or an inline agent object;
+  // self-references and NoAssertion are dropped, duplicates collapsed, and an
+  // inline name is preferred when the referenced agent isn't in the graph.
+  _resolveAgentRefs(pkg, raw) {
     const arr = Array.isArray(raw) ? raw : raw == null || raw === '' ? [] : [raw];
     const out = [];
     const seen = new Set();
@@ -529,6 +528,16 @@ export const accessorsMixin = {
       out.push({ id, displayName });
     }
     return out;
+  },
+
+  // Agent(s) that supplied this package (Artifact.suppliedBy / software_suppliedBy).
+  packageSuppliers(pkg) {
+    return this._resolveAgentRefs(pkg, pkg?.suppliedBy ?? pkg?.software_suppliedBy);
+  },
+
+  // Agent(s) that originated this package (Artifact.originatedBy / software_originatedBy).
+  packageOriginators(pkg) {
+    return this._resolveAgentRefs(pkg, pkg?.originatedBy ?? pkg?.software_originatedBy);
   },
 
   // Sort order for relationship groups (most relevant first)
