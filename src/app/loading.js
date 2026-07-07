@@ -76,7 +76,7 @@ export const loadingMixin = {
     try {
       const res = await fetch('samples/samples.json');
       if (res.ok) {
-        this.samples = await res.json();
+        this.samples = (await res.json()).filter((s) => !s.disabled);
         // Sizes come from the manifest (uncompressed totals) so the label
         // reflects the real download rather than a gzipped Content-Length.
         this.samples.forEach((s) => {
