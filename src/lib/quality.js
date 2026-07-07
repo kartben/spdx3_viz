@@ -11,6 +11,7 @@
  */
 import { isMeaningfulValue, cleanName } from './format.js';
 import { getExternalIdentifiers } from './provenance.js';
+import { RELATIONSHIP_TYPES } from '../config.js';
 
 const OFFENDER_CAP = 10;
 
@@ -144,15 +145,31 @@ function offenderList(elements, total) {
   };
 }
 
+// A per-component NTIA/FSCT element: coverage plus a (capped) list of the
+// components missing it, matching the "nonconformant components" lists the
+// reference tool (spdx/ntia-conformance-checker) emits per element.
+function componentElement(key, label, missing, total) {
+  return {
+    key,
+    label,
+    level: 'component',
+    covered: total - missing.length,
+    total,
+    missing: offenderList(missing, missing.length)
+  };
+}
+
 /**
  * Computes the document-level quality report.
  *
  * @param {Object} data - Duck-typed subset of the app's parsed state:
  *   packages, files, licenses, vulnerabilities, creators, createdDate,
- *   externalRefStats, relFromIndex, relToIndex, dependentIndex.
+ *   specVersion, relationships, externalRefStats, relFromIndex, relToIndex,
+ *   dependentIndex.
  * @returns {{
  *   overall: {score: number, grade: string},
  *   categories: Array<{key: string, label: string, score: number, weight: number, applicable: boolean, detail: string}>,
+ *   ntia: {specVersion: string, totalComponents: number, isConformant: boolean, elements: Array<Object>, fsct: Array<Object>},
  *   insights: Object
  * }}
  */
@@ -166,29 +183,21 @@ export function computeQualityReport(data) {
 
   const { coveredPkgIds, familyByPkgId } = buildPackageLicenseCoverage(packages, licenses);
 
-  // --- NTIA minimum elements (per-package name/version/supplier/id/relationship
-  // checks, plus the document-level author/timestamp) ---
-  let ntiaPasses = 0;
-  let ntiaChecks = 0;
-  const missingVersion = [];
-  const missingSupplier = [];
-  packages.forEach((p) => {
-    const checks = [
-      isMeaningfulValue(p.name),
-      pkgHasVersion(p),
-      pkgHasSupplier(p),
-      pkgHasIdentifier(p),
-      elIsConnected(p, relFromIndex, relToIndex)
-    ];
-    ntiaChecks += checks.length;
-    ntiaPasses += checks.filter(Boolean).length;
-    if (!checks[1]) missingVersion.push(p);
-    if (!checks[2]) missingSupplier.push(p);
-  });
+  // --- NTIA minimum elements ---
+  // Per-component name/version/supplier/identifier coverage, plus three
+  // document-level checks: an author, a timestamp, and whether the document
+  // asserts any dependency relationship at all. Element definitions and the
+  // `ntia` report shape (built below) mirror spdx/ntia-conformance-checker so
+  // the CI parity check is 1:1 (see scripts/check-ntia-parity.mjs).
+  const missingName = packages.filter((p) => !isMeaningfulValue(p.name));
+  const missingVersion = packages.filter((p) => !pkgHasVersion(p));
+  const missingSupplier = packages.filter((p) => !pkgHasSupplier(p));
+  const missingIdentifier = packages.filter((p) => !pkgHasIdentifier(p));
   const hasAuthor = (data.creators || []).length > 0;
   const hasTimestamp = isMeaningfulValue(data.createdDate);
-  ntiaChecks += 2;
-  ntiaPasses += (hasAuthor ? 1 : 0) + (hasTimestamp ? 1 : 0);
+  const hasDependencyRel = (data.relationships || []).some(
+    (r) => r.relationshipType === RELATIONSHIP_TYPES.DEPENDS_ON
+  );
 
   // --- License & copyright (packages only — file-level licensing is rarely
   // practiced even in well-formed SBOMs, so scoring it would just add noise) ---
@@ -218,12 +227,59 @@ export function computeQualityReport(data) {
     ? structuralParts.reduce((a, b) => a + b, 0) / structuralParts.length
     : null;
 
+  // --- Detailed NTIA report (the seven minimum elements) plus the CISA FSCT3
+  // license/copyright extension. Component-element coverage is vacuously 1 when
+  // there are no components, matching the reference tool's "allProvided". ---
+  const total = packages.length;
+  const rate = (missing) => (total > 0 ? (total - missing.length) / total : 1);
+  const ntiaScore =
+    ((rate(missingName) +
+      rate(missingVersion) +
+      rate(missingSupplier) +
+      rate(missingIdentifier) +
+      (hasDependencyRel ? 1 : 0) +
+      (hasAuthor ? 1 : 0) +
+      (hasTimestamp ? 1 : 0)) /
+      7) *
+    100;
+  const ntiaConformant =
+    missingName.length === 0 &&
+    missingVersion.length === 0 &&
+    missingSupplier.length === 0 &&
+    missingIdentifier.length === 0 &&
+    hasDependencyRel &&
+    hasAuthor &&
+    hasTimestamp;
+  const ntia = {
+    specVersion: data.specVersion || '',
+    totalComponents: total,
+    isConformant: ntiaConformant,
+    elements: [
+      componentElement('name', 'Component name', missingName, total),
+      componentElement('version', 'Version of the component', missingVersion, total),
+      componentElement('supplier', 'Supplier name', missingSupplier, total),
+      componentElement('identifier', 'Unique identifier', missingIdentifier, total),
+      {
+        key: 'dependency',
+        label: 'Dependency relationships',
+        level: 'document',
+        present: hasDependencyRel
+      },
+      { key: 'author', label: 'SBOM author', level: 'document', present: hasAuthor },
+      { key: 'timestamp', label: 'Timestamp', level: 'document', present: hasTimestamp }
+    ],
+    fsct: [
+      componentElement('concludedLicense', 'Concluded license', missingLicense, total),
+      componentElement('copyrightText', 'Copyright text', missingCopyright, total)
+    ]
+  };
+
   const categories = [
     {
       key: 'ntia',
       label: 'NTIA Minimum Elements',
       weight: 0.3,
-      score: ntiaChecks > 0 ? (ntiaPasses / ntiaChecks) * 100 : null,
+      score: ntiaScore,
       detail: 'Name, version, supplier, a unique identifier and a relationship, per package'
     },
     {
@@ -306,6 +362,7 @@ export function computeQualityReport(data) {
   return {
     overall: { score: Math.round(overallScore), grade: gradeFor(overallScore) },
     categories,
+    ntia,
     insights: {
       packageCount: packages.length,
       fileCount: files.length,

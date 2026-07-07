@@ -12,6 +12,10 @@ export const CHANGELOG = [
       {
         tag: 'Added',
         text: 'Command palette (⌘K / Ctrl-K) to search and jump anywhere.'
+      },
+      {
+        tag: 'Added',
+        text: 'Per-element NTIA minimum-elements breakdown in Statistics.'
       }
     ]
   },
