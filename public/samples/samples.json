@@ -137,11 +137,21 @@
   },
   {
     "id": "supply-chain",
+    "disabled": true,
     "name": "Supply chain (synthetic)",
     "icon": "favicon.svg",
     "description": "Synthetic SPDX 3.1 SupplyChain sample for an industrial edge gateway: HBOM/SBOM, custody, transport, quarantine, resolution, and deployment.",
     "dir": "samples/supply-chain",
     "files": ["arborlink-sg1-supply-chain.spdx3.jsonld"],
     "size": 165625
+  },
+  {
+    "id": "paper-plane",
+    "name": "Paper plane supply chain (synthetic)",
+    "emoji": "✈️",
+    "description": "Minimalistic paper plane supply chain sample showing design, folding, and flight testing. (Other complex samples are commented out in the manifest.)",
+    "dir": "samples/paper-plane",
+    "files": ["paper-plane-supply-chain.spdx3.jsonld"],
+    "size": 32051
   }
 ]
