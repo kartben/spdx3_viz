@@ -16,6 +16,10 @@ export const CHANGELOG = [
       {
         tag: 'Added',
         text: 'Per-element NTIA minimum-elements breakdown in Statistics.'
+      },
+      {
+        tag: 'Added',
+        text: 'Package cards show supplier and origin agents.'
       }
     ]
   },
