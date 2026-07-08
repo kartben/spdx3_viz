@@ -1,12 +1,11 @@
-<div x-show="currentView === 'impact'" class="fade-in space-y-6 max-w-6xl">
+<div x-show="currentView === 'impact'" class="fade-in max-w-6xl">
   <template x-if="mountedViews.impact">
     <div class="space-y-6">
-      <!-- Header -->
-      <div class="flex items-center gap-3 flex-wrap">
+      <div class="flex items-start gap-3 flex-wrap">
         <div class="min-w-0">
-          <h2 class="text-lg font-semibold text-white flex items-center gap-2">Impact</h2>
+          <h2 class="text-lg font-semibold text-white">Impact</h2>
           <p class="text-sm text-slate-400 mt-0.5">
-            Trace why a component is in the build, and what a change to it would ripple into.
+            Pick one element to trace why it is present and what would be affected by a change.
           </p>
         </div>
         <button
@@ -22,140 +21,169 @@
               d="M19 12H5M11 6l-6 6 6 6"
             />
           </svg>
-          All components
+          Choose another element
         </button>
       </div>
 
-      <!-- ============ LANDING (rankings) ============ -->
-      <div x-show="!impactFocus" class="space-y-6">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <!-- Most depended-upon -->
-          <div class="card">
-            <div class="flex items-center gap-2 mb-4">
-              <h3 class="text-sm font-semibold text-white">Most depended-upon</h3>
-              <span class="text-xs text-slate-500 ml-auto">by transitive dependents</span>
+      <div
+        x-show="!impactFocus"
+        class="grid grid-cols-1 xl:grid-cols-[minmax(0,1.35fr)_minmax(22rem,0.65fr)] gap-4"
+      >
+        <section class="card">
+          <div class="flex items-start justify-between gap-3 flex-wrap mb-4">
+            <div>
+              <h3 class="text-sm font-semibold text-white">Find an element</h3>
+              <p class="text-xs text-slate-500 mt-1">
+                Search packages, files, and other dependency-graph nodes.
+              </p>
             </div>
-            <div class="space-y-1">
-              <template x-for="row in impactRankings.mostDependedUpon" :key="row.id">
-                <button
-                  @click="focusImpact(row.id)"
-                  class="grid grid-cols-[1fr_auto] items-center gap-3 w-full text-left rounded-lg px-2 py-1.5 -mx-1 hover:bg-slate-700/40 transition"
-                >
-                  <span class="flex items-center gap-2 min-w-0">
-                    <span
-                      class="flex items-center justify-center flex-shrink-0"
-                      :style="`color:${nodeTypeColor(impactNodeTypeOf(row.id))}`"
-                      x-html="nodeTypeIconSvg(impactNodeTypeOf(row.id), 'w-3.5 h-3.5')"
-                    ></span>
-                    <span
-                      class="text-sm text-slate-300 truncate font-mono"
-                      x-text="relTargetDisplayName(row.id)"
-                    ></span>
-                    <span
-                      x-show="impactVersionOf(row.id)"
-                      class="text-xs text-slate-500 font-mono truncate max-w-[12rem]"
-                      x-text="impactVersionOf(row.id)"
-                    ></span>
-                  </span>
-                  <span class="flex items-center gap-3 flex-shrink-0">
-                    <span
-                      class="hidden sm:block w-24 h-1.5 rounded-full bg-slate-700 overflow-hidden"
-                    >
+            <div class="flex flex-wrap gap-2 text-xs">
+              <span class="badge bg-slate-700/60 text-slate-300">
+                <span x-text="formatCount(impactGraphSummary.elements)"></span>
+                <span class="ml-1">elements</span>
+              </span>
+              <span class="badge bg-slate-700/60 text-slate-300">
+                <span x-text="formatCount(impactGraphSummary.edges)"></span>
+                <span class="ml-1">edges</span>
+              </span>
+              <span class="badge bg-slate-700/60 text-slate-300">
+                <span x-text="formatCount(impactGraphSummary.roots)"></span>
+                <span class="ml-1">roots</span>
+              </span>
+            </div>
+          </div>
+
+          <input
+            x-model.debounce.150ms="impactSearch"
+            type="text"
+            placeholder="Search name, version, SPDX id..."
+            class="w-full bg-slate-900/70 border border-slate-700 rounded-lg text-sm px-3 py-2 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+          />
+
+          <div
+            x-show="!impactSearch.trim()"
+            class="mt-4 rounded-lg border border-slate-700/70 bg-slate-900/40 px-4 py-5 text-sm text-slate-500"
+          >
+            Search for a specific element, or open one of the highest-reach elements on the right.
+          </div>
+
+          <div
+            x-show="impactSearch.trim() && impactSearchResults.length === 0"
+            class="mt-4 rounded-lg border border-slate-700/70 bg-slate-900/40 px-4 py-5 text-sm text-slate-500"
+          >
+            No matching dependency-graph elements.
+          </div>
+
+          <div x-show="impactSearchResults.length" class="mt-4 space-y-1">
+            <template x-for="row in impactSearchResults" :key="row.id">
+              <button
+                type="button"
+                @click="focusImpact(row.id)"
+                class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 w-full text-left rounded-lg px-2.5 py-2 -mx-1 hover:bg-slate-700/40 transition"
+              >
+                <span class="flex items-start gap-2 min-w-0">
+                  <span
+                    class="flex items-center justify-center flex-shrink-0 mt-0.5"
+                    :style="`color:${nodeTypeColor(row.type)}`"
+                    x-html="nodeTypeIconSvg(row.type, 'w-3.5 h-3.5')"
+                  ></span>
+                  <span class="min-w-0">
+                    <span class="flex items-baseline gap-1.5 min-w-0">
                       <span
-                        class="block h-full rounded-full"
-                        :style="`width:${Math.max(6, (row.total / impactRankings.maxTotal) * 100)}%; background:${nodeTypeColor(impactNodeTypeOf(row.id))}`"
+                        class="text-sm text-slate-200 truncate font-mono"
+                        x-text="row.name"
+                      ></span>
+                      <span
+                        x-show="row.version"
+                        class="text-xs text-slate-500 truncate max-w-[12rem] font-mono"
+                        x-text="row.version"
                       ></span>
                     </span>
                     <span
-                      class="text-sm font-semibold text-white tabular-nums w-8 text-right"
+                      class="block text-[11px] text-slate-600 truncate font-mono"
+                      x-text="row.id"
+                    ></span>
+                  </span>
+                </span>
+                <span class="flex items-center gap-2 flex-shrink-0">
+                  <span x-show="row.risk" class="badge" :class="row.risk?.meta.badgeClass">
+                    <span x-text="row.risk?.meta.label"></span>
+                    <span
+                      x-show="row.risk?.score != null"
+                      class="ml-1 font-semibold"
+                      x-text="row.risk?.score"
+                    ></span>
+                  </span>
+                  <span class="text-right">
+                    <span
+                      class="block text-sm font-semibold text-white tabular-nums"
                       x-text="formatCount(row.total)"
                     ></span>
+                    <span class="block text-[10px] text-slate-500">dependents</span>
                   </span>
-                </button>
-              </template>
-              <div
-                x-show="impactRankings.mostDependedUpon.length === 0"
-                class="text-xs text-slate-500 italic px-2 py-4"
-              >
-                No dependency relationships to rank.
-              </div>
-            </div>
+                </span>
+              </button>
+            </template>
           </div>
+        </section>
 
-          <!-- Vulnerable × blast radius (only when the SBOM carries CVSS) -->
-          <div class="card" x-show="hasCvssData && impactRankings.vulnerable.length > 0">
-            <div class="flex items-center gap-2 mb-4">
-              <span
-                class="flex items-center justify-center text-rose-400"
-                x-html="nodeTypeIconSvg('vulnerability', 'w-4 h-4')"
-              ></span>
-              <h3 class="text-sm font-semibold text-white">Vulnerable × blast radius</h3>
-              <span
-                class="text-[10px] uppercase tracking-wider text-rose-300/80 border border-rose-500/30 rounded px-1.5 py-0.5 ml-auto"
-                title="Shown because this SBOM carries in-document CVSS assessments"
-                >CVSS present</span
+        <section class="card">
+          <div class="flex items-center gap-2 mb-4">
+            <h3 class="text-sm font-semibold text-white">Highest reach</h3>
+            <span class="text-xs text-slate-500 ml-auto">transitive dependents</span>
+          </div>
+          <div class="space-y-1">
+            <template x-for="row in impactRankings.mostDependedUpon" :key="row.id">
+              <button
+                type="button"
+                @click="focusImpact(row.id)"
+                class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 w-full text-left rounded-lg px-2 py-1.5 -mx-1 hover:bg-slate-700/40 transition"
               >
-            </div>
-            <div class="space-y-1">
-              <template x-for="row in impactRankings.vulnerable" :key="row.id">
-                <button
-                  @click="focusImpact(row.id)"
-                  class="flex items-center gap-2.5 w-full text-left rounded-lg px-2 py-1.5 -mx-1 hover:bg-slate-700/40 transition"
-                >
+                <span class="flex items-center gap-2 min-w-0">
                   <span
                     class="flex items-center justify-center flex-shrink-0"
-                    :style="`color:${nodeTypeColor(impactNodeTypeOf(row.id))}`"
-                    x-html="nodeTypeIconSvg(impactNodeTypeOf(row.id), 'w-3.5 h-3.5')"
+                    :style="`color:${nodeTypeColor(row.type)}`"
+                    x-html="nodeTypeIconSvg(row.type, 'w-3.5 h-3.5')"
                   ></span>
-                  <span class="flex items-baseline gap-1.5 flex-1 min-w-0">
+                  <span class="min-w-0">
                     <span
-                      class="text-sm text-slate-300 truncate font-mono"
-                      x-text="relTargetDisplayName(row.id)"
+                      class="block text-sm text-slate-300 truncate font-mono"
+                      x-text="row.name"
                     ></span>
                     <span
-                      x-show="impactVersionOf(row.id)"
-                      class="text-xs text-slate-500 font-mono truncate max-w-[12rem]"
-                      x-text="impactVersionOf(row.id)"
+                      x-show="row.version"
+                      class="block text-xs text-slate-500 truncate max-w-[12rem] font-mono"
+                      x-text="row.version"
                     ></span>
                   </span>
+                </span>
+                <span class="flex items-center gap-3 flex-shrink-0">
                   <span
-                    class="badge flex-shrink-0"
-                    :class="cvssSeverityMeta(row.severity).badgeClass"
+                    class="hidden sm:block w-20 h-1.5 rounded-full bg-slate-700 overflow-hidden"
                   >
-                    <span x-text="cvssSeverityMeta(row.severity).label"></span>
                     <span
-                      x-show="row.score != null"
-                      class="ml-1 font-semibold tabular-nums"
-                      x-text="row.score"
+                      class="block h-full rounded-full"
+                      :style="`width:${Math.max(6, (row.total / impactRankings.maxTotal) * 100)}%; background:${nodeTypeColor(row.type)}`"
                     ></span>
                   </span>
                   <span
-                    class="text-[10px] text-slate-500 flex-shrink-0 w-12 text-right"
-                    x-text="`${row.vulnCount} CVE${row.vulnCount === 1 ? '' : 's'}`"
+                    class="text-sm font-semibold text-white tabular-nums w-8 text-right"
+                    x-text="formatCount(row.total)"
                   ></span>
-                  <span
-                    class="text-sm font-semibold text-white tabular-nums flex-shrink-0 w-16 text-right"
-                  >
-                    <span x-text="formatCount(row.total)"></span>
-                    <span class="text-[10px] text-slate-500 font-normal">at risk</span>
-                  </span>
-                </button>
-              </template>
-            </div>
+                </span>
+              </button>
+            </template>
             <div
-              class="mt-3 pt-3 border-t border-slate-700/50 text-xs text-slate-500 leading-relaxed"
+              x-show="impactRankings.mostDependedUpon.length === 0"
+              class="text-xs text-slate-500 italic px-2 py-4"
             >
-              Ranked by <span class="text-slate-300">reach</span>, not severity — a Medium in a
-              widely-used library can outrank a Critical in a leaf. Severity is the worst of each
-              package's CVEs.
+              No dependency relationships to rank.
             </div>
           </div>
-        </div>
+        </section>
       </div>
 
-      <!-- ============ FOCUS (one element) ============ -->
       <div x-show="impactFocus" class="space-y-4">
-        <!-- Focused element -->
         <div class="flex items-center gap-3 flex-wrap">
           <span
             class="flex items-center justify-center flex-shrink-0"
@@ -187,12 +215,38 @@
           </template>
         </div>
 
+        <div
+          class="grid grid-cols-1 sm:grid-cols-3 gap-3"
+          x-data="{ get summary() { return impactSummary(impactFocusElement) }, get dep() { return impactDependents(impactFocus) } }"
+        >
+          <div class="rounded-lg border border-slate-700 bg-slate-900/40 p-3">
+            <div class="text-[11px] uppercase tracking-wide text-slate-500">Reachability</div>
+            <div
+              class="mt-1 text-sm font-semibold text-white"
+              x-text="summary?.isRoot ? 'Document root' : summary?.reachable ? `${summary.hops} hop${summary.hops === 1 ? '' : 's'} from root` : 'Not root-reachable'"
+            ></div>
+          </div>
+          <div class="rounded-lg border border-slate-700 bg-slate-900/40 p-3">
+            <div class="text-[11px] uppercase tracking-wide text-slate-500">Direct dependents</div>
+            <div
+              class="mt-1 text-xl font-bold text-white tabular-nums"
+              x-text="formatCount(dep.direct.length)"
+            ></div>
+          </div>
+          <div class="rounded-lg border border-slate-700 bg-slate-900/40 p-3">
+            <div class="text-[11px] uppercase tracking-wide text-slate-500">Total dependents</div>
+            <div
+              class="mt-1 text-xl font-bold text-white tabular-nums"
+              x-text="formatCount(dep.total)"
+            ></div>
+          </div>
+        </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <!-- Why it's here -->
           <div class="card" x-data="{ get prov() { return impactProvenance(impactFocus) } }">
             <div class="flex items-center gap-2 mb-3">
               <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                Why it's here
+                Why it is here
               </h3>
               <span
                 x-show="prov.reachable && !prov.isRoot"
@@ -203,12 +257,12 @@
 
             <template x-if="prov.isRoot">
               <p class="text-sm text-slate-400">
-                Top-level element — a document root. Nothing else pulls it in.
+                This is a document root. Nothing else pulls it in.
               </p>
             </template>
             <template x-if="!prov.isRoot && !prov.reachable">
               <p class="text-sm text-slate-400">
-                Not reachable from a document root (no dependency or containment path).
+                No dependency or containment path from a document root reaches this element.
               </p>
             </template>
             <template x-if="!prov.isRoot && prov.reachable">
@@ -217,6 +271,7 @@
                   <template x-for="(hop, i) in prov.resolvedPaths[0]" :key="hop.id + ':' + i">
                     <div>
                       <button
+                        type="button"
                         @click="focusImpact(hop.id)"
                         class="flex items-center gap-2 w-full text-left rounded-lg border px-2.5 py-1.5 transition"
                         :class="hop.id === impactFocus ? 'border-indigo-500/50 bg-indigo-500/10' : 'border-slate-700 bg-slate-900/40 hover:border-slate-600'"
@@ -260,34 +315,17 @@
             </template>
           </div>
 
-          <!-- What depends on it -->
           <div class="card" x-data="{ get dep() { return impactDependents(impactFocus) } }">
             <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
               What depends on it
             </h3>
             <template x-if="dep.total === 0">
               <p class="text-sm text-slate-400">
-                Nothing depends on this — removing it affects nothing else.
+                Nothing depends on this element in the dependency graph.
               </p>
             </template>
             <template x-if="dep.total > 0">
               <div class="space-y-3">
-                <div class="flex items-baseline gap-2">
-                  <span
-                    class="text-2xl font-bold text-white tabular-nums"
-                    x-text="formatCount(dep.direct.length)"
-                  ></span>
-                  <span class="text-xs text-slate-400">direct</span>
-                  <span class="text-slate-600">·</span>
-                  <span
-                    class="text-2xl font-bold text-white tabular-nums"
-                    x-text="formatCount(dep.total)"
-                  ></span>
-                  <span
-                    class="text-xs text-slate-400"
-                    x-text="dep.truncated ? 'transitively (capped)' : 'transitively'"
-                  ></span>
-                </div>
                 <div>
                   <div
                     class="text-[10px] uppercase tracking-wider text-slate-500 mb-1.5"
@@ -296,6 +334,7 @@
                   <div class="flex flex-wrap gap-1.5">
                     <template x-for="d in dep.direct.slice(0, 18)" :key="d.id">
                       <button
+                        type="button"
                         @click="focusImpact(d.id)"
                         class="inline-flex items-center gap-1.5 text-xs bg-slate-900/50 border border-slate-700 rounded-md px-2 py-1 hover:border-slate-600 transition font-mono text-slate-300"
                       >
@@ -326,6 +365,7 @@
                   <div class="flex flex-wrap gap-1.5">
                     <template x-for="d in dep.transitive.slice(0, 18)" :key="d.id">
                       <button
+                        type="button"
                         @click="focusImpact(d.id)"
                         class="inline-flex items-center gap-1.5 text-xs bg-slate-900/50 border border-slate-700 rounded-md px-2 py-1 hover:border-slate-600 transition font-mono text-slate-300"
                       >
@@ -353,15 +393,12 @@
           </div>
         </div>
 
-        <!-- Dependency sub-graph -->
         <div class="card" x-show="blastRadiusOf(impactFocus).total > 0">
           <div class="flex items-center gap-2 mb-3">
             <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-              Dependency sub-graph
+              Downstream graph
             </h3>
-            <span class="text-xs text-slate-500 ml-auto"
-              >selected + everything that depends on it</span
-            >
+            <span class="text-xs text-slate-500 ml-auto">selected + dependents</span>
           </div>
           <div
             class="rounded-lg bg-slate-900/40 overflow-auto"

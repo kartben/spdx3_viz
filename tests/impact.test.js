@@ -8,7 +8,7 @@ import {
   impactEdgeVerb,
   IMPACT_EDGE_TYPES
 } from '../src/lib/impact.js';
-import { parseGraph } from '../src/parser/parser.js';
+import { buildRelationshipIndexes, parseGraph } from '../src/parser/parser.js';
 import { spdxApp } from '../src/app.js';
 
 // root R contains A and B; A and B both dependsOn L; L dependsOn C.
@@ -154,6 +154,45 @@ test('packageRiskIndex counts only packages a CVE affects, not fixed/not-affecte
   assert.equal(risk.has('pkg:b'), false);
   assert.equal(risk.get('pkg:a').severity, 'high');
   assert.equal(risk.get('pkg:a').vulnIds.size, 1);
+});
+
+test('impactSearchResults finds graph participants and reports downstream reach', () => {
+  const app = spdxApp();
+  const parsed = parseGraph([
+    { type: 'software_Package', spdxId: 'pkg:root', name: 'root-app' },
+    {
+      type: 'software_Package',
+      spdxId: 'pkg:needle',
+      name: 'needle-lib',
+      software_packageVersion: '1.2.3'
+    },
+    { type: 'software_Package', spdxId: 'pkg:leaf', name: 'leaf-app' },
+    { type: 'software_Sbom', spdxId: 'sbom:1', rootElement: 'pkg:root' },
+    {
+      type: 'Relationship',
+      spdxId: 'rel:contains',
+      relationshipType: 'contains',
+      from: 'pkg:root',
+      to: ['pkg:needle']
+    },
+    {
+      type: 'Relationship',
+      spdxId: 'rel:depends',
+      relationshipType: 'dependsOn',
+      from: 'pkg:leaf',
+      to: ['pkg:needle']
+    }
+  ]);
+  Object.assign(app, parsed, buildRelationshipIndexes(parsed.relationships));
+  app._resetImpactMemos();
+  app.impactSearch = 'needle';
+
+  const [result] = app.impactSearchResults;
+  assert.equal(result.id, 'pkg:needle');
+  assert.equal(result.name, 'needle-lib');
+  assert.equal(result.version, '1.2.3');
+  assert.equal(result.direct, 2);
+  assert.equal(result.total, 2);
 });
 
 test('impactEdgeVerb and IMPACT_EDGE_TYPES cover the cross-topology edge set', () => {
