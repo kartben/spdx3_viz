@@ -197,7 +197,6 @@
     id="stats-ntia"
     class="card scroll-mt-4"
     x-data="{
-      expandedNtia: '',
       ntiaStatus(el) {
         if (el.level === 'document') return el.present ? 'pass' : 'fail';
         if (el.missing.total === 0) return 'pass';
@@ -211,6 +210,16 @@
       },
       ntiaCoveragePct(el) {
         return el.total > 0 ? (el.covered / el.total) * 100 : 100;
+      },
+      remediationCategoryFor(key) {
+        return {
+          name: 'ntia',
+          version: 'ntia',
+          supplier: 'provenance',
+          identifier: 'provenance',
+          concludedLicense: 'license',
+          copyrightText: 'license'
+        }[key] || '';
       }
     }"
   >
@@ -275,8 +284,9 @@
           <div>
             <div
               class="flex items-center gap-3 py-2 rounded-lg px-2 -mx-2 transition"
-              :class="(el.level === 'component' && el.missing.total > 0) ? 'cursor-pointer hover:bg-slate-700/40' : ''"
-              @click="(el.level === 'component' && el.missing.total > 0) && (expandedNtia = expandedNtia === el.key ? '' : el.key)"
+              :class="(el.level === 'component' && el.missing.total > 0) ? 'cursor-pointer hover:bg-slate-700/40 group' : ''"
+              @click="(el.level === 'component' && el.missing.total > 0) && openRemediation(remediationCategoryFor(el.key))"
+              :title="(el.level === 'component' && el.missing.total > 0) ? 'Review these in Remediation' : ''"
             >
               <span
                 class="flex-shrink-0 flex items-center"
@@ -288,21 +298,11 @@
                 <span x-show="el.level === 'document'" class="text-xs text-slate-500"
                   >(document level)</span
                 >
-                <svg
+                <span
                   x-show="el.level === 'component' && el.missing.total > 0"
-                  class="w-3.5 h-3.5 text-slate-500 transition-transform"
-                  :class="expandedNtia === el.key && 'rotate-180'"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+                  class="text-[11px] text-slate-500 group-hover:text-amber-300 transition-colors inline-flex items-center gap-0.5"
+                  >Remediation <span aria-hidden="true">→</span></span
                 >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
               </div>
               <template x-if="el.level === 'component'">
                 <div class="w-28 flex-shrink-0">
@@ -332,30 +332,6 @@
                 ></span>
               </template>
             </div>
-            <template x-if="el.level === 'component'">
-              <div x-show="expandedNtia === el.key" x-collapse>
-                <div class="flex flex-wrap gap-1.5 ml-8 mt-1 mb-2">
-                  <template x-for="o in el.missing.sample" :key="o.id">
-                    <button
-                      @click="navigateTo(o.id)"
-                      class="inline-flex items-center gap-1.5 rounded-md border border-slate-700 bg-slate-900/50 px-2 py-1 text-xs text-slate-300 hover:bg-slate-700/40 transition"
-                    >
-                      <span
-                        class="flex items-center justify-center flex-shrink-0"
-                        :style="`color:${nodeTypeColor(getNodeType(o))}`"
-                        x-html="nodeTypeIconSvg(getNodeType(o), 'w-3 h-3')"
-                      ></span>
-                      <span class="truncate max-w-[160px]" x-text="o.name"></span>
-                    </button>
-                  </template>
-                  <span
-                    x-show="el.missing.total > el.missing.sample.length"
-                    class="text-xs text-slate-500 px-1 py-1"
-                    x-text="`+ ${formatCount(el.missing.total - el.missing.sample.length)} more`"
-                  ></span>
-                </div>
-              </div>
-            </template>
           </div>
         </template>
       </div>
@@ -396,46 +372,36 @@
     id="stats-risk"
     x-data="{
       groups: [
-        { key: 'missingLicense', label: 'Packages missing a license' },
-        { key: 'missingCopyright', label: 'Packages missing copyright text' },
-        { key: 'missingSupplier', label: 'Packages missing a supplier/originator' },
-        { key: 'missingVersion', label: 'Packages missing a version' },
-        { key: 'missingHash', label: 'Packages/files missing an integrity hash' },
-        { key: 'orphans', label: 'Elements with no relationships' }
+        { key: 'missingLicense', label: 'Packages missing a license', category: 'license' },
+        { key: 'missingCopyright', label: 'Packages missing copyright text', category: 'license' },
+        { key: 'missingSupplier', label: 'Packages missing a supplier/originator', category: 'provenance' },
+        { key: 'missingVersion', label: 'Packages missing a version', category: 'ntia' },
+        { key: 'missingHash', label: 'Packages/files missing an integrity hash', category: 'integrity' },
+        { key: 'orphans', label: 'Elements with no relationships', category: 'structural' }
       ]
     }"
     class="grid grid-cols-1 md:grid-cols-2 gap-4 scroll-mt-4"
   >
     <template x-for="g in groups" :key="g.key">
-      <div class="card" x-show="qualityReport.insights.offenders[g.key].total > 0">
-        <div class="flex items-center justify-between mb-3">
+      <button
+        type="button"
+        x-show="qualityReport.insights.offenders[g.key].total > 0"
+        @click="openRemediation(g.category)"
+        class="card text-left group hover:border-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40 transition"
+      >
+        <div class="flex items-center justify-between">
           <h3 class="text-sm font-semibold text-white" x-text="g.label"></h3>
           <span
             class="badge bg-amber-500/15 text-amber-400"
             x-text="formatCount(qualityReport.insights.offenders[g.key].total)"
           ></span>
         </div>
-        <div class="space-y-1.5">
-          <template x-for="o in qualityReport.insights.offenders[g.key].sample" :key="o.id">
-            <button
-              @click="navigateTo(o.id)"
-              class="flex items-center gap-2 w-full text-left rounded-lg px-2 py-1.5 -mx-2 hover:bg-slate-700/40 transition"
-            >
-              <span
-                class="flex items-center justify-center flex-shrink-0"
-                :style="`color:${nodeTypeColor(getNodeType(o))}`"
-                x-html="nodeTypeIconSvg(getNodeType(o), 'w-3.5 h-3.5')"
-              ></span>
-              <span class="text-sm text-slate-300 truncate" x-text="o.name"></span>
-            </button>
-          </template>
-          <div
-            x-show="qualityReport.insights.offenders[g.key].total > qualityReport.insights.offenders[g.key].sample.length"
-            class="text-xs text-slate-500 px-2 pt-1"
-            x-text="`+ ${formatCount(qualityReport.insights.offenders[g.key].total - qualityReport.insights.offenders[g.key].sample.length)} more`"
-          ></div>
-        </div>
-      </div>
+        <span
+          class="mt-3 inline-flex items-center gap-1 text-xs text-slate-500 group-hover:text-amber-300 transition-colors"
+        >
+          Review in Remediation <span aria-hidden="true">→</span>
+        </span>
+      </button>
     </template>
   </div>
 

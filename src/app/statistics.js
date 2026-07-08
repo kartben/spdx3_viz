@@ -400,6 +400,15 @@ export const statisticsMixin = {
     this.remediationSeverityFilter = this.remediationSeverityFilter === severity ? '' : severity;
     this.restreamView('remediation');
   },
+  // Jump from a Statistics quality gap to the matching Remediation findings so
+  // the offending components are enumerated in one place (Remediation) rather
+  // than duplicated here. Filters Remediation to the gap's category.
+  openRemediation(category = '') {
+    this.remediationCategoryFilter = category || '';
+    this.remediationSeverityFilter = '';
+    this.switchView('remediation');
+    this.restreamView('remediation');
+  },
   // Conic-gradient ring for the overall-score gauge; a plain CSS circle so the
   // gauge needs no charting dependency.
   qualityRingStyle(score, color) {
