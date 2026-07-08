@@ -233,11 +233,13 @@ export const impactMixin = {
       .map((entry) => ({ ...entry, total: this.blastRadiusOf(entry.id).total }));
   },
 
-  // Impact tab landing ranking: most-depended-upon by transitive dependents.
-  // To stay cheap on huge SBOMs, prefilter by direct-dependent count before
-  // computing exact transitive counts for the top candidates only.
+  // Impact tab landing rankings: most-depended-upon by transitive dependents,
+  // and vulnerable-by-blast-radius (which risky package hurts most if it breaks).
+  // To stay cheap on huge SBOMs, most-depended-upon is prefiltered by direct-
+  // dependent count before computing exact transitive counts for the top
+  // candidates only.
   get impactRankings() {
-    const key = `${this.impactParentIndex?.size || 0}|${this.impactChildIndex?.size || 0}`;
+    const key = `${this.impactParentIndex?.size || 0}|${this.impactChildIndex?.size || 0}|${this.vulnerabilities.length}`;
     if (key === rankingsCacheKey) return rankingsCacheVal;
 
     const CANDIDATES = 40;
@@ -256,9 +258,29 @@ export const impactMixin = {
       .sort((a, b) => b.total - a.total)
       .slice(0, TOP);
 
+    const vulnerable = [];
+    this.packageRiskIndex.forEach((e, id) => {
+      if (!e.severity) return;
+      vulnerable.push({
+        id,
+        severity: e.severity,
+        score: e.score,
+        vulnCount: e.vulnIds.size,
+        rank: e.rank,
+        total: this.blastRadiusOf(id).total
+      });
+    });
+    vulnerable.sort(
+      (a, b) =>
+        b.total - a.total ||
+        b.rank - a.rank ||
+        (parseFloat(b.score) || 0) - (parseFloat(a.score) || 0)
+    );
+
     const val = {
       mostDependedUpon,
-      maxTotal: mostDependedUpon[0]?.total || 1
+      maxTotal: mostDependedUpon[0]?.total || 1,
+      vulnerable: vulnerable.slice(0, TOP)
     };
     rankingsCacheKey = key;
     rankingsCacheVal = val;

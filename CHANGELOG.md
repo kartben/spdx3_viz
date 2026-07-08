@@ -6,9 +6,8 @@ via the "What's new" link.
 ## Unreleased
 
 - **Added:** Relationship Repartition chart in Statistics, with lifecycle scope chips and graph drill-down by relationship type.
-- **Improved:** Remediation now groups broad quality and safety gaps, adds category and severity filters, and removes noisy license-expression review findings.
-- **Improved:** Impact is now a search-first dependency investigation view, with downstream reach and provenance instead of a CVSS-only ranking.
-- **Fixed:** VEX-only remediation findings now map to normal severity buckets instead of exposing raw VEX status labels.
+- **Added:** Remediation view listing actionable SBOM gaps, with category and severity filters.
+- **Improved:** Impact adds a search-first element picker with provenance and downstream reach.
 
 ## [0.2.0] - 2026-07-07
 

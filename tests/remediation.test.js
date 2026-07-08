@@ -145,12 +145,54 @@ test('buildRemediationFindings maps VEX-only affected vulnerabilities to severit
 
   const finding = buildRemediationFindings(data).find((f) => f.kind === 'affected-vulnerability');
 
-  assert.equal(finding.severity, 'high');
+  // An "affected" VEX status with no CVSS score is a medium data gap, not a high.
+  assert.equal(finding.severity, 'medium');
+  assert.equal(finding.score, 50);
   assert.equal(finding.affectedCount, 1);
   assert.deepEqual(
     finding.affectedSamples.map((sample) => sample.id),
     ['pkg:a']
   );
+});
+
+test('buildRemediationFindings scores CVSS vulnerabilities above data-quality gaps', () => {
+  const data = parsed([
+    { type: 'software_Package', spdxId: 'pkg:a', name: 'package-a' },
+    {
+      type: 'security_Vulnerability',
+      spdxId: 'vuln:1',
+      externalIdentifier: [{ externalIdentifierType: 'cve', identifier: 'CVE-2026-0003' }]
+    },
+    {
+      type: 'security_VexAffectedVulnAssessmentRelationship',
+      spdxId: 'vex:affected',
+      relationshipType: 'affects',
+      from: 'vuln:1',
+      to: ['pkg:a']
+    },
+    {
+      type: 'security_CvssV3VulnAssessmentRelationship',
+      spdxId: 'cvss:1',
+      relationshipType: 'hasAssessmentFor',
+      from: 'vuln:1',
+      to: ['pkg:a'],
+      security_score: '9.1',
+      security_severity: 'critical'
+    }
+  ]);
+
+  const findings = buildRemediationFindings(data);
+  const vuln = findings.find((f) => f.kind === 'affected-vulnerability');
+
+  // CVSS is 0-10 but findings sort on a 0-100 scale, so a 9.1 must map to ~91.
+  assert.equal(vuln.severity, 'critical');
+  assert.equal(vuln.score, 91);
+
+  // ...and therefore outrank the package's missing-version quality gap.
+  const vulnIndex = findings.findIndex((f) => f.kind === 'affected-vulnerability');
+  const gapIndex = findings.findIndex((f) => f.kind === 'missing-version');
+  assert.ok(gapIndex >= 0, 'expected a missing-version quality gap');
+  assert.ok(vulnIndex < gapIndex, 'CVSS vulnerability should sort above the data gap');
 });
 
 import { createViews } from '../src/config.js';
