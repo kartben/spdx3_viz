@@ -55,7 +55,8 @@ const viewListProps = {
   security: 'filteredVulnerabilities',
   configs: 'filteredConfigs',
   build: 'filteredBuilds',
-  agents: 'filteredAgents'
+  agents: 'filteredAgents',
+  remediation: 'filteredRemediations'
 };
 // Nav-target kind -> how to locate its card in the corresponding list, so a
 // deep link can center the render window on the target before scrolling to it.

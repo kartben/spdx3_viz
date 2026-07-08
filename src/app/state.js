@@ -39,6 +39,7 @@ export function createState() {
       build: false,
       agents: false,
       statistics: false,
+      remediation: false,
       raw: false,
       impact: false
     },
@@ -60,7 +61,8 @@ export function createState() {
       security: 0,
       configs: 0,
       build: 0,
-      agents: 0
+      agents: 0,
+      remediation: 0
     },
     // Start index of each view's rendered window; stays 0 for normal top-down
     // browsing and only moves when a deep link centers the window deep in a list.
@@ -76,7 +78,8 @@ export function createState() {
       security: 0,
       configs: 0,
       build: 0,
-      agents: 0
+      agents: 0,
+      remediation: 0
     },
     // How many rows of an in-card "show more" list are currently revealed,
     // keyed by an arbitrary list id (e.g. a license's declaredBy list). Absent
@@ -146,6 +149,8 @@ export function createState() {
     securitySort: 'severity',
     securityStatusFilter: '',
     securitySeverityFilter: '', // '' = all, else a CVSS severity band (critical…low)
+    remediationCategoryFilter: '', // '' = all, else a remediation sourceCategory key
+    remediationSeverityFilter: '', // '' = all, else critical/high/medium/low
     impactFocus: null, // Impact tab: focused element spdxId, or null for the rankings
     _impactHookOpenId: null, // element id whose inline Impact hook is expanded
     // CVE id -> { loading, error, data } fetched on demand from cve.org

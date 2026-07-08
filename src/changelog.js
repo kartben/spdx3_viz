@@ -12,6 +12,14 @@ export const CHANGELOG = [
       {
         tag: 'Added',
         text: 'Relationship Repartition chart in Statistics, with lifecycle scope chips and graph drill-down by relationship type.'
+      },
+      {
+        tag: 'Improved',
+        text: 'Remediation now groups broad quality and safety gaps, adds category and severity filters, and removes noisy license-expression review findings.'
+      },
+      {
+        tag: 'Fixed',
+        text: 'VEX-only remediation findings now map to normal severity buckets instead of exposing raw VEX status labels.'
       }
     ]
   },

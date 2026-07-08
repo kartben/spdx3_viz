@@ -1,0 +1,233 @@
+<div x-show="currentView === 'remediation'" class="fade-in space-y-4 max-w-6xl">
+  <div
+    class="list-sticky sticky top-0 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 py-3 bg-slate-900/95 backdrop-blur border-b border-slate-800/80 space-y-3"
+  >
+    <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <h2 class="text-xl font-semibold text-white tracking-tight">Remediation</h2>
+        <p class="text-sm text-slate-500 mt-1">
+          Triage concrete SBOM data gaps and open risk findings.
+        </p>
+      </div>
+      <span
+        class="text-sm text-slate-400"
+        x-text="filteredRemediations.length === remediationSummary.total ? `${formatCount(remediationSummary.total)} findings` : `${formatCount(filteredRemediations.length)} of ${formatCount(remediationSummary.total)} findings`"
+      ></span>
+    </div>
+
+    <div class="space-y-2">
+      <div class="grid gap-1.5 sm:grid-cols-[4rem_minmax(0,1fr)] sm:items-start">
+        <div class="pt-1 text-xs font-medium uppercase tracking-wide text-slate-500">Category</div>
+        <div class="-mb-1 flex gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+          <button
+            type="button"
+            @click="remediationCategoryFilter = ''; restreamView('remediation')"
+            class="badge flex-shrink-0 whitespace-nowrap transition"
+            :class="remediationCategoryFilter === '' ? 'bg-slate-600/40 text-white ring-1 ring-slate-400/40' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
+          >
+            All categories
+          </button>
+          <template x-for="cat in remediationCategoryOptions" :key="cat.key">
+            <button
+              type="button"
+              @click="setRemediationCategoryFilter(cat.key)"
+              class="badge flex-shrink-0 whitespace-nowrap transition"
+              :class="remediationCategoryFilter === cat.key ? 'bg-amber-500/15 text-amber-200 ring-1 ring-amber-500/30' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
+              :title="`Show ${cat.label} findings`"
+            >
+              <span x-text="cat.label"></span>
+              <span class="ml-1.5 font-semibold" x-text="formatCount(cat.count)"></span>
+            </button>
+          </template>
+        </div>
+      </div>
+
+      <div class="grid gap-1.5 sm:grid-cols-[4rem_minmax(0,1fr)] sm:items-start">
+        <div class="pt-1 text-xs font-medium uppercase tracking-wide text-slate-500">Severity</div>
+        <div class="flex flex-wrap items-center gap-1.5">
+          <button
+            type="button"
+            @click="remediationSeverityFilter = ''; restreamView('remediation')"
+            class="badge whitespace-nowrap transition"
+            :class="remediationSeverityFilter === '' ? 'bg-slate-600/40 text-white ring-1 ring-slate-400/40' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
+          >
+            All severities
+          </button>
+          <template x-for="sev in remediationSeverityOptions" :key="sev.key">
+            <button
+              type="button"
+              @click="setRemediationSeverityFilter(sev.key)"
+              class="badge whitespace-nowrap capitalize transition"
+              :class="remediationSeverityFilter === sev.key ? remediationSeverityClass(sev.key) + ' brightness-125' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
+              :title="`Show ${sev.label} findings`"
+            >
+              <span x-text="sev.label"></span>
+              <span class="ml-1.5 font-semibold" x-text="formatCount(sev.count)"></span>
+            </button>
+          </template>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="space-y-2">
+    <template
+      x-for="finding in (mountedViews.remediation ? renderSlice('remediation', filteredRemediations) : [])"
+      :key="finding.id"
+    >
+      <article
+        class="card transition hover:border-slate-600"
+        data-nav-kind="remediation"
+        :data-nav-id="finding.id"
+      >
+        <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div class="min-w-0">
+            <div class="flex flex-wrap items-center gap-2">
+              <span
+                class="badge capitalize"
+                :class="remediationSeverityClass(finding.severity)"
+                x-text="finding.severity"
+              ></span>
+              <span
+                class="badge bg-slate-800 text-slate-300"
+                x-text="remediationCategoryMeta(finding.sourceCategory).label"
+              ></span>
+              <span class="text-sm font-semibold text-white" x-text="finding.title"></span>
+            </div>
+            <p class="text-sm text-slate-400 mt-2" x-text="finding.summary"></p>
+            <div class="mt-3 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+              <span
+                x-show="finding.affectedCount > 0"
+                class="rounded bg-slate-800 px-2 py-1"
+                x-text="`${formatCount(finding.affectedCount)} affected ${finding.affectedLabel}`"
+              ></span>
+              <button
+                type="button"
+                x-show="finding.elementId"
+                @click="navigateTo(finding.elementId)"
+                class="inline-flex items-center gap-1 rounded-md bg-slate-800 px-2 py-1 text-slate-300 hover:bg-slate-700 hover:text-white transition-colors"
+              >
+                <span x-text="finding.elementName"></span>
+                <span class="text-slate-500" x-text="finding.elementId"></span>
+              </button>
+              <span
+                x-show="!finding.elementId && finding.elementName"
+                class="rounded bg-slate-800 px-2 py-1 text-slate-300"
+                x-text="finding.elementName"
+              ></span>
+              <span
+                x-show="finding.elementType"
+                class="rounded bg-slate-800 px-2 py-1"
+                x-text="finding.elementType || 'Document'"
+              ></span>
+            </div>
+          </div>
+          <div class="text-right flex-shrink-0">
+            <div
+              class="text-2xl font-bold text-white tabular-nums"
+              x-text="Math.round(finding.score)"
+            ></div>
+            <div class="text-[11px] uppercase tracking-wide text-slate-500">score</div>
+          </div>
+        </div>
+
+        <div class="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-3">
+          <div
+            x-show="finding.evidence.length || finding.affectedSamples.length"
+            class="rounded-lg border border-slate-700/70 bg-slate-900/40 p-3"
+          >
+            <div class="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">
+              Evidence
+            </div>
+            <ul x-show="finding.evidence.length" class="space-y-1 text-xs text-slate-400">
+              <template x-for="line in finding.evidence" :key="line">
+                <li class="break-words" x-text="line"></li>
+              </template>
+            </ul>
+            <div x-show="finding.affectedSamples.length" class="mt-3">
+              <div class="text-[11px] uppercase tracking-wide text-slate-500 mb-1">
+                Affected examples
+              </div>
+              <div class="flex flex-wrap gap-1.5">
+                <template x-for="sample in finding.affectedSamples" :key="sample.id">
+                  <button
+                    type="button"
+                    @click="navigateTo(sample.id)"
+                    class="inline-flex max-w-full items-center gap-1 rounded bg-slate-800 px-1.5 py-0.5 text-[11px] text-slate-300 hover:bg-slate-700 hover:text-white"
+                  >
+                    <span class="truncate max-w-[12rem]" x-text="sample.name"></span>
+                    <span class="text-slate-500 truncate max-w-[10rem]" x-text="sample.id"></span>
+                  </button>
+                </template>
+              </div>
+            </div>
+          </div>
+          <div class="rounded-lg border border-blue-500/20 bg-blue-500/5 p-3">
+            <div class="text-xs font-semibold uppercase tracking-wide text-blue-300 mb-2">
+              Recommended action
+            </div>
+            <p
+              class="text-xs text-slate-300"
+              x-text="finding.recommendedAction || 'Review this finding and update the SBOM data as appropriate.'"
+            ></p>
+            <button
+              type="button"
+              x-show="finding.sourceCategory === 'vulnerability' && finding.relatedIds.length && hasImpactData"
+              @click="focusImpact(finding.relatedIds[0])"
+              class="mt-3 rounded-md bg-blue-500/10 px-2 py-1 text-xs text-blue-200 hover:bg-blue-500/20 transition-colors"
+            >
+              Open affected package in Impact
+            </button>
+            <div x-show="finding.relatedIds.length" class="mt-3">
+              <div class="text-[11px] uppercase tracking-wide text-slate-500 mb-1">Related IDs</div>
+              <div class="flex flex-wrap gap-1.5">
+                <template
+                  x-for="id in finding.relatedIds.slice(0, revealLimit(finding.id + ':related'))"
+                  :key="id"
+                >
+                  <button
+                    type="button"
+                    @click="navigateTo(id)"
+                    class="rounded bg-slate-800 px-1.5 py-0.5 text-[11px] text-slate-300 hover:bg-slate-700 hover:text-white"
+                    x-text="id"
+                  ></button>
+                </template>
+                <button
+                  type="button"
+                  x-show="finding.relatedIds.length > revealLimit(finding.id + ':related')"
+                  @click="revealMore(finding.id + ':related')"
+                  class="rounded bg-slate-800 px-1.5 py-0.5 text-[11px] text-blue-300 hover:bg-slate-700"
+                  x-text="`+ ${formatCount(finding.relatedIds.length - revealLimit(finding.id + ':related'))} more`"
+                ></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+    </template>
+  </div>
+
+  <div
+    x-show="mountedViews.remediation && remediationFindings.length === 0"
+    class="card text-center py-10"
+  >
+    <div class="text-sm font-medium text-slate-300">No remediation findings</div>
+    <p class="text-xs text-slate-500 mt-2">
+      The loaded SBOM does not currently produce actionable remediation findings.
+    </p>
+  </div>
+
+  <div
+    x-show="mountedViews.remediation && remediationFindings.length > 0 && filteredRemediations.length === 0"
+    class="card text-center py-10"
+  >
+    <div class="text-sm font-medium text-slate-300">No findings match these filters</div>
+    <button
+      type="button"
+      @click="remediationCategoryFilter = ''; remediationSeverityFilter = ''; restreamView('remediation')"
+      class="mt-3 rounded-md bg-slate-800 px-3 py-1.5 text-xs text-slate-300 hover:bg-slate-700 hover:text-white transition-colors"
+    >
+      Clear filters
+    </button>
+  </div>
+</div>

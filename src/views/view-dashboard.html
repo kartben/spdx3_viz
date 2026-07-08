@@ -91,7 +91,7 @@
   </section>
 
   <!-- High-signal summaries. Each card links to the view where the user can act. -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
     <button
       type="button"
       @click="switchView('statistics')"
@@ -129,6 +129,40 @@
         class="inline-flex items-center gap-1 text-xs text-blue-300 mt-3 group-hover:text-blue-200"
       >
         See quality details <span aria-hidden="true">→</span>
+      </span>
+    </button>
+
+    <button
+      type="button"
+      @click="switchView('remediation')"
+      class="card text-left group hover:border-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+    >
+      <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">Remediation</div>
+      <div class="flex items-baseline gap-2 mt-2">
+        <span
+          class="text-3xl font-bold tabular-nums"
+          :class="remediationSummary.counts.critical + remediationSummary.counts.high ? 'text-rose-300' : remediationSummary.counts.medium ? 'text-amber-300' : 'text-white'"
+          x-text="formatCount(remediationSummary.total)"
+        ></span>
+        <span class="text-sm text-slate-400">findings</span>
+      </div>
+      <div class="flex flex-wrap gap-x-3 gap-y-1 mt-4 text-xs">
+        <span x-show="remediationSummary.counts.critical + remediationSummary.counts.high" class="text-rose-300">
+          <strong x-text="formatCount(remediationSummary.counts.critical + remediationSummary.counts.high)"></strong>
+          high+
+        </span>
+        <span x-show="remediationSummary.counts.medium" class="text-amber-300">
+          <strong x-text="formatCount(remediationSummary.counts.medium)"></strong> medium
+        </span>
+        <span x-show="remediationSummary.counts.low" class="text-blue-300">
+          <strong x-text="formatCount(remediationSummary.counts.low)"></strong> low
+        </span>
+      </div>
+      <p class="text-xs text-slate-400 mt-3 leading-relaxed">
+        Actionable quality, security, license, import, and safety fixes.
+      </p>
+      <span class="inline-flex items-center gap-1 text-xs text-amber-300 mt-3 group-hover:text-amber-200">
+        Open remediation list <span aria-hidden="true">→</span>
       </span>
     </button>
 
