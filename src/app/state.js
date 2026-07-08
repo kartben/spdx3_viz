@@ -151,7 +151,8 @@ export function createState() {
     securitySeverityFilter: '', // '' = all, else a CVSS severity band (critical…low)
     remediationCategoryFilter: '', // '' = all, else a remediation sourceCategory key
     remediationSeverityFilter: '', // '' = all, else critical/high/medium/low
-    impactFocus: null, // Impact tab: focused element spdxId, or null for the rankings
+    impactSearch: '', // Impact tab picker query
+    impactFocus: null, // Impact tab: focused element spdxId, or null for the picker
     _impactHookOpenId: null, // element id whose inline Impact hook is expanded
     // CVE id -> { loading, error, data } fetched on demand from cve.org
     cveDetails: {},

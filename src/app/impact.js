@@ -1,9 +1,8 @@
 import { provenancePaths, blastRadius, impactEdgeVerb, getCvssSeverityMeta } from '../lib/index.js';
 
 /* Impact analysis: provenance ("why is this here?") and blast radius ("what
-   depends on it?") over the parser's dependency adjacency, plus the Impact tab's
-   whole-SBOM rankings. Heavy results are memoized off the reactive state and
-   invalidated on load via _resetImpactMemos. */
+   depends on it?") over the parser's dependency adjacency. Heavy results are
+   memoized off the reactive state and invalidated on load via _resetImpactMemos. */
 
 let rankingsCacheKey = null;
 let rankingsCacheVal = null;
@@ -167,12 +166,78 @@ export const impactMixin = {
     };
   },
 
-  // Impact tab landing rankings: most-depended-upon (by transitive dependents)
-  // and vulnerable-by-blast-radius. To stay cheap on huge SBOMs, most-depended-
-  // upon is prefiltered by direct-dependent count before computing exact
-  // transitive counts for the top candidates only.
+  get impactGraphSummary() {
+    const ids = new Set();
+    this.impactChildIndex?.forEach?.((children, from) => {
+      ids.add(from);
+      children.forEach((child) => ids.add(child.id));
+    });
+    this.impactParentIndex?.forEach?.((parents, id) => {
+      ids.add(id);
+      parents.forEach((parent) => ids.add(parent.id));
+    });
+    this.impactRoots?.forEach?.((id) => ids.add(id));
+    return {
+      elements: ids.size,
+      roots: this.impactRoots?.size || 0,
+      edges: [...(this.impactChildIndex?.values?.() || [])].reduce(
+        (sum, children) => sum + children.length,
+        0
+      )
+    };
+  },
+
+  impactEntry(id, includeTotal = true) {
+    const el = id ? this.elementMap.get(id) : null;
+    const type = el ? this.getNodeType(el) : this.impactNodeTypeOf(id);
+    const parents = this.impactParentIndex.get(id) || [];
+    const direct = new Set(parents.map((p) => p.id)).size;
+    const br = includeTotal ? this.blastRadiusOf(id) : null;
+    const risk = this.packageRisk(id);
+    const version = this.impactVersionOf(id);
+    const name = this.relTargetDisplayName(id);
+    return {
+      id,
+      name,
+      version,
+      type,
+      direct,
+      total: br?.total ?? null,
+      truncated: br?.truncated || false,
+      risk,
+      searchText: `${name} ${version} ${id} ${type}`.toLowerCase()
+    };
+  },
+
+  get impactSearchResults() {
+    const q = (this.impactSearch || '').trim().toLowerCase();
+    if (!q) return [];
+
+    const ids = new Set();
+    this.impactParentIndex.forEach((_, id) => ids.add(id));
+    this.impactChildIndex.forEach((_, id) => ids.add(id));
+    this.impactRoots.forEach((id) => ids.add(id));
+
+    const matches = [];
+    for (const id of ids) {
+      if (!this.elementMap.has(id)) continue;
+      const entry = this.impactEntry(id, false);
+      if (entry.searchText.includes(q)) matches.push(entry);
+    }
+
+    return matches
+      .sort(
+        (a, b) => b.direct - a.direct || a.name.localeCompare(b.name) || a.id.localeCompare(b.id)
+      )
+      .slice(0, 20)
+      .map((entry) => ({ ...entry, total: this.blastRadiusOf(entry.id).total }));
+  },
+
+  // Impact tab landing ranking: most-depended-upon by transitive dependents.
+  // To stay cheap on huge SBOMs, prefilter by direct-dependent count before
+  // computing exact transitive counts for the top candidates only.
   get impactRankings() {
-    const key = `${this.impactParentIndex?.size || 0}|${this.vulnerabilities.length}|${this.packages.length}`;
+    const key = `${this.impactParentIndex?.size || 0}|${this.impactChildIndex?.size || 0}`;
     if (key === rankingsCacheKey) return rankingsCacheVal;
 
     const CANDIDATES = 40;
@@ -186,41 +251,21 @@ export const impactMixin = {
     candidates.sort((a, b) => b.direct - a.direct);
     const mostDependedUpon = candidates
       .slice(0, CANDIDATES)
-      .map((c) => ({ id: c.id, total: this.blastRadiusOf(c.id).total }))
+      .map((c) => this.impactEntry(c.id, true))
       .filter((c) => c.total > 0)
       .sort((a, b) => b.total - a.total)
       .slice(0, TOP);
 
-    const vulnerable = [];
-    this.packageRiskIndex.forEach((e, id) => {
-      if (!e.severity) return;
-      vulnerable.push({
-        id,
-        severity: e.severity,
-        score: e.score,
-        vulnCount: e.vulnIds.size,
-        rank: e.rank,
-        total: this.blastRadiusOf(id).total
-      });
-    });
-    vulnerable.sort(
-      (a, b) =>
-        b.total - a.total ||
-        b.rank - a.rank ||
-        (parseFloat(b.score) || 0) - (parseFloat(a.score) || 0)
-    );
-
     const val = {
       mostDependedUpon,
-      maxTotal: mostDependedUpon[0]?.total || 1,
-      vulnerable: vulnerable.slice(0, TOP)
+      maxTotal: mostDependedUpon[0]?.total || 1
     };
     rankingsCacheKey = key;
     rankingsCacheVal = val;
     return val;
   },
 
-  // Impact tab focus (null = the landing rankings).
+  // Impact tab focus (null = the picker landing).
   get impactFocusElement() {
     return this.impactFocus
       ? this.elementMap.get(this.impactFocus) || this.placeholderElement(this.impactFocus)

@@ -318,10 +318,11 @@ export const loadingMixin = {
       this._resetGraphHeat(); // drop a heat lens the new SBOM can't honour
       this.cveDetails = {}; // drop cached CVE fetches from the previous SBOM
       this.impactFocus = null; // drop any Impact-tab focus from the previous SBOM
+      this.impactSearch = '';
       this._impactHookOpenId = null;
       this._resetListMemos(); // invalidate the build + vulnerability sort memos for new data
       this._resetSearchMemos(); // and the global-search corpus / results memos
-      this._resetImpactMemos(); // and the impact rankings / blast-radius caches
+      this._resetImpactMemos(); // and the impact ranking / blast-radius caches
       // Fresh data: reset the streaming cursors so every list view streams its
       // (new) content on next visit, and kick the one currently shown.
       this._resetStreaming();

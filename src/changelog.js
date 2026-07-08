@@ -18,6 +18,10 @@ export const CHANGELOG = [
         text: 'Remediation now groups broad quality and safety gaps, adds category and severity filters, and removes noisy license-expression review findings.'
       },
       {
+        tag: 'Improved',
+        text: 'Impact is now a search-first dependency investigation view, with downstream reach and provenance instead of a CVSS-only ranking.'
+      },
+      {
         tag: 'Fixed',
         text: 'VEX-only remediation findings now map to normal severity buckets instead of exposing raw VEX status labels.'
       }
