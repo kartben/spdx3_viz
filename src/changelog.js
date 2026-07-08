@@ -14,16 +14,12 @@ export const CHANGELOG = [
         text: 'Relationship Repartition chart in Statistics, with lifecycle scope chips and graph drill-down by relationship type.'
       },
       {
-        tag: 'Improved',
-        text: 'Remediation now groups broad quality and safety gaps, adds category and severity filters, and removes noisy license-expression review findings.'
+        tag: 'Added',
+        text: 'Remediation view listing actionable SBOM gaps, with category and severity filters.'
       },
       {
         tag: 'Improved',
-        text: 'Impact is now a search-first dependency investigation view, with downstream reach and provenance instead of a CVSS-only ranking.'
-      },
-      {
-        tag: 'Fixed',
-        text: 'VEX-only remediation findings now map to normal severity buckets instead of exposing raw VEX status labels.'
+        text: 'Impact adds a search-first element picker with provenance and downstream reach.'
       }
     ]
   },

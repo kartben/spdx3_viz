@@ -353,8 +353,13 @@ function addExternalReferenceFindings(out, data) {
   });
 }
 
+// Scores are on a 0-100 scale so a finding sorts against every other kind. Used
+// for vulnerabilities that carry no CVSS score, so the fallback tracks the
+// severity band rather than the raw VEX status.
+const FALLBACK_SEVERITY_SCORE = { critical: 95, high: 75, medium: 50, low: 25 };
+
 function vulnerabilityFallbackSeverity(status) {
-  if (status === 'affected') return 'high';
+  if (status === 'affected') return 'medium';
   if (status === 'under_investigation') return 'medium';
   return 'low';
 }
@@ -376,7 +381,12 @@ function addVulnerabilityFindings(out, data) {
       cvssMeta.key !== 'unknown' && cvssMeta.key !== 'none'
         ? cvssMeta.key
         : vulnerabilityFallbackSeverity(vuln.overallStatus);
-    const score = vuln.cvss?.score ?? statusMeta.severity * 20;
+    // CVSS is a 0-10 scale; multiply so vulnerabilities sort against the 0-100
+    // scores every other finding kind uses (a CVSS 9.1 must outrank a data gap).
+    const score =
+      vuln.cvss?.score != null
+        ? Math.round(vuln.cvss.score * 10)
+        : (FALLBACK_SEVERITY_SCORE[severity] ?? 40);
     const relatedIds = [
       ...new Set((vuln.assessments || []).map((a) => a.packageId).filter(Boolean))
     ];
