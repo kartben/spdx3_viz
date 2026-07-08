@@ -190,7 +190,7 @@ function asArray(value) {
 }
 
 function displayName(el) {
-  return el?.name || cleanName(el?.spdxId) || el?.spdxId || 'Unknown';
+  return el?.name || cleanName(el?.spdxId || el?.id) || el?.spdxId || el?.id || 'Unknown';
 }
 
 function elementType(el) {
@@ -202,14 +202,17 @@ function byId(data, id) {
 }
 
 function makeFinding(kind, el, props = {}) {
+  // Offenders resolved off a raw sample (not in elementMap) carry `id` but no
+  // `spdxId`; fall back to it so distinct offenders keep distinct finding ids.
+  const elementId = el?.spdxId || el?.id || props.elementId || '';
   return {
-    id: props.id || `${kind}:${el?.spdxId || props.elementId || 'document'}`,
+    id: props.id || `${kind}:${elementId || 'document'}`,
     kind,
     severity: props.severity || 'low',
     score: props.score ?? 0,
     title: props.title || kind,
     summary: props.summary || '',
-    elementId: el?.spdxId || props.elementId || '',
+    elementId,
     elementName: props.elementName || (el ? displayName(el) : ''),
     elementType: props.elementType || (el ? elementType(el) : ''),
     sourceView: props.sourceView || '',
@@ -419,21 +422,24 @@ function addVulnerabilityFindings(out, data) {
   });
 }
 
-function requirementVerifications(req, data) {
+function requirementVerifications(req, data, evaluationMap) {
   return (data.relFromIndex?.get(req.spdxId) || [])
     .filter((rel) => rel.relationshipType === 'verifiedBy')
     .flatMap((rel) => asArray(rel.to))
-    .map((id) => ({ id, verification: byId(data, id), evaluation: evaluationFor(id, data) }));
+    .map((id) => ({ id, verification: byId(data, id), evaluation: evaluationMap.get(id) || null }));
 }
 
-function evaluationFor(verificationId, data) {
-  return (
-    (data.requirements || []).find(
-      (r) =>
-        r.type === 'functionalsafety_EvaluationResult' &&
-        r.functionalsafety_evaluationBasedOn === verificationId
-    ) || null
-  );
+// verificationId -> its EvaluationResult, built once so requirement lookups are
+// O(1) instead of a linear scan of data.requirements per verification.
+function buildEvaluationMap(data) {
+  const map = new Map();
+  (data.requirements || []).forEach((r) => {
+    const basedOn = r.functionalsafety_evaluationBasedOn;
+    if (r.type === 'functionalsafety_EvaluationResult' && basedOn && !map.has(basedOn)) {
+      map.set(basedOn, r);
+    }
+  });
+  return map;
 }
 
 function implementedByIds(req, data) {
@@ -450,10 +456,11 @@ function implementedByIds(req, data) {
 function addFunctionalSafetyFindings(out, data) {
   const unverified = [];
   const noImplementation = [];
+  const evaluationMap = buildEvaluationMap(data);
   (data.requirements || [])
     .filter((req) => req.type === 'Requirement')
     .forEach((req) => {
-      const vers = requirementVerifications(req, data);
+      const vers = requirementVerifications(req, data, evaluationMap);
       const evaluations = vers.map((v) =>
         enumValue(v.evaluation?.functionalsafety_evaluation).toLowerCase()
       );
