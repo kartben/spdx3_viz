@@ -6,6 +6,8 @@ via the "What's new" link.
 ## Unreleased
 
 - **Added:** Relationship Repartition chart in Statistics, with lifecycle scope chips and graph drill-down by relationship type.
+- **Improved:** Remediation now groups broad quality and safety gaps, adds category and severity filters, and removes noisy license-expression review findings.
+- **Fixed:** VEX-only remediation findings now map to normal severity buckets instead of exposing raw VEX status labels.
 
 ## [0.2.0] - 2026-07-07
 

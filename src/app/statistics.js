@@ -1,7 +1,14 @@
 import * as d3 from 'd3';
 
 import { SCOPE_META, SCOPE_ORDER } from '../config.js';
-import { computeQualityReport, getRelationshipColor, gradeMeta, scoreColor } from '../lib/index.js';
+import {
+  buildRemediationFindings,
+  computeQualityReport,
+  getRelationshipColor,
+  gradeMeta,
+  remediationCategoryMeta,
+  scoreColor
+} from '../lib/index.js';
 
 /* Statistics tab: an SBOM quality score with a category breakdown and
    actionable "worst offender" insights, computed over the already-parsed
@@ -10,6 +17,30 @@ import { computeQualityReport, getRelationshipColor, gradeMeta, scoreColor } fro
 const ALL_SCOPES = 'all';
 const ALL_SCOPE_META = { key: ALL_SCOPES, label: 'All scopes', color: '#94a3b8' };
 const countFmt = new Intl.NumberFormat();
+const remediationCache = {
+  key: null,
+  value: []
+};
+
+function remediationCacheKey(data) {
+  return [
+    data.packages,
+    data.files,
+    data.licenses,
+    data.vulnerabilities,
+    data.requirements,
+    data.relationships,
+    data.externalMap,
+    data.elementMap,
+    data.relFromIndex,
+    data.relToIndex,
+    data.impactParentIndex
+  ];
+}
+
+function sameRemediationKey(a, b) {
+  return !!a && !!b && a.length === b.length && a.every((v, i) => v === b[i]);
+}
 
 function asTargets(to) {
   if (Array.isArray(to)) return to.filter(Boolean);
@@ -257,6 +288,61 @@ export const statisticsMixin = {
   get qualityReport() {
     return computeQualityReport(this);
   },
+  get remediationFindings() {
+    const key = remediationCacheKey(this);
+    if (!sameRemediationKey(remediationCache.key, key)) {
+      remediationCache.key = key;
+      remediationCache.value = buildRemediationFindings(this);
+    }
+    return remediationCache.value;
+  },
+  get filteredRemediations() {
+    let findings = this.remediationFindings;
+    if (this.remediationCategoryFilter) {
+      findings = findings.filter(
+        (finding) => finding.sourceCategory === this.remediationCategoryFilter
+      );
+    }
+    if (this.remediationSeverityFilter) {
+      findings = findings.filter((finding) => finding.severity === this.remediationSeverityFilter);
+    }
+    return findings;
+  },
+  get remediationSummary() {
+    const findings = this.remediationFindings;
+    const counts = { critical: 0, high: 0, medium: 0, low: 0, other: 0 };
+    findings.forEach((finding) => {
+      const key = counts[finding.severity] == null ? 'other' : finding.severity;
+      counts[key] += 1;
+    });
+    return {
+      total: findings.length,
+      counts,
+      top: findings.slice(0, 8)
+    };
+  },
+  get remediationCategoryOptions() {
+    const counts = new Map();
+    this.remediationFindings.forEach((finding) => {
+      const key = finding.sourceCategory || 'other';
+      counts.set(key, (counts.get(key) || 0) + 1);
+    });
+    return [...counts.entries()]
+      .map(([key, count]) => ({ ...remediationCategoryMeta(key), count }))
+      .sort((a, b) => a.order - b.order || a.label.localeCompare(b.label));
+  },
+  get remediationSeverityOptions() {
+    const labels = {
+      critical: 'Critical',
+      high: 'High',
+      medium: 'Medium',
+      low: 'Low',
+      other: 'Other'
+    };
+    return Object.entries(this.remediationSummary.counts)
+      .filter(([, count]) => count > 0)
+      .map(([key, count]) => ({ key, label: labels[key] || key, count }));
+  },
   get relationshipRepartition() {
     if (!this._relationshipRepartitionCache) {
       this._relationshipRepartitionCache = {
@@ -292,6 +378,27 @@ export const statisticsMixin = {
   },
   qualityScoreColor(score) {
     return scoreColor(score);
+  },
+  remediationSeverityClass(severity) {
+    return (
+      {
+        critical: 'bg-rose-500/20 text-rose-200 ring-1 ring-rose-400/40',
+        high: 'bg-rose-500/15 text-rose-300 ring-1 ring-rose-500/30',
+        medium: 'bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/30',
+        low: 'bg-blue-500/15 text-blue-300 ring-1 ring-blue-500/30'
+      }[severity] || 'bg-slate-600/20 text-slate-300 ring-1 ring-slate-500/30'
+    );
+  },
+  remediationCategoryMeta(category) {
+    return remediationCategoryMeta(category);
+  },
+  setRemediationCategoryFilter(category) {
+    this.remediationCategoryFilter = this.remediationCategoryFilter === category ? '' : category;
+    this.restreamView('remediation');
+  },
+  setRemediationSeverityFilter(severity) {
+    this.remediationSeverityFilter = this.remediationSeverityFilter === severity ? '' : severity;
+    this.restreamView('remediation');
   },
   // Conic-gradient ring for the overall-score gauge; a plain CSS circle so the
   // gauge needs no charting dependency.

@@ -42,6 +42,8 @@ export const paletteMixin = {
         return this.buildConfigs.length > 0;
       case 'build':
         return this.builds.length > 0 || this.tools.length > 0;
+      case 'remediation':
+        return this.remediationFindings.length > 0;
       case 'impact':
         return this.hasImpactData;
       case 'agents':

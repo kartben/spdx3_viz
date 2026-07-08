@@ -15,3 +15,4 @@ export * from './share.js';
 export * from './quality.js';
 export * from './impact.js';
 export * from './heatmap.js';
+export * from './remediation.js';
