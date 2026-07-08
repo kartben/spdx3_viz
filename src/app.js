@@ -9,6 +9,7 @@ import { paletteMixin } from './app/palette.js';
 import { securityMixin } from './app/security.js';
 import { licensesMixin } from './app/licenses.js';
 import { graphMixin } from './app/graph.js';
+import { queryMixin } from './app/query.js';
 import { rawMixin } from './app/raw.js';
 import { changelogMixin } from './app/changelog.js';
 import { statisticsMixin } from './app/statistics.js';
@@ -70,6 +71,7 @@ const mixins = [
   securityMixin,
   licensesMixin,
   graphMixin,
+  queryMixin,
   rawMixin,
   changelogMixin,
   statisticsMixin,

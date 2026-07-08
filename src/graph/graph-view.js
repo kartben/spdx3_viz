@@ -1240,7 +1240,11 @@ export function renderGraph(app, retry = 0) {
   const recomputeSearch = () => {
     const raw = (app.graphSearchQuery || '').trim().toLowerCase();
     const tokens = raw.split(/\s+/).filter(Boolean);
-    searchActive = tokens.length > 0;
+    // The structured query panel sets a compiled predicate on the app; it
+    // composes (AND) with the text box, so either or both can narrow the graph.
+    const predicate =
+      typeof app.graphQueryPredicate === 'function' ? app.graphQueryPredicate : null;
+    searchActive = tokens.length > 0 || !!predicate;
     searchFocusMode = app.graphSearchMode === 'focus';
     matchSet = new Set();
     neighborSet = new Set();
@@ -1254,11 +1258,13 @@ export function renderGraph(app, retry = 0) {
       // Match on the underlying elements, then fold each hit up to its render node so a collapsed
       // cluster lights up when any member matches.
       uNodes.forEach((u) => {
-        const hay = fullText ? fullTextOf(u) : searchTextOf(u).name;
-        if (matches(hay)) {
-          const rid = renderKeyOf.get(u.id);
-          if (rid) matchSet.add(rid);
+        if (predicate && !predicate(u.data)) return;
+        if (tokens.length) {
+          const hay = fullText ? fullTextOf(u) : searchTextOf(u).name;
+          if (!matches(hay)) return;
         }
+        const rid = renderKeyOf.get(u.id);
+        if (rid) matchSet.add(rid);
       });
       matchSet.forEach((id) => {
         const conn = connectedIndex.get(id);

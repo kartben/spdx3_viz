@@ -126,6 +126,28 @@
           x-html="uiIconSvg('reset_zoom')"
         ></button>
       </div>
+      <!-- Structured query panel toggle: build or write a query over the loaded
+           SBOM and light up the matches on the graph (see query-panel.html). -->
+      <button
+        type="button"
+        @click="toggleQueryPanel()"
+        :class="(queryPanelOpen || queryActive)
+                  ? 'bg-blue-500/15 text-blue-300 ring-1 ring-blue-500/40'
+                  : 'bg-slate-800 border border-slate-700 text-slate-400 hover:text-slate-200 hover:bg-slate-700'"
+        class="h-8 flex items-center gap-1.5 pl-1.5 pr-2 py-1 rounded-md transition-colors"
+        :title="queryActive ? `Query active: ${formatCount(queryResultTotal)} matches` : 'Query the SBOM (build or write a query)'"
+        aria-label="Query"
+      >
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path
+            d="M20 19.59V8l-6-6H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c.45 0 .85-.15 1.19-.4l-4.43-4.43c-.8.52-1.74.83-2.76.83-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5c0 1.02-.31 1.96-.83 2.75L20 19.59zM9 13c0 1.1.9 2 2 2s2-.9 2-2-.9-2-2-2-2 .9-2 2z"
+          />
+        </svg>
+        <span
+          class="text-xs font-medium whitespace-nowrap"
+          x-text="queryActive ? `Query · ${formatCount(queryResultTotal)}` : 'Query'"
+        ></span>
+      </button>
       <!-- Heatmap overlay: bloom a risk signal (open vulnerabilities, failing
            verifications, unverified requirements) over the relevant graph
            regions. Only shown when the SBOM carries data any lens can use. -->
@@ -242,6 +264,7 @@
   <!-- Graph canvas -->
   <div class="flex-1 relative graph-container" id="graphContainer">
     <div id="graphTooltip" class="tooltip hidden"></div>
+    <include src="query-panel.html"></include>
   </div>
   <!-- Graph legend (click an entry to toggle that type on/off) -->
   <div

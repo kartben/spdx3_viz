@@ -1,0 +1,426 @@
+<!-- Query panel: a structured query over the loaded SBOM, docked over the graph
+     canvas. The visual builder and the text DSL share one AST (src/lib/query.js);
+     matches drive the graph's dim/focus overlay and the results list below. See
+     src/app/query.js. -->
+<div
+  x-show="queryPanelOpen"
+  x-cloak
+  x-transition:enter="transition ease-out duration-150"
+  x-transition:enter-start="opacity-0 -translate-x-2"
+  x-transition:enter-end="opacity-100 translate-x-0"
+  class="absolute top-3 left-3 z-20 w-[22rem] max-w-[calc(100%-1.5rem)] max-h-[calc(100%-1.5rem)] flex flex-col bg-slate-900/95 backdrop-blur-sm border border-slate-700 rounded-xl shadow-xl shadow-black/40"
+>
+  <!-- Header -->
+  <div class="flex items-center gap-2 px-3 py-2 border-b border-slate-700/60 flex-shrink-0">
+    <span class="flex items-center text-blue-300">
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path
+          d="M20 19.59V8l-6-6H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c.45 0 .85-.15 1.19-.4l-4.43-4.43c-.8.52-1.74.83-2.76.83-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5c0 1.02-.31 1.96-.83 2.75L20 19.59zM9 13c0 1.1.9 2 2 2s2-.9 2-2-.9-2-2-2-2 .9-2 2z"
+        />
+      </svg>
+    </span>
+    <span class="text-sm font-semibold text-slate-100">Query</span>
+    <!-- Mode tabs -->
+    <div class="ml-auto inline-flex rounded-md border border-slate-700 overflow-hidden text-xs">
+      <button
+        type="button"
+        @click="setQueryMode('visual')"
+        :class="queryMode === 'visual' ? 'bg-blue-500/20 text-blue-300' : 'text-slate-400 hover:text-slate-200'"
+        class="px-2 py-0.5 transition-colors"
+      >
+        Build
+      </button>
+      <button
+        type="button"
+        @click="setQueryMode('text')"
+        :class="queryMode === 'text' ? 'bg-blue-500/20 text-blue-300' : 'text-slate-400 hover:text-slate-200'"
+        class="px-2 py-0.5 transition-colors border-l border-slate-700"
+      >
+        Text
+      </button>
+    </div>
+    <button
+      type="button"
+      @click="closeQueryPanel()"
+      class="text-slate-500 hover:text-slate-200 text-lg leading-none"
+      title="Close"
+    >
+      &times;
+    </button>
+  </div>
+
+  <!-- Body (scrolls) -->
+  <div class="flex-1 overflow-auto p-3 space-y-2 min-h-0">
+    <!-- ===================== Visual builder ===================== -->
+    <div x-show="queryMode === 'visual'" class="space-y-2">
+      <!-- Grouping present: not editable in the flat builder. -->
+      <template x-if="!queryBuilderEditable">
+        <div
+          class="text-xs text-slate-400 bg-slate-800/50 border border-slate-700/60 rounded-lg p-3"
+        >
+          This query uses grouping. Edit it in the
+          <button
+            type="button"
+            @click="setQueryMode('text')"
+            class="text-blue-300 underline decoration-dotted hover:text-blue-200"
+          >
+            Text
+          </button>
+          tab.
+        </div>
+      </template>
+
+      <template x-if="queryBuilderEditable">
+        <div class="space-y-2">
+          <!-- All / Any toggle -->
+          <div class="flex items-center gap-2 text-xs text-slate-300">
+            <span>Match</span>
+            <div class="inline-flex rounded-md border border-slate-700 overflow-hidden">
+              <button
+                type="button"
+                @click="setGroupOp(queryBuilder, 'and')"
+                :class="queryBuilder.op === 'and' ? 'bg-blue-500/20 text-blue-300' : 'text-slate-400 hover:text-slate-200'"
+                class="px-2 py-0.5"
+              >
+                All
+              </button>
+              <button
+                type="button"
+                @click="setGroupOp(queryBuilder, 'or')"
+                :class="queryBuilder.op === 'or' ? 'bg-blue-500/20 text-blue-300' : 'text-slate-400 hover:text-slate-200'"
+                class="px-2 py-0.5 border-l border-slate-700"
+              >
+                Any
+              </button>
+            </div>
+            <span>of the conditions:</span>
+          </div>
+
+          <!-- Condition rows -->
+          <template x-for="(child, ci) in queryBuilder.children" :key="ci">
+            <div
+              class="flex flex-col gap-1.5 rounded-lg border border-slate-700/60 bg-slate-800/40 p-2"
+            >
+              <div class="flex items-center gap-1">
+                <select
+                  @change="changeConditionKind(queryBuilder, ci, $event.target.value)"
+                  class="query-select"
+                >
+                  <option value="type" :selected="child.kind === 'type'">Type</option>
+                  <option value="prop" :selected="child.kind === 'prop'">Property</option>
+                  <option value="rel" :selected="child.kind === 'rel'">Relationship</option>
+                </select>
+                <button
+                  type="button"
+                  @click="toggleQueryNot(child)"
+                  :class="child.not ? 'bg-rose-500/20 text-rose-300 ring-1 ring-rose-500/40' : 'text-slate-400 hover:text-slate-200'"
+                  class="px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide"
+                  title="Negate this condition"
+                >
+                  not
+                </button>
+                <button
+                  type="button"
+                  @click="removeQueryChild(queryBuilder, ci)"
+                  class="ml-auto text-slate-500 hover:text-rose-300 text-sm leading-none"
+                  title="Remove condition"
+                >
+                  &times;
+                </button>
+              </div>
+
+              <!-- Type condition -->
+              <template x-if="child.kind === 'type'">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[11px] text-slate-500">is a</span>
+                  <input
+                    list="q-type-list"
+                    x-model="child.cls"
+                    @change="onBuilderChange()"
+                    @input.debounce.300ms="onBuilderChange()"
+                    placeholder="Package"
+                    class="query-input flex-1"
+                  />
+                </div>
+              </template>
+
+              <!-- Property condition -->
+              <template x-if="child.kind === 'prop'">
+                <div class="flex flex-wrap items-center gap-1.5">
+                  <input
+                    list="q-field-list"
+                    x-model="child.field"
+                    @change="onBuilderChange()"
+                    @input.debounce.300ms="onBuilderChange()"
+                    placeholder="field"
+                    class="query-input flex-1 min-w-[6rem]"
+                  />
+                  <select x-model="child.cmp" @change="onBuilderChange()" class="query-select">
+                    <template x-for="c in queryComparators" :key="c.key">
+                      <option :value="c.key" x-text="c.label"></option>
+                    </template>
+                  </select>
+                  <template x-if="comparatorNeedsValue(child.cmp)">
+                    <input
+                      :list="child.field ? 'qv_' + child.field : null"
+                      x-model="child.value"
+                      @input.debounce.300ms="onBuilderChange()"
+                      placeholder="value"
+                      class="query-input flex-1 min-w-[6rem]"
+                    />
+                  </template>
+                </div>
+              </template>
+
+              <!-- Relationship condition -->
+              <template x-if="child.kind === 'rel'">
+                <div class="flex flex-col gap-1.5">
+                  <div class="flex items-center gap-1.5">
+                    <select x-model="child.dir" @change="onBuilderChange()" class="query-select">
+                      <option value="out">has &rarr;</option>
+                      <option value="in">has &larr;</option>
+                    </select>
+                    <input
+                      list="q-rel-list"
+                      x-model="child.relType"
+                      @change="onBuilderChange()"
+                      @input.debounce.300ms="onBuilderChange()"
+                      placeholder="dependsOn"
+                      class="query-input flex-1"
+                    />
+                  </div>
+                  <div class="pl-3">
+                    <template x-if="!child.target">
+                      <button
+                        type="button"
+                        @click="addRelTarget(child)"
+                        class="text-[11px] text-blue-300 hover:text-blue-200"
+                      >
+                        + where target&hellip;
+                      </button>
+                    </template>
+                    <template x-if="child.target">
+                      <div class="flex flex-wrap items-center gap-1.5">
+                        <span class="text-[11px] text-slate-500">to</span>
+                        <select
+                          @change="setTargetKind(child, $event.target.value)"
+                          class="query-select"
+                        >
+                          <option value="type" :selected="child.target.kind === 'type'">
+                            Type
+                          </option>
+                          <option value="prop" :selected="child.target.kind === 'prop'">
+                            Property
+                          </option>
+                        </select>
+                        <template x-if="child.target.kind === 'type'">
+                          <input
+                            list="q-type-list"
+                            x-model="child.target.cls"
+                            @change="onBuilderChange()"
+                            @input.debounce.300ms="onBuilderChange()"
+                            placeholder="Vulnerability"
+                            class="query-input flex-1 min-w-[6rem]"
+                          />
+                        </template>
+                        <template x-if="child.target.kind === 'prop'">
+                          <input
+                            list="q-field-list"
+                            x-model="child.target.field"
+                            @input.debounce.300ms="onBuilderChange()"
+                            placeholder="field"
+                            class="query-input flex-1 min-w-[5rem]"
+                          />
+                        </template>
+                        <template x-if="child.target.kind === 'prop'">
+                          <input
+                            x-model="child.target.value"
+                            @input.debounce.300ms="onBuilderChange()"
+                            placeholder="value"
+                            class="query-input flex-1 min-w-[5rem]"
+                          />
+                        </template>
+                        <button
+                          type="button"
+                          @click="removeRelTarget(child)"
+                          class="text-slate-500 hover:text-rose-300 text-sm leading-none"
+                          title="Remove target condition"
+                        >
+                          &times;
+                        </button>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </template>
+
+          <!-- Empty state -->
+          <template x-if="!queryBuilder.children.length">
+            <p class="text-[11px] text-slate-500 px-1 py-2">
+              No conditions yet. Add one to filter the graph.
+            </p>
+          </template>
+
+          <!-- Add-condition buttons -->
+          <div class="flex items-center gap-1.5 pt-0.5">
+            <span class="text-[11px] text-slate-500">Add:</span>
+            <button
+              type="button"
+              @click="addQueryCondition(queryBuilder, 'type')"
+              class="query-add"
+            >
+              + Type
+            </button>
+            <button
+              type="button"
+              @click="addQueryCondition(queryBuilder, 'prop')"
+              class="query-add"
+            >
+              + Property
+            </button>
+            <button type="button" @click="addQueryCondition(queryBuilder, 'rel')" class="query-add">
+              + Relationship
+            </button>
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <!-- ===================== Text DSL ===================== -->
+    <div x-show="queryMode === 'text'" class="space-y-2">
+      <div class="relative">
+        <textarea
+          x-ref="queryInput"
+          x-model="queryText"
+          @input="onQueryInput($event)"
+          @keydown="onQueryKeydown($event)"
+          @blur="queryAcBlur()"
+          rows="2"
+          spellcheck="false"
+          autocomplete="off"
+          placeholder="type:Package name:*ssl*  ->dependsOn"
+          class="w-full resize-y bg-slate-800 border rounded-md px-2 py-1.5 text-xs font-mono text-slate-200 placeholder-slate-600 focus:outline-none transition-colors"
+          :class="queryError ? 'border-rose-500/60' : 'border-slate-700 focus:border-blue-500'"
+        ></textarea>
+        <!-- Autocomplete popover -->
+        <div
+          x-show="queryAcOpen"
+          x-cloak
+          class="absolute left-0 right-0 top-full mt-1 z-30 max-h-52 overflow-auto bg-slate-800 border border-slate-700 rounded-md shadow-xl shadow-black/40"
+        >
+          <template x-for="(it, i) in queryAcItems" :key="i">
+            <button
+              type="button"
+              @mousedown.prevent="acceptAutocomplete(i)"
+              @mouseenter="queryAcIndex = i"
+              :class="i === queryAcIndex ? 'bg-blue-500/20' : 'hover:bg-slate-700/50'"
+              class="w-full flex items-center gap-2 px-2 py-1 text-left"
+            >
+              <span class="font-mono text-xs text-slate-200 truncate" x-text="it.label"></span>
+              <span
+                class="ml-auto text-[10px] text-slate-500 flex-shrink-0"
+                x-text="it.hint || it.kind"
+              ></span>
+            </button>
+          </template>
+        </div>
+      </div>
+      <p x-show="queryError" x-cloak class="text-[11px] text-rose-300" x-text="queryError"></p>
+      <!-- Examples -->
+      <div class="flex flex-wrap items-center gap-1.5">
+        <span class="text-[11px] text-slate-500">Try:</span>
+        <template x-for="ex in queryExamples" :key="ex.q">
+          <button
+            type="button"
+            @click="applyExample(ex.q)"
+            class="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700 text-slate-300 hover:border-blue-500/50 hover:text-blue-200 transition-colors"
+            x-text="ex.label"
+          ></button>
+        </template>
+      </div>
+      <p class="text-[10px] text-slate-500 leading-relaxed">
+        <code class="text-slate-400">field:val</code> contains &middot;
+        <code class="text-slate-400">field=val</code> exact &middot;
+        <code class="text-slate-400">*</code> wildcard &middot;
+        <code class="text-slate-400">field~/re/</code> regex &middot;
+        <code class="text-slate-400">field:&gt;=n</code> numeric &middot;
+        <code class="text-slate-400">-&gt;rel</code> /
+        <code class="text-slate-400">&lt;-rel</code> link &middot;
+        <code class="text-slate-400">AND OR NOT ( )</code>
+      </p>
+    </div>
+  </div>
+
+  <!-- ===================== Results ===================== -->
+  <div x-show="queryActive" x-cloak class="border-t border-slate-700/60 flex-shrink-0">
+    <div class="flex items-center gap-2 px-3 py-2">
+      <span
+        class="text-xs font-medium"
+        :class="queryResultTotal ? 'text-blue-300' : 'text-slate-500'"
+        x-text="`${formatCount(queryResultTotal)} ${queryResultTotal === 1 ? 'match' : 'matches'}`"
+      ></span>
+      <span
+        x-show="queryHiddenCount > 0"
+        class="text-[10px] text-slate-500"
+        title="Some matches are hidden by a node/edge filter or folded into a cluster, so they are not glowing on the canvas."
+        x-text="`${formatCount(queryHiddenCount)} off canvas`"
+      ></span>
+      <button
+        type="button"
+        @click="clearQuery()"
+        class="ml-auto text-[11px] text-slate-400 hover:text-slate-200 underline decoration-dotted"
+      >
+        Clear
+      </button>
+    </div>
+    <div class="max-h-56 overflow-auto px-1.5 pb-2">
+      <template x-for="r in queryResultsShown" :key="r.id">
+        <button
+          type="button"
+          @click="selectQueryResult(r.id)"
+          class="w-full flex items-center gap-2 px-2 py-1 rounded-md text-left hover:bg-slate-800/70 transition-colors"
+        >
+          <span
+            class="w-2 h-2 rounded-full flex-shrink-0"
+            :style="`background:${nodeTypeColor(r.nodeType)}`"
+          ></span>
+          <span class="flex-1 min-w-0">
+            <span class="block text-xs text-slate-200 truncate" x-text="r.name"></span>
+            <span class="block text-[10px] text-slate-500 truncate" x-text="r.typeLabel"></span>
+          </span>
+        </button>
+      </template>
+      <button
+        x-show="queryHasMore"
+        @click="loadMoreResults()"
+        class="w-full mt-1 text-[11px] text-blue-300 hover:text-blue-200 py-1"
+      >
+        Show more
+      </button>
+      <p
+        x-show="queryActive && !queryResultTotal"
+        class="px-2 py-3 text-[11px] text-slate-500 text-center"
+      >
+        No elements match this query.
+      </p>
+    </div>
+  </div>
+
+  <!-- Autocomplete + datalist data sources. -->
+  <datalist id="q-type-list">
+    <template x-for="t in queryTypeOptions" :key="t"><option :value="t"></option></template>
+  </datalist>
+  <datalist id="q-field-list">
+    <template x-for="f in queryFieldNames" :key="f"><option :value="f"></option></template>
+  </datalist>
+  <datalist id="q-rel-list">
+    <template x-for="r in queryRelOptions" :key="r"><option :value="r"></option></template>
+  </datalist>
+  <template x-for="f in querySchema.fields.filter((x) => x.enumLike)" :key="f.field">
+    <datalist :id="'qv_' + f.field">
+      <template x-for="v in f.values" :key="v.value"><option :value="v.value"></option></template>
+    </datalist>
+  </template>
+</div>
