@@ -5,6 +5,7 @@ via the "What's new" link.
 
 ## Unreleased
 
+- **Added:** Query the graph visually or by text, with autocomplete, to spotlight matching elements.
 - **Added:** Relationship Repartition chart in Statistics, with lifecycle scope chips and graph drill-down by relationship type.
 
 ## [0.2.0] - 2026-07-07

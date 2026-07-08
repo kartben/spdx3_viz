@@ -11,6 +11,10 @@ export const CHANGELOG = [
     items: [
       {
         tag: 'Added',
+        text: 'Query the graph visually or by text, with autocomplete, to spotlight matching elements.'
+      },
+      {
+        tag: 'Added',
         text: 'Relationship Repartition chart in Statistics, with lifecycle scope chips and graph drill-down by relationship type.'
       }
     ]

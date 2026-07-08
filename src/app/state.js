@@ -266,6 +266,24 @@ export function createState() {
     graphSelectedNodeId: null, // render-node id pinned by click (keeps hover-style focus)
     graphSyncSelection: null, // set by the graph renderer; re-pins the highlight without a rebuild
 
+    // Query panel (Graph view): a structured query over the loaded model, driving
+    // the graph highlight overlay + a results list. See src/app/query.js and the
+    // pure engine in src/lib/query.js.
+    queryPanelOpen: false,
+    queryMode: 'visual', // 'visual' (builder) | 'text' (DSL box)
+    queryText: '', // the text-DSL box contents
+    queryBuilder: { op: 'and', not: false, children: [] }, // root AST group edited by the builder
+    queryError: '', // text-mode parse error, shown inline
+    queryActive: false, // true while a predicate narrows the graph
+    graphQueryPredicate: null, // compiled (element) => bool, read by the graph renderer
+    queryResults: [], // materialized result rows (capped), for the panel list
+    queryResultTotal: 0, // total matching elements (may exceed the materialized rows)
+    queryResultLimit: 50, // how many result rows are revealed (grows via loadMoreResults)
+    // Text-box autocomplete popover state.
+    queryAcOpen: false,
+    queryAcItems: [],
+    queryAcIndex: 0,
+
     // Statistics view: relationship repartition scope chip ('all' or a lifecycle scope).
     relationshipScopeFilter: 'all',
 

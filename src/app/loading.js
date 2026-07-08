@@ -318,6 +318,7 @@ export const loadingMixin = {
       this._impactHookOpenId = null;
       this._resetListMemos(); // invalidate the build + vulnerability sort memos for new data
       this._resetSearchMemos(); // and the global-search corpus / results memos
+      this._resetQuery(); // and any structured query from the previous SBOM
       this._resetImpactMemos(); // and the impact rankings / blast-radius caches
       // Fresh data: reset the streaming cursors so every list view streams its
       // (new) content on next visit, and kick the one currently shown.
