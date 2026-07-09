@@ -11,6 +11,10 @@ export const CHANGELOG = [
     items: [
       {
         tag: 'Added',
+        text: 'Graph layout picker: organic, hierarchy, radial, spotlight artifacts, and type lanes.'
+      },
+      {
+        tag: 'Added',
         text: 'Relationship Repartition chart in Statistics, with lifecycle scope chips and graph drill-down by relationship type.'
       },
       {

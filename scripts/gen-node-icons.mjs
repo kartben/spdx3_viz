@@ -78,7 +78,13 @@ const ICONS = {
   toggle_hide_orphans: 'visibility_off',
   collapse_clusters: 'unfold_less',
   reset_zoom: 'crop_free',
-  toggle_heatmap: { symbol: 'mode_heat' }
+  toggle_heatmap: { symbol: 'mode_heat' },
+  // Graph layout picker glyphs (one per layout in src/lib/graph-layout.js).
+  layout_organic: { symbol: 'bubble_chart' },
+  layout_hierarchy: 'account_tree',
+  layout_radial: 'track_changes',
+  layout_spotlight: 'stars',
+  layout_lanes: 'view_week'
 };
 
 const here = dirname(fileURLToPath(import.meta.url));

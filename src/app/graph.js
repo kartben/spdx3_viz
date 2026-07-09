@@ -2,7 +2,13 @@ import {
   renderGraph as renderGraphView,
   resetGraphZoom as resetGraphViewZoom
 } from '../graph/graph-view.js';
-import { computeHeatIndex, heatModeMeta, HEAT_MODES } from '../lib/index.js';
+import {
+  computeHeatIndex,
+  heatModeMeta,
+  HEAT_MODES,
+  GRAPH_LAYOUTS,
+  graphLayoutMeta
+} from '../lib/index.js';
 
 /* Force graph: thin bridge between the Alpine component and the D3 renderer in
    graph-view.js, plus selecting a node into the detail panel. */
@@ -42,6 +48,35 @@ export const graphMixin = {
   },
   resetGraphZoom() {
     resetGraphViewZoom(this);
+  },
+
+  // --- Layout picker -----------------------------------------------------
+
+  // The catalogue of layouts (organic / hierarchy / radial / spotlight / lanes)
+  // and metadata for the active one, for the toolbar picker and its button.
+  get graphLayoutList() {
+    return GRAPH_LAYOUTS;
+  },
+  graphLayoutMeta(key) {
+    return graphLayoutMeta(key);
+  },
+  get currentGraphLayout() {
+    return graphLayoutMeta(this.graphLayout);
+  },
+  toggleLayoutMenu() {
+    this.graphLayoutMenuOpen = !this.graphLayoutMenuOpen;
+  },
+  closeLayoutMenu() {
+    this.graphLayoutMenuOpen = false;
+  },
+  // Switch layout: the forces differ per layout, so rebuild the graph, and
+  // re-enable auto-fit since a new layout reframes the whole spread.
+  setGraphLayout(key) {
+    this.graphLayoutMenuOpen = false;
+    if (this.graphLayout === key) return;
+    this.graphLayout = key;
+    this.graphAutoFit = true;
+    this.renderGraph();
   },
 
   // --- Heatmap overlay ---------------------------------------------------

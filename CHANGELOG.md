@@ -5,6 +5,7 @@ via the "What's new" link.
 
 ## Unreleased
 
+- **Added:** Graph layout picker: organic, hierarchy, radial, spotlight artifacts, and type lanes.
 - **Added:** Relationship Repartition chart in Statistics, with lifecycle scope chips and graph drill-down by relationship type.
 - **Added:** Remediation view listing actionable SBOM gaps, with category and severity filters.
 - **Improved:** Impact adds a search-first element picker with provenance and downstream reach.
