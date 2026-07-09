@@ -101,6 +101,32 @@ test('bfsDepths pushes unreachable nodes to the outer ring', () => {
   assert.equal(depth.get('island'), 2);
 });
 
+test('bfsDepths does not route through a blocked hub', () => {
+  // A hub connects two clusters that share no other edge. root -a- hub -b- far.
+  // Without blocking, far is 2 hops (via hub). Blocking the hub as a bridge
+  // leaves far unreachable, so it drops to the outer ring instead of looking near.
+  const adjacency = new Map([
+    ['root', new Set(['a'])],
+    ['a', new Set(['root', 'hub'])],
+    ['hub', new Set(['a', 'b'])],
+    ['b', new Set(['hub', 'far'])],
+    ['far', new Set(['b'])]
+  ]);
+  const ids = ['root', 'a', 'hub', 'b', 'far'];
+
+  const open = bfsDepths(ids, adjacency, ['root']);
+  assert.equal(open.get('hub'), 2, 'hub is reached via a');
+  assert.equal(open.get('far'), 4, 'far is reached through the hub when unblocked');
+
+  const blocked = bfsDepths(ids, adjacency, ['root'], { block: new Set(['hub']) });
+  // The hub still gets its own depth, but nothing is reached *through* it.
+  assert.equal(blocked.get('hub'), 2, 'a blocked hub still lands on its own ring');
+  // b and far were only reachable via the hub, so they fall to the outer ring
+  // (deepest reached is the hub at 2, so outer = 3).
+  assert.equal(blocked.get('b'), 3);
+  assert.equal(blocked.get('far'), 3);
+});
+
 test('orderLaneTypes sorts known types canonically and keeps unknowns stable', () => {
   const ordered = orderLaneTypes(['agent', 'file', 'build', 'file', 'package']);
   // build < package < file in the canonical lane order; the duplicate file collapses.

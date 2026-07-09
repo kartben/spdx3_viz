@@ -191,12 +191,21 @@ export function computeLayers(nodeIds, edges) {
  * placed one ring beyond the deepest reached node, so a disconnected fringe
  * still lands on the outer rim rather than the centre.
  *
+ * `opts.block` is a set of high-fan-out connector nodes (a tool used by every
+ * file, an agent that created everything) that are reachable but must not be
+ * used as bridges: a blocked node still gets its own depth, but the search does
+ * not route *through* it. Without this a shared hub is a shortcut that collapses
+ * graph distance, making every node it touches look adjacent and flattening the
+ * rings/orbits into noise.
+ *
  * @param {Iterable<string>} nodeIds
  * @param {Map<string, Iterable<string>>} adjacency - id -> neighbour ids
  * @param {Iterable<string>} roots
+ * @param {{block?: Set<string>}} [opts]
  * @returns {Map<string, number>} id -> depth
  */
-export function bfsDepths(nodeIds, adjacency, roots) {
+export function bfsDepths(nodeIds, adjacency, roots, opts = {}) {
+  const block = opts.block || null;
   const ids = [...nodeIds];
   const idSet = new Set(ids);
   const depth = new Map();
@@ -213,6 +222,8 @@ export function bfsDepths(nodeIds, adjacency, roots) {
     const u = queue[head++];
     const du = depth.get(u);
     if (du > maxDepth) maxDepth = du;
+    // A blocked hub keeps its own depth but is not traversed through.
+    if (block && block.has(u)) continue;
     const neighbours = adjacency.get(u);
     if (!neighbours) continue;
     for (const v of neighbours) {

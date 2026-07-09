@@ -565,6 +565,26 @@ export function renderGraph(app, retry = 0) {
     // rebuild reproduces the same starting arrangement.
     const GOLDEN = 2.399963229728653;
 
+    // High-fan-out "connector" nodes (a tool used by every file, an agent that
+    // created everything, a build with hundreds of outputs) bias every layout:
+    // their many links drag neighbours into a ball and shift the centre of mass,
+    // and in the radial/spotlight layouts they act as shortcuts that collapse
+    // graph distance. `hubDamp` weakens the pull of a link touching such a node
+    // in inverse proportion to its degree (d3's own default link heuristic,
+    // applied only past the hub threshold so ordinary edges keep their tuned
+    // strength); the radial/spotlight BFS additionally refuses to route through
+    // them (see `hubs` passed as `block`). hasInput is already capped upstream in
+    // createLayoutLinks, so this mainly tames contains / hasOutput / ancestorOf.
+    const HUB_DEGREE = 40;
+    const hubs = new Set();
+    nodeIds.forEach((id) => {
+      if ((connCount.get(id) || 0) > HUB_DEGREE) hubs.add(id);
+    });
+    const hubDamp = (l) => {
+      const maxDeg = Math.max(connCount.get(l.source.id) || 0, connCount.get(l.target.id) || 0);
+      return maxDeg > HUB_DEGREE ? HUB_DEGREE / maxDeg : 1;
+    };
+
     const makeCharge = (strength) => {
       const c = d3.forceManyBody().strength(strength);
       // On big graphs the charge force dominates each tick, so raise Barnes-Hut's
@@ -577,7 +597,7 @@ export function renderGraph(app, retry = 0) {
         .forceLink(createLayoutLinks(links))
         .id((d) => d.id)
         .distance(distance)
-        .strength(strength);
+        .strength((l) => strength * hubDamp(l));
     const applyDecay = (sim) => {
       // Big graphs reach a readable spread quickly, so decay faster and stop
       // sooner rather than grinding through d3's default ~300 micro-adjust ticks.
@@ -668,7 +688,9 @@ export function renderGraph(app, retry = 0) {
         });
       }
       if (!roots.size && nodeIds.length) roots.add(mostConnected());
-      const depth = bfsDepths(nodeIds, adjacency, roots);
+      // Don't let a hub bridge the rings (unless it is itself a chosen root).
+      const block = new Set([...hubs].filter((h) => !roots.has(h)));
+      const depth = bfsDepths(nodeIds, adjacency, roots, { block });
       let maxDepth = 0;
       depth.forEach((v) => (maxDepth = Math.max(maxDepth, v)));
       const ring = Math.max(
@@ -732,7 +754,10 @@ export function renderGraph(app, retry = 0) {
         });
       }
       if (!keys.size && nodeIds.length) keys.add(mostConnected());
-      const dist = bfsDepths(nodeIds, adjacency, keys);
+      // Orbit rings by true distance from the artifacts: don't let a shared hub
+      // collapse everything it touches to the same ring (unless it is a key node).
+      const block = new Set([...hubs].filter((h) => !keys.has(h)));
+      const dist = bfsDepths(nodeIds, adjacency, keys, { block });
       const base = 110;
       const ring = 78;
       const radiusOf = (d) => (keys.has(d.id) ? 0 : base + (dist.get(d.id) || 0) * ring);
@@ -817,7 +842,7 @@ export function renderGraph(app, retry = 0) {
               .forceLink(createLayoutLinks(links))
               .id((d) => d.id)
               .distance((d) => (d.type === 'hasInput' ? 85 : 60))
-              .strength((d) => (d.type === 'hasInput' ? 0.05 : 0.18))
+              .strength((l) => (l.type === 'hasInput' ? 0.05 : 0.18) * hubDamp(l))
           )
           .force('charge', makeCharge(-150))
           .force('center', d3.forceCenter(cx, cy))
