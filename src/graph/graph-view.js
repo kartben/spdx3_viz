@@ -8,7 +8,11 @@ import {
   dirPrefix,
   iconKeyForElement,
   getNodeIconPath2D,
-  snippetFileRef
+  snippetFileRef,
+  computeLayers,
+  bfsDepths,
+  orderLaneTypes,
+  DEFAULT_GRAPH_LAYOUT
 } from '../lib/index.js';
 
 // Icon-node mode: below this on-screen node radius (px) icons are illegible, so
@@ -542,6 +546,292 @@ export function renderGraph(app, retry = 0) {
   app.graphNodeCount = renderNodes.length;
   app.graphEdgeCount = links.length;
 
+  // Layout: how the force simulation positions nodes. The default 'organic' is
+  // pure physics; the others precompute a per-node target (a hierarchy layer, a
+  // radial ring, an artifact-distance ring, a type lane) and pin nodes toward it
+  // so the same canvas/draw path renders as a hierarchy, radial, spotlight or
+  // lane view. Each returns { configure(sim), seed()|null, radiusBoost|null }:
+  // configure wires the forces, seed sets deterministic starting coordinates
+  // (fewer edge crossings, faster settle), and radiusBoost enlarges chosen nodes
+  // (spotlight grows the final artifacts). Built here so it can size nodes below.
+  const buildLayout = () => {
+    const layoutKey = app.graphLayout || DEFAULT_GRAPH_LAYOUT;
+    const big = renderNodes.length > 4000;
+    const huge = renderNodes.length > 12000;
+    const cx = width / 2;
+    const cy = height / 2;
+    const nodeIds = renderNodes.map((d) => d.id);
+    // Golden angle: a deterministic seed spread that needs no Math.random, so a
+    // rebuild reproduces the same starting arrangement.
+    const GOLDEN = 2.399963229728653;
+
+    const makeCharge = (strength) => {
+      const c = d3.forceManyBody().strength(strength);
+      // On big graphs the charge force dominates each tick, so raise Barnes-Hut's
+      // theta and cap the interaction distance (mirrors the old organic tuning).
+      if (big) c.theta(huge ? 1.6 : 1.4).distanceMax(huge ? 500 : 900);
+      return c;
+    };
+    const linkForce = (distance, strength) =>
+      d3
+        .forceLink(createLayoutLinks(links))
+        .id((d) => d.id)
+        .distance(distance)
+        .strength(strength);
+    const applyDecay = (sim) => {
+      // Big graphs reach a readable spread quickly, so decay faster and stop
+      // sooner rather than grinding through d3's default ~300 micro-adjust ticks.
+      if (big) sim.alphaDecay(0.06).alphaMin(0.006);
+      return sim;
+    };
+    // Structural flow direction of an edge, [from, to]: hasInput points at its
+    // source (input feeds the build), so it flows target -> source; every other
+    // edge flows source -> target.
+    const flowOf = (l) =>
+      l.type === 'hasInput' ? [l.targetId, l.sourceId] : [l.sourceId, l.targetId];
+    const undirectedAdjacency = () => {
+      const adj = new Map(nodeIds.map((id) => [id, new Set()]));
+      links.forEach((l) => {
+        adj.get(l.sourceId)?.add(l.targetId);
+        adj.get(l.targetId)?.add(l.sourceId);
+      });
+      return adj;
+    };
+    const mostConnected = () => {
+      let best = nodeIds[0];
+      let bestN = -1;
+      nodeIds.forEach((id) => {
+        const n = connCount.get(id) || 0;
+        if (n > bestN) {
+          bestN = n;
+          best = id;
+        }
+      });
+      return best;
+    };
+
+    if (layoutKey === 'hierarchy') {
+      const layer = computeLayers(nodeIds, links.map(flowOf));
+      const gap = 120;
+      const topPad = 70;
+      const layerY = (d) => topPad + (layer.get(d.id) || 0) * gap;
+      const perLayer = new Map();
+      renderNodes.forEach((d) => {
+        const L = layer.get(d.id) || 0;
+        if (!perLayer.has(L)) perLayer.set(L, []);
+        perLayer.get(L).push(d);
+      });
+      const seed = () => {
+        perLayer.forEach((list) => {
+          const n = list.length;
+          const spanW = Math.max(width, n * 26);
+          list.forEach((d, i) => {
+            d.x = cx - spanW / 2 + (spanW * (i + 0.5)) / n;
+            d.y = layerY(d);
+          });
+        });
+      };
+      const configure = (sim) =>
+        applyDecay(
+          sim
+            // Weak links so the layer bands hold instead of collapsing vertically.
+            .force('link', linkForce(50, 0.06))
+            .force('charge', makeCharge(-220))
+            .force(
+              'collision',
+              d3.forceCollide().radius((d) => d._r + 6)
+            )
+            .force('x', d3.forceX(cx).strength(0.03))
+            .force('y', d3.forceY(layerY).strength(0.9))
+        );
+      return { configure, seed, radiusBoost: null };
+    }
+
+    if (layoutKey === 'radial') {
+      const adjacency = undirectedAdjacency();
+      // Roots: rendered nodes standing in for a declared SBOM/document rootElement.
+      const roots = new Set();
+      (app.rootElementIds instanceof Set ? app.rootElementIds : []).forEach((id) => {
+        const rid = renderKeyOf.get(id);
+        if (rid && renderById.has(rid)) roots.add(rid);
+      });
+      // Fallbacks so the rings still centre on something sensible: flow sources
+      // (nothing points into them), else the single most-connected node.
+      if (!roots.size) {
+        const indeg = new Map(nodeIds.map((id) => [id, 0]));
+        links.forEach((l) => {
+          const to = flowOf(l)[1];
+          indeg.set(to, (indeg.get(to) || 0) + 1);
+        });
+        nodeIds.forEach((id) => {
+          if ((indeg.get(id) || 0) === 0 && adjacency.get(id)?.size) roots.add(id);
+        });
+      }
+      if (!roots.size && nodeIds.length) roots.add(mostConnected());
+      const depth = bfsDepths(nodeIds, adjacency, roots);
+      let maxDepth = 0;
+      depth.forEach((v) => (maxDepth = Math.max(maxDepth, v)));
+      const ring = Math.max(
+        55,
+        Math.min(120, (Math.min(width, height) * 0.42) / Math.max(maxDepth, 1))
+      );
+      const radiusOf = (d) => (depth.get(d.id) || 0) * ring;
+      const seed = () => {
+        renderNodes.forEach((d, i) => {
+          const a = i * GOLDEN;
+          const r = radiusOf(d);
+          d.x = cx + Math.cos(a) * r;
+          d.y = cy + Math.sin(a) * r;
+        });
+      };
+      const configure = (sim) =>
+        applyDecay(
+          sim
+            .force('link', linkForce(45, 0.05))
+            .force('charge', makeCharge(-140))
+            .force(
+              'collision',
+              d3.forceCollide().radius((d) => d._r + 4)
+            )
+            .force('radial', d3.forceRadial(radiusOf, cx, cy).strength(0.85))
+        );
+      return { configure, seed, radiusBoost: null };
+    }
+
+    if (layoutKey === 'spotlight') {
+      // Key artifacts: declared roots, terminal build outputs (produced by a
+      // build but not consumed by another), and distributed artifacts. These are
+      // the "final" things a build ships; everything else orbits by graph distance.
+      const keys = new Set();
+      const addKey = (uid) => {
+        const rid = renderKeyOf.get(uid);
+        if (rid && renderById.has(rid)) keys.add(rid);
+      };
+      (app.rootElementIds instanceof Set ? app.rootElementIds : []).forEach(addKey);
+      const produced =
+        app.producedByBuildIndex instanceof Map ? app.producedByBuildIndex : new Map();
+      const consumed =
+        app.consumedByBuildIndex instanceof Map ? app.consumedByBuildIndex : new Map();
+      produced.forEach((_v, uid) => {
+        if (!consumed.has(uid)) addKey(uid);
+      });
+      (app.distributedByIndex instanceof Map ? app.distributedByIndex : new Map()).forEach(
+        (_v, uid) => addKey(uid)
+      );
+      const adjacency = undirectedAdjacency();
+      // Fallback: no build/root signal, so treat flow sinks (nothing flows out of
+      // them) as the products; else the single most-connected node.
+      if (!keys.size) {
+        const outdeg = new Map(nodeIds.map((id) => [id, 0]));
+        links.forEach((l) => {
+          const from = flowOf(l)[0];
+          outdeg.set(from, (outdeg.get(from) || 0) + 1);
+        });
+        nodeIds.forEach((id) => {
+          if ((outdeg.get(id) || 0) === 0 && adjacency.get(id)?.size) keys.add(id);
+        });
+      }
+      if (!keys.size && nodeIds.length) keys.add(mostConnected());
+      const dist = bfsDepths(nodeIds, adjacency, keys);
+      const base = 110;
+      const ring = 78;
+      const radiusOf = (d) => (keys.has(d.id) ? 0 : base + (dist.get(d.id) || 0) * ring);
+      const radiusBoost = new Map();
+      keys.forEach((id) => radiusBoost.set(id, 1.9));
+      const seed = () => {
+        let ki = 0;
+        renderNodes.forEach((d, i) => {
+          if (keys.has(d.id)) {
+            const a = ki++ * GOLDEN;
+            d.x = cx + Math.cos(a) * 24;
+            d.y = cy + Math.sin(a) * 24;
+          } else {
+            const a = i * GOLDEN;
+            const r = radiusOf(d);
+            d.x = cx + Math.cos(a) * r;
+            d.y = cy + Math.sin(a) * r;
+          }
+        });
+      };
+      const configure = (sim) =>
+        applyDecay(
+          sim
+            .force('link', linkForce(55, 0.05))
+            .force('charge', makeCharge(-170))
+            .force(
+              'collision',
+              d3.forceCollide().radius((d) => d._r + 5)
+            )
+            .force(
+              'radial',
+              d3.forceRadial(radiusOf, cx, cy).strength((d) => (keys.has(d.id) ? 0.9 : 0.72))
+            )
+        );
+      return { configure, seed, radiusBoost };
+    }
+
+    if (layoutKey === 'lanes') {
+      const types = orderLaneTypes(renderNodes.map((d) => d.type));
+      const laneIndex = new Map(types.map((t, i) => [t, i]));
+      const n = Math.max(types.length, 1);
+      const laneX = (d) => (width * (laneIndex.get(d.type) + 1)) / (n + 1);
+      const perLane = new Map();
+      renderNodes.forEach((d) => {
+        if (!perLane.has(d.type)) perLane.set(d.type, []);
+        perLane.get(d.type).push(d);
+      });
+      const seed = () => {
+        perLane.forEach((list) => {
+          const m = list.length;
+          const spanH = Math.max(height, m * 22);
+          list.forEach((d, i) => {
+            d.x = laneX(d);
+            d.y = cy - spanH / 2 + (spanH * (i + 0.5)) / m;
+          });
+        });
+      };
+      const configure = (sim) =>
+        applyDecay(
+          sim
+            // Very weak links: they cross lanes, so they must not drag a node off
+            // its column. Charge + collision spread each lane out vertically.
+            .force('link', linkForce(40, 0.02))
+            .force('charge', makeCharge(-120))
+            .force(
+              'collision',
+              d3.forceCollide().radius((d) => d._r + 4)
+            )
+            .force('x', d3.forceX(laneX).strength(0.92))
+            .force('y', d3.forceY(cy).strength(0.045))
+        );
+      return { configure, seed, radiusBoost: null };
+    }
+
+    // organic (default): the original pure-physics force set.
+    const configure = (sim) =>
+      applyDecay(
+        sim
+          .force(
+            'link',
+            d3
+              .forceLink(createLayoutLinks(links))
+              .id((d) => d.id)
+              .distance((d) => (d.type === 'hasInput' ? 85 : 60))
+              .strength((d) => (d.type === 'hasInput' ? 0.05 : 0.18))
+          )
+          .force('charge', makeCharge(-150))
+          .force('center', d3.forceCenter(cx, cy))
+          .force(
+            'collision',
+            d3.forceCollide().radius((d) => d._r + 4)
+          )
+          .force('x', d3.forceX(cx).strength(0.045))
+          .force('y', d3.forceY(cy).strength(0.045))
+      );
+    return { configure, seed: null, radiusBoost: null };
+  };
+  const layout = buildLayout();
+
   // 6. Canvas (edges + nodes + labels on one surface).
   const canvas = document.createElement('canvas');
   canvas.className = 'graph-canvas';
@@ -580,7 +870,9 @@ export function renderGraph(app, retry = 0) {
     return s;
   };
   renderNodes.forEach((d) => {
-    d._r = computeRadius(d);
+    // A layout may enlarge chosen nodes (spotlight grows the final artifacts).
+    const boost = layout.radiusBoost?.get(d.id) || 1;
+    d._r = computeRadius(d) * boost;
     d._fill = fillForType(d.type);
     d._stroke = d.isCluster ? 'rgba(255,255,255,0.85)' : strokeForType(d.type);
     // Resolved once here (not per frame); clusters stand for many elements so they
@@ -1285,38 +1577,12 @@ export function renderGraph(app, retry = 0) {
     queueDraw();
   };
 
-  // 7. Force simulation (main thread; ticks redraw the canvas).
-  // On very large graphs the charge force dominates each tick, so raise Barnes-Hut's theta and cap the
-  // interaction distance; the x/y centering forces keep the layout cohesive. Small graphs keep the old forces.
-  const bigGraph = renderNodes.length > 4000;
-  const hugeGraph = renderNodes.length > 12000;
-  const charge = d3.forceManyBody().strength(-150);
-  if (bigGraph) charge.theta(hugeGraph ? 1.6 : 1.4).distanceMax(hugeGraph ? 500 : 900);
-
-  const sim = d3
-    .forceSimulation(renderNodes)
-    .force(
-      'link',
-      d3
-        .forceLink(createLayoutLinks(links))
-        .id((d) => d.id)
-        .distance((d) => (d.type === 'hasInput' ? 85 : 60))
-        .strength((d) => (d.type === 'hasInput' ? 0.05 : 0.18))
-    )
-    .force('charge', charge)
-    .force('center', d3.forceCenter(width / 2, height / 2))
-    .force(
-      'collision',
-      d3.forceCollide().radius((d) => d._r + 4)
-    )
-    .force('x', d3.forceX(width / 2).strength(0.045))
-    .force('y', d3.forceY(height / 2).strength(0.045));
-
-  if (bigGraph) {
-    // Big graphs reach a readable spread quickly, so decay faster and stop sooner rather than
-    // grinding through d3's default ~300 ticks of imperceptible micro-adjustment.
-    sim.alphaDecay(0.06).alphaMin(0.006);
-  }
+  // 7. Force simulation (main thread; ticks redraw the canvas). The active
+  // layout (organic/hierarchy/radial/spotlight/lanes) seeds any starting
+  // positions and wires the forces; see buildLayout above.
+  if (layout.seed) layout.seed();
+  const sim = d3.forceSimulation(renderNodes);
+  layout.configure(sim);
 
   // Hit-testing quadtree, rebuilt lazily only after the simulation moves nodes (flagged on tick),
   // so hover/drag hit-tests on a settled layout reuse it in O(log n) instead of rebuilding per mousemove.

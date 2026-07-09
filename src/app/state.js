@@ -251,6 +251,10 @@ export function createState() {
     scopeFilters: createScopeFilters(),
     graphAggregate: false,
     graphUseIcons: false, // draw nodes as their type's Material icon instead of a plain dot
+    // Layout algorithm: a GRAPH_LAYOUTS key deciding how the force sim positions
+    // nodes (organic / hierarchy / radial / spotlight / lanes).
+    graphLayout: 'organic',
+    graphLayoutMenuOpen: false, // the toolbar layout picker popover
     graphHideOrphans: true, // hide nodes left with no edges once every other filter is applied
     // Heatmap overlay: 'off' or a HEAT_MODES key (vuln / failed / unverified).
     // Blooms a glow over the elements carrying that risk signal without touching
