@@ -24,7 +24,9 @@ export const paletteMixin = {
   isViewAvailable(id) {
     switch (id) {
       case 'security':
-        return this.vulnerabilities.length > 0;
+        // Reachable when the SBOM carries vulnerabilities, when an online lookup
+        // has surfaced some, or when there are purls to check against OSV.
+        return this.allVulnerabilities.length > 0 || this.canSyncOsv;
       case 'packages':
         return this.plainPackages.length > 0;
       case 'ai':

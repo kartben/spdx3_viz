@@ -1,10 +1,120 @@
 <div x-show="currentView === 'security'" class="fade-in space-y-3 max-w-4xl">
   <div class="list-sticky space-y-3">
+    <!-- On-demand lookup against public vulnerability databases (OSV.dev) -->
+    <div
+      x-show="canSyncOsv || hasOnlineData"
+      class="rounded-lg border border-slate-700/60 bg-slate-800/40 px-3 py-2.5"
+    >
+      <div class="flex items-center gap-3 flex-wrap">
+        <span
+          class="w-7 h-7 rounded-lg bg-sky-500/15 text-sky-300 flex items-center justify-center flex-shrink-0"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M3 12a9 9 0 0018 0 9 9 0 00-18 0zm9-9v18m-9-9h18"
+            />
+          </svg>
+        </span>
+        <div class="min-w-0">
+          <div class="text-sm font-medium text-slate-200">Public vulnerability databases</div>
+          <div class="text-xs text-slate-500">
+            Match components against
+            <a
+              href="https://osv.dev"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-sky-400 hover:text-sky-300"
+              >OSV.dev</a
+            >
+            by PackageURL
+          </div>
+        </div>
+
+        <!-- Idle / done actions -->
+        <div class="ml-auto flex items-center gap-2" x-show="osvSync.status !== 'running'">
+          <span x-show="osvSync.status === 'done'" class="text-xs text-slate-400">
+            <span x-text="`${formatCount(securitySummary.onlineTotal)} from OSV`"></span>
+            <span
+              x-show="securitySummary.newOnline"
+              class="text-emerald-300"
+              x-text="`· ${formatCount(securitySummary.newOnline)} new`"
+            ></span>
+          </span>
+          <button
+            @click="startOsvSync()"
+            class="badge bg-sky-500/15 text-sky-200 hover:bg-sky-500/25 ring-1 ring-sky-500/30"
+          >
+            <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+            <span x-text="osvSync.status === 'done' ? 'Re-check' : 'Check public databases'"></span>
+          </button>
+          <button
+            x-show="hasOnlineData"
+            @click="resetOsvSync()"
+            class="badge bg-slate-700/60 text-slate-400 hover:text-slate-200"
+            title="Clear online findings"
+          >
+            Clear
+          </button>
+        </div>
+
+        <!-- In-progress: phase label + progress bar + cancel -->
+        <div
+          class="ml-auto flex items-center gap-3 flex-1 min-w-[240px]"
+          x-show="osvSync.status === 'running'"
+        >
+          <div class="flex-1">
+            <div class="flex justify-between text-xs text-slate-400 mb-1">
+              <span
+                x-text="osvSync.phase === 'details' ? 'Fetching advisories…' : 'Querying OSV…'"
+              ></span>
+              <span
+                class="tabular-nums"
+                x-text="`${formatCount(osvSync.done)} / ${formatCount(osvSync.total)}`"
+              ></span>
+            </div>
+            <div class="h-1.5 rounded-full bg-slate-700 overflow-hidden">
+              <div
+                class="h-full bg-sky-400 transition-all duration-200"
+                :style="`width:${osvProgress}%`"
+              ></div>
+            </div>
+          </div>
+          <button
+            @click="cancelOsvSync()"
+            class="badge bg-slate-700/60 text-slate-300 hover:text-white"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+      <div
+        x-show="osvSync.status === 'error'"
+        class="text-xs text-rose-300 mt-2"
+        x-text="'Lookup failed: ' + osvSync.error"
+      ></div>
+      <div
+        x-show="osvSync.status === 'done' && !securitySummary.onlineTotal"
+        class="text-xs text-slate-500 mt-2"
+      >
+        OSV reported no additional vulnerabilities for this SBOM's components.
+      </div>
+    </div>
+
     <!-- Controls: count + search + sort -->
     <div class="flex flex-wrap items-center gap-3">
       <span
         class="text-sm text-slate-400"
-        x-text="`${formatCount(filteredVulnerabilities.length)} of ${formatCount(vulnerabilities.length)} vulnerabilities`"
+        x-text="`${formatCount(filteredVulnerabilities.length)} of ${formatCount(allVulnerabilities.length)} vulnerabilities`"
       ></span>
       <input
         x-model.debounce.200ms="securitySearch"
@@ -70,6 +180,37 @@
         </button>
       </template>
     </div>
+
+    <!-- Provenance filter chips (only after an online lookup has run) -->
+    <div x-show="hasOnlineData" class="flex flex-wrap items-center gap-2">
+      <span class="text-xs text-slate-500 mr-0.5">Source</span>
+      <button
+        @click="securitySourceFilter = ''; restreamView('security')"
+        class="badge transition"
+        :class="securitySourceFilter === '' ? 'bg-slate-600/40 text-white ring-1 ring-slate-400/40' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
+      >
+        All
+        <span class="ml-1.5 font-semibold" x-text="formatCount(securitySummary.total)"></span>
+      </button>
+      <button
+        @click="securitySourceFilter = (securitySourceFilter === 'sbom' ? '' : 'sbom'); restreamView('security')"
+        class="badge transition"
+        :class="securitySourceFilter === 'sbom' ? 'bg-slate-600/40 text-white ring-1 ring-slate-400/40' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
+        title="Vulnerabilities carried by the SBOM document"
+      >
+        In SBOM
+        <span class="ml-1.5 font-semibold" x-text="formatCount(securitySummary.sbomTotal)"></span>
+      </button>
+      <button
+        @click="securitySourceFilter = (securitySourceFilter === 'online' ? '' : 'online'); restreamView('security')"
+        class="badge transition"
+        :class="securitySourceFilter === 'online' ? 'bg-sky-500/20 text-sky-200 ring-1 ring-sky-400/40' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
+        title="Vulnerabilities reported online by OSV.dev"
+      >
+        Online (OSV)
+        <span class="ml-1.5 font-semibold" x-text="formatCount(securitySummary.onlineTotal)"></span>
+      </button>
+    </div>
   </div>
 
   <!-- Vulnerability cards -->
@@ -121,6 +262,13 @@
           ></div>
         </div>
         <div class="flex items-center gap-2 flex-shrink-0">
+          <span
+            x-show="hasOnlineData"
+            class="badge"
+            :class="vulnSourceMeta(vuln.source).badgeClass"
+            :title="vulnSourceMeta(vuln.source).title"
+            x-text="vulnSourceMeta(vuln.source).label"
+          ></span>
           <span
             x-show="vuln.kev"
             class="badge bg-rose-500/15 text-rose-300 ring-1 ring-rose-500/40"
@@ -191,7 +339,7 @@
 
         <!-- In-SBOM risk assessment (CVSS/EPSS/exploit), straight from the document -->
         <div
-          x-show="vuln.cvss || vuln.epss || vuln.kev"
+          x-show="(vuln.cvss || vuln.epss || vuln.kev) && vuln.source !== 'online'"
           class="rounded-lg bg-slate-900/40 border border-slate-700/50 p-3 space-y-2"
         >
           <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
@@ -336,9 +484,107 @@
           </div>
         </div>
 
+        <!-- Online match from OSV.dev (present on online/both vulnerabilities) -->
+        <div
+          x-show="vuln.online"
+          class="rounded-lg bg-sky-950/20 border border-sky-800/40 p-3 space-y-2"
+        >
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-xs font-semibold text-sky-300 uppercase tracking-wider">
+              Online match · OSV.dev
+            </span>
+            <span
+              x-show="vuln.online?.osvId && vuln.online?.osvId !== vuln.name"
+              class="badge bg-slate-700/60 text-slate-300 font-mono"
+              x-text="vuln.online?.osvId"
+            ></span>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <span
+              x-show="vuln.online?.cvss"
+              class="badge"
+              :class="cvssSeverityMeta(vuln.online?.cvss?.severity).badgeClass"
+              :title="vuln.online?.cvss?.vector"
+            >
+              <span x-text="cvssSeverityMeta(vuln.online?.cvss?.severity).label"></span>
+              <span
+                x-show="vuln.online?.cvss?.score != null"
+                class="ml-1.5 font-semibold tabular-nums"
+                x-text="vuln.online?.cvss?.score"
+              ></span>
+            </span>
+            <span
+              x-show="vuln.online?.cvss?.version"
+              class="text-[10px] text-slate-500"
+              x-text="'CVSS v' + vuln.online?.cvss?.version"
+            ></span>
+            <template x-for="cwe in vuln.online?.cwes || []" :key="cwe">
+              <span class="badge bg-slate-700/60 text-slate-300" x-text="cwe"></span>
+            </template>
+          </div>
+          <p
+            x-show="vuln.online?.summary"
+            class="text-sm text-slate-300 leading-relaxed"
+            x-text="vuln.online?.summary"
+          ></p>
+          <p
+            x-show="vuln.online?.details && vuln.online?.details !== vuln.online?.summary"
+            class="text-xs text-slate-400 leading-relaxed max-h-32 overflow-y-auto whitespace-pre-wrap break-words"
+            x-text="vuln.online?.details"
+          ></p>
+
+          <!-- Components this advisory matched, by PackageURL -->
+          <div x-show="(vuln.online?.matched || []).length">
+            <div
+              class="text-xs text-slate-500 mb-1"
+              x-text="`Matched ${formatCount((vuln.online?.matched || []).length)} ${(vuln.online?.matched || []).length === 1 ? 'component' : 'components'} by PackageURL`"
+            ></div>
+            <div class="flex flex-wrap gap-1.5">
+              <template x-for="m in (vuln.online?.matched || []).slice(0, 24)" :key="m.spdxId">
+                <button
+                  @click="navigateTo(m.spdxId)"
+                  class="badge bg-slate-800 text-slate-300 hover:text-white font-mono max-w-full truncate"
+                  :title="m.purl || m.name"
+                  x-text="m.name"
+                ></button>
+              </template>
+              <span
+                x-show="(vuln.online?.matched || []).length > 24"
+                class="badge bg-slate-800 text-slate-500"
+                x-text="`+${(vuln.online?.matched || []).length - 24} more`"
+              ></span>
+            </div>
+          </div>
+
+          <details x-show="(vuln.online?.references || []).length > 0" class="group">
+            <summary class="cursor-pointer text-xs text-slate-400 hover:text-slate-200">
+              <span x-text="(vuln.online?.references || []).length + ' OSV references'"></span>
+            </summary>
+            <div class="mt-2 space-y-1">
+              <template x-for="ref in vuln.online?.references || []" :key="ref.url">
+                <a
+                  :href="ref.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="block text-xs text-sky-400 hover:text-sky-300 truncate"
+                  :title="ref.url"
+                  x-text="ref.url.replace(/^https?:\/\//,'')"
+                ></a>
+              </template>
+            </div>
+          </details>
+          <div class="text-[10px] text-slate-600 flex flex-wrap gap-x-3 gap-y-1">
+            <span
+              x-show="vuln.online?.published"
+              x-text="'Published ' + formatDate(vuln.online?.published)"
+            ></span>
+            <span>Source: OSV.dev</span>
+          </div>
+        </div>
+
         <!-- Fallback reference links (until the rich record loads) -->
         <div
-          x-show="vuln.locators.length > 0 && !cveDetail(vuln.cveId)?.data"
+          x-show="vuln.locators.length > 0 && !cveDetail(vuln.cveId)?.data && !vuln.online"
           class="flex flex-wrap gap-2"
         >
           <template x-for="url in vuln.locators" :key="url">

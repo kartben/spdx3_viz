@@ -162,6 +162,7 @@ export function createState() {
     securitySort: 'severity',
     securityStatusFilter: '',
     securitySeverityFilter: '', // '' = all, else a CVSS severity band (critical…low)
+    securitySourceFilter: '', // '' = all, else 'sbom' | 'online' (data provenance)
     remediationCategoryFilter: '', // '' = all, else a remediation sourceCategory key
     remediationSeverityFilter: '', // '' = all, else critical/high/medium/low
     impactSearch: '', // Impact tab picker query
@@ -209,6 +210,18 @@ export function createState() {
     creatorTools: [], // tools the documents were created with (createdUsing)
     licenses: [],
     vulnerabilities: [], // enriched CVEs with VEX assessments
+    onlineVulns: [], // OSV findings merged into the security view (source online/both)
+    // On-demand OSV lookup state: idle | running | done | error.
+    osvSync: {
+      status: 'idle',
+      phase: '',
+      done: 0,
+      total: 0,
+      error: '',
+      findings: 0,
+      queried: 0,
+      ranAt: 0
+    },
     vexRelationships: [], // raw VEX assessment relationship elements (for the graph)
     presentNodeTypes: [], // graph node types present in the data (trims the legend)
     presentRelTypes: [], // relationship types present in the data (trims the legend)

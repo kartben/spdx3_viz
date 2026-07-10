@@ -1,4 +1,5 @@
 import { computeRelationshipTypeCounts } from '../parser/parser.js';
+import { mergeVulnLists } from '../lib/index.js';
 import { isA, CLASS } from '../spdx/model.js';
 
 /* Derived data: computed getters over the parsed model — filtered/sorted list
@@ -12,6 +13,8 @@ let filteredBuildsCacheKey = null;
 let filteredBuildsCacheVal = [];
 let filteredVulnsCacheKey = null;
 let filteredVulnsCacheVal = [];
+let allVulnsCacheKey = null;
+let allVulnsCacheVal = [];
 let filteredFilesCacheKey = null;
 let filteredFilesCacheVal = [];
 
@@ -22,6 +25,20 @@ export const derivedMixin = {
     filteredBuildsCacheKey = null;
     filteredVulnsCacheKey = null;
     filteredFilesCacheKey = null;
+    allVulnsCacheKey = null;
+  },
+
+  // SBOM-derived vulnerabilities merged with any OSV online findings. Before a
+  // lookup runs (no online data) this is just the SBOM list, so the view is
+  // unchanged. After a lookup, entries are tagged source: sbom | online | both.
+  // Memoized so the merge runs once per (SBOM, online-result) pair.
+  get allVulnerabilities() {
+    if (!this.onlineVulns.length) return this.vulnerabilities;
+    const key = `${this.vulnerabilities.length}|${this.onlineVulns.length}|${this.osvSync.ranAt}`;
+    if (key === allVulnsCacheKey) return allVulnsCacheVal;
+    allVulnsCacheVal = mergeVulnLists(this.vulnerabilities, this.onlineVulns);
+    allVulnsCacheKey = key;
+    return allVulnsCacheVal;
   },
 
   get currentViewLabel() {
@@ -1055,8 +1072,9 @@ export const derivedMixin = {
     const sort = this.securitySort;
     const statusFilter = this.securityStatusFilter;
     const severityFilter = this.securitySeverityFilter;
-    const vulns = this.vulnerabilities;
-    const key = `${vulns.length}|${search}|${sort}|${statusFilter}|${severityFilter}`;
+    const sourceFilter = this.securitySourceFilter;
+    const vulns = this.allVulnerabilities;
+    const key = `${vulns.length}|${this.onlineVulns.length}|${this.osvSync.ranAt}|${search}|${sort}|${statusFilter}|${severityFilter}|${sourceFilter}`;
     if (key === filteredVulnsCacheKey) return filteredVulnsCacheVal;
 
     let list = vulns;
@@ -1082,6 +1100,13 @@ export const derivedMixin = {
     // strip the whole list).
     if (severityFilter && this.hasCvssData) {
       list = list.filter((v) => v.severity === severityFilter);
+    }
+    // Provenance filter: 'sbom' = anything the document already carried
+    // (sbom + both); 'online' = anything OSV reported (online + both).
+    if (sourceFilter === 'sbom') {
+      list = list.filter((v) => v.source !== 'online');
+    } else if (sourceFilter === 'online') {
+      list = list.filter((v) => v.source === 'online' || v.source === 'both');
     }
 
     const sev = { affected: 4, under_investigation: 3, not_affected: 2, fixed: 1, unknown: 0 };
@@ -1117,10 +1142,25 @@ export const derivedMixin = {
   // header. Counts each vulnerability once by its overall (most severe) status.
   get securitySummary() {
     const counts = { fixed: 0, not_affected: 0, affected: 0, under_investigation: 0, unknown: 0 };
-    this.vulnerabilities.forEach((v) => {
+    let sbomOnly = 0;
+    let onlineOnly = 0;
+    let both = 0;
+    this.allVulnerabilities.forEach((v) => {
       counts[v.overallStatus] = (counts[v.overallStatus] || 0) + 1;
+      if (v.source === 'online') onlineOnly++;
+      else if (v.source === 'both') both++;
+      else sbomOnly++;
     });
-    return { total: this.vulnerabilities.length, counts };
+    return {
+      total: this.allVulnerabilities.length,
+      counts,
+      // Provenance rollup: sbomTotal = carried by the document, onlineTotal =
+      // reported by OSV (both overlap on `both`), newOnline = OSV-only.
+      sbomTotal: sbomOnly + both,
+      onlineTotal: onlineOnly + both,
+      newOnline: onlineOnly,
+      both
+    };
   },
 
   // Ordered list of statuses that actually occur, for rendering summary chips
@@ -1134,7 +1174,7 @@ export const derivedMixin = {
   // True when at least one vulnerability carries an in-SBOM CVSS severity, so the
   // severity histogram/filter/badges only appear when there's data behind them.
   get hasCvssData() {
-    return this.vulnerabilities.some((v) => v.severity);
+    return this.allVulnerabilities.some((v) => v.severity);
   },
 
   // CVSS-severity histogram across all scored vulnerabilities, counted once each
@@ -1142,7 +1182,7 @@ export const derivedMixin = {
   get securitySeveritySummary() {
     const counts = { critical: 0, high: 0, medium: 0, low: 0, none: 0 };
     let scored = 0;
-    this.vulnerabilities.forEach((v) => {
+    this.allVulnerabilities.forEach((v) => {
       // Only count the standard bands the chips/bar can render, so `scored`
       // never diverges from what the UI shows.
       if (!Object.hasOwn(counts, v.severity)) return;
