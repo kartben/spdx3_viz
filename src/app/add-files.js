@@ -30,6 +30,7 @@ export const addFilesMixin = {
     this.addFilesStaged = [];
     this.addFilesRemove = [];
     this.addFilesExpanded = {};
+    this.addFilesError = '';
     stagedLocal = [];
     this.addFilesLocal = [];
     this.addFilesOpen = true;
@@ -221,8 +222,13 @@ export const addFilesMixin = {
 
   // Fetch the staged sample files, read the staged local ones, drop whatever was
   // unchecked, and re-parse once. Reuses the load overlay so a large sample still
-  // shows download + parse progress. A failed fetch aborts the whole batch, so a
-  // half-applied set never reaches the parser.
+  // shows download + parse progress, which is why the dialog closes before the
+  // download rather than after: it sits above the overlay.
+  //
+  // A failed fetch aborts the whole batch, so a half-applied set never reaches
+  // the parser, and reopens the dialog on the untouched staging with the error
+  // shown. Nothing is cleared until the batch is known to be good, so the user
+  // can retry or drop the offending pick instead of rebuilding the selection.
   async confirmAddFiles() {
     if (!this.addFilesCanApply) return;
     const paths = [...this.addFilesStaged];
@@ -230,6 +236,7 @@ export const addFilesMixin = {
     const removing = new Set(this.addFilesRemove);
     const kept = this.loadedFiles.filter((f) => !removing.has(f.uid));
     this.addFilesOpen = false;
+    this.addFilesError = '';
 
     const added = [];
     if (paths.length || locals.length) {
@@ -252,8 +259,8 @@ export const addFilesMixin = {
       } catch (err) {
         this.parsing = false;
         this.progressEta = null;
-        this.toastMsg = `Could not add files: ${err.message}`;
-        setTimeout(() => (this.toastMsg = ''), 5000);
+        this.addFilesError = `Could not add files: ${err.message}`;
+        this.addFilesOpen = true; // staging survived: let the user retry
         return;
       }
     }

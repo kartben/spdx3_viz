@@ -176,7 +176,7 @@
                 <button
                   type="button"
                   role="checkbox"
-                  :aria-checked="g.allOn"
+                  :aria-checked="g.allOn ? 'true' : g.someOn ? 'mixed' : 'false'"
                   :aria-label="`Include every file from ${g.name}`"
                   @click="toggleAddFilesGroupAll(g)"
                   class="w-[18px] h-[18px] flex-shrink-0 rounded-[5px] border flex items-center justify-center transition-colors"
@@ -403,7 +403,16 @@
 
     <!-- Actions -->
     <div class="flex items-center gap-3 px-5 py-3 border-t border-slate-700 bg-slate-800/60">
+      <!-- A batch that failed to download reopens the dialog on this message,
+           with every pick still staged so the user can retry. -->
       <span
+        x-show="addFilesError"
+        class="text-xs text-red-400 flex-1 min-w-0 truncate"
+        :title="addFilesError"
+        x-text="addFilesError"
+      ></span>
+      <span
+        x-show="!addFilesError"
         class="text-xs flex-1 min-w-0 truncate"
         :class="addFilesResultCount === 0 ? 'text-amber-400' : 'text-slate-500'"
         x-text="addFilesStatus"

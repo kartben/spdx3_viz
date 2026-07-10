@@ -189,12 +189,15 @@ export const loadingMixin = {
   // removing it again restores the link.
   _recomputeLoadedSampleId() {
     const srcs = this.loadedFiles.map((f) => f.src);
-    this.loadedSampleId = srcs.every(Boolean)
-      ? (this.samples.find(
-          (s) =>
-            s.files.length === srcs.length && s.files.every((f) => srcs.includes(`${s.dir}/${f}`))
-        )?.id ?? null)
-      : null;
+    // An empty document matches no sample: `[].every()` is true, so without the
+    // length check a zero-file sample would claim it.
+    this.loadedSampleId =
+      srcs.length > 0 && srcs.every(Boolean)
+        ? (this.samples.find(
+            (s) =>
+              s.files.length === srcs.length && s.files.every((f) => srcs.includes(`${s.dir}/${f}`))
+          )?.id ?? null)
+        : null;
   },
   readFiles(fileList) {
     this.loadedSampleId = null; // user files (even added to a sample) aren't linkable

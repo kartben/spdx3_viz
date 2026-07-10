@@ -25,6 +25,7 @@ export function createState() {
     addFilesRemove: [], // uids of loaded files queued for removal
     addFilesLocal: [], // [{name, size}] local files queued to add
     addFilesExpanded: {}, // sample id -> explicitly toggled open/closed
+    addFilesError: '', // a failed batch, shown in the dialog it reopens
     _pendingDeepLink: null, // parsed share hash to apply once the sample finishes parsing
     sampleError: '',
     parsing: false, // true while loading/parsing a freshly loaded SBOM
