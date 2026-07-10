@@ -49,6 +49,8 @@ export const paletteMixin = {
         return this.hasImpactData;
       case 'agents':
         return this.agents.length > 0;
+      case 'supplychain':
+        return this.supplyChain.length > 0;
       default:
         return true; // dashboard, graph, statistics, raw are always available
     }
