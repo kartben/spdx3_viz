@@ -1,5 +1,6 @@
 import { createState } from './app/state.js';
 import { loadingMixin } from './app/loading.js';
+import { addFilesMixin } from './app/add-files.js';
 import { derivedMixin } from './app/derived.js';
 import { accessorsMixin } from './app/accessors.js';
 import { navigationMixin } from './app/navigation.js';
@@ -61,6 +62,7 @@ const lifecycleMixin = {
 const mixins = [
   lifecycleMixin,
   loadingMixin,
+  addFilesMixin,
   derivedMixin,
   accessorsMixin,
   navigationMixin,

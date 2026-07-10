@@ -72,7 +72,7 @@ function prettyPrint(text) {
 }
 
 export const rawMixin = {
-  // Clamped index of the file the Raw view is showing (safe after removeFile).
+  // Clamped index of the file the Raw view is showing (safe after a removal).
   get rawIndex() {
     if (!this.loadedFiles.length) return 0;
     return Math.min(Math.max(this.rawActiveFile, 0), this.loadedFiles.length - 1);
