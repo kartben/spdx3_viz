@@ -15,6 +15,10 @@ export const CHANGELOG = [
       },
       {
         tag: 'Added',
+        text: 'Files dialog to add or remove sample and local files.'
+      },
+      {
+        tag: 'Added',
         text: 'Relationship Repartition chart in Statistics, with lifecycle scope chips and graph drill-down by relationship type.'
       },
       {

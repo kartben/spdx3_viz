@@ -1,7 +1,7 @@
 <header
   class="h-14 border-b border-slate-700/50 bg-slate-800/30 flex items-center justify-between gap-2 px-3 md:px-5 flex-shrink-0"
 >
-  <div class="flex items-center gap-2 md:gap-3 min-w-0">
+  <div class="flex items-center gap-2 md:gap-3 flex-shrink-0">
     <!-- Hamburger (mobile only) -->
     <button
       @click="sidebarOpen = true"
@@ -18,48 +18,73 @@
       </svg>
     </button>
     <h2 class="text-sm font-semibold text-white flex-shrink-0" x-text="currentViewLabel"></h2>
-    <!-- Loaded file pills (hidden on the smallest screens to save room) -->
-    <div class="hidden sm:flex items-center gap-1.5 min-w-0 overflow-x-auto">
-      <template x-for="(f, i) in loadedFiles" :key="i">
-        <span
-          class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs bg-slate-700/60 text-slate-300 flex-shrink-0"
+    <!-- Everything about this document's files, in one segmented control beside
+         the view title. Left half: what the document is made of (names in the
+         tooltip, blue dot when the user mixed their own files in), opening the
+         Raw JSON-LD view, which already gives every file a tab. Right half: the
+         Files dialog, where files are added and removed. Below `sm` only the
+         dialog half survives, so the entry point is never lost. -->
+    <div
+      class="inline-flex items-center rounded-lg bg-slate-700/60 overflow-hidden flex-shrink-0 text-xs"
+    >
+      <button
+        type="button"
+        @click="switchView('raw')"
+        :title="loadedFilesTooltip"
+        :aria-label="`${loadedFiles.length} loaded files, view raw JSON-LD`"
+        class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 text-slate-300 hover:bg-slate-700 hover:text-white transition-colors"
+      >
+        <svg
+          class="w-3.5 h-3.5 text-slate-500"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
         >
-          <svg class="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-            />
-          </svg>
-          <span x-text="f.name" class="truncate max-w-[120px]"></span>
-          <button
-            @click="removeFile(i)"
-            class="ml-0.5 text-slate-500 hover:text-red-400 transition-colors"
-            title="Remove this file"
-          >
-            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </span>
-      </template>
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+          />
+        </svg>
+        <span x-text="`${loadedFiles.length} file${loadedFiles.length === 1 ? '' : 's'}`"></span>
+        <span
+          x-show="hasOwnLoadedFiles"
+          aria-hidden="true"
+          class="w-1.5 h-1.5 rounded-full bg-blue-400"
+        ></span>
+      </button>
+      <button
+        type="button"
+        @click="openAddFilesModal()"
+        class="inline-flex items-center gap-1.5 px-2.5 py-1.5 font-medium text-slate-300 hover:bg-slate-700 hover:text-white transition-colors sm:border-l sm:border-slate-800"
+        title="Add or remove the files this document is made of"
+      >
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 4v16m8-8H4"
+          />
+        </svg>
+        <!-- The md gap is deliberate: that is where the static sidebar appears
+             and the header suddenly has 256px less to work with. -->
+        <span class="hidden sm:inline md:hidden lg:inline">Add files</span>
+      </button>
     </div>
   </div>
-  <div class="flex items-center gap-2 md:gap-3 flex-shrink-0">
+  <div class="flex flex-1 items-center justify-end gap-2 md:gap-3 min-w-0">
     <!-- Global search + command palette trigger: an input-styled button that
          opens the ⌘K palette. Identical on every view (the palette is the one
-         global search), so the header never changes shape as you navigate. -->
+         global search), so the header never changes shape as you navigate. It is
+         the only thing here allowed to shrink, so a narrow viewport eats into it
+         rather than overlapping the title and the Files control. -->
     <button
       @click="openPalette()"
       type="button"
       aria-label="Search elements or jump to a view"
-      class="group flex items-center gap-2 w-44 sm:w-56 md:w-72 pl-3 pr-2 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-slate-500 hover:border-slate-600 hover:text-slate-400 transition-colors"
+      class="group flex items-center gap-2 sm:w-56 lg:w-72 min-w-0 px-2.5 sm:pl-3 sm:pr-2 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-slate-500 hover:border-slate-600 hover:text-slate-400 transition-colors"
     >
       <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -69,8 +94,8 @@
           d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
         />
       </svg>
-      <span class="flex-1 text-left text-sm truncate">Search anything…</span>
-      <span class="hidden md:inline-flex items-center gap-1 font-mono">
+      <span class="hidden sm:block flex-1 text-left text-sm truncate">Search anything…</span>
+      <span class="hidden lg:inline-flex items-center gap-1 font-mono">
         <kbd
           class="px-1.5 py-0.5 text-[10px] font-medium bg-slate-700/60 border border-slate-600/50 rounded"
           x-text="isMac ? '⌘' : 'Ctrl'"
@@ -89,7 +114,7 @@
       x-show="loadedSampleId"
       type="button"
       @click="copyShareLink()"
-      class="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors text-slate-300 hover:text-white text-xs font-medium"
+      class="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors text-slate-300 hover:text-white text-xs font-medium flex-shrink-0"
       title="Copy a link to this exact view"
     >
       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -100,24 +125,7 @@
           d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
         />
       </svg>
-      <span class="hidden sm:inline">Share</span>
+      <span class="hidden sm:inline md:hidden lg:inline">Share</span>
     </button>
-    <!-- Add more files -->
-    <label
-      class="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg cursor-pointer transition-colors text-slate-300 hover:text-white text-xs font-medium"
-      title="Add more SPDX files"
-    >
-      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-      </svg>
-      <span class="hidden sm:inline">Add files</span>
-      <input
-        type="file"
-        accept=".json,.jsonld"
-        class="hidden"
-        multiple
-        @change="handleFileInput($event)"
-      />
-    </label>
   </div>
 </header>

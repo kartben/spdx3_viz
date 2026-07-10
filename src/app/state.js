@@ -9,10 +9,22 @@ export function createState() {
   return {
     // State
     dataLoaded: false,
-    loadedFiles: [], // [{name, data}] — one entry per loaded file
+    // [{name, text, src?}]: one entry per loaded file. `src` is the sample path
+    // a file was fetched from (absent for user files), which is what lets the
+    // Add files picker gray out what the document already holds.
+    loadedFiles: [],
     samples: [], // bundled demo sets, loaded from samples/samples.json
     loadingSample: null, // id of the sample currently being fetched
     loadedSampleId: null, // id of the sample the loaded files came from (null once user files mix in); gates shareable URLs
+    // Files dialog: the staged edits to the loaded set, applied as one batch.
+    // addFilesLocal mirrors the File objects held module-side in add-files.js
+    // (name/size only, so Alpine never proxies a File).
+    addFilesOpen: false,
+    addFilesQuery: '',
+    addFilesStaged: [], // sample file paths (`${dir}/${name}`) queued to add
+    addFilesRemove: [], // uids of loaded files queued for removal
+    addFilesLocal: [], // [{name, size}] local files queued to add
+    addFilesExpanded: {}, // sample id -> explicitly toggled open/closed
     _pendingDeepLink: null, // parsed share hash to apply once the sample finishes parsing
     sampleError: '',
     parsing: false, // true while loading/parsing a freshly loaded SBOM

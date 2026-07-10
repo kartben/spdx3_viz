@@ -11,6 +11,18 @@ let parserWorker = null;
 let parseReqSeq = 0;
 let latestParseReqId = 0;
 
+/* Every loaded file gets a process-unique id. Names collide across samples
+   (zephyr/app.jsonld vs zephyr-experimental/app.jsonld) and indexes shift as
+   files come and go, so the Files dialog identifies a loaded file by its uid. */
+let fileUidSeq = 0;
+
+// Stamps a freshly loaded {name, text, src?} with its uid and load time. The
+// timestamp is what the Files dialog shows next to a user's own files, which
+// carry no sample path to identify them by.
+export function tagLoadedFile(file) {
+  return { ...file, uid: ++fileUidSeq, addedAt: Date.now() };
+}
+
 // VEX edges and the Vulnerabilities node type default to off since a large VEX
 // set can swamp the graph; when there are fewer than this many VEX edges we
 // enable the vuln node type and all four VEX edge types at load time.
@@ -57,7 +69,7 @@ function markPayloadRaw(payload) {
 
 // Human-readable size for a byte count using decimal (1000-based) units.
 // Returns '' for anything that isn't a positive, finite number.
-function formatBytes(bytes) {
+export function formatBytes(bytes) {
   if (!Number.isFinite(bytes) || bytes <= 0) return '';
   const units = ['B', 'KB', 'MB', 'GB'];
   let n = bytes;
@@ -71,6 +83,18 @@ function formatBytes(bytes) {
 }
 
 export const loadingMixin = {
+  // True once any of the user's own files is merged in, which the header chip
+  // flags: from the parsed data alone there is no telling a sample apart from
+  // something the user dropped on top of it.
+  get hasOwnLoadedFiles() {
+    return this.loadedFiles.some((f) => !f.src);
+  },
+  // The header chip's tooltip: every loaded file, the user's own ones marked.
+  get loadedFilesTooltip() {
+    const names = this.loadedFiles.map((f) => (f.src ? f.name : `${f.name} (your file)`));
+    return `${names.join('\n')}\n\nClick to view the raw JSON-LD`;
+  },
+
   // Bundled demo SBOMs — listed in samples/samples.json, loaded over fetch
   async loadSampleManifest() {
     try {
@@ -107,12 +131,13 @@ export const loadingMixin = {
       const total = sample.files.length;
       for (let i = 0; i < sample.files.length; i++) {
         const fname = sample.files[i];
-        const res = await fetch(`${sample.dir}/${fname}`);
+        const path = `${sample.dir}/${fname}`;
+        const res = await fetch(path);
         if (!res.ok) throw new Error(`${fname} (HTTP ${res.status})`);
         const text = await this._readResponseWithProgress(res, i, total);
-        loaded.push({ name: fname, text });
+        loaded.push(tagLoadedFile({ name: fname, text, src: path }));
       }
-      this.loadedFiles = loaded; // replace — the drop zone starts empty
+      this.loadedFiles = loaded; // replace: the drop zone starts empty
       this.loadedSampleId = sample.id; // pure sample content: the URL can link back to it
       this.rebuildFromLoadedFiles(); // existing merge + parse path (session continues)
       this.dataLoaded = true;
@@ -158,6 +183,19 @@ export const loadingMixin = {
     if (files.length) this.readFiles(files);
     e.target.value = ''; // reset so same file can be re-added
   },
+  // A share link replays a sample by id, so the URL is only honest while the
+  // loaded set is exactly one sample's files. Recomputed after every add/remove
+  // rather than latched, so dropping an extra file un-shares the session and
+  // removing it again restores the link.
+  _recomputeLoadedSampleId() {
+    const srcs = this.loadedFiles.map((f) => f.src);
+    this.loadedSampleId = srcs.every(Boolean)
+      ? (this.samples.find(
+          (s) =>
+            s.files.length === srcs.length && s.files.every((f) => srcs.includes(`${s.dir}/${f}`))
+        )?.id ?? null)
+      : null;
+  },
   readFiles(fileList) {
     this.loadedSampleId = null; // user files (even added to a sample) aren't linkable
     this._beginParseSession(); // show the overlay during file reads too
@@ -177,7 +215,7 @@ export const loadingMixin = {
       reader.onload = (ev) => {
         // Store the raw text; JSON.parse happens in the worker so the main
         // thread never blocks on large files.
-        loaded[i] = { name: file.name, text: ev.target.result };
+        loaded[i] = tagLoadedFile({ name: file.name, text: ev.target.result, size: file.size });
         fileProgress[i] = 1;
         remaining--;
         if (remaining === 0) {
@@ -189,15 +227,18 @@ export const loadingMixin = {
       reader.readAsText(file);
     });
   },
-  removeFile(index) {
-    this.loadedSampleId = null;
-    this.loadedFiles.splice(index, 1);
-    if (this.loadedFiles.length === 0) {
+  // Swaps in a new loaded set (the Files dialog's add + remove result) and
+  // re-parses. An empty set means everything was removed, which is the same
+  // state as never having loaded anything.
+  applyLoadedFiles(files) {
+    this.loadedFiles = files;
+    this._recomputeLoadedSampleId();
+    if (files.length === 0) {
       this.dataLoaded = false;
       return;
     }
     // Keep the Raw view's selected file in range after a removal.
-    if (this.rawActiveFile >= this.loadedFiles.length) this.rawActiveFile = 0;
+    if (this.rawActiveFile >= files.length) this.rawActiveFile = 0;
     this.rebuildFromLoadedFiles();
   },
 
