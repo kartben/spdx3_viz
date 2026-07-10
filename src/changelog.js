@@ -26,6 +26,10 @@ export const CHANGELOG = [
         text: 'Remediation view listing actionable SBOM gaps, with category and severity filters.'
       },
       {
+        tag: 'Added',
+        text: 'On-demand OSV.dev lookup in Security, matching components by PackageURL, merged with SBOM findings.'
+      },
+      {
         tag: 'Improved',
         text: 'Impact adds a search-first element picker with provenance and downstream reach.'
       }

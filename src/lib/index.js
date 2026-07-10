@@ -11,6 +11,7 @@ export * from './icons.js';
 export * from './build.js';
 export * from './provenance.js';
 export * from './security.js';
+export * from './osv.js';
 export * from './share.js';
 export * from './quality.js';
 export * from './impact.js';
