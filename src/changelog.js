@@ -32,6 +32,10 @@ export const CHANGELOG = [
       {
         tag: 'Improved',
         text: 'Impact adds a search-first element picker with provenance and downstream reach.'
+      },
+      {
+        tag: 'Fixed',
+        text: 'Overview cards no longer wrap awkwardly on narrow screens.'
       }
     ]
   },
