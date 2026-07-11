@@ -11,6 +11,7 @@ via the "What's new" link.
 - **Added:** Remediation view listing actionable SBOM gaps, with category and severity filters.
 - **Added:** On-demand public-database lookup in Security: OSV.dev by PackageURL and NVD by CPE, merged with SBOM findings.
 - **Improved:** Impact adds a search-first element picker with provenance and downstream reach.
+- **Fixed:** Overview cards no longer wrap awkwardly on narrow screens.
 
 ## [0.2.0] - 2026-07-07
 
