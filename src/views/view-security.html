@@ -85,7 +85,10 @@
           <div class="flex-1">
             <div class="flex justify-between text-xs text-slate-400 mb-1">
               <span x-text="onlinePhaseLabel"></span>
-              <span class="tabular-nums" x-text="`${onlineProgress}%`"></span>
+              <span class="tabular-nums whitespace-nowrap">
+                <span x-show="onlineEta" class="text-slate-500" x-text="onlineEta"></span>
+                <span x-text="`${onlineProgress}%`"></span>
+              </span>
             </div>
             <div class="h-1.5 rounded-full bg-slate-700 overflow-hidden">
               <div

@@ -254,6 +254,18 @@ export const accessorsMixin = {
     return new Intl.NumberFormat().format(count || 0);
   },
 
+  // Human "time left" label for a millisecond estimate: "~5s", "~1m 20s", "~2h 5m".
+  formatEta(ms) {
+    const secs = Math.max(0, Math.round((ms || 0) / 1000));
+    if (secs < 60) return `~${secs}s`;
+    const mins = Math.floor(secs / 60);
+    const remSecs = secs % 60;
+    if (mins < 60) return remSecs ? `~${mins}m ${remSecs}s` : `~${mins}m`;
+    const hrs = Math.floor(mins / 60);
+    const remMins = mins % 60;
+    return remMins ? `~${hrs}h ${remMins}m` : `~${hrs}h`;
+  },
+
   supplyChainKind(el) {
     const t = el?.type || '';
     if (!t) return '';
