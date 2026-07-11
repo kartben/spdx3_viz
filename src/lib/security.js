@@ -209,6 +209,9 @@ export function summarizeVulnAssessments(assessments) {
  * @property {Array<{url: string, name: string, tags: string[]}>} references
  * @property {string} published
  * @property {string} assigner
+ * @property {string[]} affectedFiles - source paths from affected[].programFiles
+ * @property {string[]} affectedRoutines - function/method names from affected[].programRoutines
+ * @property {string[]} affectedModules - component names from affected[].modules
  */
 
 /**
@@ -292,6 +295,29 @@ export function summarizeCveRecord(record) {
   addRefs(cna);
   adp.forEach(addRefs);
 
+  // Affected source files / functions / modules. These live in the CVE 5.x
+  // record's `affected[]` entries (optional, and mostly populated by CNAs like
+  // the Linux kernel). They're de-duplicated across CNA + ADP containers and
+  // across the per-version `affected` entries, which usually repeat the paths.
+  const affectedFiles = [];
+  const affectedRoutines = [];
+  const affectedModules = [];
+  const pushUnique = (list, value) => {
+    const v = typeof value === 'string' ? value.trim() : '';
+    if (v && !list.includes(v)) list.push(v);
+  };
+  const addAffected = (container) => {
+    (container?.affected || []).forEach((a) => {
+      (a?.programFiles || []).forEach((f) => pushUnique(affectedFiles, f));
+      (a?.programRoutines || []).forEach((r) =>
+        pushUnique(affectedRoutines, typeof r === 'string' ? r : r?.name)
+      );
+      (a?.modules || []).forEach((m) => pushUnique(affectedModules, m));
+    });
+  };
+  addAffected(cna);
+  adp.forEach(addAffected);
+
   return {
     id: meta.cveId || '',
     state: meta.state || '',
@@ -300,6 +326,9 @@ export function summarizeCveRecord(record) {
     cwes,
     references,
     published: meta.datePublished || '',
-    assigner: meta.assignerShortName || ''
+    assigner: meta.assignerShortName || '',
+    affectedFiles,
+    affectedRoutines,
+    affectedModules
   };
 }

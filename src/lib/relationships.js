@@ -62,7 +62,8 @@ export function getRelationshipColor(relType) {
     fixedIn: COLORS.vexFixed,
     doesNotAffect: COLORS.vexNotAffected,
     affects: COLORS.vexAffected,
-    underInvestigation: COLORS.vexUnderInvestigation
+    underInvestigation: COLORS.vexUnderInvestigation,
+    affectsFile: COLORS.vulnerability
   };
   return colorMap[relType] || COLORS.default;
 }

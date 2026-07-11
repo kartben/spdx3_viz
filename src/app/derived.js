@@ -1211,6 +1211,12 @@ export const derivedMixin = {
       nodeTypes.add('vulnerability');
       relTypes.add('affects');
     }
+    // Inferred vuln -> file edges add a Files-linking toggle (and need the
+    // vulnerability node type) that the SBOM's own relationship set never has.
+    if (this.affectedFileRelationships.length) {
+      nodeTypes.add('vulnerability');
+      relTypes.add('affectsFile');
+    }
     return this.graphFilters.filter((f) => (f.isRel ? relTypes.has(f.key) : nodeTypes.has(f.key)));
   },
 

@@ -606,6 +606,18 @@ export function createGraphFilters() {
       color: COLORS.vexUnderInvestigation,
       active: false,
       isRel: true
+    },
+    // Inferred vulnerability -> file edges: a CVE record's affected source files
+    // matched to File elements in this SBOM by path. Not declared by the SBOM, so
+    // dashed and in the vulnerability colour to read as a derived link. Off by
+    // default; auto-enabled for small sets like the VEX edges above.
+    {
+      key: 'affectsFile',
+      label: 'affects file (inferred)',
+      color: COLORS.vulnerability,
+      active: false,
+      isRel: true,
+      lineStyle: 'dashed'
     }
   ];
 }
