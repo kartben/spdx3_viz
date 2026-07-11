@@ -27,7 +27,7 @@ export const CHANGELOG = [
       },
       {
         tag: 'Added',
-        text: 'On-demand OSV.dev lookup in Security, matching components by PackageURL, merged with SBOM findings.'
+        text: 'On-demand public-database lookup in Security: OSV.dev by PackageURL and NVD by CPE, merged with SBOM findings.'
       },
       {
         tag: 'Improved',

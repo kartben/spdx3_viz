@@ -1,8 +1,8 @@
 <div x-show="currentView === 'security'" class="fade-in space-y-3 max-w-4xl">
   <div class="list-sticky space-y-3">
-    <!-- On-demand lookup against public vulnerability databases (OSV.dev) -->
+    <!-- On-demand lookup against public vulnerability databases (OSV + NVD) -->
     <div
-      x-show="canSyncOsv || hasOnlineData"
+      x-show="canSyncOnline || hasOnlineData"
       class="rounded-lg border border-slate-700/60 bg-slate-800/40 px-3 py-2.5"
     >
       <div class="flex items-center gap-3 flex-wrap">
@@ -29,14 +29,22 @@
               class="text-sky-400 hover:text-sky-300"
               >OSV.dev</a
             >
-            by PackageURL
+            (PackageURL) and
+            <a
+              href="https://nvd.nist.gov"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-sky-400 hover:text-sky-300"
+              >NVD</a
+            >
+            (CPE)
           </div>
         </div>
 
         <!-- Idle / done actions -->
-        <div class="ml-auto flex items-center gap-2" x-show="osvSync.status !== 'running'">
-          <span x-show="osvSync.status === 'done'" class="text-xs text-slate-400">
-            <span x-text="`${formatCount(securitySummary.onlineTotal)} from OSV`"></span>
+        <div class="ml-auto flex items-center gap-2" x-show="onlineSync.status !== 'running'">
+          <span x-show="onlineSync.status === 'done'" class="text-xs text-slate-400">
+            <span x-text="`${formatCount(securitySummary.onlineTotal)} from public DBs`"></span>
             <span
               x-show="securitySummary.newOnline"
               class="text-emerald-300"
@@ -44,7 +52,7 @@
             ></span>
           </span>
           <button
-            @click="startOsvSync()"
+            @click="startOnlineSync()"
             class="badge bg-sky-500/15 text-sky-200 hover:bg-sky-500/25 ring-1 ring-sky-500/30"
           >
             <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -55,11 +63,13 @@
                 d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
               />
             </svg>
-            <span x-text="osvSync.status === 'done' ? 'Re-check' : 'Check public databases'"></span>
+            <span
+              x-text="onlineSync.status === 'done' ? 'Re-check' : 'Check public databases'"
+            ></span>
           </button>
           <button
             x-show="hasOnlineData"
-            @click="resetOsvSync()"
+            @click="resetOnlineSync()"
             class="badge bg-slate-700/60 text-slate-400 hover:text-slate-200"
             title="Clear online findings"
           >
@@ -67,46 +77,83 @@
           </button>
         </div>
 
-        <!-- In-progress: phase label + progress bar + cancel -->
+        <!-- In-progress: phase label + combined progress bar + cancel -->
         <div
           class="ml-auto flex items-center gap-3 flex-1 min-w-[240px]"
-          x-show="osvSync.status === 'running'"
+          x-show="onlineSync.status === 'running'"
         >
           <div class="flex-1">
             <div class="flex justify-between text-xs text-slate-400 mb-1">
-              <span
-                x-text="osvSync.phase === 'details' ? 'Fetching advisories…' : 'Querying OSV…'"
-              ></span>
-              <span
-                class="tabular-nums"
-                x-text="`${formatCount(osvSync.done)} / ${formatCount(osvSync.total)}`"
-              ></span>
+              <span x-text="onlinePhaseLabel"></span>
+              <span class="tabular-nums" x-text="`${onlineProgress}%`"></span>
             </div>
             <div class="h-1.5 rounded-full bg-slate-700 overflow-hidden">
               <div
                 class="h-full bg-sky-400 transition-all duration-200"
-                :style="`width:${osvProgress}%`"
+                :style="`width:${onlineProgress}%`"
               ></div>
+            </div>
+            <div class="flex gap-3 mt-1 text-[10px] text-slate-500 tabular-nums">
+              <span x-show="onlineSync.osv.total"
+                >OSV
+                <span
+                  x-text="`${formatCount(onlineSync.osv.done)}/${formatCount(onlineSync.osv.total)}`"
+                ></span
+              ></span>
+              <span x-show="onlineSync.nvd.total"
+                >NVD
+                <span
+                  x-text="`${formatCount(onlineSync.nvd.done)}/${formatCount(onlineSync.nvd.total)}`"
+                ></span
+              ></span>
             </div>
           </div>
           <button
-            @click="cancelOsvSync()"
+            @click="cancelOnlineSync()"
             class="badge bg-slate-700/60 text-slate-300 hover:text-white"
           >
             Cancel
           </button>
         </div>
       </div>
+
+      <!-- Optional NVD API key (raises NVD's rate limit) -->
+      <details x-show="onlineSync.status !== 'running' && canSyncOnline" class="mt-2 group">
+        <summary class="cursor-pointer text-[11px] text-slate-500 hover:text-slate-300 select-none">
+          NVD options
+          <span x-show="nvdApiKey" class="text-emerald-400">· API key set</span>
+        </summary>
+        <div class="mt-2 flex items-center gap-2">
+          <input
+            type="password"
+            :value="nvdApiKey"
+            @change="setNvdApiKey($event.target.value)"
+            placeholder="NVD API key (optional)"
+            class="bg-slate-900 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-sky-500 w-64"
+          />
+          <a
+            href="https://nvd.nist.gov/developers/request-an-api-key"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-[11px] text-sky-400 hover:text-sky-300"
+            >Get a key</a
+          >
+          <span class="text-[10px] text-slate-500"
+            >Speeds up NVD (50 vs 5 requests / 30s). Stored in your browser only.</span
+          >
+        </div>
+      </details>
+
       <div
-        x-show="osvSync.status === 'error'"
+        x-show="onlineSync.status === 'error'"
         class="text-xs text-rose-300 mt-2"
-        x-text="'Lookup failed: ' + osvSync.error"
+        x-text="'Lookup failed: ' + onlineSync.error"
       ></div>
       <div
-        x-show="osvSync.status === 'done' && !securitySummary.onlineTotal"
+        x-show="onlineSync.status === 'done' && !securitySummary.onlineTotal"
         class="text-xs text-slate-500 mt-2"
       >
-        OSV reported no additional vulnerabilities for this SBOM's components.
+        No additional vulnerabilities were found online for this SBOM's components.
       </div>
     </div>
 
@@ -205,9 +252,9 @@
         @click="securitySourceFilter = (securitySourceFilter === 'online' ? '' : 'online'); restreamView('security')"
         class="badge transition"
         :class="securitySourceFilter === 'online' ? 'bg-sky-500/20 text-sky-200 ring-1 ring-sky-400/40' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
-        title="Vulnerabilities reported online by OSV.dev"
+        title="Vulnerabilities reported online by OSV.dev or NVD"
       >
-        Online (OSV)
+        Online
         <span class="ml-1.5 font-semibold" x-text="formatCount(securitySummary.onlineTotal)"></span>
       </button>
     </div>
@@ -484,15 +531,21 @@
           </div>
         </div>
 
-        <!-- Online match from OSV.dev (present on online/both vulnerabilities) -->
+        <!-- Online match from public databases (present on online/both vulns) -->
         <div
           x-show="vuln.online"
           class="rounded-lg bg-sky-950/20 border border-sky-800/40 p-3 space-y-2"
         >
           <div class="flex items-center gap-2 flex-wrap">
             <span class="text-xs font-semibold text-sky-300 uppercase tracking-wider">
-              Online match · OSV.dev
+              Online match
             </span>
+            <template x-for="src in vuln.online?.sources || []" :key="src">
+              <span
+                class="badge bg-sky-500/15 text-sky-300 ring-1 ring-sky-500/30"
+                x-text="src === 'NVD' ? 'NVD' : 'OSV.dev'"
+              ></span>
+            </template>
             <span
               x-show="vuln.online?.osvId && vuln.online?.osvId !== vuln.name"
               class="badge bg-slate-700/60 text-slate-300 font-mono"
@@ -533,18 +586,18 @@
             x-text="vuln.online?.details"
           ></p>
 
-          <!-- Components this advisory matched, by PackageURL -->
+          <!-- Components this advisory matched, by PackageURL / CPE -->
           <div x-show="(vuln.online?.matched || []).length">
             <div
               class="text-xs text-slate-500 mb-1"
-              x-text="`Matched ${formatCount((vuln.online?.matched || []).length)} ${(vuln.online?.matched || []).length === 1 ? 'component' : 'components'} by PackageURL`"
+              x-text="`Matched ${formatCount((vuln.online?.matched || []).length)} ${(vuln.online?.matched || []).length === 1 ? 'component' : 'components'} by PackageURL / CPE`"
             ></div>
             <div class="flex flex-wrap gap-1.5">
               <template x-for="m in (vuln.online?.matched || []).slice(0, 24)" :key="m.spdxId">
                 <button
                   @click="navigateTo(m.spdxId)"
                   class="badge bg-slate-800 text-slate-300 hover:text-white font-mono max-w-full truncate"
-                  :title="m.purl || m.name"
+                  :title="m.purl || m.cpe || m.name"
                   x-text="m.name"
                 ></button>
               </template>
@@ -558,7 +611,7 @@
 
           <details x-show="(vuln.online?.references || []).length > 0" class="group">
             <summary class="cursor-pointer text-xs text-slate-400 hover:text-slate-200">
-              <span x-text="(vuln.online?.references || []).length + ' OSV references'"></span>
+              <span x-text="(vuln.online?.references || []).length + ' references'"></span>
             </summary>
             <div class="mt-2 space-y-1">
               <template x-for="ref in vuln.online?.references || []" :key="ref.url">
@@ -578,7 +631,9 @@
               x-show="vuln.online?.published"
               x-text="'Published ' + formatDate(vuln.online?.published)"
             ></span>
-            <span>Source: OSV.dev</span>
+            <span
+              x-text="'Source: ' + (vuln.online?.sources || []).map(s => s === 'NVD' ? 'NVD' : 'OSV.dev').join(', ')"
+            ></span>
           </div>
         </div>
 
@@ -665,13 +720,13 @@
     class="text-sm text-slate-500 italic text-center py-8"
   >
     <span x-show="allVulnerabilities.length > 0">No vulnerabilities match your filters</span>
-    <span x-show="allVulnerabilities.length === 0 && osvSync.status === 'done'">
+    <span x-show="allVulnerabilities.length === 0 && onlineSync.status === 'done'">
       No known vulnerabilities were found in the SBOM or online.
     </span>
-    <span x-show="allVulnerabilities.length === 0 && osvSync.status !== 'done'">
+    <span x-show="allVulnerabilities.length === 0 && onlineSync.status !== 'done'">
       This SBOM carries no vulnerability data.
-      <span x-show="canSyncOsv" class="not-italic">
-        Use “Check public databases” above to look up known CVEs by PackageURL.
+      <span x-show="canSyncOnline" class="not-italic">
+        Use “Check public databases” above to look up known CVEs by PackageURL and CPE.
       </span>
     </span>
   </div>

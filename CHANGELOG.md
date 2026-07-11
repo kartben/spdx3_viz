@@ -9,7 +9,7 @@ via the "What's new" link.
 - **Added:** Files dialog to add or remove sample and local files.
 - **Added:** Relationship Repartition chart in Statistics, with lifecycle scope chips and graph drill-down by relationship type.
 - **Added:** Remediation view listing actionable SBOM gaps, with category and severity filters.
-- **Added:** On-demand OSV.dev lookup in Security, matching components by PackageURL, merged with SBOM findings.
+- **Added:** On-demand public-database lookup in Security: OSV.dev by PackageURL and NVD by CPE, merged with SBOM findings.
 - **Improved:** Impact adds a search-first element picker with provenance and downstream reach.
 
 ## [0.2.0] - 2026-07-07
