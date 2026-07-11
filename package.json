@@ -14,6 +14,7 @@
     "lint": "eslint .",
     "gen:icons": "node scripts/gen-node-icons.mjs",
     "gen:changelog": "node scripts/gen-changelog.mjs",
+    "measure:nvd": "node --max-old-space-size=8192 scripts/measure-nvd-index.mjs",
     "gen:functional-safety-sample": "node scripts/gen-functional-safety-sample.mjs",
     "gen:supply-chain-sample": "node scripts/gen-supply-chain-sample.mjs",
     "gen:paper-plane-sample": "node scripts/gen-paper-plane-sample.mjs"
