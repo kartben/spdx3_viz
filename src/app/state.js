@@ -180,6 +180,9 @@ export function createState() {
     _impactHookOpenId: null, // element id whose inline Impact hook is expanded
     // CVE id -> { loading, error, data } fetched on demand from cve.org
     cveDetails: {},
+    _affectedFileIndex: null, // memoized basename->File index for affected-file linking
+    _affectedFileIndexFor: null, // the `files` array the index was built from
+    _affectedFileLinksCache: null, // memoized CVE id -> AffectedFileLink[]
     licenseSort: 'usage',
     buildSort: 'output',
     pkgSort: 'name',
@@ -243,6 +246,9 @@ export function createState() {
     virtualVulnMap: new Map(), // online:<id> -> synthetic security_Vulnerability element
     virtualVulnElements: [], // the same synthetic elements, as a list (search corpus)
     virtualVexRelationships: [], // synthetic `affects` edges (vuln -> matched component)
+    affectedFileRelationships: [], // inferred `affectsFile` edges (vuln -> matched File)
+    resolvingAffectedFiles: false, // true while bulk-fetching CVE records for graph linkage
+    affectedFilesProgress: { done: 0, total: 0 }, // bulk-resolve progress
     vexRelationships: [], // raw VEX assessment relationship elements (for the graph)
     presentNodeTypes: [], // graph node types present in the data (trims the legend)
     presentRelTypes: [], // relationship types present in the data (trims the legend)

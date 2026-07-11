@@ -7,6 +7,9 @@ import {
   getVexJustificationLabel,
   getCvssSeverityMeta,
   summarizeCveRecord,
+  buildFileIndex,
+  linkAffectedFiles,
+  buildAffectedFileRelationships,
   collectPurlTargets,
   collectCpeTargets,
   buildOnlineVulns,
@@ -16,6 +19,11 @@ import {
 // Above this many synthesized vuln edges, keep the graph's vulnerability nodes
 // opt-in (mirrors the SBOM load path) so a large scan doesn't swamp the canvas.
 const VIRTUAL_VEX_AUTO_SHOW_MAX = 200;
+
+// Bulk "Resolve affected files" bounds: cap how many CVE records one run will
+// fetch (so a huge advisory list can't hammer cve.org) and how many at once.
+const AFFECTED_FILES_RESOLVE_MAX = 300;
+const AFFECTED_FILES_RESOLVE_CONCURRENCY = 5;
 
 /* Long-lived lookup workers, kept off the reactive state so they are never
    proxied. One queries OSV by PackageURL, the other NVD by CPE. onlineReqSeq
@@ -110,6 +118,38 @@ export const securityMixin = {
   cveDetail(cveId) {
     return this.cveDetails[cveId] || null;
   },
+  // A basename->File index over the current document's files, rebuilt only when
+  // the files array itself changes (i.e. a new SBOM loads). Backs the "affected
+  // files" linking without rescanning every File on each render.
+  _fileIndex() {
+    if (this._affectedFileIndexFor !== this.files) {
+      this._affectedFileIndex = buildFileIndex(this.files);
+      this._affectedFileIndexFor = this.files;
+      this._affectedFileLinksCache = {}; // a new file set invalidates every resolved link
+    }
+    return this._affectedFileIndex;
+  },
+  // For a CVE whose record has loaded, resolves each declared affected source
+  // path to a File in this SBOM (when one matches). Returns [] until the record
+  // is fetched or when the record lists no affected files. Memoized per cveId
+  // (both cards call this several times per render); the cache is dropped when
+  // the SBOM's files change (see _fileIndex) and a no-data CVE is never cached,
+  // so a later fetch still resolves.
+  affectedFileLinks(cveId) {
+    const files = this.cveDetail(cveId)?.data?.affectedFiles;
+    if (!files || !files.length) return [];
+    const index = this._fileIndex(); // resolves the cache reset before we read it
+    this._affectedFileLinksCache ||= {};
+    if (!this._affectedFileLinksCache[cveId]) {
+      this._affectedFileLinksCache[cveId] = linkAffectedFiles(files, index);
+    }
+    return this._affectedFileLinksCache[cveId];
+  },
+  // How many affected paths resolved to a File in this SBOM (drives the "N in
+  // this SBOM" hint next to the affected-files list).
+  affectedFileMatchCount(cveId) {
+    return this.affectedFileLinks(cveId).filter((l) => l.linked).length;
+  },
   // Lazily fetch a CVE's public record the first time it's viewed, cached in
   // this.cveDetails so re-opening a card is instant and we never re-request.
   ensureCveDetails(cveId) {
@@ -128,6 +168,9 @@ export const securityMixin = {
       }
       const record = await res.json();
       this.cveDetails[cveId] = { loading: false, error: '', data: summarizeCveRecord(record) };
+      // A newly fetched record may name affected files present in this SBOM, so
+      // refresh the inferred vuln -> file graph edges.
+      if (this.cveDetails[cveId].data.affectedFiles.length) this._rebuildAffectedFileLinks();
     } catch (err) {
       this.cveDetails[cveId] = {
         loading: false,
@@ -419,6 +462,86 @@ export const securityMixin = {
     this.virtualVulnElements = [];
     this.virtualVulnMap = new Map();
     this.virtualVexRelationships = [];
+    this.affectedFileRelationships = [];
+    this.affectedFilesProgress = { done: 0, total: 0 };
+  },
+
+  // Rebuilds the inferred vulnerability -> file graph edges from every CVE record
+  // fetched so far: each affected source path that resolves unambiguously to a
+  // File in this SBOM becomes one dashed `affectsFile` edge. Kept off elementMap
+  // (both endpoints already exist) and, for a small set, auto-revealed like the
+  // virtual VEX edges so the linkage is visible without hunting the legend.
+  _rebuildAffectedFileLinks() {
+    const index = this._fileIndex();
+    if (!index.size) {
+      this.affectedFileRelationships = [];
+      return;
+    }
+    const rels = buildAffectedFileRelationships(
+      this.allVulnerabilities,
+      (v) => this.cveDetails[v.cveId]?.data?.affectedFiles,
+      index
+    );
+    this.affectedFileRelationships = rels;
+    if (rels.length && rels.length < VIRTUAL_VEX_AUTO_SHOW_MAX) {
+      // Only ever switch these on, never off: surface a link the user's action
+      // (viewing a CVE, or Resolve) just produced, without overriding an opt-out.
+      this.graphFilters.forEach((f) => {
+        if (f.key === 'vulnerability' || f.key === 'affectsFile') f.active = true;
+      });
+    }
+    if (this.currentView === 'graph') this.renderGraph();
+  },
+
+  // Whether bulk-resolving affected files can do anything: needs File elements to
+  // match against and at least one CVE-identified vulnerability to fetch.
+  get canResolveAffectedFiles() {
+    return this._fileIndex().size > 0 && this.allVulnerabilities.some((v) => v.cveId);
+  },
+
+  // Fetches the public CVE records for the SBOM's vulnerabilities (bounded, so a
+  // huge advisory list can't hammer cve.org), populating cveDetails so the
+  // inferred vuln -> file edges appear on the graph. Records already fetched are
+  // reused; the per-fetch rebuild keeps the edges current as they arrive.
+  async resolveAffectedFilesForGraph() {
+    if (this.resolvingAffectedFiles) return;
+    const cveIds = [...new Set(this.allVulnerabilities.map((v) => v.cveId).filter(Boolean))];
+    const pending = cveIds.filter((id) => !this.cveDetails[id]);
+    const capped = pending.slice(0, AFFECTED_FILES_RESOLVE_MAX);
+    if (!capped.length) {
+      this._rebuildAffectedFileLinks(); // records already cached; just (re)link
+      const n = this.affectedFileRelationships.length;
+      this.toastMsg = n
+        ? `Linked ${n} affected file${n === 1 ? '' : 's'} to this SBOM.`
+        : 'No affected files from these CVEs match files in this SBOM.';
+      setTimeout(() => (this.toastMsg = ''), 5000);
+      return;
+    }
+    this.resolvingAffectedFiles = true;
+    this.affectedFilesProgress = { done: 0, total: capped.length };
+    let cursor = 0;
+    const worker = async () => {
+      while (cursor < capped.length) {
+        const id = capped[cursor++];
+        await this.fetchCveDetails(id);
+        this.affectedFilesProgress = {
+          done: this.affectedFilesProgress.done + 1,
+          total: capped.length
+        };
+      }
+    };
+    try {
+      await Promise.all(Array.from({ length: AFFECTED_FILES_RESOLVE_CONCURRENCY }, worker));
+    } finally {
+      this.resolvingAffectedFiles = false;
+      this._rebuildAffectedFileLinks();
+      const n = this.affectedFileRelationships.length;
+      const truncated = pending.length > capped.length ? ` (first ${capped.length} CVEs)` : '';
+      this.toastMsg = n
+        ? `Linked ${n} affected file${n === 1 ? '' : 's'} to this SBOM${truncated}.`
+        : `No affected files matched files in this SBOM${truncated}.`;
+      setTimeout(() => (this.toastMsg = ''), 6000);
+    }
   },
 
   // Cancels an in-flight lookup, leaving any prior results in place.

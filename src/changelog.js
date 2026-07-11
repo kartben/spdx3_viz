@@ -38,6 +38,10 @@ export const CHANGELOG = [
         text: 'Optional bundled NVD index for CPE matching without live API calls (no rate limits or CORS, offline).'
       },
       {
+        tag: 'Added',
+        text: 'CVE details list affected files and functions, with inferred links to matching SBOM files.'
+      },
+      {
         tag: 'Improved',
         text: 'Impact adds a search-first element picker with provenance and downstream reach.'
       },

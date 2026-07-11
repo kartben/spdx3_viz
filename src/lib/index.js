@@ -11,6 +11,7 @@ export * from './icons.js';
 export * from './build.js';
 export * from './provenance.js';
 export * from './security.js';
+export * from './affected-files.js';
 export * from './osv.js';
 export * from './nvd.js';
 export * from './nvd-bundle.js';

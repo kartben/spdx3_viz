@@ -65,6 +65,10 @@ function dashPatternFor(type, lineWidth, k) {
     case 'hasEvidence':
       // Denser than the provenance dots above so it doesn't read as the same edge kind.
       return [lineWidth, 2 / k];
+    case 'affectsFile':
+      // Inferred vuln -> file link: an even dash so it reads as "derived", distinct
+      // from the solid VEX `affects` edge in the same vulnerability colour family.
+      return [6 / k, 4 / k];
     default:
       return null;
   }
@@ -331,6 +335,10 @@ export function renderGraph(app, retry = 0) {
   // Virtual VEX edges: online-scan findings connected to the component(s) they
   // hit. They ride the same `affects`/vulnerability toggles as real VEX edges.
   (app.virtualVexRelationships || []).forEach(addRelLinks);
+  // Inferred vuln -> file edges: a CVE record's affected files matched to Files in
+  // this SBOM. Their own `affectsFile` toggle (and the vulnerability node type)
+  // gate them, kept separate from real VEX edges.
+  (app.affectedFileRelationships || []).forEach(addRelLinks);
 
   // Agent provenance edges: beyond the generic Relationship array, an element
   // can name agent(s) directly — CreationInfo.createdBy, an Artifact's

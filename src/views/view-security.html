@@ -199,6 +199,76 @@
       </div>
     </div>
 
+    <!-- Inferred vuln -> file linkage: fetch CVE records and match their affected
+         source files to Files in this SBOM, drawn as dashed edges on the graph. -->
+    <div
+      x-show="canResolveAffectedFiles"
+      class="rounded-lg border border-slate-700/60 bg-slate-800/40 px-3 py-2.5"
+    >
+      <div class="flex items-center gap-3 flex-wrap">
+        <span
+          class="w-7 h-7 rounded-lg bg-rose-500/15 text-rose-300 flex items-center justify-center flex-shrink-0"
+        >
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9l-7-7z"
+            />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 2v7h7" />
+          </svg>
+        </span>
+        <div class="min-w-0 flex-1">
+          <div class="text-sm font-medium text-slate-200">Affected files in this SBOM</div>
+          <div class="text-xs text-slate-500 hidden sm:block">
+            Fetch CVE records and link the source files they name to Files in this SBOM (inferred by
+            path, shown as dashed edges on the graph).
+          </div>
+        </div>
+
+        <div class="ml-auto flex items-center gap-2" x-show="!resolvingAffectedFiles">
+          <span
+            x-show="affectedFileRelationships.length"
+            class="text-xs text-emerald-300"
+            x-text="`${formatCount(affectedFileRelationships.length)} linked`"
+          ></span>
+          <button
+            @click="resolveAffectedFilesForGraph()"
+            class="badge bg-rose-500/15 text-rose-200 hover:bg-rose-500/25 ring-1 ring-rose-500/30"
+          >
+            Resolve affected files
+          </button>
+        </div>
+
+        <div
+          class="ml-auto flex items-center gap-3 flex-1 min-w-[200px]"
+          x-show="resolvingAffectedFiles"
+        >
+          <div class="flex-1">
+            <div class="flex justify-between text-xs text-slate-400 mb-1">
+              <span>Fetching CVE records…</span>
+              <span
+                class="tabular-nums"
+                x-text="`${formatCount(affectedFilesProgress.done)}/${formatCount(affectedFilesProgress.total)}`"
+              ></span>
+            </div>
+            <div class="h-1.5 rounded-full bg-slate-700 overflow-hidden">
+              <div
+                class="h-full bg-rose-400 transition-all duration-200"
+                :style="`width:${affectedFilesProgress.total ? Math.round((affectedFilesProgress.done / affectedFilesProgress.total) * 100) : 0}%`"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Controls: count + search + sort -->
     <div class="flex flex-wrap items-center gap-3">
       <span
@@ -571,6 +641,103 @@
                 x-text="'Assigner: ' + cveDetail(vuln.cveId)?.data?.assigner"
               ></span>
             </div>
+            <!-- Affected source files / functions from the CVE record. Files that
+                 match an element in this SBOM become a link into it. -->
+            <div
+              x-show="affectedFileLinks(vuln.cveId).length || (cveDetail(vuln.cveId)?.data?.affectedRoutines || []).length || (cveDetail(vuln.cveId)?.data?.affectedModules || []).length"
+              class="rounded-md bg-slate-900/40 ring-1 ring-slate-700/40 p-2.5 space-y-2"
+            >
+              <template x-if="affectedFileLinks(vuln.cveId).length">
+                <div class="space-y-1.5">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                      >Affected files</span
+                    >
+                    <span
+                      x-show="affectedFileMatchCount(vuln.cveId)"
+                      class="badge bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30"
+                      x-text="affectedFileMatchCount(vuln.cveId) + ' in this SBOM'"
+                    ></span>
+                  </div>
+                  <ul class="space-y-1">
+                    <template x-for="link in affectedFileLinks(vuln.cveId)" :key="link.path">
+                      <li>
+                        <button
+                          x-show="link.linked"
+                          type="button"
+                          @click="navigateTo(link.spdxId)"
+                          class="group inline-flex items-center gap-1.5 text-xs font-mono text-sky-300 hover:text-sky-200 text-left break-all"
+                          :title="'Open ' + link.name + ' in this SBOM'"
+                        >
+                          <svg
+                            class="w-3 h-3 flex-shrink-0 opacity-70 group-hover:opacity-100"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9l-7-7z"
+                            />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 2v7h7" />
+                          </svg>
+                          <span x-text="link.path"></span>
+                        </button>
+                        <span
+                          x-show="!link.linked"
+                          class="inline-flex items-center gap-1.5 text-xs font-mono text-slate-400 break-all"
+                          :title="link.candidates ? 'A file with this name is in the SBOM, but the path is ambiguous' : 'Not present in this SBOM'"
+                        >
+                          <span x-text="link.path"></span>
+                        </span>
+                      </li>
+                    </template>
+                  </ul>
+                  <p
+                    x-show="affectedFileMatchCount(vuln.cveId)"
+                    class="text-[10px] text-slate-500 italic leading-snug"
+                  >
+                    Links are inferred by matching file paths, not declared in this SBOM.
+                  </p>
+                </div>
+              </template>
+              <template x-if="(cveDetail(vuln.cveId)?.data?.affectedRoutines || []).length">
+                <div class="space-y-1">
+                  <span class="text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                    >Affected functions</span
+                  >
+                  <div class="flex flex-wrap gap-1">
+                    <template
+                      x-for="fn in cveDetail(vuln.cveId)?.data?.affectedRoutines || []"
+                      :key="fn"
+                    >
+                      <span
+                        class="badge bg-slate-700/60 text-slate-300 font-mono"
+                        x-text="fn"
+                      ></span>
+                    </template>
+                  </div>
+                </div>
+              </template>
+              <template x-if="(cveDetail(vuln.cveId)?.data?.affectedModules || []).length">
+                <div class="space-y-1">
+                  <span class="text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                    >Affected modules</span
+                  >
+                  <div class="flex flex-wrap gap-1">
+                    <template
+                      x-for="mod in cveDetail(vuln.cveId)?.data?.affectedModules || []"
+                      :key="mod"
+                    >
+                      <span class="badge bg-slate-700/60 text-slate-300" x-text="mod"></span>
+                    </template>
+                  </div>
+                </div>
+              </template>
+            </div>
+
             <details
               x-show="(cveDetail(vuln.cveId)?.data?.references || []).length > 0"
               class="group"
