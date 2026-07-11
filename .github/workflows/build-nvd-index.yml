@@ -1,0 +1,68 @@
+# Builds the bundled NVD CPE->CVE index (scripts/build-nvd-index.mjs) and
+# publishes it as assets on a rolling "nvd-index" pre-release. Release assets
+# don't bloat git history and are served with Range support. Weekly + manual.
+#
+# The app points at the index via the "Bundled index" NVD source; set its base
+# URL to this release's asset download path (see docs/nvd-bundled-index.md), or
+# copy the assets into the Pages deploy to serve them same-origin.
+name: Build NVD bundled index
+
+on:
+  schedule:
+    - cron: '17 4 * * 1' # 04:17 UTC every Monday
+  workflow_dispatch:
+    inputs:
+      sample_pages:
+        description: 'Pages to fetch (2000 CVEs each); 0 = full corpus'
+        required: false
+        default: '0'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nvd-index
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build & publish
+    runs-on: ubuntu-latest
+    # A full no-key build pages NVD at 5 req/30s (~16 min) plus write time.
+    # An NVD_API_KEY secret cuts the fetch to ~2 min.
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          lfs: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build index
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+        run: |
+          node --max-old-space-size=8192 scripts/build-nvd-index.mjs \
+            --out nvd-cpe \
+            --sample-pages "${{ github.event.inputs.sample_pages || '0' }}"
+          ls -la nvd-cpe
+
+      - name: Publish to rolling release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view nvd-index >/dev/null 2>&1 || \
+            gh release create nvd-index \
+              --prerelease \
+              --title "NVD bundled index" \
+              --notes "Auto-generated NVD CPE→CVE index consumed by the app's 'Bundled index' NVD source. Regenerated weekly."
+          gh release upload nvd-index nvd-cpe/manifest.json nvd-cpe/part-*.ndjson --clobber

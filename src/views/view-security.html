@@ -120,13 +120,56 @@
         </div>
       </div>
 
-      <!-- Optional NVD API key (raises NVD's rate limit) -->
+      <!-- NVD source + optional API key -->
       <details x-show="onlineSync.status !== 'running' && canSyncOnline" class="mt-2 group">
         <summary class="cursor-pointer text-[11px] text-slate-500 hover:text-slate-300 select-none">
           NVD options
-          <span x-show="nvdApiKey" class="text-emerald-400">· API key set</span>
+          <span x-show="nvdSource === 'bundle'" class="text-emerald-400">· bundled index</span>
+          <span x-show="nvdSource === 'live' && nvdApiKey" class="text-emerald-400"
+            >· API key set</span
+          >
         </summary>
-        <div class="mt-2 flex items-center gap-2">
+
+        <!-- Source: live REST API vs bundled static index -->
+        <div class="mt-2 flex items-center gap-2 flex-wrap">
+          <span class="text-[10px] text-slate-500 uppercase tracking-wider">NVD source</span>
+          <div class="inline-flex rounded-lg overflow-hidden ring-1 ring-slate-700">
+            <button
+              @click="setNvdSource('live')"
+              class="text-xs px-2.5 py-1"
+              :class="nvdSource === 'live' ? 'bg-sky-500/20 text-sky-200' : 'bg-slate-900 text-slate-400 hover:text-slate-200'"
+            >
+              Live API
+            </button>
+            <button
+              @click="setNvdSource('bundle')"
+              class="text-xs px-2.5 py-1"
+              :class="nvdSource === 'bundle' ? 'bg-sky-500/20 text-sky-200' : 'bg-slate-900 text-slate-400 hover:text-slate-200'"
+            >
+              Bundled index
+            </button>
+          </div>
+          <span class="text-[10px] text-slate-500"
+            >Bundled matches a hosted snapshot: no rate limits or CORS, works offline.</span
+          >
+        </div>
+
+        <!-- Bundle-only: index base URL -->
+        <div x-show="nvdSource === 'bundle'" class="mt-2 flex items-center gap-2 flex-wrap">
+          <input
+            type="text"
+            :value="nvdBundleUrl"
+            @change="setNvdBundleUrl($event.target.value)"
+            placeholder="./nvd-cpe/"
+            class="bg-slate-900 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-sky-500 w-80 font-mono"
+          />
+          <span class="text-[10px] text-slate-500"
+            >Base URL of the index (manifest.json + parts). Same-origin by default.</span
+          >
+        </div>
+
+        <!-- Live-only: optional API key -->
+        <div x-show="nvdSource === 'live'" class="mt-2 flex items-center gap-2">
           <input
             type="password"
             :value="nvdApiKey"
@@ -144,6 +187,27 @@
           <span class="text-[10px] text-slate-500"
             >Speeds up NVD (50 vs 5 requests / 30s). Stored in your browser only.</span
           >
+        </div>
+
+        <!-- NVD Terms of Use: required attribution + non-endorsement notice. -->
+        <div class="mt-2 text-[10px] text-slate-600 leading-relaxed">
+          This product uses data from the
+          <a
+            href="https://nvd.nist.gov"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-slate-500 hover:text-slate-300 underline"
+            >NVD</a
+          >
+          but is not endorsed or certified by the NVD. CVE is a registered trademark of MITRE. See
+          the
+          <a
+            href="https://nvd.nist.gov/developers/terms-of-use"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-slate-500 hover:text-slate-300 underline"
+            >NVD Terms of Use</a
+          >.
         </div>
       </details>
 
@@ -637,6 +701,9 @@
             <span
               x-text="'Source: ' + (vuln.online?.sources || []).map(s => s === 'NVD' ? 'NVD' : 'OSV.dev').join(', ')"
             ></span>
+            <span x-show="(vuln.online?.sources || []).includes('NVD')">
+              Not endorsed or certified by the NVD.
+            </span>
           </div>
         </div>
 

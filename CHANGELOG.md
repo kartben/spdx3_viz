@@ -11,6 +11,7 @@ via the "What's new" link.
 - **Added:** Remediation view listing actionable SBOM gaps, with category and severity filters.
 - **Added:** On-demand public-database lookup in Security: OSV.dev by PackageURL and NVD by CPE, merged with SBOM findings.
 - **Added:** Online scan findings show as flagged virtual nodes on the graph and in search.
+- **Added:** Optional bundled NVD index for CPE matching without live API calls (no rate limits or CORS, offline).
 - **Improved:** Impact adds a search-first element picker with provenance and downstream reach.
 - **Fixed:** Overview cards no longer wrap awkwardly on narrow screens.
 
