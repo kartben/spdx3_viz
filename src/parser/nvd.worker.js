@@ -19,9 +19,11 @@
  * @module parser/nvd.worker
  */
 import { NVD_API, cpeMatchString, normalizeNvdCve, matchNvdCveToComponents } from '../lib/nvd.js';
+import { planBundleFetches, matchBundleShard } from '../lib/nvd-bundle.js';
 
 const PAGE_SIZE = 2000; // NVD max resultsPerPage
 const MAX_RETRIES = 4;
+const BUNDLE_CONCURRENCY = 8; // parallel Range fetches against the bundled index
 
 let job = null; // { id, cancelled, controllers:Set<AbortController>, lastRequest, minInterval }
 
@@ -34,8 +36,110 @@ self.onmessage = (event) => {
     }
     return;
   }
-  if (msg.type === 'start') runJob(msg);
+  if (msg.type === 'start') {
+    if (msg.mode === 'bundle') runBundleJob(msg);
+    else runJob(msg);
+  }
 };
+
+// Merges an NVD finding into the by-CVE accumulator, unioning affected elements.
+function addFinding(byCve, f) {
+  const existing = byCve.get(f.cveId);
+  if (existing) {
+    existing.elementIds = [...new Set([...existing.elementIds, ...f.elementIds])];
+  } else {
+    byCve.set(f.cveId, f);
+  }
+}
+
+// Runs `worker` over `items` with at most `size` in flight.
+async function pool(items, size, worker) {
+  let cursor = 0;
+  const runners = Array.from({ length: Math.min(size, items.length) }, async () => {
+    while (cursor < items.length) await worker(items[cursor++]);
+  });
+  await Promise.all(runners);
+}
+
+// --- Bundled index mode: match against a statically-hosted index (no live NVD).
+async function runBundleJob({ id, baseUrl, targets }) {
+  job = { id, cancelled: false, controllers: new Set() };
+  const post = (m) => self.postMessage({ id, ...m });
+  const list = Array.isArray(targets) ? targets : [];
+  const base = String(baseUrl || './nvd-cpe/').replace(/\/?$/, '/');
+
+  try {
+    // Manifest first: one small fetch that maps product -> {part, byte range}.
+    let manifest;
+    try {
+      const controller = new AbortController();
+      job.controllers.add(controller);
+      const res = await fetch(`${base}manifest.json`, { signal: controller.signal });
+      job.controllers.delete(controller);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      manifest = await res.json();
+    } catch (err) {
+      throw new Error(
+        `Could not load the bundled NVD index (${(err && err.message) || 'fetch failed'}). ` +
+          `Check that it is published at ${base}manifest.json.`
+      );
+    }
+
+    const plan = planBundleFetches(manifest, list);
+    const total = plan.length;
+    const byCve = new Map();
+    let done = 0;
+    let failed = 0;
+    post({ type: 'progress', phase: 'bundle', done: 0, total });
+
+    await pool(plan, BUNDLE_CONCURRENCY, async (item) => {
+      if (job.cancelled) return;
+      let rows;
+      try {
+        const text = await rangeFetch(`${base}${item.part}`, item.offset, item.length);
+        rows = JSON.parse(text);
+      } catch {
+        failed++;
+        done++;
+        post({ type: 'progress', phase: 'bundle', done, total });
+        return;
+      }
+      matchBundleShard(rows, item.target).forEach((f) => addFinding(byCve, f));
+      done++;
+      post({ type: 'progress', phase: 'bundle', done, total });
+    });
+
+    if (job.cancelled)
+      return post({ type: 'done', ok: false, cancelled: true, error: 'Cancelled' });
+    const warning = failed
+      ? `Bundled NVD: ${failed} shard${failed === 1 ? '' : 's'} could not be read`
+      : '';
+    post({ type: 'done', ok: true, findings: [...byCve.values()], queried: total, warning });
+  } catch (err) {
+    post({ type: 'done', ok: false, error: (err && err.message) || String(err) });
+  } finally {
+    job = null;
+  }
+}
+
+// Fetches a byte range of a part file. Handles servers that honor Range (206,
+// body is exactly the range) and those that ignore it (200, slice locally).
+async function rangeFetch(url, offset, length) {
+  const controller = new AbortController();
+  job?.controllers.add(controller);
+  try {
+    const res = await fetch(url, {
+      headers: { Range: `bytes=${offset}-${offset + length - 1}` },
+      signal: controller.signal
+    });
+    if (!res.ok && res.status !== 206) throw new Error(`shard fetch failed (${res.status})`);
+    const bytes = new Uint8Array(await res.arrayBuffer());
+    const slice = res.status === 206 ? bytes : bytes.subarray(offset, offset + length);
+    return new TextDecoder().decode(slice);
+  } finally {
+    job?.controllers.delete(controller);
+  }
+}
 
 async function runJob({ id, targets, apiKey }) {
   job = {

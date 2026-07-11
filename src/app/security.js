@@ -311,9 +311,19 @@ export const securityMixin = {
       onlineAccum.pending.add('NVD');
       const nvd = getNvdWorker();
       nvd.onmessage = (event) => this._onProviderMessage('NVD', reqId, event.data || {});
+      // 'bundle' matches a statically-hosted index (no CORS/rate limits); 'live'
+      // queries NVD's REST API directly.
+      const bundle = this.nvdSource === 'bundle';
+      // Resolve to an absolute URL against the page: a relative URL inside a
+      // worker would otherwise resolve against the worker script's location.
+      const baseUrl = bundle
+        ? new URL(this.nvdBundleUrl || './nvd-cpe/', location.href).href
+        : undefined;
       nvd.postMessage({
         id: reqId,
         type: 'start',
+        mode: bundle ? 'bundle' : 'live',
+        baseUrl,
         targets: cpeTargets,
         apiKey: this.nvdApiKey || ''
       });
@@ -433,6 +443,26 @@ export const securityMixin = {
       else localStorage.removeItem(NVD_KEY_STORAGE);
     } catch {
       /* storage may be unavailable (private mode); the key still applies this session */
+    }
+  },
+
+  // Persists the NVD source choice ('live' | 'bundle') to localStorage.
+  setNvdSource(value) {
+    this.nvdSource = value === 'bundle' ? 'bundle' : 'live';
+    try {
+      localStorage.setItem('spdx3viz.nvdSource', this.nvdSource);
+    } catch {
+      /* storage may be unavailable; the choice still applies this session */
+    }
+  },
+
+  // Persists the bundled-index base URL; empty falls back to the default.
+  setNvdBundleUrl(value) {
+    this.nvdBundleUrl = String(value || '').trim() || './nvd-cpe/';
+    try {
+      localStorage.setItem('spdx3viz.nvdBundleUrl', this.nvdBundleUrl);
+    } catch {
+      /* storage may be unavailable; the URL still applies this session */
     }
   },
 

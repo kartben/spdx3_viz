@@ -34,6 +34,10 @@ export const CHANGELOG = [
         text: 'Online scan findings show as flagged virtual nodes on the graph and in search.'
       },
       {
+        tag: 'Added',
+        text: 'Optional bundled NVD index for CPE matching without live API calls (no rate limits or CORS, offline).'
+      },
+      {
         tag: 'Improved',
         text: 'Impact adds a search-first element picker with provenance and downstream reach.'
       },
