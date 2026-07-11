@@ -55,6 +55,24 @@ jobs:
       - name: Build site
         run: npm run build
 
+      # Serve the bundled NVD CPE index same-origin (so the app's default
+      # ./nvd-cpe/ base URL works without CORS). Pulled from the rolling
+      # 'nvd-index' release the "Build NVD bundled index" workflow publishes.
+      # Optional: if that release doesn't exist yet the deploy still succeeds and
+      # the Bundled index source is simply unavailable until it does.
+      - name: Include bundled NVD index
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p dist/nvd-cpe
+          if gh release download nvd-index --repo "$GITHUB_REPOSITORY" --dir dist/nvd-cpe --clobber; then
+            echo "Included bundled NVD index:"
+            ls -la dist/nvd-cpe
+          else
+            echo "No 'nvd-index' release yet — skipping; run the 'Build NVD bundled index' workflow to publish it."
+            rmdir dist/nvd-cpe 2>/dev/null || true
+          fi
+
       - name: Configure Pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
 
