@@ -22,6 +22,16 @@ let onlineReqSeq = 0;
    which providers are still running. Kept module-side so pushing findings does
    not churn Alpine reactivity. */
 let onlineAccum = { reqId: 0, findings: [], pending: new Set() };
+/* Ticks `onlineNow` while a lookup runs so the ETA counts down smoothly
+   between provider progress messages (NVD without a key is rate-limited to
+   one request every ~6s). Cleared as soon as the run settles. */
+let etaTimer = null;
+function stopEtaTimer() {
+  if (etaTimer) {
+    clearInterval(etaTimer);
+    etaTimer = null;
+  }
+}
 
 function getOsvWorker() {
   if (!osvWorker) {
@@ -170,9 +180,9 @@ export const securityMixin = {
     return this.onlineVulns.length > 0 || this.onlineSync.status === 'done';
   },
 
-  // 0–100 completion across whichever providers are still running. OSV runs a
-  // query then a details phase (each half the bar); NVD is a single phase.
-  get onlineProgress() {
+  // 0–1 completion across whichever providers are still running. OSV runs a
+  // query then a details phase (each half its share); NVD is a single phase.
+  get _onlineFraction() {
     const s = this.onlineSync;
     const fr = [];
     if (s.osv.active) {
@@ -181,7 +191,28 @@ export const securityMixin = {
     }
     if (s.nvd.active) fr.push(s.nvd.total ? s.nvd.done / s.nvd.total : 0);
     if (!fr.length) return 0;
-    return Math.round((fr.reduce((a, b) => a + b, 0) / fr.length) * 100);
+    return fr.reduce((a, b) => a + b, 0) / fr.length;
+  },
+
+  // 0–100 completion, for the progress bar and its percentage label.
+  get onlineProgress() {
+    return Math.round(this._onlineFraction * 100);
+  },
+
+  // Rough "time left" for the running lookup, projected from how far it has
+  // progressed since it started. Empty until there's enough signal to avoid a
+  // wildly wrong first guess. onlineNow ticks every second so it counts down
+  // smoothly between the (sometimes slow) provider progress messages.
+  get onlineEta() {
+    const s = this.onlineSync;
+    if (s.status !== 'running' || !s.startedAt) return '';
+    const frac = this._onlineFraction;
+    if (frac <= 0.02) return ''; // too early to project reliably
+    const elapsed = (this.onlineNow || Date.now()) - s.startedAt;
+    if (elapsed < 1500) return '';
+    const remainingMs = (elapsed * (1 - frac)) / frac;
+    if (remainingMs <= 0) return '';
+    return this.formatEta(remainingMs) + ' left';
   },
 
   // Human label for the running phase, naming the active providers.
@@ -249,14 +280,21 @@ export const securityMixin = {
     const reqId = ++onlineReqSeq;
     this._onlineReqId = reqId;
     onlineAccum = { reqId, findings: [], pending: new Set() };
+    const now = Date.now();
     this.onlineSync = {
       status: 'running',
       error: '',
       findings: 0,
       ranAt: 0,
+      startedAt: now,
       osv: { active: purlTargets.length > 0, phase: 'query', done: 0, total: purlTargets.length },
       nvd: { active: cpeTargets.length > 0, done: 0, total: cpeTargets.length }
     };
+    this.onlineNow = now;
+    stopEtaTimer();
+    etaTimer = setInterval(() => {
+      this.onlineNow = Date.now();
+    }, 1000);
 
     if (purlTargets.length) {
       onlineAccum.pending.add('OSV');
@@ -316,6 +354,7 @@ export const securityMixin = {
 
   // Builds the merged online vulnerability list once every provider has finished.
   _finalizeOnline(cancelled) {
+    stopEtaTimer();
     if (cancelled && !onlineAccum.findings.length) {
       this.onlineSync = { ...this.onlineSync, status: 'idle' };
       return;
@@ -341,6 +380,7 @@ export const securityMixin = {
   // Cancels an in-flight lookup, leaving any prior results in place.
   cancelOnlineSync() {
     if (this.onlineSync.status !== 'running') return;
+    stopEtaTimer();
     if (osvWorker) osvWorker.postMessage({ id: this._onlineReqId, type: 'cancel' });
     if (nvdWorker) nvdWorker.postMessage({ id: this._onlineReqId, type: 'cancel' });
     this.onlineSync = { ...this.onlineSync, status: 'idle' };
@@ -363,6 +403,7 @@ export const securityMixin = {
       if (osvWorker) osvWorker.postMessage({ id: this._onlineReqId, type: 'cancel' });
       if (nvdWorker) nvdWorker.postMessage({ id: this._onlineReqId, type: 'cancel' });
     }
+    stopEtaTimer();
     onlineReqSeq++;
     this._onlineReqId = onlineReqSeq;
     onlineAccum = { reqId: 0, findings: [], pending: new Set() };
@@ -373,9 +414,11 @@ export const securityMixin = {
       error: '',
       findings: 0,
       ranAt: 0,
+      startedAt: 0,
       osv: { active: false, phase: 'query', done: 0, total: 0 },
       nvd: { active: false, done: 0, total: 0 }
     };
+    this.onlineNow = 0;
     this._resetListMemos();
   },
 

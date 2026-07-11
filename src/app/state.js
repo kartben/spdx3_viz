@@ -229,9 +229,11 @@ export function createState() {
       error: '',
       findings: 0,
       ranAt: 0,
+      startedAt: 0,
       osv: { active: false, phase: 'query', done: 0, total: 0 },
       nvd: { active: false, done: 0, total: 0 }
     },
+    onlineNow: 0, // wall-clock tick (ms) driving the lookup ETA countdown
     vexRelationships: [], // raw VEX assessment relationship elements (for the graph)
     presentNodeTypes: [], // graph node types present in the data (trims the legend)
     presentRelTypes: [], // relationship types present in the data (trims the legend)
