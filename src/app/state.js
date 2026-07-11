@@ -3,6 +3,16 @@ import { APP_VERSION } from '../version.js';
 import { CHANGELOG } from '../changelog.js';
 import { storedDetailPanelWidth } from './detail-panel.js';
 
+// Restores the optional NVD API key a prior session saved (empty when unset or
+// when storage is unavailable).
+function readNvdApiKey() {
+  try {
+    return localStorage.getItem('spdx3viz.nvdApiKey') || '';
+  } catch {
+    return '';
+  }
+}
+
 /* The Alpine component's initial reactive state, returned fresh per instance so
    Maps/Sets and arrays aren't shared between mounts. Pure data only. */
 export function createState() {
@@ -210,17 +220,17 @@ export function createState() {
     creatorTools: [], // tools the documents were created with (createdUsing)
     licenses: [],
     vulnerabilities: [], // enriched CVEs with VEX assessments
-    onlineVulns: [], // OSV findings merged into the security view (source online/both)
-    // On-demand OSV lookup state: idle | running | done | error.
-    osvSync: {
+    onlineVulns: [], // OSV/NVD findings merged into the security view (source online/both)
+    nvdApiKey: readNvdApiKey(), // optional NVD API key (raises the rate limit)
+    // On-demand public-database lookup state: idle | running | done | error.
+    // Per-provider progress lets one combined bar span OSV (purl) + NVD (cpe).
+    onlineSync: {
       status: 'idle',
-      phase: '',
-      done: 0,
-      total: 0,
       error: '',
       findings: 0,
-      queried: 0,
-      ranAt: 0
+      ranAt: 0,
+      osv: { active: false, phase: 'query', done: 0, total: 0 },
+      nvd: { active: false, done: 0, total: 0 }
     },
     vexRelationships: [], // raw VEX assessment relationship elements (for the graph)
     presentNodeTypes: [], // graph node types present in the data (trims the legend)

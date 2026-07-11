@@ -6,9 +6,17 @@ import {
   pickCveId,
   cvssBaseScore,
   normalizeOsvVuln,
-  toOnlineVuln,
+  buildOnlineVulns,
   mergeVulnLists
 } from '../src/lib/index.js';
+
+// Builds an OSV provider finding for the tests from a raw OSV record + matches.
+const osvFinding = (osv, elementIds) => ({
+  provider: 'OSV',
+  ...normalizeOsvVuln(osv),
+  elementIds
+});
+const resolveById = (id) => ({ spdxId: id, name: id, purl: `pkg:test/${id}` });
 
 test('collectPurlTargets de-duplicates by purl and remembers every element', () => {
   const targets = collectPurlTargets([
@@ -96,23 +104,26 @@ test('mergeVulnLists tags SBOM/both/online and keeps the SBOM CVSS', () => {
     },
     { spdxId: 's2', name: 'CVE-2024-2222', cveId: 'CVE-2024-2222', cvss: null, severity: '' }
   ];
-  const online = [
-    toOnlineVuln(
-      normalizeOsvVuln({
-        id: 'CVE-2024-1111',
-        severity: [{ type: 'CVSS_V3', score: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N' }]
-      }),
-      [{ spdxId: 'p1', name: 'curl', purl: 'pkg:deb/curl' }]
-    ),
-    toOnlineVuln(
-      normalizeOsvVuln({
-        id: 'GHSA-new',
-        aliases: ['CVE-2024-3333'],
-        severity: [{ type: 'CVSS_V3', score: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H' }]
-      }),
-      [{ spdxId: 'p2', name: 'left-pad', purl: 'pkg:npm/left-pad' }]
-    )
-  ];
+  const online = buildOnlineVulns(
+    [
+      osvFinding(
+        {
+          id: 'CVE-2024-1111',
+          severity: [{ type: 'CVSS_V3', score: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N' }]
+        },
+        ['p1']
+      ),
+      osvFinding(
+        {
+          id: 'GHSA-new',
+          aliases: ['CVE-2024-3333'],
+          severity: [{ type: 'CVSS_V3', score: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H' }]
+        },
+        ['p2']
+      )
+    ],
+    resolveById
+  );
   const merged = mergeVulnLists(sbom, online);
   const m1 = merged.find((v) => v.cveId === 'CVE-2024-1111');
   assert.equal(m1.source, 'both');
@@ -120,15 +131,18 @@ test('mergeVulnLists tags SBOM/both/online and keeps the SBOM CVSS', () => {
   assert.ok(m1.online, 'online payload attached');
 
   // s2 had no CVSS: the online value should fill it in and flip severity.
-  const online2 = [
-    toOnlineVuln(
-      normalizeOsvVuln({
-        id: 'CVE-2024-2222',
-        severity: [{ type: 'CVSS_V3', score: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H' }]
-      }),
-      [{ spdxId: 'p3', name: 'x', purl: 'pkg:npm/x' }]
-    )
-  ];
+  const online2 = buildOnlineVulns(
+    [
+      osvFinding(
+        {
+          id: 'CVE-2024-2222',
+          severity: [{ type: 'CVSS_V3', score: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H' }]
+        },
+        ['p3']
+      )
+    ],
+    resolveById
+  );
   const merged2 = mergeVulnLists(sbom, online2);
   const m2 = merged2.find((v) => v.cveId === 'CVE-2024-2222');
   assert.equal(m2.source, 'both');
@@ -138,4 +152,37 @@ test('mergeVulnLists tags SBOM/both/online and keeps the SBOM CVSS', () => {
   assert.equal(onlineOnly.source, 'online');
   assert.equal(onlineOnly.packageCount, 1);
   assert.equal(onlineOnly.overallStatus, 'unknown');
+});
+
+test('buildOnlineVulns merges the same CVE from OSV and NVD into one entry', () => {
+  const findings = [
+    osvFinding(
+      {
+        id: 'CVE-2022-37434',
+        severity: [{ type: 'CVSS_V3', score: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N' }],
+        references: [{ type: 'WEB', url: 'https://osv.dev/x' }]
+      },
+      ['p-purl']
+    ),
+    {
+      provider: 'NVD',
+      cveId: 'CVE-2022-37434',
+      displayId: 'CVE-2022-37434',
+      summary: 'Heap overflow in zlib',
+      details: '',
+      cvss: { score: 9.8, severity: 'critical', vector: 'v', version: '3.1' },
+      cwes: ['CWE-787'],
+      references: [{ url: 'https://nvd.nist.gov/vuln/detail/CVE-2022-37434', type: 'patch' }],
+      published: '2022-08-05',
+      elementIds: ['p-cpe']
+    }
+  ];
+  const vulns = buildOnlineVulns(findings, resolveById);
+  assert.equal(vulns.length, 1);
+  const v = vulns[0];
+  assert.deepEqual(v.online.sources.sort(), ['NVD', 'OSV']);
+  assert.equal(v.cvss.score, 9.8, 'higher NVD score wins over OSV');
+  assert.equal(v.packageCount, 2, 'matched by both purl and cpe');
+  assert.deepEqual(v.online.cwes, ['CWE-787']);
+  assert.equal(v.online.references.length, 2);
 });

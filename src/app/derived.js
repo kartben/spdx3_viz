@@ -34,7 +34,7 @@ export const derivedMixin = {
   // Memoized so the merge runs once per (SBOM, online-result) pair.
   get allVulnerabilities() {
     if (!this.onlineVulns.length) return this.vulnerabilities;
-    const key = `${this.vulnerabilities.length}|${this.onlineVulns.length}|${this.osvSync.ranAt}`;
+    const key = `${this.vulnerabilities.length}|${this.onlineVulns.length}|${this.onlineSync.ranAt}`;
     if (key === allVulnsCacheKey) return allVulnsCacheVal;
     allVulnsCacheVal = mergeVulnLists(this.vulnerabilities, this.onlineVulns);
     allVulnsCacheKey = key;
@@ -1074,7 +1074,7 @@ export const derivedMixin = {
     const severityFilter = this.securitySeverityFilter;
     const sourceFilter = this.securitySourceFilter;
     const vulns = this.allVulnerabilities;
-    const key = `${vulns.length}|${this.onlineVulns.length}|${this.osvSync.ranAt}|${search}|${sort}|${statusFilter}|${severityFilter}|${sourceFilter}`;
+    const key = `${vulns.length}|${this.onlineVulns.length}|${this.onlineSync.ranAt}|${search}|${sort}|${statusFilter}|${severityFilter}|${sourceFilter}`;
     if (key === filteredVulnsCacheKey) return filteredVulnsCacheVal;
 
     let list = vulns;

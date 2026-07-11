@@ -260,43 +260,116 @@ export function normalizeOsvVuln(osv) {
 }
 
 /**
- * Turns a normalized OSV finding plus the components it matched into a
- * card-ready vulnerability object, shaped like the SBOM-derived entries the
- * security view already renders (so both flow through the same list, sort, and
- * filters) but tagged `source: 'online'`.
- *
- * @param {NormalizedOsvVuln} n
- * @param {Array<{spdxId:string,name:string,purl:string}>} matched - matched components
- * @returns {Object} card-ready vulnerability
+ * Human label for a provider key, used in source tags and the references list.
+ * @param {string} provider - 'OSV' | 'NVD'
+ * @returns {string}
  */
-export function toOnlineVuln(n, matched) {
-  const references = n.references.map((r) => r.url);
-  const locators = [...references];
-  if (n.cveId && !locators.some((u) => /cve\.org|nvd\.nist\.gov/i.test(u))) {
-    locators.push(`https://www.cve.org/CVERecord?id=${n.cveId}`);
-  } else if (!n.cveId) {
-    locators.unshift(`${OSV_API.replace('api.', '')}/vulnerability/${n.osvId}`);
+export function providerLabel(provider) {
+  return provider === 'NVD' ? 'NVD' : 'OSV.dev';
+}
+
+// Picks the richer of two CVSS objects: a numeric score beats none, then the
+// higher score wins.
+function betterCvss(a, b) {
+  if (!a) return b;
+  if (!b) return a;
+  const as = a.score == null ? -1 : a.score;
+  const bs = b.score == null ? -1 : b.score;
+  return bs > as ? b : a;
+}
+
+/**
+ * @typedef {Object} ProviderFinding
+ * @property {string} provider - 'OSV' | 'NVD'
+ * @property {string} [osvId]
+ * @property {string} cveId
+ * @property {string} displayId
+ * @property {string} summary
+ * @property {string} details
+ * @property {{score:(number|null),severity:string,vector:string,version:string}|null} cvss
+ * @property {string[]} cwes
+ * @property {Array<{url:string,type:string}>} references
+ * @property {string} published
+ * @property {string[]} elementIds - matched component spdxIds
+ */
+
+/**
+ * Groups online provider findings (from OSV and/or NVD) by the CVE they
+ * describe and builds one card-ready vulnerability per group, combining the
+ * providers' data and recording which databases reported it. A single CVE found
+ * by both OSV and NVD becomes one entry tagged with both sources.
+ *
+ * @param {ProviderFinding[]} findings
+ * @param {(spdxId: string) => ({spdxId:string,name:string,purl?:string,cpe?:string}|null)} resolve
+ * @returns {Object[]} card-ready online vulnerabilities (source: 'online')
+ */
+export function buildOnlineVulns(findings, resolve) {
+  const groups = new Map();
+  for (const f of findings || []) {
+    if (!f) continue;
+    const key = mergeKey({ cveId: f.cveId, name: f.displayId, osvId: f.osvId });
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(f);
   }
-  const severity = n.cvss?.severity || '';
+  return [...groups.values()].map((fs) => buildOnlineVuln(fs, resolve));
+}
+
+const CVE_RE = /^CVE-\d{4}-\d+$/i;
+
+function buildOnlineVuln(fs, resolve) {
+  const sources = [...new Set(fs.map((f) => f.provider))];
+  const cveId = (fs.find((f) => CVE_RE.test(f.cveId || ''))?.cveId || '').toUpperCase();
+  const osvId = fs.find((f) => f.osvId)?.osvId || '';
+  const displayId = cveId || osvId || fs[0].displayId || '';
+
+  const elementIds = [...new Set(fs.flatMap((f) => f.elementIds || []))];
+  const matched = elementIds.map(resolve).filter(Boolean);
+
+  const cvss = fs.reduce((best, f) => betterCvss(best, f.cvss), null);
+  const severity = cvss?.severity || '';
+
+  const cwes = [...new Set(fs.flatMap((f) => f.cwes || []))];
+  const summary = fs.map((f) => f.summary).find(Boolean) || '';
+  const details = fs.map((f) => f.details).find(Boolean) || '';
+  const published = fs.map((f) => f.published).find(Boolean) || '';
+
+  // References de-duplicated by URL, remembering which provider(s) cited each.
+  const refMap = new Map();
+  fs.forEach((f) => {
+    (f.references || []).forEach((r) => {
+      if (!r?.url) return;
+      if (!refMap.has(r.url)) refMap.set(r.url, { url: r.url, providers: new Set() });
+      refMap.get(r.url).providers.add(f.provider);
+    });
+  });
+  const references = [...refMap.values()].map((r) => ({ url: r.url, providers: [...r.providers] }));
+
+  const locators = references.map((r) => r.url);
+  if (cveId && !locators.some((u) => /cve\.org|nvd\.nist\.gov/i.test(u))) {
+    locators.push(`https://www.cve.org/CVERecord?id=${cveId}`);
+  } else if (!cveId && osvId) {
+    locators.unshift(`https://osv.dev/vulnerability/${osvId}`);
+  }
+
   return {
     // Synthetic spdxId keeps Alpine's :key stable and distinct from SBOM ids.
-    spdxId: `osv:${n.osvId}`,
-    el: { summary: n.summary, description: n.details },
-    name: n.displayId,
-    cveId: n.cveId,
-    osvId: n.osvId,
+    spdxId: `online:${displayId}`,
+    el: { summary, description: details },
+    name: displayId,
+    cveId,
+    osvId,
     locators,
     assessments: [],
     statusCounts: {},
     overallStatus: 'unknown',
     packageCount: matched.length,
-    cvss: n.cvss && n.cvss.score != null ? n.cvss : n.cvss ? { ...n.cvss } : null,
+    cvss,
     epss: null,
     kev: false,
     severity,
     severityRank: getCvssSeverityMeta(severity).rank,
     source: 'online',
-    online: { ...n, matched }
+    online: { sources, matched, cvss, cwes, references, summary, details, osvId, cveId, published }
   };
 }
 
