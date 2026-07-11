@@ -223,6 +223,7 @@ export function createState() {
     onlineVulns: [], // OSV/NVD findings merged into the security view (source online/both)
     nvdSource: readNvdSource(), // 'live' = NVD REST API, 'bundle' = hosted static index
     nvdBundleUrl: './nvd-cpe/', // same-origin base URL of the bundled index (manifest.json + parts)
+    nvdBundleGenerated: '', // bundled-index build date (from meta.json), shown in the source hint
     // On-demand public-database lookup state: idle | running | done | error.
     // Per-provider progress lets one combined bar span OSV (purl) + NVD (cpe).
     onlineSync: {

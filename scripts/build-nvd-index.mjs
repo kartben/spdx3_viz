@@ -150,6 +150,11 @@ async function main() {
   };
   writeFileSync(join(out, 'manifest.json'), JSON.stringify(manifest));
 
+  // Tiny sidecar with everything but the (multi-MB) index, so the app can show
+  // the snapshot's build date without downloading the full manifest.
+  const { index: _omit, ...meta } = manifest;
+  writeFileSync(join(out, 'meta.json'), JSON.stringify(meta));
+
   const manifestBytes = Buffer.byteLength(JSON.stringify(manifest));
   process.stderr.write(
     `\nWrote ${index.size.toLocaleString()} products across ${parts.length} part(s) to ${out}` +

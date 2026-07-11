@@ -65,4 +65,4 @@ jobs:
               --prerelease \
               --title "NVD bundled index" \
               --notes "Auto-generated NVD CPE→CVE index consumed by the app's 'Bundled index' NVD source. Regenerated weekly."
-          gh release upload nvd-index nvd-cpe/manifest.json nvd-cpe/part-*.ndjson --clobber
+          gh release upload nvd-index nvd-cpe/manifest.json nvd-cpe/meta.json nvd-cpe/part-*.ndjson --clobber

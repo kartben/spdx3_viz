@@ -440,6 +440,23 @@ export const securityMixin = {
     }
   },
 
+  // Fetches the bundled index's tiny meta.json (once) to learn its build date,
+  // shown in the NVD-source hint. Silent if the index isn't deployed (e.g. local
+  // dev): the hint just omits the date. Not the multi-MB manifest.
+  async ensureNvdBundleMeta() {
+    if (this._nvdMetaFetched) return;
+    this._nvdMetaFetched = true;
+    try {
+      const url = new URL('meta.json', new URL(this.nvdBundleUrl, location.href)).href;
+      const res = await fetch(url);
+      if (!res.ok) return;
+      const meta = await res.json();
+      if (meta && meta.generated) this.nvdBundleGenerated = String(meta.generated);
+    } catch {
+      /* index not hosted here, or offline; the hint drops the date */
+    }
+  },
+
   // Clears online findings + lookup state (a fresh SBOM, or an explicit reset).
   resetOnlineSync() {
     if (this.onlineSync?.status === 'running') {

@@ -18,6 +18,8 @@ matcher needs, groups by `vendor:product`, and writes:
 
 - `manifest.json` – `{ schema, notice, generated, products, parts, index }`, where
   `index` maps `"vendor product"` → `[partIndex, byteOffset, byteLength]`.
+- `meta.json` – the same fields **minus** `index`, so the app can show the
+  snapshot's build date in the source hint without downloading the full manifest.
 - `part-000.ndjson`, `part-001.ndjson`, … – packed per-product shards.
 
 The client fetches `manifest.json` once, then HTTP **Range**-fetches only the byte
