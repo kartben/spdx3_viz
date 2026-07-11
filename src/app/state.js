@@ -3,31 +3,12 @@ import { APP_VERSION } from '../version.js';
 import { CHANGELOG } from '../changelog.js';
 import { storedDetailPanelWidth } from './detail-panel.js';
 
-// Restores the optional NVD API key a prior session saved (empty when unset or
-// when storage is unavailable).
-function readNvdApiKey() {
-  try {
-    return localStorage.getItem('spdx3viz.nvdApiKey') || '';
-  } catch {
-    return '';
-  }
-}
-
 // Restores the saved NVD source preference ('live' | 'bundle'); defaults to live.
 function readNvdSource() {
   try {
     return localStorage.getItem('spdx3viz.nvdSource') === 'bundle' ? 'bundle' : 'live';
   } catch {
     return 'live';
-  }
-}
-
-// Restores the bundled-index base URL; defaults to a same-origin ./nvd-cpe/.
-function readNvdBundleUrl() {
-  try {
-    return localStorage.getItem('spdx3viz.nvdBundleUrl') || './nvd-cpe/';
-  } catch {
-    return './nvd-cpe/';
   }
 }
 
@@ -239,9 +220,8 @@ export function createState() {
     licenses: [],
     vulnerabilities: [], // enriched CVEs with VEX assessments
     onlineVulns: [], // OSV/NVD findings merged into the security view (source online/both)
-    nvdApiKey: readNvdApiKey(), // optional NVD API key (raises the rate limit)
     nvdSource: readNvdSource(), // 'live' = NVD REST API, 'bundle' = hosted static index
-    nvdBundleUrl: readNvdBundleUrl(), // base URL of the bundled index (manifest.json + parts)
+    nvdBundleUrl: './nvd-cpe/', // same-origin base URL of the bundled index (manifest.json + parts)
     // On-demand public-database lookup state: idle | running | done | error.
     // Per-provider progress lets one combined bar span OSV (purl) + NVD (cpe).
     onlineSync: {

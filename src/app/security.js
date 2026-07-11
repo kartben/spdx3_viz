@@ -52,8 +52,6 @@ function getNvdWorker() {
   return nvdWorker;
 }
 
-const NVD_KEY_STORAGE = 'spdx3viz.nvdApiKey';
-
 /* Security / VEX: status and justification labels, per-package and
    per-vulnerability assessment lookups, on-demand fetch of CVE records, and the
    on-demand public-database lookup (OSV by PackageURL, NVD by CPE). */
@@ -316,16 +314,13 @@ export const securityMixin = {
       const bundle = this.nvdSource === 'bundle';
       // Resolve to an absolute URL against the page: a relative URL inside a
       // worker would otherwise resolve against the worker script's location.
-      const baseUrl = bundle
-        ? new URL(this.nvdBundleUrl || './nvd-cpe/', location.href).href
-        : undefined;
+      const baseUrl = bundle ? new URL(this.nvdBundleUrl, location.href).href : undefined;
       nvd.postMessage({
         id: reqId,
         type: 'start',
         mode: bundle ? 'bundle' : 'live',
         baseUrl,
-        targets: cpeTargets,
-        apiKey: this.nvdApiKey || ''
+        targets: cpeTargets
       });
     }
   },
@@ -435,17 +430,6 @@ export const securityMixin = {
     this.onlineSync = { ...this.onlineSync, status: 'idle' };
   },
 
-  // Persists the optional NVD API key (raises NVD's rate limit) to localStorage.
-  setNvdApiKey(value) {
-    this.nvdApiKey = String(value || '').trim();
-    try {
-      if (this.nvdApiKey) localStorage.setItem(NVD_KEY_STORAGE, this.nvdApiKey);
-      else localStorage.removeItem(NVD_KEY_STORAGE);
-    } catch {
-      /* storage may be unavailable (private mode); the key still applies this session */
-    }
-  },
-
   // Persists the NVD source choice ('live' | 'bundle') to localStorage.
   setNvdSource(value) {
     this.nvdSource = value === 'bundle' ? 'bundle' : 'live';
@@ -453,16 +437,6 @@ export const securityMixin = {
       localStorage.setItem('spdx3viz.nvdSource', this.nvdSource);
     } catch {
       /* storage may be unavailable; the choice still applies this session */
-    }
-  },
-
-  // Persists the bundled-index base URL; empty falls back to the default.
-  setNvdBundleUrl(value) {
-    this.nvdBundleUrl = String(value || '').trim() || './nvd-cpe/';
-    try {
-      localStorage.setItem('spdx3viz.nvdBundleUrl', this.nvdBundleUrl);
-    } catch {
-      /* storage may be unavailable; the URL still applies this session */
     }
   },
 
