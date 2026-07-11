@@ -234,6 +234,13 @@ export function createState() {
       nvd: { active: false, done: 0, total: 0 }
     },
     onlineNow: 0, // wall-clock tick (ms) driving the lookup ETA countdown
+    // "Virtual" vulnerabilities: graph nodes/edges synthesized from online-only
+    // scan findings so they show like SBOM vulns while staying flagged as scan
+    // findings (not carried by the SBOM). Kept off elementMap so the element
+    // count stays a true SBOM count.
+    virtualVulnMap: new Map(), // online:<id> -> synthetic security_Vulnerability element
+    virtualVulnElements: [], // the same synthetic elements, as a list (search corpus)
+    virtualVexRelationships: [], // synthetic `affects` edges (vuln -> matched component)
     vexRelationships: [], // raw VEX assessment relationship elements (for the graph)
     presentNodeTypes: [], // graph node types present in the data (trims the legend)
     presentRelTypes: [], // relationship types present in the data (trims the legend)

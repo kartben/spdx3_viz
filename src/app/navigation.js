@@ -569,7 +569,7 @@ export const navigationMixin = {
     }
   },
   navigateTo(spdxId) {
-    const el = this.elementMap.get(spdxId);
+    const el = this.elementMap.get(spdxId) || this.virtualVulnMap?.get(spdxId);
     if (!el) {
       this.selectGraphNode(spdxId);
       return;

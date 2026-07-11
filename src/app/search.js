@@ -46,12 +46,15 @@ export const searchMixin = {
       this.tools.length,
       this.licenses.length,
       this.vulnerabilities.length,
-      this.agents.length
+      this.agents.length,
+      // Online-scan (virtual) vulns join the corpus once a lookup has run.
+      this.virtualVulnElements.length,
+      this.onlineSync.ranAt
     ].join('|');
     if (key === searchCorpusKey) return searchCorpusVal;
 
     const out = [];
-    const add = (id, nodeType, name, sub, extra, typeLabelOverride) => {
+    const add = (id, nodeType, name, sub, extra, typeLabelOverride, virtual) => {
       if (!id || !name) return;
       out.push({
         id,
@@ -59,6 +62,8 @@ export const searchMixin = {
         typeLabel: typeLabelOverride || SEARCH_TYPE_LABELS[nodeType] || 'Element',
         name,
         sub: sub || '',
+        // Flags an online-scan finding so the palette can tag it as not-in-SBOM.
+        virtual: !!virtual,
         _n: name.toLowerCase(),
         _e: (extra || '').toLowerCase()
       });
@@ -128,6 +133,15 @@ export const searchMixin = {
         ? `${v.packageCount} package${v.packageCount === 1 ? '' : 's'} affected`
         : '';
       add(v.spdxId, 'vulnerability', v.name, sub, '');
+    }
+    // Virtual vulns: online-scan findings not present in the SBOM. Same node type
+    // as an SBOM vuln, flagged so the palette marks them as a scan finding.
+    for (const el of this.virtualVulnElements) {
+      const matched = el._online?.matched?.length || 0;
+      const sub = matched
+        ? `${matched} component${matched === 1 ? '' : 's'} · online scan`
+        : 'Found by online scan';
+      add(el.spdxId, 'vulnerability', el.name, sub, el._online?.cveId || '', 'Vulnerability', true);
     }
     for (const a of this.agents) {
       const links = this.agentLinkCount(a);

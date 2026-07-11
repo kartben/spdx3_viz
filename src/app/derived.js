@@ -1205,6 +1205,12 @@ export const derivedMixin = {
   get visibleGraphFilters() {
     const nodeTypes = new Set(this.presentNodeTypes);
     const relTypes = new Set(this.presentRelTypes);
+    // An online scan can add vulnerability nodes + `affects` edges the SBOM alone
+    // had none of, so surface those toggles once virtual vulns exist.
+    if (this.virtualVexRelationships.length) {
+      nodeTypes.add('vulnerability');
+      relTypes.add('affects');
+    }
     return this.graphFilters.filter((f) => (f.isRel ? relTypes.has(f.key) : nodeTypes.has(f.key)));
   },
 

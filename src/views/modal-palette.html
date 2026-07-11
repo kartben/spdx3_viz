@@ -109,6 +109,15 @@
             </span>
 
             <!-- Right-side chip: element type, or an Enter hint on the active command -->
+            <!-- Virtual (online-scan) findings get a leading "scan" chip so it's
+                 clear they aren't carried by the SBOM. -->
+            <template x-if="item.kind === 'element' && item.virtual">
+              <span
+                class="text-[10px] font-medium px-1.5 py-0.5 rounded-full flex-shrink-0 bg-sky-500/15 text-sky-300 ring-1 ring-sky-500/30"
+                title="Found by an online scan, not present in the SBOM"
+                >scan</span
+              >
+            </template>
             <template x-if="item.kind === 'element'">
               <span
                 class="text-[10px] font-medium px-1.5 py-0.5 rounded-full flex-shrink-0"
