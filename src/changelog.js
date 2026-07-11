@@ -30,6 +30,10 @@ export const CHANGELOG = [
         text: 'On-demand public-database lookup in Security: OSV.dev by PackageURL and NVD by CPE, merged with SBOM findings.'
       },
       {
+        tag: 'Added',
+        text: 'Online scan findings show as flagged virtual nodes on the graph and in search.'
+      },
+      {
         tag: 'Improved',
         text: 'Impact adds a search-first element picker with provenance and downstream reach.'
       },

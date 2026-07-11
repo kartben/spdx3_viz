@@ -394,6 +394,64 @@ function mergeKey(v) {
 }
 
 /**
+ * Builds "virtual" graph elements + edges for online-only vulnerabilities so a
+ * scan finding shows on the graph, in search and in the detail panel like an
+ * in-SBOM vulnerability, while staying clearly flagged (`virtual: true`) as
+ * discovered by a public database rather than carried by the SBOM.
+ *
+ * Each element mimics a security_Vulnerability (so getNodeType, the vuln detail
+ * section and the CVE lookup all treat it identically), and one `affects` VEX
+ * edge is synthesized per matched component so the finding connects to the
+ * package(s) it hits on the graph.
+ *
+ * @param {Object[]} onlineOnlyVulns - merged vulnerabilities with source 'online'
+ * @returns {{elements: Object[], relationships: Object[]}}
+ */
+export function buildVirtualVulnGraph(onlineOnlyVulns) {
+  const elements = [];
+  const relationships = [];
+  (onlineOnlyVulns || []).forEach((v) => {
+    if (!v || !v.spdxId) return;
+    const cveId = v.cveId || '';
+    const identifier = cveId || v.osvId || v.name || v.spdxId;
+    const locators = Array.isArray(v.locators) ? v.locators : [];
+    const online = v.online || {};
+    elements.push({
+      type: 'security_Vulnerability',
+      spdxId: v.spdxId,
+      name: v.name || identifier,
+      // Not from the SBOM: discovered by an online scan (OSV/NVD). Every consumer
+      // reads this flag to mark the node/row/panel as a scan finding.
+      virtual: true,
+      summary: online.summary || '',
+      description: online.details || '',
+      externalIdentifier: [
+        {
+          externalIdentifierType: cveId ? 'cve' : 'securityOther',
+          identifier,
+          identifierLocator: locators
+        }
+      ],
+      // The card-ready online payload (matched components, CVSS, sources) so the
+      // detail panel can list what the scan matched without re-deriving it.
+      _online: online
+    });
+    (online.matched || []).filter(Boolean).forEach((m) => {
+      if (!m.spdxId) return;
+      relationships.push({
+        type: 'security_VexAffectedVulnAssessmentRelationship',
+        spdxId: `${v.spdxId}#affects#${m.spdxId}`,
+        relationshipType: 'affects',
+        from: v.spdxId,
+        to: m.spdxId,
+        virtual: true
+      });
+    });
+  });
+  return { elements, relationships };
+}
+
+/**
  * Merges online (OSV) findings into the SBOM-derived vulnerability list. SBOM
  * entries that OSV also reports are tagged `source: 'both'` and carry the online
  * payload under `.online`; online-only findings are appended with

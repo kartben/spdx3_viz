@@ -9,8 +9,13 @@ import {
   summarizeCveRecord,
   collectPurlTargets,
   collectCpeTargets,
-  buildOnlineVulns
+  buildOnlineVulns,
+  buildVirtualVulnGraph
 } from '../lib/index.js';
+
+// Above this many synthesized vuln edges, keep the graph's vulnerability nodes
+// opt-in (mirrors the SBOM load path) so a large scan doesn't swamp the canvas.
+const VIRTUAL_VEX_AUTO_SHOW_MAX = 200;
 
 /* Long-lived lookup workers, kept off the reactive state so they are never
    proxied. One queries OSV by PackageURL, the other NVD by CPE. onlineReqSeq
@@ -368,6 +373,8 @@ export const securityMixin = {
       ranAt: Date.now()
     };
     this._resetListMemos();
+    this._rebuildVirtualVulns();
+    this._resetSearchMemos(); // the corpus now includes the scan's virtual vulns
     const secView = this.views.find((v) => v.id === 'security');
     if (secView) secView.count = this.allVulnerabilities.length;
     if (this.currentView === 'security') this.restreamView('security');
@@ -375,6 +382,38 @@ export const securityMixin = {
       this.toastMsg = 'Online lookup incomplete — ' + this.onlineSync.error;
       setTimeout(() => (this.toastMsg = ''), 6000);
     }
+  },
+
+  // Rebuilds the "virtual" vulnerability graph nodes/edges from the current
+  // online-only findings: synthetic security_Vulnerability elements plus one
+  // `affects` edge per matched component. Kept off elementMap (so the SBOM
+  // element count is untouched) and exposed via virtualVulnMap for the graph and
+  // detail panel to resolve. On the first run with findings, reveals the graph's
+  // vulnerability nodes + `affects` edges the way a freshly loaded SBOM does, so
+  // the scan's results are visible without hunting through the legend.
+  _rebuildVirtualVulns() {
+    const onlineOnly = this.allVulnerabilities.filter((v) => v.source === 'online');
+    const { elements, relationships } = buildVirtualVulnGraph(onlineOnly);
+    this.virtualVulnElements = elements;
+    this.virtualVulnMap = new Map(elements.map((el) => [el.spdxId, el]));
+    this.virtualVexRelationships = relationships;
+
+    if (relationships.length && relationships.length < VIRTUAL_VEX_AUTO_SHOW_MAX) {
+      // Only ever switch these on: never override a user who turned vuln nodes
+      // off, but do surface a scan they explicitly asked for.
+      this.graphFilters.forEach((f) => {
+        if (f.key === 'vulnerability' || f.key === 'affects') f.active = true;
+      });
+    }
+    // Repaint the canvas if the graph is on screen so the new nodes appear.
+    if (this.currentView === 'graph') this.renderGraph();
+  },
+
+  // Drops every synthesized virtual-vuln node/edge (a reset, or a fresh SBOM).
+  _clearVirtualVulns() {
+    this.virtualVulnElements = [];
+    this.virtualVulnMap = new Map();
+    this.virtualVexRelationships = [];
   },
 
   // Cancels an in-flight lookup, leaving any prior results in place.
@@ -408,6 +447,7 @@ export const securityMixin = {
     this._onlineReqId = onlineReqSeq;
     onlineAccum = { reqId: 0, findings: [], pending: new Set() };
     this.onlineVulns = [];
+    this._clearVirtualVulns();
     this.securitySourceFilter = '';
     this.onlineSync = {
       status: 'idle',
@@ -420,6 +460,7 @@ export const securityMixin = {
     };
     this.onlineNow = 0;
     this._resetListMemos();
+    this._resetSearchMemos(); // drop the virtual vulns from the search corpus
   },
 
   // Deduplicated, severity-sorted assessments for a vulnerability detail view.

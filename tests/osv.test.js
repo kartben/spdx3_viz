@@ -7,7 +7,8 @@ import {
   cvssBaseScore,
   normalizeOsvVuln,
   buildOnlineVulns,
-  mergeVulnLists
+  mergeVulnLists,
+  buildVirtualVulnGraph
 } from '../src/lib/index.js';
 
 // Builds an OSV provider finding for the tests from a raw OSV record + matches.
@@ -195,4 +196,38 @@ test('buildOnlineVulns merges the same CVE from OSV and NVD into one entry', () 
   assert.equal(v.packageCount, 2, 'matched by both purl and cpe');
   assert.deepEqual(v.online.cwes, ['CWE-787']);
   assert.equal(v.online.references.length, 2);
+});
+
+test('buildVirtualVulnGraph makes flagged vuln nodes + affects edges per match', () => {
+  const online = buildOnlineVulns(
+    [osvFinding({ id: 'CVE-2021-1', references: [] }, ['pkg-a', 'pkg-b'])],
+    resolveById
+  );
+  const { elements, relationships } = buildVirtualVulnGraph(online);
+
+  assert.equal(elements.length, 1);
+  const el = elements[0];
+  assert.equal(el.type, 'security_Vulnerability');
+  assert.equal(el.virtual, true, 'flagged as a scan finding, not from the SBOM');
+  assert.equal(el.spdxId, 'online:CVE-2021-1');
+  assert.equal(el.externalIdentifier[0].externalIdentifierType, 'cve');
+  assert.equal(el.externalIdentifier[0].identifier, 'CVE-2021-1');
+
+  assert.equal(relationships.length, 2, 'one affects edge per matched component');
+  relationships.forEach((r) => {
+    assert.equal(r.relationshipType, 'affects');
+    assert.equal(r.from, 'online:CVE-2021-1');
+    assert.equal(r.virtual, true);
+  });
+  assert.deepEqual(relationships.map((r) => r.to).sort(), ['pkg-a', 'pkg-b']);
+});
+
+test('buildVirtualVulnGraph uses a non-CVE identifier type for GHSA-only findings', () => {
+  const online = buildOnlineVulns(
+    [osvFinding({ id: 'GHSA-xxxx-yyyy-zzzz', references: [] }, ['pkg-a'])],
+    resolveById
+  );
+  const { elements } = buildVirtualVulnGraph(online);
+  assert.equal(elements[0].externalIdentifier[0].externalIdentifierType, 'securityOther');
+  assert.equal(elements[0].externalIdentifier[0].identifier, 'GHSA-xxxx-yyyy-zzzz');
 });

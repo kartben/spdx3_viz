@@ -245,7 +245,9 @@ export function renderGraph(app, retry = 0) {
     if (!spdxId) return null;
     if (uNodeIds.has(spdxId)) return uNodeById.get(spdxId);
 
-    let el = app.elementMap.get(spdxId);
+    // A virtual (online-scan) vulnerability isn't in elementMap (kept out so the
+    // SBOM element count stays true), so fall back to the scan's own map.
+    let el = app.elementMap.get(spdxId) || app.virtualVulnMap?.get(spdxId);
     if (!el) {
       el = placeholderFor(spdxId, rel || {}, role);
       // For an unresolved reference declared as an ExternalMap import, attach where it's
@@ -326,6 +328,9 @@ export function renderGraph(app, retry = 0) {
   // VEX assessment relationships live outside the generic relationships array and only become
   // nodes/edges when the Vulnerabilities node type and a VEX edge type are enabled (both off by default).
   (app.vexRelationships || []).forEach(addRelLinks);
+  // Virtual VEX edges: online-scan findings connected to the component(s) they
+  // hit. They ride the same `affects`/vulnerability toggles as real VEX edges.
+  (app.virtualVexRelationships || []).forEach(addRelLinks);
 
   // Agent provenance edges: beyond the generic Relationship array, an element
   // can name agent(s) directly — CreationInfo.createdBy, an Artifact's
@@ -910,6 +915,10 @@ export function renderGraph(app, retry = 0) {
   // draw pass is cheaper than special-casing the batched node loop.
   const externalRenderNodes = renderNodes.filter((d) => !d.isCluster && d.data?.external);
   const EXTERNAL_RING_COLOR = getNodeTypeColor('external');
+  // Virtual (online-scan) vulnerabilities get their own dashed ring so it's clear
+  // at a glance they were found by a scan, not carried by the SBOM.
+  const virtualRenderNodes = renderNodes.filter((d) => !d.isCluster && d.data?.virtual);
+  const VIRTUAL_RING_COLOR = getNodeTypeColor('vulnerability');
   // Draw bigger nodes' labels first so the MAX_LABELS cap keeps the useful ones.
   const labelOrder = [...renderNodes].sort((a, b) => b._r - a._r);
 
@@ -1081,6 +1090,31 @@ export function renderGraph(app, retry = 0) {
     ctx.restore();
   };
 
+  // Dashed ring in the vulnerability colour around virtual (online-scan) vuln
+  // nodes, mirroring the external-ring pass so it sits on top of the node fills
+  // and tracks the same search/hover emphasis.
+  const drawVirtualRings = () => {
+    if (!virtualRenderNodes.length) return;
+    const k = currentTransform.k;
+    ctx.save();
+    ctx.setLineDash([4 / k, 3 / k]);
+    ctx.lineWidth = 1.5 / k;
+    ctx.strokeStyle = VIRTUAL_RING_COLOR;
+    virtualRenderNodes.forEach((d) => {
+      if (d.x == null || !nodeInView(d)) return;
+      const ss = nodeSearchStyle(d.id);
+      if (ss.hidden) return;
+      ctx.globalAlpha = ss.alpha;
+      const r = radiusFor(d) + 2.5 / k;
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, r, 0, 2 * Math.PI);
+      ctx.stroke();
+    });
+    ctx.setLineDash([]);
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  };
+
   // One icon node: a faint type-colour halo (which keeps the colour legend and a
   // clear hit target) with the Material glyph, tinted a shade brighter, on top.
   const drawIconNode = (d, r, k, alpha) => {
@@ -1154,6 +1188,7 @@ export function renderGraph(app, retry = 0) {
     });
     ctx.globalAlpha = 1;
     drawExternalRings();
+    drawVirtualRings();
   };
 
   const drawNodes = () => {
@@ -1164,6 +1199,7 @@ export function renderGraph(app, retry = 0) {
     if (!searchActive && !highlightedNodeId) {
       drawNodesFast();
       drawExternalRings();
+      drawVirtualRings();
       return;
     }
     // Hover emphasis is suppressed while a search overlay is active so the
@@ -1200,6 +1236,7 @@ export function renderGraph(app, retry = 0) {
     });
     ctx.globalAlpha = 1;
     drawExternalRings();
+    drawVirtualRings();
   };
 
   // Screen-space label decluttering: labels are placed greedily in priority order and any that would
@@ -1796,16 +1833,21 @@ export function renderGraph(app, retry = 0) {
     };
     if (found) {
       const isExternal = !found.isCluster && found.data?.external;
+      const isVirtual = !found.isCluster && found.data?.virtual;
       const meta = found.isCluster
         ? `${found.clusterKind} cluster · ${found.memberCount} items`
         : isExternal
           ? `external · ${found.data?.type || found.type}`
-          : found.data?.type || found.type;
+          : isVirtual
+            ? `online scan · ${found.data?.type || found.type}`
+            : found.data?.type || found.type;
       const hint = found.isCluster
         ? 'double-click to expand'
         : isExternal && found.data?.locationHint
           ? `defined in ${found.data.locationHint}`
-          : `${connCount.get(found.id) || 0} connections`;
+          : isVirtual
+            ? 'found by online scan, not in the SBOM'
+            : `${connCount.get(found.id) || 0} connections`;
       showTooltip(
         `<div class="font-semibold text-white">${escapeHtml(found.name)}</div>` +
           `<div class="text-slate-400 text-xs">${escapeHtml(meta)}</div>` +

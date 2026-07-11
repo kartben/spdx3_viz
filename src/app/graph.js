@@ -15,7 +15,9 @@ import {
 
 export const graphMixin = {
   selectGraphNode(spdxId) {
-    const el = this.elementMap.get(spdxId);
+    // Virtual (online-scan) vulns live outside elementMap; resolve them too so a
+    // deep link or restore lands on the real node, not a bare placeholder.
+    const el = this.elementMap.get(spdxId) || this.virtualVulnMap?.get(spdxId);
     this.detailElement = el || this.placeholderElement(spdxId);
     this._scheduleNavPush();
   },
