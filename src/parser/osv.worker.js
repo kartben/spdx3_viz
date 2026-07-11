@@ -91,8 +91,12 @@ async function runJob({ id, targets }) {
       let raw;
       try {
         raw = await osvFetch(`/v1/vulns/${encodeURIComponent(osvId)}`, null);
-      } catch {
-        raw = null; // a withdrawn/removed id 404s; skip it rather than fail the run
+      } catch (err) {
+        // A withdrawn/removed advisory 404s: skip just that id. Any other error
+        // (network, server) propagates so we fail loudly rather than silently
+        // returning an incomplete vulnerability list.
+        if (err && err.status === 404) raw = null;
+        else throw err;
       }
       done++;
       post({ type: 'progress', phase: 'details', done, total: ids.length });
@@ -127,9 +131,10 @@ async function pool(items, size, worker) {
   await Promise.all(runners);
 }
 
-// Fetches an OSV endpoint (POST when `body` is given, else GET), retrying on
-// transient 429/5xx responses with exponential backoff. Aborts promptly when the
-// job is cancelled.
+// Fetches an OSV endpoint (POST when `body` is given, else GET). Retries only on
+// transient failures (network errors, 429, 5xx) with exponential backoff; fails
+// fast on other 4xx, attaching the status so the caller can special-case 404.
+// Aborts promptly when the job is cancelled.
 async function osvFetch(path, body) {
   const url = `${OSV_API}${path}`;
   let lastErr;
@@ -137,25 +142,29 @@ async function osvFetch(path, body) {
     if (job?.cancelled) throw new Error('Cancelled');
     const controller = new AbortController();
     job?.controllers.add(controller);
+    let res = null;
     try {
-      const res = await fetch(url, {
+      res = await fetch(url, {
         method: body ? 'POST' : 'GET',
         headers: body ? { 'Content-Type': 'application/json' } : undefined,
         body: body ? JSON.stringify(body) : undefined,
         signal: controller.signal
       });
-      if (res.status === 429 || res.status >= 500) {
-        lastErr = new Error(`OSV request failed (${res.status})`);
-      } else if (!res.ok) {
-        throw new Error(`OSV request failed (${res.status})`);
-      } else {
-        return await res.json();
-      }
     } catch (err) {
       if (job?.cancelled) throw err;
-      lastErr = err;
+      lastErr = err; // network error: retry
     } finally {
       job?.controllers.delete(controller);
+    }
+    if (res) {
+      if (res.ok) return await res.json();
+      if (res.status === 429 || res.status >= 500) {
+        lastErr = new Error(`OSV request failed (${res.status})`); // transient: retry
+      } else {
+        const err = new Error(`OSV request failed (${res.status})`);
+        err.status = res.status;
+        throw err; // non-transient 4xx: fail fast
+      }
     }
     // Backoff: 400ms, 800ms, 1600ms.
     await sleep(400 * 2 ** attempt);

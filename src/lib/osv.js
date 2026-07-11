@@ -386,7 +386,9 @@ function mergeKey(v) {
     .trim()
     .toUpperCase();
   if (/^CVE-\d{4}-\d+$/.test(cve)) return cve;
-  return String(v?.name || v?.osvId || '')
+  // Fall back through name/osvId to spdxId so identifier-less entries still get a
+  // distinct key and don't all collapse onto '' (which would drop all but one).
+  return String(v?.name || v?.osvId || v?.spdxId || '')
     .trim()
     .toUpperCase();
 }

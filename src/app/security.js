@@ -305,6 +305,9 @@ export const securityMixin = {
       };
     } else if (msg.ok) {
       (msg.findings || []).forEach((f) => onlineAccum.findings.push({ ...f, provider }));
+      // A partial run (e.g. some NVD products failed) still returns results, but
+      // the gap is surfaced rather than hidden.
+      if (msg.warning) this.onlineSync = { ...this.onlineSync, error: msg.warning };
     }
 
     onlineAccum.pending.delete(provider);
@@ -330,7 +333,7 @@ export const securityMixin = {
     if (secView) secView.count = this.allVulnerabilities.length;
     if (this.currentView === 'security') this.restreamView('security');
     if (hadError) {
-      this.toastMsg = 'Some online sources failed: ' + this.onlineSync.error;
+      this.toastMsg = 'Online lookup incomplete — ' + this.onlineSync.error;
       setTimeout(() => (this.toastMsg = ''), 6000);
     }
   },

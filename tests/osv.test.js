@@ -154,6 +154,16 @@ test('mergeVulnLists tags SBOM/both/online and keeps the SBOM CVSS', () => {
   assert.equal(onlineOnly.overallStatus, 'unknown');
 });
 
+test('mergeVulnLists keeps identifier-less entries distinct via spdxId', () => {
+  const sbom = [
+    { spdxId: 'v-a', name: '', cveId: '', cvss: null, severity: '' },
+    { spdxId: 'v-b', name: '', cveId: '', cvss: null, severity: '' }
+  ];
+  const merged = mergeVulnLists(sbom, []);
+  assert.equal(merged.length, 2, 'both survive rather than colliding on an empty key');
+  assert.deepEqual(merged.map((v) => v.spdxId).sort(), ['v-a', 'v-b']);
+});
+
 test('buildOnlineVulns merges the same CVE from OSV and NVD into one entry', () => {
   const findings = [
     osvFinding(
