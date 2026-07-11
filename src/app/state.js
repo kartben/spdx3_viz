@@ -3,12 +3,13 @@ import { APP_VERSION } from '../version.js';
 import { CHANGELOG } from '../changelog.js';
 import { storedDetailPanelWidth } from './detail-panel.js';
 
-// Restores the saved NVD source preference ('live' | 'bundle'); defaults to live.
+// Restores the saved NVD source preference ('live' | 'bundle'); defaults to the
+// bundled index (no rate limits or CORS, works offline).
 function readNvdSource() {
   try {
-    return localStorage.getItem('spdx3viz.nvdSource') === 'bundle' ? 'bundle' : 'live';
+    return localStorage.getItem('spdx3viz.nvdSource') === 'live' ? 'live' : 'bundle';
   } catch {
-    return 'live';
+    return 'bundle';
   }
 }
 
