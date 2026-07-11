@@ -127,7 +127,7 @@
           <input
             type="password"
             :value="nvdApiKey"
-            @change="setNvdApiKey($event.target.value)"
+            @input="setNvdApiKey($event.target.value)"
             placeholder="NVD API key (optional)"
             class="bg-slate-900 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-sky-500 w-64"
           />

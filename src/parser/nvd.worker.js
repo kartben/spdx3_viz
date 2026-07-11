@@ -53,6 +53,8 @@ async function runJob({ id, targets, apiKey }) {
 
   try {
     const byCve = new Map(); // cveId -> finding (elementIds unioned across products)
+    let failed = 0; // products that could not be checked (reported, not hidden)
+    const failedNames = [];
     for (let i = 0; i < list.length; i++) {
       if (job.cancelled)
         return post({ type: 'done', ok: false, cancelled: true, error: 'Cancelled' });
@@ -62,15 +64,18 @@ async function runJob({ id, targets, apiKey }) {
         cves = await fetchProductCves(target);
       } catch (err) {
         // A hard failure on the very first product is almost always CORS or an
-        // unreachable API, not a per-product issue: surface it rather than
-        // grinding through every (throttled) product only to fail each time.
+        // unreachable API, not a per-product issue: fail the whole run.
         if (i === 0) {
           throw new Error(
             (err && err.message) ||
               'NVD request failed. The browser may be blocked from calling NVD directly (CORS), or NVD is unreachable.'
           );
         }
-        cves = []; // later products: skip and keep going
+        // Later products: keep going so one flaky product doesn't sink the whole
+        // scan, but count and report the gap so the result isn't silently partial.
+        failed++;
+        if (failedNames.length < 3) failedNames.push(`${target.vendor}:${target.product}`);
+        cves = [];
       }
       cves.forEach((cve) => {
         const affected = matchNvdCveToComponents(cve, target);
@@ -99,7 +104,13 @@ async function runJob({ id, targets, apiKey }) {
 
     if (job.cancelled)
       return post({ type: 'done', ok: false, cancelled: true, error: 'Cancelled' });
-    post({ type: 'done', ok: true, findings: [...byCve.values()], queried: total });
+    const warning = failed
+      ? `NVD: ${failed} product${failed === 1 ? '' : 's'} could not be checked` +
+        (failedNames.length
+          ? ` (${failedNames.join(', ')}${failed > failedNames.length ? ', …' : ''})`
+          : '')
+      : '';
+    post({ type: 'done', ok: true, findings: [...byCve.values()], queried: total, warning });
   } catch (err) {
     post({ type: 'done', ok: false, error: (err && err.message) || String(err) });
   } finally {
@@ -128,8 +139,10 @@ async function fetchProductCves(target) {
   return out;
 }
 
-// Fetches an NVD URL with throttling (to respect rate limits) and retry/backoff
-// on 403/429/5xx. Aborts promptly when cancelled.
+// Fetches an NVD URL with throttling (to respect rate limits). Retries only on
+// transient failures (network errors, and NVD's 403/429/5xx rate-limit signals)
+// with exponential backoff; fails fast on other 4xx so an invalid query doesn't
+// burn 60s of retries. Aborts promptly when cancelled.
 async function nvdFetch(url) {
   let lastErr;
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
@@ -137,24 +150,28 @@ async function nvdFetch(url) {
     await throttle();
     const controller = new AbortController();
     job?.controllers.add(controller);
+    let res = null;
     try {
-      const res = await fetch(url, {
+      res = await fetch(url, {
         headers: job?.apiKey ? { apiKey: job.apiKey } : undefined,
         signal: controller.signal
       });
-      // NVD signals rate limiting with 403 or 429; both are worth retrying.
-      if (res.status === 403 || res.status === 429 || res.status >= 500) {
-        lastErr = new Error(`NVD rate-limited or unavailable (${res.status})`);
-      } else if (!res.ok) {
-        throw new Error(`NVD request failed (${res.status})`);
-      } else {
-        return await res.json();
-      }
     } catch (err) {
       if (job?.cancelled) throw err;
-      lastErr = err;
+      lastErr = err; // network error: retry
     } finally {
       job?.controllers.delete(controller);
+    }
+    if (res) {
+      if (res.ok) return await res.json();
+      // NVD signals rate limiting with 403 or 429; those plus 5xx are transient.
+      if (res.status === 403 || res.status === 429 || res.status >= 500) {
+        lastErr = new Error(`NVD rate-limited or unavailable (${res.status})`);
+      } else {
+        const err = new Error(`NVD request failed (${res.status})`);
+        err.status = res.status;
+        throw err; // non-transient 4xx: fail fast
+      }
     }
     // Backoff on top of the base throttle: 4s, 8s, 16s, 32s.
     await sleep(4000 * 2 ** attempt);
