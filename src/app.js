@@ -23,6 +23,11 @@ const lifecycleMixin = {
     this.$watch('currentView', (v) => {
       if (v === 'graph') this.$nextTick(() => this.renderGraph());
       if (v === 'statistics') this.$nextTick(() => this.renderStatisticsCharts());
+      // Learn the bundled index's build date the first time Security is shown,
+      // for the NVD-source hint. Watching currentView (rather than switchView)
+      // covers every entry path, including opening straight into Security via a
+      // deep link. No-op if already fetched or the index isn't hosted.
+      if (v === 'security') this.ensureNvdBundleMeta();
       if (v === 'supplychain' && this.supplyChainViewMode === 'states') {
         this.renderSupplyChainStateDiagram();
       }

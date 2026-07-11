@@ -221,9 +221,6 @@ export const navigationMixin = {
     this.currentView = id;
     this.detailElement = null;
     this.sidebarOpen = false; // close the mobile drawer after navigating
-    // Learn the bundled index's build date the first time Security is opened,
-    // for the NVD-source hint (no-op if already fetched or not hosted).
-    if (id === 'security') this.ensureNvdBundleMeta();
     this._ensureViewRendered(id);
     this._scheduleNavPush();
   },
