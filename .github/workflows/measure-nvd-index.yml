@@ -1,0 +1,51 @@
+# Manual, on-demand job that measures how large a bundled NVD CPE->CVE index
+# would be (see scripts/measure-nvd-index.mjs). Runs where NVD is reachable and
+# prints the numeric report to the run summary. Not part of the app build.
+name: Measure NVD index
+
+on:
+  workflow_dispatch:
+    inputs:
+      sample_pages:
+        description: 'Pages to fetch (2000 CVEs each); 0 = full corpus'
+        required: false
+        default: '0'
+
+jobs:
+  measure:
+    name: Measure
+    runs-on: ubuntu-latest
+    # A full no-key run pages through NVD at 5 req/30s (~16 min). With an
+    # NVD_API_KEY secret it is ~2 min. Give it generous headroom either way.
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          lfs: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Measure NVD index
+        env:
+          # Optional: set an NVD_API_KEY repository secret to run ~8x faster.
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+        run: |
+          npm run measure:nvd -- \
+            --sample-pages "${{ inputs.sample_pages }}" \
+            --report nvd-index-report.json | tee measure.out
+          {
+            echo '### NVD compact-index measurement'
+            echo ''
+            echo '```'
+            cat measure.out
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
