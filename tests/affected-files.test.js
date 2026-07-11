@@ -7,7 +7,8 @@ import {
   buildFileIndex,
   matchAffectedFile,
   linkAffectedFiles,
-  buildAffectedFileRelationships
+  buildAffectedFileRelationships,
+  cveAffectedRow
 } from '../src/lib/index.js';
 
 // A trimmed but structurally real CVE 5.x record, shaped like the Linux kernel
@@ -152,6 +153,18 @@ test('buildAffectedFileRelationships emits inferred vuln -> file edges for linke
   assert.equal(rels[0].relationshipType, 'affectsFile');
   assert.equal(rels[0].virtual, true);
   assert.equal(rels[0].inferred, true);
+});
+
+test('cveAffectedRow keeps only non-empty fields and returns null when empty', () => {
+  assert.deepEqual(
+    cveAffectedRow({ affectedFiles: ['a.c'], affectedRoutines: [], affectedModules: ['m'] }),
+    { f: ['a.c'], m: ['m'] }
+  );
+  assert.equal(
+    cveAffectedRow({ affectedFiles: [], affectedRoutines: [], affectedModules: [] }),
+    null
+  );
+  assert.equal(cveAffectedRow({}), null);
 });
 
 test('buildAffectedFileRelationships de-dupes a vuln->file pair reached by two paths', () => {

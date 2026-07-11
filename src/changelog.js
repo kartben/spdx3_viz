@@ -42,6 +42,10 @@ export const CHANGELOG = [
         text: 'CVE details list affected files and functions, with inferred links to matching SBOM files.'
       },
       {
+        tag: 'Added',
+        text: 'Optional bundled CVE affected-files index links affected files offline, without per-CVE fetches.'
+      },
+      {
         tag: 'Improved',
         text: 'Impact adds a search-first element picker with provenance and downstream reach.'
       },
