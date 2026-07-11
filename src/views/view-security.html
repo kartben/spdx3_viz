@@ -133,6 +133,7 @@
         <summary class="cursor-pointer text-[11px] text-slate-500 hover:text-slate-300 select-none">
           NVD options
           <span x-show="nvdSource === 'bundle'" class="text-emerald-400">· bundled index</span>
+          <span x-show="nvdSource === 'live'" class="text-emerald-400">· live API</span>
         </summary>
 
         <!-- Source: live REST API vs bundled static index -->
@@ -140,18 +141,18 @@
           <span class="text-[10px] text-slate-500 uppercase tracking-wider">NVD source</span>
           <div class="inline-flex rounded-lg overflow-hidden ring-1 ring-slate-700">
             <button
-              @click="setNvdSource('live')"
-              class="text-xs px-2.5 py-1"
-              :class="nvdSource === 'live' ? 'bg-sky-500/20 text-sky-200' : 'bg-slate-900 text-slate-400 hover:text-slate-200'"
-            >
-              Live API
-            </button>
-            <button
               @click="setNvdSource('bundle')"
               class="text-xs px-2.5 py-1"
               :class="nvdSource === 'bundle' ? 'bg-sky-500/20 text-sky-200' : 'bg-slate-900 text-slate-400 hover:text-slate-200'"
             >
               Bundled index
+            </button>
+            <button
+              @click="setNvdSource('live')"
+              class="text-xs px-2.5 py-1"
+              :class="nvdSource === 'live' ? 'bg-sky-500/20 text-sky-200' : 'bg-slate-900 text-slate-400 hover:text-slate-200'"
+            >
+              Live API
             </button>
           </div>
           <span class="text-[10px] text-slate-500"
