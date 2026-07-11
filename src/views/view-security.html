@@ -664,6 +664,15 @@
     x-show="mountedViews.security && filteredVulnerabilities.length === 0"
     class="text-sm text-slate-500 italic text-center py-8"
   >
-    No vulnerabilities match your filters
+    <span x-show="allVulnerabilities.length > 0">No vulnerabilities match your filters</span>
+    <span x-show="allVulnerabilities.length === 0 && osvSync.status === 'done'">
+      No known vulnerabilities were found in the SBOM or online.
+    </span>
+    <span x-show="allVulnerabilities.length === 0 && osvSync.status !== 'done'">
+      This SBOM carries no vulnerability data.
+      <span x-show="canSyncOsv" class="not-italic">
+        Use “Check public databases” above to look up known CVEs by PackageURL.
+      </span>
+    </span>
   </div>
 </div>
