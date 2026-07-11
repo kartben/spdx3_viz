@@ -227,7 +227,7 @@
               x-show="canSyncOnline"
               @click.stop="switchView('security'); if (onlineSync.status === 'idle' || onlineSync.status === 'error') startOnlineSync()"
               class="inline-flex items-center gap-1 text-xs text-sky-300 hover:text-sky-200 cursor-pointer"
-              title="Look up CVEs from public databases (OSV.dev) by PackageURL"
+              title="Look up CVEs from public databases: OSV.dev (PackageURL) and NVD (CPE)"
             >
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -253,7 +253,7 @@
             x-show="canSyncOnline"
             @click.stop="switchView('security'); if (onlineSync.status === 'idle' || onlineSync.status === 'error') startOnlineSync()"
             class="inline-flex items-center gap-1 text-xs text-sky-300 hover:text-sky-200 cursor-pointer mt-3"
-            title="Look up CVEs from public databases (OSV.dev) by PackageURL"
+            title="Look up CVEs from public databases: OSV.dev (PackageURL) and NVD (CPE)"
           >
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -263,7 +263,7 @@
                 d="M3 12a9 9 0 0018 0 9 9 0 00-18 0zm9-9v18m-9-9h18"
               />
             </svg>
-            Check public databases (OSV)
+            Check public databases
           </span>
         </div>
       </template>
