@@ -3,3 +3,4 @@ dist/
 .DS_Store
 .nvd-cache/
 public/nvd-cpe/
+public/cve-affected/

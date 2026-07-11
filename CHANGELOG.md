@@ -13,6 +13,7 @@ via the "What's new" link.
 - **Added:** Online scan findings show as flagged virtual nodes on the graph and in search.
 - **Added:** Optional bundled NVD index for CPE matching without live API calls (no rate limits or CORS, offline).
 - **Added:** CVE details list affected files and functions, with inferred links to matching SBOM files.
+- **Added:** Optional bundled CVE affected-files index links affected files offline, without per-CVE fetches.
 - **Improved:** Impact adds a search-first element picker with provenance and downstream reach.
 - **Fixed:** Overview cards no longer wrap awkwardly on narrow screens.
 

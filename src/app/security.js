@@ -129,14 +129,32 @@ export const securityMixin = {
     }
     return this._affectedFileIndex;
   },
-  // For a CVE whose record has loaded, resolves each declared affected source
-  // path to a File in this SBOM (when one matches). Returns [] until the record
-  // is fetched or when the record lists no affected files. Memoized per cveId
-  // (both cards call this several times per render); the cache is dropped when
-  // the SBOM's files change (see _fileIndex) and a no-data CVE is never cached,
-  // so a later fetch still resolves.
+  // A CVE's affected files/functions/modules, preferring the freshly fetched
+  // record (what the card also shows) and falling back to the bundled index
+  // (scripts/build-cve-affected-index.mjs) so the data is available offline and
+  // in bulk without a per-CVE fetch. Returns null when neither source has it.
+  affectedFilesFor(cveId) {
+    const rec = this.cveDetail(cveId)?.data;
+    if (rec) {
+      return {
+        affectedFiles: rec.affectedFiles || [],
+        affectedRoutines: rec.affectedRoutines || [],
+        affectedModules: rec.affectedModules || []
+      };
+    }
+    const b = this.cveAffectedBundle?.get(cveId);
+    if (b)
+      return { affectedFiles: b.f || [], affectedRoutines: b.r || [], affectedModules: b.m || [] };
+    return null;
+  },
+  // Resolves each affected source path a CVE declares to a File in this SBOM
+  // (when one matches). Returns [] when neither the record nor the bundle has
+  // affected files. Memoized per cveId (both cards call this several times per
+  // render); the cache is dropped when the SBOM's files change (see _fileIndex),
+  // when a record is fetched, and when the bundle loads, and a no-data CVE is
+  // never cached, so a later source still resolves.
   affectedFileLinks(cveId) {
-    const files = this.cveDetail(cveId)?.data?.affectedFiles;
+    const files = this.affectedFilesFor(cveId)?.affectedFiles;
     if (!files || !files.length) return [];
     const index = this._fileIndex(); // resolves the cache reset before we read it
     this._affectedFileLinksCache ||= {};
@@ -168,8 +186,9 @@ export const securityMixin = {
       }
       const record = await res.json();
       this.cveDetails[cveId] = { loading: false, error: '', data: summarizeCveRecord(record) };
-      // A newly fetched record may name affected files present in this SBOM, so
-      // refresh the inferred vuln -> file graph edges.
+      // A newly fetched record supersedes the bundle for this CVE, so drop its
+      // memoized links and, if it names affected files, refresh the graph edges.
+      if (this._affectedFileLinksCache) delete this._affectedFileLinksCache[cveId];
       if (this.cveDetails[cveId].data.affectedFiles.length) this._rebuildAffectedFileLinks();
     } catch (err) {
       this.cveDetails[cveId] = {
@@ -479,7 +498,7 @@ export const securityMixin = {
     }
     const rels = buildAffectedFileRelationships(
       this.allVulnerabilities,
-      (v) => this.cveDetails[v.cveId]?.data?.affectedFiles,
+      (v) => this.affectedFilesFor(v.cveId)?.affectedFiles,
       index
     );
     this.affectedFileRelationships = rels;
@@ -494,17 +513,63 @@ export const securityMixin = {
   },
 
   // Whether bulk-resolving affected files can do anything: needs File elements to
-  // match against and at least one CVE-identified vulnerability to fetch.
+  // match against and at least one CVE-identified vulnerability to link.
   get canResolveAffectedFiles() {
     return this._fileIndex().size > 0 && this.allVulnerabilities.some((v) => v.cveId);
   },
 
-  // Fetches the public CVE records for the SBOM's vulnerabilities (bounded, so a
-  // huge advisory list can't hammer cve.org), populating cveDetails so the
-  // inferred vuln -> file edges appear on the graph. Records already fetched are
-  // reused; the per-fetch rebuild keeps the edges current as they arrive.
+  // Loads the bundled CVE affected-files index once (a single static fetch that
+  // covers every CVE), parsing it into a cveId -> {f,r,m} map. Marks the source
+  // 'absent' if it isn't hosted, so callers fall back to the live cve.org fetch.
+  async loadCveAffectedBundle() {
+    if (this.cveAffectedBundleStatus === 'loading' || this.cveAffectedBundleStatus === 'done') {
+      return;
+    }
+    this.cveAffectedBundleStatus = 'loading';
+    const base = String(this.cveAffectedBundleUrl || './cve-affected/').replace(/\/?$/, '/');
+    try {
+      const res = await fetch(`${base}index.json`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      this.cveAffectedBundle = new Map(Object.entries(data.cves || {}));
+      this.cveAffectedGenerated = data.generated || '';
+      this.cveAffectedBundleStatus = 'done';
+      this._affectedFileLinksCache = {}; // a new affected-files source invalidates cached links
+    } catch {
+      this.cveAffectedBundleStatus = 'absent';
+    }
+  },
+
+  // Links affected files across the whole SBOM. Prefers the bundled index: one
+  // fetch links every CVE instantly and offline. Only when the bundle isn't
+  // hosted does it fall back to fetching CVE records from cve.org (bounded, so a
+  // huge advisory list can't hammer the API).
   async resolveAffectedFilesForGraph() {
     if (this.resolvingAffectedFiles) return;
+
+    // Bundle path: load once, then link everything from it.
+    if (this.cveAffectedBundleStatus !== 'absent') {
+      if (this.cveAffectedBundleStatus !== 'done') {
+        this.resolvingAffectedFiles = true;
+        this.affectedFilesProgress = { done: 0, total: 0 }; // indeterminate: single fetch
+        try {
+          await this.loadCveAffectedBundle();
+        } finally {
+          this.resolvingAffectedFiles = false;
+        }
+      }
+      if (this.cveAffectedBundleStatus === 'done') {
+        this._rebuildAffectedFileLinks();
+        const n = this.affectedFileRelationships.length;
+        this.toastMsg = n
+          ? `Linked ${n} affected file${n === 1 ? '' : 's'} to this SBOM (bundled index).`
+          : 'No affected files from these CVEs match files in this SBOM.';
+        setTimeout(() => (this.toastMsg = ''), 5000);
+        return;
+      }
+    }
+
+    // Fallback: no bundle hosted — fetch records from cve.org (bounded).
     const cveIds = [...new Set(this.allVulnerabilities.map((v) => v.cveId).filter(Boolean))];
     const pending = cveIds.filter((id) => !this.cveDetails[id]);
     const capped = pending.slice(0, AFFECTED_FILES_RESOLVE_MAX);

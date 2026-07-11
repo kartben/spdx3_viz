@@ -362,6 +362,9 @@ export const loadingMixin = {
       this._resetGraphHeat(); // drop a heat lens the new SBOM can't honour
       this.cveDetails = {}; // drop cached CVE fetches from the previous SBOM
       this.resetOnlineSync(); // drop OSV online findings from the previous SBOM
+      // If the CVE affected-files bundle is already loaded, link this SBOM's CVEs
+      // to its files right away (resetOnlineSync cleared the previous edges).
+      if (this.cveAffectedBundleStatus === 'done') this._rebuildAffectedFileLinks();
       this.impactFocus = null; // drop any Impact-tab focus from the previous SBOM
       this.impactSearch = '';
       this._impactHookOpenId = null;

@@ -227,8 +227,12 @@
         <div class="min-w-0 flex-1">
           <div class="text-sm font-medium text-slate-200">Affected files in this SBOM</div>
           <div class="text-xs text-slate-500 hidden sm:block">
-            Fetch CVE records and link the source files they name to Files in this SBOM (inferred by
-            path, shown as dashed edges on the graph).
+            Link the source files CVEs name to Files in this SBOM (inferred by path, shown as dashed
+            edges on the graph). Uses a bundled CVE index when available (offline, all CVEs<span
+              x-show="cveAffectedGenerated"
+              x-text="`, updated ${cveAffectedGenerated}`"
+            ></span
+            >), otherwise fetches records from cve.org.
           </div>
         </div>
 
@@ -252,8 +256,11 @@
         >
           <div class="flex-1">
             <div class="flex justify-between text-xs text-slate-400 mb-1">
-              <span>Fetching CVE records…</span>
               <span
+                x-text="affectedFilesProgress.total ? 'Fetching CVE records…' : 'Loading CVE index…'"
+              ></span>
+              <span
+                x-show="affectedFilesProgress.total"
                 class="tabular-nums"
                 x-text="`${formatCount(affectedFilesProgress.done)}/${formatCount(affectedFilesProgress.total)}`"
               ></span>
@@ -261,7 +268,8 @@
             <div class="h-1.5 rounded-full bg-slate-700 overflow-hidden">
               <div
                 class="h-full bg-rose-400 transition-all duration-200"
-                :style="`width:${affectedFilesProgress.total ? Math.round((affectedFilesProgress.done / affectedFilesProgress.total) * 100) : 0}%`"
+                :class="affectedFilesProgress.total ? '' : 'animate-pulse w-full'"
+                :style="affectedFilesProgress.total ? `width:${Math.round((affectedFilesProgress.done / affectedFilesProgress.total) * 100)}%` : ''"
               ></div>
             </div>
           </div>

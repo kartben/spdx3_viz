@@ -73,6 +73,22 @@ jobs:
             rmdir dist/nvd-cpe 2>/dev/null || true
           fi
 
+      # Same as above for the bundled CVE affected-files index (the app's default
+      # ./cve-affected/ base URL). Pulled from the rolling 'cve-affected-index'
+      # release; optional, so the deploy still succeeds before it exists.
+      - name: Include bundled CVE affected-files index
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p dist/cve-affected
+          if gh release download cve-affected-index --repo "$GITHUB_REPOSITORY" --dir dist/cve-affected --clobber; then
+            echo "Included bundled CVE affected-files index:"
+            ls -la dist/cve-affected
+          else
+            echo "No 'cve-affected-index' release yet — skipping; run the 'Build CVE affected-files index' workflow to publish it."
+            rmdir dist/cve-affected 2>/dev/null || true
+          fi
+
       - name: Configure Pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
 

@@ -183,6 +183,12 @@ export function createState() {
     _affectedFileIndex: null, // memoized basename->File index for affected-file linking
     _affectedFileIndexFor: null, // the `files` array the index was built from
     _affectedFileLinksCache: null, // memoized CVE id -> AffectedFileLink[]
+    // Bundled CVE affected-files index (built by scripts/build-cve-affected-index.mjs):
+    // a static CVE id -> {f,r,m} map so affected files link offline, no per-CVE fetch.
+    cveAffectedBundleUrl: './cve-affected/', // same-origin base URL of index.json
+    cveAffectedBundle: null, // Map<cveId, {f?,r?,m?}> once loaded
+    cveAffectedBundleStatus: 'idle', // idle | loading | done | absent
+    cveAffectedGenerated: '', // bundle build date, shown in the Security UI
     licenseSort: 'usage',
     buildSort: 'output',
     pkgSort: 'name',
