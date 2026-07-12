@@ -3,7 +3,7 @@
 All notable changes to this project are documented here. Also viewable in-app
 via the "What's new" link.
 
-## Unreleased
+## [0.3.0] - 2026-07-12
 
 - **Added:** Graph layout picker: organic, hierarchy, radial, spotlight, and type lanes.
 - **Added:** Files dialog to add or remove sample and local files.
