@@ -11,7 +11,7 @@ export const CHANGELOG = [
     items: [
       {
         tag: 'Added',
-        text: 'Graph layout picker: organic, hierarchy, radial, spotlight artifacts, and type lanes.'
+        text: 'Graph layout picker: organic, hierarchy, radial, spotlight, and type lanes.'
       },
       {
         tag: 'Added',
@@ -19,35 +19,31 @@ export const CHANGELOG = [
       },
       {
         tag: 'Added',
-        text: 'Relationship Repartition chart in Statistics, with lifecycle scope chips and graph drill-down by relationship type.'
+        text: 'Relationship Repartition chart in Statistics, with graph drill-down.'
       },
       {
         tag: 'Added',
-        text: 'Remediation view listing actionable SBOM gaps, with category and severity filters.'
+        text: 'Remediation view listing actionable SBOM gaps, with filters.'
       },
       {
         tag: 'Added',
-        text: 'On-demand public-database lookup in Security: OSV.dev by PackageURL and NVD by CPE, merged with SBOM findings.'
+        text: 'Online vulnerability lookup via OSV.dev and NVD, merged with SBOM findings.'
       },
       {
         tag: 'Added',
-        text: 'Online scan findings show as flagged virtual nodes on the graph and in search.'
+        text: 'Scan findings flagged on the graph and in search.'
       },
       {
         tag: 'Added',
-        text: 'Optional bundled NVD index for CPE matching without live API calls (no rate limits or CORS, offline).'
+        text: 'Optional bundled indexes for offline CPE and CVE matching.'
       },
       {
         tag: 'Added',
-        text: 'CVE details list affected files and functions, with inferred links to matching SBOM files.'
-      },
-      {
-        tag: 'Added',
-        text: 'Optional bundled CVE affected-files index links affected files offline, without per-CVE fetches.'
+        text: 'CVE details list affected files and functions, linked to SBOM.'
       },
       {
         tag: 'Improved',
-        text: 'Impact adds a search-first element picker with provenance and downstream reach.'
+        text: 'Impact adds a search-first element picker with provenance.'
       },
       {
         tag: 'Fixed',
