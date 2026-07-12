@@ -5,16 +5,15 @@ via the "What's new" link.
 
 ## Unreleased
 
-- **Added:** Graph layout picker: organic, hierarchy, radial, spotlight artifacts, and type lanes.
+- **Added:** Graph layout picker: organic, hierarchy, radial, spotlight, and type lanes.
 - **Added:** Files dialog to add or remove sample and local files.
-- **Added:** Relationship Repartition chart in Statistics, with lifecycle scope chips and graph drill-down by relationship type.
-- **Added:** Remediation view listing actionable SBOM gaps, with category and severity filters.
-- **Added:** On-demand public-database lookup in Security: OSV.dev by PackageURL and NVD by CPE, merged with SBOM findings.
-- **Added:** Online scan findings show as flagged virtual nodes on the graph and in search.
-- **Added:** Optional bundled NVD index for CPE matching without live API calls (no rate limits or CORS, offline).
-- **Added:** CVE details list affected files and functions, with inferred links to matching SBOM files.
-- **Added:** Optional bundled CVE affected-files index links affected files offline, without per-CVE fetches.
-- **Improved:** Impact adds a search-first element picker with provenance and downstream reach.
+- **Added:** Relationship Repartition chart in Statistics, with graph drill-down.
+- **Added:** Remediation view listing actionable SBOM gaps, with filters.
+- **Added:** Online vulnerability lookup via OSV.dev and NVD, merged with SBOM findings.
+- **Added:** Scan findings flagged on the graph and in search.
+- **Added:** Optional bundled indexes for offline CPE and CVE matching.
+- **Added:** CVE details list affected files and functions, linked to SBOM.
+- **Improved:** Impact adds a search-first element picker with provenance.
 - **Fixed:** Overview cards no longer wrap awkwardly on narrow screens.
 
 ## [0.2.0] - 2026-07-07
