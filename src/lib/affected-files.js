@@ -216,16 +216,26 @@ export function effectiveVexStatus(assessments, vulnSpdxId) {
  * @typedef {AffectedFileLink} AnnotatedAffectedFile
  * @property {string} packageId - spdxId of the package that contains the matched File ('' when unlinked/unknown)
  * @property {string} packageName - that package's display name ('')
- * @property {string} vexStatus - the package's effective VEX status for this vuln ('' when none)
- * @property {boolean} ruledOut - true when that VEX status clears the package (not_affected/fixed)
+ * @property {string} vexStatus - the effective VEX status for this vuln ('' when none)
+ * @property {boolean} ruledOut - true when that VEX status clears the file (not_affected/fixed)
+ * @property {boolean} vexInherited - true when vexStatus came from the whole-CVE clearance
+ *   rather than the file's own package (the file's package carries no direct assessment)
  */
 
 /**
  * Joins each resolved affected-file link to the package that contains its
- * matched File and to the VEX status that package carries for this
- * vulnerability, so the UI can flag files a VEX already rules out. Pure: the
- * document lookups are supplied as callbacks. Only linked files (a path that
- * resolved to a File in the document) can carry a package or status.
+ * matched File and to the VEX status that clears it for this vulnerability, so
+ * the UI can flag files a VEX already rules out. Pure: the document lookups are
+ * supplied as callbacks. Only linked files (a path that resolved to a File in
+ * the document) can carry a package or status.
+ *
+ * A file's own containing package rarely carries the VEX statement directly: VEX
+ * records typically target a top-level product package, while a matched source
+ * file belongs to a sub-component (or to no package at all). So when the whole
+ * CVE is ruled out for this SBOM (`overallStatus` is not_affected/fixed), a
+ * matched file with no direct assessment inherits that clearance rather than
+ * reading as "still an issue", which would contradict the card's clearance
+ * banner. A file whose own package is directly assessed keeps that status.
  *
  * The result is ordered for display: still-affected matched files first, then
  * matched files a VEX rules out, then paths not present in this SBOM.
@@ -237,21 +247,42 @@ export function effectiveVexStatus(assessments, vulnSpdxId) {
  *   matched File spdxId -> its containing package, or null
  * @param {(pkgId: string) => Array<{vulnId?: string, status?: string}>} lookups.assessmentsOf
  *   package spdxId -> its VEX assessments
+ * @param {string} [lookups.overallStatus] - the vuln's effective VEX status across every
+ *   assessed package; when it clears the CVE, matched files inherit the clearance
  * @returns {AnnotatedAffectedFile[]}
  */
-export function annotateAffectedFiles(links, vulnSpdxId, { packageOf, assessmentsOf }) {
+export function annotateAffectedFiles(
+  links,
+  vulnSpdxId,
+  { packageOf, assessmentsOf, overallStatus = '' }
+) {
+  const clearedOverall = isRuledOutStatus(overallStatus);
   const annotated = (links || []).map((link) => {
-    const base = { ...link, packageId: '', packageName: '', vexStatus: '', ruledOut: false };
+    const base = {
+      ...link,
+      packageId: '',
+      packageName: '',
+      vexStatus: '',
+      ruledOut: false,
+      vexInherited: false
+    };
+    // A path not present in this SBOM stays a bare reference, even when the CVE
+    // is cleared overall: there is no file here to rule out.
     if (!link.linked) return base;
     const pkg = packageOf(link.spdxId);
-    if (!pkg || !pkg.spdxId) return base;
-    const vexStatus = effectiveVexStatus(assessmentsOf(pkg.spdxId), vulnSpdxId);
+    const pkgStatus =
+      pkg && pkg.spdxId ? effectiveVexStatus(assessmentsOf(pkg.spdxId), vulnSpdxId) : '';
+    // Prefer the file's own package assessment; otherwise inherit the whole-CVE
+    // clearance so a matched file never contradicts the card's "not an issue"
+    // banner just because the VEX names the product, not this sub-package.
+    const vexStatus = pkgStatus || (clearedOverall ? overallStatus : '');
     return {
       ...base,
-      packageId: pkg.spdxId,
-      packageName: pkg.name || '',
+      packageId: pkg?.spdxId || '',
+      packageName: pkg?.name || '',
       vexStatus,
-      ruledOut: isRuledOutStatus(vexStatus)
+      ruledOut: isRuledOutStatus(vexStatus),
+      vexInherited: !pkgStatus && clearedOverall
     };
   });
   // Actionable (matched, still affected) first, ruled-out next, absent last. A

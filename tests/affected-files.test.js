@@ -255,6 +255,88 @@ test('annotateAffectedFiles leaves a matched file without a known package unanno
   assert.equal(out[0].ruledOut, false);
 });
 
+test('annotateAffectedFiles inherits a whole-CVE VEX clearance for files without a direct assessment', () => {
+  const idx = buildFileIndex(FILES);
+  const links = linkAffectedFiles(['net/netfilter/nft_set_rbtree.c', 'fs/ext4/mballoc.c'], idx);
+  // F1's package carries no assessment for V; F2's package is directly cleared.
+  const packageOf = (id) =>
+    ({
+      F1: { spdxId: 'PKG_KERNEL', name: 'kernel' },
+      F2: { spdxId: 'PKG_EXT4', name: 'ext4' }
+    })[id] || null;
+  const assessmentsOf = (pkgId) => ({ PKG_EXT4: [{ vulnId: 'V', status: 'fixed' }] })[pkgId] || [];
+
+  // The CVE is not_affected for this SBOM overall (product-level VEX).
+  const out = annotateAffectedFiles(links, 'V', {
+    packageOf,
+    assessmentsOf,
+    overallStatus: 'not_affected'
+  });
+  const byPath = Object.fromEntries(out.map((d) => [d.path, d]));
+
+  // F1 has no direct assessment: it inherits the whole-CVE clearance rather
+  // than reading as "still an issue" under a "not an issue" banner.
+  assert.equal(byPath['net/netfilter/nft_set_rbtree.c'].ruledOut, true);
+  assert.equal(byPath['net/netfilter/nft_set_rbtree.c'].vexStatus, 'not_affected');
+  assert.equal(byPath['net/netfilter/nft_set_rbtree.c'].vexInherited, true);
+  assert.equal(byPath['net/netfilter/nft_set_rbtree.c'].packageName, 'kernel');
+
+  // F2 keeps its own package's status, not the inherited one.
+  assert.equal(byPath['fs/ext4/mballoc.c'].vexStatus, 'fixed');
+  assert.equal(byPath['fs/ext4/mballoc.c'].ruledOut, true);
+  assert.equal(byPath['fs/ext4/mballoc.c'].vexInherited, false);
+
+  // With the CVE cleared overall, nothing is left "still an issue".
+  assert.deepEqual(summarizeAffectedFiles(out), {
+    matched: 2,
+    ruledOut: 2,
+    affected: 0,
+    packages: 2
+  });
+});
+
+test('annotateAffectedFiles inherits a whole-CVE clearance even for a file with no known package', () => {
+  const idx = buildFileIndex(FILES);
+  const links = linkAffectedFiles(['net/netfilter/nft_set_rbtree.c'], idx);
+  const out = annotateAffectedFiles(links, 'V', {
+    packageOf: () => null, // no containing package resolvable
+    assessmentsOf: () => [],
+    overallStatus: 'fixed'
+  });
+  assert.equal(out[0].linked, true);
+  assert.equal(out[0].packageId, '');
+  assert.equal(out[0].vexStatus, 'fixed');
+  assert.equal(out[0].ruledOut, true);
+  assert.equal(out[0].vexInherited, true);
+});
+
+test('annotateAffectedFiles does not inherit clearance for paths absent from the SBOM', () => {
+  const idx = buildFileIndex(FILES);
+  const links = linkAffectedFiles(['mm/slab.c'], idx); // no matching file
+  const out = annotateAffectedFiles(links, 'V', {
+    packageOf: () => null,
+    assessmentsOf: () => [],
+    overallStatus: 'not_affected'
+  });
+  assert.equal(out[0].linked, false);
+  assert.equal(out[0].ruledOut, false);
+  assert.equal(out[0].vexStatus, '');
+  assert.equal(out[0].vexInherited, false);
+});
+
+test('annotateAffectedFiles keeps a still-affected package status when the CVE is not cleared', () => {
+  const idx = buildFileIndex(FILES);
+  const links = linkAffectedFiles(['net/netfilter/nft_set_rbtree.c'], idx);
+  const out = annotateAffectedFiles(links, 'V', {
+    packageOf: () => ({ spdxId: 'PKG', name: 'kernel' }),
+    assessmentsOf: () => [], // package has no direct assessment
+    overallStatus: 'affected' // and the CVE is still an issue overall
+  });
+  assert.equal(out[0].ruledOut, false);
+  assert.equal(out[0].vexStatus, '');
+  assert.equal(out[0].vexInherited, false);
+});
+
 test('summarizeAffectedFiles counts matched, ruled-out, and distinct packages', () => {
   const annotated = [
     { linked: true, packageId: 'A', ruledOut: false },

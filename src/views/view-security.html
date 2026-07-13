@@ -800,7 +800,9 @@
                           x-show="d.vexStatus"
                           class="badge"
                           :class="vexStatusMeta(d.vexStatus).badgeClass"
-                          :title="`${vexStatusMeta(d.vexStatus).label}: ${d.packageName} is assessed for ${vuln.name} by a VEX statement`"
+                          :title="d.vexInherited
+                            ? `${vexStatusMeta(d.vexStatus).label}: a VEX statement rules out ${vuln.name} for this SBOM`
+                            : `${vexStatusMeta(d.vexStatus).label}: ${d.packageName} is assessed for ${vuln.name} by a VEX statement`"
                         >
                           <span
                             class="w-1.5 h-1.5 rounded-full mr-1"
@@ -817,7 +819,7 @@
                   >
                     Files are matched to this SBOM by path from the CVE record, not declared by the
                     SBOM itself. A file tagged “Not affected” or “Fixed” is cleared by a VEX
-                    statement on its package: it's linked here for reference, not as an open issue.
+                    statement: it's linked here for reference, not as an open issue.
                   </p>
                 </div>
               </template>
