@@ -27,7 +27,7 @@
            in a synchronous parse phase; progressAnimateMs widens the transition
            to roughly the phase duration so the bar sweeps rather than jumps. -->
       <div
-        class="h-full w-full bg-blue-500 rounded-full origin-left relative overflow-hidden"
+        class="h-full w-full bg-blue-500 rounded-full origin-left relative overflow-hidden will-change-transform"
         :style="`transform: scaleX(${Math.max(0.02, progress)}); transition: transform ${progressAnimateMs}ms linear`"
       >
         <div
