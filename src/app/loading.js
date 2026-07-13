@@ -426,11 +426,23 @@ export const loadingMixin = {
         (phase, count) => this._beginParsePhaseSweep(phase, count, yieldToPaint)
       );
       if (reqId !== latestParseReqId) return; // superseded
-      this.progressAnimateMs = 150;
-      this.progress = 1;
+
+      // Applying the result and Alpine's first dashboard render is itself a
+      // synchronous block (hundreds of ms to a couple of seconds on a huge
+      // SBOM). Sweep the bar across the reserved tail (0.90 → 0.99) while it
+      // runs, and only complete + hide the overlay once that render has painted
+      // (nextTick) so the bar never freezes at 99%.
+      this.progressPhase = 'Finalizing…';
       this.progressEta = null;
-      this.parsing = false;
+      this.progressAnimateMs = this._estParsePhaseMs('finalize', parsed?.elementMap?.size || 0);
+      this.progress = 0.99;
+      await yieldToPaint(); // commit the tail sweep before the render blocks
       this._applyParsedResult(parsed, indexes);
+      this.$nextTick(() => {
+        this.progressAnimateMs = 150;
+        this.progress = 1;
+        this.parsing = false;
+      });
     } catch (err) {
       if (reqId !== latestParseReqId) return;
       this.parsing = false;
@@ -439,17 +451,23 @@ export const loadingMixin = {
     }
   },
 
+  // Rough per-phase duration estimate (ms) from item count, used only to size
+  // the bar's sweep. Overshooting parks the bar near the phase end with the
+  // sheen still moving; undershooting completes early and snaps forward.
+  _estParsePhaseMs(phase, count) {
+    const perItem = phase === 'graph' ? 0.0024 : phase === 'index' ? 0.003 : 0.0013;
+    return Math.min(15000, Math.max(500, Math.round(count * perItem)));
+  },
+
   // Sets the progress bar sweeping toward a phase's end over roughly how long
   // that phase will block, then yields once so the transition starts painting
-  // before the synchronous work begins. Per-item factors are rough (tuned on a
-  // ~1.3M-element SBOM); overshooting just parks the bar near the end with the
-  // sheen still moving, undershooting snaps forward at the next phase.
+  // before the synchronous work begins.
   async _beginParsePhaseSweep(phase, count, yieldToPaint) {
     const spec =
       phase === 'graph'
-        ? { target: 0.78, label: 'Building graph…', perItem: 0.0024 }
-        : { target: 0.985, label: 'Indexing relationships…', perItem: 0.003 };
-    const estMs = Math.min(15000, Math.max(500, Math.round(count * spec.perItem)));
+        ? { target: 0.75, label: 'Building graph…' }
+        : { target: 0.9, label: 'Indexing relationships…' };
+    const estMs = this._estParsePhaseMs(phase, count);
     this.progressPhase = spec.label;
     this.progressEta = estMs / 1000;
     this.progressAnimateMs = estMs;
