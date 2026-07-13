@@ -28,12 +28,13 @@ import { forEachGraphItem } from './stream-graph.js';
  * @returns {Promise<{ parsed: any, indexes: any }>}
  */
 export async function parseFiles(files, progress, onPhase) {
-  const sizeOf = (f) => (f.blob ? f.blob.size : f.text ? f.text.length : 0);
+  const sizeOf = (f) => (f?.blob ? f.blob.size : f?.text ? f.text.length : 0);
   const totalBytes = (files || []).reduce((sum, f) => sum + sizeOf(f), 0) || 1;
   let bytesDone = 0;
   const mergedGraph = [];
 
   for (const file of files || []) {
+    if (!file) continue;
     if (file.blob) {
       // Too large for one string: stream its @graph, parsing item by item.
       // Throttle progress to ~0.2% steps: a multi-hundred-MB file yields
