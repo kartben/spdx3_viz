@@ -23,6 +23,10 @@ export const CHANGELOG = [
       },
       {
         tag: 'Improved',
+        text: 'Graph legend filtering is faster on large SBOMs.'
+      },
+      {
+        tag: 'Improved',
         text: 'CVE cards clarify referenced files and flag VEX-cleared ones.'
       }
     ]

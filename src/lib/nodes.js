@@ -7,6 +7,14 @@
 import { COLORS } from '../config.js';
 import { isA, CLASS } from '../spdx/model.js';
 
+// An element's node type is a pure function of its immutable fields, but
+// computing it walks the SPDX class hierarchy up to ~20 times (one isA() per
+// candidate class, each allocating a Set). On a large SBOM the graph rebuild
+// calls this once per element (hundreds of thousands of times), so memoize on
+// the element object: the first call classifies, every later one is a lookup.
+// A WeakMap lets discarded placeholder objects be collected.
+const NODE_TYPE_CACHE = new WeakMap();
+
 /**
  * Determines the node type from an element
  *
@@ -15,7 +23,14 @@ import { isA, CLASS } from '../spdx/model.js';
  */
 export function getNodeType(item) {
   if (!item || !item.type) return 'other';
+  const cached = NODE_TYPE_CACHE.get(item);
+  if (cached !== undefined) return cached;
+  const type = computeNodeType(item);
+  NODE_TYPE_CACHE.set(item, type);
+  return type;
+}
 
+function computeNodeType(item) {
   // Placeholder nodes stand in for references that don't resolve to a loaded
   // element; grouped as one 'external' node type.
   if (item.placeholder || item.type === 'ExternalReference') return 'external';
