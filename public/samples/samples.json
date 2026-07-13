@@ -40,7 +40,17 @@
     "description": "Yocto <code>core-image-minimal</code> build: rootfs, packages, build graph, and vulnerability (VEX) data.",
     "dir": "samples/yocto",
     "files": ["core-image-minimal-1-0-0-0-20260321-1540.spdx.json"],
-    "size": 15914617
+    "size": 15914617,
+    "disabled": true
+  },
+  {
+    "id": "yocto6",
+    "name": "Yocto 6.0.1 LTS",
+    "icon": "favicon.png",
+    "description": "Full SPDX3 SBOM for a <code>core-image-minimal</code> targeting <code>qemux86-64</code>.",
+    "dir": "samples/yocto6",
+    "files": ["core-image-minimal-qemux86-64.rootfs-20260713122608.spdx.json"],
+    "size": 987612704
   },
   {
     "id": "android",

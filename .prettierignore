@@ -7,6 +7,7 @@ dist
 # Bundled demo SBOM data — kept verbatim, not formatted
 public/samples/zephyr
 public/samples/linux
+public/samples/yocto6
 
 # Auto-generated from the official SPDX model (scripts/gen-spdx-model.mjs)
 src/spdx/hierarchy.js
