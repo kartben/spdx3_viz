@@ -114,6 +114,30 @@ html {
   }
 }
 
+/* Loading progress bar: a sheen sweeps across the filled portion so the bar
+   keeps visibly moving even while the main thread is briefly blocked parsing a
+   huge SBOM (the sweep is a transform, so it runs on the compositor rather than
+   the blocked main thread). Honours reduced-motion. */
+@keyframes progressSheen {
+  from {
+    transform: translateX(-150%);
+  }
+
+  to {
+    transform: translateX(350%);
+  }
+}
+
+.progress-sheen {
+  animation: progressSheen 1.1s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress-sheen {
+    animation: none;
+  }
+}
+
 /* Supply Chain route map: dashed transport legs animate a flow of "packets"
    from pickup to dropoff. Honours reduced-motion. */
 .sc-flow {

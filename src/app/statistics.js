@@ -21,6 +21,14 @@ const remediationCache = {
   key: null,
   value: []
 };
+// The quality report is derived purely from the parsed data (same inputs as the
+// remediation cache), but the dashboard reads it many times per render and it
+// costs a full pass over every element. Without this memo a huge SBOM re-ran
+// that pass dozens of times on load, freezing the UI for many seconds.
+const qualityReportCache = {
+  key: null,
+  value: null
+};
 
 function remediationCacheKey(data) {
   return [
@@ -286,7 +294,12 @@ function buildRelationshipRepartition(app) {
 
 export const statisticsMixin = {
   get qualityReport() {
-    return computeQualityReport(this);
+    const key = remediationCacheKey(this);
+    if (!sameRemediationKey(qualityReportCache.key, key)) {
+      qualityReportCache.key = key;
+      qualityReportCache.value = computeQualityReport(this);
+    }
+    return qualityReportCache.value;
   },
   get remediationFindings() {
     const key = remediationCacheKey(this);
