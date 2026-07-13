@@ -1,1 +1,2 @@
 public/samples/ansible/ansible-automation-platform-2.6.spdx3.jsonld filter=lfs diff=lfs merge=lfs -text
+public/samples/yocto6/core-image-minimal-qemux86-64.rootfs-20260713122608.spdx.json filter=lfs diff=lfs merge=lfs -text
