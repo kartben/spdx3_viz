@@ -86,6 +86,25 @@ test('is robust to tiny chunk boundaries', async () => {
   }
 });
 
+test('decodes multi-byte UTF-8 split across chunk boundaries', async () => {
+  // Names/values with accents, CJK, and emoji encode to 2-4 bytes; tiny byte
+  // chunks split them mid-character, which the streaming decoder must stitch
+  // back together (and flush at the end).
+  const doc = {
+    '@graph': [
+      { spdxId: 'a', name: 'Benjamin Cabé' },
+      { spdxId: 'b', name: '零之执行者 — 🚀🛰️' }
+    ]
+  };
+  const json = JSON.stringify(doc);
+  for (const chunk of [1, 2, 3, 5]) {
+    const items = await collect(json, chunk);
+    assert.equal(items.length, 2, `chunk=${chunk}`);
+    assert.equal(items[0].name, 'Benjamin Cabé', `chunk=${chunk}`);
+    assert.equal(items[1].name, '零之执行者 — 🚀🛰️', `chunk=${chunk}`);
+  }
+});
+
 test('does not false-match @graph appearing as a value before the key', async () => {
   const doc = {
     note: '@graph',

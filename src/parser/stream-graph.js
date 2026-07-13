@@ -88,7 +88,7 @@ export async function forEachGraphItem(blob, onItem, onProgress) {
     try {
       obj = JSON.parse(chunk);
     } catch (err) {
-      throw new Error(`graph item: ${err.message}`);
+      throw new Error(`graph item: ${err.message} (near: ${chunk.slice(0, 140)})`);
     }
     onItem(obj);
   };
@@ -100,6 +100,9 @@ export async function forEachGraphItem(blob, onItem, onProgress) {
       bytesRead += value.length;
       if (onProgress) onProgress(bytesRead);
     }
+    // Flush any bytes the decoder is holding for a multi-byte char that ended
+    // exactly at the stream's end, so trailing content isn't dropped.
+    if (done) buf += decoder.decode();
 
     const n = buf.length;
     while (pos < n) {
