@@ -28,6 +28,10 @@ export const CHANGELOG = [
       {
         tag: 'Improved',
         text: 'CVE cards clarify referenced files and flag VEX-cleared ones.'
+      },
+      {
+        tag: 'Fixed',
+        text: 'Online-only CVEs now resolve referenced files when expanded.'
       }
     ]
   },

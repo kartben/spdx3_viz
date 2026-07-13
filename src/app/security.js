@@ -110,9 +110,12 @@ export const securityMixin = {
         .map((s) => ({ status: s, count: byStatus[s].size, meta: getVexStatusMeta(s) }))
     };
   },
-  // The full enriched vulnerability record for a vuln spdxId (or null).
+  // The full enriched vulnerability record for a vuln spdxId (or null). Searches
+  // the merged list so online-only findings (spdxId `online:…`, absent from the
+  // SBOM's own vulnerabilities) resolve too, otherwise expanding an online CVE
+  // card would never trigger its cve.org fetch (and its referenced files).
   vulnRecord(spdxId) {
-    return this.vulnerabilities.find((v) => v.spdxId === spdxId) || null;
+    return this.allVulnerabilities.find((v) => v.spdxId === spdxId) || null;
   },
   cvssSeverityMeta(severity) {
     return getCvssSeverityMeta(severity);
