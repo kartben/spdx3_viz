@@ -17,6 +17,18 @@ let allVulnsCacheKey = null;
 let allVulnsCacheVal = [];
 let filteredFilesCacheKey = null;
 let filteredFilesCacheVal = [];
+let fileTypesCacheKey = null;
+let fileTypesCacheVal = [];
+
+// Most-common file extensions to offer as filter chips. A large rootfs SBOM can
+// carry thousands of distinct extensions; showing one chip each turns the Files
+// header into a wall. We surface the top few by file count instead.
+const FILE_TYPE_CHIP_LIMIT = 12;
+
+// Chip value+label for files with no extension (fileExt returns ''). A real
+// extension always starts with '.', so this never collides with one, nor with
+// the '' that fileTypeFilter uses to mean "no filter / All".
+const NO_EXT_LABEL = '(no ext)';
 
 export const derivedMixin = {
   // Clears the build + vulnerability sort memos. Called when fresh data is
@@ -25,6 +37,7 @@ export const derivedMixin = {
     filteredBuildsCacheKey = null;
     filteredVulnsCacheKey = null;
     filteredFilesCacheKey = null;
+    fileTypesCacheKey = null;
     allVulnsCacheKey = null;
   },
 
@@ -179,7 +192,9 @@ export const derivedMixin = {
       const q = search.toLowerCase();
       fs = fs.filter((f) => f.name?.toLowerCase().includes(q));
     }
-    if (typeFilter) {
+    if (typeFilter === NO_EXT_LABEL) {
+      fs = fs.filter((f) => !this.fileExt(f.name));
+    } else if (typeFilter) {
       fs = fs.filter((f) => this.fileExt(f.name) === typeFilter);
     }
     const sorted = [...fs].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
@@ -1293,9 +1308,25 @@ export const derivedMixin = {
     return sorted;
   },
 
+  // The extension filter chips for the Files view: the most common extensions by
+  // file count (capped at FILE_TYPE_CHIP_LIMIT), plus whatever is currently
+  // selected so its chip always shows. Memoized: counting over hundreds of
+  // thousands of files on every render was a real cost on large SBOMs.
   get fileTypes() {
-    const exts = new Set(this.files.map((f) => this.fileExt(f.name)));
-    return [...exts].sort();
+    const key = `${this.files.length}|${this.fileTypeFilter}`;
+    if (key === fileTypesCacheKey) return fileTypesCacheVal;
+    const counts = new Map();
+    for (const f of this.files) {
+      const e = this.fileExt(f.name) || NO_EXT_LABEL; // labeled bucket for no-extension files
+      counts.set(e, (counts.get(e) || 0) + 1);
+    }
+    const top = [...counts.keys()]
+      .sort((a, b) => counts.get(b) - counts.get(a) || (a < b ? -1 : a > b ? 1 : 0))
+      .slice(0, FILE_TYPE_CHIP_LIMIT);
+    if (this.fileTypeFilter && !top.includes(this.fileTypeFilter)) top.push(this.fileTypeFilter);
+    fileTypesCacheKey = key;
+    fileTypesCacheVal = top;
+    return top;
   },
 
   // Agents (Person / Organization / SoftwareAgent) filtered by the in-view search

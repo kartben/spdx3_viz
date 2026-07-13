@@ -13,7 +13,21 @@
         class="ml-auto bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-emerald-500 w-44 sm:w-56"
       />
     </div>
-    <div x-show="fileTypes.length" class="flex flex-wrap gap-1.5">
+    <div x-show="fileTypes.length" class="flex flex-wrap items-center gap-1.5">
+      <span
+        class="text-xs text-slate-500 mr-0.5"
+        title="The most common file extensions in this SBOM"
+      >
+        Filter by most-used extension:
+      </span>
+      <!-- "All" clears the filter; it is highlighted when no extension is selected. -->
+      <button
+        class="text-xs px-2.5 py-1 rounded-md transition-colors"
+        :class="fileTypeFilter === '' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-700 text-slate-400 hover:text-white'"
+        @click="fileTypeFilter = ''; restreamView('files')"
+      >
+        All
+      </button>
       <template x-for="ft in fileTypes" :key="ft">
         <button
           class="text-xs px-2.5 py-1 rounded-md transition-colors"
