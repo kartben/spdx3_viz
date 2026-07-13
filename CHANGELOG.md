@@ -10,6 +10,7 @@ via the "What's new" link.
 - **Fixed:** Build cards no longer stall to open on large SBOMs.
 - **Improved:** Graph legend filtering is faster on large SBOMs.
 - **Improved:** CVE cards clarify referenced files and flag VEX-cleared ones.
+- **Fixed:** Online-only CVEs now resolve referenced files when expanded.
 
 ## [0.3.0] - 2026-07-12
 
