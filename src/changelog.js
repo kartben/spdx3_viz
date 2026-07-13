@@ -20,6 +20,10 @@ export const CHANGELOG = [
       {
         tag: 'Fixed',
         text: 'Build cards no longer stall to open on large SBOMs.'
+      },
+      {
+        tag: 'Improved',
+        text: 'Affected files show their package and flag VEX-cleared ones.'
       }
     ]
   },

@@ -431,10 +431,7 @@
                 </svg>
               </a>
             </div>
-            <div
-              class="text-xs text-slate-500 truncate"
-              x-text="vuln.packageCount === 0 ? 'Not linked to a package' : `${formatCount(vuln.packageCount)} ${vuln.packageCount === 1 ? 'package' : 'packages'}`"
-            ></div>
+            <div class="text-xs text-slate-500 truncate" x-text="vulnCardSubtitle(vuln)"></div>
           </div>
           <!-- Chevron sits in the identity row on mobile only. -->
           <svg
@@ -662,20 +659,30 @@
                       >Affected files</span
                     >
                     <span
-                      x-show="affectedFileMatchCount(vuln.cveId)"
+                      x-show="affectedFileStats(vuln.cveId, vuln.spdxId).matched"
                       class="badge bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30"
-                      x-text="affectedFileMatchCount(vuln.cveId) + ' in this SBOM'"
+                      x-text="`${formatCount(affectedFileStats(vuln.cveId, vuln.spdxId).matched)} in this SBOM`"
+                    ></span>
+                    <span
+                      x-show="affectedFileStats(vuln.cveId, vuln.spdxId).ruledOut"
+                      class="badge bg-sky-500/15 text-sky-300 ring-1 ring-sky-500/30"
+                      :title="`A VEX statement clears the package(s) owning these files for ${vuln.name}`"
+                      x-text="`${formatCount(affectedFileStats(vuln.cveId, vuln.spdxId).ruledOut)} ruled out by VEX`"
                     ></span>
                   </div>
-                  <ul class="space-y-1">
-                    <template x-for="link in affectedFileLinks(vuln.cveId)" :key="link.path">
-                      <li>
+                  <ul class="space-y-1.5">
+                    <template
+                      x-for="d in affectedFileDetails(vuln.cveId, vuln.spdxId)"
+                      :key="d.path"
+                    >
+                      <li class="flex flex-wrap items-center gap-x-2 gap-y-0.5">
                         <button
-                          x-show="link.linked"
+                          x-show="d.linked"
                           type="button"
-                          @click="navigateTo(link.spdxId)"
-                          class="group inline-flex items-center gap-1.5 text-xs font-mono text-sky-300 hover:text-sky-200 text-left break-all"
-                          :title="'Open ' + link.name + ' in this SBOM'"
+                          @click="navigateTo(d.spdxId)"
+                          class="group inline-flex items-center gap-1.5 text-xs font-mono text-left break-all"
+                          :class="d.ruledOut ? 'text-slate-500 hover:text-slate-300 line-through decoration-slate-600' : 'text-sky-300 hover:text-sky-200'"
+                          :title="'Open ' + d.name + ' in this SBOM'"
                         >
                           <svg
                             class="w-3 h-3 flex-shrink-0 opacity-70 group-hover:opacity-100"
@@ -691,23 +698,48 @@
                             />
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13 2v7h7" />
                           </svg>
-                          <span x-text="link.path"></span>
+                          <span x-text="d.path"></span>
                         </button>
                         <span
-                          x-show="!link.linked"
+                          x-show="!d.linked"
                           class="inline-flex items-center gap-1.5 text-xs font-mono text-slate-400 break-all"
-                          :title="link.candidates ? 'A file with this name is in the SBOM, but the path is ambiguous' : 'Not present in this SBOM'"
+                          :title="d.candidates ? 'A file with this name is in the SBOM, but the path is ambiguous' : 'Not present in this SBOM'"
                         >
-                          <span x-text="link.path"></span>
+                          <span x-text="d.path"></span>
+                        </span>
+                        <span
+                          x-show="d.linked && d.packageName"
+                          class="text-[10px] text-slate-500 whitespace-nowrap"
+                        >
+                          in
+                          <button
+                            type="button"
+                            @click="navigateTo(d.packageId)"
+                            class="text-slate-400 hover:text-slate-200 hover:underline decoration-slate-600"
+                            x-text="d.packageName"
+                          ></button>
+                        </span>
+                        <span
+                          x-show="d.vexStatus"
+                          class="badge"
+                          :class="vexStatusMeta(d.vexStatus).badgeClass"
+                          :title="`${vexStatusMeta(d.vexStatus).label}: ${d.packageName} is assessed for ${vuln.name} by a VEX statement`"
+                        >
+                          <span
+                            class="w-1.5 h-1.5 rounded-full mr-1"
+                            :class="vexStatusMeta(d.vexStatus).dotClass"
+                          ></span>
+                          <span x-text="vexStatusMeta(d.vexStatus).label"></span>
                         </span>
                       </li>
                     </template>
                   </ul>
                   <p
-                    x-show="affectedFileMatchCount(vuln.cveId)"
+                    x-show="affectedFileStats(vuln.cveId, vuln.spdxId).matched"
                     class="text-[10px] text-slate-500 italic leading-snug"
                   >
-                    Links are inferred by matching file paths, not declared in this SBOM.
+                    File links are inferred by matching paths, not declared in this SBOM. A “not
+                    affected”/“fixed” tag reflects a VEX statement on the file's package.
                   </p>
                 </div>
               </template>

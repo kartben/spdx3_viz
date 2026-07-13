@@ -8,6 +8,7 @@ via the "What's new" link.
 - **Fixed:** Large SBOMs (over ~512 MB) now load by streaming, without failing or freezing.
 - **Improved:** Files view caps the extension filter to the most-used extensions.
 - **Fixed:** Build cards no longer stall to open on large SBOMs.
+- **Improved:** Affected files show their package and flag VEX-cleared ones.
 
 ## [0.3.0] - 2026-07-12
 

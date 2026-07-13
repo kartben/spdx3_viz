@@ -9,6 +9,8 @@ import {
   summarizeCveRecord,
   buildFileIndex,
   linkAffectedFiles,
+  annotateAffectedFiles,
+  summarizeAffectedFiles,
   buildAffectedFileRelationships,
   collectPurlTargets,
   collectCpeTargets,
@@ -167,6 +169,45 @@ export const securityMixin = {
   // this SBOM" hint next to the affected-files list).
   affectedFileMatchCount(cveId) {
     return this.affectedFileLinks(cveId).filter((l) => l.linked).length;
+  },
+  // The CVE's affected files, annotated with the package that contains each
+  // matched File and the VEX status that package carries for this vulnerability,
+  // and ordered actionable-first. cveId keys the affected files; vulnSpdxId keys
+  // the VEX lookup (a vuln's assessments live under its spdxId, not its CVE id).
+  // Recomputed per call: the join is a handful of O(1) lookups over the already
+  // memoized links, and staying uncached keeps it reactive to a later fetch.
+  affectedFileDetails(cveId, vulnSpdxId) {
+    const links = this.affectedFileLinks(cveId);
+    if (!links.length) return links; // [] fast; nothing to annotate
+    return annotateAffectedFiles(links, vulnSpdxId, {
+      packageOf: (fileId) => {
+        const pkgId = this.parentPackage(fileId);
+        if (!pkgId) return null;
+        const el = this.elementMap.get(pkgId);
+        return { spdxId: pkgId, name: el?.name || this.cleanName(pkgId) };
+      },
+      assessmentsOf: (pkgId) => this.vexByPackage.get(pkgId) || []
+    });
+  },
+  // Counts over a CVE's affected files relative to this SBOM (matched, ruled-out
+  // by VEX, distinct owning packages). Backs the card subtitle and the
+  // affected-files header badges.
+  affectedFileStats(cveId, vulnSpdxId) {
+    return summarizeAffectedFiles(this.affectedFileDetails(cveId, vulnSpdxId));
+  },
+  // The collapsed vulnerability card's one-line subtitle: the count of assessed
+  // packages plus, once affected files are resolved, how many of the CVE's
+  // affected files land in this SBOM (noting any a VEX already rules out).
+  vulnCardSubtitle(vuln) {
+    const pkgs = vuln.packageCount;
+    const { matched, ruledOut } = this.affectedFileStats(vuln.cveId, vuln.spdxId);
+    const parts = [];
+    if (pkgs > 0) parts.push(`${this.formatCount(pkgs)} ${pkgs === 1 ? 'package' : 'packages'}`);
+    if (matched > 0) {
+      const files = `${this.formatCount(matched)} ${matched === 1 ? 'file' : 'files'}`;
+      parts.push(ruledOut > 0 ? `${files} (${this.formatCount(ruledOut)} not affected)` : files);
+    }
+    return parts.length ? parts.join(' · ') : 'Not linked to a package';
   },
   // Lazily fetch a CVE's public record the first time it's viewed, cached in
   // this.cveDetails so re-opening a card is instant and we never re-request.

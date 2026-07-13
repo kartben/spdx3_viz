@@ -8,7 +8,11 @@ import {
   matchAffectedFile,
   linkAffectedFiles,
   buildAffectedFileRelationships,
-  cveAffectedRow
+  cveAffectedRow,
+  isRuledOutStatus,
+  effectiveVexStatus,
+  annotateAffectedFiles,
+  summarizeAffectedFiles
 } from '../src/lib/index.js';
 
 // A trimmed but structurally real CVE 5.x record, shaped like the Linux kernel
@@ -165,6 +169,101 @@ test('cveAffectedRow keeps only non-empty fields and returns null when empty', (
     null
   );
   assert.equal(cveAffectedRow({}), null);
+});
+
+test('isRuledOutStatus recognizes only the clearing statuses', () => {
+  assert.equal(isRuledOutStatus('not_affected'), true);
+  assert.equal(isRuledOutStatus('fixed'), true);
+  assert.equal(isRuledOutStatus('affected'), false);
+  assert.equal(isRuledOutStatus('under_investigation'), false);
+  assert.equal(isRuledOutStatus(''), false);
+});
+
+test('effectiveVexStatus picks the most severe status for the target vuln only', () => {
+  // affected outranks not_affected: a contradicting pair is never cleared.
+  assert.equal(
+    effectiveVexStatus(
+      [
+        { vulnId: 'V', status: 'not_affected' },
+        { vulnId: 'V', status: 'affected' }
+      ],
+      'V'
+    ),
+    'affected'
+  );
+  // not_affected (2) outranks fixed (1).
+  assert.equal(
+    effectiveVexStatus(
+      [
+        { vulnId: 'V', status: 'fixed' },
+        { vulnId: 'V', status: 'not_affected' }
+      ],
+      'V'
+    ),
+    'not_affected'
+  );
+  // Assessments for a different vuln are ignored.
+  assert.equal(effectiveVexStatus([{ vulnId: 'OTHER', status: 'affected' }], 'V'), '');
+  assert.equal(effectiveVexStatus([], 'V'), '');
+});
+
+test('annotateAffectedFiles joins package + VEX status and orders actionable-first', () => {
+  const idx = buildFileIndex(FILES);
+  const links = linkAffectedFiles(
+    ['net/netfilter/nft_set_rbtree.c', 'fs/ext4/mballoc.c', 'mm/slab.c'],
+    idx
+  );
+  const packageOf = (id) =>
+    ({
+      F1: { spdxId: 'PKG_KERNEL', name: 'kernel' },
+      F2: { spdxId: 'PKG_EXT4', name: 'ext4' }
+    })[id] || null;
+  const assessmentsOf = (pkgId) =>
+    ({
+      PKG_KERNEL: [{ vulnId: 'V', status: 'fixed' }], // ruled out
+      PKG_EXT4: [{ vulnId: 'V', status: 'affected' }] // still affected
+    })[pkgId] || [];
+
+  const out = annotateAffectedFiles(links, 'V', { packageOf, assessmentsOf });
+
+  // Active matched file first, ruled-out matched file next, absent path last.
+  assert.deepEqual(
+    out.map((d) => d.path),
+    ['fs/ext4/mballoc.c', 'net/netfilter/nft_set_rbtree.c', 'mm/slab.c']
+  );
+  assert.deepEqual(
+    out.map((d) => [d.linked, d.packageName, d.vexStatus, d.ruledOut]),
+    [
+      [true, 'ext4', 'affected', false],
+      [true, 'kernel', 'fixed', true],
+      [false, '', '', false]
+    ]
+  );
+});
+
+test('annotateAffectedFiles leaves a matched file without a known package unannotated', () => {
+  const idx = buildFileIndex(FILES);
+  const links = linkAffectedFiles(['net/netfilter/nft_set_rbtree.c'], idx);
+  const out = annotateAffectedFiles(links, 'V', {
+    packageOf: () => null, // no containing package resolvable
+    assessmentsOf: () => [{ vulnId: 'V', status: 'not_affected' }]
+  });
+  assert.equal(out.length, 1);
+  assert.equal(out[0].linked, true);
+  assert.equal(out[0].packageId, '');
+  assert.equal(out[0].vexStatus, '');
+  assert.equal(out[0].ruledOut, false);
+});
+
+test('summarizeAffectedFiles counts matched, ruled-out, and distinct packages', () => {
+  const annotated = [
+    { linked: true, packageId: 'A', ruledOut: false },
+    { linked: true, packageId: 'A', ruledOut: true }, // same package, ruled out
+    { linked: true, packageId: 'B', ruledOut: true },
+    { linked: false, packageId: '', ruledOut: false } // absent path, ignored
+  ];
+  assert.deepEqual(summarizeAffectedFiles(annotated), { matched: 3, ruledOut: 2, packages: 2 });
+  assert.deepEqual(summarizeAffectedFiles([]), { matched: 0, ruledOut: 0, packages: 0 });
 });
 
 test('buildAffectedFileRelationships de-dupes a vuln->file pair reached by two paths', () => {
