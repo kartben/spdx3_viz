@@ -141,7 +141,11 @@ export const loadingMixin = {
         const path = `${sample.dir}/${fname}`;
         const res = await fetch(path);
         if (!res.ok) throw new Error(`${fname} (HTTP ${res.status})`);
-        const result = await this._readResponseWithProgress(res, i, total);
+        // The manifest size is the uncompressed total; use it as the download
+        // denominator (see _readResponseWithProgress). Split evenly when a
+        // sample has several files (per-file sizes aren't in the manifest).
+        const expectedSize = sample.size ? sample.size / sample.files.length : 0;
+        const result = await this._readResponseWithProgress(res, i, total, expectedSize);
         loaded.push(
           tagLoadedFile(
             typeof result === 'string'
@@ -164,13 +168,19 @@ export const loadingMixin = {
   },
 
   // Streams a fetch response, advancing the download band of the progress bar.
-  // Falls back to a plain read when the body/Content-Length isn't available.
+  // Falls back to a plain read when the body/total size isn't available.
   // Returns a string for normal files, or the raw Blob for ones too big to hold
   // as one JS string (see STREAM_THRESHOLD); callers await it and branch on the
   // type. Awaiting a Blob is a no-op, so the two shapes unify at the call site.
-  async _readResponseWithProgress(res, fileIndex, totalFiles) {
-    const len = Number(res.headers.get('Content-Length'));
-    if (!res.body || !len) {
+  //
+  // `expectedSize` is the file's uncompressed size (from the manifest). Prefer
+  // it over Content-Length: hosts like GitHub Pages gzip large files, so
+  // Content-Length is the *compressed* size (~72 MB for the 988 MB Yocto SBOM)
+  // while the body reader yields decompressed bytes, which would peg the bar at
+  // 100% after ~7% of the real download and then look stuck.
+  async _readResponseWithProgress(res, fileIndex, totalFiles, expectedSize = 0) {
+    const total = expectedSize || Number(res.headers.get('Content-Length')) || 0;
+    if (!res.body || !total) {
       const blob = await res.blob();
       this._setProgress('download', (fileIndex + 1) / totalFiles);
       return blob.size >= STREAM_THRESHOLD ? blob : blob.text();
@@ -183,7 +193,7 @@ export const loadingMixin = {
       if (done) break;
       chunks.push(value);
       received += value.length;
-      this._setProgress('download', (fileIndex + Math.min(1, received / len)) / totalFiles);
+      this._setProgress('download', (fileIndex + Math.min(1, received / total)) / totalFiles);
     }
     const blob = new Blob(chunks);
     return blob.size >= STREAM_THRESHOLD ? blob : blob.text();

@@ -248,7 +248,16 @@ export const addFilesMixin = {
           const name = path.slice(path.lastIndexOf('/') + 1);
           const res = await fetch(path);
           if (!res.ok) throw new Error(`${name} (HTTP ${res.status})`);
-          const result = await this._readResponseWithProgress(res, added.length, total);
+          // Uncompressed size from the manifest keeps the download bar honest on
+          // gzip-serving hosts (see _readResponseWithProgress).
+          const sample = this.samples.find((s) => path.startsWith(`${s.dir}/`));
+          const expectedSize = sample?.size ? sample.size / sample.files.length : 0;
+          const result = await this._readResponseWithProgress(
+            res,
+            added.length,
+            total,
+            expectedSize
+          );
           added.push(
             tagLoadedFile(
               typeof result === 'string'
