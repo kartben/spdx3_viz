@@ -262,8 +262,18 @@ test('summarizeAffectedFiles counts matched, ruled-out, and distinct packages', 
     { linked: true, packageId: 'B', ruledOut: true },
     { linked: false, packageId: '', ruledOut: false } // absent path, ignored
   ];
-  assert.deepEqual(summarizeAffectedFiles(annotated), { matched: 3, ruledOut: 2, packages: 2 });
-  assert.deepEqual(summarizeAffectedFiles([]), { matched: 0, ruledOut: 0, packages: 0 });
+  assert.deepEqual(summarizeAffectedFiles(annotated), {
+    matched: 3,
+    ruledOut: 2,
+    affected: 1,
+    packages: 2
+  });
+  assert.deepEqual(summarizeAffectedFiles([]), {
+    matched: 0,
+    ruledOut: 0,
+    affected: 0,
+    packages: 0
+  });
 });
 
 test('buildAffectedFileRelationships de-dupes a vuln->file pair reached by two paths', () => {

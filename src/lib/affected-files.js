@@ -262,11 +262,12 @@ export function annotateAffectedFiles(links, vulnSpdxId, { packageOf, assessment
 
 /**
  * Compact counts over a CVE's annotated affected files, relative to this SBOM:
- * how many paths matched a File, how many of those a VEX rules out, and how many
- * distinct packages own the matched files. Drives the card subtitle and badges.
+ * how many paths matched a File, how many of those a VEX rules out, how many
+ * remain an open issue (matched minus ruled out), and how many distinct packages
+ * own the matched files. Drives the card subtitle and badges.
  *
  * @param {AnnotatedAffectedFile[]} annotated - from annotateAffectedFiles
- * @returns {{matched: number, ruledOut: number, packages: number}}
+ * @returns {{matched: number, ruledOut: number, affected: number, packages: number}}
  */
 export function summarizeAffectedFiles(annotated) {
   let matched = 0;
@@ -278,7 +279,7 @@ export function summarizeAffectedFiles(annotated) {
     if (d.ruledOut) ruledOut++;
     if (d.packageId) pkgs.add(d.packageId);
   }
-  return { matched, ruledOut, packages: pkgs.size };
+  return { matched, ruledOut, affected: matched - ruledOut, packages: pkgs.size };
 }
 
 /**
