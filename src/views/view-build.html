@@ -68,7 +68,11 @@
         Build Parameters
       </div>
       <div class="space-y-3">
-        <template x-for="group in buildParameters(buildInfo)" :key="group.key">
+        <!-- Capped with reveal (a Yocto root build can have 1000+ groups). -->
+        <template
+          x-for="group in buildParameters(buildInfo).slice(0, revealLimit('bParamInfo'))"
+          :key="group.key"
+        >
           <div>
             <div
               class="text-xs font-semibold text-purple-400 mb-2"
@@ -120,6 +124,12 @@
             </div>
           </div>
         </template>
+        <button
+          x-show="buildParameters(buildInfo).length > revealLimit('bParamInfo')"
+          @click="revealMore('bParamInfo')"
+          class="text-xs text-slate-500 hover:text-slate-300"
+          x-text="'+' + formatCount(buildParameters(buildInfo).length - revealLimit('bParamInfo')) + ' more parameter groups'"
+        ></button>
       </div>
     </div>
   </div>
@@ -377,7 +387,12 @@
                   class="space-y-1 max-h-72 overflow-y-auto pr-1"
                   x-show="buildInputs(build.spdxId).length > 0"
                 >
-                  <template x-for="input in buildInputs(build.spdxId)" :key="input">
+                  <!-- Capped with reveal: a Yocto build can have thousands of
+                       inputs, and mounting them all froze the card on open. -->
+                  <template
+                    x-for="input in buildInputs(build.spdxId).slice(0, revealLimit('bIn:' + build.spdxId))"
+                    :key="input"
+                  >
                     <div
                       class="text-xs text-orange-400 hover:text-orange-300 cursor-pointer flex items-center gap-1.5"
                       @click="navigateTo(input)"
@@ -386,6 +401,12 @@
                       <span class="truncate" x-text="relTargetDisplayName(input)"></span>
                     </div>
                   </template>
+                  <button
+                    x-show="buildInputs(build.spdxId).length > revealLimit('bIn:' + build.spdxId)"
+                    @click="revealMore('bIn:' + build.spdxId)"
+                    class="text-xs text-slate-500 hover:text-slate-300 mt-1"
+                    x-text="'+' + formatCount(buildInputs(build.spdxId).length - revealLimit('bIn:' + build.spdxId)) + ' more'"
+                  ></button>
                 </div>
                 <div
                   x-show="buildInputs(build.spdxId).length === 0"
@@ -404,7 +425,11 @@
                   class="space-y-1 max-h-72 overflow-y-auto pr-1"
                   x-show="buildOutputs(build.spdxId).length > 0"
                 >
-                  <template x-for="output in buildOutputs(build.spdxId)" :key="output">
+                  <!-- Capped with reveal (see Inputs above). -->
+                  <template
+                    x-for="output in buildOutputs(build.spdxId).slice(0, revealLimit('bOut:' + build.spdxId))"
+                    :key="output"
+                  >
                     <div
                       class="text-xs text-green-400 hover:text-green-300 cursor-pointer flex items-center gap-1.5"
                       @click="navigateTo(output)"
@@ -413,6 +438,12 @@
                       <span class="truncate" x-text="relTargetDisplayName(output)"></span>
                     </div>
                   </template>
+                  <button
+                    x-show="buildOutputs(build.spdxId).length > revealLimit('bOut:' + build.spdxId)"
+                    @click="revealMore('bOut:' + build.spdxId)"
+                    class="text-xs text-slate-500 hover:text-slate-300 mt-1"
+                    x-text="'+' + formatCount(buildOutputs(build.spdxId).length - revealLimit('bOut:' + build.spdxId)) + ' more'"
+                  ></button>
                 </div>
                 <div
                   x-show="buildOutputs(build.spdxId).length === 0"
@@ -480,7 +511,12 @@
                   x-text="'Parameters (' + formatCount(buildParameterCount(build)) + ')'"
                 ></div>
                 <div class="space-y-3">
-                  <template x-for="group in buildParameters(build)" :key="group.key">
+                  <!-- Capped with reveal: a Yocto build can carry over a
+                       thousand parameter groups, which froze the card on open. -->
+                  <template
+                    x-for="group in buildParameters(build).slice(0, revealLimit('bParam:' + build.spdxId))"
+                    :key="group.key"
+                  >
                     <div class="rounded-lg border border-slate-700 bg-slate-900/40 p-3">
                       <div
                         class="text-xs font-semibold text-slate-300 mb-2"
@@ -532,6 +568,12 @@
                       </div>
                     </div>
                   </template>
+                  <button
+                    x-show="buildParameters(build).length > revealLimit('bParam:' + build.spdxId)"
+                    @click="revealMore('bParam:' + build.spdxId)"
+                    class="text-xs text-slate-500 hover:text-slate-300"
+                    x-text="'+' + formatCount(buildParameters(build).length - revealLimit('bParam:' + build.spdxId)) + ' more parameter groups'"
+                  ></button>
                 </div>
               </div>
             </div>

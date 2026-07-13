@@ -438,6 +438,9 @@ test('parseBuildParameters gives repeated parameter tokens unique render keys', 
 test('build parameter token display helpers never render undefined', () => {
   const app = spdxApp();
   const groups = app.buildParameters({
+    // Only Zephyr's zephyr-cmake builds get the tokenized view (see
+    // _isZephyrCmakeBuild); other producers show the raw value instead.
+    build_buildType: 'urn:spdx.dev:zephyr-cmake',
     build_parameter: [
       {
         type: 'DictionaryEntry',

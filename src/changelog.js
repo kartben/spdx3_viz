@@ -16,6 +16,10 @@ export const CHANGELOG = [
       {
         tag: 'Improved',
         text: 'Files view caps the extension filter to the most-used extensions.'
+      },
+      {
+        tag: 'Fixed',
+        text: 'Build cards no longer stall to open on large SBOMs.'
       }
     ]
   },

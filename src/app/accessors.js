@@ -45,6 +45,12 @@ import hljs from '../lib/highlight.js';
 // via a "+N more" indicator (mirrors agentLinkGroups' CAP).
 const DETAIL_REL_CAP = 50;
 
+// Grouped build parameters, memoized per build element (see buildParameters).
+// Templates read them several times per card, and computing them for a large
+// SBOM's builds each time is wasteful; keyed on the build object so a new SBOM's
+// (fresh) objects miss and recompute.
+const buildParameterCache = new WeakMap();
+
 // Coarse gazetteer for the Supply Chain route map. SPDX PhysicalLocation carries
 // city / country (ISO 3166-1 alpha-3) but no coordinates, so we resolve a rough
 // lat/lng from the city name, falling back to a country centroid. Anything we
@@ -1014,8 +1020,26 @@ export const accessorsMixin = {
   parseCompileFlags(config) {
     return parseBuildConfigFlags(config);
   },
+  // ⚠️ ZEPHYR SPECIAL CASE — read before touching. The build-parameter "token"
+  // view (values split into chips coloured by compile-flag kind: -D, -I, -O,
+  // -std=, -f…) is written ONLY for Zephyr, whose `urn:spdx.dev:zephyr-cmake`
+  // builds store actual gcc/cmake command lines as parameters. Other producers
+  // (notably Yocto/bitbake) dump unrelated, sometimes enormous strings there (a
+  // single Yocto parameter can hold ~2000 tokens), where classifying every
+  // token is both slow and meaningless. So we tokenize ONLY for Zephyr builds
+  // and otherwise show the raw value (the template falls back to it when a
+  // parameter has no tokens). Keep this narrow and obvious.
+  _isZephyrCmakeBuild(build) {
+    return build?.build_buildType === 'urn:spdx.dev:zephyr-cmake';
+  },
   buildParameters(build) {
-    return parseBuildParameterGroups(build);
+    if (!build || typeof build !== 'object') return []; // WeakMap key must be an object
+    let cached = buildParameterCache.get(build);
+    if (!cached) {
+      cached = parseBuildParameterGroups(build, { tokenize: this._isZephyrCmakeBuild(build) });
+      buildParameterCache.set(build, cached);
+    }
+    return cached;
   },
   buildParameterCount(build) {
     return this.buildParameters(build).reduce((count, group) => count + group.entries.length, 0);
