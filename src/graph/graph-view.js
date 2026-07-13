@@ -299,7 +299,14 @@ export function renderGraph(app, retry = 0) {
   // tooltip hint it's routed "via snippet …" rather than a direct file relationship. Non-snippets,
   // and snippets with no resolvable source file, pass through unchanged (the latter then drop as
   // before instead of pointing at a phantom node).
+  //
+  // Only snippet endpoints ever redirect, but this runs for both ends of every relationship
+  // (millions of times on a big SBOM). Most SBOMs have no snippets at all, so gate the lookup on
+  // a set of the actual snippet ids: a non-snippet endpoint then skips the elementMap.get +
+  // snippetFileRef entirely and passes straight through, unchanged.
+  const snippetIds = app.snippets?.length ? new Set(app.snippets.map((s) => s.spdxId)) : null;
   const redirectSnippet = (spdxId) => {
+    if (!snippetIds || !snippetIds.has(spdxId)) return { id: spdxId, snippet: null };
     const ref = snippetFileRef(app.elementMap.get(spdxId), app.elementMap);
     if (!ref || !ref.fileId) return { id: spdxId, snippet: null };
     return { id: ref.fileId, snippet: ref.name || cleanName(spdxId) };
