@@ -95,7 +95,7 @@ export const rawMixin = {
   // toggle is on (and the file is small enough to reparse), else as loaded.
   _rawSource(index) {
     const f = this.loadedFiles[index];
-    if (!f) return '';
+    if (!f || f.text == null) return ''; // blob-backed (too large): no inline text
     if (this.rawPretty && f.text.length <= INLINE_MAX_CHARS) return prettyPrint(f.text);
     return f.text;
   },
@@ -105,25 +105,33 @@ export const rawMixin = {
   // oversized (download-only) files.
   rawHighlighted(index) {
     const f = this.loadedFiles[index];
-    if (!f) return '';
+    if (!f || f.text == null) return '';
     const src = this._rawSource(index);
     if (f.text.length > HIGHLIGHT_MAX_CHARS) return escapeHtml(src);
     return renderJsonLd(src, (id) => this._rawLinkable(id));
   },
 
+  // Byte size from the stored size (blob-backed files) or the loaded text.
   rawSizeLabel(index) {
     const f = this.loadedFiles[index];
-    return f ? formatByteSize(f.text.length) : '';
+    if (!f) return '';
+    return formatByteSize(f.size ?? f.text?.length ?? 0);
   },
-  // File too big to render inline at all.
+  // File too big to render inline at all: either over the char cap, or kept as a
+  // Blob (never read into a string) because it exceeds STREAM_THRESHOLD.
   rawTooLarge(index) {
     const f = this.loadedFiles[index];
-    return !!f && f.text.length > INLINE_MAX_CHARS;
+    return !!f && (f.text == null || f.text.length > INLINE_MAX_CHARS);
   },
   // Rendered inline, but as plain text because highlighting would be too slow.
   rawHighlightDisabled(index) {
     const f = this.loadedFiles[index];
-    return !!f && f.text.length > HIGHLIGHT_MAX_CHARS && f.text.length <= INLINE_MAX_CHARS;
+    return (
+      !!f &&
+      f.text != null &&
+      f.text.length > HIGHLIGHT_MAX_CHARS &&
+      f.text.length <= INLINE_MAX_CHARS
+    );
   },
 
   // Pick a file to display, resetting the scroll to the top of the new file.
@@ -173,7 +181,9 @@ export const rawMixin = {
   downloadRaw(index) {
     const f = this.loadedFiles[index];
     if (!f) return;
-    const blob = new Blob([f.text], { type: 'application/ld+json' });
+    // Blob-backed (large) files download their original Blob directly; text
+    // files wrap their string in a fresh Blob.
+    const blob = f.blob ?? new Blob([f.text], { type: 'application/ld+json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;

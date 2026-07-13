@@ -43,6 +43,9 @@ export function createState() {
     progress: 0, // 0..1 overall load progress (download → JSON → graph → index)
     progressPhase: '', // human-readable current phase label
     progressEta: null, // estimated seconds remaining, or null when unknown
+    progressAnimateMs: 150, // progress-bar transition duration; widened so the bar
+    // keeps sweeping (on the compositor) through the main thread's synchronous
+    // graph/index phases instead of freezing (see _parseOnMainThread)
     currentView: 'dashboard',
     // Views build their heavy x-for lists lazily, only once opened; the
     // dashboard is the landing view so it's mounted from the start.

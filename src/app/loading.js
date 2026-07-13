@@ -23,6 +23,13 @@ export function tagLoadedFile(file) {
   return { ...file, uid: ++fileUidSeq, addedAt: Date.now() };
 }
 
+// A single JS string tops out near 512 MiB (V8's max string length), so a file
+// at or above this size can't be read into one string + JSON.parse-d. Such
+// files are kept as their Blob and stream-parsed in the worker instead. The
+// margin under 512 MiB covers UTF-8 multi-byte inflation. Large files carry no
+// `text`, so the Raw JSON-LD view shows them as download-only.
+export const STREAM_THRESHOLD = 256 * 1024 * 1024;
+
 // VEX edges and the Vulnerabilities node type default to off since a large VEX
 // set can swamp the graph; when there are fewer than this many VEX edges we
 // enable the vuln node type and all four VEX edge types at load time.
@@ -134,8 +141,14 @@ export const loadingMixin = {
         const path = `${sample.dir}/${fname}`;
         const res = await fetch(path);
         if (!res.ok) throw new Error(`${fname} (HTTP ${res.status})`);
-        const text = await this._readResponseWithProgress(res, i, total);
-        loaded.push(tagLoadedFile({ name: fname, text, src: path }));
+        const result = await this._readResponseWithProgress(res, i, total);
+        loaded.push(
+          tagLoadedFile(
+            typeof result === 'string'
+              ? { name: fname, text: result, src: path }
+              : { name: fname, blob: result, src: path, size: result.size }
+          )
+        );
       }
       this.loadedFiles = loaded; // replace: the drop zone starts empty
       this.loadedSampleId = sample.id; // pure sample content: the URL can link back to it
@@ -152,12 +165,15 @@ export const loadingMixin = {
 
   // Streams a fetch response, advancing the download band of the progress bar.
   // Falls back to a plain read when the body/Content-Length isn't available.
+  // Returns a string for normal files, or the raw Blob for ones too big to hold
+  // as one JS string (see STREAM_THRESHOLD); callers await it and branch on the
+  // type. Awaiting a Blob is a no-op, so the two shapes unify at the call site.
   async _readResponseWithProgress(res, fileIndex, totalFiles) {
     const len = Number(res.headers.get('Content-Length'));
     if (!res.body || !len) {
-      const text = await res.text();
+      const blob = await res.blob();
       this._setProgress('download', (fileIndex + 1) / totalFiles);
-      return text;
+      return blob.size >= STREAM_THRESHOLD ? blob : blob.text();
     }
     const reader = res.body.getReader();
     const chunks = [];
@@ -169,7 +185,8 @@ export const loadingMixin = {
       received += value.length;
       this._setProgress('download', (fileIndex + Math.min(1, received / len)) / totalFiles);
     }
-    return new Blob(chunks).text();
+    const blob = new Blob(chunks);
+    return blob.size >= STREAM_THRESHOLD ? blob : blob.text();
   },
 
   // File handling — supports multiple files
@@ -207,7 +224,25 @@ export const loadingMixin = {
     const loaded = new Array(total); // preserve input order
     const fileProgress = new Array(total).fill(0);
     let remaining = total;
+    const finishOne = () => {
+      remaining--;
+      if (remaining === 0) {
+        loaded.forEach((f) => this.loadedFiles.push(f));
+        this.rebuildFromLoadedFiles(); // session continues into the worker
+        this.dataLoaded = true;
+      }
+    };
     fileList.forEach((file, i) => {
+      // Too big to hold as one string: keep the Blob and let the worker stream
+      // it. No FileReader read, so it contributes its full weight to the bar at
+      // once (the real cost is the worker's streamed json phase).
+      if (file.size >= STREAM_THRESHOLD) {
+        loaded[i] = tagLoadedFile({ name: file.name, blob: file, size: file.size });
+        fileProgress[i] = 1;
+        this._setProgress('download', fileProgress.reduce((a, b) => a + b, 0) / total);
+        finishOne();
+        return;
+      }
       const reader = new FileReader();
       reader.onprogress = (ev) => {
         if (!ev.lengthComputable) return;
@@ -220,12 +255,7 @@ export const loadingMixin = {
         // thread never blocks on large files.
         loaded[i] = tagLoadedFile({ name: file.name, text: ev.target.result, size: file.size });
         fileProgress[i] = 1;
-        remaining--;
-        if (remaining === 0) {
-          loaded.forEach((f) => this.loadedFiles.push(f));
-          this.rebuildFromLoadedFiles(); // session continues into the worker
-          this.dataLoaded = true;
-        }
+        finishOne();
       };
       reader.readAsText(file);
     });
@@ -256,12 +286,17 @@ export const loadingMixin = {
     this.progress = 0;
     this.progressPhase = '';
     this.progressEta = null;
-    this._progressStart = performance.now();
-    this._progressEtaSmoothed = null;
+    this.progressAnimateMs = 150; // snappy transitions for the frequent phases
+    this._progressMark = null; // last {t, p} used to measure the rate
+    this._progressRate = null; // smoothed bar-fraction/second of recent progress
   },
 
   // Maps a phase + within-phase fraction (0..1) onto the overall bar and
-  // updates the ETA from elapsed time vs. overall fraction.
+  // updates the ETA. The estimate uses a smoothed *recent* progress rate, not
+  // the average since the start: the phases move at very different speeds (a
+  // streamed file's download is instant, then parsing crawls), so an
+  // average-since-start ETA is anchored to the fast early phases and reads far
+  // too low. A recent-rate estimate re-converges within a second or two.
   _setProgress(phase, value) {
     const bands = {
       download: [0, 0.3],
@@ -282,13 +317,23 @@ export const loadingMixin = {
     if (overall >= this.progress) this.progress = overall;
     this.progressPhase = labels[phase] || '';
 
-    const elapsed = (performance.now() - (this._progressStart || performance.now())) / 1000;
-    if (this.progress > 0.04 && this.progress < 0.985) {
-      const eta = (elapsed * (1 - this.progress)) / this.progress;
-      // Exponential smoothing so the number doesn't jitter.
-      this._progressEtaSmoothed =
-        this._progressEtaSmoothed == null ? eta : this._progressEtaSmoothed * 0.6 + eta * 0.4;
-      this.progressEta = this._progressEtaSmoothed;
+    const now = performance.now();
+    const p = this.progress;
+    const mark = this._progressMark;
+    if (!mark) {
+      this._progressMark = { t: now, p };
+    } else if (p > mark.p && now - mark.t >= 50) {
+      // Measure over >=50ms windows so bursts of near-instant updates can't
+      // spike the rate; stalls fold in naturally (the window just grows).
+      const inst = (p - mark.p) / ((now - mark.t) / 1000);
+      this._progressRate =
+        this._progressRate == null ? inst : this._progressRate * 0.6 + inst * 0.4;
+      this._progressMark = { t: now, p };
+    }
+    if (this._progressRate > 0 && p > 0.02 && p < 0.985) {
+      this.progressEta = (1 - p) / this._progressRate;
+    } else if (p >= 0.985) {
+      this.progressEta = null;
     }
   },
 
@@ -297,15 +342,23 @@ export const loadingMixin = {
     this.parseData(this.loadedFiles);
   },
 
-  // Parse the loaded files in the worker, then apply the result.
-  // `files` is [{ name, text }]; parsing (JSON.parse + graph + indexes) runs
-  // in parser.worker.js so the UI never freezes on large SBOMs.
+  // Parse the loaded files, then apply the result. Normally this runs in
+  // parser.worker.js so the UI never freezes on large SBOMs. But a file too big
+  // to hold as one JS string arrives as a Blob, and the model it parses into can
+  // be too big to structured-clone back out of the worker (it OOMs on
+  // postMessage). Those we parse on the main thread instead: a brief stall, but
+  // no doubling of ~GB of data across the worker boundary.
   parseData(files) {
-    const worker = getParserWorker();
     const reqId = ++parseReqSeq;
     latestParseReqId = reqId;
     if (!this.parsing) this._beginParseSession(); // re-parse path (no download)
 
+    if (files.some((f) => f.blob)) {
+      this._parseOnMainThread(files, reqId);
+      return;
+    }
+
+    const worker = getParserWorker();
     worker.onmessage = (event) => {
       const msg = event.data || {};
       if (msg.id !== latestParseReqId) return; // a newer load superseded this one
@@ -321,16 +374,103 @@ export const loadingMixin = {
       this.progressEta = null;
 
       if (!msg.ok) {
-        this.parseError = msg.error || 'Failed to parse SBOM';
-        console.error('SBOM parse failed:', this.parseError);
-        this.toastMsg = 'Error parsing SBOM: ' + this.parseError;
-        setTimeout(() => (this.toastMsg = ''), 5000);
+        this._onParseError(msg.error);
         return;
       }
 
-      Object.assign(this, markPayloadRaw(msg.parsed));
-      Object.assign(this, markPayloadRaw(msg.indexes));
+      this._applyParsedResult(msg.parsed, msg.indexes);
+    };
 
+    worker.onerror = (err) => {
+      if (latestParseReqId !== reqId) return;
+      this.parsing = false;
+      this.progressEta = null;
+      this.parseError = err.message || 'Worker error';
+      console.error('Parser worker error:', this.parseError);
+      this.toastMsg = 'Parser worker error: ' + this.parseError;
+      setTimeout(() => (this.toastMsg = ''), 5000);
+    };
+
+    worker.postMessage({
+      id: reqId,
+      files: files.map((f) => ({ name: f.name, text: f.text, blob: f.blob }))
+    });
+  },
+
+  // Parse on the main thread (see parseData). Used for blob-backed files whose
+  // result can't be cloned out of the worker. The streaming (json) phase yields
+  // periodically so the progress bar animates from real byte progress. The graph
+  // and index phases each run as one synchronous block that would freeze the
+  // bar, so instead of reporting their (unpaintable) fractions we hand the bar a
+  // compositor-driven sweep toward the phase's end over roughly its expected
+  // duration, started just before the block via onPhase. A brief stall on those
+  // is the accepted cost of loading a multi-hundred-MB SBOM without a worker.
+  async _parseOnMainThread(files, reqId) {
+    // Two rAFs guarantee a committed, painted frame, so the progress bar's
+    // transform transition is handed to the compositor before the next
+    // synchronous phase blocks the main thread (a bare setTimeout may not have
+    // produced a frame yet, leaving the bar frozen).
+    const yieldToPaint = () =>
+      new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    await yieldToPaint(); // let the overlay paint before any blocking work
+    try {
+      const { parseFiles } = await import('../parser/parse-files.js');
+      const { parsed, indexes } = await parseFiles(
+        files,
+        // Only the streaming (json) phase reports fractions; its yields let them
+        // paint. Graph/index fractions can't paint (the thread is blocked), so
+        // the sweep set up in onPhase drives the bar instead.
+        (phase, value) => {
+          if (reqId === latestParseReqId && phase === 'json') this._setProgress(phase, value);
+        },
+        (phase, count) => this._beginParsePhaseSweep(phase, count, yieldToPaint)
+      );
+      if (reqId !== latestParseReqId) return; // superseded
+      this.progressAnimateMs = 150;
+      this.progress = 1;
+      this.progressEta = null;
+      this.parsing = false;
+      this._applyParsedResult(parsed, indexes);
+    } catch (err) {
+      if (reqId !== latestParseReqId) return;
+      this.parsing = false;
+      this.progressEta = null;
+      this._onParseError(err && err.message ? err.message : String(err));
+    }
+  },
+
+  // Sets the progress bar sweeping toward a phase's end over roughly how long
+  // that phase will block, then yields once so the transition starts painting
+  // before the synchronous work begins. Per-item factors are rough (tuned on a
+  // ~1.3M-element SBOM); overshooting just parks the bar near the end with the
+  // sheen still moving, undershooting snaps forward at the next phase.
+  async _beginParsePhaseSweep(phase, count, yieldToPaint) {
+    const spec =
+      phase === 'graph'
+        ? { target: 0.78, label: 'Building graph…', perItem: 0.0024 }
+        : { target: 0.985, label: 'Indexing relationships…', perItem: 0.003 };
+    const estMs = Math.min(15000, Math.max(500, Math.round(count * spec.perItem)));
+    this.progressPhase = spec.label;
+    this.progressEta = estMs / 1000;
+    this.progressAnimateMs = estMs;
+    this.progress = spec.target;
+    await yieldToPaint(); // start the transition before the block monopolizes the thread
+  },
+
+  _onParseError(error) {
+    this.parseError = error || 'Failed to parse SBOM';
+    console.error('SBOM parse failed:', this.parseError);
+    this.toastMsg = 'Error parsing SBOM: ' + this.parseError;
+    setTimeout(() => (this.toastMsg = ''), 5000);
+  },
+
+  // Applies a freshly parsed model + indexes to component state and resets all
+  // the per-SBOM view state. Shared by the worker and main-thread parse paths.
+  _applyParsedResult(parsed, indexes) {
+    Object.assign(this, markPayloadRaw(parsed));
+    Object.assign(this, markPayloadRaw(indexes));
+
+    {
       // Fresh data: show vulnerabilities + their VEX edges by default only for a
       // small VEX set, otherwise keep them off. Reset deterministically per load.
       const showVex =
@@ -387,21 +527,6 @@ export const loadingMixin = {
       this.$nextTick(() => {
         if (this.currentView === 'graph') this.renderGraph();
       });
-    };
-
-    worker.onerror = (err) => {
-      if (latestParseReqId !== reqId) return;
-      this.parsing = false;
-      this.progressEta = null;
-      this.parseError = err.message || 'Worker error';
-      console.error('Parser worker error:', this.parseError);
-      this.toastMsg = 'Parser worker error: ' + this.parseError;
-      setTimeout(() => (this.toastMsg = ''), 5000);
-    };
-
-    worker.postMessage({
-      id: reqId,
-      files: files.map((f) => ({ name: f.name, text: f.text }))
-    });
+    }
   }
 };
