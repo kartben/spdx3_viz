@@ -108,9 +108,14 @@ export function classifyParameterToken(token) {
  * Parses SPDX build parameters into grouped display data.
  *
  * @param {Object} build - The build element
+ * @param {{tokenize?: boolean}} [options] - When `tokenize` is false, entries
+ *   carry an empty `tokens` array (callers then render the raw value). Token
+ *   classification is tuned for compile-command parameters and is expensive on
+ *   the huge, non-compile values other producers store; see the caller's
+ *   Zephyr check.
  * @returns {Array<{key: string, label: string, entries: Array<Object>}>} Grouped parameters
  */
-export function parseBuildParameters(build) {
+export function parseBuildParameters(build, { tokenize = true } = {}) {
   const params = build?.build_parameter || build?.build_parameters || [];
   if (!Array.isArray(params)) return [];
 
@@ -127,18 +132,20 @@ export function parseBuildParameters(build) {
       });
     }
 
-    const tokens = splitParameterValue(param.value).map((token, index) => {
-      const metadata = classifyParameterToken(token);
-      const renderKey = `${param.key}:${paramIndex}:${index}`;
-      return {
-        id: renderKey,
-        renderKey,
-        text: token,
-        display: token,
-        kind: metadata.kind,
-        className: metadata.className
-      };
-    });
+    const tokens = tokenize
+      ? splitParameterValue(param.value).map((token, index) => {
+          const metadata = classifyParameterToken(token);
+          const renderKey = `${param.key}:${paramIndex}:${index}`;
+          return {
+            id: renderKey,
+            renderKey,
+            text: token,
+            display: token,
+            kind: metadata.kind,
+            className: metadata.className
+          };
+        })
+      : [];
     groups.get(groupKey).entries.push({
       id: `${param.key}:${paramIndex}`,
       renderKey: `${param.key}:${paramIndex}`,
