@@ -4,7 +4,7 @@
    removal. Everything is staged, then fetched/read/dropped in a single batch so
    a big SBOM is only re-parsed once. */
 
-import { formatBytes, tagLoadedFile } from './loading.js';
+import { formatBytes, tagLoadedFile, STREAM_THRESHOLD } from './loading.js';
 
 /* Staged local files live here, not in Alpine state: a File put on a reactive
    object comes back as a Proxy, and its native methods (text(), slice()) throw
@@ -248,12 +248,24 @@ export const addFilesMixin = {
           const name = path.slice(path.lastIndexOf('/') + 1);
           const res = await fetch(path);
           if (!res.ok) throw new Error(`${name} (HTTP ${res.status})`);
-          const text = await this._readResponseWithProgress(res, added.length, total);
-          added.push(tagLoadedFile({ name, text, src: path }));
+          const result = await this._readResponseWithProgress(res, added.length, total);
+          added.push(
+            tagLoadedFile(
+              typeof result === 'string'
+                ? { name, text: result, src: path }
+                : { name, blob: result, src: path, size: result.size }
+            )
+          );
         }
         for (const file of locals) {
-          const text = await file.text();
-          added.push(tagLoadedFile({ name: file.name, text, size: file.size }));
+          // Files too big for one JS string are kept as their Blob and
+          // stream-parsed in the worker (see STREAM_THRESHOLD).
+          if (file.size >= STREAM_THRESHOLD) {
+            added.push(tagLoadedFile({ name: file.name, blob: file, size: file.size }));
+          } else {
+            const text = await file.text();
+            added.push(tagLoadedFile({ name: file.name, text, size: file.size }));
+          }
           this._setProgress('download', added.length / total);
         }
       } catch (err) {

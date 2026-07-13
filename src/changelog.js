@@ -6,6 +6,20 @@
  */
 export const CHANGELOG = [
   {
+    version: 'Unreleased',
+    date: null,
+    items: [
+      {
+        tag: 'Fixed',
+        text: 'Large SBOMs (over ~512 MB) now load by streaming, without failing or freezing.'
+      },
+      {
+        tag: 'Improved',
+        text: 'Files view caps the extension filter to the most-used extensions.'
+      }
+    ]
+  },
+  {
     version: '0.3.0',
     date: '2026-07-12',
     items: [
