@@ -23,7 +23,7 @@ export const CHANGELOG = [
       },
       {
         tag: 'Improved',
-        text: 'Affected files show their package and flag VEX-cleared ones.'
+        text: 'CVE cards clarify referenced files and flag VEX-cleared ones.'
       }
     ]
   },

@@ -11,6 +11,7 @@ import {
   linkAffectedFiles,
   annotateAffectedFiles,
   summarizeAffectedFiles,
+  isRuledOutStatus,
   buildAffectedFileRelationships,
   collectPurlTargets,
   collectCpeTargets,
@@ -196,8 +197,8 @@ export const securityMixin = {
     return summarizeAffectedFiles(this.affectedFileDetails(cveId, vulnSpdxId));
   },
   // The collapsed vulnerability card's one-line subtitle: the count of assessed
-  // packages plus, once affected files are resolved, how many of the CVE's
-  // affected files land in this SBOM (noting any a VEX already rules out).
+  // packages plus, once files are resolved, how many of the CVE's referenced
+  // files land in this SBOM (noting any a VEX already clears).
   vulnCardSubtitle(vuln) {
     const pkgs = vuln.packageCount;
     const { matched, ruledOut } = this.affectedFileStats(vuln.cveId, vuln.spdxId);
@@ -205,9 +206,33 @@ export const securityMixin = {
     if (pkgs > 0) parts.push(`${this.formatCount(pkgs)} ${pkgs === 1 ? 'package' : 'packages'}`);
     if (matched > 0) {
       const files = `${this.formatCount(matched)} ${matched === 1 ? 'file' : 'files'}`;
-      parts.push(ruledOut > 0 ? `${files} (${this.formatCount(ruledOut)} not affected)` : files);
+      parts.push(ruledOut > 0 ? `${files} (${this.formatCount(ruledOut)} not an issue)` : files);
     }
     return parts.length ? parts.join(' · ') : 'Not linked to a package';
+  },
+  // The VEX status that clears this vulnerability for the whole SBOM
+  // ('not_affected' or 'fixed'), or '' when at least one assessed package is
+  // still affected / under investigation, or nothing has assessed it.
+  // overallStatus is the most-severe status across assessments, so it only lands
+  // on a clearing status when no assessment outranks it. Drives the card's
+  // "not an issue" banner and reframes the referenced-files list as reference.
+  vulnClearedByVex(vuln) {
+    if (!vuln || !vuln.packageCount) return '';
+    return isRuledOutStatus(vuln.overallStatus) ? vuln.overallStatus : '';
+  },
+  // Distinct packages a vulnerability is assessed against, for the card's
+  // quick-jump chips. Deduped by spdxId and display-name sorted, so a security
+  // card offers a one-click hop to every package it touches without scrolling to
+  // the assessments section.
+  vulnPackages(spdxId) {
+    const seen = new Set();
+    const out = [];
+    for (const a of this.vexByVuln.get(spdxId) || []) {
+      if (!a.packageId || seen.has(a.packageId)) continue;
+      seen.add(a.packageId);
+      out.push({ spdxId: a.packageId, name: this.relTargetDisplayName(a.packageId) });
+    }
+    return out.sort((x, y) => x.name.localeCompare(y.name));
   },
   // Lazily fetch a CVE's public record the first time it's viewed, cached in
   // this.cveDetails so re-opening a card is instant and we never re-request.
@@ -603,8 +628,8 @@ export const securityMixin = {
         this._rebuildAffectedFileLinks();
         const n = this.affectedFileRelationships.length;
         this.toastMsg = n
-          ? `Linked ${n} affected file${n === 1 ? '' : 's'} to this SBOM (bundled index).`
-          : 'No affected files from these CVEs match files in this SBOM.';
+          ? `Linked ${n} referenced file${n === 1 ? '' : 's'} to this SBOM (bundled index).`
+          : 'No referenced files from these CVEs match files in this SBOM.';
         setTimeout(() => (this.toastMsg = ''), 5000);
         return;
       }
@@ -618,8 +643,8 @@ export const securityMixin = {
       this._rebuildAffectedFileLinks(); // records already cached; just (re)link
       const n = this.affectedFileRelationships.length;
       this.toastMsg = n
-        ? `Linked ${n} affected file${n === 1 ? '' : 's'} to this SBOM.`
-        : 'No affected files from these CVEs match files in this SBOM.';
+        ? `Linked ${n} referenced file${n === 1 ? '' : 's'} to this SBOM.`
+        : 'No referenced files from these CVEs match files in this SBOM.';
       setTimeout(() => (this.toastMsg = ''), 5000);
       return;
     }
@@ -644,8 +669,8 @@ export const securityMixin = {
       const n = this.affectedFileRelationships.length;
       const truncated = pending.length > capped.length ? ` (first ${capped.length} CVEs)` : '';
       this.toastMsg = n
-        ? `Linked ${n} affected file${n === 1 ? '' : 's'} to this SBOM${truncated}.`
-        : `No affected files matched files in this SBOM${truncated}.`;
+        ? `Linked ${n} referenced file${n === 1 ? '' : 's'} to this SBOM${truncated}.`
+        : `No referenced files matched files in this SBOM${truncated}.`;
       setTimeout(() => (this.toastMsg = ''), 6000);
     }
   },

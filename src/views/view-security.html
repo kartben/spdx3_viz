@@ -225,7 +225,7 @@
           </svg>
         </span>
         <div class="min-w-0 flex-1">
-          <div class="text-sm font-medium text-slate-200">Affected files in this SBOM</div>
+          <div class="text-sm font-medium text-slate-200">Referenced files in this SBOM</div>
           <div class="text-xs text-slate-500 hidden sm:block">
             Link the source files CVEs name to Files in this SBOM (inferred by path, shown as dashed
             edges on the graph). Uses a bundled CVE index when available (offline, all CVEs<span
@@ -246,7 +246,7 @@
             @click="resolveAffectedFilesForGraph()"
             class="badge bg-rose-500/15 text-rose-200 hover:bg-rose-500/25 ring-1 ring-rose-500/30"
           >
-            Resolve affected files
+            Link referenced files
           </button>
         </div>
 
@@ -510,6 +510,76 @@
         x-collapse
         class="mt-4 pt-4 border-t border-slate-700 sm:pl-11 space-y-3"
       >
+        <!-- Whole-CVE VEX clearance: lead with reassurance when every assessed
+             package is cleared (not_affected/fixed), so anything linked below
+             reads as reference, not an open issue. -->
+        <div
+          x-show="vulnClearedByVex(vuln)"
+          class="rounded-lg p-3 flex items-start gap-2.5"
+          :class="vexStatusMeta(vulnClearedByVex(vuln)).badgeClass"
+        >
+          <svg
+            class="w-4 h-4 mt-0.5 flex-shrink-0"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <div class="text-xs leading-relaxed min-w-0">
+            <span
+              class="font-semibold"
+              x-text="`${vexStatusMeta(vulnClearedByVex(vuln)).label} — not an issue for this SBOM`"
+            ></span>
+            <span class="block opacity-80 mt-0.5">
+              A VEX statement clears <span class="font-mono" x-text="vuln.name"></span> for
+              <span
+                x-text="vuln.packageCount === 1 ? 'the assessed package' : `all ${formatCount(vuln.packageCount)} assessed packages`"
+              ></span
+              >. Any files listed below are linked for reference only.
+            </span>
+          </div>
+        </div>
+
+        <!-- Quick-jump: hop straight to any package this CVE touches, without
+             scrolling down to the assessments. Always available (VEX-derived, no
+             CVE fetch needed), so cross-navigating to components is one click. -->
+        <div x-show="vulnPackages(vuln.spdxId).length" class="flex flex-wrap items-center gap-1.5">
+          <span class="text-[10px] uppercase tracking-wider text-slate-500 mr-0.5">Jump to</span>
+          <template x-for="p in vulnPackages(vuln.spdxId).slice(0, 12)" :key="p.spdxId">
+            <button
+              @click="navigateTo(p.spdxId)"
+              class="badge bg-slate-800 text-slate-300 hover:text-white ring-1 ring-slate-700/60 max-w-full truncate"
+              :title="'Open ' + p.name + ' in Packages'"
+            >
+              <svg
+                class="w-3 h-3 mr-1 flex-shrink-0 opacity-70"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-14L4 7m8 4v10m0-10L4 7v10l8 4"
+                />
+              </svg>
+              <span class="truncate" x-text="p.name"></span>
+            </button>
+          </template>
+          <span
+            x-show="vulnPackages(vuln.spdxId).length > 12"
+            class="badge bg-slate-800 text-slate-500"
+            x-text="`+${formatCount(vulnPackages(vuln.spdxId).length - 12)} more`"
+          ></span>
+        </div>
+
         <!-- Summary / description from the SPDX vulnerability element -->
         <div x-show="isMeaningful(vuln.el?.summary)">
           <div class="text-xs text-slate-500 mb-1">Summary</div>
@@ -656,18 +726,25 @@
                 <div class="space-y-1.5">
                   <div class="flex items-center gap-2 flex-wrap">
                     <span class="text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
-                      >Affected files</span
+                      >Files referenced by this CVE</span
                     >
                     <span
                       x-show="affectedFileStats(vuln.cveId, vuln.spdxId).matched"
-                      class="badge bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30"
+                      class="badge bg-slate-700/60 text-slate-300 ring-1 ring-slate-600/40"
+                      title="Files named in the CVE record that match a file in this SBOM by path"
                       x-text="`${formatCount(affectedFileStats(vuln.cveId, vuln.spdxId).matched)} in this SBOM`"
                     ></span>
                     <span
+                      x-show="affectedFileStats(vuln.cveId, vuln.spdxId).affected"
+                      class="badge bg-rose-500/15 text-rose-300 ring-1 ring-rose-500/30"
+                      :title="`No VEX statement clears the package(s) owning these files for ${vuln.name}`"
+                      x-text="`${formatCount(affectedFileStats(vuln.cveId, vuln.spdxId).affected)} still an issue`"
+                    ></span>
+                    <span
                       x-show="affectedFileStats(vuln.cveId, vuln.spdxId).ruledOut"
-                      class="badge bg-sky-500/15 text-sky-300 ring-1 ring-sky-500/30"
+                      class="badge bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30"
                       :title="`A VEX statement clears the package(s) owning these files for ${vuln.name}`"
-                      x-text="`${formatCount(affectedFileStats(vuln.cveId, vuln.spdxId).ruledOut)} ruled out by VEX`"
+                      x-text="`${formatCount(affectedFileStats(vuln.cveId, vuln.spdxId).ruledOut)} not an issue`"
                     ></span>
                   </div>
                   <ul class="space-y-1.5">
@@ -738,15 +815,16 @@
                     x-show="affectedFileStats(vuln.cveId, vuln.spdxId).matched"
                     class="text-[10px] text-slate-500 italic leading-snug"
                   >
-                    File links are inferred by matching paths, not declared in this SBOM. A “not
-                    affected”/“fixed” tag reflects a VEX statement on the file's package.
+                    Files are matched to this SBOM by path from the CVE record, not declared by the
+                    SBOM itself. A file tagged “Not affected” or “Fixed” is cleared by a VEX
+                    statement on its package: it's linked here for reference, not as an open issue.
                   </p>
                 </div>
               </template>
               <template x-if="(cveDetail(vuln.cveId)?.data?.affectedRoutines || []).length">
                 <div class="space-y-1">
                   <span class="text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
-                    >Affected functions</span
+                    >Functions referenced by this CVE</span
                   >
                   <div class="flex flex-wrap gap-1">
                     <template
@@ -764,7 +842,7 @@
               <template x-if="(cveDetail(vuln.cveId)?.data?.affectedModules || []).length">
                 <div class="space-y-1">
                   <span class="text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
-                    >Affected modules</span
+                    >Modules referenced by this CVE</span
                   >
                   <div class="flex flex-wrap gap-1">
                     <template
