@@ -187,7 +187,11 @@ export const securityMixin = {
         const el = this.elementMap.get(pkgId);
         return { spdxId: pkgId, name: el?.name || this.cleanName(pkgId) };
       },
-      assessmentsOf: (pkgId) => this.vexByPackage.get(pkgId) || []
+      assessmentsOf: (pkgId) => this.vexByPackage.get(pkgId) || [],
+      // When a VEX clears the whole CVE for this SBOM, matched files inherit that
+      // clearance so they don't read as an open issue under the "not an issue"
+      // banner (their own sub-package rarely carries the product-level VEX).
+      overallStatus: this.vulnRecord(vulnSpdxId)?.overallStatus || ''
     });
   },
   // Counts over a CVE's affected files relative to this SBOM (matched, ruled-out
