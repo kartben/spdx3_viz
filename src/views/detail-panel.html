@@ -88,61 +88,6 @@
       </svg>
     </button>
 
-    <!-- Main artifact set/unset. Shown for any file/package; the current main
-         artifact reads as a filled pill, a detected candidate gets a hint. -->
-    <template x-if="detailElement && mainArtifactEligible(detailElement)">
-      <div>
-        <!-- Active: this element is the main artifact -->
-        <div
-          x-show="isMainArtifact(detailElement)"
-          class="flex items-center gap-2 rounded-lg bg-amber-500/10 border border-amber-500/30 px-2.5 py-2"
-        >
-          <svg
-            class="w-4 h-4 text-amber-400 flex-shrink-0"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
-            />
-          </svg>
-          <span class="text-xs font-medium text-amber-300 flex-1">Main artifact</span>
-          <button
-            @click="clearMainArtifact()"
-            class="text-xs text-slate-400 hover:text-slate-200 px-1.5 py-0.5 rounded hover:bg-slate-700/60 transition-colors"
-          >
-            Unset
-          </button>
-        </div>
-        <!-- Inactive: offer to make it the main artifact -->
-        <button
-          x-show="!isMainArtifact(detailElement)"
-          @click="setMainArtifact(detailElement.spdxId)"
-          class="w-full flex items-center gap-2 rounded-lg border border-slate-700 hover:border-amber-500/40 hover:bg-amber-500/5 px-2.5 py-2 text-left transition-colors group"
-        >
-          <svg
-            class="w-4 h-4 text-slate-500 group-hover:text-amber-400 flex-shrink-0 transition-colors"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
-            />
-          </svg>
-          <span class="min-w-0 flex-1">
-            <span class="block text-xs font-medium text-slate-200">Set as main artifact</span>
-            <span
-              x-show="isMainArtifactCandidate(detailElement) && mainArtifactReason(detailElement.spdxId)"
-              class="block text-[11px] text-slate-500 truncate"
-              x-text="mainArtifactReason(detailElement.spdxId)"
-            ></span>
-          </span>
-        </button>
-      </div>
-    </template>
-
     <!-- Virtual vulnerability: found by an online scan (OSV/NVD), not in the SBOM -->
     <div
       x-show="detailElement?.virtual"
