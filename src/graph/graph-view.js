@@ -1051,31 +1051,43 @@ export function renderGraph(app, retry = 0) {
     });
   };
 
-  // Fast path for the common "no search, nothing highlighted" view: every node is fully opaque, so
-  // bucket visible nodes by fill/stroke and emit one fill()+stroke() per bucket instead of per node.
-  const drawNodesFast = () => {
-    const k = currentTransform.k;
-    const buckets = new Map();
+  // A node's fill/stroke/cluster flag are fixed for the life of a render, so the
+  // fill/stroke buckets never change membership. Group them once here instead of
+  // rebuilding the grouping on every frame of the fast path (which redraws
+  // constantly through the settle animation and every pan/zoom); the draw loop
+  // below just culls by viewport within each precomputed bucket.
+  const nodeBuckets = (() => {
+    const m = new Map();
     renderNodes.forEach((d) => {
-      if (d.x == null || !nodeInView(d)) return;
       const key = d._fill + '|' + d._stroke + '|' + (d.isCluster ? 1 : 0);
-      let b = buckets.get(key);
+      let b = m.get(key);
       if (!b) {
-        b = { fill: d._fill, stroke: d._stroke, lw: (d.isCluster ? 2.5 : 1.5) / k, list: [] };
-        buckets.set(key, b);
+        b = { fill: d._fill, stroke: d._stroke, isCluster: d.isCluster, list: [] };
+        m.set(key, b);
       }
       b.list.push(d);
     });
+    return [...m.values()];
+  })();
+
+  // Fast path for the common "no search, nothing highlighted" view: every node is fully opaque, so
+  // emit one fill()+stroke() per precomputed bucket instead of per node.
+  const drawNodesFast = () => {
+    const k = currentTransform.k;
     ctx.globalAlpha = 1;
-    buckets.forEach((b) => {
+    nodeBuckets.forEach((b) => {
       ctx.beginPath();
+      let any = false;
       b.list.forEach((d) => {
+        if (d.x == null || !nodeInView(d)) return;
+        any = true;
         ctx.moveTo(d.x + d._r, d.y); // moveTo before arc so circles don't chain
         ctx.arc(d.x, d.y, d._r, 0, 2 * Math.PI);
       });
+      if (!any) return;
       ctx.fillStyle = b.fill;
       ctx.fill();
-      ctx.lineWidth = b.lw;
+      ctx.lineWidth = (b.isCluster ? 2.5 : 1.5) / k;
       ctx.strokeStyle = b.stroke;
       ctx.stroke();
     });
