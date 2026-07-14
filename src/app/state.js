@@ -347,6 +347,7 @@ export function createState() {
     _mainArtifactWasAuto: false, // true when the current selection came from auto-detection
     mainArtifactBannerDismissed: false, // hides the auto-detect confirm banner
     graphFocusMainArtifact: true, // dim nodes/edges outside the artifact's contribution set
+    graphFocusMode: 'dim', // 'dim' grays out non-contributing nodes, 'hide' removes them
     graphRecomputeFocus: null, // set by the graph renderer; repaints the focus overlay without a rebuild
 
     // Statistics view: relationship repartition scope chip ('all' or a lifecycle scope).

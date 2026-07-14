@@ -1162,6 +1162,10 @@ export function renderGraph(app, retry = 0) {
     ctx.restore();
   };
 
+  // Flat slate the focus lens paints non-contributing nodes/edges, so they read
+  // as "greyed out" rather than just faded versions of their type colour.
+  const FOCUS_GRAY = '#334155';
+
   // Gold halo marking the main-artifact node, drawn full-opacity over whatever
   // dimming is in effect so the focused artifact is always the anchor on screen.
   const drawArtifactRing = (d, r, k) => {
@@ -1194,10 +1198,10 @@ export function renderGraph(app, retry = 0) {
         ctx.globalAlpha = alpha;
         ctx.beginPath();
         ctx.arc(d.x, d.y, r, 0, 2 * Math.PI);
-        ctx.fillStyle = d._fill;
+        ctx.fillStyle = ss.desat ? FOCUS_GRAY : d._fill;
         ctx.fill();
         ctx.lineWidth = (d.isCluster ? 2.5 : 1.5) / k;
-        ctx.strokeStyle = d._stroke;
+        ctx.strokeStyle = ss.desat ? FOCUS_GRAY : d._stroke;
         ctx.stroke();
       } else {
         drawIconNode(d, r, k, alpha);
@@ -1246,10 +1250,10 @@ export function renderGraph(app, retry = 0) {
       ctx.globalAlpha = alpha;
       ctx.beginPath();
       ctx.arc(d.x, d.y, r, 0, 2 * Math.PI);
-      ctx.fillStyle = d._fill;
+      ctx.fillStyle = ss.desat ? FOCUS_GRAY : d._fill;
       ctx.fill();
       ctx.lineWidth = (d.isCluster ? 2.5 : 1.5) / k;
-      ctx.strokeStyle = d._stroke;
+      ctx.strokeStyle = ss.desat ? FOCUS_GRAY : d._stroke;
       ctx.stroke();
       if (searchActive && matchSet.has(d.id)) {
         // Amber ring so search hits pop regardless of node colour.
@@ -1531,9 +1535,12 @@ export function renderGraph(app, retry = 0) {
       }
     } else if (focusActive) {
       // Links inside the artifact's contribution set stay legible; the rest fade
-      // to a faint backdrop, mirroring the node dimming.
-      if (focusDimGroups) drawLinkGroups(focusDimGroups, 0.04, 0.7 / k);
-      if (focusHotGroups) drawLinkGroups(focusHotGroups, 0.24, 0.9 / k);
+      // to a faint backdrop (and vanish entirely in 'hide' mode, since their
+      // endpoints are gone), mirroring the node dimming.
+      if (focusDimGroups && app.graphFocusMode !== 'hide') {
+        drawLinkGroups(focusDimGroups, 0.05, 0.7 / k);
+      }
+      if (focusHotGroups) drawLinkGroups(focusHotGroups, 0.26, 0.9 / k);
     } else {
       drawLinkGroups(groupedLinks, 0.22, 0.85 / k);
     }
@@ -1587,9 +1594,10 @@ export function renderGraph(app, retry = 0) {
   const SS_NEIGHBOR = { hidden: false, alpha: 0.4 };
   const SS_HIDDEN = { hidden: true, alpha: 0 };
   const SS_DIM = { hidden: false, alpha: 0.1 };
-  // Main-artifact focus lens: nodes that didn't contribute to the artifact fade
-  // right back so the artifact's real footprint stands out.
-  const SS_FOCUS_DIM = { hidden: false, alpha: 0.07 };
+  // Main-artifact focus lens: nodes that didn't contribute to the artifact are
+  // recoloured to a flat gray (desat) and faded, so the artifact's real footprint
+  // reads clearly even on a dense graph. `hide` mode drops them entirely instead.
+  const SS_FOCUS_DIM = { hidden: false, alpha: 0.32, desat: true };
 
   let searchActive = false;
   let searchFocusMode = false; // 'focus' hides non-matches; 'dim' just fades them
@@ -1636,8 +1644,10 @@ export function renderGraph(app, retry = 0) {
   const nodeSearchStyle = (id) => {
     if (focusActive && !focusSet.has(id)) {
       // A search hit outside the focus set still gets the (brighter) search dim
-      // so it stays findable; everything else fades to the focus backdrop.
-      return searchActive && matchSet.has(id) ? SS_DIM : SS_FOCUS_DIM;
+      // so it stays findable; everything else fades to the focus backdrop, or is
+      // hidden outright in 'hide' mode.
+      if (searchActive && matchSet.has(id)) return SS_DIM;
+      return app.graphFocusMode === 'hide' ? SS_HIDDEN : SS_FOCUS_DIM;
     }
     if (!searchActive || matchSet.has(id)) return SS_VISIBLE;
     if (searchFocusMode) return neighborSet.has(id) ? SS_NEIGHBOR : SS_HIDDEN;

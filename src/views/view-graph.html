@@ -143,6 +143,18 @@
           x-html="uiIconSvg('reset_zoom')"
         ></button>
       </div>
+      <!-- Focus lens mode: gray out vs. hide non-contributing nodes. Only
+           meaningful while a main artifact is set and the lens is on. -->
+      <select
+        x-show="hasMainArtifact && graphFocusMainArtifact"
+        x-model="graphFocusMode"
+        @change="setGraphFocusMode(graphFocusMode)"
+        title="How to treat nodes that didn't contribute to the main artifact"
+        class="text-xs bg-slate-800 border border-slate-700 rounded-md text-slate-300 px-1.5 py-1 focus:outline-none focus:border-amber-500"
+      >
+        <option value="dim">Gray out others</option>
+        <option value="hide">Hide others</option>
+      </select>
       <!-- Layout picker: switch how the force sim arranges nodes (organic,
            hierarchy, radial, spotlight artifacts, type lanes). Each entry
            carries a Material icon and a one-line "when to use it" hint. -->
