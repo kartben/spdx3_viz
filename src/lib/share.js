@@ -12,8 +12,7 @@
  * Returns '' when there is no sample to anchor the link to.
  *
  * @param {{sample?: string|null, view?: string|null, expanded?: string|null,
- *          detail?: string|null, graphSelected?: string|null,
- *          mainArtifact?: string|null}} spot
+ *          detail?: string|null, graphSelected?: string|null}} spot
  * @returns {string}
  */
 export function buildShareHash(spot) {
@@ -24,7 +23,6 @@ export function buildShareHash(spot) {
   if (spot.expanded) params.set('e', spot.expanded);
   if (spot.detail) params.set('d', spot.detail);
   if (spot.graphSelected) params.set('g', spot.graphSelected);
-  if (spot.mainArtifact) params.set('m', spot.mainArtifact);
   return params.toString();
 }
 
@@ -34,8 +32,7 @@ export function buildShareHash(spot) {
  *
  * @param {string} hash - location.hash, with or without the leading '#'
  * @returns {{sample: string, view: string, expanded: string|null,
- *            detail: string|null, graphSelected: string|null,
- *            mainArtifact: string|null}|null}
+ *            detail: string|null, graphSelected: string|null}|null}
  */
 export function parseShareHash(hash) {
   const raw = String(hash || '').replace(/^#/, '');
@@ -48,7 +45,6 @@ export function parseShareHash(hash) {
     view: params.get('v') || 'dashboard',
     expanded: params.get('e') || null,
     detail: params.get('d') || null,
-    graphSelected: params.get('g') || null,
-    mainArtifact: params.get('m') || null
+    graphSelected: params.get('g') || null
   };
 }

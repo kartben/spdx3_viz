@@ -1174,21 +1174,6 @@ export function renderGraph(app, retry = 0) {
     ctx.restore();
   };
 
-  // Flat slate the focus lens paints non-contributing nodes/edges, so they read
-  // as "greyed out" rather than just faded versions of their type colour.
-  const FOCUS_GRAY = '#334155';
-
-  // Gold halo marking the main-artifact node, drawn full-opacity over whatever
-  // dimming is in effect so the focused artifact is always the anchor on screen.
-  const drawArtifactRing = (d, r, k) => {
-    ctx.globalAlpha = 1;
-    ctx.beginPath();
-    ctx.arc(d.x, d.y, r + 4.5 / k, 0, 2 * Math.PI);
-    ctx.strokeStyle = '#facc15';
-    ctx.lineWidth = 2.5 / k;
-    ctx.stroke();
-  };
-
   // Icon-mode node pass: unifies the plain/hover/search cases (alpha comes from
   // the search style + hover focus). Clusters, glyph-less nodes, and nodes too
   // small on screen keep the plain dot; everything else draws its Material glyph.
@@ -1210,10 +1195,10 @@ export function renderGraph(app, retry = 0) {
         ctx.globalAlpha = alpha;
         ctx.beginPath();
         ctx.arc(d.x, d.y, r, 0, 2 * Math.PI);
-        ctx.fillStyle = ss.desat ? FOCUS_GRAY : d._fill;
+        ctx.fillStyle = d._fill;
         ctx.fill();
         ctx.lineWidth = (d.isCluster ? 2.5 : 1.5) / k;
-        ctx.strokeStyle = ss.desat ? FOCUS_GRAY : d._stroke;
+        ctx.strokeStyle = d._stroke;
         ctx.stroke();
       } else {
         drawIconNode(d, r, k, alpha);
@@ -1227,7 +1212,6 @@ export function renderGraph(app, retry = 0) {
         ctx.lineWidth = 2 / k;
         ctx.stroke();
       }
-      if (focusActive && d.id === focusArtifactRenderId) drawArtifactRing(d, r, k);
     });
     ctx.globalAlpha = 1;
     drawExternalRings();
@@ -1239,7 +1223,7 @@ export function renderGraph(app, retry = 0) {
       drawNodesIcons();
       return;
     }
-    if (!searchActive && !highlightedNodeId && !focusActive) {
+    if (!searchActive && !highlightedNodeId) {
       drawNodesFast();
       drawExternalRings();
       drawVirtualRings();
@@ -1262,10 +1246,10 @@ export function renderGraph(app, retry = 0) {
       ctx.globalAlpha = alpha;
       ctx.beginPath();
       ctx.arc(d.x, d.y, r, 0, 2 * Math.PI);
-      ctx.fillStyle = ss.desat ? FOCUS_GRAY : d._fill;
+      ctx.fillStyle = d._fill;
       ctx.fill();
       ctx.lineWidth = (d.isCluster ? 2.5 : 1.5) / k;
-      ctx.strokeStyle = ss.desat ? FOCUS_GRAY : d._stroke;
+      ctx.strokeStyle = d._stroke;
       ctx.stroke();
       if (searchActive && matchSet.has(d.id)) {
         // Amber ring so search hits pop regardless of node colour.
@@ -1276,7 +1260,6 @@ export function renderGraph(app, retry = 0) {
         ctx.lineWidth = 2 / k;
         ctx.stroke();
       }
-      if (focusActive && d.id === focusArtifactRenderId) drawArtifactRing(d, r, k);
     });
     ctx.globalAlpha = 1;
     drawExternalRings();
@@ -1545,14 +1528,6 @@ export function renderGraph(app, retry = 0) {
       } else {
         drawLinkGroups(groupLinksByColor(hl), 0.85, 1.6 / k);
       }
-    } else if (focusActive) {
-      // Links inside the artifact's contribution set stay legible; the rest fade
-      // to a faint backdrop (and vanish entirely in 'hide' mode, since their
-      // endpoints are gone), mirroring the node dimming.
-      if (focusDimGroups && app.graphFocusMode !== 'hide') {
-        drawLinkGroups(focusDimGroups, 0.05, 0.7 / k);
-      }
-      if (focusHotGroups) drawLinkGroups(focusHotGroups, 0.26, 0.9 / k);
     } else {
       drawLinkGroups(groupedLinks, 0.22, 0.85 / k);
     }
@@ -1606,10 +1581,6 @@ export function renderGraph(app, retry = 0) {
   const SS_NEIGHBOR = { hidden: false, alpha: 0.4 };
   const SS_HIDDEN = { hidden: true, alpha: 0 };
   const SS_DIM = { hidden: false, alpha: 0.1 };
-  // Main-artifact focus lens: nodes that didn't contribute to the artifact are
-  // recoloured to a flat gray (desat) and faded, so the artifact's real footprint
-  // reads clearly even on a dense graph. `hide` mode drops them entirely instead.
-  const SS_FOCUS_DIM = { hidden: false, alpha: 0.32, desat: true };
 
   let searchActive = false;
   let searchFocusMode = false; // 'focus' hides non-matches; 'dim' just fades them
@@ -1619,15 +1590,6 @@ export function renderGraph(app, retry = 0) {
   let searchDimGroups = null; // colour-grouped links not touching a match
   let searchHotGroups = null; // colour-grouped links touching a match
   const searchTextCache = new Map(); // underlying id -> { name, full|null }
-
-  // Main-artifact focus overlay (see recomputeFocus). focusSet holds render-node
-  // ids in the artifact's contribution set; focusDim/HotGroups partition links by
-  // whether both endpoints are in it.
-  let focusActive = false;
-  let focusSet = new Set();
-  let focusArtifactRenderId = null;
-  let focusDimGroups = null;
-  let focusHotGroups = null;
 
   const searchTextOf = (uNode) => {
     let entry = searchTextCache.get(uNode.id);
@@ -1650,17 +1612,7 @@ export function renderGraph(app, retry = 0) {
     return entry.full;
   };
 
-  // Combined node style: the main-artifact focus lens is a persistent backdrop
-  // (dim everything outside the contribution set), which the transient search
-  // overlay then paints on top of.
   const nodeSearchStyle = (id) => {
-    if (focusActive && !focusSet.has(id)) {
-      // A search hit outside the focus set still gets the (brighter) search dim
-      // so it stays findable; everything else fades to the focus backdrop, or is
-      // hidden outright in 'hide' mode.
-      if (searchActive && matchSet.has(id)) return SS_DIM;
-      return app.graphFocusMode === 'hide' ? SS_HIDDEN : SS_FOCUS_DIM;
-    }
     if (!searchActive || matchSet.has(id)) return SS_VISIBLE;
     if (searchFocusMode) return neighborSet.has(id) ? SS_NEIGHBOR : SS_HIDDEN;
     return SS_DIM;
@@ -1711,41 +1663,6 @@ export function renderGraph(app, retry = 0) {
     }
 
     app.graphMatchCount = matchSet.size;
-    queueDraw();
-  };
-
-  // Focus overlay: folds the app's main-artifact contribution set (underlying
-  // spdxIds) up to render-node ids, then partitions links by whether they stay
-  // inside it. A pure repaint, like the search/heat overlays — no rebuild.
-  const recomputeFocus = () => {
-    focusActive = false;
-    focusSet = new Set();
-    focusArtifactRenderId = null;
-    focusDimGroups = null;
-    focusHotGroups = null;
-
-    if (app.graphFocusMainArtifact && app.mainArtifactId) {
-      const contrib = app.mainArtifactContributionSet;
-      contrib.forEach((uid) => {
-        const rid = renderKeyOf.get(uid);
-        if (rid) focusSet.add(rid);
-      });
-      focusArtifactRenderId = renderKeyOf.get(app.mainArtifactId) || null;
-      // If nothing in the set is actually on screen (artifact filtered out),
-      // don't fade the whole graph to nothing — leave the lens off.
-      focusActive = focusSet.size > 0;
-    }
-
-    if (focusActive) {
-      const dim = [];
-      const hot = [];
-      links.forEach((l) => {
-        if (focusSet.has(l.sourceId) && focusSet.has(l.targetId)) hot.push(l);
-        else dim.push(l);
-      });
-      focusDimGroups = groupLinksByColor(dim);
-      focusHotGroups = groupLinksByColor(hot);
-    }
     queueDraw();
   };
 
@@ -2056,11 +1973,7 @@ export function renderGraph(app, retry = 0) {
     buildHeat();
     queueDraw();
   };
-  // Re-fold the main-artifact contribution set onto the settled layout and
-  // repaint, so toggling the focus lens or changing the artifact never rebuilds.
-  app.graphRecomputeFocus = recomputeFocus;
   recomputeSearch();
-  recomputeFocus();
   setFlow();
 
   // Lets nav-history restoration (browser back/forward) re-pin a node's
