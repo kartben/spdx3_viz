@@ -5,6 +5,7 @@ via the "What's new" link.
 
 ## Unreleased
 
+- **Added:** Main artifact detection with a graph focus lens that grays out non-contributing nodes.
 - **Fixed:** Large SBOMs (over ~512 MB) now load by streaming, without failing or freezing.
 - **Improved:** Files view caps the extension filter to the most-used extensions.
 - **Fixed:** Build cards no longer stall to open on large SBOMs.

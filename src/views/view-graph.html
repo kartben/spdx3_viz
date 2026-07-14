@@ -106,6 +106,23 @@
           data-tip="Hide nodes left with no edges once every other filter is applied."
           x-html="uiIconSvg('toggle_hide_orphans')"
         ></button>
+        <!-- Main-artifact focus: gray out everything that didn't contribute to
+             the selected main build output. Only shown once one is set. -->
+        <button
+          type="button"
+          x-show="hasMainArtifact"
+          @click="toggleMainArtifactFocus()"
+          :class="graphFocusMainArtifact ? 'bg-amber-500/20 text-amber-400' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700'"
+          class="g-tip p-1.5 rounded transition-colors"
+          aria-label="Focus on main artifact"
+          :data-tip="`${graphFocusMainArtifact ? 'Showing' : 'Dim nodes outside'} everything that builds ${mainArtifactName}. Click to ${graphFocusMainArtifact ? 'show the whole graph' : 'focus it'}.`"
+        >
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path
+              d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+            />
+          </svg>
+        </button>
         <div class="w-px self-stretch bg-slate-700 mx-0.5"></div>
         <button
           type="button"
@@ -326,6 +343,55 @@
   <!-- Graph canvas -->
   <div class="flex-1 relative graph-container" id="graphContainer">
     <div id="graphTooltip" class="tooltip hidden"></div>
+    <!-- Auto-detect confirm banner: surfaced once when the app picks a main
+         artifact on load, so the focus lens never feels like it happened by
+         magic. Dismissible; also drops away the moment the user overrides. -->
+    <div
+      x-show="showMainArtifactBanner"
+      x-transition
+      class="absolute top-3 left-1/2 -translate-x-1/2 z-20 max-w-[calc(100%-1.5rem)] flex items-center gap-2.5 pl-3 pr-2 py-2 rounded-lg bg-slate-800/95 backdrop-blur-sm border border-amber-500/40 shadow-lg text-xs"
+    >
+      <svg
+        class="w-4 h-4 text-amber-400 flex-shrink-0"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        aria-hidden="true"
+      >
+        <path
+          d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+        />
+      </svg>
+      <span class="text-slate-200 min-w-0">
+        Focused on
+        <button
+          @click="if (mainArtifactElement) selectGraphNode(mainArtifactId)"
+          class="font-semibold text-amber-300 hover:underline"
+          x-text="mainArtifactName"
+        ></button>
+        <span class="text-slate-400">as the main output.</span>
+      </span>
+      <button
+        @click="clearMainArtifact()"
+        class="flex-shrink-0 text-slate-400 hover:text-slate-200 px-1.5 py-0.5 rounded hover:bg-slate-700 transition-colors"
+        title="Clear the main artifact"
+      >
+        Clear
+      </button>
+      <button
+        @click="dismissMainArtifactBanner()"
+        class="flex-shrink-0 p-1 text-slate-400 hover:text-slate-200 rounded hover:bg-slate-700 transition-colors"
+        aria-label="Dismiss"
+      >
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+    </div>
   </div>
   <!-- Graph legend (click an entry to toggle that type on/off) -->
   <div

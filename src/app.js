@@ -14,6 +14,7 @@ import { rawMixin } from './app/raw.js';
 import { changelogMixin } from './app/changelog.js';
 import { statisticsMixin } from './app/statistics.js';
 import { impactMixin } from './app/impact.js';
+import { mainArtifactMixin } from './app/main-artifact.js';
 
 /* The spdxApp Alpine component: assembles fresh state with behaviour mixins. */
 
@@ -80,7 +81,8 @@ const mixins = [
   rawMixin,
   changelogMixin,
   statisticsMixin,
-  impactMixin
+  impactMixin,
+  mainArtifactMixin
 ];
 
 export function spdxApp() {
