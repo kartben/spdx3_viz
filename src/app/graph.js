@@ -37,6 +37,18 @@ export const graphMixin = {
     this.graphSearchQuery = '';
     this.graphSearch();
   },
+  // Main-artifact focus is a pure overlay (dim non-contributing nodes/edges), so
+  // repaint the settled canvas instead of rebuilding. Falls back to a full
+  // render when the graph isn't built yet.
+  focusMainArtifact() {
+    if (this.graphRecomputeFocus) this.graphRecomputeFocus();
+    else this.renderGraph();
+  },
+  // Toolbar toggle for the dimming lens (leaves the selection intact).
+  toggleMainArtifactFocus() {
+    this.graphFocusMainArtifact = !this.graphFocusMainArtifact;
+    this.focusMainArtifact();
+  },
   collapseAllClusters() {
     this.expandedClusters = new Set();
     this.graphExpandedCount = 0;

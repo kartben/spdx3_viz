@@ -536,6 +536,7 @@ export const loadingMixin = {
       this.impactFocus = null; // drop any Impact-tab focus from the previous SBOM
       this.impactSearch = '';
       this._impactHookOpenId = null;
+      this._resetMainArtifact(); // detect the main build output + apply any stored/auto pick
       this._resetListMemos(); // invalidate the build + vulnerability sort memos for new data
       this._resetSearchMemos(); // and the global-search corpus / results memos
       this._resetImpactMemos(); // and the impact ranking / blast-radius caches

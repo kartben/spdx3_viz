@@ -338,6 +338,17 @@ export function createState() {
     graphSelectedNodeId: null, // render-node id pinned by click (keeps hover-style focus)
     graphSyncSelection: null, // set by the graph renderer; re-pins the highlight without a rebuild
 
+    // Main artifact: the primary build output the SBOM is about (zephyr.elf,
+    // bzImage, ...). Detected on load, overridable from a detail card; drives the
+    // graph "focus" lens that grays out non-contributing nodes.
+    mainArtifactId: null, // selected element spdxId, or null
+    mainArtifactCandidates: [], // ranked [{id, name, score, reasons}] for the current SBOM
+    mainArtifactAuto: null, // the confidently auto-detected id (for the confirm banner)
+    _mainArtifactWasAuto: false, // true when the current selection came from auto-detection
+    mainArtifactBannerDismissed: false, // hides the auto-detect confirm banner
+    graphFocusMainArtifact: true, // dim nodes/edges outside the artifact's contribution set
+    graphRecomputeFocus: null, // set by the graph renderer; repaints the focus overlay without a rebuild
+
     // Statistics view: relationship repartition scope chip ('all' or a lifecycle scope).
     relationshipScopeFilter: 'all',
 

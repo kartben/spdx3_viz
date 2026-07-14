@@ -835,9 +835,18 @@ test('share hash round-trips a spot in a sample', () => {
     view: 'security',
     expanded: 'urn:spdx:vuln/CVE-2026-1234',
     detail: null,
-    graphSelected: null
+    graphSelected: null,
+    mainArtifact: null
   };
   assert.deepEqual(parseShareHash('#' + buildShareHash(spot)), spot);
+
+  // The main-artifact selection travels in the hash (key 'm') and round-trips
+  const withArtifact = buildShareHash({
+    sample: 'zephyr',
+    mainArtifact: 'zephyr:files/File-zephyr.elf'
+  });
+  assert.equal(withArtifact.includes('m=zephyr'), true);
+  assert.equal(parseShareHash('#' + withArtifact).mainArtifact, 'zephyr:files/File-zephyr.elf');
 
   // The default view stays out of the hash, and parsing restores it
   const home = buildShareHash({ sample: 'zephyr', view: 'dashboard' });

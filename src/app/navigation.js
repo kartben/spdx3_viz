@@ -96,7 +96,8 @@ export const navigationMixin = {
       expandedVuln: this.expandedVuln,
       expandedAgent: this.expandedAgent,
       detail: this.detailElement?.spdxId || null,
-      graphSelected: this.graphSelectedNodeId
+      graphSelected: this.graphSelectedNodeId,
+      mainArtifact: this.mainArtifactId
     };
   },
   _initNavHistory() {
@@ -131,7 +132,8 @@ export const navigationMixin = {
       view: state.view,
       expanded: state[expandedFieldByView[state.view]] || null,
       detail: state.detail,
-      graphSelected: state.graphSelected
+      graphSelected: state.graphSelected,
+      mainArtifact: state.mainArtifact
     });
     return hash ? `${base}#${hash}` : base;
   },
@@ -153,7 +155,10 @@ export const navigationMixin = {
       expandedVuln: null,
       expandedAgent: null,
       detail: link.detail,
-      graphSelected: link.graphSelected
+      graphSelected: link.graphSelected,
+      // A link that carries no main-artifact (older or hand-typed link) leaves
+      // the auto-detected pick made on load in place rather than clearing it.
+      mainArtifact: link.mainArtifact ?? this.mainArtifactId ?? null
     };
     const field = expandedFieldByView[view];
     if (field && link.expanded) state[field] = link.expanded;
@@ -191,11 +196,17 @@ export const navigationMixin = {
       ? this.elementMap.get(state.detail) || this.placeholderElement(state.detail)
       : null;
     this.graphSelectedNodeId = state.graphSelected || null;
+    // Restore the main-artifact selection this history entry / share link
+    // carried (undefined on pre-feature entries leaves the current pick alone).
+    if (state.mainArtifact !== undefined) this.mainArtifactId = state.mainArtifact || null;
     // Switching into 'graph' triggers a full rebuild (see the currentView
     // $watch in init) which already reads graphSelectedNodeId fresh; only
     // nudge the live canvas here if it was already showing (no rebuild
     // coming) and needs its pinned highlight moved to match.
-    if (wasGraphView && state.view === 'graph') this.graphSyncSelection?.(state.graphSelected);
+    if (wasGraphView && state.view === 'graph') {
+      this.graphSyncSelection?.(state.graphSelected);
+      this.graphRecomputeFocus?.(); // reflect a restored main-artifact focus
+    }
     // Mirror navigateToX's scroll-into-view for whichever list the restored
     // view tracks an expanded card for.
     const expandedNavTarget = {

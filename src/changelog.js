@@ -10,6 +10,10 @@ export const CHANGELOG = [
     date: null,
     items: [
       {
+        tag: 'Added',
+        text: 'Main artifact detection with a graph focus lens that grays out non-contributing nodes.'
+      },
+      {
         tag: 'Fixed',
         text: 'Large SBOMs (over ~512 MB) now load by streaming, without failing or freezing.'
       },
