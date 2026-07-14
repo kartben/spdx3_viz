@@ -10,11 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # No LFS: the format/lint/typecheck/test/build gate never reads the large
-      # LFS sample SBOMs (tests use the small supply-chain sample), and the build
-      # here is only a smoke check that is never deployed. Skipping the LFS fetch
-      # saves bandwidth on every PR and push. Only pages.yml (the deploy) pulls
-      # LFS, since it ships the samples to users.
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
