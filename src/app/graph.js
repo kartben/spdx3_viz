@@ -49,6 +49,12 @@ export const graphMixin = {
     this.graphFocusMainArtifact = !this.graphFocusMainArtifact;
     this.focusMainArtifact();
   },
+  // Switch the lens between graying out and hiding non-contributing nodes.
+  setGraphFocusMode(mode) {
+    if (this.graphFocusMode === mode) return;
+    this.graphFocusMode = mode;
+    this.focusMainArtifact();
+  },
   collapseAllClusters() {
     this.expandedClusters = new Set();
     this.graphExpandedCount = 0;
