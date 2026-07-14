@@ -27,6 +27,10 @@ export const CHANGELOG = [
       },
       {
         tag: 'Improved',
+        text: 'Graph view repaints faster on large SBOMs.'
+      },
+      {
+        tag: 'Improved',
         text: 'CVE cards clarify referenced files and flag VEX-cleared ones.'
       },
       {
