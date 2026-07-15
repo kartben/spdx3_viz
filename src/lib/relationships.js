@@ -37,6 +37,7 @@ export function getRelationshipColor(relType) {
     hasStaticLink: COLORS.staticLink,
     hasDynamicLink: COLORS.dynamicLink,
     hasOptionalComponent: COLORS.optionalComponent,
+    hasPrerequisite: COLORS.prerequisite,
     hasVariant: COLORS.variant,
     runsOn: COLORS.hardware,
     implementedBy: COLORS.requirement,

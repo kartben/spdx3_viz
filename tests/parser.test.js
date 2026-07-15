@@ -1172,6 +1172,50 @@ test('parseGraph supports hasVariant relationships (as emitted by the AOSP SBOM)
   assert.equal(inGroups.find((g) => g.key === 'hasVariant:in')?.items[0].id, 'pkg:toybox');
 });
 
+test('parseGraph supports hasPrerequisite relationships (as emitted by the Zephyr SBOM)', () => {
+  const app = spdxApp();
+  const graph = [
+    { type: 'software_Package', spdxId: 'pkg:app', name: 'app' },
+    { type: 'software_Package', spdxId: 'pkg:libc', name: 'libc' },
+    {
+      type: 'Relationship',
+      spdxId: 'rel:prereq',
+      relationshipType: 'hasPrerequisite',
+      from: 'pkg:app',
+      to: ['pkg:libc']
+    }
+  ];
+
+  const parsed = parseGraph(graph);
+
+  // The plain Relationship is collected and surfaces in the legend's present types.
+  assert.equal(parsed.relationships.length, 1);
+  assert.ok(parsed.presentRelTypes.includes('hasPrerequisite'));
+
+  // hasPrerequisite has a distinct, non-default colour and directional labels.
+  const prereq = getRelationshipColor('hasPrerequisite');
+  assert.notEqual(prereq, getRelationshipColor('nonexistentRel'));
+  assert.notEqual(prereq, getRelationshipColor('dependsOn'));
+  assert.equal(getRelationshipGroupLabel('hasPrerequisite', 'out'), 'Prerequisites');
+  assert.equal(getRelationshipGroupLabel('hasPrerequisite', 'in'), 'Prerequisite for');
+
+  // It has a graph legend toggle, so its edges actually render (they were being
+  // dropped when the type had no filter entry).
+  app.presentNodeTypes = parsed.presentNodeTypes;
+  app.presentRelTypes = parsed.presentRelTypes;
+  assert.ok(app.visibleGraphFilters.some((f) => f.isRel && f.key === 'hasPrerequisite'));
+
+  // It surfaces in the detail panel's relationship groups, both directions.
+  const indexes = buildRelationshipIndexes(parsed.relationships);
+  app.elementMap = parsed.elementMap;
+  app.relFromIndex = indexes.relFromIndex;
+  app.relToIndex = indexes.relToIndex;
+  const outGroups = app.detailRelGroupsFor({ spdxId: 'pkg:app' });
+  assert.equal(outGroups.find((g) => g.key === 'hasPrerequisite:out')?.items[0].id, 'pkg:libc');
+  const inGroups = app.detailRelGroupsFor({ spdxId: 'pkg:libc' });
+  assert.equal(inGroups.find((g) => g.key === 'hasPrerequisite:in')?.items[0].id, 'pkg:app');
+});
+
 test('detailRelGroupsFor surfaces lifecycle-scoped relationships with their scope', () => {
   const app = spdxApp();
   const graph = [

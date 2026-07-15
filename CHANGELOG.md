@@ -12,6 +12,7 @@ via the "What's new" link.
 - **Improved:** Graph view repaints faster on large SBOMs.
 - **Improved:** CVE cards clarify referenced files and flag VEX-cleared ones.
 - **Fixed:** Online-only CVEs now resolve referenced files when expanded.
+- **Fixed:** `hasPrerequisite` relationships now show on the graph (e.g. Zephyr build SBOMs).
 
 ## [0.3.0] - 2026-07-12
 

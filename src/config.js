@@ -37,6 +37,7 @@ export const RELATIONSHIP_TYPES = {
   HAS_STATIC_LINK: 'hasStaticLink',
   HAS_DYNAMIC_LINK: 'hasDynamicLink',
   HAS_OPTIONAL_COMPONENT: 'hasOptionalComponent',
+  HAS_PREREQUISITE: 'hasPrerequisite',
   HAS_VARIANT: 'hasVariant',
   CONFIGURES: 'configures',
   HAS_CONCLUDED_LICENSE: 'hasConcludedLicense',
@@ -294,6 +295,7 @@ export const COLORS = {
   staticLink: '#06b6d4',
   dynamicLink: '#0ea5e9',
   optionalComponent: '#d946ef',
+  prerequisite: '#6366f1',
   variant: '#eab308',
   vulnerability: '#f43f5e',
   // VEX edge colors mirror the VEX_STATUSES palette so an edge reads as its status.
@@ -385,6 +387,13 @@ export function createGraphFilters() {
     },
     // Relationship type filters
     { key: 'dependsOn', label: 'dependsOn', color: COLORS.package, active: true, isRel: true },
+    {
+      key: 'hasPrerequisite',
+      label: 'hasPrerequisite',
+      color: COLORS.prerequisite,
+      active: true,
+      isRel: true
+    },
     { key: 'contains', label: 'contains', color: COLORS.file, active: true, isRel: true },
     { key: 'generates', label: 'generates', color: COLORS.build, active: true, isRel: true },
     { key: 'hasInput', label: 'hasInput', color: COLORS.buildInput, active: true, isRel: true },
@@ -721,6 +730,8 @@ export const TAILWIND_CONFIG = {
 export const RELATIONSHIP_LABELS = {
   'dependsOn:out': 'Depends on',
   'dependsOn:in': 'Required by',
+  'hasPrerequisite:out': 'Prerequisites',
+  'hasPrerequisite:in': 'Prerequisite for',
   'contains:out': 'Contains',
   'contains:in': 'Contained in',
   'generates:out': 'Generates',
@@ -871,6 +882,8 @@ export const RELATIONSHIP_SORT_ORDER = {
   'configures:out': 12,
   'dependsOn:out': 13,
   'dependsOn:in': 14,
+  'hasPrerequisite:out': 14.3,
+  'hasPrerequisite:in': 14.6,
   'generates:out': 15,
   'generates:in': 16,
   'hasStaticLink:out': 17,

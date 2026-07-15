@@ -36,6 +36,10 @@ export const CHANGELOG = [
       {
         tag: 'Fixed',
         text: 'Online-only CVEs now resolve referenced files when expanded.'
+      },
+      {
+        tag: 'Fixed',
+        text: '`hasPrerequisite` relationships now show on the graph (e.g. Zephyr build SBOMs).'
       }
     ]
   },
