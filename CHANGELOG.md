@@ -3,6 +3,8 @@
 All notable changes to this project are documented here. Also viewable in-app
 via the "What's new" link.
 
+## Unreleased
+
 ## [0.4.0] - 2026-07-15
 
 - **Fixed:** Large SBOMs (over ~512 MB) now load by streaming, without failing or freezing.
