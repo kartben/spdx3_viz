@@ -2,10 +2,11 @@
  * SBOM quality score: a document-level completeness score plus actionable
  * "worst offender" insights, computed purely from data the parser already
  * produces (no extra parsing pass). The category/metric vocabulary mirrors
- * publicly documented practice in the SBOM tooling space — the NTIA "minimum
- * elements" baseline, and the category breakdown used by tools such as
- * Interlynk's sbomqs and eBay's sbom-scorecard — reimplemented natively
- * against this app's own model rather than any vendored code.
+ * publicly documented practice in the SBOM tooling space: the NTIA "minimum
+ * elements" baseline, the CISA 2026 Minimum Elements update, and the category
+ * breakdown used by tools such as Interlynk's sbomqs and eBay's sbom-scorecard,
+ * reimplemented natively against this app's own model rather than any vendored
+ * code.
  *
  * @module lib/quality
  */
@@ -14,6 +15,14 @@ import { getExternalIdentifiers } from './provenance.js';
 import { RELATIONSHIP_TYPES } from '../config.js';
 
 const OFFENDER_CAP = 10;
+
+/** @see https://www.cisa.gov/resources-tools/resources/2026-minimum-elements-software-bill-materials-sbom */
+export const CISA_2026_REFERENCE_URL =
+  'https://www.cisa.gov/resources-tools/resources/2026-minimum-elements-software-bill-materials-sbom';
+export const CISA_2026_PDF_URL =
+  'https://www.cisa.gov/sites/default/files/2026-07/2026_cisa_sbom_minimum_elements_508c.pdf';
+
+const EXPLICIT_UNKNOWN_RE = /^(noassertion|none)$/i;
 
 function asArray(v) {
   return Array.isArray(v) ? v : v == null || v === '' ? [] : [v];
@@ -103,6 +112,289 @@ function elIsConnected(el, relFromIndex, relToIndex) {
   );
 }
 
+function isExplicitUnknown(value) {
+  if (value == null) return false;
+  const s = String(value).trim();
+  return s !== '' && (EXPLICIT_UNKNOWN_RE.test(s) || s.includes('NoAssertion'));
+}
+
+function isBlankField(value) {
+  return value == null || String(value).trim() === '';
+}
+
+/** Meaningful value or an explicit unknown marker (NOASSERTION / None). */
+function hasValueOrUnknown(value) {
+  return isMeaningfulValue(value) || isExplicitUnknown(value);
+}
+
+function pkgHasVersionOrUnknown(p) {
+  return hasValueOrUnknown(p.software_packageVersion);
+}
+
+function pkgHashEntries(p) {
+  return asArray(p.verifiedUsing).filter((h) => h && typeof h === 'object');
+}
+
+/** Package hash present, or explicitly marked unknown. Silent absence fails. */
+function pkgHasHashOrUnknown(p) {
+  const hashes = pkgHashEntries(p);
+  if (!hashes.length) return false;
+  return hashes.some((h) => hasValueOrUnknown(h.hashValue));
+}
+
+function pkgHasHashAlgorithm(p) {
+  const hashes = pkgHashEntries(p);
+  if (!hashes.length) return false;
+  // Explicit unknown hash: algorithm may also be unknown; treat as covered.
+  if (hashes.some((h) => isExplicitUnknown(h.hashValue))) return true;
+  return hashes.some((h) => isMeaningfulValue(h.hashValue) && isMeaningfulValue(h.algorithm));
+}
+
+/**
+ * Per-package license status for CISA Component License: a concrete license
+ * ("present"), an explicit unknown ("unknown"), or silent absence ("missing").
+ *
+ * @param {Array<Object>} packages
+ * @param {Array<Object>} licenses
+ * @returns {Map<string, 'present'|'unknown'|'missing'>}
+ */
+function buildPackageLicenseStatus(packages, licenses) {
+  const status = new Map(packages.map((p) => [p.spdxId, 'missing']));
+  licenses.forEach((lic) => {
+    const label = (lic.label || '').trim();
+    if (!label) return;
+    const kind =
+      EXPLICIT_UNKNOWN_RE.test(label) || label.includes('NoAssertion') ? 'unknown' : 'present';
+    const users = new Set([...(lic.declaredBy || []), ...(lic.concludedBy || [])]);
+    users.forEach((uid) => {
+      if (!status.has(uid)) return;
+      if (kind === 'present') status.set(uid, 'present');
+      else if (status.get(uid) !== 'present') status.set(uid, 'unknown');
+    });
+  });
+  return status;
+}
+
+function resolveToolElement(tool, data) {
+  if (!tool) return null;
+  if (tool.software_packageVersion != null || tool.externalIdentifier) return tool;
+  return (
+    data.elementMap?.get(tool.id) || (data.tools || []).find((t) => t.spdxId === tool.id) || tool
+  );
+}
+
+/** True when a creator tool carries a version, versioned PURL, or versioned name. */
+function toolHasVersion(tool, data) {
+  const el = resolveToolElement(tool, data);
+  if (!el) return false;
+  if (isMeaningfulValue(el.software_packageVersion) || isMeaningfulValue(el.version)) return true;
+  const ids = getExternalIdentifiers(el);
+  if (ids.some((id) => id.type === 'packageUrl' && /@[^/@\s]+$/.test(id.identifier))) return true;
+  // Common generator spelling: "trivy 0.72.0"
+  const name = el.name || tool.name || '';
+  return /\b\d+\.\d+(\.\d+)?\b/.test(name);
+}
+
+function documentHasAuthorSignature(data) {
+  const docs = [];
+  if (data.elementMap) {
+    for (const el of data.elementMap.values()) {
+      if (el?.type === 'SpdxDocument' || el?.type === 'software_Sbom') docs.push(el);
+    }
+  }
+  (data.sboms || []).forEach((s) => docs.push(s));
+  const candidates = docs.length ? docs : [...(data.packages || []).slice(0, 1)];
+  return candidates.some((el) => {
+    if (!el) return false;
+    if (isMeaningfulValue(el.signature) || asArray(el.signature).some(isMeaningfulValue))
+      return true;
+    return asArray(el.verifiedUsing).some((m) => {
+      if (!m || typeof m !== 'object') return false;
+      const type = String(m.type || '');
+      if (/sign/i.test(type)) return true;
+      // Hash / content-identifier integrity is not an author signature.
+      if (type === 'Hash' || type === 'PackageVerificationCode') return false;
+      if (type.includes('ContentIdentifier')) return false;
+      return isMeaningfulValue(m.algorithm) && /sign|ed25519|rsa|ecdsa/i.test(String(m.algorithm));
+    });
+  });
+}
+
+/**
+ * SBOM Generation Context: prefer software_sbomType, then lifecycle scopes,
+ * then build profile / build elements.
+ *
+ * @param {Object} data
+ * @returns {{present: boolean, detail: string}}
+ */
+function resolveGenerationContext(data) {
+  const types = (data.sbomTypes || []).filter(Boolean);
+  if (types.length) return { present: true, detail: types.join(', ') };
+
+  const scopes = new Set();
+  (data.relationships || []).forEach((r) => {
+    if (r?.scope && r.scope !== 'unscoped') scopes.add(r.scope);
+  });
+  if (scopes.size) return { present: true, detail: [...scopes].join(', ') };
+
+  if ((data.builds || []).length > 0) return { present: true, detail: 'build' };
+  if ((data.profileConformance || []).includes('build')) return { present: true, detail: 'build' };
+  return { present: false, detail: '' };
+}
+
+function documentElement(key, label, present, opts = {}) {
+  return {
+    key,
+    label,
+    level: 'document',
+    present: !!present,
+    status: opts.status || (present ? 'pass' : 'fail'),
+    detail: opts.detail || '',
+    blocksConformance: opts.blocksConformance !== false
+  };
+}
+
+function practiceElement(key, label, status, detail = '') {
+  return { key, label, level: 'practice', status, detail, present: status === 'pass' };
+}
+
+/**
+ * CISA 2026 Minimum Elements report (data fields + assessable practices).
+ * Author Signature is advisory (warn) and does not block isConformant.
+ * SBOM Version has no stable SPDX 3 mapping (na).
+ *
+ * @param {Object} data
+ * @param {{coveredPkgIds: Set<string>, missingName: Object[], missingSupplier: Object[], missingIdentifier: Object[], hasAuthor: boolean, hasTimestamp: boolean, hasDependencyRel: boolean, licenses: Object[]}} ctx
+ * @returns {Object}
+ */
+function buildCisa2026Report(data, ctx) {
+  const packages = data.packages || [];
+  const total = packages.length;
+  const licenseStatus = buildPackageLicenseStatus(packages, ctx.licenses || []);
+
+  const missingVersion = packages.filter((p) => !pkgHasVersionOrUnknown(p));
+  const missingProducer = ctx.missingSupplier;
+  const missingIdentifier = ctx.missingIdentifier;
+  const missingName = ctx.missingName;
+  const missingLicense = packages.filter((p) => licenseStatus.get(p.spdxId) === 'missing');
+  const missingHash = packages.filter((p) => !pkgHasHashOrUnknown(p));
+  const missingHashAlg = packages.filter((p) => !pkgHasHashAlgorithm(p));
+
+  const hasAuthor = ctx.hasAuthor;
+  const hasTimestamp = ctx.hasTimestamp;
+  const hasDependencyRel = ctx.hasDependencyRel;
+  const hasFormatName = true; // this app only loads SPDX / SPDX-compatible JSON-LD
+  const hasFormatVersion = isMeaningfulValue(data.specVersion);
+  const generation = resolveGenerationContext(data);
+  const creatorTools = data.creatorTools || [];
+  const hasToolName = creatorTools.some((t) => isMeaningfulValue(t.name));
+  const hasToolVersion = creatorTools.some((t) => toolHasVersion(t, data));
+  const hasSignature = documentHasAuthorSignature(data);
+
+  const metadata = [
+    documentElement('author', 'SBOM Author', hasAuthor),
+    documentElement('authorSignature', 'SBOM Author Signature', hasSignature, {
+      status: hasSignature ? 'pass' : 'warn',
+      detail: hasSignature ? '' : 'Advisory: not required for the Conformant badge yet',
+      blocksConformance: false
+    }),
+    documentElement('formatName', 'SBOM Data Format Name', hasFormatName, {
+      detail: 'SPDX'
+    }),
+    documentElement('formatVersion', 'SBOM Data Format Version', hasFormatVersion, {
+      detail: data.specVersion || ''
+    }),
+    documentElement('generationContext', 'SBOM Generation Context', generation.present, {
+      detail: generation.detail
+    }),
+    documentElement('timestamp', 'SBOM Timestamp', hasTimestamp),
+    documentElement('toolName', 'SBOM Tool Name', hasToolName, {
+      detail: creatorTools
+        .map((t) => t.name)
+        .filter(Boolean)
+        .slice(0, 3)
+        .join(', ')
+    }),
+    documentElement('toolVersion', 'SBOM Tool Version', hasToolVersion),
+    documentElement('sbomVersion', 'SBOM Version', false, {
+      status: 'na',
+      detail: 'No stable SPDX 3 field mapping yet',
+      blocksConformance: false
+    })
+  ];
+
+  const component = [
+    componentElement('name', 'Component Name', missingName, total),
+    componentElement('producer', 'Component Producer', missingProducer, total),
+    componentElement('version', 'Component Version', missingVersion, total),
+    componentElement('identifier', 'Component Identifiers', missingIdentifier, total),
+    componentElement('license', 'Component License', missingLicense, total),
+    componentElement('hashValue', 'Component Hash Value', missingHash, total),
+    componentElement('hashAlgorithm', 'Component Hash Algorithm', missingHashAlg, total),
+    documentElement('dependency', 'Component Dependency Relationship', hasDependencyRel)
+  ].map((el) => {
+    if (el.level === 'document') return el;
+    const status =
+      el.missing.total === 0 ? 'pass' : el.covered > 0 ? 'partial' : total === 0 ? 'pass' : 'fail';
+    return { ...el, status, blocksConformance: true };
+  });
+
+  // Silent blanks (empty, not NOASSERTION) on fields that allow unknown.
+  const silentVersionGaps = packages.filter((p) => isBlankField(p.software_packageVersion)).length;
+  const silentGaps = silentVersionGaps + missingLicense.length + missingHash.length;
+  const maxSilentGaps = total * 3;
+  const explicitUnknownPractice =
+    total === 0 || silentGaps === 0
+      ? practiceElement(
+          'explicitUnknowns',
+          'Explicitly Identifying Unknown Information',
+          'pass',
+          total === 0 ? '' : 'Gaps use explicit unknown markers'
+        )
+      : practiceElement(
+          'explicitUnknowns',
+          'Explicitly Identifying Unknown Information',
+          silentGaps < maxSilentGaps ? 'partial' : 'fail',
+          `${silentGaps} silent gap${silentGaps === 1 ? '' : 's'} (empty, not NOASSERTION)`
+        );
+
+  const practices = [
+    practiceElement('machineProcessable', 'Machine-Processable Data', 'pass', 'SPDX JSON-LD'),
+    explicitUnknownPractice,
+    practiceElement('coverage', 'Coverage', 'na', 'Not assessable from this document alone'),
+    practiceElement('frequency', 'Frequency', 'na', 'Not assessable from this document alone'),
+    practiceElement(
+      'distribution',
+      'Distribution and Delivery',
+      'na',
+      'Not assessable from this document alone'
+    ),
+    practiceElement(
+      'updates',
+      'Accommodation of Updates to SBOM Data',
+      'na',
+      'Not assessable from this document alone'
+    )
+  ];
+
+  const scored = [...metadata, ...component].filter((el) => el.blocksConformance !== false);
+  const isConformant = scored.every((el) => {
+    if (el.level === 'document') return el.present;
+    return el.missing.total === 0;
+  });
+
+  return {
+    referenceUrl: CISA_2026_REFERENCE_URL,
+    pdfUrl: CISA_2026_PDF_URL,
+    specVersion: data.specVersion || '',
+    totalComponents: total,
+    isConformant,
+    metadata,
+    component,
+    practices
+  };
+}
+
 /**
  * Maps each license's declaring/concluding elements (from the parser's
  * `licenses` list) onto the subset that are packages, so per-package license
@@ -170,6 +462,7 @@ function componentElement(key, label, missing, total) {
  *   overall: {score: number, grade: string},
  *   categories: Array<{key: string, label: string, score: number, weight: number, applicable: boolean, detail: string}>,
  *   ntia: {specVersion: string, totalComponents: number, isConformant: boolean, elements: Array<Object>, fsct: Array<Object>},
+ *   cisa2026: Object,
  *   insights: Object
  * }}
  */
@@ -274,6 +567,17 @@ export function computeQualityReport(data) {
     ]
   };
 
+  const cisa2026 = buildCisa2026Report(data, {
+    coveredPkgIds,
+    missingName,
+    missingSupplier,
+    missingIdentifier,
+    hasAuthor,
+    hasTimestamp,
+    hasDependencyRel,
+    licenses
+  });
+
   const categories = [
     {
       key: 'ntia',
@@ -363,6 +667,7 @@ export function computeQualityReport(data) {
     overall: { score: Math.round(overallScore), grade: gradeFor(overallScore) },
     categories,
     ntia,
+    cisa2026,
     insights: {
       packageCount: packages.length,
       fileCount: files.length,

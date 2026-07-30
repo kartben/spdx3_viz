@@ -5,6 +5,7 @@ via the "What's new" link.
 
 ## Unreleased
 
+- **Added:** CISA 2026 Minimum Elements findings in Statistics.
 - **Improved:** Sidebar groups SPDX profiles, with sticky Insights and Lucide icons.
 
 ## [0.4.0] - 2026-07-15
