@@ -34,6 +34,13 @@
       </button>
       <button
         type="button"
+        @click="scrollToStatsSection('stats-cisa2026')"
+        class="rounded-md border border-slate-700 bg-slate-800/60 px-2.5 py-1.5 text-slate-300 hover:border-slate-500 hover:text-white transition-colors"
+      >
+        CISA 2026 Minimum Elements
+      </button>
+      <button
+        type="button"
         @click="scrollToStatsSection('stats-categories')"
         class="rounded-md border border-slate-700 bg-slate-800/60 px-2.5 py-1.5 text-slate-300 hover:border-slate-500 hover:text-white transition-colors"
       >
@@ -329,6 +336,208 @@
                   class="badge flex-shrink-0"
                   :class="el.present ? 'bg-emerald-500/15 text-emerald-400' : 'bg-rose-500/15 text-rose-400'"
                   x-text="el.present ? 'Present' : 'Missing'"
+                ></span>
+              </template>
+            </div>
+          </div>
+        </template>
+      </div>
+    </template>
+  </div>
+
+  <!-- CISA 2026 minimum elements -->
+  <div
+    id="stats-cisa2026"
+    class="card scroll-mt-4"
+    x-data="{
+      statusOf(el) {
+        if (el.status) return el.status;
+        if (el.level === 'document' || el.level === 'practice') return el.present ? 'pass' : 'fail';
+        if (el.missing.total === 0) return 'pass';
+        return el.covered > 0 ? 'partial' : 'fail';
+      },
+      statusColor(s) {
+        return {
+          pass: '#34d399',
+          partial: '#fbbf24',
+          warn: '#fbbf24',
+          fail: '#fb7185',
+          na: '#94a3b8'
+        }[s] || '#94a3b8';
+      },
+      statusIconKey(s) {
+        return {
+          pass: 'status_pass',
+          partial: 'status_warning',
+          warn: 'status_warning',
+          fail: 'status_fail',
+          na: 'status_warning'
+        }[s] || 'status_warning';
+      },
+      statusLabel(s) {
+        return {
+          pass: 'Pass',
+          partial: 'Partial',
+          warn: 'Advisory',
+          fail: 'Fail',
+          na: 'N/A'
+        }[s] || s;
+      },
+      coveragePct(el) {
+        return el.total > 0 ? (el.covered / el.total) * 100 : 100;
+      },
+      remediationCategoryFor(key) {
+        return {
+          name: 'ntia',
+          version: 'ntia',
+          producer: 'provenance',
+          identifier: 'provenance',
+          license: 'license',
+          hashValue: 'integrity',
+          hashAlgorithm: 'integrity',
+          dependency: 'structural',
+          author: 'provenance',
+          timestamp: 'ntia',
+          toolName: 'cisa',
+          toolVersion: 'cisa',
+          generationContext: 'cisa',
+          authorSignature: 'cisa'
+        }[key] || '';
+      },
+      isClickable(el) {
+        if (el.level === 'component') return el.missing.total > 0;
+        if (el.level === 'document') {
+          return !el.present && el.status !== 'na' && this.remediationCategoryFor(el.key);
+        }
+        return false;
+      }
+    }"
+  >
+    <div class="flex items-start justify-between gap-3 flex-wrap">
+      <div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <h3 class="text-sm font-semibold text-white">CISA 2026 Minimum Elements</h3>
+          <span
+            class="badge"
+            :class="qualityReport.cisa2026.isConformant ? 'bg-emerald-500/15 text-emerald-400' : 'bg-rose-500/15 text-rose-400'"
+            x-text="qualityReport.cisa2026.isConformant ? 'Conformant' : 'Not conformant'"
+          ></span>
+        </div>
+        <p class="text-xs text-slate-500 mt-1.5 max-w-2xl">
+          Data fields from the 2026 SBOM baseline. Signature is advisory; SBOM Version is N/A for
+          SPDX 3.
+        </p>
+        <div class="flex items-center gap-2 mt-2 flex-wrap">
+          <span
+            x-show="qualityReport.cisa2026.specVersion"
+            class="text-[11px] font-mono bg-slate-700/40 text-slate-300 px-2 py-0.5 rounded"
+            x-text="(String(qualityReport.cisa2026.specVersion).toUpperCase().startsWith('SPDX') ? '' : 'SPDX ') + qualityReport.cisa2026.specVersion"
+          ></span>
+          <span
+            class="text-xs text-slate-500"
+            x-text="formatCount(qualityReport.cisa2026.totalComponents) + ' components'"
+          ></span>
+        </div>
+      </div>
+      <div class="flex flex-col items-end gap-1.5 text-[11px]">
+        <a
+          :href="qualityReport.cisa2026.referenceUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-1 text-sky-300 hover:text-sky-200"
+        >
+          Reference
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+            />
+          </svg>
+        </a>
+        <a
+          :href="qualityReport.cisa2026.pdfUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-slate-500 hover:text-slate-300"
+          >PDF</a
+        >
+      </div>
+    </div>
+
+    <div class="border-t border-slate-700/60 mt-4 mb-1"></div>
+
+    <template
+      x-for="section in [
+        { key: 'metadata', title: 'SBOM metadata', items: qualityReport.cisa2026.metadata },
+        { key: 'component', title: 'Component data', items: qualityReport.cisa2026.component },
+        { key: 'practices', title: 'Practices', items: qualityReport.cisa2026.practices }
+      ]"
+      :key="section.key"
+    >
+      <div>
+        <div class="flex items-center gap-2 mt-4 mb-1">
+          <span class="text-xs font-medium text-slate-400" x-text="section.title"></span>
+        </div>
+        <template x-for="el in section.items" :key="el.key">
+          <div>
+            <div
+              class="flex items-center gap-3 py-2 rounded-lg px-2 -mx-2 transition"
+              :class="isClickable(el) ? 'cursor-pointer hover:bg-slate-700/40 group' : ''"
+              @click="isClickable(el) && openRemediation(remediationCategoryFor(el.key))"
+              :title="isClickable(el) ? 'Review in Remediation' : ''"
+            >
+              <span
+                class="flex-shrink-0 flex items-center"
+                :style="`color:${statusColor(statusOf(el))}`"
+                x-html="uiIconSvg(statusIconKey(statusOf(el)), 'w-[18px] h-[18px]')"
+              ></span>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-sm text-slate-200" x-text="el.label"></span>
+                  <span
+                    x-show="el.detail && el.level !== 'component'"
+                    class="text-[11px] text-slate-500 truncate max-w-[16rem]"
+                    x-text="el.detail"
+                  ></span>
+                  <span
+                    x-show="isClickable(el)"
+                    class="text-[11px] text-slate-500 group-hover:text-amber-300 transition-colors inline-flex items-center gap-0.5"
+                    >Remediation <span aria-hidden="true">→</span></span
+                  >
+                </div>
+              </div>
+              <template x-if="el.level === 'component'">
+                <div class="w-28 flex-shrink-0">
+                  <div class="flex items-center justify-between text-[11px] mb-1">
+                    <span
+                      :class="el.missing.total > 0 ? 'text-amber-500/90' : 'text-slate-500'"
+                      x-text="el.missing.total > 0 ? formatCount(el.missing.total) + ' missing' : 'coverage'"
+                    ></span>
+                    <span
+                      class="text-slate-400 tabular-nums"
+                      x-text="formatCount(el.covered) + ' / ' + formatCount(el.total)"
+                    ></span>
+                  </div>
+                  <div class="h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                    <div
+                      class="h-full rounded-full"
+                      :style="`width:${coveragePct(el)}%; background-color:${qualityScoreColor(coveragePct(el))}`"
+                    ></div>
+                  </div>
+                </div>
+              </template>
+              <template x-if="el.level !== 'component'">
+                <span
+                  class="badge flex-shrink-0"
+                  :class="{
+                    'bg-emerald-500/15 text-emerald-400': statusOf(el) === 'pass',
+                    'bg-amber-500/15 text-amber-400': statusOf(el) === 'partial' || statusOf(el) === 'warn',
+                    'bg-rose-500/15 text-rose-400': statusOf(el) === 'fail',
+                    'bg-slate-600/20 text-slate-400': statusOf(el) === 'na'
+                  }"
+                  x-text="statusLabel(statusOf(el))"
                 ></span>
               </template>
             </div>

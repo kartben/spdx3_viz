@@ -12,6 +12,7 @@ import { blastRadius, buildImpactAdjacency } from './impact.js';
 
 export const REMEDIATION_CATEGORY_META = {
   ntia: { key: 'ntia', label: 'NTIA data', order: 10 },
+  cisa: { key: 'cisa', label: 'CISA 2026', order: 15 },
   license: { key: 'license', label: 'License & copyright', order: 20 },
   provenance: { key: 'provenance', label: 'Provenance', order: 30 },
   integrity: { key: 'integrity', label: 'Integrity', order: 40 },
@@ -152,6 +153,60 @@ const DOCUMENT_KIND_META = {
     recommendedAction: 'Populate CreationInfo.created with the SBOM creation timestamp.',
     sourceCategory: 'ntia',
     evidence: 'No document creation timestamp was found.'
+  }
+};
+
+const CISA_DOCUMENT_KIND_META = {
+  authorSignature: {
+    kind: 'document-missing-author-signature',
+    severity: 'low',
+    score: 20,
+    title: 'SBOM author signature is missing',
+    summary: 'Add a digital signature attributable to the SBOM author (advisory).',
+    recommendedAction:
+      'Sign the SBOM with an approved signature algorithm and attach the signature.',
+    sourceCategory: 'cisa',
+    evidence: 'No SBOM author signature was found on the document.'
+  },
+  generationContext: {
+    kind: 'document-missing-generation-context',
+    severity: 'medium',
+    score: 35,
+    title: 'SBOM generation context is missing',
+    summary: 'Record the lifecycle phase when this SBOM was generated (for example build).',
+    recommendedAction: 'Set software_sbomType or emit lifecycle-scoped relationships.',
+    sourceCategory: 'cisa',
+    evidence: 'No SBOM generation context (sbomType, lifecycle scope, or build profile) was found.'
+  },
+  toolName: {
+    kind: 'document-missing-tool-name',
+    severity: 'medium',
+    score: 35,
+    title: 'SBOM tool name is missing',
+    summary: 'Record the tool used to generate or amend this SBOM.',
+    recommendedAction: 'Populate CreationInfo.createdUsing with a named Tool.',
+    sourceCategory: 'cisa',
+    evidence: 'No SBOM generation tool name was found.'
+  },
+  toolVersion: {
+    kind: 'document-missing-tool-version',
+    severity: 'medium',
+    score: 35,
+    title: 'SBOM tool version is missing',
+    summary: 'Record the version of the SBOM generation tool.',
+    recommendedAction: 'Add a tool version, versioned PURL, or versioned tool name.',
+    sourceCategory: 'cisa',
+    evidence: 'The SBOM generation tool has no version identifier.'
+  },
+  formatVersion: {
+    kind: 'document-missing-format-version',
+    severity: 'medium',
+    score: 40,
+    title: 'SBOM data format version is missing',
+    summary: 'Record the SPDX (or CycloneDX) format version used.',
+    recommendedAction: 'Populate CreationInfo.specVersion.',
+    sourceCategory: 'cisa',
+    evidence: 'No SBOM data format version was found.'
   }
 };
 
@@ -308,19 +363,50 @@ function addDocumentQualityFindings(out, data, report) {
         })
       );
     });
+
+  const cisaItems = [...(report.cisa2026?.metadata || []), ...(report.cisa2026?.component || [])];
+  cisaItems
+    .filter((el) => el.level === 'document' && el.status !== 'pass' && el.status !== 'na')
+    .forEach((el) => {
+      const meta = CISA_DOCUMENT_KIND_META[el.key];
+      if (!meta) return;
+      // Skip NTIA overlaps already emitted (author, timestamp, dependency).
+      if (DOCUMENT_KIND_META[el.key]) return;
+      out.push(
+        makeFinding(meta.kind, docEl, {
+          ...meta,
+          id: meta.kind,
+          sourceView: 'statistics',
+          elementId: docEl?.spdxId || '',
+          elementName: docName,
+          elementType: docEl?.type || 'SpdxDocument',
+          evidence: meta.evidence ? [meta.evidence] : []
+        })
+      );
+    });
 }
 
 function addQualityFindings(out, data) {
   const report = computeQualityReport(data);
   const ntia = elementsByKey(report.ntia?.elements);
   const fsct = elementsByKey(report.ntia?.fsct);
+  const cisaComp = elementsByKey(report.cisa2026?.component);
   const offenderMap = {
     'missing-name': ntia.name?.missing,
-    'missing-license': fsct.concludedLicense?.missing || report.insights.offenders.missingLicense,
+    'missing-license':
+      cisaComp.license?.missing ||
+      fsct.concludedLicense?.missing ||
+      report.insights.offenders.missingLicense,
     'missing-copyright': fsct.copyrightText?.missing || report.insights.offenders.missingCopyright,
-    'missing-supplier': ntia.supplier?.missing || report.insights.offenders.missingSupplier,
-    'missing-version': ntia.version?.missing || report.insights.offenders.missingVersion,
-    'missing-identifier': ntia.identifier?.missing,
+    'missing-supplier':
+      cisaComp.producer?.missing ||
+      ntia.supplier?.missing ||
+      report.insights.offenders.missingSupplier,
+    'missing-version':
+      cisaComp.version?.missing ||
+      ntia.version?.missing ||
+      report.insights.offenders.missingVersion,
+    'missing-identifier': cisaComp.identifier?.missing || ntia.identifier?.missing,
     'missing-hash': report.insights.offenders.missingHash,
     'orphan-component': report.insights.offenders.orphans
   };

@@ -150,3 +150,150 @@ test('computeQualityReport builds a detailed NTIA report mirroring the reference
   assert.equal(el.concludedLicense.covered, 1);
   assert.equal(el.copyrightText.covered, 1);
 });
+
+test('computeQualityReport builds a CISA 2026 minimum-elements report', () => {
+  const graph = [
+    {
+      type: 'SpdxDocument',
+      spdxId: 'doc:1',
+      name: 'demo',
+      creationInfo: 'ci:1',
+      profileConformance: ['core', 'software']
+    },
+    {
+      type: 'CreationInfo',
+      '@id': 'ci:1',
+      created: '2026-07-01T00:00:00Z',
+      createdBy: ['agent:author'],
+      createdUsing: ['tool:gen'],
+      specVersion: '3.0.1'
+    },
+    { type: 'Organization', spdxId: 'agent:author', name: 'Example Org', creationInfo: 'ci:1' },
+    { type: 'Tool', spdxId: 'tool:gen', name: 'Example SBOM Tool 1.2.3', creationInfo: 'ci:1' },
+    {
+      type: 'software_Sbom',
+      spdxId: 'sbom:1',
+      name: 'demo-sbom',
+      software_sbomType: ['build'],
+      creationInfo: 'ci:1',
+      rootElement: ['pkg:good']
+    },
+    {
+      type: 'software_Package',
+      spdxId: 'pkg:good',
+      name: 'good-lib',
+      software_packageVersion: '1.2.3',
+      software_packageUrl: 'pkg:npm/good-lib@1.2.3',
+      suppliedBy: 'agent:author',
+      verifiedUsing: [{ type: 'Hash', algorithm: 'sha256', hashValue: 'abc123' }],
+      creationInfo: 'ci:1'
+    },
+    {
+      type: 'software_Package',
+      spdxId: 'pkg:bare',
+      name: 'bare-lib',
+      creationInfo: 'ci:1'
+    },
+    {
+      type: 'simplelicensing_LicenseExpression',
+      spdxId: 'lic:mit',
+      simplelicensing_licenseExpression: 'MIT'
+    },
+    {
+      type: 'Relationship',
+      spdxId: 'rel:license',
+      relationshipType: 'hasDeclaredLicense',
+      from: 'pkg:good',
+      to: ['lic:mit']
+    },
+    {
+      type: 'Relationship',
+      spdxId: 'rel:dep',
+      relationshipType: 'dependsOn',
+      from: 'pkg:good',
+      to: ['pkg:bare']
+    }
+  ];
+
+  const parsed = parseGraph(graph);
+  const indexes = buildRelationshipIndexes(parsed.relationships);
+  const { cisa2026 } = computeQualityReport({ ...parsed, ...indexes });
+
+  assert.equal(cisa2026.isConformant, false);
+  assert.ok(cisa2026.referenceUrl.includes('cisa.gov'));
+  assert.ok(cisa2026.pdfUrl.endsWith('.pdf'));
+
+  const meta = Object.fromEntries(cisa2026.metadata.map((e) => [e.key, e]));
+  assert.equal(meta.author.status, 'pass');
+  assert.equal(meta.authorSignature.status, 'warn');
+  assert.equal(meta.formatName.status, 'pass');
+  assert.equal(meta.formatVersion.status, 'pass');
+  assert.equal(meta.generationContext.status, 'pass');
+  assert.equal(meta.generationContext.detail, 'build');
+  assert.equal(meta.timestamp.status, 'pass');
+  assert.equal(meta.toolName.status, 'pass');
+  assert.equal(meta.toolVersion.status, 'pass');
+  assert.equal(meta.sbomVersion.status, 'na');
+
+  const comp = Object.fromEntries(cisa2026.component.map((e) => [e.key, e]));
+  assert.equal(comp.name.missing.total, 0);
+  assert.equal(comp.producer.missing.total, 1);
+  assert.deepEqual(
+    comp.version.missing.sample.map((o) => o.id),
+    ['pkg:bare']
+  );
+  assert.equal(comp.hashValue.missing.total, 1);
+  assert.equal(comp.hashAlgorithm.missing.total, 1);
+  assert.equal(comp.license.covered, 1);
+  assert.equal(comp.dependency.present, true);
+
+  const practices = Object.fromEntries(cisa2026.practices.map((e) => [e.key, e]));
+  assert.equal(practices.machineProcessable.status, 'pass');
+  assert.equal(practices.coverage.status, 'na');
+  assert.equal(practices.explicitUnknowns.status, 'partial');
+});
+
+test('CISA 2026 treats explicit unknown hash and version as covered', () => {
+  const report = computeQualityReport({
+    packages: [
+      {
+        type: 'software_Package',
+        spdxId: 'pkg:1',
+        name: 'lib',
+        software_packageVersion: 'NOASSERTION',
+        suppliedBy: 'agent:x',
+        software_packageUrl: 'pkg:generic/lib@unknown',
+        verifiedUsing: [{ type: 'Hash', algorithm: 'sha256', hashValue: 'NOASSERTION' }]
+      }
+    ],
+    files: [],
+    licenses: [
+      {
+        id: 'lic:na',
+        label: 'NoAssertion',
+        declaredBy: ['pkg:1'],
+        concludedBy: []
+      }
+    ],
+    creators: [{ id: 'agent:x', name: 'X', type: 'Organization' }],
+    creatorTools: [{ id: 'tool:1', name: 'Tool 9.0', type: 'Tool' }],
+    createdDate: '2026-01-01T00:00:00Z',
+    specVersion: '3.0.1',
+    sbomTypes: ['source'],
+    relationships: [{ relationshipType: 'dependsOn', from: 'pkg:1', to: ['pkg:1'] }],
+    elementMap: new Map(),
+    tools: [],
+    builds: [],
+    profileConformance: [],
+    relFromIndex: new Map(),
+    relToIndex: new Map(),
+    dependentIndex: new Map()
+  });
+
+  const comp = Object.fromEntries(report.cisa2026.component.map((e) => [e.key, e]));
+  assert.equal(comp.version.missing.total, 0);
+  assert.equal(comp.hashValue.missing.total, 0);
+  assert.equal(comp.hashAlgorithm.missing.total, 0);
+  assert.equal(comp.license.missing.total, 0);
+  assert.equal(report.cisa2026.practices.find((p) => p.key === 'explicitUnknowns').status, 'pass');
+});

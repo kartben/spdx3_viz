@@ -10,6 +10,10 @@ export const CHANGELOG = [
     date: null,
     items: [
       {
+        tag: 'Added',
+        text: 'CISA 2026 Minimum Elements findings in Statistics.'
+      },
+      {
         tag: 'Improved',
         text: 'Sidebar groups SPDX profiles, with sticky Insights and Lucide icons.'
       }
