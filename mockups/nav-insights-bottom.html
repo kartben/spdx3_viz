@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nav mockup: Insights bottom</title>
+    <script src="https://unpkg.com/lucide@0.468.0"></script>
+    <style>
+      :root {
+        --bg: #0f172a;
+        --panel: rgba(30, 41, 59, 0.92);
+        --border: rgba(51, 65, 85, 0.55);
+        --text: #94a3b8;
+        --text-strong: #f8fafc;
+        --muted: #64748b;
+        --active: #60a5fa;
+        --active-bg: rgba(59, 130, 246, 0.12);
+        --active-bar: #3b82f6;
+        --badge-bg: rgba(51, 65, 85, 0.65);
+        --badge-text: #94a3b8;
+        --danger-bg: rgba(244, 63, 94, 0.15);
+        --danger-text: #fda4af;
+        --section: #64748b;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family:
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          Helvetica,
+          Arial,
+          sans-serif;
+        background: #020617;
+        color: var(--text-strong);
+        padding: 28px;
+      }
+      h1 {
+        font-size: 1.15rem;
+        margin: 0 0 6px;
+        font-weight: 650;
+      }
+      .lede {
+        color: var(--muted);
+        font-size: 0.85rem;
+        margin: 0 0 22px;
+        max-width: 46rem;
+        line-height: 1.5;
+      }
+      .grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 28px;
+        align-items: flex-start;
+      }
+      .col {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .caption {
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #93c5fd;
+      }
+      .note {
+        font-size: 0.78rem;
+        color: var(--muted);
+        line-height: 1.4;
+        max-width: 260px;
+        min-height: 2.8em;
+      }
+      aside.sidebar {
+        width: 260px;
+        height: 560px;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .brand {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+      }
+      .brand-mark {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #3b82f6, #9333ea);
+        display: grid;
+        place-items: center;
+      }
+      .brand-mark svg {
+        width: 16px;
+        height: 16px;
+        color: white;
+      }
+      .brand-name {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: white;
+      }
+      .brand-sub {
+        font-size: 0.72rem;
+        color: var(--muted);
+      }
+      .nav-scroll {
+        flex: 1;
+        overflow-y: auto;
+        padding: 8px 8px 10px;
+        min-height: 0;
+      }
+      .section-label {
+        display: block;
+        padding: 12px 10px 6px;
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--section);
+      }
+      .nav-item,
+      .profile-head {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 10px;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        color: var(--text);
+      }
+      .nav-item.active {
+        background: var(--active-bg);
+        color: var(--active);
+        font-weight: 500;
+      }
+      .nav-item.active::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 6px;
+        bottom: 6px;
+        width: 3px;
+        border-radius: 0 3px 3px 0;
+        background: var(--active-bar);
+      }
+      .nav-item svg,
+      .profile-head svg {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+        opacity: 0.7;
+        stroke-width: 1.75;
+      }
+      .nav-item.active svg {
+        opacity: 1;
+      }
+      .badge {
+        margin-left: auto;
+        font-size: 0.625rem;
+        background: var(--badge-bg);
+        color: var(--badge-text);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-variant-numeric: tabular-nums;
+      }
+      .badge.danger {
+        background: var(--danger-bg);
+        color: var(--danger-text);
+      }
+      .child.rail {
+        margin-left: 17px;
+        padding-left: 18px;
+        border-left: 1px solid rgba(51, 65, 85, 0.55);
+        border-radius: 0 8px 8px 0;
+      }
+      .profile-head {
+        font-weight: 550;
+        color: #cbd5e1;
+      }
+      .profile-head .chev {
+        margin-left: auto;
+        width: 14px;
+        height: 14px;
+        opacity: 0.55;
+      }
+      .profile-head .count-pill {
+        margin-left: 0;
+        margin-right: 2px;
+        margin-left: auto;
+        font-size: 0.625rem;
+        color: var(--muted);
+        border: 1px solid rgba(71, 85, 105, 0.7);
+        padding: 1px 6px;
+        border-radius: 999px;
+      }
+      .profile-head.has-chev .count-pill {
+        margin-left: 0;
+      }
+      .profile-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #34d399;
+        margin-left: 2px;
+        flex-shrink: 0;
+      }
+      .insights-block {
+        padding: 0 8px 8px;
+      }
+      .insights-block.sticky {
+        flex-shrink: 0;
+        border-top: 1px solid rgba(51, 65, 85, 0.55);
+        background: rgba(15, 23, 42, 0.55);
+        padding-top: 2px;
+      }
+      .insights-block .section-label {
+        padding-top: 10px;
+      }
+      .footer {
+        border-top: 1px solid var(--border);
+        padding: 12px 16px;
+        font-size: 0.7rem;
+        color: var(--muted);
+        flex-shrink: 0;
+      }
+      .scroll-hint {
+        margin: 6px 10px 2px;
+        font-size: 0.65rem;
+        color: #64748b;
+        font-style: italic;
+      }
+      /* Force scroll position for the "scrolled away" demo */
+      .nav-scroll.scrolled-to-bottom {
+        /* content taller than viewport; we'll set scrollTop via JS */
+      }
+      .fade-top {
+        pointer-events: none;
+        height: 18px;
+        margin: -8px -8px 0;
+        background: linear-gradient(to bottom, rgba(30, 41, 59, 0.95), transparent);
+        position: sticky;
+        top: 0;
+        z-index: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Insights at the bottom</h1>
+    <p class="lede">
+      Option B with Software + Build expanded. Left: Insights scroll with the list (can leave the
+      viewport). Right: Insights pinned above the footer so Statistics / Remediation / Impact / Raw
+      stay reachable.
+    </p>
+
+    <div class="grid">
+      <!-- Scroll-away -->
+      <div class="col" id="scroll">
+        <div class="caption">1 · Scrolls away</div>
+        <p class="note">Drawers open push Insights down. You scroll the sidebar to reach them.</p>
+        <aside class="sidebar">
+          <div class="brand">
+            <div class="brand-mark"><i data-lucide="file-text"></i></div>
+            <div>
+              <div class="brand-name">SPDX 3 Visualizer</div>
+              <div class="brand-sub">SPDX 3.0 &amp; 3.1</div>
+            </div>
+          </div>
+          <div class="nav-scroll" id="scroll-nav">
+            <div class="fade-top"></div>
+            <span class="section-label" style="padding-top: 2px">Explore</span>
+            <div class="nav-item"><i data-lucide="layout-dashboard"></i><span>Overview</span></div>
+            <div class="nav-item"><i data-lucide="share-2"></i><span>Graph</span></div>
+
+            <span class="section-label">Profiles</span>
+            <div class="profile-head has-chev">
+              <i data-lucide="boxes"></i><span>Software</span><span class="count-pill">2148</span
+              ><i data-lucide="chevron-down" class="chev"></i>
+            </div>
+            <div class="nav-item child rail">
+              <i data-lucide="package"></i><span>Packages</span><span class="badge">206</span>
+            </div>
+            <div class="nav-item child rail">
+              <i data-lucide="file"></i><span>Files</span><span class="badge">1942</span>
+            </div>
+            <div class="nav-item">
+              <i data-lucide="shield"></i><span>Security</span><span class="badge danger">12</span>
+            </div>
+            <div class="nav-item">
+              <i data-lucide="scale"></i><span>Licensing</span><span class="badge">10</span>
+            </div>
+            <div class="profile-head has-chev">
+              <i data-lucide="hammer"></i><span>Build</span><span class="count-pill">28</span
+              ><i data-lucide="chevron-down" class="chev"></i>
+            </div>
+            <div class="nav-item child rail">
+              <i data-lucide="wrench"></i><span>Builds &amp; tools</span><span class="badge">28</span>
+            </div>
+            <div class="nav-item child rail">
+              <i data-lucide="sliders-horizontal"></i><span>Configs</span>
+            </div>
+            <div class="nav-item">
+              <i data-lucide="clipboard-check"></i><span>Functional Safety</span
+              ><span class="badge">1895</span>
+            </div>
+            <div class="nav-item"><i data-lucide="cpu"></i><span>Hardware</span></div>
+            <div class="profile-head has-chev">
+              <i data-lucide="brain"></i><span>AI &amp; Dataset</span
+              ><i data-lucide="chevron-down" class="chev"></i>
+            </div>
+            <div class="nav-item child rail">
+              <i data-lucide="brain"></i><span>AI Models</span>
+            </div>
+            <div class="nav-item child rail">
+              <i data-lucide="database"></i><span>Datasets</span>
+            </div>
+            <div class="nav-item"><i data-lucide="git-branch"></i><span>Supply Chain</span></div>
+            <div class="nav-item">
+              <i data-lucide="user-round"></i><span>Agents</span><span class="badge">1</span>
+            </div>
+
+            <div class="insights-block" id="insights-scroll-target">
+              <span class="section-label">Insights</span>
+              <div class="nav-item"><i data-lucide="chart-column"></i><span>Statistics</span></div>
+              <div class="nav-item">
+                <i data-lucide="triangle-alert"></i><span>Remediation</span
+                ><span class="badge">5</span>
+              </div>
+              <div class="nav-item"><i data-lucide="git-fork"></i><span>Impact</span></div>
+              <div class="nav-item"><i data-lucide="braces"></i><span>Raw JSON-LD</span></div>
+            </div>
+          </div>
+          <div class="footer">v0.4.1-dev · What's new</div>
+        </aside>
+      </div>
+
+      <!-- Sticky -->
+      <div class="col" id="sticky">
+        <div class="caption">2 · Sticky Insights (preferred)</div>
+        <p class="note">
+          Profile list scrolls above; Insights stay pinned over the chrome footer.
+        </p>
+        <aside class="sidebar">
+          <div class="brand">
+            <div class="brand-mark"><i data-lucide="file-text"></i></div>
+            <div>
+              <div class="brand-name">SPDX 3 Visualizer</div>
+              <div class="brand-sub">SPDX 3.0 &amp; 3.1</div>
+            </div>
+          </div>
+          <div class="nav-scroll" id="sticky-nav">
+            <div class="fade-top"></div>
+            <span class="section-label" style="padding-top: 2px">Explore</span>
+            <div class="nav-item"><i data-lucide="layout-dashboard"></i><span>Overview</span></div>
+            <div class="nav-item"><i data-lucide="share-2"></i><span>Graph</span></div>
+
+            <span class="section-label">Profiles</span>
+            <div class="profile-head has-chev">
+              <i data-lucide="boxes"></i><span>Software</span><span class="count-pill">2148</span
+              ><i data-lucide="chevron-down" class="chev"></i>
+            </div>
+            <div class="nav-item child rail">
+              <i data-lucide="package"></i><span>Packages</span><span class="badge">206</span>
+            </div>
+            <div class="nav-item child rail">
+              <i data-lucide="file"></i><span>Files</span><span class="badge">1942</span>
+            </div>
+            <div class="nav-item">
+              <i data-lucide="shield"></i><span>Security</span><span class="badge danger">12</span>
+            </div>
+            <div class="nav-item">
+              <i data-lucide="scale"></i><span>Licensing</span><span class="badge">10</span>
+            </div>
+            <div class="profile-head has-chev">
+              <i data-lucide="hammer"></i><span>Build</span><span class="count-pill">28</span
+              ><i data-lucide="chevron-down" class="chev"></i>
+            </div>
+            <div class="nav-item child rail">
+              <i data-lucide="wrench"></i><span>Builds &amp; tools</span><span class="badge">28</span>
+            </div>
+            <div class="nav-item child rail">
+              <i data-lucide="sliders-horizontal"></i><span>Configs</span>
+            </div>
+            <div class="nav-item">
+              <i data-lucide="clipboard-check"></i><span>Functional Safety</span
+              ><span class="badge">1895</span>
+            </div>
+            <div class="nav-item"><i data-lucide="cpu"></i><span>Hardware</span></div>
+            <div class="profile-head has-chev">
+              <i data-lucide="brain"></i><span>AI &amp; Dataset</span
+              ><i data-lucide="chevron-down" class="chev"></i>
+            </div>
+            <div class="nav-item child rail">
+              <i data-lucide="brain"></i><span>AI Models</span>
+            </div>
+            <div class="nav-item child rail">
+              <i data-lucide="database"></i><span>Datasets</span>
+            </div>
+            <div class="nav-item"><i data-lucide="git-branch"></i><span>Supply Chain</span></div>
+            <div class="nav-item">
+              <i data-lucide="user-round"></i><span>Agents</span><span class="badge">1</span>
+            </div>
+            <p class="scroll-hint">…profiles continue above</p>
+          </div>
+          <div class="insights-block sticky">
+            <span class="section-label">Insights</span>
+            <div class="nav-item"><i data-lucide="chart-column"></i><span>Statistics</span></div>
+            <div class="nav-item">
+              <i data-lucide="triangle-alert"></i><span>Remediation</span><span class="badge">5</span>
+            </div>
+            <div class="nav-item"><i data-lucide="git-fork"></i><span>Impact</span></div>
+            <div class="nav-item"><i data-lucide="braces"></i><span>Raw JSON-LD</span></div>
+          </div>
+          <div class="footer">v0.4.1-dev · What's new</div>
+        </aside>
+      </div>
+
+      <!-- Bottom crop focus: sticky only Insights band -->
+      <div class="col" id="crop">
+        <div class="caption">3 · Bottom band close-up</div>
+        <p class="note">Same sticky Insights strip, cropped for the footer region.</p>
+        <aside class="sidebar" style="height: 280px" id="crop-sidebar">
+          <div class="nav-scroll" style="padding-top: 0">
+            <div class="nav-item"><i data-lucide="cpu"></i><span>Hardware</span></div>
+            <div class="nav-item"><i data-lucide="git-branch"></i><span>Supply Chain</span></div>
+            <div class="nav-item">
+              <i data-lucide="user-round"></i><span>Agents</span><span class="badge">1</span>
+            </div>
+          </div>
+          <div class="insights-block sticky">
+            <span class="section-label">Insights</span>
+            <div class="nav-item"><i data-lucide="chart-column"></i><span>Statistics</span></div>
+            <div class="nav-item">
+              <i data-lucide="triangle-alert"></i><span>Remediation</span><span class="badge">5</span>
+            </div>
+            <div class="nav-item active">
+              <i data-lucide="git-fork"></i><span>Impact</span>
+            </div>
+            <div class="nav-item"><i data-lucide="braces"></i><span>Raw JSON-LD</span></div>
+          </div>
+          <div class="footer">v0.4.1-dev · What's new</div>
+        </aside>
+      </div>
+    </div>
+
+    <script>
+      lucide.createIcons();
+      // Scroll the first panel to the Insights block so the screenshot shows the bottom.
+      requestAnimationFrame(() => {
+        const nav = document.getElementById('scroll-nav');
+        const target = document.getElementById('insights-scroll-target');
+        if (nav && target) {
+          nav.scrollTop = target.offsetTop - 8;
+        }
+        const stickyNav = document.getElementById('sticky-nav');
+        if (stickyNav) stickyNav.scrollTop = stickyNav.scrollHeight;
+      });
+    </script>
+  </body>
+</html>
