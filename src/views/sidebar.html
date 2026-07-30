@@ -46,7 +46,7 @@
         <template x-for="p in visibleNavProfiles" :key="'profile-' + p.id">
           <div>
             <!-- Multi-view profile: collapsible header + nested leaves -->
-            <div x-show="p.viewIds.length > 1">
+            <div x-show="isNavProfileCollapsible(p)">
               <button
                 type="button"
                 class="nav-profile-head"
@@ -67,10 +67,12 @@
                 ></span>
               </button>
               <div x-show="isNavProfileExpanded(p.id)" x-collapse>
-                <template x-for="vid in p.viewIds" :key="'leaf-' + p.id + '-' + vid">
+                <template
+                  x-for="vid in availableNavProfileViews(p)"
+                  :key="'leaf-' + p.id + '-' + vid"
+                >
                   <div
                     class="nav-item nav-child"
-                    x-show="isViewAvailable(vid)"
                     :class="{ 'active': currentView === vid }"
                     @click="switchView(vid)"
                   >
@@ -85,20 +87,27 @@
                 </template>
               </div>
             </div>
-            <!-- Single-view profile: one clickable row -->
+            <!-- Single available leaf (dedicated profile, or only one sibling present) -->
             <div
               class="nav-item"
-              x-show="p.viewIds.length === 1 && isViewAvailable(p.viewIds[0])"
-              :class="{ 'active': currentView === p.viewIds[0] }"
-              @click="switchView(p.viewIds[0])"
+              x-show="!isNavProfileCollapsible(p) && availableNavProfileViews(p).length === 1"
+              :class="{ 'active': currentView === availableNavProfileViews(p)[0] }"
+              @click="switchView(availableNavProfileViews(p)[0])"
             >
               <span x-html="p.icon" class="nav-icon"></span>
-              <span x-text="p.label" class="flex-1"></span>
               <span
-                x-show="viewById(p.viewIds[0])?.count"
-                x-text="viewById(p.viewIds[0])?.count"
+                class="flex-1"
+                x-text="
+                  p.viewIds.length === 1
+                    ? p.label
+                    : viewById(availableNavProfileViews(p)[0])?.label || p.label
+                "
+              ></span>
+              <span
+                x-show="viewById(availableNavProfileViews(p)[0])?.count"
+                x-text="viewById(availableNavProfileViews(p)[0])?.count"
                 class="text-[10px] bg-slate-700/60 px-1.5 py-0.5 rounded text-slate-400"
-                :class="p.viewIds[0] === 'security' && 'bg-rose-500/15 text-rose-300'"
+                :class="availableNavProfileViews(p)[0] === 'security' && 'bg-rose-500/15 text-rose-300'"
               ></span>
             </div>
           </div>

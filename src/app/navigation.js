@@ -95,6 +95,16 @@ export const navigationMixin = {
     return (this.navProfiles || []).filter((p) => p.viewIds.some((id) => this.isViewAvailable(id)));
   },
 
+  // View ids in a profile that are currently reachable (drives single-row vs
+  // collapsible rendering when some siblings are empty).
+  availableNavProfileViews(profile) {
+    return profile.viewIds.filter((id) => this.isViewAvailable(id));
+  },
+
+  isNavProfileCollapsible(profile) {
+    return this.availableNavProfileViews(profile).length > 1;
+  },
+
   navProfileForView(viewId) {
     return (this.navProfiles || []).find((p) => p.viewIds.includes(viewId)) || null;
   },
@@ -115,7 +125,7 @@ export const navigationMixin = {
   // nested leaf is never active while its parent drawer is closed.
   ensureNavProfileExpanded(viewId) {
     const profile = this.navProfileForView(viewId);
-    if (!profile || profile.viewIds.length < 2) return;
+    if (!profile || !this.isNavProfileCollapsible(profile)) return;
     if (this.expandedNavProfiles[profile.id]) return;
     this.expandedNavProfiles = { ...this.expandedNavProfiles, [profile.id]: true };
   },
@@ -123,8 +133,7 @@ export const navigationMixin = {
   navProfileCount(profile) {
     let total = 0;
     let any = false;
-    for (const id of profile.viewIds) {
-      if (!this.isViewAvailable(id)) continue;
+    for (const id of this.availableNavProfileViews(profile)) {
       const n = this.viewById(id)?.count;
       if (n != null && n !== '') {
         any = true;
