@@ -406,6 +406,22 @@ html {
    Sidebar navigation with active states and indicator line
    ========================================================================== */
 
+.nav-section-label {
+  display: block;
+  padding: 12px 10px 6px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.nav-insights {
+  border-top: 1px solid rgba(51, 65, 85, 0.55);
+  background: rgba(15, 23, 42, 0.35);
+  padding-top: 2px;
+}
+
 .nav-item {
   position: relative;
   display: flex;
@@ -424,12 +440,60 @@ html {
   color: #e2e8f0;
 }
 
-/* Divider above the analysis group (Statistics / Impact), set apart from the
-   per-type browse views above it. */
-.nav-item.nav-group-start {
-  margin-top: 10px;
-  padding-top: 14px;
-  border-top: 1px solid rgba(51, 65, 85, 0.5);
+.nav-item.nav-child {
+  margin-left: 17px;
+  padding-left: 18px;
+  border-left: 1px solid rgba(51, 65, 85, 0.55);
+  border-radius: 0 8px 8px 0;
+}
+
+.nav-profile-head {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: transparent;
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.nav-profile-head:hover {
+  background: rgba(51, 65, 85, 0.4);
+  color: #e2e8f0;
+}
+
+.nav-profile-count {
+  font-size: 0.625rem;
+  color: #64748b;
+  border: 1px solid rgba(71, 85, 105, 0.7);
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+
+.nav-chevron {
+  display: inline-flex;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  opacity: 0.55;
+  transition: transform 0.15s ease;
+}
+
+.nav-chevron svg {
+  width: 14px;
+  height: 14px;
+}
+
+.nav-chevron.collapsed {
+  transform: rotate(-90deg);
 }
 
 .nav-item.active {
@@ -449,7 +513,8 @@ html {
   background: #3b82f6;
 }
 
-.nav-item .nav-icon {
+.nav-item .nav-icon,
+.nav-profile-head .nav-icon {
   display: inline-flex;
   width: 16px;
   height: 16px;
@@ -457,7 +522,14 @@ html {
   opacity: 0.6;
 }
 
-.nav-item:hover .nav-icon {
+.nav-item .nav-icon svg,
+.nav-profile-head .nav-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.nav-item:hover .nav-icon,
+.nav-profile-head:hover .nav-icon {
   opacity: 0.9;
 }
 

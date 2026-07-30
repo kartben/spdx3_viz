@@ -3,7 +3,7 @@
  *
  * @module config
  */
-import { ICON_PATHS } from './lib/icon-paths.js';
+import { LUCIDE_NAV_ICONS, NAV_CHEVRON_ICON } from './lib/lucide-nav-icons.js';
 
 // Element categorization by SPDX type is derived from the official class
 // hierarchy in src/spdx/ (see bucketOf / isA), not from hand-maintained type
@@ -632,51 +632,34 @@ export function createGraphFilters() {
 }
 
 /**
- * Sidebar view id -> icon key in the shared Material set (src/lib/icon-paths.js).
- * Views that mirror an SPDX node type reuse its glyph; the rest (overview, graph,
- * raw) get their own. Kept here since it's a view-definition concern.
+ * Lucide stroke <svg> per sidebar view (currentColor, so the nav item tints it).
+ * Entity-type Material glyphs stay in ICON_PATHS for lists / graph / detail.
  * @constant {Object<string, string>}
  */
-const VIEW_ICON_KEYS = {
-  dashboard: 'view_dashboard',
-  graph: 'view_graph',
-  packages: 'package',
-  ai: 'ai',
-  dataset: 'dataset',
-  files: 'file',
-  hardware: 'hardware',
-  supplychain: 'supplychain',
-  requirements: 'requirement',
-  licenses: 'license',
-  security: 'view_security',
-  configs: 'config',
-  build: 'build',
-  agents: 'agent_person',
-  raw: 'view_raw',
-  statistics: 'view_statistics',
-  remediation: 'status_warning'
+const VIEW_ICONS = {
+  dashboard: LUCIDE_NAV_ICONS.dashboard,
+  graph: LUCIDE_NAV_ICONS.graph,
+  packages: LUCIDE_NAV_ICONS.packages,
+  ai: LUCIDE_NAV_ICONS.ai,
+  dataset: LUCIDE_NAV_ICONS.dataset,
+  files: LUCIDE_NAV_ICONS.files,
+  hardware: LUCIDE_NAV_ICONS.hardware,
+  supplychain: LUCIDE_NAV_ICONS.supplychain,
+  requirements: LUCIDE_NAV_ICONS.requirements,
+  licenses: LUCIDE_NAV_ICONS.licenses,
+  security: LUCIDE_NAV_ICONS.security,
+  configs: LUCIDE_NAV_ICONS.configs,
+  build: LUCIDE_NAV_ICONS.build,
+  agents: LUCIDE_NAV_ICONS.agents,
+  statistics: LUCIDE_NAV_ICONS.statistics,
+  remediation: LUCIDE_NAV_ICONS.remediation,
+  impact: LUCIDE_NAV_ICONS.impact,
+  raw: LUCIDE_NAV_ICONS.raw
 };
 
-/** Inline Material-icon <svg> per view (currentColor, so the nav item tints it). */
-const VIEW_ICONS = Object.fromEntries(
-  Object.entries(VIEW_ICON_KEYS).map(([id, key]) => {
-    const d = ICON_PATHS[key] || '';
-    return [
-      id,
-      d
-        ? `<svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${d}"/></svg>`
-        : ''
-    ];
-  })
-);
-
-// The Impact view's icon (a dependency-tree glyph) is defined inline rather than
-// in the generated ICON_PATHS set.
-const IMPACT_ICON =
-  '<svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 11V3h-7v3H9V3H2v8h7V8h2v10h4v3h7v-8h-7v3h-2V8h2v3z"/></svg>';
-
 /**
- * Creates the view configuration array
+ * Creates the flat view configuration array (palette, counts, switchView).
+ * Sidebar grouping lives in {@link createNavProfiles}.
  * @returns {Array<Object>} Array of view definition objects
  */
 export function createViews() {
@@ -697,10 +680,83 @@ export function createViews() {
     { id: 'agents', label: 'Agents', icon: VIEW_ICONS.agents, count: null },
     { id: 'statistics', label: 'Statistics', icon: VIEW_ICONS.statistics, count: null },
     { id: 'remediation', label: 'Remediation', icon: VIEW_ICONS.remediation, count: null },
-    { id: 'impact', label: 'Impact', icon: IMPACT_ICON, count: null },
+    { id: 'impact', label: 'Impact', icon: VIEW_ICONS.impact, count: null },
     { id: 'raw', label: 'Raw JSON-LD', icon: VIEW_ICONS.raw, count: null }
   ];
 }
+
+/**
+ * SPDX-profile-oriented sidebar groups. Multi-view profiles are collapsible;
+ * single-view profiles render as one row that jumps to that view. Empty groups
+ * stay hidden via isViewAvailable on their children.
+ * @returns {Array<{id: string, label: string, icon: string, viewIds: string[]}>}
+ */
+export function createNavProfiles() {
+  return [
+    {
+      id: 'software',
+      label: 'Software',
+      icon: LUCIDE_NAV_ICONS.profile_software,
+      viewIds: ['packages', 'files']
+    },
+    {
+      id: 'security',
+      label: 'Security',
+      icon: VIEW_ICONS.security,
+      viewIds: ['security']
+    },
+    {
+      id: 'licensing',
+      label: 'Licensing',
+      icon: VIEW_ICONS.licenses,
+      viewIds: ['licenses']
+    },
+    {
+      id: 'build',
+      label: 'Build',
+      icon: LUCIDE_NAV_ICONS.profile_build,
+      viewIds: ['build', 'configs']
+    },
+    {
+      id: 'functional-safety',
+      label: 'Functional Safety',
+      icon: VIEW_ICONS.requirements,
+      viewIds: ['requirements']
+    },
+    {
+      id: 'hardware',
+      label: 'Hardware',
+      icon: VIEW_ICONS.hardware,
+      viewIds: ['hardware']
+    },
+    {
+      id: 'ai-dataset',
+      label: 'AI & Dataset',
+      icon: LUCIDE_NAV_ICONS.profile_ai,
+      viewIds: ['ai', 'dataset']
+    },
+    {
+      id: 'supplychain',
+      label: 'Supply Chain',
+      icon: VIEW_ICONS.supplychain,
+      viewIds: ['supplychain']
+    },
+    {
+      id: 'agents',
+      label: 'Agents',
+      icon: VIEW_ICONS.agents,
+      viewIds: ['agents']
+    }
+  ];
+}
+
+/** View ids always shown under Explore (never gated by isViewAvailable). */
+export const NAV_EXPLORE_VIEW_IDS = ['dashboard', 'graph'];
+
+/** View ids pinned in the sticky Insights band. */
+export const NAV_INSIGHTS_VIEW_IDS = ['statistics', 'remediation', 'impact', 'raw'];
+
+export { NAV_CHEVRON_ICON };
 
 /**
  * Tailwind CSS configuration object
