@@ -6,6 +6,16 @@
  */
 export const CHANGELOG = [
   {
+    version: 'Unreleased',
+    date: null,
+    items: [
+      {
+        tag: 'Improved',
+        text: 'Sidebar groups SPDX profiles, with sticky Insights and Lucide icons.'
+      }
+    ]
+  },
+  {
     version: '0.4.0',
     date: '2026-07-15',
     items: [

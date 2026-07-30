@@ -4,6 +4,7 @@
 
 import { buildShareHash, copyToClipboard, snippetFileRef } from '../lib/index.js';
 import { CLASS, isA } from '../spdx/model.js';
+import { NAV_CHEVRON_ICON, NAV_EXPLORE_VIEW_IDS, NAV_INSIGHTS_VIEW_IDS } from '../config.js';
 
 // View id -> the nav-snapshot field holding that view's expanded card, for
 // carrying the selection in a share link.
@@ -76,6 +77,63 @@ const navKindListInfo = {
 };
 
 export const navigationMixin = {
+  navChevronIcon: NAV_CHEVRON_ICON,
+
+  viewById(id) {
+    return this.views.find((v) => v.id === id) || null;
+  },
+
+  get exploreNavViews() {
+    return NAV_EXPLORE_VIEW_IDS.map((id) => this.viewById(id)).filter(Boolean);
+  },
+
+  get insightsNavViews() {
+    return NAV_INSIGHTS_VIEW_IDS.map((id) => this.viewById(id)).filter(Boolean);
+  },
+
+  get visibleNavProfiles() {
+    return (this.navProfiles || []).filter((p) => p.viewIds.some((id) => this.isViewAvailable(id)));
+  },
+
+  navProfileForView(viewId) {
+    return (this.navProfiles || []).find((p) => p.viewIds.includes(viewId)) || null;
+  },
+
+  isNavProfileExpanded(profileId) {
+    return !!this.expandedNavProfiles[profileId];
+  },
+
+  toggleNavProfile(profileId) {
+    this.expandedNavProfiles = {
+      ...this.expandedNavProfiles,
+      [profileId]: !this.expandedNavProfiles[profileId]
+    };
+  },
+
+  // Expand the collapsible profile that owns viewId (no-op for single-row profiles
+  // or Explore / Insights views). Used by switchView and deep-link restore so a
+  // nested leaf is never active while its parent drawer is closed.
+  ensureNavProfileExpanded(viewId) {
+    const profile = this.navProfileForView(viewId);
+    if (!profile || profile.viewIds.length < 2) return;
+    if (this.expandedNavProfiles[profile.id]) return;
+    this.expandedNavProfiles = { ...this.expandedNavProfiles, [profile.id]: true };
+  },
+
+  navProfileCount(profile) {
+    let total = 0;
+    let any = false;
+    for (const id of profile.viewIds) {
+      if (!this.isViewAvailable(id)) continue;
+      const n = this.viewById(id)?.count;
+      if (n != null && n !== '') {
+        any = true;
+        total += Number(n) || 0;
+      }
+    }
+    return any ? total : null;
+  },
+
   // Navigation
   // Browser back/forward: every view switch or element drill-down (expanded
   // card / graph detail panel) is captured as one history entry. Pushes are
@@ -173,6 +231,7 @@ export const navigationMixin = {
     const wasGraphView = this.currentView === 'graph';
     this._lastNavKey = JSON.stringify(state);
     if (state.view in this.mountedViews) this.mountedViews[state.view] = true;
+    this.ensureNavProfileExpanded(state.view);
     this.currentView = state.view;
     this._ensureViewRendered(state.view);
     this.sidebarOpen = false;
@@ -218,6 +277,7 @@ export const navigationMixin = {
     // Mark the target view mounted before switching so its content builds on
     // first visit (and stays cached for instant re-switching afterwards).
     if (id in this.mountedViews) this.mountedViews[id] = true;
+    this.ensureNavProfileExpanded(id);
     this.currentView = id;
     this.detailElement = null;
     this.sidebarOpen = false; // close the mobile drawer after navigating

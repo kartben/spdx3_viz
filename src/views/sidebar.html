@@ -2,7 +2,7 @@
   class="fixed inset-y-0 left-0 z-50 w-60 bg-slate-800/50 border-r border-slate-700/50 flex flex-col flex-shrink-0 transition-transform duration-200 md:static md:z-auto md:translate-x-0"
   :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
 >
-  <div class="p-4 border-b border-slate-700/50">
+  <div class="p-4 border-b border-slate-700/50 flex-shrink-0">
     <div
       class="flex items-center gap-2.5 cursor-pointer"
       role="button"
@@ -31,29 +31,100 @@
     </div>
   </div>
 
-  <div class="px-3 pt-4 pb-1">
-    <span class="text-[10px] font-semibold uppercase tracking-widest text-slate-500"
-      >Navigation</span
-    >
-  </div>
-  <nav class="flex-1 px-2 pb-2 space-y-0.5 overflow-y-auto">
-    <template x-for="v in views" :key="v.id">
-      <div
-        class="nav-item"
-        x-show="isViewAvailable(v.id)"
-        :class="{ 'active': currentView === v.id, 'nav-group-start': v.id === 'statistics' }"
-        @click="switchView(v.id)"
-      >
-        <span x-html="v.icon" class="nav-icon"></span>
-        <span x-text="v.label" class="flex-1"></span>
-        <span
-          x-show="v.count"
-          x-text="v.count"
-          class="text-[10px] bg-slate-700/60 px-1.5 py-0.5 rounded text-slate-400"
-          :class="v.id === 'security' && 'bg-rose-500/15 text-rose-300'"
-        ></span>
+  <nav class="flex-1 min-h-0 flex flex-col">
+    <div class="flex-1 min-h-0 overflow-y-auto px-2 pt-2 pb-2 space-y-0.5">
+      <span class="nav-section-label">Explore</span>
+      <template x-for="v in exploreNavViews" :key="'explore-' + v.id">
+        <div class="nav-item" :class="{ 'active': currentView === v.id }" @click="switchView(v.id)">
+          <span x-html="v.icon" class="nav-icon"></span>
+          <span x-text="v.label" class="flex-1"></span>
+        </div>
+      </template>
+
+      <div x-show="visibleNavProfiles.length">
+        <span class="nav-section-label">Profiles</span>
+        <template x-for="p in visibleNavProfiles" :key="'profile-' + p.id">
+          <div>
+            <!-- Multi-view profile: collapsible header + nested leaves -->
+            <div x-show="p.viewIds.length > 1">
+              <button
+                type="button"
+                class="nav-profile-head"
+                :aria-expanded="isNavProfileExpanded(p.id)"
+                @click="toggleNavProfile(p.id)"
+              >
+                <span x-html="p.icon" class="nav-icon"></span>
+                <span x-text="p.label" class="flex-1 text-left"></span>
+                <span
+                  x-show="navProfileCount(p)"
+                  x-text="navProfileCount(p)"
+                  class="nav-profile-count"
+                ></span>
+                <span
+                  x-html="navChevronIcon"
+                  class="nav-chevron"
+                  :class="{ 'collapsed': !isNavProfileExpanded(p.id) }"
+                ></span>
+              </button>
+              <div x-show="isNavProfileExpanded(p.id)" x-collapse>
+                <template x-for="vid in p.viewIds" :key="'leaf-' + p.id + '-' + vid">
+                  <div
+                    class="nav-item nav-child"
+                    x-show="isViewAvailable(vid)"
+                    :class="{ 'active': currentView === vid }"
+                    @click="switchView(vid)"
+                  >
+                    <span x-html="viewById(vid)?.icon" class="nav-icon"></span>
+                    <span x-text="viewById(vid)?.label" class="flex-1"></span>
+                    <span
+                      x-show="viewById(vid)?.count"
+                      x-text="viewById(vid)?.count"
+                      class="text-[10px] bg-slate-700/60 px-1.5 py-0.5 rounded text-slate-400"
+                    ></span>
+                  </div>
+                </template>
+              </div>
+            </div>
+            <!-- Single-view profile: one clickable row -->
+            <div
+              class="nav-item"
+              x-show="p.viewIds.length === 1 && isViewAvailable(p.viewIds[0])"
+              :class="{ 'active': currentView === p.viewIds[0] }"
+              @click="switchView(p.viewIds[0])"
+            >
+              <span x-html="p.icon" class="nav-icon"></span>
+              <span x-text="p.label" class="flex-1"></span>
+              <span
+                x-show="viewById(p.viewIds[0])?.count"
+                x-text="viewById(p.viewIds[0])?.count"
+                class="text-[10px] bg-slate-700/60 px-1.5 py-0.5 rounded text-slate-400"
+                :class="p.viewIds[0] === 'security' && 'bg-rose-500/15 text-rose-300'"
+              ></span>
+            </div>
+          </div>
+        </template>
       </div>
-    </template>
+    </div>
+
+    <div class="nav-insights flex-shrink-0 px-2 pb-2">
+      <span class="nav-section-label">Insights</span>
+      <template x-for="v in insightsNavViews" :key="'insights-' + v.id">
+        <div
+          class="nav-item"
+          x-show="isViewAvailable(v.id)"
+          :class="{ 'active': currentView === v.id }"
+          @click="switchView(v.id)"
+        >
+          <span x-html="v.icon" class="nav-icon"></span>
+          <span x-text="v.label" class="flex-1"></span>
+          <span
+            x-show="v.count"
+            x-text="v.count"
+            class="text-[10px] bg-slate-700/60 px-1.5 py-0.5 rounded text-slate-400"
+          ></span>
+        </div>
+      </template>
+    </div>
   </nav>
 
   <div class="px-4 py-3 border-t border-slate-700/50 flex-shrink-0">

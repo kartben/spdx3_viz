@@ -1,4 +1,9 @@
-import { createGraphFilters, createScopeFilters, createViews } from '../config.js';
+import {
+  createGraphFilters,
+  createScopeFilters,
+  createViews,
+  createNavProfiles
+} from '../config.js';
 import { APP_VERSION } from '../version.js';
 import { CHANGELOG } from '../changelog.js';
 import { storedDetailPanelWidth } from './detail-panel.js';
@@ -47,6 +52,10 @@ export function createState() {
     // keeps sweeping (on the compositor) through the main thread's synchronous
     // graph/index phases instead of freezing (see _parseOnMainThread)
     currentView: 'dashboard',
+    // Collapsible SPDX profile groups in the sidebar (profile id -> open).
+    // Deep links / switchView expand the group that owns the target view.
+    expandedNavProfiles: {},
+    navProfiles: createNavProfiles(),
     // Views build their heavy x-for lists lazily, only once opened; the
     // dashboard is the landing view so it's mounted from the start.
     mountedViews: {
