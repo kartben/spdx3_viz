@@ -1,0 +1,630 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SPDX 3 Viz: Navigation mockups</title>
+    <script src="https://unpkg.com/lucide@0.468.0"></script>
+    <style>
+      :root {
+        --bg: #0f172a;
+        --panel: rgba(30, 41, 59, 0.85);
+        --border: rgba(51, 65, 85, 0.55);
+        --text: #94a3b8;
+        --text-hover: #e2e8f0;
+        --text-strong: #f8fafc;
+        --muted: #64748b;
+        --active: #60a5fa;
+        --active-bg: rgba(59, 130, 246, 0.12);
+        --active-bar: #3b82f6;
+        --badge-bg: rgba(51, 65, 85, 0.65);
+        --badge-text: #94a3b8;
+        --danger-bg: rgba(244, 63, 94, 0.15);
+        --danger-text: #fda4af;
+        --section: #64748b;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family:
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          Helvetica,
+          Arial,
+          sans-serif;
+        background:
+          radial-gradient(ellipse 80% 50% at 10% -10%, rgba(59, 130, 246, 0.12), transparent),
+          radial-gradient(ellipse 60% 40% at 90% 0%, rgba(99, 102, 241, 0.08), transparent),
+          var(--bg);
+        color: var(--text-strong);
+        min-height: 100vh;
+        padding: 32px 28px 48px;
+      }
+
+      h1 {
+        font-size: 1.35rem;
+        font-weight: 650;
+        letter-spacing: -0.02em;
+        margin: 0 0 6px;
+      }
+
+      .lede {
+        color: var(--muted);
+        font-size: 0.925rem;
+        max-width: 62rem;
+        line-height: 1.55;
+        margin: 0 0 28px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 22px;
+        align-items: start;
+      }
+
+      .mock {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .mock-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #93c5fd;
+      }
+
+      .mock-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-strong);
+        margin: 0;
+      }
+
+      .mock-note {
+        font-size: 0.78rem;
+        color: var(--muted);
+        line-height: 1.45;
+        margin: 0 0 4px;
+        min-height: 2.9em;
+      }
+
+      aside.sidebar {
+        width: 260px;
+        height: 720px;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        box-shadow: 0 18px 40px rgba(2, 6, 23, 0.45);
+        backdrop-filter: blur(8px);
+      }
+
+      .brand {
+        padding: 16px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .brand-mark {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #3b82f6, #9333ea);
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+      }
+
+      .brand-mark svg {
+        width: 16px;
+        height: 16px;
+        color: white;
+      }
+
+      .brand-name {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: white;
+      }
+
+      .brand-sub {
+        font-size: 0.72rem;
+        color: var(--muted);
+      }
+
+      .nav-scroll {
+        flex: 1;
+        overflow-y: auto;
+        padding: 10px 8px 12px;
+      }
+
+      .section-label {
+        display: block;
+        padding: 12px 10px 6px;
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--section);
+      }
+
+      .section-label.tight {
+        padding-top: 8px;
+      }
+
+      .nav-item,
+      .profile-head {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 10px;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        color: var(--text);
+        cursor: default;
+        user-select: none;
+      }
+
+      .nav-item:hover,
+      .profile-head:hover {
+        background: rgba(51, 65, 85, 0.4);
+        color: var(--text-hover);
+      }
+
+      .nav-item.active {
+        background: var(--active-bg);
+        color: var(--active);
+        font-weight: 500;
+      }
+
+      .nav-item.active::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 6px;
+        bottom: 6px;
+        width: 3px;
+        border-radius: 0 3px 3px 0;
+        background: var(--active-bar);
+      }
+
+      .nav-item i,
+      .profile-head i,
+      .nav-item svg,
+      .profile-head svg {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+        opacity: 0.7;
+        stroke-width: 1.75;
+      }
+
+      .nav-item.active i,
+      .nav-item.active svg {
+        opacity: 1;
+      }
+
+      .badge {
+        margin-left: auto;
+        font-size: 0.625rem;
+        background: var(--badge-bg);
+        color: var(--badge-text);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .badge.danger {
+        background: var(--danger-bg);
+        color: var(--danger-text);
+      }
+
+      .child {
+        padding-left: 28px;
+      }
+
+      .child.rail {
+        margin-left: 17px;
+        padding-left: 18px;
+        border-left: 1px solid rgba(51, 65, 85, 0.55);
+        border-radius: 0 8px 8px 0;
+      }
+
+      .profile-head {
+        font-weight: 550;
+        color: #cbd5e1;
+      }
+
+      .profile-head .chev {
+        margin-left: auto;
+        width: 14px;
+        height: 14px;
+        opacity: 0.55;
+      }
+
+      .profile-head.collapsed .chev {
+        transform: rotate(-90deg);
+      }
+
+      .profile-head .count-pill {
+        margin-left: auto;
+        font-size: 0.625rem;
+        color: var(--muted);
+        background: transparent;
+        border: 1px solid rgba(71, 85, 105, 0.7);
+        padding: 1px 6px;
+        border-radius: 999px;
+      }
+
+      .profile-head.has-chev .count-pill {
+        margin-left: 0;
+        margin-right: 2px;
+      }
+
+      .single-profile {
+        /* profile with one leaf: looks like a normal item but with a tiny profile cue */
+      }
+
+      .profile-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #34d399;
+        margin-left: 2px;
+        flex-shrink: 0;
+        opacity: 0.85;
+      }
+
+      .footer {
+        border-top: 1px solid var(--border);
+        padding: 12px 16px;
+        font-size: 0.7rem;
+        color: var(--muted);
+      }
+
+      .legend {
+        margin-top: 36px;
+        padding: 18px 20px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: rgba(15, 23, 42, 0.55);
+        max-width: 56rem;
+      }
+
+      .legend h2 {
+        margin: 0 0 8px;
+        font-size: 0.95rem;
+      }
+
+      .legend ul {
+        margin: 0;
+        padding-left: 1.1rem;
+        color: var(--text);
+        font-size: 0.85rem;
+        line-height: 1.55;
+      }
+
+      .legend strong {
+        color: #e2e8f0;
+        font-weight: 600;
+      }
+
+      .rec {
+        display: inline-block;
+        margin-top: 10px;
+        font-size: 0.8rem;
+        color: #86efac;
+        background: rgba(16, 185, 129, 0.12);
+        border: 1px solid rgba(52, 211, 153, 0.25);
+        padding: 6px 10px;
+        border-radius: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Navigation reorg mockups</h1>
+    <p class="lede">
+      SPDX profiles (Software, Security, Build, Functional Safety, …) become first-class section
+      concepts. Leaf views nest underneath. Icons switched to Lucide stroke glyphs to match the
+      header/palette line style already in the app.
+    </p>
+
+    <div class="grid">
+      <!-- ========== A: Section labels ========== -->
+      <div class="mock" id="mock-a">
+        <div class="mock-label">Option A</div>
+        <h2 class="mock-title">Profile section labels</h2>
+        <p class="mock-note">
+          Lightest change. Flat items stay clickable; uppercase labels promote each SPDX profile.
+          Single-view profiles stay one row.
+        </p>
+        <aside class="sidebar">
+          <div class="brand">
+            <div class="brand-mark"><i data-lucide="file-text"></i></div>
+            <div>
+              <div class="brand-name">SPDX 3 Visualizer</div>
+              <div class="brand-sub">SPDX 3.0 &amp; 3.1</div>
+            </div>
+          </div>
+          <div class="nav-scroll">
+            <span class="section-label">Explore</span>
+            <div class="nav-item"><i data-lucide="layout-dashboard"></i><span>Overview</span></div>
+            <div class="nav-item"><i data-lucide="share-2"></i><span>Graph</span></div>
+
+            <span class="section-label">Software</span>
+            <div class="nav-item">
+              <i data-lucide="package"></i><span>Packages</span><span class="badge">206</span>
+            </div>
+            <div class="nav-item">
+              <i data-lucide="file"></i><span>Files</span><span class="badge">1942</span>
+            </div>
+
+            <span class="section-label">Security</span>
+            <div class="nav-item active">
+              <i data-lucide="shield"></i><span>Vulnerabilities</span
+              ><span class="badge danger">12</span>
+            </div>
+
+            <span class="section-label">Licensing</span>
+            <div class="nav-item">
+              <i data-lucide="scale"></i><span>Licenses</span><span class="badge">10</span>
+            </div>
+
+            <span class="section-label">Build</span>
+            <div class="nav-item">
+              <i data-lucide="hammer"></i><span>Builds</span><span class="badge">28</span>
+            </div>
+            <div class="nav-item"><i data-lucide="sliders-horizontal"></i><span>Configs</span></div>
+
+            <span class="section-label">Functional Safety</span>
+            <div class="nav-item">
+              <i data-lucide="clipboard-check"></i><span>Requirements</span
+              ><span class="badge">1895</span>
+            </div>
+
+            <span class="section-label">Hardware</span>
+            <div class="nav-item"><i data-lucide="cpu"></i><span>Hardware</span></div>
+
+            <span class="section-label">AI &amp; Dataset</span>
+            <div class="nav-item"><i data-lucide="brain"></i><span>AI Models</span></div>
+            <div class="nav-item"><i data-lucide="database"></i><span>Datasets</span></div>
+
+            <span class="section-label">Supply Chain</span>
+            <div class="nav-item"><i data-lucide="git-branch"></i><span>Supply Chain</span></div>
+
+            <span class="section-label">Core</span>
+            <div class="nav-item">
+              <i data-lucide="user-round"></i><span>Agents</span><span class="badge">1</span>
+            </div>
+
+            <span class="section-label">Insights</span>
+            <div class="nav-item"><i data-lucide="chart-column"></i><span>Statistics</span></div>
+            <div class="nav-item">
+              <i data-lucide="triangle-alert"></i><span>Remediation</span
+              ><span class="badge">9</span>
+            </div>
+            <div class="nav-item"><i data-lucide="git-fork"></i><span>Impact</span></div>
+            <div class="nav-item"><i data-lucide="braces"></i><span>Raw JSON-LD</span></div>
+          </div>
+          <div class="footer">v0.4.1-dev · What's new</div>
+        </aside>
+      </div>
+
+      <!-- ========== B: Collapsible profiles ========== -->
+      <div class="mock" id="mock-b">
+        <div class="mock-label">Option B · recommended</div>
+        <h2 class="mock-title">Collapsible profile groups</h2>
+        <p class="mock-note">
+          Profiles are expandable parents. Empty profiles stay hidden (same as today). Multi-view
+          profiles nest; single-view profiles are one clickable row.
+        </p>
+        <aside class="sidebar">
+          <div class="brand">
+            <div class="brand-mark"><i data-lucide="file-text"></i></div>
+            <div>
+              <div class="brand-name">SPDX 3 Visualizer</div>
+              <div class="brand-sub">SPDX 3.0 &amp; 3.1</div>
+            </div>
+          </div>
+          <div class="nav-scroll">
+            <span class="section-label">Explore</span>
+            <div class="nav-item"><i data-lucide="layout-dashboard"></i><span>Overview</span></div>
+            <div class="nav-item"><i data-lucide="share-2"></i><span>Graph</span></div>
+
+            <span class="section-label">Profiles</span>
+
+            <div class="profile-head has-chev">
+              <i data-lucide="boxes"></i><span>Software</span
+              ><span class="count-pill">2148</span><i data-lucide="chevron-down" class="chev"></i>
+            </div>
+            <div class="nav-item child rail">
+              <i data-lucide="package"></i><span>Packages</span><span class="badge">206</span>
+            </div>
+            <div class="nav-item child rail">
+              <i data-lucide="file"></i><span>Files</span><span class="badge">1942</span>
+            </div>
+
+            <div class="nav-item active single-profile">
+              <i data-lucide="shield"></i><span>Security</span
+              ><span class="badge danger">12</span>
+            </div>
+
+            <div class="nav-item single-profile">
+              <i data-lucide="scale"></i><span>Licensing</span><span class="badge">10</span>
+            </div>
+
+            <div class="profile-head has-chev">
+              <i data-lucide="hammer"></i><span>Build</span><span class="count-pill">28</span
+              ><i data-lucide="chevron-down" class="chev"></i>
+            </div>
+            <div class="nav-item child rail">
+              <i data-lucide="wrench"></i><span>Builds &amp; tools</span
+              ><span class="badge">28</span>
+            </div>
+            <div class="nav-item child rail">
+              <i data-lucide="sliders-horizontal"></i><span>Configs</span>
+            </div>
+
+            <div class="nav-item single-profile">
+              <i data-lucide="clipboard-check"></i><span>Functional Safety</span
+              ><span class="badge">1895</span>
+            </div>
+
+            <div class="nav-item single-profile">
+              <i data-lucide="cpu"></i><span>Hardware</span>
+            </div>
+
+            <div class="profile-head has-chev collapsed">
+              <i data-lucide="brain"></i><span>AI &amp; Dataset</span
+              ><i data-lucide="chevron-down" class="chev"></i>
+            </div>
+
+            <div class="nav-item single-profile">
+              <i data-lucide="git-branch"></i><span>Supply Chain</span>
+            </div>
+
+            <div class="nav-item single-profile">
+              <i data-lucide="user-round"></i><span>Agents</span><span class="badge">1</span>
+            </div>
+
+            <span class="section-label">Insights</span>
+            <div class="nav-item"><i data-lucide="chart-column"></i><span>Statistics</span></div>
+            <div class="nav-item">
+              <i data-lucide="triangle-alert"></i><span>Remediation</span
+              ><span class="badge">9</span>
+            </div>
+            <div class="nav-item"><i data-lucide="git-fork"></i><span>Impact</span></div>
+            <div class="nav-item"><i data-lucide="braces"></i><span>Raw JSON-LD</span></div>
+          </div>
+          <div class="footer">v0.4.1-dev · What's new</div>
+        </aside>
+      </div>
+
+      <!-- ========== C: Hybrid compact ========== -->
+      <div class="mock" id="mock-c">
+        <div class="mock-label">Option C</div>
+        <h2 class="mock-title">Hybrid · inventory + profiles</h2>
+        <p class="mock-note">
+          Keeps everyday inventory (Packages / Files / Agents) at the top. Profile-specific views
+          sit under a Profiles band so conformance maps 1:1 to the sidebar.
+        </p>
+        <aside class="sidebar">
+          <div class="brand">
+            <div class="brand-mark"><i data-lucide="file-text"></i></div>
+            <div>
+              <div class="brand-name">SPDX 3 Visualizer</div>
+              <div class="brand-sub">SPDX 3.0 &amp; 3.1</div>
+            </div>
+          </div>
+          <div class="nav-scroll">
+            <span class="section-label">Explore</span>
+            <div class="nav-item"><i data-lucide="layout-dashboard"></i><span>Overview</span></div>
+            <div class="nav-item"><i data-lucide="share-2"></i><span>Graph</span></div>
+
+            <span class="section-label">Inventory</span>
+            <div class="nav-item">
+              <i data-lucide="package"></i><span>Packages</span><span class="badge">206</span>
+            </div>
+            <div class="nav-item">
+              <i data-lucide="file"></i><span>Files</span><span class="badge">1942</span>
+            </div>
+            <div class="nav-item">
+              <i data-lucide="user-round"></i><span>Agents</span><span class="badge">1</span>
+            </div>
+
+            <span class="section-label">Profiles</span>
+
+            <div class="nav-item active">
+              <i data-lucide="shield"></i><span>Security</span
+              ><span class="badge danger">12</span><span class="profile-dot" title="In conformance"></span>
+            </div>
+            <div class="nav-item">
+              <i data-lucide="scale"></i><span>Licensing</span><span class="badge">10</span
+              ><span class="profile-dot"></span>
+            </div>
+
+            <div class="profile-head has-chev">
+              <i data-lucide="hammer"></i><span>Build</span><span class="profile-dot"></span
+              ><i data-lucide="chevron-down" class="chev"></i>
+            </div>
+            <div class="nav-item child rail">
+              <i data-lucide="wrench"></i><span>Builds</span><span class="badge">28</span>
+            </div>
+            <div class="nav-item child rail">
+              <i data-lucide="sliders-horizontal"></i><span>Configs</span>
+            </div>
+
+            <div class="nav-item">
+              <i data-lucide="clipboard-check"></i><span>Functional Safety</span
+              ><span class="badge">1895</span><span class="profile-dot"></span>
+            </div>
+            <div class="nav-item">
+              <i data-lucide="cpu"></i><span>Hardware</span><span class="profile-dot"></span>
+            </div>
+            <div class="nav-item"><i data-lucide="brain"></i><span>AI Models</span></div>
+            <div class="nav-item"><i data-lucide="database"></i><span>Datasets</span></div>
+            <div class="nav-item">
+              <i data-lucide="git-branch"></i><span>Supply Chain</span
+              ><span class="profile-dot"></span>
+            </div>
+
+            <span class="section-label">Insights</span>
+            <div class="nav-item"><i data-lucide="chart-column"></i><span>Statistics</span></div>
+            <div class="nav-item">
+              <i data-lucide="triangle-alert"></i><span>Remediation</span
+              ><span class="badge">9</span>
+            </div>
+            <div class="nav-item"><i data-lucide="git-fork"></i><span>Impact</span></div>
+            <div class="nav-item"><i data-lucide="braces"></i><span>Raw JSON-LD</span></div>
+          </div>
+          <div class="footer">v0.4.1-dev · What's new</div>
+        </aside>
+      </div>
+    </div>
+
+    <div class="legend">
+      <h2>Design notes</h2>
+      <ul>
+        <li>
+          <strong>Why another level?</strong> Today's list mixes document chrome (Overview, Graph),
+          inventory types, SPDX profiles, and analysis tools as peers. Profiles are the SPDX mental
+          model users already see as conformance badges on Overview.
+        </li>
+        <li>
+          <strong>Lucide:</strong> stroke icons align with existing header/palette SVGs; Material
+          filled glyphs in the sidebar currently feel heavier and inconsistent. Lucide can replace
+          view icons only, or eventually the generated node icon set too.
+        </li>
+        <li>
+          <strong>Empty profiles stay hidden</strong> via the same <code>isViewAvailable</code>
+          rules; a profile group only appears when at least one child is available.
+        </li>
+        <li>
+          <strong>Recommendation:</strong> Option B. Clear profile identity, collapse keeps long
+          SBOMs scannable, single-view profiles avoid pointless nesting.
+        </li>
+      </ul>
+      <div class="rec">Preferred direction: Option B + Lucide for sidebar (and later graph nodes)</div>
+    </div>
+
+    <script>
+      lucide.createIcons();
+    </script>
+  </body>
+</html>
