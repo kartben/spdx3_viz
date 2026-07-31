@@ -251,6 +251,19 @@ test('computeQualityReport builds a CISA 2026 minimum-elements report', () => {
   assert.equal(practices.machineProcessable.status, 'pass');
   assert.equal(practices.coverage.status, 'na');
   assert.equal(practices.explicitUnknowns.status, 'partial');
+
+  assert.equal(
+    meta.author.definition,
+    'The name of the entity that creates the SBOM data for the target component.'
+  );
+  assert.equal(
+    comp.hashValue.definition,
+    'The output generated from applying a cryptographic hash algorithm to an executable component artifact.'
+  );
+  assert.match(
+    practices.explicitUnknowns.definition,
+    /explicitly state whether the information is unknown/
+  );
 });
 
 test('CISA 2026 treats explicit unknown hash and version as covered', () => {

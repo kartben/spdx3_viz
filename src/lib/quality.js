@@ -22,7 +22,56 @@ export const CISA_2026_REFERENCE_URL =
 export const CISA_2026_PDF_URL =
   'https://www.cisa.gov/sites/default/files/2026-07/2026_cisa_sbom_minimum_elements_508c.pdf';
 
+/**
+ * Verbatim CISA 2026 Minimum Elements definitions (Appendix A data fields;
+ * Practices and Processes section for practice elements).
+ * @type {Record<string, string>}
+ */
+export const CISA_2026_DEFINITIONS = {
+  author: 'The name of the entity that creates the SBOM data for the target component.',
+  authorSignature: 'A digital signature attributable to the SBOM author.',
+  formatName: 'The name of the data format used to represent the SBOM data.',
+  formatVersion:
+    'Identifier designated by the SBOM data format to specify the version of the data format.',
+  generationContext:
+    'The relative software lifecycle phase and data available at the time the SBOM author generated the SBOM.',
+  timestamp: 'Record of the date and time of the most recent update to the SBOM data.',
+  toolName: 'The name of the tool used by the SBOM author to generate or amend the SBOM.',
+  toolVersion: 'Identifier for the version of the tool identified in the SBOM Tool Name element.',
+  sbomVersion:
+    'Identifier designated by the SBOM author to specify a change in the SBOM document from a previously identified version or to indicate that it is the first version.',
+  name: 'The name assigned by the component producer to a software component.',
+  producer: 'The name of an entity that creates, defines, and identifies components.',
+  version:
+    'Identifier used by the component producer to specify a change in a software component from a previously identified version or to indicate that it is the first version.',
+  identifier:
+    'Identifiers used to identify a component or serve as a look-up key for relevant databases.',
+  license: 'The identifiers for the licenses under which the software component is available.',
+  hashValue:
+    'The output generated from applying a cryptographic hash algorithm to an executable component artifact.',
+  hashAlgorithm:
+    'The cryptographic algorithm used to compute the Component Hash Value of the software component.',
+  dependency:
+    'The relationship between two components, where one component is necessary for the operation of the other.',
+  machineProcessable:
+    'Automation support is critical for managing software component data at scale, particularly across organizational boundaries. SBOM implementations should be compatible with each other to support automation due to the volume of data, diverse use cases, and variety of tools involved with SBOMs.',
+  explicitUnknowns:
+    'If information required for any of the data fields is not provided, the SBOM author should explicitly state whether the information is unknown to the SBOM author or whether the SBOM author is withholding the information from the SBOM.',
+  coverage:
+    'An SBOM should include information for all components that make up the target software, including transitive dependencies. There is no minimum depth.',
+  frequency:
+    'Each software version or update should have an associated SBOM. When a component producer issues a new build or release, they (or the SBOM author) should also generate a new SBOM to reflect the changes.',
+  distribution:
+    'SBOMs should be available promptly to those who need them. Access controls may limit the sharing of SBOM data with unauthorized parties but should not prevent information sharing between authorized parties or restrict organizations from integrating SBOM data into trusted security tools.',
+  updates:
+    'Organizations should accommodate updates to SBOM data, including corrections. SBOM authors should correct errors promptly.'
+};
+
 const EXPLICIT_UNKNOWN_RE = /^(noassertion|none)$/i;
+
+function cisaDefinition(key) {
+  return CISA_2026_DEFINITIONS[key] || '';
+}
 
 function asArray(v) {
   return Array.isArray(v) ? v : v == null || v === '' ? [] : [v];
@@ -250,12 +299,21 @@ function documentElement(key, label, present, opts = {}) {
     present: !!present,
     status: opts.status || (present ? 'pass' : 'fail'),
     detail: opts.detail || '',
+    definition: cisaDefinition(key),
     blocksConformance: opts.blocksConformance !== false
   };
 }
 
 function practiceElement(key, label, status, detail = '') {
-  return { key, label, level: 'practice', status, detail, present: status === 'pass' };
+  return {
+    key,
+    label,
+    level: 'practice',
+    status,
+    detail,
+    definition: cisaDefinition(key),
+    present: status === 'pass'
+  };
 }
 
 /**
@@ -437,7 +495,7 @@ function offenderList(elements, total) {
   };
 }
 
-// A per-component NTIA/FSCT element: coverage plus a (capped) list of the
+// A per-component NTIA/FSCT/CISA element: coverage plus a (capped) list of the
 // components missing it, matching the "nonconformant components" lists the
 // reference tool (spdx/ntia-conformance-checker) emits per element.
 function componentElement(key, label, missing, total) {
@@ -447,7 +505,8 @@ function componentElement(key, label, missing, total) {
     level: 'component',
     covered: total - missing.length,
     total,
-    missing: offenderList(missing, missing.length)
+    missing: offenderList(missing, missing.length),
+    definition: cisaDefinition(key)
   };
 }
 
