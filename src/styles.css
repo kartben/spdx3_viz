@@ -872,6 +872,91 @@ body.detail-resizing {
   transform: translateY(0);
 }
 
+/* CISA / guideline definition tips: longer verbatim text, styled panel. */
+.cisa-tip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 9999px;
+  color: #64748b;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: help;
+}
+
+.cisa-tip:hover,
+.cisa-tip:focus-visible {
+  color: #7dd3fc;
+  outline: none;
+}
+
+.cisa-tip-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 70;
+  width: min(22rem, calc(100vw - 3rem));
+  padding: 10px 12px;
+  background: #0f172a;
+  border: 1px solid #475569;
+  border-radius: 10px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+  text-align: left;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition:
+    opacity 0.12s ease,
+    transform 0.12s ease,
+    visibility 0.12s ease;
+}
+
+.cisa-tip:hover .cisa-tip-panel,
+.cisa-tip:focus-visible .cisa-tip-panel,
+.cisa-tip:focus-within .cisa-tip-panel {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Flip upward near the bottom of the viewport / card when marked. */
+.cisa-tip.cisa-tip-up .cisa-tip-panel {
+  top: auto;
+  bottom: calc(100% + 8px);
+  transform: translateY(4px);
+}
+
+.cisa-tip.cisa-tip-up:hover .cisa-tip-panel,
+.cisa-tip.cisa-tip-up:focus-visible .cisa-tip-panel,
+.cisa-tip.cisa-tip-up:focus-within .cisa-tip-panel {
+  transform: translateY(0);
+}
+
+.cisa-tip-kicker {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #7dd3fc;
+}
+
+.cisa-tip-text {
+  display: block;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.45;
+  color: #e2e8f0;
+  white-space: normal;
+}
+
 /* ==========================================================================
    Source Viewer
    Syntax-highlighted code viewer with snippet line highlighting
