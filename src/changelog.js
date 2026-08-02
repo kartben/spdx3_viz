@@ -10,6 +10,10 @@ export const CHANGELOG = [
     date: null,
     items: [
       {
+        tag: 'Improved',
+        text: 'Functional Safety decomposition, specification filter, pass-rate summary.'
+      },
+      {
         tag: 'Added',
         text: 'CISA 2026 Minimum Elements findings in Statistics.'
       },
