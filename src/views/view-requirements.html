@@ -4,70 +4,72 @@
   :class="hasSafetySpecFacets ? 'max-w-6xl' : 'max-w-4xl'"
 >
   <div class="list-sticky space-y-3">
-    <div class="flex flex-wrap items-center gap-3">
-      <!-- Breakdown summary of the folded-in FunctionalSafety elements -->
-      <span class="text-sm text-slate-400 flex-shrink-0">
-        <span x-text="safetyCounts.requirements"></span> requirements<template
-          x-if="safetyCounts.verifications"
-          ><span
-            ><span class="text-slate-600"> · </span
-            ><span x-text="safetyCounts.verifications"></span> verifications</span
-          ></template
-        ><template x-if="safetyCounts.evaluations"
-          ><span
-            ><span class="text-slate-600"> · </span
-            ><span x-text="safetyCounts.evaluations"></span> evaluations</span
-          ></template
-        ><template x-if="safetyCounts.assumptions"
-          ><span
-            ><span class="text-slate-600"> · </span
-            ><span x-text="safetyCounts.assumptions"></span> assumptions</span
-          ></template
+    <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+      <div class="flex items-center gap-2 min-w-0">
+        <!-- Breakdown summary of the folded-in FunctionalSafety elements -->
+        <span class="text-sm text-slate-400 min-w-0 truncate">
+          <span x-text="safetyCounts.requirements"></span> requirements<template
+            x-if="safetyCounts.verifications"
+            ><span
+              ><span class="text-slate-600"> · </span
+              ><span x-text="safetyCounts.verifications"></span> verifications</span
+            ></template
+          ><template x-if="safetyCounts.evaluations"
+            ><span
+              ><span class="text-slate-600"> · </span
+              ><span x-text="safetyCounts.evaluations"></span> evaluations</span
+            ></template
+          ><template x-if="safetyCounts.assumptions"
+            ><span
+              ><span class="text-slate-600"> · </span
+              ><span x-text="safetyCounts.assumptions"></span> assumptions</span
+            ></template
+          >
+        </span>
+        <!-- Layout toggle: flat list vs. tracedToDetail decomposition tree -->
+        <div
+          x-show="hasSafetyDecomposition"
+          class="ml-auto inline-flex rounded-lg border border-slate-700 overflow-hidden text-xs flex-shrink-0"
         >
-      </span>
-      <!-- Layout toggle: flat list vs. tracedToDetail decomposition tree -->
-      <div
-        x-show="hasSafetyDecomposition"
-        class="ml-auto inline-flex rounded-lg border border-slate-700 overflow-hidden text-xs"
-      >
-        <button
-          type="button"
-          @click="requirementLayout = 'list'; restreamView('requirements')"
-          class="px-3 py-1.5 transition-colors"
-          :class="requirementLayout === 'list' ? 'bg-slate-700 text-white' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
-        >
-          List
-        </button>
-        <button
-          type="button"
-          @click="requirementLayout = 'tree'"
-          class="px-3 py-1.5 transition-colors"
-          :class="requirementLayout === 'tree' ? 'bg-slate-700 text-white' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
-        >
-          Decomposition
-        </button>
+          <button
+            type="button"
+            @click="requirementLayout = 'list'; restreamView('requirements')"
+            class="px-2.5 sm:px-3 py-1.5 transition-colors"
+            :class="requirementLayout === 'list' ? 'bg-slate-700 text-white' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
+          >
+            List
+          </button>
+          <button
+            type="button"
+            @click="requirementLayout = 'tree'"
+            class="px-2.5 sm:px-3 py-1.5 transition-colors"
+            :class="requirementLayout === 'tree' ? 'bg-slate-700 text-white' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
+          >
+            <span class="sm:hidden">Tree</span>
+            <span class="hidden sm:inline">Decomposition</span>
+          </button>
+        </div>
       </div>
       <input
         x-model="requirementSearch"
         @input.debounce.150ms="restreamView('requirements')"
         type="text"
         placeholder="Filter…"
-        :class="!hasSafetyDecomposition && 'ml-auto'"
-        class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-yellow-500 w-44 sm:w-56"
+        class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-yellow-500 w-full sm:w-44 sm:ml-auto md:w-56"
       />
     </div>
 
     <!-- Safety-case verification rollup: at-a-glance status bar + status filters -->
     <template x-if="safetyCounts.requirements > 0 && safetyStatusOrder.length">
       <div class="space-y-2">
-        <div class="flex items-baseline gap-2 flex-wrap">
+        <div class="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-2 sm:flex-wrap">
           <span
             class="text-sm font-semibold text-white"
             x-text="`${safetyStatusSummary.passPct}% pass rate`"
           ></span>
           <span
             class="text-xs text-slate-500"
-            x-text="`${formatCount(safetyStatusSummary.counts.passed)} of ${formatCount(safetyStatusSummary.total)} requirements · ${safetyStatusSummary.verifiedPct}% have verification`"
+            x-text="`${formatCount(safetyStatusSummary.counts.passed)} of ${formatCount(safetyStatusSummary.total)} · ${safetyStatusSummary.verifiedPct}% have verification`"
           ></span>
         </div>
         <!-- Stacked status bar -->
@@ -154,8 +156,7 @@
   </div>
 
   <div class="flex gap-4 items-start" :class="hasSafetySpecFacets && 'md:gap-5'">
-    <!-- Specification facet from Specification --hasRequirement-->
-    Requirement -->
+    <!-- Specification filter from Specification + hasRequirement -->
     <aside
       x-show="hasSafetySpecFacets"
       class="hidden md:block w-44 flex-shrink-0 sticky top-[var(--list-sticky-offset,7rem)] max-h-[calc(100vh-9rem)] overflow-y-auto"
@@ -211,7 +212,7 @@
         </select>
       </div>
 
-      <!-- Requirement decomposition tree (tracedToDetail: goal → detailed requirement) -->
+      <!-- Requirement decomposition tree (tracedToDetail hierarchy) -->
       <template x-if="requirementLayout === 'tree'">
         <div class="space-y-2">
           <div class="flex items-center gap-3 text-xs">
@@ -231,8 +232,8 @@
               Collapse all
             </button>
             <span
-              class="text-slate-500 ml-auto"
-              x-text="`${safetyTreeRows.filter(r => r.depth === 0).length} top-level · ${formatCount(safetyStatusSummary.total)} requirements`"
+              class="text-slate-500 ml-auto tabular-nums"
+              x-text="`${safetyTreeRows.filter(r => r.depth === 0).length} top-level`"
             ></span>
           </div>
           <div x-show="safetyTreeRows.length === 0" class="card text-center py-10">
@@ -249,14 +250,14 @@
           </div>
           <div
             x-show="safetyTreeRows.length > 0"
-            class="rounded-xl border border-slate-700/60 bg-slate-800/40 p-2"
+            class="rounded-xl border border-slate-700/60 bg-slate-800/40 p-2 overflow-x-auto"
           >
             <template x-for="row in safetyTreeRows" :key="row.id">
               <div
                 x-data="{ status: null }"
                 x-effect="status = requirementSafetyStatus(row.el)"
-                class="flex items-center gap-2 py-1.5 pr-2 rounded-lg hover:bg-slate-800/70"
-                :style="`padding-left:${row.depth * 22 + 4}px`"
+                class="flex items-center gap-2 py-1.5 pr-2 rounded-lg hover:bg-slate-800/70 min-w-0"
+                :style="`padding-left:${Math.min(row.depth, 6) * 14 + 4}px`"
               >
                 <button
                   type="button"
@@ -288,19 +289,19 @@
                 <button
                   type="button"
                   @click="navigateTo(row.id)"
-                  class="text-sm text-slate-200 hover:text-white text-left truncate min-w-0"
+                  class="text-sm text-slate-200 hover:text-white text-left truncate min-w-0 flex-1"
                   x-text="requirementDisplayName(row.el)"
                 ></button>
                 <span
                   x-show="row.cue && !row.hasChildren"
-                  class="text-[10px] text-slate-500 flex-shrink-0 ml-auto"
+                  class="text-[10px] text-slate-500 flex-shrink-0 hidden sm:inline"
                   :class="row.cue === 'no implementation' && 'text-orange-400/90'"
                   x-text="row.cue"
                 ></span>
                 <span
                   x-show="status"
                   class="w-6 h-6 rounded-full inline-flex items-center justify-center flex-shrink-0"
-                  :class="[status?.badgeClass, !row.cue || row.hasChildren ? 'ml-auto' : '']"
+                  :class="status?.badgeClass"
                   :title="status?.label"
                   :aria-label="status?.label"
                   x-html="uiIconSvg(status?.iconKey, 'w-4 h-4')"
@@ -643,10 +644,26 @@
                                 @click.stop="item.multiRange ? openSnippetRanges(item.snippetIds) : navigateTo(item.id)"
                               >
                                 <span
-                                  class="detail-rel-arrow"
+                                  class="detail-rel-arrow flex items-center flex-shrink-0"
                                   :style="`color: ${section.group.color}`"
-                                  x-text="item.direction === 'out' ? '→' : '←'"
-                                ></span>
+                                  :aria-label="item.direction === 'out' ? 'Outgoing' : 'Incoming'"
+                                >
+                                  <svg
+                                    class="w-3 h-3"
+                                    :class="item.direction === 'in' && 'rotate-180'"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                    aria-hidden="true"
+                                  >
+                                    <path
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      stroke-width="2"
+                                      d="M14 5l7 7-7 7"
+                                    />
+                                  </svg>
+                                </span>
                                 <span
                                   class="flex items-center flex-shrink-0"
                                   :style="`color: ${nodeTypeColor(getNodeType(elementMap.get(item.id) || {}))}`"
