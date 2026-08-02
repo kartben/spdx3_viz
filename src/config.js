@@ -160,7 +160,7 @@ export const SAFETY_STATUSES = {
   },
   unverified: {
     key: 'unverified',
-    label: 'Unverified',
+    label: 'Not verified',
     color: '#64748b',
     badgeClass: 'bg-slate-600/20 text-slate-300 ring-1 ring-slate-500/30',
     dotClass: 'bg-slate-500',
@@ -169,7 +169,7 @@ export const SAFETY_STATUSES = {
   },
   verified: {
     key: 'verified',
-    label: 'Verified',
+    label: 'Has verification',
     color: '#38bdf8',
     badgeClass: 'bg-sky-500/15 text-sky-300 ring-1 ring-sky-500/30',
     dotClass: 'bg-sky-500',
@@ -178,7 +178,7 @@ export const SAFETY_STATUSES = {
   },
   passed: {
     key: 'passed',
-    label: 'Pass',
+    label: 'Passed',
     color: '#10b981',
     badgeClass: 'bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30',
     dotClass: 'bg-emerald-500',

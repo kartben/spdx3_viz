@@ -1,5 +1,5 @@
 import { computeRelationshipTypeCounts } from '../parser/parser.js';
-import { mergeVulnLists } from '../lib/index.js';
+import { buildSafetySpecFacets, mergeVulnLists } from '../lib/index.js';
 import { isA, CLASS } from '../spdx/model.js';
 
 /* Derived data: computed getters over the parsed model — filtered/sorted list
@@ -935,8 +935,9 @@ export const derivedMixin = {
 
   // Rollup of every Requirement's overall verification outcome, for the
   // safety-case status bar and status-filter chips. `noImpl` counts requirements
-  // carrying no implementedBy link (a traceability gap), and `verifiedPct` is the
-  // share that reached a passing verification.
+  // carrying no implementedBy link (a traceability gap). `passPct` is the share
+  // that fully passed; `verifiedPct` is the share that has any verification link
+  // (passed + has-verification + inconclusive + failed).
   get safetyStatusSummary() {
     const counts = { failed: 0, inconclusive: 0, unverified: 0, verified: 0, passed: 0 };
     let total = 0;
@@ -948,11 +949,13 @@ export const derivedMixin = {
       if (status && Object.hasOwn(counts, status.key)) counts[status.key]++;
       if (!this.implementedByCount(r.spdxId)) noImpl++;
     });
+    const withVerification = total - counts.unverified;
     return {
       total,
       counts,
       noImpl,
-      verifiedPct: total ? Math.round((counts.passed / total) * 100) : 0
+      passPct: total ? Math.round((counts.passed / total) * 100) : 0,
+      verifiedPct: total ? Math.round((withVerification / total) * 100) : 0
     };
   },
 
@@ -962,6 +965,33 @@ export const derivedMixin = {
     const order = ['failed', 'inconclusive', 'unverified', 'verified', 'passed'];
     const counts = this.safetyStatusSummary.counts;
     return order.filter((s) => counts[s] > 0);
+  },
+
+  // Specification facets from Specification --hasRequirement--> Requirement.
+  // Empty when the SBOM has no such links (facet UI stays hidden).
+  get safetySpecFacets() {
+    const reqIds = new Set();
+    this.requirements.forEach((r) => {
+      if (isA(r.type, CLASS.Requirement)) reqIds.add(r.spdxId);
+    });
+    return buildSafetySpecFacets(
+      this.relationships,
+      this.elementMap,
+      isA,
+      CLASS.Specification,
+      reqIds
+    );
+  },
+
+  get hasSafetySpecFacets() {
+    return this.safetySpecFacets.length > 0;
+  },
+
+  // Requirement ids belonging to the active specification facet (or null = all).
+  get safetySpecMemberIds() {
+    if (!this.requirementSpecFilter) return null;
+    const facet = this.safetySpecFacets.find((f) => f.id === this.requirementSpecFilter);
+    return facet ? new Set(facet.requirementIds) : null;
   },
 
   // Requirement decomposition graph from `tracedToDetail` relationships
@@ -994,30 +1024,84 @@ export const derivedMixin = {
     return this.safetyDecomposition.hasDecomposition;
   },
 
+  // Whether a Requirement matches the active status / no-impl / search filters
+  // used by both the list and the decomposition tree.
+  _requirementMatchesSafetyFilters(r) {
+    if (!r || !isA(r.type, CLASS.Requirement)) return false;
+    const members = this.safetySpecMemberIds;
+    if (members && !members.has(r.spdxId)) return false;
+    if (this.requirementStatusFilter === 'noimpl') {
+      if (this.implementedByCount(r.spdxId)) return false;
+    } else if (this.requirementStatusFilter) {
+      if (this.requirementSafetyStatus(r)?.key !== this.requirementStatusFilter) return false;
+    }
+    if (this.requirementSearch) {
+      const q = this.requirementSearch.toLowerCase();
+      const hay = [
+        r.name,
+        this.requirementDisplayName(r),
+        this.cleanName(r.spdxId),
+        r.requirementStatement,
+        r.functionalsafety_assumptionStatement,
+        r.summary,
+        ...this.externalIdentifiers(r).map((eid) => eid.identifier)
+      ]
+        .filter(Boolean)
+        .join('\n')
+        .toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  },
+
   // Flattened, depth-annotated rows of the decomposition tree honoring
-  // collapsedReqs, so the (recursive) tree renders through a single x-for.
-  // Siblings sort by display name; a cycle guard stops a malformed graph looping.
+  // collapsedReqs and the active safety filters. Ancestors of matching leaves
+  // stay visible so the hierarchy remains readable. Siblings sort by display
+  // name; a cycle guard stops a malformed graph looping.
   get safetyTreeRows() {
     const { childrenOf, roots } = this.safetyDecomposition;
-    const nameOf = (id) => this.elementMap.get(id)?.name || this.cleanName(id);
+    const nameOf = (id) =>
+      this.requirementDisplayName(this.elementMap.get(id)) ||
+      this.elementMap.get(id)?.name ||
+      this.cleanName(id);
     const sortIds = (ids) =>
       [...ids].sort((a, b) => nameOf(a).localeCompare(nameOf(b), undefined, { numeric: true }));
+
+    const matchCache = new Map();
+    const selfMatches = (id) => {
+      if (matchCache.has(id)) return matchCache.get(id);
+      const el = this.elementMap.get(id);
+      const ok = this._requirementMatchesSafetyFilters(el);
+      matchCache.set(id, ok);
+      return ok;
+    };
+    const subtreeMatches = (id, ancestry) => {
+      if (ancestry.has(id)) return false;
+      if (selfMatches(id)) return true;
+      const next = new Set(ancestry).add(id);
+      return (childrenOf.get(id) || []).some((k) => subtreeMatches(k, next));
+    };
+
     const rows = [];
     const visit = (id, depth, ancestry) => {
       if (ancestry.has(id)) return;
+      if (!subtreeMatches(id, ancestry)) return;
       const kids = childrenOf.get(id) || [];
+      const visibleKids = sortIds(kids).filter((k) => subtreeMatches(k, new Set(ancestry).add(id)));
       const collapsed = !!this.collapsedReqs[id];
+      const el = this.elementMap.get(id);
       rows.push({
         id,
-        el: this.elementMap.get(id),
+        el,
         depth,
-        hasChildren: kids.length > 0,
-        childCount: kids.length,
-        collapsed
+        hasChildren: visibleKids.length > 0,
+        childCount: visibleKids.length,
+        collapsed,
+        cue: this.requirementQuietCue(el)
       });
-      if (kids.length && !collapsed) {
+      if (visibleKids.length && !collapsed) {
         const next = new Set(ancestry).add(id);
-        sortIds(kids).forEach((k) => visit(k, depth + 1, next));
+        visibleKids.forEach((k) => visit(k, depth + 1, next));
       }
     };
     sortIds(roots).forEach((r) => visit(r, 0, new Set()));
@@ -1031,36 +1115,32 @@ export const derivedMixin = {
     if (this.requirementKindFilter) {
       reqs = reqs.filter((r) => r.type === this.requirementKindFilter);
     }
-    // Verification-status rollup chips filter Requirements by their outcome, or
-    // by the 'noimpl' traceability gap (no implementedBy link).
-    if (this.requirementStatusFilter === 'noimpl') {
-      reqs = reqs.filter(
-        (r) => isA(r.type, CLASS.Requirement) && !this.implementedByCount(r.spdxId)
-      );
-    } else if (this.requirementStatusFilter) {
-      reqs = reqs.filter(
-        (r) =>
-          isA(r.type, CLASS.Requirement) &&
-          this.requirementSafetyStatus(r)?.key === this.requirementStatusFilter
-      );
-    }
-    if (this.requirementSearch) {
-      const q = this.requirementSearch.toLowerCase();
-      reqs = reqs.filter(
-        (r) =>
+    // Status / spec / search apply to Requirements. Other kinds only respect
+    // search (and kind), so kind × outcome stay orthogonal without forcing
+    // kind=Requirement when a status chip is clicked.
+    const members = this.safetySpecMemberIds;
+    if (members || this.requirementStatusFilter || this.requirementSearch) {
+      reqs = reqs.filter((r) => {
+        if (isA(r.type, CLASS.Requirement)) return this._requirementMatchesSafetyFilters(r);
+        if (this.requirementStatusFilter || members) return false;
+        if (!this.requirementSearch) return true;
+        const q = this.requirementSearch.toLowerCase();
+        return (
           (r.name || '').toLowerCase().includes(q) ||
           this.cleanName(r.spdxId).toLowerCase().includes(q) ||
-          (r.requirementStatement || '').toLowerCase().includes(q) ||
-          (r.functionalsafety_assumptionStatement || '').toLowerCase().includes(q) ||
           (r.summary || '').toLowerCase().includes(q) ||
+          (r.description || '').toLowerCase().includes(q) ||
           this.externalIdentifiers(r).some((eid) => eid.identifier.toLowerCase().includes(q))
-      );
+        );
+      });
     }
     const rank = (r) => (r.type === CLASS.Requirement ? 0 : 1);
     return [...reqs].sort(
       (a, b) =>
         rank(a) - rank(b) ||
-        (a.name || this.cleanName(a.spdxId)).localeCompare(b.name || this.cleanName(b.spdxId))
+        (this.requirementDisplayName(a) || a.name || this.cleanName(a.spdxId)).localeCompare(
+          this.requirementDisplayName(b) || b.name || this.cleanName(b.spdxId)
+        )
     );
   },
 

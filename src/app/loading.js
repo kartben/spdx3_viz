@@ -524,6 +524,13 @@ export const loadingMixin = {
       this.views.find((v) => v.id === 'build').count = this.builds.length;
       this.views.find((v) => v.id === 'agents').count = this.agents.length;
       this.views.find((v) => v.id === 'remediation').count = this.remediationFindings.length;
+      this.requirementSearch = '';
+      this.requirementKindFilter = '';
+      this.requirementStatusFilter = '';
+      this.requirementSpecFilter = '';
+      this.collapsedReqs = {};
+      // Prefer Decomposition when the SBOM has tracedToDetail hierarchy.
+      this.requirementLayout = this.hasSafetyDecomposition ? 'tree' : 'list';
       this.remediationCategoryFilter = '';
       this.remediationSeverityFilter = '';
       this.expandedClusters = new Set(); // fresh data: start fully collapsed
