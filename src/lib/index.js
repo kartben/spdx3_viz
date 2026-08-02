@@ -21,3 +21,4 @@ export * from './impact.js';
 export * from './heatmap.js';
 export * from './graph-layout.js';
 export * from './remediation.js';
+export * from './safety.js';
