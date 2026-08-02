@@ -5,6 +5,8 @@ via the "What's new" link.
 
 ## Unreleased
 
+- **Improved:** Packages and Files add facet filters, versions, gap chips.
+- **Improved:** Package and file lists are faster on huge SBOMs.
 - **Improved:** Functional Safety decomposition, specification filter, pass-rate summary.
 - **Added:** CISA 2026 Minimum Elements findings in Statistics.
 - **Improved:** Sidebar groups SPDX profiles, with sticky Insights and Lucide icons.

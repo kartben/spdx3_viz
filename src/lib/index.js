@@ -22,3 +22,4 @@ export * from './heatmap.js';
 export * from './graph-layout.js';
 export * from './remediation.js';
 export * from './safety.js';
+export * from './software.js';

@@ -10,7 +10,7 @@
  *
  * @module lib/quality
  */
-import { isMeaningfulValue, cleanName } from './format.js';
+import { isMeaningfulValue, hasMeaningfulRef, cleanName } from './format.js';
 import { getExternalIdentifiers } from './provenance.js';
 import { RELATIONSHIP_TYPES } from '../config.js';
 
@@ -75,14 +75,6 @@ function cisaDefinition(key) {
 
 function asArray(v) {
   return Array.isArray(v) ? v : v == null || v === '' ? [] : [v];
-}
-
-// suppliedBy/originatedBy/etc. carry raw spdxId strings; a NoAssertion sentinel
-// can be a bare word or a ref like "SPDXRef-NoAssertion", so both isMeaningfulValue's
-// exact-match check and a substring check are needed (same idiom parser.js uses
-// for these fields).
-function hasMeaningfulRef(value) {
-  return asArray(value).some((v) => isMeaningfulValue(v) && !String(v).includes('NoAssertion'));
 }
 
 function displayName(el) {

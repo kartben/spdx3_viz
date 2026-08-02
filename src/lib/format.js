@@ -135,6 +135,20 @@ export function isMeaningfulValue(value) {
 }
 
 /**
+ * True when an element reference (suppliedBy, originatedBy, …) names something
+ * real. These carry raw spdxId strings, so a NoAssertion sentinel can be a bare
+ * word or a ref like "SPDXRef-NoAssertion"; both the exact-match check and a
+ * substring check are needed (the same idiom parser.js uses for these fields).
+ *
+ * @param {*} value - A single reference or an array of them
+ * @returns {boolean}
+ */
+export function hasMeaningfulRef(value) {
+  const list = Array.isArray(value) ? value : value == null || value === '' ? [] : [value];
+  return list.some((v) => isMeaningfulValue(v) && !String(v).includes('NoAssertion'));
+}
+
+/**
  * Formats a byte count as a human-readable size using 1000-based (SI) units.
  * Returns '' for anything that isn't a positive, finite number.
  *

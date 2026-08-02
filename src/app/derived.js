@@ -1,5 +1,17 @@
 import { computeRelationshipTypeCounts } from '../parser/parser.js';
-import { buildSafetySpecFacets, mergeVulnLists } from '../lib/index.js';
+import {
+  buildDirectoryFacets,
+  buildPurposeFacets,
+  buildSafetySpecFacets,
+  dirPrefix,
+  getExternalIdentifiers,
+  isMeaningfulValue,
+  licenseIndividualToken,
+  mergeVulnLists,
+  packageGaps,
+  packageHasPurpose,
+  summarizePackageDescription
+} from '../lib/index.js';
 import { isA, CLASS } from '../spdx/model.js';
 
 /* Derived data: computed getters over the parsed model — filtered/sorted list
@@ -19,6 +31,24 @@ let filteredFilesCacheKey = null;
 let filteredFilesCacheVal = [];
 let fileTypesCacheKey = null;
 let fileTypesCacheVal = [];
+let fileDirsCacheKey = null;
+let fileDirsCacheVal = [];
+// Packages / AI models / Datasets share one filter+sort pipeline, and only one
+// of the three lists is on screen at a time, so a single memo slot is enough.
+let pkgListCacheKey = null;
+let pkgListCacheVal = [];
+let pkgGroupsSrc = null;
+let pkgGroupsVal = { plain: [], ai: [], dataset: [] };
+let pkgFacetsCacheKey = null;
+let pkgFacetsCacheVal = [];
+let pkgSummaryCacheKey = null;
+let pkgSummaryCacheVal = null;
+let licensedIdsSrc = null;
+let licensedIdsVal = new Set();
+// Lowercased "name version identifiers" per package, built on the first search
+// keystroke only (an SBOM the user never searches never pays for it).
+let pkgSearchIndexSrc = null;
+let pkgSearchIndexVal = new Map();
 
 // Most-common file extensions to offer as filter chips. A large rootfs SBOM can
 // carry thousands of distinct extensions; showing one chip each turns the Files
@@ -30,6 +60,11 @@ const FILE_TYPE_CHIP_LIMIT = 12;
 // the '' that fileTypeFilter uses to mean "no filter / All".
 const NO_EXT_LABEL = '(no ext)';
 
+// Most populated directories offered as Files filter facets, and how many
+// leading path segments each one groups on (matches the graph's file clusters).
+const FILE_DIR_FACET_LIMIT = 12;
+const FILE_DIR_FACET_DEPTH = 2;
+
 export const derivedMixin = {
   // Clears the build + vulnerability sort memos. Called when fresh data is
   // applied (see parseData) so the next getter read recomputes from scratch.
@@ -38,7 +73,15 @@ export const derivedMixin = {
     filteredVulnsCacheKey = null;
     filteredFilesCacheKey = null;
     fileTypesCacheKey = null;
+    fileDirsCacheKey = null;
     allVulnsCacheKey = null;
+    pkgListCacheKey = null;
+    pkgGroupsSrc = null;
+    pkgFacetsCacheKey = null;
+    pkgSummaryCacheKey = null;
+    licensedIdsSrc = null;
+    pkgSearchIndexSrc = null;
+    pkgSearchIndexVal = new Map();
   },
 
   // SBOM-derived vulnerabilities merged with any OSV online findings. Before a
@@ -103,71 +146,192 @@ export const derivedMixin = {
   },
 
   // AI models and dataset packages are software_Package subclasses (AI profile)
-  // and get their own tabs, so the Packages tab lists only plain packages. All
-  // three read the same search box + sort control (see _filterSortPackages).
-  get aiPackages() {
-    return this.packages.filter((p) => isA(p.type, CLASS.ai_AIPackage));
-  },
-  get datasetPackages() {
-    return this.packages.filter((p) => isA(p.type, CLASS.dataset_DatasetPackage));
-  },
-  get plainPackages() {
-    return this.packages.filter(
-      (p) => !isA(p.type, CLASS.ai_AIPackage) && !isA(p.type, CLASS.dataset_DatasetPackage)
-    );
+  // and get their own tabs, so the Packages tab lists only plain packages. The
+  // three-way split is one pass over `packages`, memoized on that array so the
+  // getters below stay O(1) reads instead of re-filtering per template read.
+  _packageGroups() {
+    if (pkgGroupsSrc === this.packages) return pkgGroupsVal;
+    const plain = [];
+    const ai = [];
+    const dataset = [];
+    for (const p of this.packages) {
+      const isAi = isA(p.type, CLASS.ai_AIPackage);
+      const isDataset = isA(p.type, CLASS.dataset_DatasetPackage);
+      if (isAi) ai.push(p);
+      if (isDataset) dataset.push(p);
+      if (!isAi && !isDataset) plain.push(p);
+    }
+    pkgGroupsVal = { plain, ai, dataset };
+    pkgGroupsSrc = this.packages;
+    return pkgGroupsVal;
   },
 
-  // Applies the shared package search box + sort control to a base list. Used by
-  // the Packages / AI Models / Datasets tabs so they behave identically.
-  _filterSortPackages(base) {
+  get aiPackages() {
+    return this._packageGroups().ai;
+  },
+  get datasetPackages() {
+    return this._packageGroups().dataset;
+  },
+  get plainPackages() {
+    return this._packageGroups().plain;
+  },
+
+  // Which of the three package-style tabs is showing. Doubles as the memo key
+  // for everything derived from that tab's base list.
+  get _packageGroupKey() {
+    return this.currentView === 'ai' ? 'ai' : this.currentView === 'dataset' ? 'dataset' : 'plain';
+  },
+
+  // The unfiltered list behind the current tab.
+  get currentPackageBase() {
+    return this._packageGroups()[this._packageGroupKey];
+  },
+
+  // Elements carrying a concrete declared/concluded license, from the license
+  // index the parser already built. The ExpandedLicensing NoAssertion / None
+  // individuals name the absence of a license, so they don't count as one.
+  get _licensedElementIds() {
+    if (licensedIdsSrc === this.licenses) return licensedIdsVal;
+    const ids = new Set();
+    for (const lic of this.licenses) {
+      if (licenseIndividualToken(lic.id) || !isMeaningfulValue(lic.label)) continue;
+      for (const id of lic.declaredBy || []) ids.add(id);
+      for (const id of lic.concludedBy || []) ids.add(id);
+    }
+    licensedIdsVal = ids;
+    licensedIdsSrc = this.licenses;
+    return ids;
+  },
+
+  // Search corpus per package: name, id, version, and every external identifier
+  // (PackageURL, CPE, …) so a purl paste finds its package. Built once, lazily.
+  get _packageSearchIndex() {
+    if (pkgSearchIndexSrc === this.packages) return pkgSearchIndexVal;
+    const idx = new Map();
+    for (const p of this.packages) {
+      const parts = [p.name || '', this.cleanName(p.spdxId), p.software_packageVersion || ''];
+      for (const eid of getExternalIdentifiers(p)) parts.push(eid.identifier);
+      idx.set(p.spdxId, parts.join(' ').toLowerCase());
+    }
+    pkgSearchIndexVal = idx;
+    pkgSearchIndexSrc = this.packages;
+    return idx;
+  },
+
+  // Which described-fields a package is missing (no version / license / supplier
+  // / identifier). Backs both the rollup summary and the gap filter chips.
+  packageGapsFor(pkg) {
+    return packageGaps(pkg, this._licensedElementIds.has(pkg?.spdxId));
+  },
+
+  // Applies the shared package search box, facet filters and sort control to the
+  // current tab's base list. Memoized on the inputs that actually change the
+  // result, so scrolling a 100k-package list doesn't re-filter and re-sort it on
+  // every reactive read.
+  get currentPackageList() {
+    if (
+      this.currentView !== 'packages' &&
+      this.currentView !== 'ai' &&
+      this.currentView !== 'dataset'
+    ) {
+      return [];
+    }
+    const base = this.currentPackageBase;
+    const key = [
+      this._packageGroupKey,
+      this.packages.length,
+      this.licenses.length,
+      this.packageSearch,
+      this.pkgSort,
+      this.pkgPurposeFilter,
+      this.pkgGapFilter
+    ].join('|');
+    if (key === pkgListCacheKey) return pkgListCacheVal;
+
     let pkgs = base;
     if (this.packageSearch) {
       const q = this.packageSearch.toLowerCase();
-      pkgs = pkgs.filter(
-        (p) =>
-          this.cleanName(p.spdxId).toLowerCase().includes(q) || p.name?.toLowerCase().includes(q)
-      );
+      const idx = this._packageSearchIndex;
+      pkgs = pkgs.filter((p) => (idx.get(p.spdxId) || '').includes(q));
     }
-    if (this.pkgSort === 'deps')
-      return [...pkgs].sort(
+    if (this.pkgPurposeFilter) {
+      pkgs = pkgs.filter((p) => packageHasPurpose(p, this.pkgPurposeFilter));
+    }
+    if (this.pkgGapFilter) {
+      pkgs = pkgs.filter((p) => this.packageGapsFor(p)[this.pkgGapFilter]);
+    }
+
+    let sorted;
+    if (this.pkgSort === 'deps') {
+      sorted = [...pkgs].sort(
         (a, b) => (this.depsOf(b.spdxId)?.length || 0) - (this.depsOf(a.spdxId)?.length || 0)
       );
-    if (this.pkgSort === 'dependents')
-      return [...pkgs].sort(
+    } else if (this.pkgSort === 'dependents') {
+      sorted = [...pkgs].sort(
         (a, b) =>
           (this.dependentsOf(b.spdxId)?.length || 0) - (this.dependentsOf(a.spdxId)?.length || 0)
       );
-    return [...pkgs].sort((a, b) =>
-      (a.name || this.cleanName(a.spdxId)).localeCompare(b.name || this.cleanName(b.spdxId))
-    );
-  },
-
-  get filteredPackages() {
-    return this._filterSortPackages(this.plainPackages);
-  },
-
-  get filteredAiPackages() {
-    return this._filterSortPackages(this.aiPackages);
-  },
-
-  get filteredDatasetPackages() {
-    return this._filterSortPackages(this.datasetPackages);
-  },
-
-  // The package list backing whichever of the three package-style tabs is
-  // showing (packages / ai / dataset); [] elsewhere so the shared list template
-  // renders nothing when another view is active.
-  get currentPackageList() {
-    switch (this.currentView) {
-      case 'ai':
-        return this.filteredAiPackages;
-      case 'dataset':
-        return this.filteredDatasetPackages;
-      case 'packages':
-        return this.filteredPackages;
-      default:
-        return [];
+    } else {
+      sorted = [...pkgs].sort((a, b) =>
+        (a.name || this.cleanName(a.spdxId)).localeCompare(b.name || this.cleanName(b.spdxId))
+      );
     }
+
+    pkgListCacheKey = key;
+    pkgListCacheVal = sorted;
+    return sorted;
+  },
+
+  // The three tabs render through one template, so their list props all resolve
+  // to whichever tab is showing (see viewListProps in navigation.js).
+  get filteredPackages() {
+    return this.currentPackageList;
+  },
+  get filteredAiPackages() {
+    return this.currentPackageList;
+  },
+  get filteredDatasetPackages() {
+    return this.currentPackageList;
+  },
+
+  // Primary-purpose facets for the current tab's base list (library, application,
+  // container, …), so the rail counts don't move as filters are applied.
+  get packagePurposeFacets() {
+    const key = `${this._packageGroupKey}|${this.packages.length}`;
+    if (key === pkgFacetsCacheKey) return pkgFacetsCacheVal;
+    const facets = buildPurposeFacets(this.currentPackageBase);
+    // A rail offering a single bucket filters nothing; hide it instead.
+    pkgFacetsCacheVal = facets.length > 1 ? facets : [];
+    pkgFacetsCacheKey = key;
+    return pkgFacetsCacheVal;
+  },
+
+  get hasPackagePurposeFacets() {
+    return this.packagePurposeFacets.length > 0;
+  },
+
+  // How completely the current tab describes its packages: gap counts per field
+  // plus the full/partial/sparse split behind the rollup bar.
+  get packageDescriptionSummary() {
+    const key = `${this._packageGroupKey}|${this.packages.length}|${this.licenses.length}`;
+    if (key === pkgSummaryCacheKey && pkgSummaryCacheVal) return pkgSummaryCacheVal;
+    const licensed = this._licensedElementIds;
+    pkgSummaryCacheVal = summarizePackageDescription(this.currentPackageBase, (p) =>
+      licensed.has(p?.spdxId)
+    );
+    pkgSummaryCacheKey = key;
+    return pkgSummaryCacheVal;
+  },
+
+  get packageFiltersActive() {
+    return !!(this.packageSearch || this.pkgPurposeFilter || this.pkgGapFilter);
+  },
+
+  clearPackageFilters() {
+    this.packageSearch = '';
+    this.pkgPurposeFilter = '';
+    this.pkgGapFilter = '';
+    this.restreamView(this.currentView);
   },
 
   get currentPackageNoun() {
@@ -180,11 +344,13 @@ export const derivedMixin = {
 
   get filteredFiles() {
     // Memoized on the only inputs that affect the result: the file list, the
-    // search box, and the type-filter chip (see the cache note above).
+    // search box, the type/directory filters, and the sort (see the cache note
+    // above).
     const search = this.fileSearch;
     const typeFilter = this.fileTypeFilter;
+    const dirFilter = this.fileDirFilter;
     const files = this.files;
-    const key = `${files.length}|${search}|${typeFilter}`;
+    const key = `${files.length}|${search}|${typeFilter}|${dirFilter}|${this.fileSort}`;
     if (key === filteredFilesCacheKey) return filteredFilesCacheVal;
 
     let fs = files;
@@ -197,11 +363,49 @@ export const derivedMixin = {
     } else if (typeFilter) {
       fs = fs.filter((f) => this.fileExt(f.name) === typeFilter);
     }
-    const sorted = [...fs].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    if (dirFilter) {
+      fs = fs.filter((f) => dirPrefix(f.name, FILE_DIR_FACET_DEPTH) === dirFilter);
+    }
+    const sorted =
+      this.fileSort === 'size'
+        ? [...fs].sort(
+            (a, b) =>
+              (Number(b.software_artifactSize) || 0) - (Number(a.software_artifactSize) || 0)
+          )
+        : [...fs].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
 
     filteredFilesCacheKey = key;
     filteredFilesCacheVal = sorted;
     return sorted;
+  },
+
+  // Most populated directories in the file list, as filter facets. Computed over
+  // the whole file list (not the filtered one) so the counts stay stable while
+  // the user narrows down, and memoized because a rootfs SBOM makes this a scan
+  // of hundreds of thousands of paths.
+  get fileDirFacets() {
+    const key = `${this.files.length}`;
+    if (key === fileDirsCacheKey) return fileDirsCacheVal;
+    const facets = buildDirectoryFacets(this.files, FILE_DIR_FACET_LIMIT, FILE_DIR_FACET_DEPTH);
+    // A rail offering a single directory filters nothing; hide it instead.
+    fileDirsCacheVal = facets.length > 1 ? facets : [];
+    fileDirsCacheKey = key;
+    return fileDirsCacheVal;
+  },
+
+  get hasFileDirFacets() {
+    return this.fileDirFacets.length > 0;
+  },
+
+  get fileFiltersActive() {
+    return !!(this.fileSearch || this.fileTypeFilter || this.fileDirFilter);
+  },
+
+  clearFileFilters() {
+    this.fileSearch = '';
+    this.fileTypeFilter = '';
+    this.fileDirFilter = '';
+    this.restreamView('files');
   },
 
   // Hardware elements filtered by the in-view search box (name, part number,

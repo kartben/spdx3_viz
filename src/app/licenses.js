@@ -3,6 +3,7 @@ import {
   renderLicenseExpression,
   licenseIndividualLabel,
   licenseIndividualInfo,
+  licenseIndividualToken,
   extractSpdxLicenseId,
   resolveLicenseExpression,
   extractLicenseExpressionParts,
@@ -62,6 +63,19 @@ export const licensesMixin = {
     return entries.sort((a, b) => {
       if (a.kind !== b.kind) return a.kind === 'concluded' ? -1 : 1;
       return a.label.localeCompare(b.label);
+    });
+  },
+  // Licenses that name an actual license, dropping the ExpandedLicensing
+  // NoAssertion / None individuals (they record the absence of one) and folding
+  // a license that is both declared and concluded into one entry. List rows read
+  // these so a scan isn't filled with "No assertion" and duplicate chips; the
+  // expanded card still shows every license relationship.
+  concreteLicenses(spdxId) {
+    const seen = new Set();
+    return this.elementLicenses(spdxId).filter((lic) => {
+      if (licenseIndividualToken(lic.id) || seen.has(lic.label)) return false;
+      seen.add(lic.label);
+      return true;
     });
   },
   spdxLicenseIdFor(licenseRef) {

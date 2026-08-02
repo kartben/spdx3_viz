@@ -1,17 +1,31 @@
-<div x-show="currentView === 'files'" class="fade-in space-y-3 max-w-5xl">
+<div
+  x-show="currentView === 'files'"
+  class="fade-in space-y-3"
+  :class="hasFileDirFacets ? 'max-w-6xl' : 'max-w-5xl'"
+>
   <div class="list-sticky space-y-3">
-    <div class="flex flex-wrap items-center gap-3">
-      <span
-        class="text-sm text-slate-400 flex-shrink-0"
-        x-text="`${filteredFiles.length} files`"
-      ></span>
+    <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+      <span class="text-sm text-slate-400 flex-shrink-0">
+        <span x-text="formatCount(filteredFiles.length)"></span> files
+        <template x-if="fileFiltersActive">
+          <span class="text-slate-500" x-text="` of ${formatCount(files.length)}`"></span>
+        </template>
+      </span>
       <input
         x-model="fileSearch"
         @input.debounce.150ms="restreamView('files')"
         type="text"
         placeholder="Filter files…"
-        class="ml-auto bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-emerald-500 w-44 sm:w-56"
+        class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-emerald-500 w-full sm:w-44 sm:ml-auto md:w-56"
       />
+      <select
+        x-model="fileSort"
+        @change="restreamView('files')"
+        class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 text-slate-300 focus:outline-none focus:border-emerald-500"
+      >
+        <option value="name">Sort by path</option>
+        <option value="size">Sort by size</option>
+      </select>
     </div>
     <div x-show="fileTypes.length" class="flex flex-wrap items-center gap-1.5">
       <span
@@ -38,277 +52,362 @@
       </template>
     </div>
   </div>
-  <template
-    x-for="f in (mountedViews.files ? renderSlice('files', filteredFiles) : [])"
-    :key="f.spdxId"
-  >
-    <div
-      class="card cursor-pointer"
-      data-nav-kind="file"
-      :data-nav-id="f.spdxId"
-      :class="isNavTarget('file', f.spdxId) && 'target-focus'"
-      @click="toggleFile(f.spdxId)"
+
+  <div class="flex gap-4 items-start" :class="hasFileDirFacets && 'lg:gap-5'">
+    <!-- Directory filter rail: the most populated directories, so a rootfs-sized
+         file list can be narrowed to one tree without typing a path. -->
+    <aside
+      x-show="hasFileDirFacets"
+      class="hidden lg:block w-48 flex-shrink-0 sticky top-[var(--list-sticky-offset,7rem)] max-h-[calc(100vh-9rem)] overflow-y-auto"
     >
-      <div class="flex items-center gap-3">
-        <div
-          class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-          :class="fileExt(f.name) === '.elf' ? 'bg-purple-500/15' : fileExt(f.name) === '.c' || fileExt(f.name) === '.obj' ? 'bg-amber-500/15' : 'bg-emerald-500/15'"
+      <div class="text-[10px] text-slate-500 uppercase tracking-wider px-2 mb-1.5">Directories</div>
+      <button
+        type="button"
+        @click="fileDirFilter = ''; restreamView('files')"
+        class="w-full flex items-center justify-between gap-2 text-left text-xs px-2 py-1.5 rounded-lg transition-colors"
+        :class="!fileDirFilter ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'"
+      >
+        <span>All</span>
+        <span class="text-slate-500 tabular-nums" x-text="formatCount(files.length)"></span>
+      </button>
+      <template x-for="facet in fileDirFacets" :key="facet.key">
+        <button
+          type="button"
+          @click="fileDirFilter = (fileDirFilter === facet.key ? '' : facet.key); restreamView('files')"
+          class="w-full flex items-center justify-between gap-2 text-left text-xs px-2 py-1.5 rounded-lg transition-colors"
+          :class="fileDirFilter === facet.key ? 'bg-slate-800 text-white ring-1 ring-emerald-500/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'"
+          :title="facet.label"
         >
+          <span class="truncate font-mono" x-text="facet.label"></span>
           <span
-            class="flex items-center justify-center"
-            :class="fileExt(f.name) === '.elf' ? 'text-purple-400' : fileExt(f.name) === '.c' || fileExt(f.name) === '.obj' ? 'text-amber-400' : 'text-emerald-400'"
-            x-html="elementIcon(f, 'w-4 h-4')"
+            class="text-slate-500 tabular-nums flex-shrink-0"
+            x-text="formatCount(facet.count)"
           ></span>
-        </div>
-        <div class="flex-1 min-w-0">
-          <div class="font-medium text-white text-sm truncate" x-text="f.name"></div>
-          <div class="flex items-center gap-2 mt-0.5 flex-wrap">
-            <span
-              class="badge text-xs"
-              :class="fileExt(f.name) === '.elf' ? 'bg-purple-500/15 text-purple-400' : fileExt(f.name) === '.c' || fileExt(f.name) === '.obj' ? 'bg-amber-500/15 text-amber-400' : 'bg-emerald-500/15 text-emerald-400'"
-              x-text="fileExt(f.name)"
-            ></span>
-            <template x-for="lic in elementLicenses(f.spdxId)" :key="lic.id + lic.kind">
-              <button
-                type="button"
-                class="badge text-xs hover:opacity-80"
-                :class="lic.kind === 'concluded' ? 'bg-pink-500/15 text-pink-400' : 'bg-purple-500/15 text-purple-400'"
-                :title="licenseTextActionLabel(lic.id) + ' · ' + (lic.kind === 'concluded' ? 'Concluded' : 'Declared')"
-                @click.stop="showLicenseText(lic.id)"
-                x-text="lic.label"
-              ></button>
-            </template>
-            <span
-              x-show="artifactSize(f)"
-              class="text-[11px] text-slate-500 tabular-nums"
-              x-text="artifactSize(f)"
-            ></span>
-          </div>
-        </div>
-        <svg
-          class="w-4 h-4 text-slate-500 transition-transform flex-shrink-0"
-          :class="expandedFile === f.spdxId && 'rotate-180'"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+        </button>
+      </template>
+    </aside>
+
+    <div class="flex-1 min-w-0 space-y-3">
+      <!-- Mobile directory select (the rail is lg+) -->
+      <div x-show="hasFileDirFacets" class="lg:hidden">
+        <select
+          class="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-2 text-slate-300 focus:outline-none focus:border-emerald-500"
+          :value="fileDirFilter"
+          @change="fileDirFilter = $event.target.value; restreamView('files')"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M19 9l-7 7-7-7"
-          />
-        </svg>
-      </div>
-      <!-- Expanded detail — built lazily via x-if (only for the open card) -->
-      <template x-if="expandedFile === f.spdxId">
-        <div class="mt-4 pt-4 border-t border-slate-700 space-y-3 sm:pl-11 fade-in" @click.stop>
-          <!-- Summary / description -->
-          <div x-show="isMeaningful(f.summary)">
-            <div class="text-xs text-slate-500 mb-1">Summary</div>
-            <div
-              class="text-xs text-slate-300 whitespace-pre-wrap break-words"
-              x-text="f.summary"
-            ></div>
-          </div>
-          <div x-show="isMeaningful(f.description) && f.description !== f.summary">
-            <div class="text-xs text-slate-500 mb-1">Description</div>
-            <div
-              class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-32 overflow-y-auto"
-              x-text="f.description"
-            ></div>
-          </div>
-
-          <!-- Licenses -->
-          <div x-show="elementLicenses(f.spdxId).length > 0">
-            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
-              License
-            </div>
-            <div class="flex flex-wrap gap-1.5">
-              <template x-for="lic in elementLicenses(f.spdxId)" :key="lic.id + lic.kind">
-                <button
-                  type="button"
-                  class="badge hover:opacity-80"
-                  :class="lic.kind === 'concluded' ? 'bg-pink-500/15 text-pink-400' : 'bg-purple-500/15 text-purple-400'"
-                  :title="canShowLicenseText(lic.id) ? licenseTextActionLabel(lic.id) : 'View license'"
-                  @click.stop="showLicenseText(lic.id)"
-                  x-text="(lic.kind === 'declared' ? 'Declared: ' : 'Concluded: ') + lic.label"
-                ></button>
-              </template>
-            </div>
-          </div>
-          <!-- Hashes -->
-          <template x-for="h in (f.verifiedUsing || [])" :key="h.hashValue">
-            <div class="flex items-center gap-2">
-              <span
-                class="text-xs text-slate-500 w-12 flex-shrink-0 uppercase"
-                x-text="h.algorithm"
-              ></span>
-              <code class="hash-text text-slate-300 flex-1 truncate" x-text="h.hashValue"></code>
-              <button
-                @click.stop="copyHash(h.hashValue)"
-                class="text-xs px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded text-slate-400 hover:text-white transition-colors flex-shrink-0"
-              >
-                Copy
-              </button>
-            </div>
+          <option value="">All directories</option>
+          <template x-for="facet in fileDirFacets" :key="facet.key">
+            <option
+              :value="facet.key"
+              x-text="`${facet.label} (${facet.count})`"
+              :selected="fileDirFilter === facet.key"
+            ></option>
           </template>
-          <!-- Parent package -->
-          <div x-show="parentPackage(f.spdxId)">
-            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
-              Contained in
-            </div>
+        </select>
+      </div>
+
+      <div x-show="mountedViews.files && filteredFiles.length === 0" class="card text-center py-10">
+        <div
+          class="text-sm font-medium text-slate-300"
+          x-text="fileFiltersActive ? 'No files match these filters' : 'No files in this document'"
+        ></div>
+        <button
+          x-show="fileFiltersActive"
+          type="button"
+          @click="clearFileFilters()"
+          class="mt-3 rounded-md bg-slate-800 px-3 py-1.5 text-xs text-slate-300 hover:bg-slate-700 hover:text-white transition-colors"
+        >
+          Clear filters
+        </button>
+      </div>
+
+      <template
+        x-for="f in (mountedViews.files ? renderSlice('files', filteredFiles) : [])"
+        :key="f.spdxId"
+      >
+        <div
+          class="card cursor-pointer"
+          data-nav-kind="file"
+          :data-nav-id="f.spdxId"
+          :class="isNavTarget('file', f.spdxId) && 'target-focus'"
+          @click="toggleFile(f.spdxId)"
+        >
+          <div class="flex items-center gap-3">
             <div
-              class="text-xs text-blue-400 cursor-pointer hover:text-blue-300"
-              @click.stop="navigateTo(parentPackage(f.spdxId))"
-              x-text="relTargetDisplayName(parentPackage(f.spdxId) || '')"
-            ></div>
-          </div>
-          <!-- Tools used -->
-          <div x-show="(fileTools(f.spdxId)||[]).length > 0">
-            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
-              Built with
-            </div>
-            <div class="flex flex-wrap gap-1.5">
-              <template x-for="t in (fileTools(f.spdxId)||[])" :key="t">
-                <span
-                  class="badge bg-amber-500/15 text-amber-400"
-                  x-text="relTargetDisplayName(t)"
-                ></span>
-              </template>
-            </div>
-          </div>
-          <!-- Build configuration -->
-          <div x-show="configuredBy(f.spdxId).length > 0">
-            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
-              Build Configuration
-            </div>
-            <template x-for="cfg in configuredBy(f.spdxId)" :key="cfg.configId">
-              <div
-                class="text-xs text-teal-400 hover:text-teal-300 cursor-pointer flex items-center gap-1.5"
-                @click.stop="navigateToConfig(cfg.configId)"
-              >
-                <span class="w-1.5 h-1.5 rounded-full bg-teal-500/50"></span>
-                <span x-text="relTargetDisplayName(cfg.configId)"></span>
-                <span
-                  class="text-slate-500"
-                  x-show="cfg.scope"
-                  x-text="'(' + cfg.scope + ')'"
-                ></span>
-              </div>
-            </template>
-          </div>
-          <!-- Producing builds -->
-          <div x-show="producedByBuilds(f.spdxId).length > 0">
-            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
-              Produced by build
-            </div>
-            <div class="space-y-1">
-              <template x-for="build in producedByBuilds(f.spdxId)" :key="build">
-                <div
-                  class="text-xs text-green-400 hover:text-green-300 cursor-pointer flex items-center gap-1.5"
-                  @click.stop="navigateToBuild(build)"
-                >
-                  <span class="w-1.5 h-1.5 rounded-full bg-green-500/50"></span>
-                  <span x-text="relTargetDisplayName(build)"></span>
-                </div>
-              </template>
-            </div>
-          </div>
-          <!-- Consuming builds -->
-          <div x-show="consumedByBuilds(f.spdxId).length > 0">
-            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
-              Consumed by builds
-            </div>
-            <div class="flex flex-wrap gap-1.5">
-              <template x-for="build in consumedByBuilds(f.spdxId).slice(0, 12)" :key="build">
-                <button
-                  class="badge bg-orange-500/15 text-orange-400 hover:bg-orange-500/25"
-                  @click.stop="navigateToBuild(build)"
-                  x-text="relTargetDisplayName(build)"
-                ></button>
-              </template>
+              class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+              :class="fileExt(f.name) === '.elf' ? 'bg-purple-500/15' : fileExt(f.name) === '.c' || fileExt(f.name) === '.obj' ? 'bg-amber-500/15' : 'bg-emerald-500/15'"
+            >
               <span
-                x-show="consumedByBuilds(f.spdxId).length > 12"
-                class="text-xs text-slate-500 self-center"
-                x-text="'+' + formatCount(consumedByBuilds(f.spdxId).length - 12) + ' more'"
+                class="flex items-center justify-center"
+                :class="fileExt(f.name) === '.elf' ? 'text-purple-400' : fileExt(f.name) === '.c' || fileExt(f.name) === '.obj' ? 'text-amber-400' : 'text-emerald-400'"
+                x-html="elementIcon(f, 'w-4 h-4')"
               ></span>
             </div>
-          </div>
-          <!-- Static links (for .elf files) -->
-          <div x-show="(staticLinks(f.spdxId)||[]).length > 0">
-            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
-              Statically linked
+            <!-- File name first, path underneath: truncating a long path used to
+                 cut off the file name itself, which is what people scan for. -->
+            <div class="flex-1 min-w-0">
+              <div
+                class="font-medium text-white text-sm truncate"
+                x-text="fileBaseName(f.name)"
+              ></div>
+              <div
+                x-show="fileDirName(f.name)"
+                class="text-[11px] text-slate-500 font-mono truncate"
+                :title="f.name"
+                x-text="fileDirName(f.name)"
+              ></div>
+              <div class="flex items-center gap-2 mt-0.5 flex-wrap">
+                <span
+                  class="badge text-xs"
+                  :class="fileExt(f.name) === '.elf' ? 'bg-purple-500/15 text-purple-400' : fileExt(f.name) === '.c' || fileExt(f.name) === '.obj' ? 'bg-amber-500/15 text-amber-400' : 'bg-emerald-500/15 text-emerald-400'"
+                  x-text="fileExt(f.name)"
+                ></span>
+                <template x-for="lic in concreteLicenses(f.spdxId)" :key="lic.id + lic.kind">
+                  <button
+                    type="button"
+                    class="badge text-xs hover:opacity-80"
+                    :class="lic.kind === 'concluded' ? 'bg-pink-500/15 text-pink-400' : 'bg-purple-500/15 text-purple-400'"
+                    :title="licenseTextActionLabel(lic.id) + ' · ' + (lic.kind === 'concluded' ? 'Concluded' : 'Declared')"
+                    @click.stop="showLicenseText(lic.id)"
+                    x-text="lic.label"
+                  ></button>
+                </template>
+                <span
+                  x-show="artifactSize(f)"
+                  class="text-[11px] text-slate-500 tabular-nums"
+                  x-text="artifactSize(f)"
+                ></span>
+              </div>
             </div>
-            <div class="space-y-1">
-              <template x-for="l in (staticLinks(f.spdxId)||[])" :key="l">
-                <div class="text-xs text-cyan-400 flex items-center gap-1.5">
-                  <span class="w-1.5 h-1.5 rounded-full bg-cyan-500/50"></span>
-                  <span x-text="cleanFileName(l)"></span>
+            <svg
+              class="w-4 h-4 text-slate-500 transition-transform flex-shrink-0"
+              :class="expandedFile === f.spdxId && 'rotate-180'"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </div>
+          <!-- Expanded detail — built lazily via x-if (only for the open card) -->
+          <template x-if="expandedFile === f.spdxId">
+            <div class="mt-4 pt-4 border-t border-slate-700 space-y-3 sm:pl-11 fade-in" @click.stop>
+              <!-- Summary / description -->
+              <div x-show="isMeaningful(f.summary)">
+                <div class="text-xs text-slate-500 mb-1">Summary</div>
+                <div
+                  class="text-xs text-slate-300 whitespace-pre-wrap break-words"
+                  x-text="f.summary"
+                ></div>
+              </div>
+              <div x-show="isMeaningful(f.description) && f.description !== f.summary">
+                <div class="text-xs text-slate-500 mb-1">Description</div>
+                <div
+                  class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-32 overflow-y-auto"
+                  x-text="f.description"
+                ></div>
+              </div>
+
+              <!-- Licenses -->
+              <div x-show="elementLicenses(f.spdxId).length > 0">
+                <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                  License
+                </div>
+                <div class="flex flex-wrap gap-1.5">
+                  <template x-for="lic in elementLicenses(f.spdxId)" :key="lic.id + lic.kind">
+                    <button
+                      type="button"
+                      class="badge hover:opacity-80"
+                      :class="lic.kind === 'concluded' ? 'bg-pink-500/15 text-pink-400' : 'bg-purple-500/15 text-purple-400'"
+                      :title="canShowLicenseText(lic.id) ? licenseTextActionLabel(lic.id) : 'View license'"
+                      @click.stop="showLicenseText(lic.id)"
+                      x-text="(lic.kind === 'declared' ? 'Declared: ' : 'Concluded: ') + lic.label"
+                    ></button>
+                  </template>
+                </div>
+              </div>
+              <!-- Hashes -->
+              <template x-for="h in (f.verifiedUsing || [])" :key="h.hashValue">
+                <div class="flex items-center gap-2">
+                  <span
+                    class="text-xs text-slate-500 w-12 flex-shrink-0 uppercase"
+                    x-text="h.algorithm"
+                  ></span>
+                  <code
+                    class="hash-text text-slate-300 flex-1 truncate"
+                    x-text="h.hashValue"
+                  ></code>
+                  <button
+                    @click.stop="copyHash(h.hashValue)"
+                    class="text-xs px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded text-slate-400 hover:text-white transition-colors flex-shrink-0"
+                  >
+                    Copy
+                  </button>
                 </div>
               </template>
-            </div>
-          </div>
-          <!-- Source viewer (full file) -->
-          <div x-show="fileSourceIndex.get(f.spdxId)" class="pt-1">
-            <div class="flex items-center gap-2 mb-2">
-              <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                Source
+              <!-- Parent package -->
+              <div x-show="parentPackage(f.spdxId)">
+                <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                  Contained in
+                </div>
+                <div
+                  class="text-xs text-blue-400 cursor-pointer hover:text-blue-300"
+                  @click.stop="navigateTo(parentPackage(f.spdxId))"
+                  x-text="relTargetDisplayName(parentPackage(f.spdxId) || '')"
+                ></div>
               </div>
-              <a
-                :href="fileSourceIndex.get(f.spdxId)"
-                target="_blank"
-                rel="noopener"
-                class="ml-auto text-xs text-slate-500 hover:text-slate-300"
-                @click.stop
-                >Raw source ↗</a
-              >
-            </div>
-
-            <!-- Loading -->
-            <div
-              x-show="fileSourceCache[f.spdxId]?.loading"
-              class="flex items-center gap-2 text-xs text-slate-500 py-2"
-            >
-              <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle
-                  class="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  stroke-width="4"
-                ></circle>
-                <path
-                  class="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                ></path>
-              </svg>
-              Loading source…
-            </div>
-
-            <!-- Error -->
-            <div x-show="fileSourceCache[f.spdxId]?.error" class="text-xs text-red-400/80 py-1">
-              Could not load source: <span x-text="fileSourceCache[f.spdxId]?.error"></span>
-            </div>
-
-            <!-- Full file source -->
-            <template x-if="fileSourceCache[f.spdxId]?.lines">
-              <div class="rounded-lg border border-slate-700/60 overflow-hidden mt-1">
-                <div class="source-viewer" @click.stop>
-                  <template x-for="line in fileSourceCache[f.spdxId].lines" :key="line.lineNum">
-                    <div class="sv-line" :data-line="line.lineNum">
-                      <span class="sv-lnum" x-text="line.lineNum"></span>
-                      <span class="sv-code" x-html="line.html || '​'"></span>
+              <!-- Tools used -->
+              <div x-show="(fileTools(f.spdxId)||[]).length > 0">
+                <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                  Built with
+                </div>
+                <div class="flex flex-wrap gap-1.5">
+                  <template x-for="t in (fileTools(f.spdxId)||[])" :key="t">
+                    <span
+                      class="badge bg-amber-500/15 text-amber-400"
+                      x-text="relTargetDisplayName(t)"
+                    ></span>
+                  </template>
+                </div>
+              </div>
+              <!-- Build configuration -->
+              <div x-show="configuredBy(f.spdxId).length > 0">
+                <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                  Build Configuration
+                </div>
+                <template x-for="cfg in configuredBy(f.spdxId)" :key="cfg.configId">
+                  <div
+                    class="text-xs text-teal-400 hover:text-teal-300 cursor-pointer flex items-center gap-1.5"
+                    @click.stop="navigateToConfig(cfg.configId)"
+                  >
+                    <span class="w-1.5 h-1.5 rounded-full bg-teal-500/50"></span>
+                    <span x-text="relTargetDisplayName(cfg.configId)"></span>
+                    <span
+                      class="text-slate-500"
+                      x-show="cfg.scope"
+                      x-text="'(' + cfg.scope + ')'"
+                    ></span>
+                  </div>
+                </template>
+              </div>
+              <!-- Producing builds -->
+              <div x-show="producedByBuilds(f.spdxId).length > 0">
+                <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                  Produced by build
+                </div>
+                <div class="space-y-1">
+                  <template x-for="build in producedByBuilds(f.spdxId)" :key="build">
+                    <div
+                      class="text-xs text-green-400 hover:text-green-300 cursor-pointer flex items-center gap-1.5"
+                      @click.stop="navigateToBuild(build)"
+                    >
+                      <span class="w-1.5 h-1.5 rounded-full bg-green-500/50"></span>
+                      <span x-text="relTargetDisplayName(build)"></span>
                     </div>
                   </template>
                 </div>
               </div>
-            </template>
-          </div>
+              <!-- Consuming builds -->
+              <div x-show="consumedByBuilds(f.spdxId).length > 0">
+                <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                  Consumed by builds
+                </div>
+                <div class="flex flex-wrap gap-1.5">
+                  <template x-for="build in consumedByBuilds(f.spdxId).slice(0, 12)" :key="build">
+                    <button
+                      class="badge bg-orange-500/15 text-orange-400 hover:bg-orange-500/25"
+                      @click.stop="navigateToBuild(build)"
+                      x-text="relTargetDisplayName(build)"
+                    ></button>
+                  </template>
+                  <span
+                    x-show="consumedByBuilds(f.spdxId).length > 12"
+                    class="text-xs text-slate-500 self-center"
+                    x-text="'+' + formatCount(consumedByBuilds(f.spdxId).length - 12) + ' more'"
+                  ></span>
+                </div>
+              </div>
+              <!-- Static links (for .elf files) -->
+              <div x-show="(staticLinks(f.spdxId)||[]).length > 0">
+                <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                  Statically linked
+                </div>
+                <div class="space-y-1">
+                  <template x-for="l in (staticLinks(f.spdxId)||[])" :key="l">
+                    <div class="text-xs text-cyan-400 flex items-center gap-1.5">
+                      <span class="w-1.5 h-1.5 rounded-full bg-cyan-500/50"></span>
+                      <span x-text="cleanFileName(l)"></span>
+                    </div>
+                  </template>
+                </div>
+              </div>
+              <!-- Source viewer (full file) -->
+              <div x-show="fileSourceIndex.get(f.spdxId)" class="pt-1">
+                <div class="flex items-center gap-2 mb-2">
+                  <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                    Source
+                  </div>
+                  <a
+                    :href="fileSourceIndex.get(f.spdxId)"
+                    target="_blank"
+                    rel="noopener"
+                    class="ml-auto text-xs text-slate-500 hover:text-slate-300"
+                    @click.stop
+                    >Raw source ↗</a
+                  >
+                </div>
+
+                <!-- Loading -->
+                <div
+                  x-show="fileSourceCache[f.spdxId]?.loading"
+                  class="flex items-center gap-2 text-xs text-slate-500 py-2"
+                >
+                  <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle
+                      class="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-width="4"
+                    ></circle>
+                    <path
+                      class="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    ></path>
+                  </svg>
+                  Loading source…
+                </div>
+
+                <!-- Error -->
+                <div x-show="fileSourceCache[f.spdxId]?.error" class="text-xs text-red-400/80 py-1">
+                  Could not load source: <span x-text="fileSourceCache[f.spdxId]?.error"></span>
+                </div>
+
+                <!-- Full file source -->
+                <template x-if="fileSourceCache[f.spdxId]?.lines">
+                  <div class="rounded-lg border border-slate-700/60 overflow-hidden mt-1">
+                    <div class="source-viewer" @click.stop>
+                      <template x-for="line in fileSourceCache[f.spdxId].lines" :key="line.lineNum">
+                        <div class="sv-line" :data-line="line.lineNum">
+                          <span class="sv-lnum" x-text="line.lineNum"></span>
+                          <span class="sv-code" x-html="line.html || '​'"></span>
+                        </div>
+                      </template>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </template>
         </div>
       </template>
     </div>
-  </template>
+  </div>
 </div>
