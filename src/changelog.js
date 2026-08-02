@@ -11,7 +11,11 @@ export const CHANGELOG = [
     items: [
       {
         tag: 'Improved',
-        text: 'Packages and Files add facet filters, versions, gap chips.'
+        text: 'Packages and Files filter by purpose, directory, missing fields.'
+      },
+      {
+        tag: 'Improved',
+        text: 'Package rows show version and license without expanding.'
       },
       {
         tag: 'Improved',
