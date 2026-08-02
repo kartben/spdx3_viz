@@ -11,6 +11,14 @@ export const CHANGELOG = [
     items: [
       {
         tag: 'Improved',
+        text: 'Packages and Files add facet filters, versions, gap chips.'
+      },
+      {
+        tag: 'Improved',
+        text: 'Package and file lists are faster on huge SBOMs.'
+      },
+      {
+        tag: 'Improved',
         text: 'Functional Safety decomposition, specification filter, pass-rate summary.'
       },
       {

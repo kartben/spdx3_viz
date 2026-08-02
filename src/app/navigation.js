@@ -695,20 +695,27 @@ export const navigationMixin = {
       this.navigateToVuln(spdxId);
     }
   },
-  navigateToPackage(spdxId) {
+  // Drops the Packages list filters so the target can't be filtered out from
+  // under a drill-down (the same reason navigateToFile clears the file filters).
+  _clearPackageListFilters() {
     this.packageSearch = '';
+    this.pkgPurposeFilter = '';
+    this.pkgGapFilter = '';
+  },
+  navigateToPackage(spdxId) {
+    this._clearPackageListFilters();
     this.switchView('packages');
     this.expandedPkg = spdxId;
     this.scrollToNavTarget('package', spdxId);
   },
   navigateToAiPackage(spdxId) {
-    this.packageSearch = '';
+    this._clearPackageListFilters();
     this.switchView('ai');
     this.expandedPkg = spdxId;
     this.scrollToNavTarget('ai', spdxId);
   },
   navigateToDataset(spdxId) {
-    this.packageSearch = '';
+    this._clearPackageListFilters();
     this.switchView('dataset');
     this.expandedPkg = spdxId;
     this.scrollToNavTarget('dataset', spdxId);
@@ -722,6 +729,7 @@ export const navigationMixin = {
   navigateToFile(spdxId) {
     this.fileSearch = '';
     this.fileTypeFilter = '';
+    this.fileDirFilter = '';
     this.switchView('files');
     this.expandedFile = spdxId;
     if (this.fileSourceIndex.get(spdxId)) {

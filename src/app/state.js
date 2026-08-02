@@ -205,7 +205,11 @@ export function createState() {
     licenseSort: 'usage',
     buildSort: 'output',
     pkgSort: 'name',
+    pkgPurposeFilter: '', // '' = all, else a software_primaryPurpose facet key
+    pkgGapFilter: '', // '' = all, else a PACKAGE_GAP_ORDER key (version, license, …)
     fileTypeFilter: '',
+    fileDirFilter: '', // '' = all, else a directory facet key (see fileDirFacets)
+    fileSort: 'name', // Files list sort: 'name' (path) | 'size'
     rawActiveFile: 0, // index into loadedFiles of the file shown in the Raw JSON-LD view
     rawPretty: true, // Raw view: true = pretty-printed, false = file as loaded
     toastMsg: '',

@@ -1,134 +1,324 @@
 <div
   x-show="currentView === 'packages' || currentView === 'ai' || currentView === 'dataset'"
-  class="fade-in space-y-3 max-w-4xl"
+  class="fade-in space-y-3"
+  :class="hasPackagePurposeFacets ? 'max-w-6xl' : 'max-w-4xl'"
 >
-  <div class="list-sticky flex flex-wrap items-center gap-3">
-    <span
-      class="text-sm text-slate-400 flex-shrink-0"
-      x-text="`${currentPackageList.length} ${currentPackageNoun}`"
-    ></span>
-    <input
-      x-model="packageSearch"
-      @input.debounce.150ms="restreamView(currentView)"
-      type="text"
-      :placeholder="`Filter ${currentPackageNoun}…`"
-      class="ml-auto bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-blue-500 w-44 sm:w-56"
-    />
-    <select
-      x-model="pkgSort"
-      @change="restreamView(currentView)"
-      class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 text-slate-300 focus:outline-none focus:border-blue-500"
-    >
-      <option value="name">Sort by name</option>
-      <option value="deps">Sort by dependencies</option>
-      <option value="dependents">Sort by dependents</option>
-    </select>
-  </div>
-  <template
-    x-for="pkg in (mountedViews[currentView] ? renderSlice(currentView, currentPackageList) : [])"
-    :key="pkg.spdxId"
-  >
-    <div
-      class="card"
-      :data-nav-kind="pkgNavKind(pkg)"
-      :data-nav-id="pkg.spdxId"
-      :class="isNavTarget(pkgNavKind(pkg), pkg.spdxId) && 'target-focus'"
-    >
-      <div class="flex items-center gap-3 cursor-pointer" @click="togglePkg(pkg.spdxId)">
-        <div
-          class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-          :style="`background:${nodeTypeColor(getNodeType(pkg))}26`"
-        >
+  <div class="list-sticky space-y-3">
+    <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+      <span class="text-sm text-slate-400 flex-shrink-0">
+        <span x-text="formatCount(currentPackageList.length)"></span>
+        <span x-text="currentPackageNoun"></span>
+        <template x-if="packageFiltersActive">
           <span
-            class="flex items-center justify-center"
-            :style="`color:${nodeTypeColor(getNodeType(pkg))}`"
-            x-html="elementIcon(pkg, 'w-4 h-4')"
+            class="text-slate-500"
+            x-text="` of ${formatCount(packageDescriptionSummary.total)}`"
           ></span>
-        </div>
-        <div class="flex-1 min-w-0">
-          <div
-            class="font-medium text-white text-sm break-words"
-            x-text="pkg.name || cleanName(pkg.spdxId)"
-          ></div>
-          <div
+        </template>
+      </span>
+      <input
+        x-model="packageSearch"
+        @input.debounce.150ms="restreamView(currentView)"
+        type="text"
+        placeholder="Filter by name, version, or purl…"
+        class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-blue-500 w-full sm:w-56 sm:ml-auto md:w-72"
+      />
+      <select
+        x-model="pkgSort"
+        @change="restreamView(currentView)"
+        class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 text-slate-300 focus:outline-none focus:border-blue-500"
+      >
+        <option value="name">Sort by name</option>
+        <option value="deps">Sort by dependencies</option>
+        <option value="dependents">Sort by dependents</option>
+      </select>
+    </div>
+
+    <!-- How completely this list describes its components: rollup bar over the
+         four component-level fields every SBOM baseline asks for, then one chip
+         per gap to jump straight to the packages missing it. -->
+    <template x-if="packageDescriptionSummary.total > 0">
+      <div class="space-y-2">
+        <div class="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-2 sm:flex-wrap">
+          <span
+            class="text-sm font-semibold text-white"
+            x-text="`${packageDescriptionSummary.fullPct}% fully described`"
+          ></span>
+          <span
             class="text-xs text-slate-500"
-            x-text="pkg.software_primaryPurpose || 'library'"
-          ></div>
+            x-text="`${formatCount(packageDescriptionSummary.buckets.full)} of ${formatCount(packageDescriptionSummary.total)} carry a version, license, supplier and identifier`"
+          ></span>
         </div>
-        <div class="flex items-center gap-2 flex-shrink-0">
-          <span
-            x-show="(depsOf(pkg.spdxId)||[]).length > 0"
-            class="badge bg-blue-500/15 text-blue-400"
-            :title="'Depends on ' + (depsOf(pkg.spdxId)||[]).length + ' package(s) (SPDX dependsOn)'"
-            x-text="'depends on ' + (depsOf(pkg.spdxId)||[]).length"
-          ></span>
-          <span
-            x-show="(dependentsOf(pkg.spdxId)||[]).length > 0"
-            class="badge bg-purple-500/15 text-purple-400"
-            :title="(dependentsOf(pkg.spdxId)||[]).length + ' package(s) depend on this one (SPDX dependsOn)'"
-            x-text="'required by ' + (dependentsOf(pkg.spdxId)||[]).length"
-          ></span>
-          <span
-            x-show="consumedByBuilds(pkg.spdxId).length > 0"
-            class="badge bg-orange-500/15 text-orange-400"
-            :title="'Consumed as input by ' + consumedByBuilds(pkg.spdxId).length + ' build(s) (SPDX hasInput)'"
-            x-text="'input to ' + consumedByBuilds(pkg.spdxId).length + (consumedByBuilds(pkg.spdxId).length === 1 ? ' build' : ' builds')"
-          ></span>
-          <span
-            x-show="producedByBuilds(pkg.spdxId).length > 0"
-            class="badge bg-green-500/15 text-green-400"
-            :title="'Produced by ' + producedByBuilds(pkg.spdxId).length + ' build(s) (SPDX hasOutput)'"
-            x-text="'built'"
-          ></span>
-          <span
-            x-show="distributionArtifacts(pkg.spdxId).length > 0"
-            class="badge bg-sky-500/15 text-sky-400"
-            :title="distributionArtifacts(pkg.spdxId).length + ' distribution artifact(s) (SPDX hasDistributionArtifact)'"
-            x-text="distributionArtifacts(pkg.spdxId).length + (distributionArtifacts(pkg.spdxId).length === 1 ? ' artifact' : ' artifacts')"
-          ></span>
-          <button
-            x-show="packageVulnSummary(pkg.spdxId).total > 0"
-            @click.stop="navigateToPackageSecurity(pkg.spdxId)"
-            class="badge bg-rose-500/15 text-rose-300 hover:brightness-125 inline-flex items-center"
-            :title="`${packageVulnSummary(pkg.spdxId).total} associated vulnerabilities — view in Security`"
+        <div class="flex h-2.5 w-full rounded-full overflow-hidden bg-slate-700">
+          <template x-for="seg in packageDescriptionSegments" :key="seg.key">
+            <div
+              class="h-full first:rounded-l-full last:rounded-r-full"
+              :style="`width:${(packageDescriptionSummary.buckets[seg.key] / packageDescriptionSummary.total) * 100}%; background:${seg.color}`"
+              :title="`${seg.label}: ${formatCount(packageDescriptionSummary.buckets[seg.key])}`"
+            ></div>
+          </template>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-xs text-slate-500 mr-0.5">Gaps</span>
+          <template
+            x-for="key in packageGapOrder.filter(k => packageDescriptionSummary.gapCounts[k] > 0)"
+            :key="key"
           >
-            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 9v2m0 4h.01M12 3l7 4v5c0 4.418-3 8.418-7 9.5C8 20.418 5 16.418 5 12V7l7-4z"
-              />
-            </svg>
-            <span x-text="formatCount(packageVulnSummary(pkg.spdxId).total) + ' CVEs'"></span>
-          </button>
-          <svg
-            class="w-4 h-4 text-slate-500 transition-transform"
-            :class="expandedPkg === pkg.spdxId && 'rotate-180'"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+            <button
+              type="button"
+              @click="pkgGapFilter = (pkgGapFilter === key ? '' : key); restreamView(currentView)"
+              class="badge transition"
+              :class="pkgGapFilter === key ? 'bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/30 brightness-125' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
+              :title="packageGapMeta(key).title"
+            >
+              <span x-text="packageGapMeta(key).label"></span>
+              <span
+                class="ml-1.5 font-semibold"
+                x-text="formatCount(packageDescriptionSummary.gapCounts[key])"
+              ></span>
+            </button>
+          </template>
+          <span
+            x-show="packageGapOrder.every(k => packageDescriptionSummary.gapCounts[k] === 0)"
+            class="text-xs text-emerald-400"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M19 9l-7 7-7-7"
-            />
-          </svg>
+            None: every package carries all four fields
+          </span>
         </div>
       </div>
-      <!-- Expanded detail — mirrors the graph detail panel -->
-      <div
-        x-show="expandedPkg === pkg.spdxId"
-        x-collapse
-        class="mt-4 pt-4 border-t border-slate-700"
+    </template>
+  </div>
+
+  <div class="flex gap-4 items-start" :class="hasPackagePurposeFacets && 'lg:gap-5'">
+    <!-- Primary-purpose filter rail (software_primaryPurpose) -->
+    <aside
+      x-show="hasPackagePurposeFacets"
+      class="hidden lg:block w-44 flex-shrink-0 sticky top-[var(--list-sticky-offset,7rem)] max-h-[calc(100vh-9rem)] overflow-y-auto"
+    >
+      <div class="text-[10px] text-slate-500 uppercase tracking-wider px-2 mb-1.5">Purpose</div>
+      <button
+        type="button"
+        @click="pkgPurposeFilter = ''; restreamView(currentView)"
+        class="w-full flex items-center justify-between gap-2 text-left text-xs px-2 py-1.5 rounded-lg transition-colors"
+        :class="!pkgPurposeFilter ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'"
       >
-        <div class="sm:pl-11 space-y-4">
-          <!-- Provenance & identifiers -->
+        <span>All</span>
+        <span
+          class="text-slate-500 tabular-nums"
+          x-text="formatCount(packageDescriptionSummary.total)"
+        ></span>
+      </button>
+      <template x-for="facet in packagePurposeFacets" :key="facet.key">
+        <button
+          type="button"
+          @click="pkgPurposeFilter = (pkgPurposeFilter === facet.key ? '' : facet.key); restreamView(currentView)"
+          class="w-full flex items-center justify-between gap-2 text-left text-xs px-2 py-1.5 rounded-lg transition-colors"
+          :class="pkgPurposeFilter === facet.key ? 'bg-slate-800 text-white ring-1 ring-blue-500/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'"
+          :title="facet.label"
+        >
+          <span class="truncate" x-text="facet.label"></span>
+          <span
+            class="text-slate-500 tabular-nums flex-shrink-0"
+            x-text="formatCount(facet.count)"
+          ></span>
+        </button>
+      </template>
+    </aside>
+
+    <div class="flex-1 min-w-0 space-y-3">
+      <!-- Mobile purpose select (the rail is lg+) -->
+      <div x-show="hasPackagePurposeFacets" class="lg:hidden">
+        <select
+          class="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+          :value="pkgPurposeFilter"
+          @change="pkgPurposeFilter = $event.target.value; restreamView(currentView)"
+        >
+          <option value="">All purposes</option>
+          <template x-for="facet in packagePurposeFacets" :key="facet.key">
+            <option
+              :value="facet.key"
+              x-text="`${facet.label} (${facet.count})`"
+              :selected="pkgPurposeFilter === facet.key"
+            ></option>
+          </template>
+        </select>
+      </div>
+
+      <div
+        x-show="mountedViews[currentView] && currentPackageList.length === 0"
+        class="card text-center py-10"
+      >
+        <div
+          class="text-sm font-medium text-slate-300"
+          x-text="packageFiltersActive
+            ? `No ${currentPackageNoun} match these filters`
+            : `No ${currentPackageNoun} in this document`"
+        ></div>
+        <button
+          x-show="packageFiltersActive"
+          type="button"
+          @click="clearPackageFilters()"
+          class="mt-3 rounded-md bg-slate-800 px-3 py-1.5 text-xs text-slate-300 hover:bg-slate-700 hover:text-white transition-colors"
+        >
+          Clear filters
+        </button>
+      </div>
+
+      <template
+        x-for="pkg in (mountedViews[currentView] ? renderSlice(currentView, currentPackageList) : [])"
+        :key="pkg.spdxId"
+      >
+        <div
+          class="card"
+          :data-nav-kind="pkgNavKind(pkg)"
+          :data-nav-id="pkg.spdxId"
+          :class="isNavTarget(pkgNavKind(pkg), pkg.spdxId) && 'target-focus'"
+        >
+          <div class="flex items-center gap-3 cursor-pointer" @click="togglePkg(pkg.spdxId)">
+            <div
+              class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+              :style="`background:${nodeTypeColor(getNodeType(pkg))}26`"
+            >
+              <span
+                class="flex items-center justify-center"
+                :style="`color:${nodeTypeColor(getNodeType(pkg))}`"
+                x-html="elementIcon(pkg, 'w-4 h-4')"
+              ></span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-baseline gap-2 flex-wrap">
+                <!-- min-w-0 so a long unbroken package id can wrap: as a flex item
+                     it would otherwise refuse to shrink below its content width. -->
+                <span
+                  class="font-medium text-white text-sm break-words min-w-0"
+                  x-text="pkg.name || cleanName(pkg.spdxId)"
+                ></span>
+                <!-- The version is the field people scan a package list for; show
+                     it on the row rather than only inside the expanded card. Some
+                     producers put a full commit hash here, so it truncates rather
+                     than wrapping the row onto four lines on a phone. -->
+                <span
+                  x-show="packageRowSummary(pkg).version"
+                  class="text-xs px-1.5 py-0.5 rounded bg-slate-700 text-slate-300 font-mono truncate max-w-[9rem] sm:max-w-[18rem]"
+                  :title="packageRowSummary(pkg).version"
+                  x-text="packageRowSummary(pkg).version"
+                ></span>
+                <span
+                  x-show="!packageRowSummary(pkg).version"
+                  class="text-[11px] text-amber-400/80"
+                  title="No software_packageVersion declared"
+                  >no version</span
+                >
+              </div>
+              <div class="flex items-center gap-2 mt-0.5 flex-wrap">
+                <span
+                  x-show="packageRowSummary(pkg).purposeLabel"
+                  class="text-xs text-slate-500"
+                  x-text="packageRowSummary(pkg).purposeLabel"
+                ></span>
+                <template x-for="lic in packageRowSummary(pkg).licenses" :key="lic.id + lic.kind">
+                  <button
+                    type="button"
+                    class="badge text-xs hover:opacity-80"
+                    :class="lic.kind === 'concluded' ? 'bg-pink-500/15 text-pink-400' : 'bg-purple-500/15 text-purple-400'"
+                    :title="licenseTextActionLabel(lic.id) + ' · ' + (lic.kind === 'concluded' ? 'Concluded' : 'Declared')"
+                    @click.stop="showLicenseText(lic.id)"
+                    x-text="lic.label"
+                  ></button>
+                </template>
+                <span
+                  x-show="packageRowSummary(pkg).extraLicenses"
+                  class="text-[11px] text-slate-500"
+                  x-text="`+${packageRowSummary(pkg).extraLicenses}`"
+                ></span>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <!-- Structural and build badges are grouped so they can drop out on
+                   narrow screens: .badge sets display:inline-flex, which would win
+                   over a `hidden` utility on the badge itself. The vulnerability
+                   badge stays at every width. -->
+              <div
+                x-show="packageRowSummary(pkg).deps || packageRowSummary(pkg).dependents"
+                class="hidden sm:flex items-center gap-2"
+              >
+                <span
+                  x-show="packageRowSummary(pkg).deps"
+                  class="badge bg-blue-500/15 text-blue-400"
+                  :title="'Depends on ' + packageRowSummary(pkg).deps + ' package(s) (SPDX dependsOn)'"
+                  x-text="'depends on ' + packageRowSummary(pkg).deps"
+                ></span>
+                <span
+                  x-show="packageRowSummary(pkg).dependents"
+                  class="badge bg-purple-500/15 text-purple-400"
+                  :title="packageRowSummary(pkg).dependents + ' package(s) depend on this one (SPDX dependsOn)'"
+                  x-text="'required by ' + packageRowSummary(pkg).dependents"
+                ></span>
+              </div>
+              <div
+                x-show="packageRowSummary(pkg).inputToBuilds || packageRowSummary(pkg).producedByBuilds || packageRowSummary(pkg).artifacts"
+                class="hidden lg:flex items-center gap-2"
+              >
+                <span
+                  x-show="packageRowSummary(pkg).inputToBuilds"
+                  class="badge bg-orange-500/15 text-orange-400"
+                  :title="'Consumed as input by ' + packageRowSummary(pkg).inputToBuilds + ' build(s) (SPDX hasInput)'"
+                  x-text="'input to ' + packageRowSummary(pkg).inputToBuilds + (packageRowSummary(pkg).inputToBuilds === 1 ? ' build' : ' builds')"
+                ></span>
+                <span
+                  x-show="packageRowSummary(pkg).producedByBuilds"
+                  class="badge bg-green-500/15 text-green-400"
+                  :title="'Produced by ' + packageRowSummary(pkg).producedByBuilds + ' build(s) (SPDX hasOutput)'"
+                  x-text="'built'"
+                ></span>
+                <span
+                  x-show="packageRowSummary(pkg).artifacts"
+                  class="badge bg-sky-500/15 text-sky-400"
+                  :title="packageRowSummary(pkg).artifacts + ' distribution artifact(s) (SPDX hasDistributionArtifact)'"
+                  x-text="packageRowSummary(pkg).artifacts + (packageRowSummary(pkg).artifacts === 1 ? ' artifact' : ' artifacts')"
+                ></span>
+              </div>
+              <button
+                x-show="packageRowSummary(pkg).vuln.total > 0"
+                @click.stop="navigateToPackageSecurity(pkg.spdxId)"
+                class="badge bg-rose-500/15 text-rose-300 hover:brightness-125 inline-flex items-center"
+                :title="`${packageRowSummary(pkg).vuln.total} associated vulnerabilities — view in Security`"
+              >
+                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 9v2m0 4h.01M12 3l7 4v5c0 4.418-3 8.418-7 9.5C8 20.418 5 16.418 5 12V7l7-4z"
+                  />
+                </svg>
+                <span x-text="formatCount(packageRowSummary(pkg).vuln.total) + ' CVEs'"></span>
+              </button>
+              <svg
+                class="w-4 h-4 text-slate-500 transition-transform"
+                :class="expandedPkg === pkg.spdxId && 'rotate-180'"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </div>
+          </div>
+          <!-- Expanded detail — mirrors the graph detail panel -->
           <div
-            x-show="isMeaningful(pkg.software_packageVersion) ||
-                              artifactSize(pkg) ||
+            x-show="expandedPkg === pkg.spdxId"
+            x-collapse
+            class="mt-4 pt-4 border-t border-slate-700"
+          >
+            <div class="sm:pl-11 space-y-4">
+              <!-- Provenance & identifiers -->
+              <div
+                x-show="artifactSize(pkg) ||
                               packageOriginators(pkg).length > 0 ||
                               packageSuppliers(pkg).length > 0 ||
                               isMeaningful(pkg.software_downloadLocation) ||
@@ -138,232 +328,379 @@
                               externalIdentifiers(pkg).length > 0 ||
                               isMeaningful(pkg.software_copyrightText) ||
                               isMeaningful(pkg.comment)"
-            class="space-y-3"
-          >
-            <!-- Version -->
-            <div x-show="isMeaningful(pkg.software_packageVersion)" class="flex items-center gap-2">
-              <span class="text-xs text-slate-500 flex-shrink-0">Version</span>
-              <span
-                class="text-xs px-2 py-0.5 rounded-md bg-slate-700 text-slate-300 font-mono break-all"
-                x-text="pkg.software_packageVersion"
-              ></span>
-            </div>
+                class="space-y-3"
+              >
+                <!-- The version shows on the collapsed row, so it isn't repeated here. -->
+                <!-- Size (software_artifactSize) -->
+                <div x-show="artifactSize(pkg)" class="flex items-center gap-2">
+                  <span class="text-xs text-slate-500 flex-shrink-0">Size</span>
+                  <span
+                    class="text-xs px-2 py-0.5 rounded-md bg-slate-700 text-slate-300 tabular-nums"
+                    x-text="artifactSize(pkg)"
+                  ></span>
+                </div>
 
-            <!-- Size (software_artifactSize) -->
-            <div x-show="artifactSize(pkg)" class="flex items-center gap-2">
-              <span class="text-xs text-slate-500 flex-shrink-0">Size</span>
-              <span
-                class="text-xs px-2 py-0.5 rounded-md bg-slate-700 text-slate-300 tabular-nums"
-                x-text="artifactSize(pkg)"
-              ></span>
-            </div>
-
-            <!-- Provenance agents: Origin (originatedBy) then Supplier (suppliedBy).
+                <!-- Provenance agents: Origin (originatedBy) then Supplier (suppliedBy).
                  Two columns when the card is wide, stacked when it's narrow. -->
-            <div
-              x-show="packageOriginators(pkg).length > 0 || packageSuppliers(pkg).length > 0"
-              class="provenance-grid"
-            >
-              <div class="provenance-cols">
-                <!-- Origin(s) (Artifact.originatedBy / software_originatedBy) -->
-                <div x-show="packageOriginators(pkg).length > 0" class="flex-1 min-w-0">
+                <div
+                  x-show="packageOriginators(pkg).length > 0 || packageSuppliers(pkg).length > 0"
+                  class="provenance-grid"
+                >
+                  <div class="provenance-cols">
+                    <!-- Origin(s) (Artifact.originatedBy / software_originatedBy) -->
+                    <div x-show="packageOriginators(pkg).length > 0" class="flex-1 min-w-0">
+                      <div
+                        class="text-xs text-slate-500 mb-1"
+                        x-text="packageOriginators(pkg).length > 1 ? 'Origins' : 'Origin'"
+                      ></div>
+                      <div class="space-y-1">
+                        <template
+                          x-for="org in packageOriginators(pkg)"
+                          :key="org.id || org.displayName"
+                        >
+                          <div
+                            class="detail-rel-item group"
+                            :class="!org.id && 'cursor-default hover:bg-transparent'"
+                            @click.stop="org.id && navigateTo(org.id)"
+                          >
+                            <span
+                              class="flex items-center flex-shrink-0"
+                              :style="`color: ${nodeTypeColor(elementMap.get(org.id) ? getNodeType(elementMap.get(org.id)) : 'agent')}`"
+                              x-html="elementMap.get(org.id) ? elementIcon(elementMap.get(org.id), 'w-3.5 h-3.5') : nodeTypeIconSvg('agent', 'w-3.5 h-3.5')"
+                            ></span>
+                            <span class="flex-1 truncate" x-text="org.displayName"></span>
+                            <svg
+                              x-show="org.id"
+                              class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors flex-shrink-0"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M9 5l7 7-7 7"
+                              />
+                            </svg>
+                          </div>
+                        </template>
+                      </div>
+                    </div>
+
+                    <!-- Supplier(s) (Artifact.suppliedBy / software_suppliedBy) -->
+                    <div x-show="packageSuppliers(pkg).length > 0" class="flex-1 min-w-0">
+                      <div
+                        class="text-xs text-slate-500 mb-1"
+                        x-text="packageSuppliers(pkg).length > 1 ? 'Suppliers' : 'Supplier'"
+                      ></div>
+                      <div class="space-y-1">
+                        <template
+                          x-for="sup in packageSuppliers(pkg)"
+                          :key="sup.id || sup.displayName"
+                        >
+                          <div
+                            class="detail-rel-item group"
+                            :class="!sup.id && 'cursor-default hover:bg-transparent'"
+                            @click.stop="sup.id && navigateTo(sup.id)"
+                          >
+                            <span
+                              class="flex items-center flex-shrink-0"
+                              :style="`color: ${nodeTypeColor(elementMap.get(sup.id) ? getNodeType(elementMap.get(sup.id)) : 'agent')}`"
+                              x-html="elementMap.get(sup.id) ? elementIcon(elementMap.get(sup.id), 'w-3.5 h-3.5') : nodeTypeIconSvg('agent', 'w-3.5 h-3.5')"
+                            ></span>
+                            <span class="flex-1 truncate" x-text="sup.displayName"></span>
+                            <svg
+                              x-show="sup.id"
+                              class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors flex-shrink-0"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M9 5l7 7-7 7"
+                              />
+                            </svg>
+                          </div>
+                        </template>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Summary / description -->
+                <div x-show="isMeaningful(pkg.summary)">
+                  <div class="text-xs text-slate-500 mb-1">Summary</div>
                   <div
-                    class="text-xs text-slate-500 mb-1"
-                    x-text="packageOriginators(pkg).length > 1 ? 'Origins' : 'Origin'"
+                    class="text-xs text-slate-300 whitespace-pre-wrap break-words"
+                    x-text="pkg.summary"
                   ></div>
-                  <div class="space-y-1">
+                </div>
+                <div x-show="isMeaningful(pkg.description) && pkg.description !== pkg.summary">
+                  <div class="text-xs text-slate-500 mb-1">Description</div>
+                  <div
+                    class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-32 overflow-y-auto"
+                    x-text="pkg.description"
+                  ></div>
+                </div>
+
+                <!-- Homepage -->
+                <div x-show="isMeaningful(pkg.software_homePage)">
+                  <div class="text-xs text-slate-500 mb-1">Homepage</div>
+                  <a
+                    x-show="downloadUrl(pkg.software_homePage)"
+                    :href="downloadUrl(pkg.software_homePage)"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    @click.stop
+                    class="text-xs text-sky-400 hover:text-sky-300 break-all"
+                    x-text="pkg.software_homePage"
+                  ></a>
+                  <span
+                    x-show="!downloadUrl(pkg.software_homePage)"
+                    class="block text-xs text-slate-300 break-all"
+                    x-text="pkg.software_homePage"
+                  ></span>
+                </div>
+
+                <!-- Download / source location -->
+                <div x-show="isMeaningful(pkg.software_downloadLocation)">
+                  <div class="text-xs text-slate-500 mb-1">Download location</div>
+                  <a
+                    x-show="downloadUrl(pkg.software_downloadLocation)"
+                    :href="downloadUrl(pkg.software_downloadLocation)"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    @click.stop
+                    class="text-xs text-sky-400 hover:text-sky-300 font-mono break-all"
+                    x-text="pkg.software_downloadLocation"
+                  ></a>
+                  <code
+                    x-show="!downloadUrl(pkg.software_downloadLocation)"
+                    class="block text-xs text-slate-300 font-mono break-all"
+                    x-text="pkg.software_downloadLocation"
+                  ></code>
+                </div>
+
+                <!-- External identifiers (PackageURL, CPE, …) -->
+                <div x-show="externalIdentifiers(pkg).length > 0">
+                  <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                    Identifiers
+                  </div>
+                  <div class="space-y-1.5">
                     <template
-                      x-for="org in packageOriginators(pkg)"
-                      :key="org.id || org.displayName"
+                      x-for="eid in externalIdentifiers(pkg)"
+                      :key="eid.type + eid.identifier"
                     >
-                      <div
-                        class="detail-rel-item group"
-                        :class="!org.id && 'cursor-default hover:bg-transparent'"
-                        @click.stop="org.id && navigateTo(org.id)"
-                      >
+                      <div class="flex items-start gap-2 group">
                         <span
-                          class="flex items-center flex-shrink-0"
-                          :style="`color: ${nodeTypeColor(elementMap.get(org.id) ? getNodeType(elementMap.get(org.id)) : 'agent')}`"
-                          x-html="elementMap.get(org.id) ? elementIcon(elementMap.get(org.id), 'w-3.5 h-3.5') : nodeTypeIconSvg('agent', 'w-3.5 h-3.5')"
+                          class="text-[10px] text-slate-500 uppercase tracking-wider w-20 pt-0.5 flex-shrink-0 text-right"
+                          x-text="eid.label"
                         ></span>
-                        <span class="flex-1 truncate" x-text="org.displayName"></span>
-                        <svg
-                          x-show="org.id"
-                          class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors flex-shrink-0"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
+                        <code
+                          class="hash-text text-slate-300 break-all flex-1 leading-relaxed"
+                          x-text="eid.identifier"
+                        ></code>
+                        <a
+                          x-show="purlLink(eid)"
+                          :href="purlLink(eid)?.url"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          @click.stop
+                          :title="purlLink(eid)?.label"
+                          class="text-sky-400/70 hover:text-sky-300 transition-colors flex-shrink-0 pt-0.5"
                         >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M9 5l7 7-7 7"
-                          />
-                        </svg>
+                          <svg
+                            class="w-3.5 h-3.5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                            />
+                          </svg>
+                        </a>
+                        <a
+                          x-show="vulnLookup(eid)"
+                          :href="vulnLookup(eid)?.url"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          @click.stop
+                          :title="vulnLookup(eid)?.label"
+                          class="text-rose-400/70 hover:text-rose-300 transition-colors flex-shrink-0 pt-0.5"
+                        >
+                          <svg
+                            class="w-3.5 h-3.5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                            />
+                          </svg>
+                        </a>
+                        <button
+                          @click.stop="copyHash(eid.identifier)"
+                          class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity flex-shrink-0 pt-0.5"
+                          title="Copy"
+                        >
+                          <svg
+                            class="w-3 h-3"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                            />
+                          </svg>
+                        </button>
                       </div>
                     </template>
                   </div>
                 </div>
 
-                <!-- Supplier(s) (Artifact.suppliedBy / software_suppliedBy) -->
-                <div x-show="packageSuppliers(pkg).length > 0" class="flex-1 min-w-0">
+                <!-- Copyright -->
+                <div x-show="isMeaningful(pkg.software_copyrightText)">
+                  <div class="text-xs text-slate-500 mb-1">Copyright</div>
                   <div
-                    class="text-xs text-slate-500 mb-1"
-                    x-text="packageSuppliers(pkg).length > 1 ? 'Suppliers' : 'Supplier'"
+                    class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-32 overflow-y-auto bg-slate-900/50 rounded px-2 py-1.5"
+                    x-text="pkg.software_copyrightText"
                   ></div>
-                  <div class="space-y-1">
-                    <template x-for="sup in packageSuppliers(pkg)" :key="sup.id || sup.displayName">
-                      <div
-                        class="detail-rel-item group"
-                        :class="!sup.id && 'cursor-default hover:bg-transparent'"
-                        @click.stop="sup.id && navigateTo(sup.id)"
-                      >
-                        <span
-                          class="flex items-center flex-shrink-0"
-                          :style="`color: ${nodeTypeColor(elementMap.get(sup.id) ? getNodeType(elementMap.get(sup.id)) : 'agent')}`"
-                          x-html="elementMap.get(sup.id) ? elementIcon(elementMap.get(sup.id), 'w-3.5 h-3.5') : nodeTypeIconSvg('agent', 'w-3.5 h-3.5')"
-                        ></span>
-                        <span class="flex-1 truncate" x-text="sup.displayName"></span>
-                        <svg
-                          x-show="sup.id"
-                          class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors flex-shrink-0"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M9 5l7 7-7 7"
-                          />
-                        </svg>
-                      </div>
-                    </template>
-                  </div>
+                </div>
+
+                <!-- Free-form comment / note -->
+                <div x-show="isMeaningful(pkg.comment)">
+                  <div class="text-xs text-slate-500 mb-1">Note</div>
+                  <div
+                    class="text-xs text-slate-300 whitespace-pre-wrap break-words bg-slate-900/50 rounded px-2 py-1.5"
+                    x-text="pkg.comment"
+                  ></div>
                 </div>
               </div>
-            </div>
 
-            <!-- Summary / description -->
-            <div x-show="isMeaningful(pkg.summary)">
-              <div class="text-xs text-slate-500 mb-1">Summary</div>
-              <div
-                class="text-xs text-slate-300 whitespace-pre-wrap break-words"
-                x-text="pkg.summary"
-              ></div>
-            </div>
-            <div x-show="isMeaningful(pkg.description) && pkg.description !== pkg.summary">
-              <div class="text-xs text-slate-500 mb-1">Description</div>
-              <div
-                class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-32 overflow-y-auto"
-                x-text="pkg.description"
-              ></div>
-            </div>
-
-            <!-- Homepage -->
-            <div x-show="isMeaningful(pkg.software_homePage)">
-              <div class="text-xs text-slate-500 mb-1">Homepage</div>
-              <a
-                x-show="downloadUrl(pkg.software_homePage)"
-                :href="downloadUrl(pkg.software_homePage)"
-                target="_blank"
-                rel="noopener noreferrer"
-                @click.stop
-                class="text-xs text-sky-400 hover:text-sky-300 break-all"
-                x-text="pkg.software_homePage"
-              ></a>
-              <span
-                x-show="!downloadUrl(pkg.software_homePage)"
-                class="block text-xs text-slate-300 break-all"
-                x-text="pkg.software_homePage"
-              ></span>
-            </div>
-
-            <!-- Download / source location -->
-            <div x-show="isMeaningful(pkg.software_downloadLocation)">
-              <div class="text-xs text-slate-500 mb-1">Download location</div>
-              <a
-                x-show="downloadUrl(pkg.software_downloadLocation)"
-                :href="downloadUrl(pkg.software_downloadLocation)"
-                target="_blank"
-                rel="noopener noreferrer"
-                @click.stop
-                class="text-xs text-sky-400 hover:text-sky-300 font-mono break-all"
-                x-text="pkg.software_downloadLocation"
-              ></a>
-              <code
-                x-show="!downloadUrl(pkg.software_downloadLocation)"
-                class="block text-xs text-slate-300 font-mono break-all"
-                x-text="pkg.software_downloadLocation"
-              ></code>
-            </div>
-
-            <!-- External identifiers (PackageURL, CPE, …) -->
-            <div x-show="externalIdentifiers(pkg).length > 0">
-              <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-                Identifiers
+              <!-- AI / Dataset profile (ai_AIPackage, dataset_DatasetPackage) -->
+              <div x-show="profileFields(pkg).length > 0" class="space-y-3">
+                <div
+                  class="text-xs font-semibold uppercase tracking-wider"
+                  :style="`color:${nodeTypeColor(getNodeType(pkg))}`"
+                  x-text="pkg.type === 'dataset_DatasetPackage' ? 'Dataset' : 'AI model'"
+                ></div>
+                <template x-for="f in profileFields(pkg)" :key="f.label">
+                  <div>
+                    <div class="text-xs text-slate-500 mb-1" x-text="f.label"></div>
+                    <span
+                      x-show="f.kind === 'badge'"
+                      class="text-xs px-2 py-0.5 rounded-md bg-slate-700 text-slate-300"
+                      x-text="f.kind === 'badge' ? f.value : ''"
+                    ></span>
+                    <div
+                      x-show="f.kind === 'text'"
+                      class="text-xs text-slate-300 break-words"
+                      x-text="f.kind === 'text' ? f.value : ''"
+                    ></div>
+                    <div
+                      x-show="f.kind === 'longtext'"
+                      class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-40 overflow-y-auto"
+                      x-text="f.kind === 'longtext' ? f.value : ''"
+                    ></div>
+                    <div x-show="f.kind === 'chips'" class="flex flex-wrap gap-1">
+                      <template x-for="c in (f.kind === 'chips' ? f.value : [])" :key="c">
+                        <span
+                          class="text-xs px-2 py-0.5 rounded-md bg-slate-700 text-slate-300"
+                          x-text="c"
+                        ></span>
+                      </template>
+                    </div>
+                    <ul
+                      x-show="f.kind === 'list'"
+                      class="list-disc list-inside space-y-1 text-xs text-slate-300"
+                    >
+                      <template x-for="(item, i) in (f.kind === 'list' ? f.value : [])" :key="i">
+                        <li class="break-words" x-text="item"></li>
+                      </template>
+                    </ul>
+                    <div x-show="f.kind === 'dict'" class="space-y-1">
+                      <template x-for="(entry, i) in (f.kind === 'dict' ? f.value : [])" :key="i">
+                        <div class="rounded bg-slate-900/50 px-2 py-1">
+                          <div
+                            class="text-[10px] uppercase tracking-wider text-slate-500"
+                            x-text="entry.key"
+                          ></div>
+                          <div
+                            class="text-xs text-slate-300 font-mono break-all max-h-24 overflow-y-auto"
+                            x-text="entry.value"
+                          ></div>
+                        </div>
+                      </template>
+                    </div>
+                  </div>
+                </template>
               </div>
-              <div class="space-y-1.5">
-                <template x-for="eid in externalIdentifiers(pkg)" :key="eid.type + eid.identifier">
+
+              <!-- Verification (hashes + content identifiers) -->
+              <div
+                x-show="(pkg.verifiedUsing || []).length > 0 || (pkg.software_contentIdentifier || []).length > 0"
+                class="space-y-2"
+              >
+                <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                  Verification
+                </div>
+                <template x-for="h in (pkg.verifiedUsing || [])" :key="h.hashValue">
                   <div class="flex items-start gap-2 group">
                     <span
-                      class="text-[10px] text-slate-500 uppercase tracking-wider w-20 pt-0.5 flex-shrink-0 text-right"
-                      x-text="eid.label"
+                      class="text-[10px] text-slate-500 uppercase w-10 pt-0.5 flex-shrink-0 text-right"
+                      x-text="h.algorithm"
                     ></span>
                     <code
-                      class="hash-text text-slate-300 break-all flex-1 leading-relaxed"
-                      x-text="eid.identifier"
+                      class="hash-text text-slate-400 break-all flex-1 leading-relaxed"
+                      x-text="h.hashValue"
                     ></code>
-                    <a
-                      x-show="purlLink(eid)"
-                      :href="purlLink(eid)?.url"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      @click.stop
-                      :title="purlLink(eid)?.label"
-                      class="text-sky-400/70 hover:text-sky-300 transition-colors flex-shrink-0 pt-0.5"
-                    >
-                      <svg
-                        class="w-3.5 h-3.5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                        />
-                      </svg>
-                    </a>
-                    <a
-                      x-show="vulnLookup(eid)"
-                      :href="vulnLookup(eid)?.url"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      @click.stop
-                      :title="vulnLookup(eid)?.label"
-                      class="text-rose-400/70 hover:text-rose-300 transition-colors flex-shrink-0 pt-0.5"
-                    >
-                      <svg
-                        class="w-3.5 h-3.5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                        />
-                      </svg>
-                    </a>
                     <button
-                      @click.stop="copyHash(eid.identifier)"
+                      @click.stop="copyHash(h.hashValue)"
+                      class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity flex-shrink-0 pt-0.5"
+                      title="Copy"
+                    >
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </template>
+                <template
+                  x-for="ci in (pkg.software_contentIdentifier || [])"
+                  :key="ci.software_contentIdentifierValue"
+                >
+                  <div class="flex items-start gap-2 group">
+                    <span
+                      class="text-[10px] text-slate-500 uppercase w-10 pt-0.5 flex-shrink-0 text-right"
+                      x-text="ci.software_contentIdentifierType"
+                    ></span>
+                    <code
+                      class="hash-text text-slate-400 break-all flex-1 leading-relaxed"
+                      x-text="ci.software_contentIdentifierValue"
+                    ></code>
+                    <button
+                      @click.stop="copyHash(ci.software_contentIdentifierValue)"
                       class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity flex-shrink-0 pt-0.5"
                       title="Copy"
                     >
@@ -379,328 +716,201 @@
                   </div>
                 </template>
               </div>
-            </div>
 
-            <!-- Copyright -->
-            <div x-show="isMeaningful(pkg.software_copyrightText)">
-              <div class="text-xs text-slate-500 mb-1">Copyright</div>
+              <!-- CycloneDX properties (SPDX 3 CdxPropertiesExtension) -->
               <div
-                class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-32 overflow-y-auto bg-slate-900/50 rounded px-2 py-1.5"
-                x-text="pkg.software_copyrightText"
-              ></div>
-            </div>
-
-            <!-- Free-form comment / note -->
-            <div x-show="isMeaningful(pkg.comment)">
-              <div class="text-xs text-slate-500 mb-1">Note</div>
-              <div
-                class="text-xs text-slate-300 whitespace-pre-wrap break-words bg-slate-900/50 rounded px-2 py-1.5"
-                x-text="pkg.comment"
-              ></div>
-            </div>
-          </div>
-
-          <!-- AI / Dataset profile (ai_AIPackage, dataset_DatasetPackage) -->
-          <div x-show="profileFields(pkg).length > 0" class="space-y-3">
-            <div
-              class="text-xs font-semibold uppercase tracking-wider"
-              :style="`color:${nodeTypeColor(getNodeType(pkg))}`"
-              x-text="pkg.type === 'dataset_DatasetPackage' ? 'Dataset' : 'AI model'"
-            ></div>
-            <template x-for="f in profileFields(pkg)" :key="f.label">
-              <div>
-                <div class="text-xs text-slate-500 mb-1" x-text="f.label"></div>
-                <span
-                  x-show="f.kind === 'badge'"
-                  class="text-xs px-2 py-0.5 rounded-md bg-slate-700 text-slate-300"
-                  x-text="f.kind === 'badge' ? f.value : ''"
-                ></span>
-                <div
-                  x-show="f.kind === 'text'"
-                  class="text-xs text-slate-300 break-words"
-                  x-text="f.kind === 'text' ? f.value : ''"
-                ></div>
-                <div
-                  x-show="f.kind === 'longtext'"
-                  class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-40 overflow-y-auto"
-                  x-text="f.kind === 'longtext' ? f.value : ''"
-                ></div>
-                <div x-show="f.kind === 'chips'" class="flex flex-wrap gap-1">
-                  <template x-for="c in (f.kind === 'chips' ? f.value : [])" :key="c">
-                    <span
-                      class="text-xs px-2 py-0.5 rounded-md bg-slate-700 text-slate-300"
-                      x-text="c"
-                    ></span>
-                  </template>
-                </div>
-                <ul
-                  x-show="f.kind === 'list'"
-                  class="list-disc list-inside space-y-1 text-xs text-slate-300"
+                x-show="cdxProperties(pkg).length > 0"
+                x-data="{ cdxOpen: false }"
+                class="space-y-2"
+              >
+                <button
+                  @click.stop="cdxOpen = !cdxOpen"
+                  class="flex items-center gap-2 w-full text-left"
                 >
-                  <template x-for="(item, i) in (f.kind === 'list' ? f.value : [])" :key="i">
-                    <li class="break-words" x-text="item"></li>
-                  </template>
-                </ul>
-                <div x-show="f.kind === 'dict'" class="space-y-1">
-                  <template x-for="(entry, i) in (f.kind === 'dict' ? f.value : [])" :key="i">
-                    <div class="rounded bg-slate-900/50 px-2 py-1">
-                      <div
-                        class="text-[10px] uppercase tracking-wider text-slate-500"
-                        x-text="entry.key"
-                      ></div>
-                      <div
-                        class="text-xs text-slate-300 font-mono break-all max-h-24 overflow-y-auto"
-                        x-text="entry.value"
-                      ></div>
+                  <span class="detail-rel-line" style="background: #f59e0b"></span>
+                  <span class="text-xs font-semibold uppercase tracking-wider text-amber-400"
+                    >CycloneDX properties</span
+                  >
+                  <span
+                    class="badge bg-amber-500/15 text-amber-300 text-[10px] uppercase tracking-wider"
+                    title="Carried via the SPDX 3 CdxPropertiesExtension"
+                    >CDX</span
+                  >
+                  <span
+                    class="text-[10px] text-slate-500"
+                    x-text="'(' + cdxProperties(pkg).length + ')'"
+                  ></span>
+                  <svg
+                    class="w-3.5 h-3.5 text-slate-500 ml-auto transition-transform"
+                    :class="cdxOpen && 'rotate-90'"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </button>
+                <div x-show="cdxOpen" x-collapse class="space-y-1.5 ml-3">
+                  <template x-for="prop in cdxProperties(pkg)" :key="prop.name">
+                    <div class="group">
+                      <div class="flex items-center gap-2">
+                        <code
+                          class="hash-text text-amber-300/80 break-all leading-relaxed"
+                          x-text="prop.name"
+                        ></code>
+                        <button
+                          @click.stop="copyHash(prop.json ? prop.pretty : prop.value)"
+                          class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity flex-shrink-0"
+                          title="Copy"
+                        >
+                          <svg
+                            class="w-3 h-3"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                      <pre
+                        x-show="prop.json"
+                        class="hash-text text-slate-300 bg-slate-900/50 rounded px-2 py-1.5 mt-0.5 overflow-x-auto whitespace-pre"
+                        x-text="prop.pretty"
+                      ></pre>
+                      <code
+                        x-show="!prop.json"
+                        class="hash-text text-slate-300 break-all leading-relaxed block mt-0.5"
+                        x-text="prop.value"
+                      ></code>
                     </div>
                   </template>
                 </div>
               </div>
-            </template>
-          </div>
 
-          <!-- Verification (hashes + content identifiers) -->
-          <div
-            x-show="(pkg.verifiedUsing || []).length > 0 || (pkg.software_contentIdentifier || []).length > 0"
-            class="space-y-2"
-          >
-            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-              Verification
-            </div>
-            <template x-for="h in (pkg.verifiedUsing || [])" :key="h.hashValue">
-              <div class="flex items-start gap-2 group">
-                <span
-                  class="text-[10px] text-slate-500 uppercase w-10 pt-0.5 flex-shrink-0 text-right"
-                  x-text="h.algorithm"
-                ></span>
-                <code
-                  class="hash-text text-slate-400 break-all flex-1 leading-relaxed"
-                  x-text="h.hashValue"
-                ></code>
+              <!-- Associated vulnerabilities (VEX) -->
+              <div x-show="vulnsForPackage(pkg.spdxId).length > 0" class="space-y-2">
+                <div class="flex items-center gap-2">
+                  <span class="detail-rel-line" style="background: #f43f5e"></span>
+                  <span class="text-xs font-semibold uppercase tracking-wider text-rose-400"
+                    >Vulnerabilities (VEX)</span
+                  >
+                  <span
+                    class="text-[10px] text-slate-500"
+                    x-text="'(' + formatCount(packageRowSummary(pkg).vuln.total) + ')'"
+                  ></span>
+                </div>
+                <div class="flex flex-wrap gap-1.5 ml-3">
+                  <template x-for="st in packageRowSummary(pkg).vuln.statuses" :key="st.status">
+                    <span class="badge" :class="st.meta.badgeClass">
+                      <span
+                        class="w-1.5 h-1.5 rounded-full mr-1.5"
+                        :class="st.meta.dotClass"
+                      ></span>
+                      <span x-text="st.meta.label"></span>
+                      <span class="ml-1.5 font-semibold" x-text="formatCount(st.count)"></span>
+                    </span>
+                  </template>
+                </div>
                 <button
-                  @click.stop="copyHash(h.hashValue)"
-                  class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity flex-shrink-0 pt-0.5"
-                  title="Copy"
+                  @click.stop="navigateToPackageSecurity(pkg.spdxId)"
+                  class="ml-3 text-xs text-rose-300 hover:text-rose-200 inline-flex items-center gap-1"
                 >
+                  View all in Security
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
                       stroke-width="2"
-                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                      d="M9 5l7 7-7 7"
                     />
                   </svg>
                 </button>
               </div>
-            </template>
-            <template
-              x-for="ci in (pkg.software_contentIdentifier || [])"
-              :key="ci.software_contentIdentifierValue"
-            >
-              <div class="flex items-start gap-2 group">
-                <span
-                  class="text-[10px] text-slate-500 uppercase w-10 pt-0.5 flex-shrink-0 text-right"
-                  x-text="ci.software_contentIdentifierType"
-                ></span>
-                <code
-                  class="hash-text text-slate-400 break-all flex-1 leading-relaxed"
-                  x-text="ci.software_contentIdentifierValue"
-                ></code>
-                <button
-                  @click.stop="copyHash(ci.software_contentIdentifierValue)"
-                  class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity flex-shrink-0 pt-0.5"
-                  title="Copy"
-                >
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                    />
-                  </svg>
-                </button>
-              </div>
-            </template>
-          </div>
 
-          <!-- CycloneDX properties (SPDX 3 CdxPropertiesExtension) -->
-          <div x-show="cdxProperties(pkg).length > 0" x-data="{ cdxOpen: false }" class="space-y-2">
-            <button
-              @click.stop="cdxOpen = !cdxOpen"
-              class="flex items-center gap-2 w-full text-left"
-            >
-              <span class="detail-rel-line" style="background: #f59e0b"></span>
-              <span class="text-xs font-semibold uppercase tracking-wider text-amber-400"
-                >CycloneDX properties</span
-              >
-              <span
-                class="badge bg-amber-500/15 text-amber-300 text-[10px] uppercase tracking-wider"
-                title="Carried via the SPDX 3 CdxPropertiesExtension"
-                >CDX</span
-              >
-              <span
-                class="text-[10px] text-slate-500"
-                x-text="'(' + cdxProperties(pkg).length + ')'"
-              ></span>
-              <svg
-                class="w-3.5 h-3.5 text-slate-500 ml-auto transition-transform"
-                :class="cdxOpen && 'rotate-90'"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </button>
-            <div x-show="cdxOpen" x-collapse class="space-y-1.5 ml-3">
-              <template x-for="prop in cdxProperties(pkg)" :key="prop.name">
-                <div class="group">
-                  <div class="flex items-center gap-2">
-                    <code
-                      class="hash-text text-amber-300/80 break-all leading-relaxed"
-                      x-text="prop.name"
-                    ></code>
-                    <button
-                      @click.stop="copyHash(prop.json ? prop.pretty : prop.value)"
-                      class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity flex-shrink-0"
-                      title="Copy"
-                    >
-                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                        />
-                      </svg>
-                    </button>
+              <!-- Relationships — grouped semantically -->
+              <template x-for="group in detailRelGroupsFor(pkg)" :key="group.key">
+                <div class="detail-rel-section">
+                  <div class="flex items-center gap-2 mb-2">
+                    <span class="detail-rel-line" :style="`background: ${group.color}`"></span>
+                    <span
+                      class="text-xs font-semibold uppercase tracking-wider"
+                      :style="`color: ${group.color}`"
+                      x-text="group.label"
+                    ></span>
+                    <span
+                      class="text-[10px] text-slate-500"
+                      x-text="'(' + group.total + ')'"
+                    ></span>
                   </div>
-                  <pre
-                    x-show="prop.json"
-                    class="hash-text text-slate-300 bg-slate-900/50 rounded px-2 py-1.5 mt-0.5 overflow-x-auto whitespace-pre"
-                    x-text="prop.pretty"
-                  ></pre>
-                  <code
-                    x-show="!prop.json"
-                    class="hash-text text-slate-300 break-all leading-relaxed block mt-0.5"
-                    x-text="prop.value"
-                  ></code>
+                  <div class="space-y-1 ml-3">
+                    <template x-for="item in group.items" :key="item.id">
+                      <div
+                        class="detail-rel-item group"
+                        @click.stop="item.multiRange ? openSnippetRanges(item.snippetIds) : navigateTo(item.id)"
+                      >
+                        <span
+                          class="detail-rel-arrow"
+                          :style="`color: ${group.color}`"
+                          x-text="item.direction === 'out' ? '→' : '←'"
+                        ></span>
+                        <span
+                          class="flex items-center flex-shrink-0"
+                          :style="`color: ${nodeTypeColor(getNodeType(elementMap.get(item.id) || {}))}`"
+                          x-html="elementIcon(elementMap.get(item.id) || { spdxId: item.id }, 'w-3.5 h-3.5')"
+                        ></span>
+                        <span class="flex-1 truncate" x-text="item.displayName"></span>
+                        <span
+                          x-show="item.scope"
+                          class="text-[10px] px-1.5 py-0.5 rounded bg-slate-700/60 text-slate-400 flex-shrink-0"
+                          :title="'Lifecycle scope: ' + item.scope"
+                          x-text="item.scope"
+                        ></span>
+                        <svg
+                          class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors flex-shrink-0"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                      </div>
+                    </template>
+                    <div
+                      x-show="group.hiddenCount > 0"
+                      class="text-[10px] text-slate-500 italic pl-1"
+                      x-text="'+' + formatCount(group.hiddenCount) + ' more'"
+                    ></div>
+                  </div>
                 </div>
               </template>
-            </div>
-          </div>
 
-          <!-- Associated vulnerabilities (VEX) -->
-          <div x-show="vulnsForPackage(pkg.spdxId).length > 0" class="space-y-2">
-            <div class="flex items-center gap-2">
-              <span class="detail-rel-line" style="background: #f43f5e"></span>
-              <span class="text-xs font-semibold uppercase tracking-wider text-rose-400"
-                >Vulnerabilities (VEX)</span
+              <!-- Empty state -->
+              <div
+                x-show="detailRelGroupsFor(pkg).length === 0 && vulnsForPackage(pkg.spdxId).length === 0"
+                class="text-xs text-slate-500 italic text-center py-4"
               >
-              <span
-                class="text-[10px] text-slate-500"
-                x-text="'(' + formatCount(packageVulnSummary(pkg.spdxId).total) + ')'"
-              ></span>
-            </div>
-            <div class="flex flex-wrap gap-1.5 ml-3">
-              <template x-for="st in packageVulnSummary(pkg.spdxId).statuses" :key="st.status">
-                <span class="badge" :class="st.meta.badgeClass">
-                  <span class="w-1.5 h-1.5 rounded-full mr-1.5" :class="st.meta.dotClass"></span>
-                  <span x-text="st.meta.label"></span>
-                  <span class="ml-1.5 font-semibold" x-text="formatCount(st.count)"></span>
-                </span>
-              </template>
-            </div>
-            <button
-              @click.stop="navigateToPackageSecurity(pkg.spdxId)"
-              class="ml-3 text-xs text-rose-300 hover:text-rose-200 inline-flex items-center gap-1"
-            >
-              View all in Security
-              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </button>
-          </div>
-
-          <!-- Relationships — grouped semantically -->
-          <template x-for="group in detailRelGroupsFor(pkg)" :key="group.key">
-            <div class="detail-rel-section">
-              <div class="flex items-center gap-2 mb-2">
-                <span class="detail-rel-line" :style="`background: ${group.color}`"></span>
-                <span
-                  class="text-xs font-semibold uppercase tracking-wider"
-                  :style="`color: ${group.color}`"
-                  x-text="group.label"
-                ></span>
-                <span class="text-[10px] text-slate-500" x-text="'(' + group.total + ')'"></span>
-              </div>
-              <div class="space-y-1 ml-3">
-                <template x-for="item in group.items" :key="item.id">
-                  <div
-                    class="detail-rel-item group"
-                    @click.stop="item.multiRange ? openSnippetRanges(item.snippetIds) : navigateTo(item.id)"
-                  >
-                    <span
-                      class="detail-rel-arrow"
-                      :style="`color: ${group.color}`"
-                      x-text="item.direction === 'out' ? '→' : '←'"
-                    ></span>
-                    <span
-                      class="flex items-center flex-shrink-0"
-                      :style="`color: ${nodeTypeColor(getNodeType(elementMap.get(item.id) || {}))}`"
-                      x-html="elementIcon(elementMap.get(item.id) || { spdxId: item.id }, 'w-3.5 h-3.5')"
-                    ></span>
-                    <span class="flex-1 truncate" x-text="item.displayName"></span>
-                    <span
-                      x-show="item.scope"
-                      class="text-[10px] px-1.5 py-0.5 rounded bg-slate-700/60 text-slate-400 flex-shrink-0"
-                      :title="'Lifecycle scope: ' + item.scope"
-                      x-text="item.scope"
-                    ></span>
-                    <svg
-                      class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors flex-shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </div>
-                </template>
-                <div
-                  x-show="group.hiddenCount > 0"
-                  class="text-[10px] text-slate-500 italic pl-1"
-                  x-text="'+' + formatCount(group.hiddenCount) + ' more'"
-                ></div>
+                No relationships found
               </div>
             </div>
-          </template>
-
-          <!-- Empty state -->
-          <div
-            x-show="detailRelGroupsFor(pkg).length === 0 && vulnsForPackage(pkg.spdxId).length === 0"
-            class="text-xs text-slate-500 italic text-center py-4"
-          >
-            No relationships found
           </div>
         </div>
-      </div>
+      </template>
     </div>
-  </template>
+  </div>
 </div>

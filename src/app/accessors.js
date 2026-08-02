@@ -30,7 +30,12 @@ import {
   normalizeUrl,
   copyToClipboard,
   licenseIndividualDescription,
-  requirementDisplayName as formatRequirementDisplayName
+  requirementDisplayName as formatRequirementDisplayName,
+  primaryPurposeLabel as formatPrimaryPurpose,
+  splitFilePath,
+  PACKAGE_GAP_META,
+  PACKAGE_GAP_ORDER,
+  PACKAGE_DESCRIPTION_SEGMENTS
 } from '../lib/index.js';
 import { COLORS, getScopeColor, SAFETY_STATUSES, SAFETY_NO_IMPL_META } from '../config.js';
 import { CLASS, isA } from '../spdx/model.js';
@@ -51,6 +56,16 @@ const DETAIL_REL_CAP = 50;
 // SBOM's builds each time is wasteful; keyed on the build object so a new SBOM's
 // (fresh) objects miss and recompute.
 const buildParameterCache = new WeakMap();
+
+// Everything a collapsed Packages row shows, memoized per package element (see
+// packageRowSummary). Without it each rendered card re-runs a dozen index
+// lookups plus the VEX rollup on every reactive re-evaluation, which is what
+// made scrolling a large package list stutter. Keyed on the element object, so a
+// newly parsed document's (fresh) objects miss and recompute.
+const packageRowCache = new WeakMap();
+
+// Licenses shown inline on a collapsed Packages row before the rest are summed up.
+const ROW_LICENSE_CAP = 2;
 
 // Coarse gazetteer for the Supply Chain route map. SPDX PhysicalLocation carries
 // city / country (ISO 3166-1 alpha-3) but no coordinates, so we resolve a rough
@@ -1374,6 +1389,55 @@ export const accessorsMixin = {
       out.push({ id, displayName });
     }
     return out;
+  },
+
+  // A file path split into the directory and the file name, so a list row can
+  // lead with the name and let the (often far longer) path truncate instead of
+  // truncating the name itself.
+  fileBaseName(name) {
+    return splitFilePath(name).base;
+  },
+  fileDirName(name) {
+    return splitFilePath(name).dir;
+  },
+  packageGapMeta(key) {
+    return PACKAGE_GAP_META[key] || { key, label: key, title: '' };
+  },
+  get packageGapOrder() {
+    return PACKAGE_GAP_ORDER;
+  },
+  get packageDescriptionSegments() {
+    return PACKAGE_DESCRIPTION_SEGMENTS;
+  },
+
+  // One memoized descriptor per collapsed Packages row: the badge counts, the
+  // inline license chips, the VEX rollup, and the description gaps. Templates
+  // read these several times per card, and a large SBOM renders hundreds of
+  // cards, so they are computed once per package rather than per binding.
+  packageRowSummary(pkg) {
+    if (!pkg?.spdxId) return null;
+    const cached = packageRowCache.get(pkg);
+    if (cached) return cached;
+    const id = pkg.spdxId;
+    const licenses = this.concreteLicenses(id);
+    const summary = {
+      version: isMeaningfulValue(pkg.software_packageVersion)
+        ? String(pkg.software_packageVersion)
+        : '',
+      purposeLabel: pkg.software_primaryPurpose
+        ? formatPrimaryPurpose(pkg.software_primaryPurpose)
+        : '',
+      licenses: licenses.slice(0, ROW_LICENSE_CAP),
+      extraLicenses: Math.max(0, licenses.length - ROW_LICENSE_CAP),
+      deps: this.depsOf(id).length,
+      dependents: this.dependentsOf(id).length,
+      inputToBuilds: this.consumedByBuilds(id).length,
+      producedByBuilds: this.producedByBuilds(id).length,
+      artifacts: this.distributionArtifacts(id).length,
+      vuln: this.packageVulnSummary(id)
+    };
+    packageRowCache.set(pkg, summary);
+    return summary;
   },
 
   // Agent(s) that supplied this package (Artifact.suppliedBy / software_suppliedBy).
