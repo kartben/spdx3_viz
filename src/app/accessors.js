@@ -29,7 +29,8 @@ import {
   formatHardwareDimensions,
   normalizeUrl,
   copyToClipboard,
-  licenseIndividualDescription
+  licenseIndividualDescription,
+  requirementDisplayName as formatRequirementDisplayName
 } from '../lib/index.js';
 import { COLORS, getScopeColor, SAFETY_STATUSES, SAFETY_NO_IMPL_META } from '../config.js';
 import { CLASS, isA } from '../spdx/model.js';
@@ -1637,12 +1638,85 @@ export const accessorsMixin = {
     }
     const decided = evals.filter(Boolean);
     if (decided.length && decided.every((e) => e === 'pass')) {
-      return { ...SAFETY_STATUSES.passed, label: 'Verified · pass' };
+      return { ...SAFETY_STATUSES.passed, label: 'Passed' };
     }
     if (evals.includes('inconclusive')) {
       return SAFETY_STATUSES.inconclusive;
     }
     return SAFETY_STATUSES.verified;
+  },
+
+  // Human title for a requirement/FS artifact (strips embedded UID prefixes).
+  requirementDisplayName(el) {
+    if (!el) return '';
+    if (isA(el.type, CLASS.Requirement)) {
+      return (
+        formatRequirementDisplayName(el, (e) => this.externalIdentifiers(e)) ||
+        el.name ||
+        this.cleanName(el.spdxId)
+      );
+    }
+    return el.name || this.cleanName(el.spdxId);
+  },
+
+  // Evidence targets reachable from a requirement via
+  // verifiedBy → EvaluationResult --hasEvidence--> artifact/snippet/file.
+  requirementEvidence(el, { limit = 8 } = {}) {
+    if (!el?.spdxId) return [];
+    const seen = new Set();
+    const out = [];
+    const pushTarget = (id) => {
+      if (!id || seen.has(id)) return;
+      seen.add(id);
+      const target = this.elementMap.get(id);
+      out.push({
+        id,
+        name: target?.description || target?.name || this.cleanName(id),
+        el: target
+      });
+    };
+    this.requirementVerifications(el).forEach(({ evaluation }) => {
+      if (!evaluation?.spdxId) return;
+      (this.outgoingRels(evaluation.spdxId) || []).forEach((rel) => {
+        if (rel.relationshipType !== 'hasEvidence') return;
+        (Array.isArray(rel.to) ? rel.to : [rel.to]).forEach(pushTarget);
+      });
+    });
+    // Direct hasEvidence from the requirement itself (some producers skip eval).
+    (this.outgoingRels(el.spdxId) || []).forEach((rel) => {
+      if (rel.relationshipType !== 'hasEvidence') return;
+      (Array.isArray(rel.to) ? rel.to : [rel.to]).forEach(pushTarget);
+    });
+    return {
+      items: out.slice(0, limit),
+      total: out.length,
+      hiddenCount: Math.max(0, out.length - limit)
+    };
+  },
+
+  // One quiet cue for a tree/list row: only surface the implementation gap.
+  // Status is the icon; evidence belongs in the expanded card.
+  requirementQuietCue(el) {
+    if (!el || !isA(el.type, CLASS.Requirement)) return '';
+    if (!this.implementedByCount(el.spdxId)) return 'no implementation';
+    return '';
+  },
+
+  // Plain-language summary under an expanded requirement card.
+  requirementSummaryLine(el) {
+    if (!el || !isA(el.type, CLASS.Requirement)) return '';
+    const parts = [];
+    const status = this.requirementSafetyStatus(el);
+    if (status?.key === 'passed') parts.push('Passes verification');
+    else if (status?.key === 'failed') parts.push('Verification failed');
+    else if (status?.key === 'inconclusive') parts.push('Verification inconclusive');
+    else if (status?.key === 'verified') parts.push('Has verification');
+    else if (status?.key === 'unverified') parts.push('Not verified');
+    const impl = this.implementedByCount(el.spdxId);
+    if (impl === 0) parts.push('no implementation');
+    else if (impl === 1) parts.push('implemented in 1 place');
+    else parts.push(`implemented in ${this.formatCount(impl)} places`);
+    return parts.join(' · ');
   },
 
   // Presentation metadata ({label, color, dotClass, badgeClass}) for a

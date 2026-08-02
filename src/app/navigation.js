@@ -997,11 +997,11 @@ export const navigationMixin = {
   },
   navigateToRequirement(spdxId) {
     this.requirementSearch = '';
-    // Clear the kind + status filters and drop back to the list layout, else the
-    // target may be filtered out of filteredRequirements (or hidden by the
-    // decomposition tree) and nothing scrolls into view.
+    // Clear filters so the target is visible; use list layout so the expandable
+    // card can scroll into view (tree rows open the detail panel instead).
     this.requirementKindFilter = '';
     this.requirementStatusFilter = '';
+    this.requirementSpecFilter = '';
     this.requirementLayout = 'list';
     this.switchView('requirements');
     this.expandedRequirement = spdxId;
