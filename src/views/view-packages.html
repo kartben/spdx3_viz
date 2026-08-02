@@ -33,9 +33,9 @@
       </select>
     </div>
 
-    <!-- How completely this list describes its components: rollup bar over the
-         four component-level fields every SBOM baseline asks for, then one chip
-         per gap to jump straight to the packages missing it. -->
+    <!-- How completely this list describes its components: a summary bar over the
+         four component-level fields every SBOM baseline asks for, then one button
+         per missing field to jump straight to the packages that lack it. -->
     <template x-if="packageDescriptionSummary.total > 0">
       <div class="space-y-2">
         <div class="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-2 sm:flex-wrap">
@@ -57,8 +57,13 @@
             ></div>
           </template>
         </div>
-        <div class="flex flex-wrap items-center gap-2">
-          <span class="text-xs text-slate-500 mr-0.5">Gaps</span>
+        <!-- Hidden outright when nothing is missing: the headline above already
+             says so, and "nothing to show" chips would just add noise. -->
+        <div
+          x-show="packageGapOrder.some(k => packageDescriptionSummary.gapCounts[k] > 0)"
+          class="flex flex-wrap items-center gap-2"
+        >
+          <span class="text-xs text-slate-500 mr-0.5">Filter by what's missing:</span>
           <template
             x-for="key in packageGapOrder.filter(k => packageDescriptionSummary.gapCounts[k] > 0)"
             :key="key"
@@ -77,12 +82,6 @@
               ></span>
             </button>
           </template>
-          <span
-            x-show="packageGapOrder.every(k => packageDescriptionSummary.gapCounts[k] === 0)"
-            class="text-xs text-emerald-400"
-          >
-            None: every package carries all four fields
-          </span>
         </div>
       </div>
     </template>

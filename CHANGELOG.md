@@ -5,7 +5,8 @@ via the "What's new" link.
 
 ## Unreleased
 
-- **Improved:** Packages and Files add facet filters, versions, gap chips.
+- **Improved:** Packages and Files filter by purpose, directory, missing fields.
+- **Improved:** Package rows show version and license without expanding.
 - **Improved:** Package and file lists are faster on huge SBOMs.
 - **Improved:** Functional Safety decomposition, specification filter, pass-rate summary.
 - **Added:** CISA 2026 Minimum Elements findings in Statistics.
