@@ -2,9 +2,10 @@
  * The core parse pipeline shared by the worker and the main-thread fallback:
  * merge every file's `@graph` into one array, then build the model and indexes.
  *
- * Small files arrive as `{ name, text }` and are JSON.parse-d whole; files too
- * big to hold as one JS string (~512 MiB) arrive as `{ name, blob }` and are
- * streamed item by item (see forEachGraphItem).
+ * Files arrive as `{ name, text }` or `{ name, blob }`. A blob is read here
+ * rather than by the caller, so the main thread never has to materialize a large
+ * string; if it is too big to hold as one JS string (~512 MiB) it is streamed
+ * item by item instead (see forEachGraphItem).
  *
  * The worker runs this and structured-clones the result back. That clone
  * duplicates the whole model, so for a very large SBOM (millions of elements) it
@@ -17,6 +18,12 @@
 
 import { parseGraph, buildRelationshipIndexes, buildFileSourceIndex } from './parser.js';
 import { forEachGraphItem } from './stream-graph.js';
+
+// A single JS string tops out near 512 MiB (V8's max string length), so a blob
+// at or above this size can't be read into one and JSON.parse-d; it is scanned
+// as a byte stream instead. The margin under 512 MiB covers UTF-8 multi-byte
+// inflation. Streaming is the slower path, so it is only for what needs it.
+export const STREAM_THRESHOLD = 256 * 1024 * 1024;
 
 /**
  * @param {Array<{name:string, text?:string, blob?:Blob}>} files
@@ -35,7 +42,7 @@ export async function parseFiles(files, progress, onPhase) {
 
   for (const file of files || []) {
     if (!file) continue;
-    if (file.blob) {
+    if (file.blob && file.blob.size >= STREAM_THRESHOLD) {
       // Too large for one string: stream its @graph, parsing item by item.
       // Throttle progress to ~0.2% steps: a multi-hundred-MB file yields
       // thousands of chunks, and one update each would swamp the listener.
@@ -58,7 +65,10 @@ export async function parseFiles(files, progress, onPhase) {
     } else {
       let data;
       try {
-        data = JSON.parse(file.text);
+        // Reading the blob here rather than at the call site is the point of
+        // accepting one: decoding tens of megabytes into a string is a single
+        // uninterruptible task, and this runs in the worker.
+        data = JSON.parse(file.blob ? await file.blob.text() : file.text);
       } catch (err) {
         throw new Error(`${file.name}: ${err.message}`);
       }

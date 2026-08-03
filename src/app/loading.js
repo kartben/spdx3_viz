@@ -23,12 +23,23 @@ export function tagLoadedFile(file) {
   return { ...file, uid: ++fileUidSeq, addedAt: Date.now() };
 }
 
-// A single JS string tops out near 512 MiB (V8's max string length), so a file
-// at or above this size can't be read into one string + JSON.parse-d. Such
-// files are kept as their Blob and stream-parsed in the worker instead. The
-// margin under 512 MiB covers UTF-8 multi-byte inflation. Large files carry no
-// `text`, so the Raw JSON-LD view shows them as download-only.
-export const STREAM_THRESHOLD = 256 * 1024 * 1024;
+// Past this size a loaded file keeps only its Blob and the worker does the
+// reading; below it we also hold the decoded text, which is what the Raw JSON-LD
+// view renders.
+//
+// Decoding a large file into a string is one uninterruptible task, and doing it
+// here means paying it on the main thread and then structured-cloning the whole
+// string into the worker on top. Measured on the 62 MB Kubernetes sample that is
+// ~500 ms of frozen UI before parsing even starts (~50 ms at 24 MB, ~120 ms at
+// 48 MB, nothing below ~16 MB); handing the Blob over instead costs nothing.
+//
+// The cut-off is where the Raw view stops inlining a file anyway (it offers a
+// download past this point, see rawTooLarge), so no file loses anything on
+// screen by being kept as a Blob. Compared against a byte count here and a
+// character count there; for JSON-LD the two are within a few percent, and
+// erring either way only shifts which of the two equivalent paths a borderline
+// file takes.
+export const INLINE_TEXT_MAX = 50 * 1000 * 1000;
 
 // VEX edges and the Vulnerabilities node type default to off since a large VEX
 // set can swamp the graph; when there are fewer than this many VEX edges we
@@ -196,9 +207,9 @@ export const loadingMixin = {
   // Streams a fetch response, reporting this file's own 0..1 progress through
   // `onFraction` (the caller folds it into the overall download band).
   // Falls back to a plain read when the body/total size isn't available.
-  // Returns a string for normal files, or the raw Blob for ones too big to hold
-  // as one JS string (see STREAM_THRESHOLD); callers await it and branch on the
-  // type. Awaiting a Blob is a no-op, so the two shapes unify at the call site.
+  // Returns a string for normal files, or the raw Blob for ones past
+  // INLINE_TEXT_MAX; callers await it and branch on the type. Awaiting a Blob is
+  // a no-op, so the two shapes unify at the call site.
   //
   // `expectedSize` is the file's uncompressed size (from the manifest). Prefer
   // it over Content-Length: hosts like GitHub Pages gzip large files, so
@@ -210,7 +221,7 @@ export const loadingMixin = {
     if (!res.body || !total) {
       const blob = await res.blob();
       onFraction(1);
-      return blob.size >= STREAM_THRESHOLD ? blob : blob.text();
+      return blob.size >= INLINE_TEXT_MAX ? blob : blob.text();
     }
     const reader = res.body.getReader();
     const chunks = [];
@@ -227,7 +238,7 @@ export const loadingMixin = {
     // its share would otherwise leave the download band permanently short.
     onFraction(1);
     const blob = new Blob(chunks);
-    return blob.size >= STREAM_THRESHOLD ? blob : blob.text();
+    return blob.size >= INLINE_TEXT_MAX ? blob : blob.text();
   },
 
   // File handling — supports multiple files
@@ -274,10 +285,10 @@ export const loadingMixin = {
       }
     };
     fileList.forEach((file, i) => {
-      // Too big to hold as one string: keep the Blob and let the worker stream
-      // it. No FileReader read, so it contributes its full weight to the bar at
-      // once (the real cost is the worker's streamed json phase).
-      if (file.size >= STREAM_THRESHOLD) {
+      // Big enough that reading it here would stall the UI: keep the Blob and
+      // let the worker do the read. No FileReader pass, so it contributes its
+      // full weight to the bar at once (the real cost moves to the json phase).
+      if (file.size >= INLINE_TEXT_MAX) {
         loaded[i] = tagLoadedFile({ name: file.name, blob: file, size: file.size });
         fileProgress[i] = 1;
         this._setProgress('download', fileProgress.reduce((a, b) => a + b, 0) / total);

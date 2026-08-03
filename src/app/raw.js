@@ -1,4 +1,5 @@
 import { copyToClipboard, formatByteSize } from '../lib/index.js';
+import { INLINE_TEXT_MAX } from './loading.js';
 
 /* Raw JSON-LD view: shows the underlying file(s) as loaded (or pretty-printed)
    with lightweight syntax highlighting. String values that are the spdxId of a
@@ -6,7 +7,10 @@ import { copyToClipboard, formatByteSize } from '../lib/index.js';
    file shows at a time so only the active file's markup stays in the DOM. */
 
 const HIGHLIGHT_MAX_CHARS = 10_000_000;
-const INLINE_MAX_CHARS = 50_000_000;
+// Same number as the size past which a loaded file keeps only its Blob: a file
+// we refuse to inline is exactly a file whose text we don't bother holding.
+// Imported rather than restated so the two can't drift apart.
+const INLINE_MAX_CHARS = INLINE_TEXT_MAX;
 
 function escapeHtml(s) {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -118,7 +122,8 @@ export const rawMixin = {
     return formatByteSize(f.size ?? f.text?.length ?? 0);
   },
   // File too big to render inline at all: either over the char cap, or kept as a
-  // Blob (never read into a string) because it exceeds STREAM_THRESHOLD.
+  // Blob (never read into a string) because it exceeds INLINE_TEXT_MAX. Those
+  // two cut-offs are the same size, so this is one condition wearing two hats.
   rawTooLarge(index) {
     const f = this.loadedFiles[index];
     return !!f && (f.text == null || f.text.length > INLINE_MAX_CHARS);
