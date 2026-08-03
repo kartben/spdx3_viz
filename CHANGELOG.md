@@ -9,6 +9,7 @@ via the "What's new" link.
 - **Improved:** Package rows show version and license without expanding.
 - **Improved:** List views search and filter faster on huge SBOMs.
 - **Improved:** Smaller initial download; source highlighting loads on demand.
+- **Improved:** The start screen paints roughly twice as fast.
 - **Improved:** Samples made of several files download in parallel.
 - **Fixed:** Searching Licenses, Builds, or Build configs returns to the top.
 - **Improved:** Functional Safety decomposition, specification filter, pass-rate summary.

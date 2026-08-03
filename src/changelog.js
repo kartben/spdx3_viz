@@ -27,6 +27,10 @@ export const CHANGELOG = [
       },
       {
         tag: 'Improved',
+        text: 'The start screen paints roughly twice as fast.'
+      },
+      {
+        tag: 'Improved',
         text: 'Samples made of several files download in parallel.'
       },
       {
