@@ -244,28 +244,22 @@ export const addFilesMixin = {
       this.progressPhase = 'Downloading…';
       const total = paths.length + locals.length;
       try {
-        for (const path of paths) {
-          const name = path.slice(path.lastIndexOf('/') + 1);
-          const res = await fetch(path);
-          if (!res.ok) throw new Error(`${name} (HTTP ${res.status})`);
-          // Uncompressed size from the manifest keeps the download bar honest on
-          // gzip-serving hosts (see _readResponseWithProgress).
-          const sample = this.samples.find((s) => path.startsWith(`${s.dir}/`));
-          const expectedSize = sample?.size ? sample.size / sample.files.length : 0;
-          const result = await this._readResponseWithProgress(
-            res,
-            added.length,
-            total,
-            expectedSize
-          );
-          added.push(
-            tagLoadedFile(
-              typeof result === 'string'
-                ? { name, text: result, src: path }
-                : { name, blob: result, src: path, size: result.size }
-            )
-          );
-        }
+        const downloaded = await this._downloadFiles(
+          paths.map((path) => {
+            // Uncompressed size from the manifest keeps the download bar honest
+            // on gzip-serving hosts (see _readResponseWithProgress).
+            const sample = this.samples.find((s) => path.startsWith(`${s.dir}/`));
+            return {
+              path,
+              name: path.slice(path.lastIndexOf('/') + 1),
+              expectedSize: sample?.size ? sample.size / sample.files.length : 0
+            };
+          }),
+          // The downloads own the first `paths.length` of the batch's items; the
+          // local reads below carry the bar the rest of the way.
+          (fraction) => this._setProgress('download', (fraction * paths.length) / total)
+        );
+        added.push(...downloaded);
         for (const file of locals) {
           // Files too big for one JS string are kept as their Blob and
           // stream-parsed in the worker (see STREAM_THRESHOLD).
