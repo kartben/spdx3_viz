@@ -456,9 +456,12 @@ export const navigationMixin = {
   // old ordering mounted.
   restreamView(view) {
     if (!(view in this.renderLimits)) return;
-    const total = this[viewListProps[view]]?.length ?? 0;
+    // A full page, without consulting the list: the search boxes debounce both
+    // their model and this call, so the list here may still be the pre-keystroke
+    // one. renderSlice clamps to whatever the list actually holds, and
+    // loadMoreForView re-reads the real total before growing the window.
     this.renderStarts[view] = 0;
-    this.renderLimits[view] = Math.min(INITIAL_RENDER, total);
+    this.renderLimits[view] = INITIAL_RENDER;
     this.$nextTick(() => {
       document.getElementById('mainContent')?.scrollTo({ top: 0 });
       this._ensureScrollLoader();

@@ -2,7 +2,8 @@
   <div class="list-sticky flex items-center gap-3">
     <span class="text-sm text-slate-400" x-text="`${filteredLicenses.length} licenses`"></span>
     <input
-      x-model="licenseSearch"
+      x-model.debounce.150ms="licenseSearch"
+      @input.debounce.150ms="restreamView('licenses')"
       type="text"
       placeholder="Search licenses…"
       class="ml-auto bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-pink-500 w-48"

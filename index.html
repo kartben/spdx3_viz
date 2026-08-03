@@ -147,9 +147,21 @@
     <include src="src/views/modal-palette.html"></include>
 
     <!-- TOAST -->
+    <!-- The live region stays mounted and only its text changes: a region that
+         is display:none at the moment it gains content isn't announced, so the
+         visible toast below can't double as one. It carries the announcement,
+         the toast carries the pixels. -->
+    <div
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+      class="sr-only"
+      x-text="toastMsg"
+    ></div>
     <div
       x-show="toastMsg"
       x-transition
+      aria-hidden="true"
       class="fixed bottom-5 right-5 bg-slate-700 text-white text-sm px-4 py-2 rounded-lg shadow-lg z-50"
       x-text="toastMsg"
     ></div>

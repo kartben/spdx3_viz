@@ -135,7 +135,7 @@
         <span class="text-slate-500" x-text="`(${supplyChainCounts.resolutions})`"></span>
       </button>
       <input
-        x-model="supplyChainSearch"
+        x-model.debounce.150ms="supplyChainSearch"
         @input.debounce.150ms="restreamView('supplychain')"
         type="text"
         placeholder="Filter timeline…"

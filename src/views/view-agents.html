@@ -5,7 +5,7 @@
       x-text="`${filteredAgents.length} ${filteredAgents.length === 1 ? 'agent' : 'agents'}`"
     ></span>
     <input
-      x-model="agentSearch"
+      x-model.debounce.150ms="agentSearch"
       @input.debounce.150ms="restreamView('agents')"
       type="text"
       placeholder="Filter agents…"
