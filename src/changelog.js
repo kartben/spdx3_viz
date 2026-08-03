@@ -26,6 +26,10 @@ export const CHANGELOG = [
         text: 'Smaller initial download; source highlighting loads on demand.'
       },
       {
+        tag: 'Improved',
+        text: 'Samples made of several files download in parallel.'
+      },
+      {
         tag: 'Fixed',
         text: 'Searching Licenses, Builds, or Build configs returns to the top.'
       },

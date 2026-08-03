@@ -134,26 +134,18 @@ export const loadingMixin = {
     this._beginParseSession(); // show the overlay during download too
     this.progressPhase = 'Downloading…';
     try {
-      const loaded = [];
-      const total = sample.files.length;
-      for (let i = 0; i < sample.files.length; i++) {
-        const fname = sample.files[i];
-        const path = `${sample.dir}/${fname}`;
-        const res = await fetch(path);
-        if (!res.ok) throw new Error(`${fname} (HTTP ${res.status})`);
-        // The manifest size is the uncompressed total; use it as the download
-        // denominator (see _readResponseWithProgress). Split evenly when a
-        // sample has several files (per-file sizes aren't in the manifest).
-        const expectedSize = sample.size ? sample.size / sample.files.length : 0;
-        const result = await this._readResponseWithProgress(res, i, total, expectedSize);
-        loaded.push(
-          tagLoadedFile(
-            typeof result === 'string'
-              ? { name: fname, text: result, src: path }
-              : { name: fname, blob: result, src: path, size: result.size }
-          )
-        );
-      }
+      // The manifest size is the uncompressed total; use it as the download
+      // denominator (see _readResponseWithProgress). Split evenly when a
+      // sample has several files (per-file sizes aren't in the manifest).
+      const expectedSize = sample.size ? sample.size / sample.files.length : 0;
+      const loaded = await this._downloadFiles(
+        sample.files.map((fname) => ({
+          name: fname,
+          path: `${sample.dir}/${fname}`,
+          expectedSize
+        })),
+        (fraction) => this._setProgress('download', fraction)
+      );
       this.loadedFiles = loaded; // replace: the drop zone starts empty
       this.loadedSampleId = sample.id; // pure sample content: the URL can link back to it
       this.rebuildFromLoadedFiles(); // existing merge + parse path (session continues)
@@ -167,7 +159,42 @@ export const loadingMixin = {
     }
   },
 
-  // Streams a fetch response, advancing the download band of the progress bar.
+  // Downloads a batch of sample files concurrently and returns them tagged, in
+  // the order given. Serial fetches cost one round trip each, which the
+  // multi-file samples (six for zephyr-experimental, three for linux) paid in
+  // full before the parse could start. Samples list a handful of files at most,
+  // so the requests all go out at once rather than through a pool.
+  //
+  // `onFraction` receives the batch's overall 0..1 progress. It is summed from
+  // the per-file fractions because overlapping requests have no "file 2 of 3"
+  // position to report. A rejected fetch rejects the batch, which is what both
+  // callers already treat as a failed load.
+  async _downloadFiles(entries, onFraction) {
+    const fractions = new Array(entries.length).fill(0);
+    const advance = (i, f) => {
+      fractions[i] = f;
+      onFraction(fractions.reduce((a, b) => a + b, 0) / (entries.length || 1));
+    };
+    return Promise.all(
+      entries.map(async ({ name, path, expectedSize }, i) => {
+        const res = await fetch(path);
+        if (!res.ok) throw new Error(`${name} (HTTP ${res.status})`);
+        const result = await this._readResponseWithProgress(
+          res,
+          (f) => advance(i, f),
+          expectedSize
+        );
+        return tagLoadedFile(
+          typeof result === 'string'
+            ? { name, text: result, src: path }
+            : { name, blob: result, src: path, size: result.size }
+        );
+      })
+    );
+  },
+
+  // Streams a fetch response, reporting this file's own 0..1 progress through
+  // `onFraction` (the caller folds it into the overall download band).
   // Falls back to a plain read when the body/total size isn't available.
   // Returns a string for normal files, or the raw Blob for ones too big to hold
   // as one JS string (see STREAM_THRESHOLD); callers await it and branch on the
@@ -178,11 +205,11 @@ export const loadingMixin = {
   // Content-Length is the *compressed* size (~72 MB for the 988 MB Yocto SBOM)
   // while the body reader yields decompressed bytes, which would peg the bar at
   // 100% after ~7% of the real download and then look stuck.
-  async _readResponseWithProgress(res, fileIndex, totalFiles, expectedSize = 0) {
+  async _readResponseWithProgress(res, onFraction, expectedSize = 0) {
     const total = expectedSize || Number(res.headers.get('Content-Length')) || 0;
     if (!res.body || !total) {
       const blob = await res.blob();
-      this._setProgress('download', (fileIndex + 1) / totalFiles);
+      onFraction(1);
       return blob.size >= STREAM_THRESHOLD ? blob : blob.text();
     }
     const reader = res.body.getReader();
@@ -193,8 +220,12 @@ export const loadingMixin = {
       if (done) break;
       chunks.push(value);
       received += value.length;
-      this._setProgress('download', (fileIndex + Math.min(1, received / total)) / totalFiles);
+      onFraction(Math.min(1, received / total));
     }
+    // A finished file is a finished file, whatever `total` predicted. Sample
+    // sizes are split evenly across a multi-file sample, so a file smaller than
+    // its share would otherwise leave the download band permanently short.
+    onFraction(1);
     const blob = new Blob(chunks);
     return blob.size >= STREAM_THRESHOLD ? blob : blob.text();
   },
