@@ -11,6 +11,7 @@ via the "What's new" link.
 - **Improved:** Smaller initial download; source highlighting loads on demand.
 - **Improved:** The start screen paints roughly twice as fast.
 - **Improved:** Samples made of several files download in parallel.
+- **Fixed:** Scrolling far into a huge list no longer bloats memory.
 - **Fixed:** Searching Licenses, Builds, or Build configs returns to the top.
 - **Improved:** Functional Safety decomposition, specification filter, pass-rate summary.
 - **Added:** CISA 2026 Minimum Elements findings in Statistics.

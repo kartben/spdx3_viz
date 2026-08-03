@@ -37,6 +37,14 @@ const expandedFieldByView = {
    state as pure bookkeeping. */
 const INITIAL_RENDER = 200; // cards rendered when a list view first opens
 const RENDER_CHUNK = 200; // cards added per scroll step toward either end
+// Ceiling on how many cards stay mounted at once. The window used to only ever
+// grow: scrolling through the Kubernetes sample's file list reached 207,692 DOM
+// nodes and a 960 MB heap at 12,000 rows (~17 nodes and ~67 kB each), with the
+// worst scroll frame at 190 ms, and the full 28,305-file list would have been
+// roughly half a million nodes. Past this many rows, growing one end releases a
+// chunk off the other. Six chunks is ~140,000 px of content around a ~900 px
+// viewport, far more than either observer's lookahead can outrun.
+const MAX_WINDOW = 6 * RENDER_CHUNK;
 // In-card "show more" lists (revealLimit/revealMore): rows shown before the
 // first reveal, and rows added per reveal click.
 const REVEAL_BASE = 50;
@@ -354,39 +362,112 @@ export const navigationMixin = {
     this.$nextTick(() => this._ensureScrollLoader());
   },
 
-  // Grows the current view's window downward by one chunk. Called by the bottom
-  // scroll observer as its sentinel nears the viewport; no-ops once the window
-  // already reaches the end of the list or for non-list views.
+  // Both ends of the window can move in the same step now, so a scrollHeight
+  // delta no longer describes how far the content shifted: appending a chunk at
+  // the bottom and releasing one at the top cancel out in the total while the
+  // visible rows still jump a chunk's worth. Anchor on a row that is actually on
+  // screen instead, and put it back where it was.
+  //
+  // Only the view on screen contributes layout, so rows belonging to the hidden
+  // views measure zero-height and are skipped. Rows are in document order, so
+  // the scan stops at the first one past the bottom of the viewport. Taking the
+  // topmost visible row also means the anchor survives either mutation: rows are
+  // released from the far top when growing down and the far bottom when growing
+  // up, never from around the viewport.
+  _scrollAnchor(root) {
+    const box = root.getBoundingClientRect();
+    for (const el of root.querySelectorAll('[data-nav-id]')) {
+      const rect = el.getBoundingClientRect();
+      if (!rect.height) continue;
+      if (rect.bottom < box.top) continue;
+      if (rect.top > box.bottom) break;
+      return {
+        el,
+        kind: el.getAttribute('data-nav-kind') || '',
+        id: el.getAttribute('data-nav-id') || '',
+        top: rect.top
+      };
+    }
+    return null;
+  },
+
+  // Where the anchor row sits now, or null if it really is gone. x-for may
+  // rebuild a row rather than move it, so a detached element is re-found by id
+  // rather than treated as lost; the id is matched together with the nav kind
+  // and a non-zero height so a same-id row in a hidden view can't answer.
+  _anchorTop(root, anchor) {
+    let el = anchor.el;
+    if (!el.isConnected && anchor.id) {
+      el = root.querySelector(
+        `[data-nav-kind="${CSS.escape(anchor.kind)}"][data-nav-id="${CSS.escape(anchor.id)}"]`
+      );
+    }
+    const rect = el?.getBoundingClientRect();
+    return rect && rect.height ? rect.top : null;
+  },
+
+  // Applies `mutate` to the render window and holds the viewport still across
+  // it. Falls back to the scrollHeight delta only when there was no row to
+  // anchor on at all (an empty or not-yet-painted list), which is the one-ended
+  // case anyway.
+  _mutateWindowPinned(root, mutate) {
+    this._prevLoading = true;
+    const anchor = this._scrollAnchor(root);
+    const prevHeight = root.scrollHeight;
+    const prevTop = root.scrollTop;
+    mutate();
+    this.$nextTick(() => {
+      requestAnimationFrame(() => {
+        const now = anchor && this._anchorTop(root, anchor);
+        if (now != null) root.scrollTop += now - anchor.top;
+        else root.scrollTop = prevTop + (root.scrollHeight - prevHeight);
+        this._prevLoading = false;
+      });
+    });
+  },
+
+  // Grows the current view's window downward by one chunk, releasing rows off
+  // the far top once the window is at MAX_WINDOW. Called by the bottom scroll
+  // observer as its sentinel nears the viewport; no-ops once the window already
+  // reaches the end of the list or for non-list views. Growth that doesn't trim
+  // only adds below the viewport, so it needs no pin and no frame to settle.
   loadMoreForView(view) {
     const listProp = viewListProps[view];
     if (!listProp) return;
     const total = this[listProp].length;
     if (this.renderLimits[view] >= total) return;
-    this.renderLimits[view] = Math.min(this.renderLimits[view] + RENDER_CHUNK, total);
+    const end = Math.min(this.renderLimits[view] + RENDER_CHUNK, total);
+    const start = this.renderStarts[view] || 0;
+    const trimTo = end - MAX_WINDOW;
+    const root = trimTo > start ? document.getElementById('mainContent') : null;
+    if (!root) {
+      this.renderLimits[view] = end;
+      return;
+    }
+    if (this._prevLoading) return;
+    this._mutateWindowPinned(root, () => {
+      this.renderLimits[view] = end;
+      this.renderStarts[view] = trimTo;
+    });
   },
 
-  // Grows the current view's window upward by one chunk (lowers `start`). Called
-  // by the top scroll observer when the user scrolls back toward the top of a
+  // Grows the current view's window upward by one chunk (lowers `start`), and
+  // releases rows off the far bottom once the window is at MAX_WINDOW. Called by
+  // the top scroll observer when the user scrolls back toward the top of a
   // window that was opened deep in the list. Prepending rows above the viewport
-  // would shove the visible content down, so we measure the scroll height before
-  // and after and re-pin scrollTop by the delta to hold the view still. The
-  // _prevLoading guard keeps it to one chunk per frame so the pin is applied
-  // before another chunk can queue.
+  // would shove the visible content down, hence the pin. The _prevLoading guard
+  // keeps it to one chunk per frame so the pin is applied before another chunk
+  // can queue.
   loadPrevForView(view) {
     const listProp = viewListProps[view];
     if (!listProp) return;
     if ((this.renderStarts[view] || 0) <= 0 || this._prevLoading) return;
     const root = document.getElementById('mainContent');
     if (!root) return;
-    this._prevLoading = true;
-    const prevHeight = root.scrollHeight;
-    const prevTop = root.scrollTop;
-    this.renderStarts[view] = Math.max(0, this.renderStarts[view] - RENDER_CHUNK);
-    this.$nextTick(() => {
-      requestAnimationFrame(() => {
-        root.scrollTop = prevTop + (root.scrollHeight - prevHeight);
-        this._prevLoading = false;
-      });
+    const start = Math.max(0, this.renderStarts[view] - RENDER_CHUNK);
+    this._mutateWindowPinned(root, () => {
+      this.renderStarts[view] = start;
+      this.renderLimits[view] = Math.min(this.renderLimits[view], start + MAX_WINDOW);
     });
   },
 
@@ -422,10 +503,19 @@ export const navigationMixin = {
         (entries) => {
           for (const e of entries) if (e.isIntersecting) app.loadPrevForView(app.currentView);
         },
-        // A tighter margin than the bottom: each upward chunk re-pins scrollTop,
-        // which pushes this sentinel back out of range, so a smaller lookahead
-        // keeps loading to roughly one chunk per scroll-up gesture.
-        { root, rootMargin: '300px 0px' }
+        // Much larger lookahead than the bottom, for a reason the bottom does
+        // not have. A chunk of rows takes longer than a frame to render, and the
+        // pin that holds the viewport still can only land once it has. Chrome's
+        // own scroll anchoring covers that gap everywhere except scrollTop 0,
+        // where it is deliberately suppressed: reach the very top before the
+        // chunk renders and the content visibly jumps a chunk's height, then
+        // snaps back. Starting the load this far out keeps the scroll from
+        // getting there first; measured against a 2,400 px-per-140 ms scroll,
+        // 2,000 px still jumped and 6,000 px did not (12,000 px was no better).
+        // Loading stays at roughly one chunk per gesture regardless, since a
+        // prepended chunk pushes the sentinel tens of thousands of pixels away,
+        // far past any margin.
+        { root, rootMargin: '6000px 0px' }
       );
     }
     if (!root.querySelector(':scope > [data-stream-sentinel="top"]')) {
