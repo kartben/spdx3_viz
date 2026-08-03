@@ -7,7 +7,8 @@
     <div class="ml-auto flex items-center gap-2">
       <input
         type="text"
-        x-model="configSearch"
+        x-model.debounce.150ms="configSearch"
+        @input.debounce.150ms="restreamView('configs')"
         placeholder="Search configs..."
         class="w-48 px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-teal-500 transition-colors"
       />

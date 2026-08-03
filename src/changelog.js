@@ -19,7 +19,15 @@ export const CHANGELOG = [
       },
       {
         tag: 'Improved',
-        text: 'Package and file lists are faster on huge SBOMs.'
+        text: 'List views search and filter faster on huge SBOMs.'
+      },
+      {
+        tag: 'Improved',
+        text: 'Smaller initial download; source highlighting loads on demand.'
+      },
+      {
+        tag: 'Fixed',
+        text: 'Searching Licenses, Builds, or Build configs returns to the top.'
       },
       {
         tag: 'Improved',

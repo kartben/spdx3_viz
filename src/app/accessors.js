@@ -39,7 +39,7 @@ import {
 } from '../lib/index.js';
 import { COLORS, getScopeColor, SAFETY_STATUSES, SAFETY_NO_IMPL_META } from '../config.js';
 import { CLASS, isA } from '../spdx/model.js';
-import hljs from '../lib/highlight.js';
+import { loadHighlighter } from '../lib/highlight.js';
 
 /* Element accessors and display helpers: thin lookups into the relationship
    indexes, name/date formatting, and the relationship-group data the detail
@@ -209,7 +209,7 @@ export const accessorsMixin = {
       const res = await fetch(url);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const content = await res.text();
-      const lines = this._highlightSource(content, file?.name);
+      const lines = await this._highlightSource(content, file?.name);
       this.fileSourceCache[fileId] = {
         loading: false,
         error: null,
@@ -221,8 +221,9 @@ export const accessorsMixin = {
     }
   },
   // Syntax-highlights a whole file into [{ lineNum, html }], escaping to plain
-  // text when no grammar matches.
-  _highlightSource(content, fileName) {
+  // text when no grammar matches. Async because highlight.js is loaded on first
+  // use (see lib/highlight.js); a load failure falls back to plain text.
+  async _highlightSource(content, fileName) {
     const ext = getFileExtension(fileName || '');
     const rawLines = content.split('\n');
     const escaped = rawLines.map((l) =>
@@ -233,6 +234,7 @@ export const accessorsMixin = {
     const langMap = { '.c': 'c', '.h': 'c', '.cpp': 'cpp', '.py': 'python', '.js': 'javascript' };
     const lang = langMap[ext];
     try {
+      const hljs = await loadHighlighter();
       const html = lang
         ? hljs.highlight(content, { language: lang, ignoreIllegals: true }).value
         : hljs.highlightAuto(content).value;

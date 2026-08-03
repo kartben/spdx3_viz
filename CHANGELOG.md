@@ -7,7 +7,9 @@ via the "What's new" link.
 
 - **Improved:** Packages and Files filter by purpose, directory, missing fields.
 - **Improved:** Package rows show version and license without expanding.
-- **Improved:** Package and file lists are faster on huge SBOMs.
+- **Improved:** List views search and filter faster on huge SBOMs.
+- **Improved:** Smaller initial download; source highlighting loads on demand.
+- **Fixed:** Searching Licenses, Builds, or Build configs returns to the top.
 - **Improved:** Functional Safety decomposition, specification filter, pass-rate summary.
 - **Added:** CISA 2026 Minimum Elements findings in Statistics.
 - **Improved:** Sidebar groups SPDX profiles, with sticky Insights and Lucide icons.
