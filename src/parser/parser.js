@@ -11,7 +11,6 @@ import {
   displayLicenseExpression,
   renderLicenseExpression,
   licenseIndividualLabel,
-  getRelationshipColor,
   getVulnerabilityId,
   getVulnerabilityLocators,
   vexStatusForRel,
@@ -1416,30 +1415,4 @@ export function buildFileSourceIndex(parsed, indexes) {
   }
 
   return fileSourceIndex;
-}
-
-/**
- * Computes relationship type counts and percentages
- *
- * @param {Array<Object>} relationships - Array of relationship objects
- * @returns {Array<{type: string, count: number, pct: string, color: string}>}
- */
-export function computeRelationshipTypeCounts(relationships) {
-  const counts = {};
-
-  relationships.forEach((rel) => {
-    counts[rel.relationshipType] = (counts[rel.relationshipType] || 0) + 1;
-  });
-
-  const total = relationships.length;
-
-  return Object.entries(counts)
-    .sort((a, b) => b[1] - a[1])
-    .map(([type, count]) => ({
-      type,
-      count,
-      pct: total ? ((count / total) * 100).toFixed(1) : '0.0',
-      // Single source of truth for edge colours across every surface.
-      color: getRelationshipColor(type)
-    }));
 }
