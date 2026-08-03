@@ -43,6 +43,10 @@ const REVEAL_BASE = 50;
 const REVEAL_CHUNK = 200;
 let scrollObserver = null; // grows the window downward (bottom sentinel)
 let prevObserver = null; // grows the window upward (top sentinel)
+// The #mainContent the observers were built against. The app shell is behind an
+// x-if (see index.html), so going home and loading again gives us a brand new
+// scroll root; observers still rooted on the detached one would never fire.
+let observerRoot = null;
 // View id -> the filtered list its main x-for renders.
 const viewListProps = {
   packages: 'filteredPackages',
@@ -394,6 +398,15 @@ export const navigationMixin = {
     const root = document.getElementById('mainContent');
     if (!root) return;
     const app = this;
+    // A new scroll root means the previous observers are watching a detached
+    // element; drop them so the pair below is rebuilt against this one.
+    if (observerRoot !== root) {
+      scrollObserver?.disconnect();
+      prevObserver?.disconnect();
+      scrollObserver = null;
+      prevObserver = null;
+      observerRoot = root;
+    }
     if (!scrollObserver) {
       scrollObserver = new IntersectionObserver(
         (entries) => {
