@@ -18,6 +18,50 @@ import {
 } from './licenses.js';
 import { getVulnerabilityId } from './security.js';
 
+// Relationship type -> edge colour. Module-level: getRelationshipColor is called
+// once per edge per repaint on the graph, and per row in the detail panel.
+const RELATIONSHIP_COLORS = {
+  dependsOn: COLORS.package,
+  contains: COLORS.file,
+  generates: COLORS.build,
+  hasInput: COLORS.buildInput,
+  hasOutput: COLORS.buildOutput,
+  hasDistributionArtifact: COLORS.distribution,
+  ancestorOf: COLORS.buildLineage,
+  usesTool: COLORS.tool,
+  hasStaticLink: COLORS.staticLink,
+  hasDynamicLink: COLORS.dynamicLink,
+  hasOptionalComponent: COLORS.optionalComponent,
+  hasPrerequisite: COLORS.prerequisite,
+  hasVariant: COLORS.variant,
+  runsOn: COLORS.hardware,
+  implementedBy: COLORS.requirement,
+  verifiedBy: COLORS.requirement,
+  hasRequirement: COLORS.requirement,
+  hasEvidence: COLORS.requirement,
+  assumes: COLORS.requirement,
+  conformsTo: COLORS.requirement,
+  evaluationBasedOn: COLORS.requirement,
+  tracedToDetail: COLORS.requirement,
+  resolved: COLORS.buildOutput,
+  hasResolution: COLORS.buildOutput,
+  configures: COLORS.config,
+  createdBy: COLORS.createdBy,
+  suppliedBy: COLORS.createdBy,
+  originatedBy: COLORS.createdBy,
+  manufacturedBy: COLORS.createdBy,
+  performedBy: COLORS.agent,
+  hasConcludedLicense: COLORS.license,
+  hasDeclaredLicense: COLORS.license,
+  trainedOn: COLORS.ai,
+  testedOn: COLORS.dataset,
+  fixedIn: COLORS.vexFixed,
+  doesNotAffect: COLORS.vexNotAffected,
+  affects: COLORS.vexAffected,
+  underInvestigation: COLORS.vexUnderInvestigation,
+  affectsFile: COLORS.vulnerability
+};
+
 /**
  * Gets the color for a relationship type
  *
@@ -25,48 +69,7 @@ import { getVulnerabilityId } from './security.js';
  * @returns {string} Hex color code
  */
 export function getRelationshipColor(relType) {
-  const colorMap = {
-    dependsOn: COLORS.package,
-    contains: COLORS.file,
-    generates: COLORS.build,
-    hasInput: COLORS.buildInput,
-    hasOutput: COLORS.buildOutput,
-    hasDistributionArtifact: COLORS.distribution,
-    ancestorOf: COLORS.buildLineage,
-    usesTool: COLORS.tool,
-    hasStaticLink: COLORS.staticLink,
-    hasDynamicLink: COLORS.dynamicLink,
-    hasOptionalComponent: COLORS.optionalComponent,
-    hasPrerequisite: COLORS.prerequisite,
-    hasVariant: COLORS.variant,
-    runsOn: COLORS.hardware,
-    implementedBy: COLORS.requirement,
-    verifiedBy: COLORS.requirement,
-    hasRequirement: COLORS.requirement,
-    hasEvidence: COLORS.requirement,
-    assumes: COLORS.requirement,
-    conformsTo: COLORS.requirement,
-    evaluationBasedOn: COLORS.requirement,
-    tracedToDetail: COLORS.requirement,
-    resolved: COLORS.buildOutput,
-    hasResolution: COLORS.buildOutput,
-    configures: COLORS.config,
-    createdBy: COLORS.createdBy,
-    suppliedBy: COLORS.createdBy,
-    originatedBy: COLORS.createdBy,
-    manufacturedBy: COLORS.createdBy,
-    performedBy: COLORS.agent,
-    hasConcludedLicense: COLORS.license,
-    hasDeclaredLicense: COLORS.license,
-    trainedOn: COLORS.ai,
-    testedOn: COLORS.dataset,
-    fixedIn: COLORS.vexFixed,
-    doesNotAffect: COLORS.vexNotAffected,
-    affects: COLORS.vexAffected,
-    underInvestigation: COLORS.vexUnderInvestigation,
-    affectsFile: COLORS.vulnerability
-  };
-  return colorMap[relType] || COLORS.default;
+  return RELATIONSHIP_COLORS[relType] || COLORS.default;
 }
 
 /**

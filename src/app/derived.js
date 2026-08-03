@@ -1,4 +1,3 @@
-import { computeRelationshipTypeCounts } from '../parser/parser.js';
 import {
   buildDirectoryFacets,
   buildPurposeFacets,
@@ -45,6 +44,29 @@ let pkgSummaryCacheKey = null;
 let pkgSummaryCacheVal = null;
 let licensedIdsSrc = null;
 let licensedIdsVal = new Set();
+let filteredHardwareCacheKey = null;
+let filteredHardwareCacheVal = [];
+let filteredLicensesCacheKey = null;
+let filteredLicensesCacheVal = [];
+let filteredConfigsCacheKey = null;
+let filteredConfigsCacheVal = [];
+let filteredAgentsCacheKey = null;
+let filteredAgentsCacheVal = [];
+let filteredSupplyChainCacheKey = null;
+let filteredSupplyChainCacheVal = [];
+let filteredReqsCacheKey = null;
+let filteredReqsCacheVal = [];
+// supplyChainActions feeds most of the other supply-chain getters, so a single
+// identity memo on the source list spares the whole cascade a re-filter+sort.
+let scActionsSrc = null;
+let scActionsVal = [];
+// The decomposition graph is a full pass over `relationships` (85k+ on a large
+// SBOM) and is read by the tree, its empty state, and collapseAllReqs.
+let safetyDecompRelsSrc = null;
+let safetyDecompReqsSrc = null;
+let safetyDecompVal = { childrenOf: new Map(), roots: [], hasDecomposition: false };
+let safetyTreeCacheKey = null;
+let safetyTreeCacheVal = [];
 // Lowercased "name version identifiers" per package, built on the first search
 // keystroke only (an SBOM the user never searches never pays for it).
 let pkgSearchIndexSrc = null;
@@ -82,6 +104,16 @@ export const derivedMixin = {
     licensedIdsSrc = null;
     pkgSearchIndexSrc = null;
     pkgSearchIndexVal = new Map();
+    filteredHardwareCacheKey = null;
+    filteredLicensesCacheKey = null;
+    filteredConfigsCacheKey = null;
+    filteredAgentsCacheKey = null;
+    filteredSupplyChainCacheKey = null;
+    filteredReqsCacheKey = null;
+    scActionsSrc = null;
+    safetyDecompRelsSrc = null;
+    safetyDecompReqsSrc = null;
+    safetyTreeCacheKey = null;
   },
 
   // SBOM-derived vulnerabilities merged with any OSV online findings. Before a
@@ -99,10 +131,6 @@ export const derivedMixin = {
 
   get currentViewLabel() {
     return this.views.find((v) => v.id === this.currentView)?.label || '';
-  },
-
-  get relTypeCounts() {
-    return computeRelationshipTypeCounts(this.relationships);
   },
 
   // Compact, type-aware inventory for the overview. Empty kinds are omitted so
@@ -411,7 +439,11 @@ export const derivedMixin = {
   // Hardware elements filtered by the in-view search box (name, part number,
   // summary) and sorted by name.
   get filteredHardware() {
-    let hw = this.hardware;
+    const hardware = this.hardware;
+    const key = `${hardware.length}|${this.hardwareSearch}`;
+    if (key === filteredHardwareCacheKey) return filteredHardwareCacheVal;
+
+    let hw = hardware;
     if (this.hardwareSearch) {
       const q = this.hardwareSearch.toLowerCase();
       hw = hw.filter(
@@ -422,9 +454,11 @@ export const derivedMixin = {
           (h.summary || '').toLowerCase().includes(q)
       );
     }
-    return [...hw].sort((a, b) =>
+    filteredHardwareCacheVal = [...hw].sort((a, b) =>
       (a.name || this.cleanName(a.spdxId)).localeCompare(b.name || this.cleanName(b.spdxId))
     );
+    filteredHardwareCacheKey = key;
+    return filteredHardwareCacheVal;
   },
 
   get supplyChainCounts() {
@@ -455,10 +489,16 @@ export const derivedMixin = {
     return c;
   },
 
+  // Memoized on the source list: nearly every other supply-chain getter reads
+  // this one, so without it a single render re-filters and re-sorts the whole
+  // supply-chain list once per reader.
   get supplyChainActions() {
-    return this.supplyChain
+    if (scActionsSrc === this.supplyChain) return scActionsVal;
+    scActionsVal = this.supplyChain
       .filter((el) => this.supplyChainKind(el) === 'action')
       .sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
+    scActionsSrc = this.supplyChain;
+    return scActionsVal;
   },
 
   // Timeline events: the actions that genuinely happen at a point in time.
@@ -1088,7 +1128,11 @@ export const derivedMixin = {
   },
 
   get filteredSupplyChain() {
-    let items = this.supplyChainEvents;
+    const events = this.supplyChainEvents;
+    const key = `${events.length}|${this.supplyChainFamilyFilter}|${this.supplyChainExceptionFilter}|${this.supplyChainSearch}`;
+    if (key === filteredSupplyChainCacheKey) return filteredSupplyChainCacheVal;
+
+    let items = events;
     if (this.supplyChainFamilyFilter) {
       items = items.filter((el) => this.supplyChainFamily(el) === this.supplyChainFamilyFilter);
     }
@@ -1109,7 +1153,7 @@ export const derivedMixin = {
           this.supplyChainTypeLabel(el).toLowerCase().includes(q)
       );
     }
-    return [...items].sort((a, b) => {
+    filteredSupplyChainCacheVal = [...items].sort((a, b) => {
       const at = a.startTime || a.endTime || '';
       const bt = b.startTime || b.endTime || '';
       if (at && !bt) return -1;
@@ -1122,6 +1166,8 @@ export const derivedMixin = {
       }
       return (a.name || this.cleanName(a.spdxId)).localeCompare(b.name || this.cleanName(b.spdxId));
     });
+    filteredSupplyChainCacheKey = key;
+    return filteredSupplyChainCacheVal;
   },
 
   // Breakdown of the functional-safety elements by kind, for the tab header
@@ -1203,6 +1249,9 @@ export const derivedMixin = {
   // appearing as a child become roots, so isolated requirements still show. Only
   // Requirement-typed endpoints are kept (verifications/assumptions are excluded).
   get safetyDecomposition() {
+    if (safetyDecompRelsSrc === this.relationships && safetyDecompReqsSrc === this.requirements) {
+      return safetyDecompVal;
+    }
     const reqIds = new Set();
     this.requirements.forEach((r) => {
       if (isA(r.type, CLASS.Requirement)) reqIds.add(r.spdxId);
@@ -1221,7 +1270,10 @@ export const derivedMixin = {
       childrenOf.set(rel.from, kids);
     });
     const roots = [...reqIds].filter((id) => !isChild.has(id));
-    return { childrenOf, roots, hasDecomposition: childrenOf.size > 0 };
+    safetyDecompVal = { childrenOf, roots, hasDecomposition: childrenOf.size > 0 };
+    safetyDecompRelsSrc = this.relationships;
+    safetyDecompReqsSrc = this.requirements;
+    return safetyDecompVal;
   },
 
   get hasSafetyDecomposition() {
@@ -1263,7 +1315,21 @@ export const derivedMixin = {
   // stay visible so the hierarchy remains readable. Siblings sort by display
   // name; a cycle guard stops a malformed graph looping.
   get safetyTreeRows() {
-    const { childrenOf, roots } = this.safetyDecomposition;
+    const decomposition = this.safetyDecomposition;
+    // collapsedReqs is reassigned rather than mutated (see toggleReqCollapse),
+    // so its identity is a sound cache key alongside the safety filters.
+    const collapsed = this.collapsedReqs;
+    const key = `${this.requirements.length}|${this.requirementSearch}|${this.requirementStatusFilter}|${this.requirementSpecFilter}`;
+    if (
+      safetyTreeCacheKey &&
+      safetyTreeCacheKey.key === key &&
+      safetyTreeCacheKey.decomposition === decomposition &&
+      safetyTreeCacheKey.collapsed === collapsed
+    ) {
+      return safetyTreeCacheVal;
+    }
+
+    const { childrenOf, roots } = decomposition;
     const nameOf = (id) =>
       this.requirementDisplayName(this.elementMap.get(id)) ||
       this.elementMap.get(id)?.name ||
@@ -1292,7 +1358,7 @@ export const derivedMixin = {
       if (!subtreeMatches(id, ancestry)) return;
       const kids = childrenOf.get(id) || [];
       const visibleKids = sortIds(kids).filter((k) => subtreeMatches(k, new Set(ancestry).add(id)));
-      const collapsed = !!this.collapsedReqs[id];
+      const isCollapsed = !!collapsed[id];
       const el = this.elementMap.get(id);
       rows.push({
         id,
@@ -1300,20 +1366,27 @@ export const derivedMixin = {
         depth,
         hasChildren: visibleKids.length > 0,
         childCount: visibleKids.length,
-        collapsed,
+        collapsed: isCollapsed,
         cue: this.requirementQuietCue(el)
       });
-      if (visibleKids.length && !collapsed) {
+      if (visibleKids.length && !isCollapsed) {
         const next = new Set(ancestry).add(id);
         visibleKids.forEach((k) => visit(k, depth + 1, next));
       }
     };
     sortIds(roots).forEach((r) => visit(r, 0, new Set()));
+
+    safetyTreeCacheKey = { key, decomposition, collapsed };
+    safetyTreeCacheVal = rows;
     return rows;
   },
 
   get filteredRequirements() {
-    let reqs = this.requirements;
+    const requirements = this.requirements;
+    const key = `${requirements.length}|${this.requirementKindFilter}|${this.requirementStatusFilter}|${this.requirementSpecFilter}|${this.requirementSearch}`;
+    if (key === filteredReqsCacheKey) return filteredReqsCacheVal;
+
+    let reqs = requirements;
     // Kind filter chips (all / requirements / verifications / assumptions /
     // evaluations) let the folded-in artifacts be browsed on their own.
     if (this.requirementKindFilter) {
@@ -1339,29 +1412,37 @@ export const derivedMixin = {
       });
     }
     const rank = (r) => (r.type === CLASS.Requirement ? 0 : 1);
-    return [...reqs].sort(
+    filteredReqsCacheVal = [...reqs].sort(
       (a, b) =>
         rank(a) - rank(b) ||
         (this.requirementDisplayName(a) || a.name || this.cleanName(a.spdxId)).localeCompare(
           this.requirementDisplayName(b) || b.name || this.cleanName(b.spdxId)
         )
     );
+    filteredReqsCacheKey = key;
+    return filteredReqsCacheVal;
   },
 
   get filteredLicenses() {
-    let lics = this.licenses;
+    const licenses = this.licenses;
+    const key = `${licenses.length}|${this.licenseSearch}|${this.licenseSort}`;
+    if (key === filteredLicensesCacheKey) return filteredLicensesCacheVal;
+
+    let lics = licenses;
     if (this.licenseSearch) {
       const q = this.licenseSearch.toLowerCase();
       lics = lics.filter(
         (l) => (l.label || '').toLowerCase().includes(q) || (l.id || '').toLowerCase().includes(q)
       );
     }
-    if (this.licenseSort === 'name') {
-      return [...lics].sort((a, b) => (a.label || '').localeCompare(b.label || ''));
-    }
-    return [...lics].sort(
-      (a, b) => b.userCount - a.userCount || (a.label || '').localeCompare(b.label || '')
-    );
+    filteredLicensesCacheVal =
+      this.licenseSort === 'name'
+        ? [...lics].sort((a, b) => (a.label || '').localeCompare(b.label || ''))
+        : [...lics].sort(
+            (a, b) => b.userCount - a.userCount || (a.label || '').localeCompare(b.label || '')
+          );
+    filteredLicensesCacheKey = key;
+    return filteredLicensesCacheVal;
   },
 
   // Vulnerabilities filtered by the search box + status filter, then sorted.
@@ -1527,7 +1608,11 @@ export const derivedMixin = {
   },
 
   get filteredConfigs() {
-    let cfgs = this.buildConfigs;
+    const buildConfigs = this.buildConfigs;
+    const key = `${buildConfigs.length}|${this.configSearch}`;
+    if (key === filteredConfigsCacheKey) return filteredConfigsCacheVal;
+
+    let cfgs = buildConfigs;
     if (this.configSearch) {
       const q = this.configSearch.toLowerCase();
       cfgs = cfgs.filter(
@@ -1537,9 +1622,11 @@ export const derivedMixin = {
           (c.description || '').toLowerCase().includes(q)
       );
     }
-    return [...cfgs].sort((a, b) =>
+    filteredConfigsCacheVal = [...cfgs].sort((a, b) =>
       (a.name || a.spdxId || '').localeCompare(b.name || b.spdxId || '')
     );
+    filteredConfigsCacheKey = key;
+    return filteredConfigsCacheVal;
   },
 
   get filteredBuilds() {
@@ -1617,7 +1704,11 @@ export const derivedMixin = {
   // box (name, id, or email) and sorted either by how many elements they're tied
   // to — the most active creators/suppliers first — or by name.
   get filteredAgents() {
-    let list = this.agents;
+    const agents = this.agents;
+    const key = `${agents.length}|${this.agentSearch}|${this.agentSort}`;
+    if (key === filteredAgentsCacheKey) return filteredAgentsCacheVal;
+
+    let list = agents;
     if (this.agentSearch) {
       const q = this.agentSearch.toLowerCase();
       list = list.filter(
@@ -1627,15 +1718,17 @@ export const derivedMixin = {
           (this.agentEmail(a) || '').toLowerCase().includes(q)
       );
     }
-    if (this.agentSort === 'name') {
-      return [...list].sort((a, b) =>
-        (a.name || this.cleanName(a.spdxId)).localeCompare(b.name || this.cleanName(b.spdxId))
-      );
-    }
-    return [...list].sort(
-      (a, b) =>
-        this.agentLinkCount(b) - this.agentLinkCount(a) ||
-        (a.name || this.cleanName(a.spdxId)).localeCompare(b.name || this.cleanName(b.spdxId))
-    );
+    filteredAgentsCacheVal =
+      this.agentSort === 'name'
+        ? [...list].sort((a, b) =>
+            (a.name || this.cleanName(a.spdxId)).localeCompare(b.name || this.cleanName(b.spdxId))
+          )
+        : [...list].sort(
+            (a, b) =>
+              this.agentLinkCount(b) - this.agentLinkCount(a) ||
+              (a.name || this.cleanName(a.spdxId)).localeCompare(b.name || this.cleanName(b.spdxId))
+          );
+    filteredAgentsCacheKey = key;
+    return filteredAgentsCacheVal;
   }
 };
