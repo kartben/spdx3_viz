@@ -35,6 +35,10 @@ export const CHANGELOG = [
       },
       {
         tag: 'Fixed',
+        text: 'Scrolling far into a huge list no longer bloats memory.'
+      },
+      {
+        tag: 'Fixed',
         text: 'Searching Licenses, Builds, or Build configs returns to the top.'
       },
       {
