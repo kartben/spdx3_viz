@@ -4,7 +4,7 @@
    removal. Everything is staged, then fetched/read/dropped in a single batch so
    a big SBOM is only re-parsed once. */
 
-import { formatBytes, tagLoadedFile, STREAM_THRESHOLD } from './loading.js';
+import { formatBytes, tagLoadedFile, INLINE_TEXT_MAX } from './loading.js';
 
 /* Staged local files live here, not in Alpine state: a File put on a reactive
    object comes back as a Proxy, and its native methods (text(), slice()) throw
@@ -261,9 +261,9 @@ export const addFilesMixin = {
         );
         added.push(...downloaded);
         for (const file of locals) {
-          // Files too big for one JS string are kept as their Blob and
-          // stream-parsed in the worker (see STREAM_THRESHOLD).
-          if (file.size >= STREAM_THRESHOLD) {
+          // Files big enough that decoding them here would stall the UI are
+          // kept as their Blob and read in the worker (see INLINE_TEXT_MAX).
+          if (file.size >= INLINE_TEXT_MAX) {
             added.push(tagLoadedFile({ name: file.name, blob: file, size: file.size }));
           } else {
             const text = await file.text();
