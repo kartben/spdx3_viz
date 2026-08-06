@@ -505,572 +505,574 @@
       </div>
 
       <!-- Expanded: per-package VEX assessments -->
-      <div
-        x-show="expandedVuln === vuln.spdxId"
-        x-collapse
-        class="mt-4 pt-4 border-t border-slate-700 sm:pl-11 space-y-3"
-      >
-        <!-- Whole-CVE VEX clearance: lead with reassurance when every assessed
+      <template x-if="expandedVuln === vuln.spdxId">
+        <div class="mt-4 pt-4 border-t border-slate-700 sm:pl-11 space-y-3 fade-in">
+          <!-- Whole-CVE VEX clearance: lead with reassurance when every assessed
              package is cleared (not_affected/fixed), so anything linked below
              reads as reference, not an open issue. -->
-        <div
-          x-show="vulnClearedByVex(vuln)"
-          class="rounded-lg p-3 flex items-start gap-2.5"
-          :class="vexStatusMeta(vulnClearedByVex(vuln)).badgeClass"
-        >
-          <svg
-            class="w-4 h-4 mt-0.5 flex-shrink-0"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            viewBox="0 0 24 24"
+          <div
+            x-show="vulnClearedByVex(vuln)"
+            class="rounded-lg p-3 flex items-start gap-2.5"
+            :class="vexStatusMeta(vulnClearedByVex(vuln)).badgeClass"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <div class="text-xs leading-relaxed min-w-0">
-            <span
-              class="font-semibold"
-              x-text="`${vexStatusMeta(vulnClearedByVex(vuln)).label} — not an issue for this SBOM`"
-            ></span>
-            <span class="block opacity-80 mt-0.5">
-              A VEX statement clears <span class="font-mono" x-text="vuln.name"></span> for
-              <span
-                x-text="vuln.packageCount === 1 ? 'the assessed package' : `all ${formatCount(vuln.packageCount)} assessed packages`"
-              ></span
-              >. Any files listed below are linked for reference only.
-            </span>
-          </div>
-        </div>
-
-        <!-- Quick-jump: hop straight to any package this CVE touches, without
-             scrolling down to the assessments. Always available (VEX-derived, no
-             CVE fetch needed), so cross-navigating to components is one click. -->
-        <div x-show="vulnPackages(vuln.spdxId).length" class="flex flex-wrap items-center gap-1.5">
-          <span class="text-[10px] uppercase tracking-wider text-slate-500 mr-0.5">Jump to</span>
-          <template x-for="p in vulnPackages(vuln.spdxId).slice(0, 12)" :key="p.spdxId">
-            <button
-              @click="navigateTo(p.spdxId)"
-              class="badge bg-slate-800 text-slate-300 hover:text-white ring-1 ring-slate-700/60 max-w-full truncate"
-              :title="'Open ' + p.name + ' in Packages'"
+            <svg
+              class="w-4 h-4 mt-0.5 flex-shrink-0"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
             >
-              <svg
-                class="w-3 h-3 mr-1 flex-shrink-0 opacity-70"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-14L4 7m8 4v10m0-10L4 7v10l8 4"
-                />
-              </svg>
-              <span class="truncate" x-text="p.name"></span>
-            </button>
-          </template>
-          <span
-            x-show="vulnPackages(vuln.spdxId).length > 12"
-            class="badge bg-slate-800 text-slate-500"
-            x-text="`+${formatCount(vulnPackages(vuln.spdxId).length - 12)} more`"
-          ></span>
-        </div>
-
-        <!-- Summary / description from the SPDX vulnerability element -->
-        <div x-show="isMeaningful(vuln.el?.summary)">
-          <div class="text-xs text-slate-500 mb-1">Summary</div>
-          <div
-            class="text-xs text-slate-300 whitespace-pre-wrap break-words"
-            x-text="vuln.el?.summary"
-          ></div>
-        </div>
-        <div
-          x-show="isMeaningful(vuln.el?.description) && vuln.el?.description !== vuln.el?.summary"
-        >
-          <div class="text-xs text-slate-500 mb-1">Description</div>
-          <div
-            class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-32 overflow-y-auto"
-            x-text="vuln.el?.description"
-          ></div>
-        </div>
-
-        <!-- In-SBOM risk assessment (CVSS/EPSS/exploit), straight from the document -->
-        <div
-          x-show="(vuln.cvss || vuln.epss || vuln.kev) && vuln.source !== 'online'"
-          class="rounded-lg bg-slate-900/40 border border-slate-700/50 p-3 space-y-2"
-        >
-          <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-            Risk assessment
-          </div>
-          <div class="flex flex-wrap items-center gap-2">
-            <span
-              x-show="vuln.cvss"
-              class="badge"
-              :class="cvssSeverityMeta(vuln.severity).badgeClass"
-            >
-              <span x-text="cvssSeverityMeta(vuln.severity).label"></span>
-              <span
-                x-show="vuln.cvss?.score != null"
-                class="ml-1.5 font-semibold tabular-nums"
-                x-text="vuln.cvss?.score"
-              ></span>
-            </span>
-            <span
-              x-show="vuln.cvss?.version"
-              class="text-[10px] text-slate-500"
-              x-text="'CVSS v' + vuln.cvss?.version"
-            ></span>
-            <span
-              x-show="vuln.epss"
-              class="badge bg-slate-700/60 text-slate-300"
-              title="Exploit Prediction Scoring System — likelihood of exploitation in the next 30 days"
-              x-text="'EPSS ' + (vuln.epss ? (vuln.epss.probability * 100).toFixed(1) + '%' : '')"
-            ></span>
-            <span
-              x-show="vuln.kev"
-              class="badge bg-rose-500/15 text-rose-300 ring-1 ring-rose-500/40"
-              title="Listed in a known-exploited vulnerability catalog (e.g. CISA KEV)"
-            >
-              Known exploited
-            </span>
-          </div>
-          <div
-            x-show="vuln.cvss?.vector"
-            class="text-[11px] font-mono text-slate-500 break-all"
-            x-text="vuln.cvss?.vector"
-          ></div>
-          <div class="text-[10px] text-slate-600">Source: this SBOM's risk assessment</div>
-        </div>
-
-        <!-- CVE details, fetched on demand from cve.org -->
-        <div
-          class="rounded-lg bg-slate-900/40 border border-slate-700/50 p-3"
-          x-show="cveDetail(vuln.cveId)"
-        >
-          <div
-            x-show="cveDetail(vuln.cveId)?.loading"
-            class="flex items-center gap-2 text-xs text-slate-400"
-          >
-            <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              />
               <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            Loading CVE details…
+            <div class="text-xs leading-relaxed min-w-0">
+              <span
+                class="font-semibold"
+                x-text="`${vexStatusMeta(vulnClearedByVex(vuln)).label} — not an issue for this SBOM`"
+              ></span>
+              <span class="block opacity-80 mt-0.5">
+                A VEX statement clears <span class="font-mono" x-text="vuln.name"></span> for
+                <span
+                  x-text="vuln.packageCount === 1 ? 'the assessed package' : `all ${formatCount(vuln.packageCount)} assessed packages`"
+                ></span
+                >. Any files listed below are linked for reference only.
+              </span>
+            </div>
+          </div>
+
+          <!-- Quick-jump: hop straight to any package this CVE touches, without
+             scrolling down to the assessments. Always available (VEX-derived, no
+             CVE fetch needed), so cross-navigating to components is one click. -->
+          <div
+            x-show="vulnPackages(vuln.spdxId).length"
+            class="flex flex-wrap items-center gap-1.5"
+          >
+            <span class="text-[10px] uppercase tracking-wider text-slate-500 mr-0.5">Jump to</span>
+            <template x-for="p in vulnPackages(vuln.spdxId).slice(0, 12)" :key="p.spdxId">
+              <button
+                @click="navigateTo(p.spdxId)"
+                class="badge bg-slate-800 text-slate-300 hover:text-white ring-1 ring-slate-700/60 max-w-full truncate"
+                :title="'Open ' + p.name + ' in Packages'"
+              >
+                <svg
+                  class="w-3 h-3 mr-1 flex-shrink-0 opacity-70"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-14L4 7m8 4v10m0-10L4 7v10l8 4"
+                  />
+                </svg>
+                <span class="truncate" x-text="p.name"></span>
+              </button>
+            </template>
+            <span
+              x-show="vulnPackages(vuln.spdxId).length > 12"
+              class="badge bg-slate-800 text-slate-500"
+              x-text="`+${formatCount(vulnPackages(vuln.spdxId).length - 12)} more`"
+            ></span>
+          </div>
+
+          <!-- Summary / description from the SPDX vulnerability element -->
+          <div x-show="isMeaningful(vuln.el?.summary)">
+            <div class="text-xs text-slate-500 mb-1">Summary</div>
+            <div
+              class="text-xs text-slate-300 whitespace-pre-wrap break-words"
+              x-text="vuln.el?.summary"
+            ></div>
           </div>
           <div
-            x-show="cveDetail(vuln.cveId)?.error"
-            class="text-xs text-slate-500 italic"
-            x-text="'CVE details unavailable — ' + (cveDetail(vuln.cveId)?.error || '')"
-          ></div>
-          <div x-show="cveDetail(vuln.cveId)?.data" class="space-y-2.5">
+            x-show="isMeaningful(vuln.el?.description) && vuln.el?.description !== vuln.el?.summary"
+          >
+            <div class="text-xs text-slate-500 mb-1">Description</div>
+            <div
+              class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-32 overflow-y-auto"
+              x-text="vuln.el?.description"
+            ></div>
+          </div>
+
+          <!-- In-SBOM risk assessment (CVSS/EPSS/exploit), straight from the document -->
+          <div
+            x-show="(vuln.cvss || vuln.epss || vuln.kev) && vuln.source !== 'online'"
+            class="rounded-lg bg-slate-900/40 border border-slate-700/50 p-3 space-y-2"
+          >
+            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              Risk assessment
+            </div>
             <div class="flex flex-wrap items-center gap-2">
               <span
-                x-show="cveDetail(vuln.cveId)?.data?.cvss"
+                x-show="vuln.cvss"
                 class="badge"
-                :class="cvssSeverityMeta(cveDetail(vuln.cveId)?.data?.cvss?.severity).badgeClass"
-                :title="cveDetail(vuln.cveId)?.data?.cvss?.vector"
+                :class="cvssSeverityMeta(vuln.severity).badgeClass"
               >
+                <span x-text="cvssSeverityMeta(vuln.severity).label"></span>
                 <span
-                  x-text="cvssSeverityMeta(cveDetail(vuln.cveId)?.data?.cvss?.severity).label"
-                ></span>
-                <span
-                  class="ml-1.5 font-semibold"
-                  x-text="cveDetail(vuln.cveId)?.data?.cvss?.score"
+                  x-show="vuln.cvss?.score != null"
+                  class="ml-1.5 font-semibold tabular-nums"
+                  x-text="vuln.cvss?.score"
                 ></span>
               </span>
               <span
-                x-show="cveDetail(vuln.cveId)?.data?.cvss?.version"
+                x-show="vuln.cvss?.version"
                 class="text-[10px] text-slate-500"
-                x-text="'CVSS v' + cveDetail(vuln.cveId)?.data?.cvss?.version"
+                x-text="'CVSS v' + vuln.cvss?.version"
               ></span>
-              <template x-for="cwe in cveDetail(vuln.cveId)?.data?.cwes || []" :key="cwe">
+              <span
+                x-show="vuln.epss"
+                class="badge bg-slate-700/60 text-slate-300"
+                title="Exploit Prediction Scoring System — likelihood of exploitation in the next 30 days"
+                x-text="'EPSS ' + (vuln.epss ? (vuln.epss.probability * 100).toFixed(1) + '%' : '')"
+              ></span>
+              <span
+                x-show="vuln.kev"
+                class="badge bg-rose-500/15 text-rose-300 ring-1 ring-rose-500/40"
+                title="Listed in a known-exploited vulnerability catalog (e.g. CISA KEV)"
+              >
+                Known exploited
+              </span>
+            </div>
+            <div
+              x-show="vuln.cvss?.vector"
+              class="text-[11px] font-mono text-slate-500 break-all"
+              x-text="vuln.cvss?.vector"
+            ></div>
+            <div class="text-[10px] text-slate-600">Source: this SBOM's risk assessment</div>
+          </div>
+
+          <!-- CVE details, fetched on demand from cve.org -->
+          <div
+            class="rounded-lg bg-slate-900/40 border border-slate-700/50 p-3"
+            x-show="cveDetail(vuln.cveId)"
+          >
+            <div
+              x-show="cveDetail(vuln.cveId)?.loading"
+              class="flex items-center gap-2 text-xs text-slate-400"
+            >
+              <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                />
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                />
+              </svg>
+              Loading CVE details…
+            </div>
+            <div
+              x-show="cveDetail(vuln.cveId)?.error"
+              class="text-xs text-slate-500 italic"
+              x-text="'CVE details unavailable — ' + (cveDetail(vuln.cveId)?.error || '')"
+            ></div>
+            <div x-show="cveDetail(vuln.cveId)?.data" class="space-y-2.5">
+              <div class="flex flex-wrap items-center gap-2">
+                <span
+                  x-show="cveDetail(vuln.cveId)?.data?.cvss"
+                  class="badge"
+                  :class="cvssSeverityMeta(cveDetail(vuln.cveId)?.data?.cvss?.severity).badgeClass"
+                  :title="cveDetail(vuln.cveId)?.data?.cvss?.vector"
+                >
+                  <span
+                    x-text="cvssSeverityMeta(cveDetail(vuln.cveId)?.data?.cvss?.severity).label"
+                  ></span>
+                  <span
+                    class="ml-1.5 font-semibold"
+                    x-text="cveDetail(vuln.cveId)?.data?.cvss?.score"
+                  ></span>
+                </span>
+                <span
+                  x-show="cveDetail(vuln.cveId)?.data?.cvss?.version"
+                  class="text-[10px] text-slate-500"
+                  x-text="'CVSS v' + cveDetail(vuln.cveId)?.data?.cvss?.version"
+                ></span>
+                <template x-for="cwe in cveDetail(vuln.cveId)?.data?.cwes || []" :key="cwe">
+                  <span class="badge bg-slate-700/60 text-slate-300" x-text="cwe"></span>
+                </template>
+              </div>
+              <p
+                class="text-sm text-slate-300 leading-relaxed"
+                x-text="cveDetail(vuln.cveId)?.data?.description"
+              ></p>
+              <div class="text-[10px] text-slate-500 flex flex-wrap gap-x-3 gap-y-1">
+                <span
+                  x-show="cveDetail(vuln.cveId)?.data?.published"
+                  x-text="'Published ' + formatDate(cveDetail(vuln.cveId)?.data?.published)"
+                ></span>
+                <span
+                  x-show="cveDetail(vuln.cveId)?.data?.assigner"
+                  x-text="'Assigner: ' + cveDetail(vuln.cveId)?.data?.assigner"
+                ></span>
+              </div>
+              <!-- Affected source files / functions from the CVE record. Files that
+                 match an element in this SBOM become a link into it. -->
+              <div
+                x-show="affectedFileLinks(vuln.cveId).length || (cveDetail(vuln.cveId)?.data?.affectedRoutines || []).length || (cveDetail(vuln.cveId)?.data?.affectedModules || []).length"
+                class="rounded-md bg-slate-900/40 ring-1 ring-slate-700/40 p-2.5 space-y-2"
+              >
+                <template x-if="affectedFileLinks(vuln.cveId).length">
+                  <div class="space-y-1.5">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <span
+                        class="text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                        >Files referenced by this CVE</span
+                      >
+                      <span
+                        x-show="affectedFileStats(vuln.cveId, vuln.spdxId).matched"
+                        class="badge bg-slate-700/60 text-slate-300 ring-1 ring-slate-600/40"
+                        title="Files named in the CVE record that match a file in this SBOM by path"
+                        x-text="`${formatCount(affectedFileStats(vuln.cveId, vuln.spdxId).matched)} in this SBOM`"
+                      ></span>
+                      <span
+                        x-show="affectedFileStats(vuln.cveId, vuln.spdxId).affected"
+                        class="badge bg-rose-500/15 text-rose-300 ring-1 ring-rose-500/30"
+                        :title="`No VEX statement clears the package(s) owning these files for ${vuln.name}`"
+                        x-text="`${formatCount(affectedFileStats(vuln.cveId, vuln.spdxId).affected)} still an issue`"
+                      ></span>
+                      <span
+                        x-show="affectedFileStats(vuln.cveId, vuln.spdxId).ruledOut"
+                        class="badge bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30"
+                        :title="`A VEX statement clears the package(s) owning these files for ${vuln.name}`"
+                        x-text="`${formatCount(affectedFileStats(vuln.cveId, vuln.spdxId).ruledOut)} not an issue`"
+                      ></span>
+                    </div>
+                    <ul class="space-y-1.5">
+                      <template
+                        x-for="d in affectedFileDetails(vuln.cveId, vuln.spdxId)"
+                        :key="d.path"
+                      >
+                        <li class="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                          <button
+                            x-show="d.linked"
+                            type="button"
+                            @click="navigateTo(d.spdxId)"
+                            class="group inline-flex items-center gap-1.5 text-xs font-mono text-left break-all"
+                            :class="d.ruledOut ? 'text-slate-500 hover:text-slate-300 line-through decoration-slate-600' : 'text-sky-300 hover:text-sky-200'"
+                            :title="'Open ' + d.name + ' in this SBOM'"
+                          >
+                            <svg
+                              class="w-3 h-3 flex-shrink-0 opacity-70 group-hover:opacity-100"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9l-7-7z"
+                              />
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M13 2v7h7" />
+                            </svg>
+                            <span x-text="d.path"></span>
+                          </button>
+                          <span
+                            x-show="!d.linked"
+                            class="inline-flex items-center gap-1.5 text-xs font-mono text-slate-400 break-all"
+                            :title="d.candidates ? 'A file with this name is in the SBOM, but the path is ambiguous' : 'Not present in this SBOM'"
+                          >
+                            <span x-text="d.path"></span>
+                          </span>
+                          <span
+                            x-show="d.linked && d.packageName"
+                            class="text-[10px] text-slate-500 whitespace-nowrap"
+                          >
+                            in
+                            <button
+                              type="button"
+                              @click="navigateTo(d.packageId)"
+                              class="text-slate-400 hover:text-slate-200 hover:underline decoration-slate-600"
+                              x-text="d.packageName"
+                            ></button>
+                          </span>
+                          <span
+                            x-show="d.vexStatus"
+                            class="badge"
+                            :class="vexStatusMeta(d.vexStatus).badgeClass"
+                            :title="d.vexInherited
+                            ? `${vexStatusMeta(d.vexStatus).label}: a VEX statement rules out ${vuln.name} for this SBOM`
+                            : `${vexStatusMeta(d.vexStatus).label}: ${d.packageName} is assessed for ${vuln.name} by a VEX statement`"
+                          >
+                            <span
+                              class="w-1.5 h-1.5 rounded-full mr-1"
+                              :class="vexStatusMeta(d.vexStatus).dotClass"
+                            ></span>
+                            <span x-text="vexStatusMeta(d.vexStatus).label"></span>
+                          </span>
+                        </li>
+                      </template>
+                    </ul>
+                    <p
+                      x-show="affectedFileStats(vuln.cveId, vuln.spdxId).matched"
+                      class="text-[10px] text-slate-500 italic leading-snug"
+                    >
+                      Files are matched to this SBOM by path from the CVE record, not declared by
+                      the SBOM itself. A file tagged “Not affected” or “Fixed” is cleared by a VEX
+                      statement: it's linked here for reference, not as an open issue.
+                    </p>
+                  </div>
+                </template>
+                <template x-if="(cveDetail(vuln.cveId)?.data?.affectedRoutines || []).length">
+                  <div class="space-y-1">
+                    <span class="text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                      >Functions referenced by this CVE</span
+                    >
+                    <div class="flex flex-wrap gap-1">
+                      <template
+                        x-for="fn in cveDetail(vuln.cveId)?.data?.affectedRoutines || []"
+                        :key="fn"
+                      >
+                        <span
+                          class="badge bg-slate-700/60 text-slate-300 font-mono"
+                          x-text="fn"
+                        ></span>
+                      </template>
+                    </div>
+                  </div>
+                </template>
+                <template x-if="(cveDetail(vuln.cveId)?.data?.affectedModules || []).length">
+                  <div class="space-y-1">
+                    <span class="text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                      >Modules referenced by this CVE</span
+                    >
+                    <div class="flex flex-wrap gap-1">
+                      <template
+                        x-for="mod in cveDetail(vuln.cveId)?.data?.affectedModules || []"
+                        :key="mod"
+                      >
+                        <span class="badge bg-slate-700/60 text-slate-300" x-text="mod"></span>
+                      </template>
+                    </div>
+                  </div>
+                </template>
+              </div>
+
+              <details
+                x-show="(cveDetail(vuln.cveId)?.data?.references || []).length > 0"
+                class="group"
+              >
+                <summary class="cursor-pointer text-xs text-slate-400 hover:text-slate-200">
+                  <span
+                    x-text="(cveDetail(vuln.cveId)?.data?.references || []).length + ' references'"
+                  ></span>
+                </summary>
+                <div class="mt-2 space-y-1">
+                  <template
+                    x-for="ref in cveDetail(vuln.cveId)?.data?.references || []"
+                    :key="ref.url"
+                  >
+                    <a
+                      :href="ref.url"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="block text-xs text-sky-400 hover:text-sky-300 truncate"
+                      :title="ref.url"
+                      x-text="ref.name || ref.url.replace(/^https?:\/\//,'')"
+                    ></a>
+                  </template>
+                </div>
+              </details>
+              <div class="text-[10px] text-slate-600">Source: CVE Program · cve.org</div>
+            </div>
+          </div>
+
+          <!-- Online match from public databases (present on online/both vulns) -->
+          <div
+            x-show="vuln.online"
+            class="rounded-lg bg-sky-950/20 border border-sky-800/40 p-3 space-y-2"
+          >
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-xs font-semibold text-sky-300 uppercase tracking-wider">
+                Online match
+              </span>
+              <template x-for="src in vuln.online?.sources || []" :key="src">
+                <span
+                  class="badge bg-sky-500/15 text-sky-300 ring-1 ring-sky-500/30"
+                  x-text="src === 'NVD' ? 'NVD' : 'OSV.dev'"
+                ></span>
+              </template>
+              <span
+                x-show="vuln.online?.osvId && vuln.online?.osvId !== vuln.name"
+                class="badge bg-slate-700/60 text-slate-300 font-mono"
+                x-text="vuln.online?.osvId"
+              ></span>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span
+                x-show="vuln.online?.cvss"
+                class="badge"
+                :class="cvssSeverityMeta(vuln.online?.cvss?.severity).badgeClass"
+                :title="vuln.online?.cvss?.vector"
+              >
+                <span x-text="cvssSeverityMeta(vuln.online?.cvss?.severity).label"></span>
+                <span
+                  x-show="vuln.online?.cvss?.score != null"
+                  class="ml-1.5 font-semibold tabular-nums"
+                  x-text="vuln.online?.cvss?.score"
+                ></span>
+              </span>
+              <span
+                x-show="vuln.online?.cvss?.version"
+                class="text-[10px] text-slate-500"
+                x-text="'CVSS v' + vuln.online?.cvss?.version"
+              ></span>
+              <template x-for="cwe in vuln.online?.cwes || []" :key="cwe">
                 <span class="badge bg-slate-700/60 text-slate-300" x-text="cwe"></span>
               </template>
             </div>
             <p
+              x-show="vuln.online?.summary"
               class="text-sm text-slate-300 leading-relaxed"
-              x-text="cveDetail(vuln.cveId)?.data?.description"
+              x-text="vuln.online?.summary"
             ></p>
-            <div class="text-[10px] text-slate-500 flex flex-wrap gap-x-3 gap-y-1">
-              <span
-                x-show="cveDetail(vuln.cveId)?.data?.published"
-                x-text="'Published ' + formatDate(cveDetail(vuln.cveId)?.data?.published)"
-              ></span>
-              <span
-                x-show="cveDetail(vuln.cveId)?.data?.assigner"
-                x-text="'Assigner: ' + cveDetail(vuln.cveId)?.data?.assigner"
-              ></span>
-            </div>
-            <!-- Affected source files / functions from the CVE record. Files that
-                 match an element in this SBOM become a link into it. -->
-            <div
-              x-show="affectedFileLinks(vuln.cveId).length || (cveDetail(vuln.cveId)?.data?.affectedRoutines || []).length || (cveDetail(vuln.cveId)?.data?.affectedModules || []).length"
-              class="rounded-md bg-slate-900/40 ring-1 ring-slate-700/40 p-2.5 space-y-2"
-            >
-              <template x-if="affectedFileLinks(vuln.cveId).length">
-                <div class="space-y-1.5">
-                  <div class="flex items-center gap-2 flex-wrap">
-                    <span class="text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
-                      >Files referenced by this CVE</span
-                    >
-                    <span
-                      x-show="affectedFileStats(vuln.cveId, vuln.spdxId).matched"
-                      class="badge bg-slate-700/60 text-slate-300 ring-1 ring-slate-600/40"
-                      title="Files named in the CVE record that match a file in this SBOM by path"
-                      x-text="`${formatCount(affectedFileStats(vuln.cveId, vuln.spdxId).matched)} in this SBOM`"
-                    ></span>
-                    <span
-                      x-show="affectedFileStats(vuln.cveId, vuln.spdxId).affected"
-                      class="badge bg-rose-500/15 text-rose-300 ring-1 ring-rose-500/30"
-                      :title="`No VEX statement clears the package(s) owning these files for ${vuln.name}`"
-                      x-text="`${formatCount(affectedFileStats(vuln.cveId, vuln.spdxId).affected)} still an issue`"
-                    ></span>
-                    <span
-                      x-show="affectedFileStats(vuln.cveId, vuln.spdxId).ruledOut"
-                      class="badge bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30"
-                      :title="`A VEX statement clears the package(s) owning these files for ${vuln.name}`"
-                      x-text="`${formatCount(affectedFileStats(vuln.cveId, vuln.spdxId).ruledOut)} not an issue`"
-                    ></span>
-                  </div>
-                  <ul class="space-y-1.5">
-                    <template
-                      x-for="d in affectedFileDetails(vuln.cveId, vuln.spdxId)"
-                      :key="d.path"
-                    >
-                      <li class="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                        <button
-                          x-show="d.linked"
-                          type="button"
-                          @click="navigateTo(d.spdxId)"
-                          class="group inline-flex items-center gap-1.5 text-xs font-mono text-left break-all"
-                          :class="d.ruledOut ? 'text-slate-500 hover:text-slate-300 line-through decoration-slate-600' : 'text-sky-300 hover:text-sky-200'"
-                          :title="'Open ' + d.name + ' in this SBOM'"
-                        >
-                          <svg
-                            class="w-3 h-3 flex-shrink-0 opacity-70 group-hover:opacity-100"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9l-7-7z"
-                            />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 2v7h7" />
-                          </svg>
-                          <span x-text="d.path"></span>
-                        </button>
-                        <span
-                          x-show="!d.linked"
-                          class="inline-flex items-center gap-1.5 text-xs font-mono text-slate-400 break-all"
-                          :title="d.candidates ? 'A file with this name is in the SBOM, but the path is ambiguous' : 'Not present in this SBOM'"
-                        >
-                          <span x-text="d.path"></span>
-                        </span>
-                        <span
-                          x-show="d.linked && d.packageName"
-                          class="text-[10px] text-slate-500 whitespace-nowrap"
-                        >
-                          in
-                          <button
-                            type="button"
-                            @click="navigateTo(d.packageId)"
-                            class="text-slate-400 hover:text-slate-200 hover:underline decoration-slate-600"
-                            x-text="d.packageName"
-                          ></button>
-                        </span>
-                        <span
-                          x-show="d.vexStatus"
-                          class="badge"
-                          :class="vexStatusMeta(d.vexStatus).badgeClass"
-                          :title="d.vexInherited
-                            ? `${vexStatusMeta(d.vexStatus).label}: a VEX statement rules out ${vuln.name} for this SBOM`
-                            : `${vexStatusMeta(d.vexStatus).label}: ${d.packageName} is assessed for ${vuln.name} by a VEX statement`"
-                        >
-                          <span
-                            class="w-1.5 h-1.5 rounded-full mr-1"
-                            :class="vexStatusMeta(d.vexStatus).dotClass"
-                          ></span>
-                          <span x-text="vexStatusMeta(d.vexStatus).label"></span>
-                        </span>
-                      </li>
-                    </template>
-                  </ul>
-                  <p
-                    x-show="affectedFileStats(vuln.cveId, vuln.spdxId).matched"
-                    class="text-[10px] text-slate-500 italic leading-snug"
-                  >
-                    Files are matched to this SBOM by path from the CVE record, not declared by the
-                    SBOM itself. A file tagged “Not affected” or “Fixed” is cleared by a VEX
-                    statement: it's linked here for reference, not as an open issue.
-                  </p>
-                </div>
-              </template>
-              <template x-if="(cveDetail(vuln.cveId)?.data?.affectedRoutines || []).length">
-                <div class="space-y-1">
-                  <span class="text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
-                    >Functions referenced by this CVE</span
-                  >
-                  <div class="flex flex-wrap gap-1">
-                    <template
-                      x-for="fn in cveDetail(vuln.cveId)?.data?.affectedRoutines || []"
-                      :key="fn"
-                    >
-                      <span
-                        class="badge bg-slate-700/60 text-slate-300 font-mono"
-                        x-text="fn"
-                      ></span>
-                    </template>
-                  </div>
-                </div>
-              </template>
-              <template x-if="(cveDetail(vuln.cveId)?.data?.affectedModules || []).length">
-                <div class="space-y-1">
-                  <span class="text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
-                    >Modules referenced by this CVE</span
-                  >
-                  <div class="flex flex-wrap gap-1">
-                    <template
-                      x-for="mod in cveDetail(vuln.cveId)?.data?.affectedModules || []"
-                      :key="mod"
-                    >
-                      <span class="badge bg-slate-700/60 text-slate-300" x-text="mod"></span>
-                    </template>
-                  </div>
-                </div>
-              </template>
+            <p
+              x-show="vuln.online?.details && vuln.online?.details !== vuln.online?.summary"
+              class="text-xs text-slate-400 leading-relaxed max-h-32 overflow-y-auto whitespace-pre-wrap break-words"
+              x-text="vuln.online?.details"
+            ></p>
+
+            <!-- Components this advisory matched, by PackageURL / CPE -->
+            <div x-show="(vuln.online?.matched || []).length">
+              <div
+                class="text-xs text-slate-500 mb-1"
+                x-text="`Matched ${formatCount((vuln.online?.matched || []).length)} ${(vuln.online?.matched || []).length === 1 ? 'component' : 'components'} by PackageURL / CPE`"
+              ></div>
+              <div class="flex flex-wrap gap-1.5">
+                <template x-for="m in (vuln.online?.matched || []).slice(0, 24)" :key="m.spdxId">
+                  <button
+                    @click="navigateTo(m.spdxId)"
+                    class="badge bg-slate-800 text-slate-300 hover:text-white font-mono max-w-full truncate"
+                    :title="m.purl || m.cpe || m.name"
+                    x-text="m.name"
+                  ></button>
+                </template>
+                <span
+                  x-show="(vuln.online?.matched || []).length > 24"
+                  class="badge bg-slate-800 text-slate-500"
+                  x-text="`+${(vuln.online?.matched || []).length - 24} more`"
+                ></span>
+              </div>
             </div>
 
-            <details
-              x-show="(cveDetail(vuln.cveId)?.data?.references || []).length > 0"
-              class="group"
-            >
+            <details x-show="(vuln.online?.references || []).length > 0" class="group">
               <summary class="cursor-pointer text-xs text-slate-400 hover:text-slate-200">
-                <span
-                  x-text="(cveDetail(vuln.cveId)?.data?.references || []).length + ' references'"
-                ></span>
+                <span x-text="(vuln.online?.references || []).length + ' references'"></span>
               </summary>
               <div class="mt-2 space-y-1">
-                <template
-                  x-for="ref in cveDetail(vuln.cveId)?.data?.references || []"
-                  :key="ref.url"
-                >
+                <template x-for="ref in vuln.online?.references || []" :key="ref.url">
                   <a
                     :href="ref.url"
                     target="_blank"
                     rel="noopener noreferrer"
                     class="block text-xs text-sky-400 hover:text-sky-300 truncate"
                     :title="ref.url"
-                    x-text="ref.name || ref.url.replace(/^https?:\/\//,'')"
+                    x-text="ref.url.replace(/^https?:\/\//,'')"
                   ></a>
                 </template>
               </div>
             </details>
-            <div class="text-[10px] text-slate-600">Source: CVE Program · cve.org</div>
-          </div>
-        </div>
-
-        <!-- Online match from public databases (present on online/both vulns) -->
-        <div
-          x-show="vuln.online"
-          class="rounded-lg bg-sky-950/20 border border-sky-800/40 p-3 space-y-2"
-        >
-          <div class="flex items-center gap-2 flex-wrap">
-            <span class="text-xs font-semibold text-sky-300 uppercase tracking-wider">
-              Online match
-            </span>
-            <template x-for="src in vuln.online?.sources || []" :key="src">
+            <div class="text-[10px] text-slate-600 flex flex-wrap gap-x-3 gap-y-1">
               <span
-                class="badge bg-sky-500/15 text-sky-300 ring-1 ring-sky-500/30"
-                x-text="src === 'NVD' ? 'NVD' : 'OSV.dev'"
+                x-show="vuln.online?.published"
+                x-text="'Published ' + formatDate(vuln.online?.published)"
               ></span>
-            </template>
-            <span
-              x-show="vuln.online?.osvId && vuln.online?.osvId !== vuln.name"
-              class="badge bg-slate-700/60 text-slate-300 font-mono"
-              x-text="vuln.online?.osvId"
-            ></span>
-          </div>
-          <div class="flex flex-wrap items-center gap-2">
-            <span
-              x-show="vuln.online?.cvss"
-              class="badge"
-              :class="cvssSeverityMeta(vuln.online?.cvss?.severity).badgeClass"
-              :title="vuln.online?.cvss?.vector"
-            >
-              <span x-text="cvssSeverityMeta(vuln.online?.cvss?.severity).label"></span>
               <span
-                x-show="vuln.online?.cvss?.score != null"
-                class="ml-1.5 font-semibold tabular-nums"
-                x-text="vuln.online?.cvss?.score"
+                x-text="'Source: ' + (vuln.online?.sources || []).map(s => s === 'NVD' ? 'NVD' : 'OSV.dev').join(', ')"
               ></span>
-            </span>
-            <span
-              x-show="vuln.online?.cvss?.version"
-              class="text-[10px] text-slate-500"
-              x-text="'CVSS v' + vuln.online?.cvss?.version"
-            ></span>
-            <template x-for="cwe in vuln.online?.cwes || []" :key="cwe">
-              <span class="badge bg-slate-700/60 text-slate-300" x-text="cwe"></span>
-            </template>
-          </div>
-          <p
-            x-show="vuln.online?.summary"
-            class="text-sm text-slate-300 leading-relaxed"
-            x-text="vuln.online?.summary"
-          ></p>
-          <p
-            x-show="vuln.online?.details && vuln.online?.details !== vuln.online?.summary"
-            class="text-xs text-slate-400 leading-relaxed max-h-32 overflow-y-auto whitespace-pre-wrap break-words"
-            x-text="vuln.online?.details"
-          ></p>
-
-          <!-- Components this advisory matched, by PackageURL / CPE -->
-          <div x-show="(vuln.online?.matched || []).length">
-            <div
-              class="text-xs text-slate-500 mb-1"
-              x-text="`Matched ${formatCount((vuln.online?.matched || []).length)} ${(vuln.online?.matched || []).length === 1 ? 'component' : 'components'} by PackageURL / CPE`"
-            ></div>
-            <div class="flex flex-wrap gap-1.5">
-              <template x-for="m in (vuln.online?.matched || []).slice(0, 24)" :key="m.spdxId">
-                <button
-                  @click="navigateTo(m.spdxId)"
-                  class="badge bg-slate-800 text-slate-300 hover:text-white font-mono max-w-full truncate"
-                  :title="m.purl || m.cpe || m.name"
-                  x-text="m.name"
-                ></button>
-              </template>
-              <span
-                x-show="(vuln.online?.matched || []).length > 24"
-                class="badge bg-slate-800 text-slate-500"
-                x-text="`+${(vuln.online?.matched || []).length - 24} more`"
-              ></span>
+              <span x-show="(vuln.online?.sources || []).includes('NVD')">
+                Not endorsed or certified by the NVD.
+              </span>
             </div>
           </div>
 
-          <details x-show="(vuln.online?.references || []).length > 0" class="group">
-            <summary class="cursor-pointer text-xs text-slate-400 hover:text-slate-200">
-              <span x-text="(vuln.online?.references || []).length + ' references'"></span>
-            </summary>
-            <div class="mt-2 space-y-1">
-              <template x-for="ref in vuln.online?.references || []" :key="ref.url">
-                <a
-                  :href="ref.url"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="block text-xs text-sky-400 hover:text-sky-300 truncate"
-                  :title="ref.url"
-                  x-text="ref.url.replace(/^https?:\/\//,'')"
-                ></a>
-              </template>
+          <!-- Fallback reference links (until the rich record loads) -->
+          <div
+            x-show="vuln.locators.length > 0 && !cveDetail(vuln.cveId)?.data && !vuln.online"
+            class="flex flex-wrap gap-2"
+          >
+            <template x-for="url in vuln.locators" :key="url">
+              <a
+                :href="url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="badge bg-slate-700/60 text-sky-300 hover:text-sky-200 font-mono max-w-full truncate"
+                :title="url"
+                x-text="url.replace(/^https?:\/\//,'')"
+              ></a>
+            </template>
+          </div>
+
+          <!-- Assessments -->
+          <div x-show="assessmentsForVuln(vuln.spdxId).length > 0" class="space-y-2">
+            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              VEX assessments
             </div>
-          </details>
-          <div class="text-[10px] text-slate-600 flex flex-wrap gap-x-3 gap-y-1">
-            <span
-              x-show="vuln.online?.published"
-              x-text="'Published ' + formatDate(vuln.online?.published)"
-            ></span>
-            <span
-              x-text="'Source: ' + (vuln.online?.sources || []).map(s => s === 'NVD' ? 'NVD' : 'OSV.dev').join(', ')"
-            ></span>
-            <span x-show="(vuln.online?.sources || []).includes('NVD')">
-              Not endorsed or certified by the NVD.
-            </span>
-          </div>
-        </div>
-
-        <!-- Fallback reference links (until the rich record loads) -->
-        <div
-          x-show="vuln.locators.length > 0 && !cveDetail(vuln.cveId)?.data && !vuln.online"
-          class="flex flex-wrap gap-2"
-        >
-          <template x-for="url in vuln.locators" :key="url">
-            <a
-              :href="url"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="badge bg-slate-700/60 text-sky-300 hover:text-sky-200 font-mono max-w-full truncate"
-              :title="url"
-              x-text="url.replace(/^https?:\/\//,'')"
-            ></a>
-          </template>
-        </div>
-
-        <!-- Assessments -->
-        <div x-show="assessmentsForVuln(vuln.spdxId).length > 0" class="space-y-2">
-          <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-            VEX assessments
-          </div>
-          <template x-for="a in assessmentsForVuln(vuln.spdxId)" :key="a.spdxId">
-            <div class="rounded-lg bg-slate-900/50 border border-slate-700/50 p-3">
-              <div class="flex items-center gap-2 flex-wrap">
-                <span class="badge" :class="vexStatusMeta(a.status).badgeClass">
+            <template x-for="a in assessmentsForVuln(vuln.spdxId)" :key="a.spdxId">
+              <div class="rounded-lg bg-slate-900/50 border border-slate-700/50 p-3">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="badge" :class="vexStatusMeta(a.status).badgeClass">
+                    <span
+                      class="w-1.5 h-1.5 rounded-full mr-1.5"
+                      :class="vexStatusMeta(a.status).dotClass"
+                    ></span>
+                    <span x-text="vexStatusMeta(a.status).label"></span>
+                  </span>
+                  <button
+                    @click="navigateTo(a.packageId)"
+                    class="text-sm text-slate-200 hover:text-white hover:underline decoration-slate-500 underline-offset-2 font-medium truncate"
+                    x-text="relTargetDisplayName(a.packageId)"
+                  ></button>
                   <span
-                    class="w-1.5 h-1.5 rounded-full mr-1.5"
-                    :class="vexStatusMeta(a.status).dotClass"
+                    x-show="a.justification"
+                    class="badge bg-sky-500/10 text-sky-300 ml-auto"
+                    :title="a.justification"
+                    x-text="vexJustificationLabel(a.justification)"
                   ></span>
-                  <span x-text="vexStatusMeta(a.status).label"></span>
-                </span>
-                <button
-                  @click="navigateTo(a.packageId)"
-                  class="text-sm text-slate-200 hover:text-white hover:underline decoration-slate-500 underline-offset-2 font-medium truncate"
-                  x-text="relTargetDisplayName(a.packageId)"
-                ></button>
-                <span
-                  x-show="a.justification"
-                  class="badge bg-sky-500/10 text-sky-300 ml-auto"
-                  :title="a.justification"
-                  x-text="vexJustificationLabel(a.justification)"
-                ></span>
+                </div>
+                <p
+                  x-show="a.impactStatement"
+                  class="text-xs text-slate-400 mt-2 leading-relaxed"
+                  x-text="a.impactStatement"
+                ></p>
+                <p
+                  x-show="a.actionStatement"
+                  class="text-xs text-amber-300/90 mt-2 leading-relaxed"
+                  x-text="'Action: ' + a.actionStatement"
+                ></p>
+                <p
+                  x-show="a.statusNotes"
+                  class="text-xs text-slate-500 mt-1 leading-relaxed"
+                  x-text="a.statusNotes"
+                ></p>
+                <div
+                  x-show="a.vexVersion"
+                  class="text-[10px] text-slate-600 mt-2"
+                  x-text="'VEX ' + a.vexVersion"
+                ></div>
               </div>
-              <p
-                x-show="a.impactStatement"
-                class="text-xs text-slate-400 mt-2 leading-relaxed"
-                x-text="a.impactStatement"
-              ></p>
-              <p
-                x-show="a.actionStatement"
-                class="text-xs text-amber-300/90 mt-2 leading-relaxed"
-                x-text="'Action: ' + a.actionStatement"
-              ></p>
-              <p
-                x-show="a.statusNotes"
-                class="text-xs text-slate-500 mt-1 leading-relaxed"
-                x-text="a.statusNotes"
-              ></p>
-              <div
-                x-show="a.vexVersion"
-                class="text-[10px] text-slate-600 mt-2"
-                x-text="'VEX ' + a.vexVersion"
-              ></div>
-            </div>
-          </template>
-        </div>
+            </template>
+          </div>
 
-        <div
-          x-show="assessmentsForVuln(vuln.spdxId).length === 0"
-          class="text-xs text-slate-500 italic"
-        >
-          No VEX status recorded for this vulnerability.
+          <div
+            x-show="assessmentsForVuln(vuln.spdxId).length === 0"
+            class="text-xs text-slate-500 italic"
+          >
+            No VEX status recorded for this vulnerability.
+          </div>
         </div>
-      </div>
+      </template>
     </div>
   </template>
 
