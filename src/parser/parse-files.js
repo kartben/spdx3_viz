@@ -25,6 +25,26 @@ import { forEachGraphItem } from './stream-graph.js';
 // inflation. Streaming is the slower path, so it is only for what needs it.
 export const STREAM_THRESHOLD = 256 * 1024 * 1024;
 
+// Recognizes the formats people most often drop here by mistake, so a wrong
+// file fails with a specific message instead of parsing into an empty model:
+// without this, any JSON that merely lacks `@graph` (a CycloneDX BOM, an SPDX
+// 2.x document, a package-lock.json) would load "successfully" as zero
+// elements. Returns the message, or null when the shape looks like SPDX 3.
+// A bare top-level array is accepted as the graph itself, matching the parser.
+export function unsupportedFormatMessage(data, name) {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return null;
+  if (data.bomFormat === 'CycloneDX') {
+    return `${name} is a CycloneDX BOM, not an SPDX 3 document. Convert it to SPDX 3 JSON-LD first, then load the result.`;
+  }
+  if (typeof data.spdxVersion === 'string' && data.spdxVersion.startsWith('SPDX-')) {
+    return `${name} is an ${data.spdxVersion} document. This tool reads SPDX 3 JSON-LD; convert the file to SPDX 3 first.`;
+  }
+  if (!Array.isArray(data['@graph'])) {
+    return `${name} has no @graph array, so it does not look like an SPDX 3 JSON-LD document.`;
+  }
+  return null;
+}
+
 /**
  * @param {Array<{name:string, text?:string, blob?:Blob}>} files
  * @param {(phase: 'json'|'graph'|'index', value: number) => void} progress
@@ -72,11 +92,24 @@ export async function parseFiles(files, progress, onPhase) {
       } catch (err) {
         throw new Error(`${file.name}: ${err.message}`);
       }
-      const graph = data['@graph'] || (Array.isArray(data) ? data : []);
+      const formatError = unsupportedFormatMessage(data, file.name);
+      if (formatError) throw new Error(formatError);
+      const graph = Array.isArray(data) ? data : data['@graph'];
       graph.forEach((item) => mergedGraph.push(item));
     }
     bytesDone += sizeOf(file);
     progress('json', bytesDone / totalBytes);
+  }
+
+  // Structurally valid but empty (an empty @graph, or a streamed file whose
+  // @graph never appeared): refuse rather than open an app with every view at
+  // zero and nothing to explain why.
+  if (mergedGraph.length === 0) {
+    const names = (files || [])
+      .filter(Boolean)
+      .map((f) => f.name)
+      .join(', ');
+    throw new Error(`No SPDX elements found in ${names || 'the loaded files'}.`);
   }
 
   if (onPhase) await onPhase('graph', mergedGraph.length);

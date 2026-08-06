@@ -84,6 +84,62 @@ test('parse-files', async (t) => {
     );
   });
 
+  // Wrong-format files must fail loudly. Every shape below used to parse into
+  // an empty model, dropping the user into an app with every view at zero.
+  await t.test('rejects a CycloneDX BOM, naming file and format', async () => {
+    const bom = JSON.stringify({ bomFormat: 'CycloneDX', specVersion: '1.5', components: [] });
+    await assert.rejects(
+      () => parseFiles([{ name: 'bom.json', text: bom }], noop),
+      /bom\.json.*CycloneDX/
+    );
+  });
+
+  await t.test('rejects an SPDX 2.x document, naming its version', async () => {
+    const spdx2 = JSON.stringify({ spdxVersion: 'SPDX-2.3', SPDXID: 'SPDXRef-DOCUMENT' });
+    await assert.rejects(
+      () => parseFiles([{ name: 'old.json', text: spdx2 }], noop),
+      /old\.json.*SPDX-2\.3/
+    );
+  });
+
+  await t.test('rejects JSON with no @graph array', async () => {
+    const lockfile = JSON.stringify({ name: 'my-app', lockfileVersion: 3, packages: {} });
+    await assert.rejects(
+      () => parseFiles([{ name: 'package-lock.json', text: lockfile }], noop),
+      /package-lock\.json.*@graph/
+    );
+  });
+
+  await t.test('rejects a blob-backed wrong-format file the same way', async () => {
+    const bom = JSON.stringify({ bomFormat: 'CycloneDX', components: [] });
+    await assert.rejects(
+      () => parseFiles([{ name: 'bom.json', blob: new Blob([bom]) }], noop),
+      /CycloneDX/
+    );
+  });
+
+  await t.test('rejects when the merged graph has no elements', async () => {
+    await assert.rejects(
+      () => parseFiles([{ name: 'empty.json', text: doc([]) }], noop),
+      /No SPDX elements found in empty\.json/
+    );
+  });
+
+  await t.test('one wrong-format file fails the load even next to a valid one', async () => {
+    const bom = JSON.stringify({ bomFormat: 'CycloneDX', components: [] });
+    await assert.rejects(
+      () =>
+        parseFiles(
+          [
+            { name: 'a.json', text: doc([PKG]) },
+            { name: 'bom.json', text: bom }
+          ],
+          noop
+        ),
+      /bom\.json.*CycloneDX/
+    );
+  });
+
   await t.test('reports progress across both file shapes', async () => {
     const seen = [];
     await parseFiles(
