@@ -45,6 +45,38 @@ export function unsupportedFormatMessage(data, name) {
   return null;
 }
 
+// Makes a JSON.parse failure actionable. V8's "at position N" errors carry no
+// source excerpt, which for a multi-MB SBOM leaves the user searching blind;
+// engines older than 2023 don't even include the line/column. When the message
+// pinpoints a position, append line/column (unless already present) and the
+// surrounding source, mirroring what the streaming path does for graph items.
+// Messages without a position (engine-dependent) pass through unchanged.
+export function describeJsonError(err, source) {
+  const msg = err && err.message ? err.message : String(err);
+  const posMatch = /at position (\d+)/.exec(msg);
+  if (!posMatch || typeof source !== 'string') return msg;
+  const pos = Math.min(Number(posMatch[1]), source.length);
+  let lineCol = '';
+  if (!/line \d+/.test(msg)) {
+    let line = 1;
+    let col = 1;
+    for (let i = 0; i < pos; i++) {
+      if (source.charCodeAt(i) === 10) {
+        line++;
+        col = 1;
+      } else {
+        col++;
+      }
+    }
+    lineCol = `line ${line} column ${col}, `;
+  }
+  const excerpt = source
+    .slice(Math.max(0, pos - 60), pos + 60)
+    .replace(/\s+/g, ' ')
+    .trim();
+  return `${msg} (${lineCol}near: ${excerpt})`;
+}
+
 /**
  * @param {Array<{name:string, text?:string, blob?:Blob}>} files
  * @param {(phase: 'json'|'graph'|'index', value: number) => void} progress
@@ -84,13 +116,15 @@ export async function parseFiles(files, progress, onPhase) {
       }
     } else {
       let data;
+      let text;
       try {
         // Reading the blob here rather than at the call site is the point of
         // accepting one: decoding tens of megabytes into a string is a single
         // uninterruptible task, and this runs in the worker.
-        data = JSON.parse(file.blob ? await file.blob.text() : file.text);
+        text = file.blob ? await file.blob.text() : file.text;
+        data = JSON.parse(text);
       } catch (err) {
-        throw new Error(`${file.name}: ${err.message}`);
+        throw new Error(`${file.name}: ${describeJsonError(err, text)}`);
       }
       const formatError = unsupportedFormatMessage(data, file.name);
       if (formatError) throw new Error(formatError);
