@@ -47,6 +47,7 @@ export function createState() {
     parseError: '',
     progress: 0, // 0..1 overall load progress (download → JSON → graph → index)
     progressPhase: '', // human-readable current phase label
+    progressDetail: '', // what is loading (file names + size), shown in the overlay
     progressEta: null, // estimated seconds remaining, or null when unknown
     progressAnimateMs: 150, // progress-bar transition duration; widened so the bar
     // keeps sweeping (on the compositor) through the main thread's synchronous

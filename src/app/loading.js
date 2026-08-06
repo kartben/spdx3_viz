@@ -11,6 +11,13 @@ let parserWorker = null;
 let parseReqSeq = 0;
 let latestParseReqId = 0;
 
+/* Cancellation handles, module-scoped like the worker so Alpine never proxies
+   them (calling a platform object's methods through a reactive proxy throws).
+   downloadAbort cancels an in-flight sample download; loadSession invalidates
+   the pending FileReader continuations of a canceled drop. */
+let downloadAbort = null;
+let loadSession = 0;
+
 /* Every loaded file gets a process-unique id. Names collide across samples
    (zephyr/app.jsonld vs zephyr-experimental/app.jsonld) and indexes shift as
    files come and go, so the Files dialog identifies a loaded file by its uid. */
@@ -144,6 +151,8 @@ export const loadingMixin = {
     this.sampleError = '';
     this._beginParseSession(); // show the overlay during download too
     this.progressPhase = 'Downloading…';
+    this.progressDetail = sample.sizeLabel ? `${sample.name} · ${sample.sizeLabel}` : sample.name;
+    downloadAbort = new AbortController();
     try {
       // The manifest size is the uncompressed total; use it as the download
       // denominator (see _readResponseWithProgress). Split evenly when a
@@ -155,7 +164,8 @@ export const loadingMixin = {
           path: `${sample.dir}/${fname}`,
           expectedSize
         })),
-        (fraction) => this._setProgress('download', fraction)
+        (fraction) => this._setProgress('download', fraction),
+        downloadAbort.signal
       );
       this.loadedFiles = loaded; // replace: the drop zone starts empty
       this.loadedSampleId = sample.id; // pure sample content: the URL can link back to it
@@ -164,6 +174,7 @@ export const loadingMixin = {
       // succeeded; committing it here would tear down the landing screen and
       // strand a failed parse in an empty app shell.
     } catch (err) {
+      if (err && err.name === 'AbortError') return; // canceled: cancelParse reset the UI
       this.parsing = false;
       this.progressEta = null;
       this.sampleError = `Could not load ${sample.name}: ${err.message}`;
@@ -182,7 +193,7 @@ export const loadingMixin = {
   // the per-file fractions because overlapping requests have no "file 2 of 3"
   // position to report. A rejected fetch rejects the batch, which is what both
   // callers already treat as a failed load.
-  async _downloadFiles(entries, onFraction) {
+  async _downloadFiles(entries, onFraction, signal) {
     const fractions = new Array(entries.length).fill(0);
     const advance = (i, f) => {
       fractions[i] = f;
@@ -190,7 +201,7 @@ export const loadingMixin = {
     };
     return Promise.all(
       entries.map(async ({ name, path, expectedSize }, i) => {
-        const res = await fetch(path);
+        const res = await fetch(path, { signal });
         if (!res.ok) throw new Error(`${name} (HTTP ${res.status})`);
         const result = await this._readResponseWithProgress(
           res,
@@ -274,11 +285,14 @@ export const loadingMixin = {
     this.loadedSampleId = null; // user files (even added to a sample) aren't linkable
     this._beginParseSession(); // show the overlay during file reads too
     this.progressPhase = 'Reading files…';
+    this.progressDetail = this._fileSetLabel(fileList);
+    const session = ++loadSession; // canceled: pending FileReader results are dropped
     const total = fileList.length;
     const loaded = new Array(total); // preserve input order
     const fileProgress = new Array(total).fill(0);
     let remaining = total;
     const finishOne = () => {
+      if (session !== loadSession) return; // canceled while files were reading
       remaining--;
       if (remaining === 0) {
         loaded.forEach((f) => this.loadedFiles.push(f));
@@ -341,8 +355,52 @@ export const loadingMixin = {
     this.progressPhase = '';
     this.progressEta = null;
     this.progressAnimateMs = 150; // snappy transitions for the frequent phases
+    this.progressDetail = ''; // what is loading (file names + size), shown in the overlay
     this._progressMark = null; // last {t, p} used to measure the rate
     this._progressRate = null; // smoothed bar-fraction/second of recent progress
+  },
+
+  // One line naming what is being loaded, so the overlay says which files (and
+  // how much data) a wait is for; a mis-click on a 1 GB sample is recognizable
+  // before it completes. Long file lists elide past the second name.
+  _fileSetLabel(files) {
+    const names = (files || []).map((f) => f.name).filter(Boolean);
+    const label =
+      names.length > 2
+        ? `${names.slice(0, 2).join(', ')} +${names.length - 2} more`
+        : names.join(', ');
+    const total = (files || []).reduce(
+      (sum, f) => sum + (f.size || f.blob?.size || f.text?.length || 0),
+      0
+    );
+    const size = formatBytes(total);
+    return size && label ? `${label} · ${size}` : label;
+  },
+
+  // Abandons an in-flight load: supersedes the request id so a straggling
+  // result is ignored, kills the worker mid-parse, aborts any sample download,
+  // and drops pending file reads. A canceled first load returns to the landing
+  // screen; canceling a re-parse keeps the already-open document (its model was
+  // never touched), though the Files dialog's pending add/remove is kept too,
+  // so the loaded-files list may not match the model until the next re-parse.
+  cancelParse() {
+    latestParseReqId = ++parseReqSeq;
+    loadSession++;
+    if (parserWorker) {
+      parserWorker.terminate();
+      parserWorker = null;
+    }
+    if (downloadAbort) {
+      downloadAbort.abort();
+      downloadAbort = null;
+    }
+    this.loadingSample = null;
+    this.parsing = false;
+    this.progressEta = null;
+    if (!this.dataLoaded) {
+      this.loadedFiles = [];
+      this.loadedSampleId = null;
+    }
   },
 
   // Maps a phase + within-phase fraction (0..1) onto the overall bar and
@@ -405,7 +463,10 @@ export const loadingMixin = {
   parseData(files) {
     const reqId = ++parseReqSeq;
     latestParseReqId = reqId;
-    if (!this.parsing) this._beginParseSession(); // re-parse path (no download)
+    if (!this.parsing) {
+      this._beginParseSession(); // re-parse path (no download)
+      this.progressDetail = this._fileSetLabel(files);
+    }
 
     if (files.some((f) => f.blob)) {
       this._parseOnMainThread(files, reqId);
@@ -470,9 +531,12 @@ export const loadingMixin = {
         files,
         // Only the streaming (json) phase reports fractions; its yields let them
         // paint. Graph/index fractions can't paint (the thread is blocked), so
-        // the sweep set up in onPhase drives the bar instead.
+        // the sweep set up in onPhase drives the bar instead. A superseded
+        // request (a newer load, or Cancel) throws to unwind the parse at its
+        // next progress tick; the catch below sees the stale reqId and returns.
         (phase, value) => {
-          if (reqId === latestParseReqId && phase === 'json') this._setProgress(phase, value);
+          if (reqId !== latestParseReqId) throw new Error('canceled');
+          if (phase === 'json') this._setProgress(phase, value);
         },
         (phase, count) => this._beginParsePhaseSweep(phase, count, yieldToPaint)
       );

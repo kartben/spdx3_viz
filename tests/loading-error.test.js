@@ -51,3 +51,57 @@ test('_onParseError', async (t) => {
     assert.equal(app.parseError, 'Failed to parse SBOM');
   });
 });
+
+test('cancelParse', async (t) => {
+  await t.test('a canceled first load returns to the landing screen', () => {
+    const app = harness({
+      parsing: true,
+      progressEta: 12,
+      loadingSample: 'yocto6',
+      loadedFiles: [{ name: 'huge.json' }],
+      loadedSampleId: 'yocto6'
+    });
+    app.cancelParse();
+    assert.equal(app.parsing, false, 'the overlay closes');
+    assert.equal(app.loadingSample, null);
+    assert.equal(app.progressEta, null);
+    assert.deepEqual(app.loadedFiles, [], 'the canceled files are dropped');
+    assert.equal(app.loadedSampleId, null);
+    assert.equal(app.dataLoaded, false, 'back on the landing screen');
+  });
+
+  await t.test('canceling a re-parse keeps the open document', () => {
+    const files = [{ name: 'good.json' }];
+    const app = harness({ parsing: true, dataLoaded: true, loadedFiles: files });
+    app.cancelParse();
+    assert.equal(app.parsing, false);
+    assert.equal(app.dataLoaded, true, 'the already-open document stays');
+    assert.equal(app.loadedFiles, files, 'the loaded set is untouched');
+  });
+});
+
+test('_fileSetLabel', async (t) => {
+  const app = harness();
+
+  await t.test('names the files and their total size', () => {
+    const label = app._fileSetLabel([
+      { name: 'a.json', size: 1500 },
+      { name: 'b.json', size: 500 }
+    ]);
+    assert.equal(label, 'a.json, b.json · 2 KB');
+  });
+
+  await t.test('elides long file lists past the second name', () => {
+    const label = app._fileSetLabel([
+      { name: 'a.json', size: 1000 },
+      { name: 'b.json', size: 1000 },
+      { name: 'c.json', size: 1000 },
+      { name: 'd.json', size: 1000 }
+    ]);
+    assert.equal(label, 'a.json, b.json +2 more · 4 KB');
+  });
+
+  await t.test('omits the size when none is known', () => {
+    assert.equal(app._fileSetLabel([{ name: 'a.json' }]), 'a.json');
+  });
+});

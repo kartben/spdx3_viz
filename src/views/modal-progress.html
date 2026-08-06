@@ -21,6 +21,12 @@
         x-text="Math.round(progress * 100) + '%'"
       ></span>
     </div>
+    <p
+      x-show="progressDetail"
+      class="-mt-2 mb-3 text-xs text-slate-500 truncate"
+      x-text="progressDetail"
+      :title="progressDetail"
+    ></p>
     <div class="h-2 w-full bg-slate-700 rounded-full overflow-hidden">
       <!-- Fill uses transform: scaleX (not width) so its transition runs on the
            compositor and keeps advancing even while the main thread is blocked
@@ -35,11 +41,18 @@
         ></div>
       </div>
     </div>
-    <div class="mt-2 text-xs text-slate-400 h-4">
+    <div class="mt-2 flex items-center justify-between gap-3 text-xs text-slate-400 min-h-7">
       <span
         x-show="progressEta != null"
         x-text="progressEta >= 1 ? `about ${Math.ceil(progressEta)}s remaining` : 'almost done…'"
       ></span>
+      <button
+        type="button"
+        @click="cancelParse()"
+        class="ml-auto px-2.5 py-1 rounded-md border border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+      >
+        Cancel
+      </button>
     </div>
   </div>
 </div>
