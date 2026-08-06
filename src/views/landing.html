@@ -66,6 +66,38 @@
       </label>
     </div>
 
+    <!-- A failed parse lands back here; the error stays until the next load
+         attempt clears it, unlike a toast that vanishes mid-read. -->
+    <div
+      x-show="parseError"
+      class="mt-4 rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-left"
+      role="alert"
+    >
+      <div class="flex items-start gap-2.5">
+        <svg
+          class="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="1.5"
+            d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+          />
+        </svg>
+        <div class="min-w-0">
+          <p class="text-sm font-medium text-red-300">Could not load this SBOM</p>
+          <p class="text-xs text-red-400/90 mt-1 break-words" x-text="parseError"></p>
+          <p class="text-xs text-slate-500 mt-1.5">
+            Fix the file or pick another one, then drop it again.
+          </p>
+        </div>
+      </div>
+    </div>
+
     <!-- BUNDLED DEMO SBOMs -->
     <div x-show="samples.length" class="mt-8">
       <div class="flex items-center gap-3 mb-4">

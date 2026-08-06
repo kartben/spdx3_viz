@@ -160,7 +160,9 @@ export const loadingMixin = {
       this.loadedFiles = loaded; // replace: the drop zone starts empty
       this.loadedSampleId = sample.id; // pure sample content: the URL can link back to it
       this.rebuildFromLoadedFiles(); // existing merge + parse path (session continues)
-      this.dataLoaded = true;
+      // dataLoaded flips in _applyParsedResult, once the parse has actually
+      // succeeded; committing it here would tear down the landing screen and
+      // strand a failed parse in an empty app shell.
     } catch (err) {
       this.parsing = false;
       this.progressEta = null;
@@ -281,7 +283,7 @@ export const loadingMixin = {
       if (remaining === 0) {
         loaded.forEach((f) => this.loadedFiles.push(f));
         this.rebuildFromLoadedFiles(); // session continues into the worker
-        this.dataLoaded = true;
+        // dataLoaded flips in _applyParsedResult, once the parse succeeds.
       }
     };
     fileList.forEach((file, i) => {
@@ -437,10 +439,7 @@ export const loadingMixin = {
       if (latestParseReqId !== reqId) return;
       this.parsing = false;
       this.progressEta = null;
-      this.parseError = err.message || 'Worker error';
-      console.error('Parser worker error:', this.parseError);
-      this.toastMsg = 'Parser worker error: ' + this.parseError;
-      setTimeout(() => (this.toastMsg = ''), 5000);
+      this._onParseError(err.message || 'Worker error');
     };
 
     worker.postMessage({
@@ -527,9 +526,19 @@ export const loadingMixin = {
     await yieldToPaint(); // start the transition before the block monopolizes the thread
   },
 
+  // A failed first load keeps the user on the landing screen, which renders
+  // parseError persistently next to the drop zone; the files are dropped so the
+  // retry starts clean (they'd fail identically on the next merge otherwise).
+  // A failure while a document is already open (re-parse after add/remove)
+  // keeps that document on screen and falls back to a toast.
   _onParseError(error) {
     this.parseError = error || 'Failed to parse SBOM';
     console.error('SBOM parse failed:', this.parseError);
+    if (!this.dataLoaded) {
+      this.loadedFiles = [];
+      this.loadedSampleId = null;
+      return;
+    }
     this.toastMsg = 'Error parsing SBOM: ' + this.parseError;
     setTimeout(() => (this.toastMsg = ''), 5000);
   },
@@ -539,6 +548,10 @@ export const loadingMixin = {
   _applyParsedResult(parsed, indexes) {
     Object.assign(this, markPayloadRaw(parsed));
     Object.assign(this, markPayloadRaw(indexes));
+    // Only now is there a document to show: flipping this earlier (during
+    // download or parse) would commit the app shell before knowing the parse
+    // succeeds, leaving a failed load stranded in an empty app.
+    this.dataLoaded = true;
 
     {
       // Fresh data: show vulnerabilities + their VEX edges by default only for a
