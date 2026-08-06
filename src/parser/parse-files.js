@@ -18,12 +18,9 @@
 
 import { parseGraph, buildRelationshipIndexes, buildFileSourceIndex } from './parser.js';
 import { forEachGraphItem } from './stream-graph.js';
+import { STREAM_THRESHOLD } from './limits.js';
 
-// A single JS string tops out near 512 MiB (V8's max string length), so a blob
-// at or above this size can't be read into one and JSON.parse-d; it is scanned
-// as a byte stream instead. The margin under 512 MiB covers UTF-8 multi-byte
-// inflation. Streaming is the slower path, so it is only for what needs it.
-export const STREAM_THRESHOLD = 256 * 1024 * 1024;
+export { STREAM_THRESHOLD };
 
 // Recognizes the formats people most often drop here by mistake, so a wrong
 // file fails with a specific message instead of parsing into an empty model:
