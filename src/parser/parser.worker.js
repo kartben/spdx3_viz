@@ -13,8 +13,10 @@
  *
  * A file too big to hold as one JS string (~512 MiB) arrives as a `blob` and is
  * stream-parsed a chunk at a time instead of JSON.parse-d whole; small files
- * still arrive as `text`. A result too big to structured-clone back is handled
- * by the caller (it re-parses on the main thread); see parseData.
+ * still arrive as `text`. A result too big to structured-clone back is
+ * reported as `tooBig` when posting it throws, and the caller re-parses on the
+ * main thread; a postMessage that outright OOMs the worker surfaces as the
+ * worker's error event, which the caller treats the same way. See parseData.
  *
  * @module parser.worker
  */
@@ -29,7 +31,11 @@ self.onmessage = async (event) => {
     const { parsed, indexes } = await parseFiles(files, (phase, value) =>
       post({ type: 'progress', phase, value })
     );
-    post({ type: 'done', ok: true, parsed, indexes });
+    try {
+      post({ type: 'done', ok: true, parsed, indexes });
+    } catch {
+      post({ type: 'done', ok: false, tooBig: true });
+    }
   } catch (err) {
     post({ type: 'done', ok: false, error: err && err.message ? err.message : String(err) });
   }

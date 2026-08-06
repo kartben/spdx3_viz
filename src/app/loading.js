@@ -2,6 +2,7 @@
    progress bar, and applying the worker's parsed result to component state. */
 
 import { parseShareHash } from '../lib/index.js';
+import { STREAM_THRESHOLD } from '../parser/limits.js';
 
 /* A single long-lived parser worker, kept off the reactive state so it is never
    proxied; parsing runs here to keep the main thread responsive.
@@ -59,6 +60,17 @@ const VEX_FILTER_KEYS = new Set([
   'affects',
   'underInvestigation'
 ]);
+
+// Decides where a parse runs. The worker is the default: it keeps the main
+// thread responsive, and a Blob posts to it by reference, for free. Only an
+// SBOM at streaming scale starts on the main thread, because its parsed model
+// is what can be too big to structured-clone back out of the worker; letting
+// the worker try anyway would parse the whole document twice. Exported for
+// tests.
+export function parseInWorker(files) {
+  const total = (files || []).reduce((sum, f) => sum + (f?.blob?.size || f?.text?.length || 0), 0);
+  return total < STREAM_THRESHOLD;
+}
 
 function getParserWorker() {
   if (!parserWorker) {
@@ -455,11 +467,14 @@ export const loadingMixin = {
   },
 
   // Parse the loaded files, then apply the result. Normally this runs in
-  // parser.worker.js so the UI never freezes on large SBOMs. But a file too big
-  // to hold as one JS string arrives as a Blob, and the model it parses into can
-  // be too big to structured-clone back out of the worker (it OOMs on
-  // postMessage). Those we parse on the main thread instead: a brief stall, but
-  // no doubling of ~GB of data across the worker boundary.
+  // parser.worker.js so the UI never freezes on large SBOMs; a Blob is
+  // structured-cloned by reference, so posting one into the worker costs
+  // nothing. Only an SBOM at streaming scale (see parseInWorker) starts on the
+  // main thread: its parsed model is what can genuinely be too big to clone
+  // back out of the worker (postMessage OOMs), and a doomed worker attempt
+  // would just parse the whole thing twice. If the worker's result still turns
+  // out too big to post back, or the worker dies trying, the main-thread path
+  // runs as the fallback.
   parseData(files) {
     const reqId = ++parseReqSeq;
     latestParseReqId = reqId;
@@ -468,7 +483,7 @@ export const loadingMixin = {
       this.progressDetail = this._fileSetLabel(files);
     }
 
-    if (files.some((f) => f.blob)) {
+    if (!parseInWorker(files)) {
       this._parseOnMainThread(files, reqId);
       return;
     }
@@ -484,6 +499,14 @@ export const loadingMixin = {
       }
 
       // type === 'done'
+      if (!msg.ok && msg.tooBig) {
+        // Parsed fine, but the model couldn't be cloned across the worker
+        // boundary: re-parse here. The bar only ever moves forward, so the
+        // repeated phases don't visibly rewind it.
+        this._parseOnMainThread(files, reqId);
+        return;
+      }
+
       this.parsing = false;
       this.progress = 1;
       this.progressEta = null;
@@ -498,9 +521,13 @@ export const loadingMixin = {
 
     worker.onerror = (err) => {
       if (latestParseReqId !== reqId) return;
-      this.parsing = false;
-      this.progressEta = null;
-      this._onParseError(err.message || 'Worker error');
+      // A crashed worker (typically OOM posting a huge result, but also a
+      // worker script that failed to load) still leaves the main-thread path,
+      // which either succeeds or surfaces the real parse error.
+      console.warn('Parser worker failed, retrying on the main thread:', err && err.message);
+      worker.terminate();
+      parserWorker = null;
+      this._parseOnMainThread(files, reqId);
     };
 
     worker.postMessage({
@@ -509,8 +536,9 @@ export const loadingMixin = {
     });
   },
 
-  // Parse on the main thread (see parseData). Used for blob-backed files whose
-  // result can't be cloned out of the worker. The streaming (json) phase yields
+  // Parse on the main thread (see parseData). Used for streaming-scale SBOMs
+  // whose result can't be cloned out of the worker, and as the fallback when
+  // the worker's attempt failed. The streaming (json) phase yields
   // periodically so the progress bar animates from real byte progress. The graph
   // and index phases each run as one synchronous block that would freeze the
   // bar, so instead of reporting their (unpaintable) fractions we hand the bar a
