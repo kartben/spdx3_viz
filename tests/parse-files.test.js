@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { parseFiles } from '../src/parser/parse-files.js';
+import { describeJsonError, parseFiles } from '../src/parser/parse-files.js';
 
 // A file's @graph as the worker receives it, either shape.
 function doc(items) {
@@ -27,6 +27,37 @@ const REL = {
 };
 
 const noop = () => {};
+
+test('describeJsonError', async (t) => {
+  await t.test('adds line/column when the message only has a position', () => {
+    const source = '{"a": 1,\n "b": oops}';
+    const pos = source.indexOf('oops');
+    const err = new Error(`Unexpected token o in JSON at position ${pos}`);
+    const out = describeJsonError(err, source);
+    assert.match(out, /line 2 column 7/);
+    assert.match(out, /near: .*"b": oops/);
+  });
+
+  await t.test('does not repeat line/column the engine already included', () => {
+    const err = new Error(`Expected property name or '}' in JSON at position 2 (line 1 column 3)`);
+    const out = describeJsonError(err, '{ not json');
+    assert.equal(out.match(/line 1 column 3/g).length, 1);
+    assert.match(out, /near: \{ not json/);
+  });
+
+  await t.test('passes through messages without a position', () => {
+    const err = new Error('Unexpected end of JSON input');
+    assert.equal(describeJsonError(err, ''), 'Unexpected end of JSON input');
+  });
+
+  await t.test('collapses whitespace in the excerpt', () => {
+    const source = `{\n  "a": [\n    1,\n    2,\n  ]\n}`;
+    const pos = source.lastIndexOf(']');
+    const err = new Error(`Unexpected token ] in JSON at position ${pos}`);
+    const out = describeJsonError(err, source);
+    assert.match(out, /near: \{ "a": \[ 1, 2, \] \}/);
+  });
+});
 
 test('parse-files', async (t) => {
   await t.test('parses a file given as text', async () => {
@@ -137,6 +168,14 @@ test('parse-files', async (t) => {
           noop
         ),
       /bom\.json.*CycloneDX/
+    );
+  });
+
+  // JSON syntax errors point at where in the source the problem is.
+  await t.test('malformed JSON errors include a source excerpt', async () => {
+    await assert.rejects(
+      () => parseFiles([{ name: 'broken.json', text: '{ not json' }], noop),
+      /broken\.json.*near: \{ not json/
     );
   });
 
