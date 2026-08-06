@@ -38,6 +38,13 @@ let onlineReqSeq = 0;
    which providers are still running. Kept module-side so pushing findings does
    not churn Alpine reactivity. */
 let onlineAccum = { reqId: 0, findings: [], pending: new Set() };
+
+/* vulnRecord's id lookup, memoized on the merged list's identity. The linear
+   .find() it replaces ran once per rendered security row and again for every
+   affected-file stat inside an expanded card: with thousands of
+   vulnerabilities that multiplied into millions of comparisons per render. */
+let vulnByIdSrc = null;
+let vulnByIdVal = new Map();
 /* Ticks `onlineNow` while a lookup runs so the ETA counts down smoothly
    between provider progress messages (NVD without a key is rate-limited to
    one request every ~6s). Cleared as soon as the run settles. */
@@ -115,7 +122,12 @@ export const securityMixin = {
   // SBOM's own vulnerabilities) resolve too, otherwise expanding an online CVE
   // card would never trigger its cve.org fetch (and its referenced files).
   vulnRecord(spdxId) {
-    return this.allVulnerabilities.find((v) => v.spdxId === spdxId) || null;
+    const list = this.allVulnerabilities;
+    if (vulnByIdSrc !== list) {
+      vulnByIdVal = new Map(list.map((v) => [v.spdxId, v]));
+      vulnByIdSrc = list;
+    }
+    return vulnByIdVal.get(spdxId) || null;
   },
   cvssSeverityMeta(severity) {
     return getCvssSeverityMeta(severity);
