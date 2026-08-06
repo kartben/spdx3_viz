@@ -31,7 +31,11 @@ export const CHANGELOG = [
       },
       {
         tag: 'Improved',
-        text: 'Smaller initial download; source highlighting loads on demand.'
+        text: 'Faster Security and Safety views on huge SBOMs.'
+      },
+      {
+        tag: 'Improved',
+        text: 'Smaller initial download; highlighting, graph, charts load on demand.'
       },
       {
         tag: 'Improved',
