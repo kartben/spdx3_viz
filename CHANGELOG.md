@@ -10,7 +10,8 @@ via the "What's new" link.
 - **Improved:** Packages and Files filter by purpose, directory, missing fields.
 - **Improved:** Package rows show version and license without expanding.
 - **Improved:** List views search and filter faster on huge SBOMs.
-- **Improved:** Smaller initial download; source highlighting loads on demand.
+- **Improved:** Faster Security and Safety views on huge SBOMs.
+- **Improved:** Smaller initial download; highlighting, graph, charts load on demand.
 - **Improved:** The start screen paints roughly twice as fast.
 - **Improved:** Samples made of several files download in parallel.
 - **Fixed:** Scrolling far into a huge list no longer bloats memory.
