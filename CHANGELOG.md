@@ -5,6 +5,8 @@ via the "What's new" link.
 
 ## Unreleased
 
+- **Fixed:** Wrong-format or broken files fail with a clear error.
+- **Added:** Loads can be canceled from the progress overlay.
 - **Improved:** Packages and Files filter by purpose, directory, missing fields.
 - **Improved:** Package rows show version and license without expanding.
 - **Improved:** List views search and filter faster on huge SBOMs.

@@ -10,6 +10,14 @@ export const CHANGELOG = [
     date: null,
     items: [
       {
+        tag: 'Fixed',
+        text: 'Wrong-format or broken files fail with a clear error.'
+      },
+      {
+        tag: 'Added',
+        text: 'Loads can be canceled from the progress overlay.'
+      },
+      {
         tag: 'Improved',
         text: 'Packages and Files filter by purpose, directory, missing fields.'
       },
