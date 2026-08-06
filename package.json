@@ -26,7 +26,14 @@
   "dependencies": {
     "@alpinejs/collapse": "^3.14.0",
     "alpinejs": "^3.14.0",
-    "d3": "^7.9.0",
+    "d3-color": "^3.1.0",
+    "d3-drag": "^3.0.0",
+    "d3-force": "^3.0.0",
+    "d3-quadtree": "^3.0.1",
+    "d3-selection": "^3.0.0",
+    "d3-shape": "^3.2.0",
+    "d3-transition": "^3.0.1",
+    "d3-zoom": "^3.0.0",
     "highlight.js": "^11.11.1",
     "mermaid": "^11.16.0"
   },

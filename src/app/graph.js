@@ -1,8 +1,4 @@
 import {
-  renderGraph as renderGraphView,
-  resetGraphZoom as resetGraphViewZoom
-} from '../graph/graph-view.js';
-import {
   computeHeatIndex,
   heatModeMeta,
   HEAT_MODES,
@@ -11,7 +7,12 @@ import {
 } from '../lib/index.js';
 
 /* Force graph: thin bridge between the Alpine component and the D3 renderer in
-   graph-view.js, plus selecting a node into the detail panel. */
+   graph-view.js, plus selecting a node into the detail panel.
+
+   The renderer (2,000 lines plus its d3 modules) loads on first use, mirroring
+   the mermaid and highlight.js patterns, so a session that never opens the
+   Graph view never downloads it. The dynamic import resolves from cache after
+   the first call, so re-renders stay effectively synchronous. */
 
 export const graphMixin = {
   selectGraphNode(spdxId) {
@@ -22,7 +23,7 @@ export const graphMixin = {
     this._scheduleNavPush();
   },
   renderGraph() {
-    renderGraphView(this);
+    import('../graph/graph-view.js').then(({ renderGraph }) => renderGraph(this));
   },
   updateGraph() {
     this.renderGraph();
@@ -49,7 +50,7 @@ export const graphMixin = {
     else this.renderGraph();
   },
   resetGraphZoom() {
-    resetGraphViewZoom(this);
+    import('../graph/graph-view.js').then(({ resetGraphZoom }) => resetGraphZoom(this));
   },
 
   // --- Layout picker -----------------------------------------------------

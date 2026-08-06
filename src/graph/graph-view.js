@@ -1,4 +1,16 @@
-import * as d3 from 'd3';
+// Only the d3 modules the renderer actually uses, merged into one namespace so
+// call sites read as before. The full d3 meta-package would bundle ~25 more
+// modules (geo, chord, dsv, contours, ...) into this chunk. d3-transition is a
+// side-effect import: it grafts .transition() onto selections.
+import * as d3Selection from 'd3-selection';
+import * as d3Drag from 'd3-drag';
+import * as d3Zoom from 'd3-zoom';
+import * as d3Quadtree from 'd3-quadtree';
+import * as d3Color from 'd3-color';
+import * as d3Force from 'd3-force';
+import 'd3-transition';
+
+const d3 = { ...d3Selection, ...d3Drag, ...d3Zoom, ...d3Quadtree, ...d3Color, ...d3Force };
 
 import {
   getRelationshipColor,
