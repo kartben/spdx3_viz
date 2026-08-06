@@ -71,6 +71,25 @@ let safetyTreeCacheVal = [];
 // keystroke only (an SBOM the user never searches never pays for it).
 let pkgSearchIndexSrc = null;
 let pkgSearchIndexVal = new Map();
+// Whole-collection summary rollups, memoized on their source array's identity.
+// Every view header is bound at shell mount (view roots are x-show, only the
+// lists are gated by mountedViews), so without a memo each of these full scans
+// re-ran for all views at once, several times per render.
+let scCountsSrc = null;
+let scCountsVal = null;
+let safetyCountsSrc = null;
+let safetyCountsVal = null;
+let safetyStatusSrc = null;
+let safetyStatusVal = null;
+let safetySpecFacetsRelsSrc = null;
+let safetySpecFacetsReqsSrc = null;
+let safetySpecFacetsVal = [];
+let securitySummarySrc = null;
+let securitySummaryVal = null;
+let severitySummarySrc = null;
+let severitySummaryVal = null;
+let hasCvssSrc = null;
+let hasCvssVal = false;
 
 // Most-common file extensions to offer as filter chips. A large rootfs SBOM can
 // carry thousands of distinct extensions; showing one chip each turns the Files
@@ -114,6 +133,14 @@ export const derivedMixin = {
     safetyDecompRelsSrc = null;
     safetyDecompReqsSrc = null;
     safetyTreeCacheKey = null;
+    scCountsSrc = null;
+    safetyCountsSrc = null;
+    safetyStatusSrc = null;
+    safetySpecFacetsRelsSrc = null;
+    safetySpecFacetsReqsSrc = null;
+    securitySummarySrc = null;
+    severitySummarySrc = null;
+    hasCvssSrc = null;
   },
 
   // SBOM-derived vulnerabilities merged with any OSV online findings. Before a
@@ -462,6 +489,7 @@ export const derivedMixin = {
   },
 
   get supplyChainCounts() {
+    if (scCountsSrc === this.supplyChain) return scCountsVal;
     const c = {
       actions: 0,
       processes: 0,
@@ -486,6 +514,8 @@ export const derivedMixin = {
       if (status?.key === 'exception') c.exceptions++;
       if (status?.key === 'resolved') c.resolutions++;
     });
+    scCountsVal = c;
+    scCountsSrc = this.supplyChain;
     return c;
   },
 
@@ -1173,6 +1203,7 @@ export const derivedMixin = {
   // Breakdown of the functional-safety elements by kind, for the tab header
   // summary and to decide which kind-filter chips to show.
   get safetyCounts() {
+    if (safetyCountsSrc === this.requirements) return safetyCountsVal;
     const c = { requirements: 0, verifications: 0, assumptions: 0, evaluations: 0 };
     this.requirements.forEach((r) => {
       if (isA(r.type, CLASS.Requirement)) c.requirements++;
@@ -1180,6 +1211,8 @@ export const derivedMixin = {
       else if (isA(r.type, CLASS.functionalsafety_Assumption)) c.assumptions++;
       else if (isA(r.type, CLASS.functionalsafety_EvaluationResult)) c.evaluations++;
     });
+    safetyCountsVal = c;
+    safetyCountsSrc = this.requirements;
     return c;
   },
 
@@ -1189,6 +1222,7 @@ export const derivedMixin = {
   // that fully passed; `verifiedPct` is the share that has any verification link
   // (passed + has-verification + inconclusive + failed).
   get safetyStatusSummary() {
+    if (safetyStatusSrc === this.requirements) return safetyStatusVal;
     const counts = { failed: 0, inconclusive: 0, unverified: 0, verified: 0, passed: 0 };
     let total = 0;
     let noImpl = 0;
@@ -1200,13 +1234,15 @@ export const derivedMixin = {
       if (!this.implementedByCount(r.spdxId)) noImpl++;
     });
     const withVerification = total - counts.unverified;
-    return {
+    safetyStatusVal = {
       total,
       counts,
       noImpl,
       passPct: total ? Math.round((counts.passed / total) * 100) : 0,
       verifiedPct: total ? Math.round((withVerification / total) * 100) : 0
     };
+    safetyStatusSrc = this.requirements;
+    return safetyStatusVal;
   },
 
   // Verification statuses that actually occur, gaps-first, so the rollup bar and
@@ -1220,17 +1256,26 @@ export const derivedMixin = {
   // Specification facets from Specification --hasRequirement--> Requirement.
   // Empty when the SBOM has no such links (facet UI stays hidden).
   get safetySpecFacets() {
+    if (
+      safetySpecFacetsRelsSrc === this.relationships &&
+      safetySpecFacetsReqsSrc === this.requirements
+    ) {
+      return safetySpecFacetsVal;
+    }
     const reqIds = new Set();
     this.requirements.forEach((r) => {
       if (isA(r.type, CLASS.Requirement)) reqIds.add(r.spdxId);
     });
-    return buildSafetySpecFacets(
+    safetySpecFacetsVal = buildSafetySpecFacets(
       this.relationships,
       this.elementMap,
       isA,
       CLASS.Specification,
       reqIds
     );
+    safetySpecFacetsRelsSrc = this.relationships;
+    safetySpecFacetsReqsSrc = this.requirements;
+    return safetySpecFacetsVal;
   },
 
   get hasSafetySpecFacets() {
@@ -1521,18 +1566,20 @@ export const derivedMixin = {
   // Status breakdown across all vulnerabilities, for the dashboard + security
   // header. Counts each vulnerability once by its overall (most severe) status.
   get securitySummary() {
+    const all = this.allVulnerabilities;
+    if (securitySummarySrc === all) return securitySummaryVal;
     const counts = { fixed: 0, not_affected: 0, affected: 0, under_investigation: 0, unknown: 0 };
     let sbomOnly = 0;
     let onlineOnly = 0;
     let both = 0;
-    this.allVulnerabilities.forEach((v) => {
+    all.forEach((v) => {
       counts[v.overallStatus] = (counts[v.overallStatus] || 0) + 1;
       if (v.source === 'online') onlineOnly++;
       else if (v.source === 'both') both++;
       else sbomOnly++;
     });
-    return {
-      total: this.allVulnerabilities.length,
+    securitySummaryVal = {
+      total: all.length,
       counts,
       // Provenance rollup: sbomTotal = carried by the document, onlineTotal =
       // reported by OSV (both overlap on `both`), newOnline = OSV-only.
@@ -1541,6 +1588,8 @@ export const derivedMixin = {
       newOnline: onlineOnly,
       both
     };
+    securitySummarySrc = all;
+    return securitySummaryVal;
   },
 
   // Ordered list of statuses that actually occur, for rendering summary chips
@@ -1554,22 +1603,29 @@ export const derivedMixin = {
   // True when at least one vulnerability carries an in-SBOM CVSS severity, so the
   // severity histogram/filter/badges only appear when there's data behind them.
   get hasCvssData() {
-    return this.allVulnerabilities.some((v) => v.severity);
+    if (hasCvssSrc === this.allVulnerabilities) return hasCvssVal;
+    hasCvssSrc = this.allVulnerabilities;
+    hasCvssVal = hasCvssSrc.some((v) => v.severity);
+    return hasCvssVal;
   },
 
   // CVSS-severity histogram across all scored vulnerabilities, counted once each
   // by their headline severity. `scored` is the total that carry a CVSS band.
   get securitySeveritySummary() {
+    const all = this.allVulnerabilities;
+    if (severitySummarySrc === all) return severitySummaryVal;
     const counts = { critical: 0, high: 0, medium: 0, low: 0, none: 0 };
     let scored = 0;
-    this.allVulnerabilities.forEach((v) => {
+    all.forEach((v) => {
       // Only count the standard bands the chips/bar can render, so `scored`
       // never diverges from what the UI shows.
       if (!Object.hasOwn(counts, v.severity)) return;
       counts[v.severity]++;
       scored++;
     });
-    return { scored, counts };
+    severitySummaryVal = { scored, counts };
+    severitySummarySrc = all;
+    return severitySummaryVal;
   },
 
   // Severity bands that actually occur, most-severe first, for the chips and bar.
