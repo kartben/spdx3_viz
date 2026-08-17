@@ -6,7 +6,7 @@
     "description": "A Zephyr application targeting an ESP32 board, and using LVGL for the GUI.",
     "dir": "samples/zephyr",
     "files": ["app.jsonld", "modules-deps.jsonld", "zephyr.jsonld", "build.jsonld"],
-    "size": 2200897
+    "size": 1777297
   },
   {
     "id": "zephyr-experimental",

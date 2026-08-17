@@ -14,6 +14,12 @@
       "creationInfo": "zephyr:creationinfo"
     },
     {
+      "type": "Organization",
+      "spdxId": "zephyr:agents/the-zephyr-project",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "The Zephyr Project"
+    },
+    {
       "type": "SoftwareAgent",
       "spdxId": "zephyr:agents/west-spdx-agent",
       "creationInfo": "zephyr:creationinfo",
@@ -26,21 +32,22 @@
       "namespaceMap": [
         {
           "type": "NamespaceMap",
-          "namespace": "http://spdx.org/spdxdocs/zephyr-22d142f5-7c5e-4eb6-baaa-76744bd56652/",
+          "namespace": "http://spdx.org/spdxdocs/zephyr-edee1dd2-27d8-4301-bdd0-94e45c3e059f/",
           "prefix": "zephyr"
         }
       ],
       "element": [
         "zephyr:agents/west-spdx-agent",
         "zephyr:tools/west-spdx",
+        "zephyr:agents/the-zephyr-project",
         "zephyr:packages/app-sources",
         "zephyr:files/File-main.c",
-        "zephyr:relationships/1140",
+        "zephyr:relationships/944",
         "https://spdx.org/licenses/Apache-2.0",
-        "zephyr:relationships/1420",
-        "zephyr:relationships/1421",
-        "zephyr:relationships/1729",
-        "zephyr:relationships/1730",
+        "zephyr:relationships/1228",
+        "zephyr:relationships/1229",
+        "zephyr:relationships/1451",
+        "zephyr:relationships/1452",
         "https://spdx.org/licenses/CC0-1.0"
       ],
       "profileConformance": [
@@ -57,9 +64,10 @@
     {
       "type": "CreationInfo",
       "@id": "zephyr:creationinfo",
-      "created": "2026-07-03T15:31:26Z",
+      "created": "2026-08-17T08:56:51Z",
       "createdBy": [
-        "zephyr:agents/west-spdx-agent"
+        "zephyr:agents/west-spdx-agent",
+        "zephyr:agents/the-zephyr-project"
       ],
       "createdUsing": [
         "zephyr:tools/west-spdx"
@@ -98,17 +106,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/1140",
-      "from": "zephyr:packages/app-sources",
-      "relationshipType": "contains",
-      "to": [
-        "zephyr:files/File-main.c"
-      ],
-      "creationInfo": "zephyr:creationinfo"
-    },
-    {
-      "type": "Relationship",
-      "spdxId": "zephyr:relationships/1420",
+      "spdxId": "zephyr:relationships/1228",
       "from": "zephyr:packages/app-sources",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -118,7 +116,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/1421",
+      "spdxId": "zephyr:relationships/1229",
       "from": "zephyr:packages/app-sources",
       "relationshipType": "hasDeclaredLicense",
       "to": [
@@ -128,7 +126,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/1729",
+      "spdxId": "zephyr:relationships/1451",
       "from": "zephyr:files/File-main.c",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -138,7 +136,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/1730",
+      "spdxId": "zephyr:relationships/1452",
       "from": "zephyr:files/File-main.c",
       "relationshipType": "hasDeclaredLicense",
       "to": [
@@ -147,10 +145,27 @@
       "creationInfo": "zephyr:creationinfo"
     },
     {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/944",
+      "from": "zephyr:packages/app-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-main.c"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
       "type": "Tool",
       "spdxId": "zephyr:tools/west-spdx",
       "creationInfo": "zephyr:creationinfo",
-      "name": "West SPDX Tool"
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "packageUrl",
+          "identifier": "pkg:generic/zephyr-spdx-builder@4.4.99"
+        }
+      ],
+      "name": "Zephyr SPDX builder"
     }
   ]
 }
