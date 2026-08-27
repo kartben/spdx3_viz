@@ -254,11 +254,31 @@ export function parseCpe(identifier) {
   };
 }
 
+const NVD_VULN_SEARCH = 'https://nvd.nist.gov/vuln/search';
+
+/**
+ * Rewrites a CPE 2.2 URI as the equivalent 2.3 formatted string, padding the
+ * fields a 2.2 URI does not carry with ANY. Returns '' when part, vendor or
+ * product is missing, since NVD needs all three.
+ *
+ * @param {{part: string, vendor: string, product: string, version: string}} cpe
+ * @returns {string}
+ */
+function toCpe23(cpe) {
+  if (!cpe.part || !cpe.vendor || !cpe.product) return '';
+  const version = cpe.version || '*';
+  return `cpe:2.3:${cpe.part}:${cpe.vendor}:${cpe.product}:${version}:*:*:*:*:*:*:*`;
+}
+
 /**
  * Builds a vulnerability-database lookup link for a package/tool external
- * identifier. Only CPEs (cpe22/cpe23) are linked. Searches cve.org by the CPE's
- * product name, which tolerates the wildcard part/vendor fields that NVD's
- * exact-CPE search rejects.
+ * identifier. Only CPEs (cpe22/cpe23) are linked.
+ *
+ * A complete CPE goes to NVD's vulnerability search as an exact CPE name, which
+ * matches on the version too. NVD needs part, vendor and product to be concrete
+ * for that: a wildcard in any of them is answered with "Invalid Part received" /
+ * "Vendor must contain a value", so Yocto-style `cpe:2.3:*:*:busybox:…` falls
+ * back to a cve.org search on the product name alone.
  *
  * @param {{type: string, identifier: string}} eid
  * @returns {{url: string, label: string}|null}
@@ -269,6 +289,21 @@ export function getVulnerabilityLookup(eid) {
 
   const cpe = parseCpe(eid.identifier);
   if (!cpe || !cpe.product) return null;
+
+  // A 2.3 identifier is passed through as written, so the update and edition
+  // fields it may carry (Zephyr pins its pre-release qualifier in `update`)
+  // still take part in the match; a 2.2 URI is widened to 2.3 first.
+  const cpeName =
+    eid.type === 'cpe23' && cpe.part && cpe.vendor ? String(eid.identifier).trim() : toCpe23(cpe);
+  if (cpeName) {
+    const version = cpe.version ? ` ${cpe.version}` : '';
+    return {
+      url:
+        `${NVD_VULN_SEARCH}?cpeFilterMode=cpe&cpeName=${encodeURIComponent(cpeName)}` +
+        '&resultType=records',
+      label: `Search NVD for ${cpe.product}${version} by CPE`
+    };
+  }
 
   // CPE products use '_' for spaces.
   const product = cpe.product.replace(/_/g, ' ');

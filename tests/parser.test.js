@@ -781,8 +781,38 @@ test('parseCpe handles CPE 2.3 and 2.2, normalizing wildcards', () => {
   assert.equal(parseCpe('not-a-cpe'), null);
 });
 
+test('getVulnerabilityLookup matches a complete CPE against NVD', () => {
+  // Part, vendor and product are all concrete, so NVD can match the exact name.
+  const kernel = getVulnerabilityLookup({
+    type: 'cpe23',
+    identifier: 'cpe:2.3:o:linux:linux_kernel:6.6:*:*:*:*:*:*:*'
+  });
+  assert.equal(
+    kernel.url,
+    'https://nvd.nist.gov/vuln/search?cpeFilterMode=cpe&cpeName=' +
+      encodeURIComponent('cpe:2.3:o:linux:linux_kernel:6.6:*:*:*:*:*:*:*') +
+      '&resultType=records'
+  );
+
+  // A 2.3 name is passed through verbatim, keeping the update field NVD matches
+  // on (Zephyr pins a pre-release qualifier there).
+  const zephyr = getVulnerabilityLookup({
+    type: 'cpe23',
+    identifier: 'cpe:2.3:o:zephyrproject:zephyr:4.4.0:rc3:*:*:*:*:*:*'
+  });
+  assert.ok(zephyr.url.includes(encodeURIComponent('zephyr:4.4.0:rc3')));
+
+  // A 2.2 URI is widened to a 2.3 name first.
+  const zlib = getVulnerabilityLookup({ type: 'cpe22', identifier: 'cpe:/a:zlib:zlib:1.3.1' });
+  assert.ok(zlib.url.includes(encodeURIComponent('cpe:2.3:a:zlib:zlib:1.3.1:*:*:*:*:*:*:*')));
+
+  // Non-CPE identifiers are not linked
+  assert.equal(getVulnerabilityLookup({ type: 'packageUrl', identifier: 'pkg:deb/glibc' }), null);
+});
+
 test('getVulnerabilityLookup routes wildcard CPEs to a cve.org product search', () => {
-  // Yocto-style wildcard part/vendor — NVD would reject this, so use cve.org
+  // Yocto-style wildcard part/vendor — NVD answers those with "Invalid Part
+  // received" / "Vendor must contain a value", so fall back to the product name.
   const glibc = getVulnerabilityLookup({
     type: 'cpe23',
     identifier: 'cpe:2.3:*:*:glibc:2.39:*:*:*:*:*:*:*'
@@ -790,14 +820,11 @@ test('getVulnerabilityLookup routes wildcard CPEs to a cve.org product search', 
   assert.equal(glibc.url, 'https://www.cve.org/CVERecord/SearchResults?query=glibc');
 
   // Underscores in the product become spaces in the query
-  const kernel = getVulnerabilityLookup({
+  const busybox = getVulnerabilityLookup({
     type: 'cpe23',
-    identifier: 'cpe:2.3:o:linux:linux_kernel:6.6:*:*:*:*:*:*:*'
+    identifier: 'cpe:2.3:*:*:busy_box:1.36.1:*:*:*:*:*:*:*'
   });
-  assert.equal(kernel.url, 'https://www.cve.org/CVERecord/SearchResults?query=linux%20kernel');
-
-  // Non-CPE identifiers are not linked
-  assert.equal(getVulnerabilityLookup({ type: 'packageUrl', identifier: 'pkg:deb/glibc' }), null);
+  assert.equal(busybox.url, 'https://www.cve.org/CVERecord/SearchResults?query=busy%20box');
 });
 
 test('getPurlLink links supported ecosystems to deps.dev', () => {
