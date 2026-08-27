@@ -9823,7 +9823,7 @@
       "namespaceMap": [
         {
           "type": "NamespaceMap",
-          "namespace": "http://spdx.org/spdxdocs/zephyr-ad683431-329f-4cd9-ab1e-cabc1bc36069/",
+          "namespace": "http://spdx.org/spdxdocs/zephyr-0ca55dbb-be33-4536-9133-9717ad064ef1/",
           "prefix": "zephyr"
         }
       ],
@@ -11020,7 +11020,7 @@
     {
       "type": "CreationInfo",
       "@id": "zephyr:creationinfo",
-      "created": "2026-08-27T20:13:49Z",
+      "created": "2026-08-27T23:11:12Z",
       "createdBy": [
         "zephyr:agents/west-spdx-agent",
         "zephyr:agents/the-zephyr-project"
@@ -11967,12 +11967,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "fe797a018c033ec4970a2e1b4654a10f71800a03"
+          "hashValue": "ad36784e349b00ddd2f8d9d5605db358ebc476ef"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "4bb708bd429031e2fd2190510154d193e8f74bfe3e5b4049fbae783f2807cba1"
+          "hashValue": "ab58747899914328e4a83a01f3ce07307d50717405d32d413f100da60fe97a61"
         }
       ]
     },
@@ -12209,12 +12209,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "10c2fe39d0a40982c4972826b4565b53a1a55fd3"
+          "hashValue": "e442c78ecd0e8ee8f267f553c3f381104afce21e"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "5450fcfa7bdce940c423e124ae52333f537bf74c5c6cae372386cb3704af911c"
+          "hashValue": "80428ed4ae3f791c8970877710cb3d0096f7a0cdaa8775ecb55002342c75e820"
         }
       ]
     },
@@ -12231,12 +12231,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "2075867e2eaf975cc6cbb14e4a442aff7b423bbf"
+          "hashValue": "d13dd3c0a5a502ce43222bd9a69e9caf89c9f9b3"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "a316b34c804a7f33379979c2fd1f666fba90e481ecf01bda5688f3f3229c296f"
+          "hashValue": "57233823dd4c6879ba1859809d0ae850b729b394470b6ff2f2d8cc228e21ef04"
         }
       ]
     },
@@ -12253,12 +12253,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "bc0944921d1f1257916be2ebeb12baba16665b0c"
+          "hashValue": "f6ece01cac86373b419e31831b32a212946a8977"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "da8ba4044ca9020782b321a22dc630f6a37971138cc9774a2a6464e8fbb321e5"
+          "hashValue": "e8d70d2be2eef6f3e8f81848f6b915df3eea805655ca607631a91ab83138642d"
         }
       ]
     },
