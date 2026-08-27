@@ -14,6 +14,12 @@
       "creationInfo": "zephyr:creationinfo"
     },
     {
+      "type": "Organization",
+      "spdxId": "zephyr:agents/the-zephyr-project",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "The Zephyr Project"
+    },
+    {
       "type": "SoftwareAgent",
       "spdxId": "zephyr:agents/west-spdx-agent",
       "creationInfo": "zephyr:creationinfo",
@@ -26,21 +32,22 @@
       "namespaceMap": [
         {
           "type": "NamespaceMap",
-          "namespace": "http://spdx.org/spdxdocs/zephyr-cdd76fc7-d4de-495f-8a7e-99dd17cb404a/",
+          "namespace": "http://spdx.org/spdxdocs/zephyr-777d5c1b-e454-4241-a45e-7abb4639efbb/",
           "prefix": "zephyr"
         }
       ],
       "element": [
         "zephyr:agents/west-spdx-agent",
         "zephyr:tools/west-spdx",
+        "zephyr:agents/the-zephyr-project",
         "zephyr:packages/app-sources",
         "zephyr:files/File-main.c",
-        "zephyr:relationships/2270",
+        "zephyr:relationships/2082",
         "https://spdx.org/licenses/Apache-2.0",
-        "zephyr:relationships/2624",
-        "zephyr:relationships/2625",
-        "zephyr:relationships/2937",
-        "zephyr:relationships/2938",
+        "zephyr:relationships/2492",
+        "zephyr:relationships/2493",
+        "zephyr:relationships/2717",
+        "zephyr:relationships/2718",
         "https://spdx.org/licenses/CC0-1.0"
       ],
       "profileConformance": [
@@ -57,9 +64,10 @@
     {
       "type": "CreationInfo",
       "@id": "zephyr:creationinfo",
-      "created": "2026-08-27T17:37:13Z",
+      "created": "2026-08-27T18:08:37Z",
       "createdBy": [
-        "zephyr:agents/west-spdx-agent"
+        "zephyr:agents/west-spdx-agent",
+        "zephyr:agents/the-zephyr-project"
       ],
       "createdUsing": [
         "zephyr:tools/west-spdx"
@@ -70,7 +78,8 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-main.c",
       "software_fileKind": "file",
-      "software_copyrightText": "<text>\n * Copyright (c) 2023 Fabian Blatz <fabianblatz@gmail.com>\n</text>",
+      "software_artifactSize": 2565,
+      "software_copyrightText": "<text>\nCopyright (c) 2023 Fabian Blatz <fabianblatz@gmail.com>\n</text>",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
       "name": "src/main.c",
@@ -98,7 +107,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2270",
+      "spdxId": "zephyr:relationships/2082",
       "from": "zephyr:packages/app-sources",
       "relationshipType": "contains",
       "to": [
@@ -108,7 +117,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2624",
+      "spdxId": "zephyr:relationships/2492",
       "from": "zephyr:packages/app-sources",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -118,7 +127,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2625",
+      "spdxId": "zephyr:relationships/2493",
       "from": "zephyr:packages/app-sources",
       "relationshipType": "hasDeclaredLicense",
       "to": [
@@ -128,7 +137,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2937",
+      "spdxId": "zephyr:relationships/2717",
       "from": "zephyr:files/File-main.c",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -138,7 +147,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2938",
+      "spdxId": "zephyr:relationships/2718",
       "from": "zephyr:files/File-main.c",
       "relationshipType": "hasDeclaredLicense",
       "to": [
@@ -150,7 +159,14 @@
       "type": "Tool",
       "spdxId": "zephyr:tools/west-spdx",
       "creationInfo": "zephyr:creationinfo",
-      "name": "West SPDX Tool"
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "packageUrl",
+          "identifier": "pkg:generic/zephyr-spdx-builder@4.4.99"
+        }
+      ],
+      "name": "Zephyr SPDX builder"
     }
   ]
 }
