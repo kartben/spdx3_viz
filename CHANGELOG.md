@@ -5,6 +5,8 @@ via the "What's new" link.
 
 ## Unreleased
 
+- **Fixed:** Build-heavy SBOMs no longer drag the graph down to a few frames per second.
+
 ## [0.5.0] - 2026-08-22
 
 - **Fixed:** Wrong-format or broken files fail with a clear error.

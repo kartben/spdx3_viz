@@ -91,6 +91,12 @@ const ARROW_REL_TYPES = new Set(['hasInput', 'hasOutput']);
 // Arrowhead dimensions in screen pixels (divided by zoom to stay a constant on-screen size).
 const ARROW_LEN = 7;
 const ARROW_HALF_WIDTH = 3;
+// Arrowheads are filled per edge, and past a few thousand the fill dominates the frame: a
+// build-heavy SBOM is mostly hasInput (every build target fans out to its sources), so a flat
+// graph can put ~6k heads on screen at once and cost ~60 ms a frame against ~1 ms for every
+// other draw phase combined. At that density they overlap into mush and read as nothing, so
+// past this budget the shafts are drawn bare — heads return on zoom, filtering, or hover.
+const MAX_ARROWHEADS = 1200;
 // Hover "flow" animation: dashes march along a hovered node's directed edges in the flow direction.
 // Dash/gap are screen pixels; SPEED is screen px per frame.
 const FLOW_DASH = 5;
@@ -975,6 +981,21 @@ export function renderGraph(app, retry = 0) {
     const headLen = (ARROW_LEN + lineWidth * k) / k;
     const headHalf = (ARROW_HALF_WIDTH + lineWidth * k * 0.6) / k;
 
+    // Decided before anything is drawn: a shaft stops short to make room for its head, so
+    // dropping heads mid-pass would leave the gap behind with nothing in it.
+    let headCount = 0;
+    groups.forEach((group) => {
+      group.forEach((link) => {
+        if (!ARROW_REL_TYPES.has(link.type)) return;
+        const a = link.sourceNode;
+        const b = link.targetNode;
+        if (!a || !b || a.x == null || b.x == null) return;
+        if (!nodeInView(a) && !nodeInView(b)) return;
+        headCount++;
+      });
+    });
+    const withHeads = headCount <= MAX_ARROWHEADS;
+
     groups.forEach((group, color) => {
       ctx.strokeStyle = color;
       ctx.globalAlpha = alpha;
@@ -1004,7 +1025,7 @@ export function renderGraph(app, retry = 0) {
           bucket.pts.push(a, b);
           return;
         }
-        if (!ARROW_REL_TYPES.has(link.type)) {
+        if (!withHeads || !ARROW_REL_TYPES.has(link.type)) {
           ctx.moveTo(a.x, a.y);
           ctx.lineTo(b.x, b.y);
           return;
