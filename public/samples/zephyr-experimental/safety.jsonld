@@ -22,7 +22,7 @@
     {
       "type": "CreationInfo",
       "@id": "zephyr:creationinfo",
-      "created": "2026-08-27T18:08:37Z",
+      "created": "2026-08-27T20:13:49Z",
       "createdBy": [
         "zephyr:agents/west-spdx-agent",
         "zephyr:agents/the-zephyr-project"
@@ -79,7 +79,7 @@
         },
         {
           "type": "ExternalMap",
-          "externalSpdxId": "zephyr:files/File-kernel.h",
+          "externalSpdxId": "zephyr:files/File-kernel.h-2",
           "locationHint": "./zephyr.jsonld"
         },
         {
@@ -181,7 +181,7 @@
       "namespaceMap": [
         {
           "type": "NamespaceMap",
-          "namespace": "http://spdx.org/spdxdocs/zephyr-777d5c1b-e454-4241-a45e-7abb4639efbb/",
+          "namespace": "http://spdx.org/spdxdocs/zephyr-ad683431-329f-4cd9-ab1e-cabc1bc36069/",
           "prefix": "zephyr"
         }
       ],
@@ -13354,7 +13354,7 @@
       "software_fileKind": "file",
       "software_primaryPurpose": "source",
       "creationInfo": "zephyr:creationinfo",
-      "name": "rebase-pr-116741-main-d9f870/kernel/smp/cpu_mask.c",
+      "name": "zephyr/kernel/smp/cpu_mask.c",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -13369,7 +13369,7 @@
       "software_fileKind": "file",
       "software_primaryPurpose": "source",
       "creationInfo": "zephyr:creationinfo",
-      "name": "rebase-pr-116741-main-d9f870/kernel/deadline.c",
+      "name": "zephyr/kernel/deadline.c",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -13384,7 +13384,7 @@
       "software_fileKind": "file",
       "software_primaryPurpose": "source",
       "creationInfo": "zephyr:creationinfo",
-      "name": "rebase-pr-116741-main-d9f870/kernel/dynamic.c",
+      "name": "zephyr/kernel/dynamic.c",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -13399,7 +13399,7 @@
       "software_fileKind": "file",
       "software_primaryPurpose": "source",
       "creationInfo": "zephyr:creationinfo",
-      "name": "rebase-pr-116741-main-d9f870/kernel/smp/ipi.c",
+      "name": "zephyr/kernel/smp/ipi.c",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -13414,7 +13414,7 @@
       "software_fileKind": "file",
       "software_primaryPurpose": "source",
       "creationInfo": "zephyr:creationinfo",
-      "name": "rebase-pr-116741-main-d9f870/kernel/userspace/mem_domain.c",
+      "name": "zephyr/kernel/userspace/mem_domain.c",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -13429,7 +13429,7 @@
       "software_fileKind": "file",
       "software_primaryPurpose": "source",
       "creationInfo": "zephyr:creationinfo",
-      "name": "rebase-pr-116741-main-d9f870/kernel/nothread.c",
+      "name": "zephyr/kernel/nothread.c",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -13444,7 +13444,7 @@
       "software_fileKind": "file",
       "software_primaryPurpose": "source",
       "creationInfo": "zephyr:creationinfo",
-      "name": "rebase-pr-116741-main-d9f870/kernel/poll.c",
+      "name": "zephyr/kernel/poll.c",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -13459,7 +13459,7 @@
       "software_fileKind": "file",
       "software_primaryPurpose": "source",
       "creationInfo": "zephyr:creationinfo",
-      "name": "rebase-pr-116741-main-d9f870/kernel/smp/smp.c",
+      "name": "zephyr/kernel/smp/smp.c",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -13474,7 +13474,7 @@
       "software_fileKind": "file",
       "software_primaryPurpose": "source",
       "creationInfo": "zephyr:creationinfo",
-      "name": "rebase-pr-116741-main-d9f870/kernel/usage.c",
+      "name": "zephyr/kernel/usage.c",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -13489,7 +13489,7 @@
       "software_fileKind": "file",
       "software_primaryPurpose": "source",
       "creationInfo": "zephyr:creationinfo",
-      "name": "rebase-pr-116741-main-d9f870/kernel/userspace/userspace_handler.c",
+      "name": "zephyr/kernel/userspace/userspace_handler.c",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -13504,7 +13504,7 @@
       "software_fileKind": "file",
       "software_primaryPurpose": "source",
       "creationInfo": "zephyr:creationinfo",
-      "name": "rebase-pr-116741-main-d9f870/kernel/userspace/userspace.c",
+      "name": "zephyr/kernel/userspace/userspace.c",
       "verifiedUsing": [
         {
           "type": "Hash",
@@ -74538,7 +74538,7 @@
         "beginIntegerRange": 1413,
         "endIntegerRange": 1413
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:1413-1413",
       "name": "include/zephyr/kernel.h:1413-1413"
@@ -74556,7 +74556,7 @@
         "beginIntegerRange": 1415,
         "endIntegerRange": 1416
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:1415-1416",
       "name": "include/zephyr/kernel.h:1415-1416"
@@ -74574,7 +74574,7 @@
         "beginIntegerRange": 2192,
         "endIntegerRange": 2192
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2192-2192",
       "name": "include/zephyr/kernel.h:2192-2192"
@@ -74592,7 +74592,7 @@
         "beginIntegerRange": 2195,
         "endIntegerRange": 2195
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2195-2195",
       "name": "include/zephyr/kernel.h:2195-2195"
@@ -74610,7 +74610,7 @@
         "beginIntegerRange": 2212,
         "endIntegerRange": 2212
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2212-2212",
       "name": "include/zephyr/kernel.h:2212-2212"
@@ -74628,7 +74628,7 @@
         "beginIntegerRange": 2215,
         "endIntegerRange": 2215
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2215-2215",
       "name": "include/zephyr/kernel.h:2215-2215"
@@ -74646,7 +74646,7 @@
         "beginIntegerRange": 2230,
         "endIntegerRange": 2230
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2230-2230",
       "name": "include/zephyr/kernel.h:2230-2230"
@@ -74664,7 +74664,7 @@
         "beginIntegerRange": 2232,
         "endIntegerRange": 2232
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2232-2232",
       "name": "include/zephyr/kernel.h:2232-2232"
@@ -74682,7 +74682,7 @@
         "beginIntegerRange": 2256,
         "endIntegerRange": 2256
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2256-2256",
       "name": "include/zephyr/kernel.h:2256-2256"
@@ -74700,7 +74700,7 @@
         "beginIntegerRange": 2259,
         "endIntegerRange": 2260
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2259-2260",
       "name": "include/zephyr/kernel.h:2259-2260"
@@ -74718,7 +74718,7 @@
         "beginIntegerRange": 2273,
         "endIntegerRange": 2273
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2273-2273",
       "name": "include/zephyr/kernel.h:2273-2273"
@@ -74736,7 +74736,7 @@
         "beginIntegerRange": 2275,
         "endIntegerRange": 2275
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2275-2275",
       "name": "include/zephyr/kernel.h:2275-2275"
@@ -74754,7 +74754,7 @@
         "beginIntegerRange": 2339,
         "endIntegerRange": 2339
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2339-2339",
       "name": "include/zephyr/kernel.h:2339-2339"
@@ -74772,7 +74772,7 @@
         "beginIntegerRange": 2341,
         "endIntegerRange": 2341
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2341-2341",
       "name": "include/zephyr/kernel.h:2341-2341"
@@ -74790,7 +74790,7 @@
         "beginIntegerRange": 2365,
         "endIntegerRange": 2365
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2365-2365",
       "name": "include/zephyr/kernel.h:2365-2365"
@@ -74808,7 +74808,7 @@
         "beginIntegerRange": 2367,
         "endIntegerRange": 2367
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2367-2367",
       "name": "include/zephyr/kernel.h:2367-2367"
@@ -74826,7 +74826,7 @@
         "beginIntegerRange": 2380,
         "endIntegerRange": 2380
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2380-2380",
       "name": "include/zephyr/kernel.h:2380-2380"
@@ -74844,7 +74844,7 @@
         "beginIntegerRange": 2382,
         "endIntegerRange": 2382
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2382-2382",
       "name": "include/zephyr/kernel.h:2382-2382"
@@ -74862,7 +74862,7 @@
         "beginIntegerRange": 2398,
         "endIntegerRange": 2398
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2398-2398",
       "name": "include/zephyr/kernel.h:2398-2398"
@@ -74880,7 +74880,7 @@
         "beginIntegerRange": 2402,
         "endIntegerRange": 2404
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2402-2404",
       "name": "include/zephyr/kernel.h:2402-2404"
@@ -74898,7 +74898,7 @@
         "beginIntegerRange": 2406,
         "endIntegerRange": 2406
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2406-2406",
       "name": "include/zephyr/kernel.h:2406-2406"
@@ -74916,7 +74916,7 @@
         "beginIntegerRange": 2419,
         "endIntegerRange": 2419
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2419-2419",
       "name": "include/zephyr/kernel.h:2419-2419"
@@ -74934,7 +74934,7 @@
         "beginIntegerRange": 2421,
         "endIntegerRange": 2421
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2421-2421",
       "name": "include/zephyr/kernel.h:2421-2421"
@@ -74952,7 +74952,7 @@
         "beginIntegerRange": 2714,
         "endIntegerRange": 2714
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2714-2714",
       "name": "include/zephyr/kernel.h:2714-2714"
@@ -74970,7 +74970,7 @@
         "beginIntegerRange": 2716,
         "endIntegerRange": 2716
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2716-2716",
       "name": "include/zephyr/kernel.h:2716-2716"
@@ -74988,7 +74988,7 @@
         "beginIntegerRange": 4084,
         "endIntegerRange": 4084
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:4084-4084",
       "name": "include/zephyr/kernel.h:4084-4084"
@@ -75006,7 +75006,7 @@
         "beginIntegerRange": 4086,
         "endIntegerRange": 4086
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:4086-4086",
       "name": "include/zephyr/kernel.h:4086-4086"
@@ -75024,7 +75024,7 @@
         "beginIntegerRange": 5151,
         "endIntegerRange": 5151
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:5151-5151",
       "name": "include/zephyr/kernel.h:5151-5151"
@@ -75042,7 +75042,7 @@
         "beginIntegerRange": 5153,
         "endIntegerRange": 5153
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:5153-5153",
       "name": "include/zephyr/kernel.h:5153-5153"
@@ -75060,7 +75060,7 @@
         "beginIntegerRange": 5174,
         "endIntegerRange": 5174
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:5174-5174",
       "name": "include/zephyr/kernel.h:5174-5174"
@@ -75078,7 +75078,7 @@
         "beginIntegerRange": 5177,
         "endIntegerRange": 5177
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:5177-5177",
       "name": "include/zephyr/kernel.h:5177-5177"
@@ -75096,7 +75096,7 @@
         "beginIntegerRange": 555,
         "endIntegerRange": 555
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:555-555",
       "name": "include/zephyr/kernel.h:555-555"
@@ -75114,7 +75114,7 @@
         "beginIntegerRange": 558,
         "endIntegerRange": 559
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:558-559",
       "name": "include/zephyr/kernel.h:558-559"
@@ -75132,7 +75132,7 @@
         "beginIntegerRange": 5834,
         "endIntegerRange": 5834
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:5834-5834",
       "name": "include/zephyr/kernel.h:5834-5834"
@@ -75150,7 +75150,7 @@
         "beginIntegerRange": 5836,
         "endIntegerRange": 5836
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:5836-5836",
       "name": "include/zephyr/kernel.h:5836-5836"
@@ -75168,7 +75168,7 @@
         "beginIntegerRange": 5851,
         "endIntegerRange": 5851
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:5851-5851",
       "name": "include/zephyr/kernel.h:5851-5851"
@@ -75186,7 +75186,7 @@
         "beginIntegerRange": 5853,
         "endIntegerRange": 5853
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:5853-5853",
       "name": "include/zephyr/kernel.h:5853-5853"
@@ -75204,7 +75204,7 @@
         "beginIntegerRange": 6469,
         "endIntegerRange": 6469
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:6469-6469",
       "name": "include/zephyr/kernel.h:6469-6469"
@@ -75222,7 +75222,7 @@
         "beginIntegerRange": 6471,
         "endIntegerRange": 6471
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:6471-6471",
       "name": "include/zephyr/kernel.h:6471-6471"
@@ -75240,7 +75240,7 @@
         "beginIntegerRange": 6510,
         "endIntegerRange": 6510
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:6510-6510",
       "name": "include/zephyr/kernel.h:6510-6510"
@@ -75258,7 +75258,7 @@
         "beginIntegerRange": 6512,
         "endIntegerRange": 6512
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:6512-6512",
       "name": "include/zephyr/kernel.h:6512-6512"
@@ -75276,7 +75276,7 @@
         "beginIntegerRange": 761,
         "endIntegerRange": 761
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:761-761",
       "name": "include/zephyr/kernel.h:761-761"
@@ -75294,7 +75294,7 @@
         "beginIntegerRange": 763,
         "endIntegerRange": 763
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:763-763",
       "name": "include/zephyr/kernel.h:763-763"
@@ -75312,7 +75312,7 @@
         "beginIntegerRange": 904,
         "endIntegerRange": 904
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:904-904",
       "name": "include/zephyr/kernel.h:904-904"
@@ -75330,7 +75330,7 @@
         "beginIntegerRange": 906,
         "endIntegerRange": 906
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:906-906",
       "name": "include/zephyr/kernel.h:906-906"
@@ -75348,7 +75348,7 @@
         "beginIntegerRange": 913,
         "endIntegerRange": 913
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:913-913",
       "name": "include/zephyr/kernel.h:913-913"
@@ -75366,7 +75366,7 @@
         "beginIntegerRange": 956,
         "endIntegerRange": 956
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:956-956",
       "name": "include/zephyr/kernel.h:956-956"
@@ -75384,7 +75384,7 @@
         "beginIntegerRange": 959,
         "endIntegerRange": 959
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:959-959",
       "name": "include/zephyr/kernel.h:959-959"
@@ -75402,7 +75402,7 @@
         "beginIntegerRange": 972,
         "endIntegerRange": 972
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:972-972",
       "name": "include/zephyr/kernel.h:972-972"
@@ -75420,7 +75420,7 @@
         "beginIntegerRange": 975,
         "endIntegerRange": 975
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:975-975",
       "name": "include/zephyr/kernel.h:975-975"
@@ -96750,7 +96750,7 @@
         "beginIntegerRange": 904,
         "endIntegerRange": 917
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:904-917",
       "name": "k_current_get @ include/zephyr/kernel.h:904-917"
@@ -96768,7 +96768,7 @@
         "beginIntegerRange": 2419,
         "endIntegerRange": 2422
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2419-2422",
       "name": "k_cycle_get_32 @ include/zephyr/kernel.h:2419-2422"
@@ -96786,7 +96786,7 @@
         "beginIntegerRange": 2436,
         "endIntegerRange": 2445
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2436-2445",
       "name": "k_cycle_get_64 @ include/zephyr/kernel.h:2436-2445"
@@ -97200,7 +97200,7 @@
         "beginIntegerRange": 6510,
         "endIntegerRange": 6513
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:6510-6513",
       "name": "k_mem_slab_num_free_get @ include/zephyr/kernel.h:6510-6513"
@@ -97218,7 +97218,7 @@
         "beginIntegerRange": 6469,
         "endIntegerRange": 6472
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:6469-6472",
       "name": "k_mem_slab_num_used_get @ include/zephyr/kernel.h:6469-6472"
@@ -97272,7 +97272,7 @@
         "beginIntegerRange": 5834,
         "endIntegerRange": 5837
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:5834-5837",
       "name": "k_msgq_num_free_get @ include/zephyr/kernel.h:5834-5837"
@@ -97290,7 +97290,7 @@
         "beginIntegerRange": 5851,
         "endIntegerRange": 5854
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:5851-5854",
       "name": "k_msgq_num_used_get @ include/zephyr/kernel.h:5851-5854"
@@ -97308,7 +97308,7 @@
         "beginIntegerRange": 761,
         "endIntegerRange": 764
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:761-764",
       "name": "k_msleep @ include/zephyr/kernel.h:761-764"
@@ -97416,7 +97416,7 @@
         "beginIntegerRange": 2714,
         "endIntegerRange": 2717
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2714-2717",
       "name": "k_queue_is_empty @ include/zephyr/kernel.h:2714-2717"
@@ -97560,7 +97560,7 @@
         "beginIntegerRange": 4084,
         "endIntegerRange": 4087
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:4084-4087",
       "name": "k_sem_count_get @ include/zephyr/kernel.h:4084-4087"
@@ -97776,7 +97776,7 @@
         "beginIntegerRange": 555,
         "endIntegerRange": 559
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:555-559",
       "name": "k_thread_heap_assign @ include/zephyr/kernel.h:555-559"
@@ -97884,7 +97884,7 @@
         "beginIntegerRange": 1413,
         "endIntegerRange": 1416
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:1413-1416",
       "name": "k_thread_start @ include/zephyr/kernel.h:1413-1416"
@@ -97938,7 +97938,7 @@
         "beginIntegerRange": 956,
         "endIntegerRange": 960
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:956-960",
       "name": "k_thread_timeout_expires_ticks @ include/zephyr/kernel.h:956-960"
@@ -97956,7 +97956,7 @@
         "beginIntegerRange": 972,
         "endIntegerRange": 976
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:972-976",
       "name": "k_thread_timeout_remaining_ticks @ include/zephyr/kernel.h:972-976"
@@ -98010,7 +98010,7 @@
         "beginIntegerRange": 2192,
         "endIntegerRange": 2196
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2192-2196",
       "name": "k_timer_expires_ticks @ include/zephyr/kernel.h:2192-2196"
@@ -98046,7 +98046,7 @@
         "beginIntegerRange": 2230,
         "endIntegerRange": 2233
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2230-2233",
       "name": "k_timer_remaining_get @ include/zephyr/kernel.h:2230-2233"
@@ -98064,7 +98064,7 @@
         "beginIntegerRange": 2212,
         "endIntegerRange": 2216
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2212-2216",
       "name": "k_timer_remaining_ticks @ include/zephyr/kernel.h:2212-2216"
@@ -98082,7 +98082,7 @@
         "beginIntegerRange": 2273,
         "endIntegerRange": 2276
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2273-2276",
       "name": "k_timer_user_data_get @ include/zephyr/kernel.h:2273-2276"
@@ -98100,7 +98100,7 @@
         "beginIntegerRange": 2256,
         "endIntegerRange": 2260
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2256-2260",
       "name": "k_timer_user_data_set @ include/zephyr/kernel.h:2256-2260"
@@ -98118,7 +98118,7 @@
         "beginIntegerRange": 2398,
         "endIntegerRange": 2407
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2398-2407",
       "name": "k_uptime_delta @ include/zephyr/kernel.h:2398-2407"
@@ -98136,7 +98136,7 @@
         "beginIntegerRange": 2339,
         "endIntegerRange": 2342
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2339-2342",
       "name": "k_uptime_get @ include/zephyr/kernel.h:2339-2342"
@@ -98154,7 +98154,7 @@
         "beginIntegerRange": 2365,
         "endIntegerRange": 2368
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2365-2368",
       "name": "k_uptime_get_32 @ include/zephyr/kernel.h:2365-2368"
@@ -98172,7 +98172,7 @@
         "beginIntegerRange": 2380,
         "endIntegerRange": 2383
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:2380-2383",
       "name": "k_uptime_seconds @ include/zephyr/kernel.h:2380-2383"
@@ -98280,7 +98280,7 @@
         "beginIntegerRange": 4633,
         "endIntegerRange": 4942
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:4633-4942",
       "name": "k_work_delayable_remaining_get @ include/zephyr/kernel.h:4633-4942"
@@ -98298,7 +98298,7 @@
         "beginIntegerRange": 5174,
         "endIntegerRange": 5178
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:5174-5178",
       "name": "k_work_delayable_remaining_get @ include/zephyr/kernel.h:5174-5178"
@@ -98370,7 +98370,7 @@
         "beginIntegerRange": 5151,
         "endIntegerRange": 5154
       },
-      "software_snippetFromFile": "zephyr:files/File-kernel.h",
+      "software_snippetFromFile": "zephyr:files/File-kernel.h-2",
       "creationInfo": "zephyr:creationinfo",
       "description": "include/zephyr/kernel.h:5151-5154",
       "name": "k_work_is_pending @ include/zephyr/kernel.h:5151-5154"

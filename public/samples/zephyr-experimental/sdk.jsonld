@@ -34,7 +34,7 @@
     {
       "type": "CreationInfo",
       "@id": "zephyr:creationinfo",
-      "created": "2026-08-27T18:08:37Z",
+      "created": "2026-08-27T20:13:49Z",
       "createdBy": [
         "zephyr:agents/west-spdx-agent",
         "zephyr:agents/the-zephyr-project"
@@ -2110,7 +2110,7 @@
       "namespaceMap": [
         {
           "type": "NamespaceMap",
-          "namespace": "http://spdx.org/spdxdocs/zephyr-777d5c1b-e454-4241-a45e-7abb4639efbb/",
+          "namespace": "http://spdx.org/spdxdocs/zephyr-ad683431-329f-4cd9-ab1e-cabc1bc36069/",
           "prefix": "zephyr"
         }
       ],
