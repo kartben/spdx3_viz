@@ -9823,7 +9823,7 @@
       "namespaceMap": [
         {
           "type": "NamespaceMap",
-          "namespace": "http://spdx.org/spdxdocs/zephyr-0ca55dbb-be33-4536-9133-9717ad064ef1/",
+          "namespace": "http://spdx.org/spdxdocs/zephyr-5772863a-a334-4ccb-86f7-465c4ba9943d/",
           "prefix": "zephyr"
         }
       ],
@@ -10489,12 +10489,12 @@
         {
           "type": "DictionaryEntry",
           "key": "compile:flags:C",
-          "value": "-fno-strict-aliasing -Os -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/ws-build/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -ftrack-macro-expansion=0 -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
+          "value": "-fno-strict-aliasing -Os -imacros /private/tmp/spdx-appbuild/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
         },
         {
           "type": "DictionaryEntry",
           "key": "compile:defines:C",
-          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
+          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
         }
       ],
       "creationInfo": "zephyr:creationinfo"
@@ -10507,12 +10507,12 @@
         {
           "type": "DictionaryEntry",
           "key": "compile:flags:C",
-          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/ws-build/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -ftrack-macro-expansion=0 -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
+          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/spdx-appbuild/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
         },
         {
           "type": "DictionaryEntry",
           "key": "compile:defines:C",
-          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
+          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
         }
       ],
       "creationInfo": "zephyr:creationinfo"
@@ -10525,22 +10525,22 @@
         {
           "type": "DictionaryEntry",
           "key": "compile:flags:ASM",
-          "value": "-Wshadow -Os -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/ws-build/zephyr/include/generated/zephyr/autoconf.h -fno-common -g -ftrack-macro-expansion=0 -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -xassembler-with-cpp -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -D_ASMLANGUAGE -Wno-unused-but-set-variable -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields"
+          "value": "-Wshadow -Os -imacros /private/tmp/spdx-appbuild/zephyr/include/generated/zephyr/autoconf.h -fno-common -g -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -xassembler-with-cpp -imacros /private/tmp/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -D_ASMLANGUAGE -Wno-unused-but-set-variable -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields"
         },
         {
           "type": "DictionaryEntry",
           "key": "compile:flags:C",
-          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/ws-build/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -ftrack-macro-expansion=0 -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
+          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/spdx-appbuild/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
         },
         {
           "type": "DictionaryEntry",
           "key": "compile:defines:ASM",
-          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
+          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
         },
         {
           "type": "DictionaryEntry",
           "key": "compile:defines:C",
-          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
+          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
         }
       ],
       "creationInfo": "zephyr:creationinfo"
@@ -10583,12 +10583,12 @@
         {
           "type": "DictionaryEntry",
           "key": "compile:flags:C",
-          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/ws-build/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -ftrack-macro-expansion=0 -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
+          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/spdx-appbuild/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
         },
         {
           "type": "DictionaryEntry",
           "key": "compile:defines:C",
-          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
+          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
         }
       ],
       "creationInfo": "zephyr:creationinfo"
@@ -10601,12 +10601,12 @@
         {
           "type": "DictionaryEntry",
           "key": "compile:flags:C",
-          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/ws-build/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -ftrack-macro-expansion=0 -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
+          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/spdx-appbuild/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
         },
         {
           "type": "DictionaryEntry",
           "key": "compile:defines:C",
-          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
+          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
         }
       ],
       "creationInfo": "zephyr:creationinfo"
@@ -10619,12 +10619,12 @@
         {
           "type": "DictionaryEntry",
           "key": "compile:flags:C",
-          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/ws-build/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -ftrack-macro-expansion=0 -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
+          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/spdx-appbuild/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
         },
         {
           "type": "DictionaryEntry",
           "key": "compile:defines:C",
-          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
+          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
         }
       ],
       "creationInfo": "zephyr:creationinfo"
@@ -10637,12 +10637,12 @@
         {
           "type": "DictionaryEntry",
           "key": "compile:flags:C",
-          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/ws-build/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -ftrack-macro-expansion=0 -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
+          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/spdx-appbuild/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
         },
         {
           "type": "DictionaryEntry",
           "key": "compile:defines:C",
-          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
+          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
         }
       ],
       "creationInfo": "zephyr:creationinfo"
@@ -10655,12 +10655,12 @@
         {
           "type": "DictionaryEntry",
           "key": "compile:flags:C",
-          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/ws-build/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -ftrack-macro-expansion=0 -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
+          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/spdx-appbuild/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
         },
         {
           "type": "DictionaryEntry",
           "key": "compile:defines:C",
-          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
+          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
         }
       ],
       "creationInfo": "zephyr:creationinfo"
@@ -10673,12 +10673,12 @@
         {
           "type": "DictionaryEntry",
           "key": "compile:flags:C",
-          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/ws-build/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -ftrack-macro-expansion=0 -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
+          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/spdx-appbuild/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
         },
         {
           "type": "DictionaryEntry",
           "key": "compile:defines:C",
-          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
+          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
         }
       ],
       "creationInfo": "zephyr:creationinfo"
@@ -10691,12 +10691,12 @@
         {
           "type": "DictionaryEntry",
           "key": "compile:flags:C",
-          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/ws-build/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -ftrack-macro-expansion=0 -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
+          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/spdx-appbuild/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
         },
         {
           "type": "DictionaryEntry",
           "key": "compile:defines:C",
-          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
+          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
         }
       ],
       "creationInfo": "zephyr:creationinfo"
@@ -10709,12 +10709,12 @@
         {
           "type": "DictionaryEntry",
           "key": "compile:flags:C",
-          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/ws-build/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -ftrack-macro-expansion=0 -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
+          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/spdx-appbuild/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
         },
         {
           "type": "DictionaryEntry",
           "key": "compile:defines:C",
-          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
+          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
         }
       ],
       "creationInfo": "zephyr:creationinfo"
@@ -10727,12 +10727,12 @@
         {
           "type": "DictionaryEntry",
           "key": "compile:flags:C",
-          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/ws-build/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -ftrack-macro-expansion=0 -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
+          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/spdx-appbuild/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
         },
         {
           "type": "DictionaryEntry",
           "key": "compile:defines:C",
-          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
+          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
         }
       ],
       "creationInfo": "zephyr:creationinfo"
@@ -10745,12 +10745,12 @@
         {
           "type": "DictionaryEntry",
           "key": "compile:flags:C",
-          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/ws-build/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -ftrack-macro-expansion=0 -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
+          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/spdx-appbuild/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
         },
         {
           "type": "DictionaryEntry",
           "key": "compile:defines:C",
-          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
+          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
         }
       ],
       "creationInfo": "zephyr:creationinfo"
@@ -10763,12 +10763,12 @@
         {
           "type": "DictionaryEntry",
           "key": "compile:flags:C",
-          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/ws-build/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -ftrack-macro-expansion=0 -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
+          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/spdx-appbuild/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
         },
         {
           "type": "DictionaryEntry",
           "key": "compile:defines:C",
-          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
+          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
         }
       ],
       "creationInfo": "zephyr:creationinfo"
@@ -10781,12 +10781,12 @@
         {
           "type": "DictionaryEntry",
           "key": "compile:flags:C",
-          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/ws-build/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -ftrack-macro-expansion=0 -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
+          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/spdx-appbuild/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
         },
         {
           "type": "DictionaryEntry",
           "key": "compile:defines:C",
-          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
+          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
         }
       ],
       "creationInfo": "zephyr:creationinfo"
@@ -10799,12 +10799,12 @@
         {
           "type": "DictionaryEntry",
           "key": "compile:flags:C",
-          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/ws-build/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -ftrack-macro-expansion=0 -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
+          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/spdx-appbuild/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
         },
         {
           "type": "DictionaryEntry",
           "key": "compile:defines:C",
-          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
+          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
         }
       ],
       "creationInfo": "zephyr:creationinfo"
@@ -10817,12 +10817,12 @@
         {
           "type": "DictionaryEntry",
           "key": "compile:flags:C",
-          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/ws-build/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -ftrack-macro-expansion=0 -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
+          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/spdx-appbuild/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
         },
         {
           "type": "DictionaryEntry",
           "key": "compile:defines:C",
-          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
+          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
         }
       ],
       "creationInfo": "zephyr:creationinfo"
@@ -10835,12 +10835,12 @@
         {
           "type": "DictionaryEntry",
           "key": "compile:flags:C",
-          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/ws-build/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -ftrack-macro-expansion=0 -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17 -fno-lto"
+          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/spdx-appbuild/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17 -fno-lto"
         },
         {
           "type": "DictionaryEntry",
           "key": "compile:defines:C",
-          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
+          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
         }
       ],
       "creationInfo": "zephyr:creationinfo"
@@ -10853,12 +10853,12 @@
         {
           "type": "DictionaryEntry",
           "key": "compile:flags:C",
-          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/ws-build/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -ftrack-macro-expansion=0 -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
+          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/spdx-appbuild/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
         },
         {
           "type": "DictionaryEntry",
           "key": "compile:defines:C",
-          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
+          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
         }
       ],
       "creationInfo": "zephyr:creationinfo"
@@ -10871,12 +10871,12 @@
         {
           "type": "DictionaryEntry",
           "key": "compile:flags:C",
-          "value": "-fno-strict-aliasing -Os -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/ws-build/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -ftrack-macro-expansion=0 -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
+          "value": "-fno-strict-aliasing -Os -imacros /private/tmp/spdx-appbuild/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
         },
         {
           "type": "DictionaryEntry",
           "key": "compile:defines:C",
-          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
+          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
         }
       ],
       "creationInfo": "zephyr:creationinfo"
@@ -10889,12 +10889,12 @@
         {
           "type": "DictionaryEntry",
           "key": "compile:flags:C",
-          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/ws-build/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -ftrack-macro-expansion=0 -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17 -fno-builtin-malloc"
+          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/spdx-appbuild/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17 -fno-builtin-malloc"
         },
         {
           "type": "DictionaryEntry",
           "key": "compile:defines:C",
-          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
+          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
         }
       ],
       "creationInfo": "zephyr:creationinfo"
@@ -10907,12 +10907,12 @@
         {
           "type": "DictionaryEntry",
           "key": "compile:flags:C",
-          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/ws-build/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -ftrack-macro-expansion=0 -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17 -fno-lto"
+          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/spdx-appbuild/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17 -fno-lto"
         },
         {
           "type": "DictionaryEntry",
           "key": "compile:defines:C",
-          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
+          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
         }
       ],
       "creationInfo": "zephyr:creationinfo"
@@ -10925,12 +10925,12 @@
         {
           "type": "DictionaryEntry",
           "key": "compile:flags:C",
-          "value": "-fno-strict-aliasing -Os -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/ws-build/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -ftrack-macro-expansion=0 -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
+          "value": "-fno-strict-aliasing -Os -imacros /private/tmp/spdx-appbuild/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
         },
         {
           "type": "DictionaryEntry",
           "key": "compile:defines:C",
-          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_C_SOURCE=200809L -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
+          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_C_SOURCE=200809L -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
         }
       ],
       "creationInfo": "zephyr:creationinfo"
@@ -10943,12 +10943,12 @@
         {
           "type": "DictionaryEntry",
           "key": "compile:flags:C",
-          "value": "-fno-strict-aliasing -Os -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/ws-build/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -ftrack-macro-expansion=0 -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17 -fno-lto"
+          "value": "-fno-strict-aliasing -Os -imacros /private/tmp/spdx-appbuild/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17 -fno-lto"
         },
         {
           "type": "DictionaryEntry",
           "key": "compile:defines:C",
-          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
+          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
         }
       ],
       "creationInfo": "zephyr:creationinfo"
@@ -10961,12 +10961,12 @@
         {
           "type": "DictionaryEntry",
           "key": "compile:flags:C",
-          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/ws-build/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -ftrack-macro-expansion=0 -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
+          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/spdx-appbuild/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
         },
         {
           "type": "DictionaryEntry",
           "key": "compile:defines:C",
-          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
+          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
         }
       ],
       "creationInfo": "zephyr:creationinfo"
@@ -10979,12 +10979,12 @@
         {
           "type": "DictionaryEntry",
           "key": "compile:flags:C",
-          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/ws-build/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -ftrack-macro-expansion=0 -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
+          "value": "-Wshadow -fno-strict-aliasing -Os -imacros /private/tmp/spdx-appbuild/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
         },
         {
           "type": "DictionaryEntry",
           "key": "compile:defines:C",
-          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
+          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
         }
       ],
       "creationInfo": "zephyr:creationinfo"
@@ -10997,22 +10997,22 @@
         {
           "type": "DictionaryEntry",
           "key": "compile:flags:ASM",
-          "value": "-Os -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/ws-build/zephyr/include/generated/zephyr/autoconf.h -fno-common -g -ftrack-macro-expansion=0 -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -xassembler-with-cpp -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -D_ASMLANGUAGE -Wno-unused-but-set-variable -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields"
+          "value": "-Os -imacros /private/tmp/spdx-appbuild/zephyr/include/generated/zephyr/autoconf.h -fno-common -g -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -xassembler-with-cpp -imacros /private/tmp/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -D_ASMLANGUAGE -Wno-unused-but-set-variable -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields"
         },
         {
           "type": "DictionaryEntry",
           "key": "compile:flags:C",
-          "value": "-fno-strict-aliasing -Os -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/ws-build/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -ftrack-macro-expansion=0 -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
+          "value": "-fno-strict-aliasing -Os -imacros /private/tmp/spdx-appbuild/zephyr/include/generated/zephyr/autoconf.h -fno-printf-return-value -fno-common -g -fdiagnostics-color=always --sysroot=/Users/kartben/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/xtensa-espressif_esp32s3_zephyr-elf -imacros /private/tmp/zws/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wdouble-promotion -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/private/tmp/zws/zephyr/samples/modules/lvgl/demos=CMAKE_SOURCE_DIR -fmacro-prefix-map=/private/tmp/zws/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/private/tmp/zws=WEST_TOPDIR -ffunction-sections -fdata-sections -mlongcalls -specs=picolibc.specs -include /private/tmp/zws/modules/hal/espressif/zephyr/port/include/zephyr_compat.h -fstrict-volatile-bitfields -std=c17"
         },
         {
           "type": "DictionaryEntry",
           "key": "compile:defines:ASM",
-          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
+          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
         },
         {
           "type": "DictionaryEntry",
           "key": "compile:defines:C",
-          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/claude-501/-Users-kartben-zephyrproject-zephyr--claude-worktrees-rebase-pr-116741-main-d9f870/9dde78c7-d443-4090-90a1-9358031035d8/scratchpad/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
+          "value": "-DCONFIG_APP_BUILD_USE_FLASH_SECTIONS -DCONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=-1 -DCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=1 -DCONFIG_SPIRAM -DESP_PLATFORM -DK_HEAP_MEM_POOL_SIZE=4096 -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=\"/private/tmp/zws/zephyr/modules/lvgl/include/lv_conf.h\" -DPICOLIBC_LONG_LONG_PRINTF_SCANF -DSOC_MMU_PAGE_SIZE=0x10000 -D_POSIX_THREAD_SAFE_FUNCTIONS=200809L -D__DECLARE_RCC_ATOMIC_ENV -D__DECLARE_RCC_RC_ATOMIC_ENV -D__LINUX_ERRNO_EXTENSIONS__ -D__ZEPHYR__=1 -Dasm=__asm__ -Dtypeof=__typeof__"
         }
       ],
       "creationInfo": "zephyr:creationinfo"
@@ -11020,7 +11020,7 @@
     {
       "type": "CreationInfo",
       "@id": "zephyr:creationinfo",
-      "created": "2026-08-27T23:11:12Z",
+      "created": "2026-08-28T22:48:18Z",
       "createdBy": [
         "zephyr:agents/west-spdx-agent",
         "zephyr:agents/the-zephyr-project"
@@ -11056,7 +11056,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-autoconf.h",
       "software_fileKind": "file",
-      "software_artifactSize": 42960,
+      "software_artifactSize": 42866,
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
@@ -11065,12 +11065,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "c426d300209ad2d27fbaf3335c0293edfab4b4f0"
+          "hashValue": "6ba57cebc53e45f932df3e82c6d24a7ab7341054"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "6fa5ef8bd376ac91b351232f5fe6ebf8c0e9a36d1b79524d31012565f0e8507f"
+          "hashValue": "e5e19d32ef6d215517875a19a29027acd9a9cbc078cf7bfbe1002e516cd7557f"
         }
       ]
     },
@@ -11122,7 +11122,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-configs.c",
       "software_fileKind": "file",
-      "software_artifactSize": 63575,
+      "software_artifactSize": 63643,
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
@@ -11131,12 +11131,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "ec72128f5f9c4c53a49a5990150c39335d7233d9"
+          "hashValue": "f8f7c3a50f552bccf013121e70f55d58e044a860"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "af50e3307401501a7525b0cac374d5fe894733588cf3acf82b264c5469755c69"
+          "hashValue": "299afdfbdaf87ee7a0de10f5c032e2a8adc42710d3ed1944700c5601af4dad82"
         }
       ]
     },
@@ -11166,7 +11166,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-devicetree-generated.h",
       "software_fileKind": "file",
-      "software_artifactSize": 1287410,
+      "software_artifactSize": 1287273,
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
@@ -11175,12 +11175,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "83fdd31a69b2f8dde5539140f81adca7744e220b"
+          "hashValue": "89252a1c9a314b4ee924683ee82a438eba0f4421"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "121a9bd554a84f9ab0bb00c119a275fe429e0056bcf68f861469860d8668a89a"
+          "hashValue": "0cdaaf8da2c8da7f5199c9c9172645178cb732e97f2807b01d487e0a3d0d4064"
         }
       ]
     },
@@ -11254,7 +11254,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-heap-constants.c.obj",
       "software_fileKind": "file",
-      "software_artifactSize": 4264,
+      "software_artifactSize": 3680,
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
@@ -11263,12 +11263,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "2294e257266bef0a7d63b47ca6538cd02d7b2280"
+          "hashValue": "e9df30767002822528eed60d9e09251967fc53bb"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "01b9bc4e6211c95f12609f039bb1359297706c30a20d2e5a16ec5ae89096da26"
+          "hashValue": "1a61c0fe78e6094d5aae17c073a27f7913fa9b64176d5d475c1bb45180325e89"
         }
       ]
     },
@@ -11408,7 +11408,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-libapp.a",
       "software_fileKind": "file",
-      "software_artifactSize": 1171340,
+      "software_artifactSize": 1126124,
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
@@ -11417,12 +11417,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "aef877b9db8bbf112753da325186cd20135fb6cb"
+          "hashValue": "73ad28eb7a032f49edde6fd3dd17bd01cc0241af"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "5e5b37dafd106ddbe98942f1187a0a45dea248a425b3ce6f2fb855418a0a4444"
+          "hashValue": "e735666b3a50afeb1b76ff6e437b9cb728e2d041e4ead9d443be0265a6c43323"
         }
       ]
     },
@@ -11430,7 +11430,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-libarch--common.a",
       "software_fileKind": "file",
-      "software_artifactSize": 27316,
+      "software_artifactSize": 24556,
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
@@ -11439,12 +11439,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "119d1276efef405589e0ef86dd040edd84f85cd5"
+          "hashValue": "04634507572b8884889056eb509a4c2bb47cc5b6"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "4773053b4feb022fc3457ade1a9987a210c6c768f6c80865478f5aa049c97839"
+          "hashValue": "b65c06df8ec09b2223b065b638686f1b0954fc0151e7e70ffb3e257b017349a6"
         }
       ]
     },
@@ -11452,7 +11452,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-libarch--xtensa--core.a",
       "software_fileKind": "file",
-      "software_artifactSize": 313658,
+      "software_artifactSize": 303494,
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
@@ -11461,12 +11461,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "0f4073c3f4b887e05d8d0e43f8e4d4790474ffb5"
+          "hashValue": "19976d706a8da88a0b18256801ef2d4666d514a2"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "044a4d5bdbe3b4cd4b310c939e98443951f05e86b6dcade4a2c4280204f55d92"
+          "hashValue": "668d670bfcda3b091ebf3bf60122e7baeed36789fd580331e20a5b23a72cf922"
         }
       ]
     },
@@ -11496,7 +11496,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-libdrivers--cache.a",
       "software_fileKind": "file",
-      "software_artifactSize": 13142,
+      "software_artifactSize": 12274,
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
@@ -11505,12 +11505,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "35a8a1404f2e91dfc4df566445369b095cfb8ce6"
+          "hashValue": "818195077186a01f5bc40e8feb43741218a18798"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "b048013adf3634c3f8861af9f3e4360333069b29dc0120a010b5e8243576fb2d"
+          "hashValue": "7e7bfe2da9cbddf2c942a3bb044f61fc7316f9b1f26b403da79537264e335224"
         }
       ]
     },
@@ -11518,7 +11518,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-libdrivers--clock-control.a",
       "software_fileKind": "file",
-      "software_artifactSize": 207820,
+      "software_artifactSize": 202260,
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
@@ -11527,12 +11527,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "5f638a4e43dba0983433582c7b64b234d0af385f"
+          "hashValue": "0b705d17f8d4e81cf7c6310b00b0ba48e9329638"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "c94d7bfcecc1fd5987ee9ce7fc3f1fea9fea9994b566a1930035f0fef681eaf7"
+          "hashValue": "463d783f7951a61cbebd1fb3003fab77da01800797e7163ddf9ca73950f5cb7e"
         }
       ]
     },
@@ -11540,7 +11540,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-libdrivers--console.a",
       "software_fileKind": "file",
-      "software_artifactSize": 15400,
+      "software_artifactSize": 13968,
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
@@ -11549,12 +11549,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "3036d4b297535310303943af9110ae50b6cb8cf3"
+          "hashValue": "01e1e14cd9d8539014f4624f71018317f9000b6c"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "2d31d6008e95144024a08abd01eaadb21a5df25b002acf41340f34e9d586710a"
+          "hashValue": "8d85ca724383e319a16a64b1ab13e9f306c761b5faf11f843c81d63dacf56206"
         }
       ]
     },
@@ -11562,7 +11562,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-libdrivers--display.a",
       "software_fileKind": "file",
-      "software_artifactSize": 179372,
+      "software_artifactSize": 176508,
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
@@ -11571,12 +11571,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "03eff280f8763846ebd4295b1522d7036c915807"
+          "hashValue": "714e163e2281ae0e29e0421cc9dfc3e41a52ebb8"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "1b0f21602e6b42eeaee4cfd507d94e3cdec09e35fe21c7a52e2de50d9136e615"
+          "hashValue": "9b641dcc9e84908f920005a3680a4b3b65af0fc93f0d1867b33cad644db1655f"
         }
       ]
     },
@@ -11584,7 +11584,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-libdrivers--gpio.a",
       "software_fileKind": "file",
-      "software_artifactSize": 199548,
+      "software_artifactSize": 193268,
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
@@ -11593,12 +11593,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "36070d5d21931693bd02a7c7d0181a61651b4929"
+          "hashValue": "d12031c1911dc810a073d4ecb27e1bb97d3ef684"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "8c9ab8066963b4f827dc1548e930bb14e4ca208c8d0edc4bf7dbbfa29f2cd72f"
+          "hashValue": "6ecf7b7dba5163db257785c5a3654620b136d3065da4b7b06dd10f024d4469d4"
         }
       ]
     },
@@ -11606,7 +11606,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-libdrivers--i2c.a",
       "software_fileKind": "file",
-      "software_artifactSize": 170430,
+      "software_artifactSize": 166710,
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
@@ -11615,12 +11615,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "d8a6cc25d3b0910573ce05b807e6fbaba759da34"
+          "hashValue": "03ff7ccbd78418c6839924e3ce363d097f5ca639"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "19ddd799ded4a1f94377c24d212f227063694e07480f534b6d7aaa93f0ddf486"
+          "hashValue": "d61a8eaf829404debf4bb4bad2acf3b12c6c57d237bb2ba7358b6441873e2b6b"
         }
       ]
     },
@@ -11628,7 +11628,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-libdrivers--input.a",
       "software_fileKind": "file",
-      "software_artifactSize": 95650,
+      "software_artifactSize": 93654,
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
@@ -11637,12 +11637,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "c184d68c029949ae01b3d0594e77de74623c571c"
+          "hashValue": "c85795e559a649226b662322e02dc09676d0d405"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "ae150b43dec9a10e74452cfe96066cda08a1b36f62e1b69abc6183db19f64183"
+          "hashValue": "4ed610837b7eca2b5c90c3ecc3e0e56a1aa682ab1e45bcf2ba4827866ad26628"
         }
       ]
     },
@@ -11650,7 +11650,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-libdrivers--interrupt-controller.a",
       "software_fileKind": "file",
-      "software_artifactSize": 79586,
+      "software_artifactSize": 77442,
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
@@ -11659,12 +11659,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "9a5a35704c86907d044ed8bafb0a331cca6f8bd7"
+          "hashValue": "1d30a65bb7465512ef82c284715e31429408e673"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "2c75236060ceaac9993de22f9c67f2d25d2c03cdc4ffa0c685c23ce26dc7101b"
+          "hashValue": "51319a12f8aa2204e6166bc1caaccccc295f50610d8b18a07ddc651bc2865535"
         }
       ]
     },
@@ -11672,7 +11672,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-libdrivers--mfd.a",
       "software_fileKind": "file",
-      "software_artifactSize": 119982,
+      "software_artifactSize": 118126,
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
@@ -11681,12 +11681,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "c8d806f89e3cc39a877a8f5d1e1113775b80581e"
+          "hashValue": "61ec4222bacec15499ef03570dbff8d9ec40ee47"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "3351495809dbf9debce93b9962cd0c9a72a39fbaebe04c5e3146ad21149b3ac3"
+          "hashValue": "cad3e614d3240a4b186e796ff80eb951e522978fb77928869af9d8bbecb04a9b"
         }
       ]
     },
@@ -11694,7 +11694,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-libdrivers--pinctrl.a",
       "software_fileKind": "file",
-      "software_artifactSize": 47742,
+      "software_artifactSize": 45154,
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
@@ -11703,12 +11703,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "c9f67fb483648b2954c2508199d5a44bbc35066b"
+          "hashValue": "0c52dcc64568a5a548a9f5addd62d2d4361967eb"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "f42dbcad8f1ed3db27fda68e5d19c80f8d2124bb4908f081ce045d27c1abc37e"
+          "hashValue": "610b5bfe87466992e6f5371a0873a1dc52176e9acf5035e37cccfdbf7cb49e9c"
         }
       ]
     },
@@ -11716,7 +11716,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-libdrivers--regulator.a",
       "software_fileKind": "file",
-      "software_artifactSize": 84530,
+      "software_artifactSize": 81102,
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
@@ -11725,12 +11725,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "9de3d155383d803f93c29b069211a840e4deaeeb"
+          "hashValue": "0a3f55d4f6ac087c3fd3e798fa08688477f30e17"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "e248ee6ba0d547b5c197134b8aa154e937edbc050341a987cca03cbab2749893"
+          "hashValue": "5992f2842711fce9e827f48ad702f1e71c2e0a4de6e194701a662f120e7cde7f"
         }
       ]
     },
@@ -11738,7 +11738,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-libdrivers--serial.a",
       "software_fileKind": "file",
-      "software_artifactSize": 53088,
+      "software_artifactSize": 51372,
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
@@ -11747,12 +11747,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "d2aa60489a7ceb3aa5f6ba30604d4e9cf3f64adb"
+          "hashValue": "4e4aed55d8b33a3d121c72761483f87b428f67bd"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "ba505b22ddadca9e0bce2ff15daea2f043a3fe2f0942953ffa578eff47765793"
+          "hashValue": "134cd1ab3591ab05dfc73b7134baa97440518ed59c17fcdd02db08ca1259b40c"
         }
       ]
     },
@@ -11760,7 +11760,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-libdrivers--spi.a",
       "software_fileKind": "file",
-      "software_artifactSize": 244322,
+      "software_artifactSize": 241894,
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
@@ -11769,12 +11769,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "1d32c98254988e5a44db5c3811eaf603433ca0fb"
+          "hashValue": "a620e890ef34455d69227eac9f72ed608b616527"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "9697318cd0e645c2a336a2ff018172052f04f1d2533bca53015933403d292c27"
+          "hashValue": "4e3ce3793d07d9b16832017f35af65a588e949b59884ba37d3ec07e0bbb80a41"
         }
       ]
     },
@@ -11782,7 +11782,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-libdrivers--timer.a",
       "software_fileKind": "file",
-      "software_artifactSize": 33892,
+      "software_artifactSize": 32300,
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
@@ -11791,12 +11791,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "e104452725726befc37fbaa8d720c1b2cea09095"
+          "hashValue": "426ec127833f22436d3d215c341d37c1c94a0b8c"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "07193763feac8d40cd08760bcce941ee4b4dc3f8004a80c1225f610c91ecff08"
+          "hashValue": "0a7c9364b87a701b7c2c334d6adb4e2f6b1b6e30d7d13f4dad093a7dc6b58a5f"
         }
       ]
     },
@@ -11804,7 +11804,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-libisr-tables.a",
       "software_fileKind": "file",
-      "software_artifactSize": 5626,
+      "software_artifactSize": 4902,
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
@@ -11813,12 +11813,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "9b7d673b66ab3eca2f2a8632707e3a11fb2b30a5"
+          "hashValue": "3e4fd58e5b3a4b14de3d75de83e59b9e99530139"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "33d1f235083b2644ca24ef23313792598788c41705441ea9966e8993dfcb801d"
+          "hashValue": "072b58d56432e1082e445906620f6e9e8c49a0cc05bccfdd43d9190dc7044d7c"
         }
       ]
     },
@@ -11826,7 +11826,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-libkernel.a",
       "software_fileKind": "file",
-      "software_artifactSize": 1268372,
+      "software_artifactSize": 1223484,
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
@@ -11835,12 +11835,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "5b0260cfa8bdda79b45380a89e42e8699ee03f13"
+          "hashValue": "2315b2d3b51a6d38ad12e41f3d5089650b3701b1"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "63c5a61b2ee2ca5506d31cd56acb97d54889bd0ceff846175e5bee9277717657"
+          "hashValue": "8415079e6c757238b57519ef68f921737b8d4303faf1b423e9f00d56f9263eaf"
         }
       ]
     },
@@ -11848,7 +11848,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-liblib--libc--common.a",
       "software_fileKind": "file",
-      "software_artifactSize": 51286,
+      "software_artifactSize": 46538,
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
@@ -11857,12 +11857,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "7669a2bdd5d23d9dad1225741963b0fc9b9525fa"
+          "hashValue": "2aafabe2d891824e99fdc2345d55f2ca077c3e89"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "19151525f5e64980921562e27352b1ef577f6c47950fbcf7d83c819c3ef9bef2"
+          "hashValue": "17dce84c13100401ba452a6d7654337b29f87dc0999419e7254d5023ddeb60dd"
         }
       ]
     },
@@ -11870,7 +11870,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-liblib--libc--picolibc.a",
       "software_fileKind": "file",
-      "software_artifactSize": 62868,
+      "software_artifactSize": 56968,
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
@@ -11879,12 +11879,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "7dda894bda4a4954a53ea9a2a1683d15b4f44387"
+          "hashValue": "b9b505fef60414890792453827b4e65e6c21793e"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "65d0802f862e6953832d62f9a0206442b49867310409cbbe92c0c2b21fdf06dd"
+          "hashValue": "1198a477f0064f5b3d9a84a81783616d6cf5c0bbb464c3d34e89e62f50d8ec65"
         }
       ]
     },
@@ -11892,7 +11892,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-libmodules--lvgl.a",
       "software_fileKind": "file",
-      "software_artifactSize": 12178976,
+      "software_artifactSize": 11722024,
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
@@ -11901,12 +11901,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "4afb98528b89f9248f4fb95c48cbcc3971fc0f9c"
+          "hashValue": "1aa1cbb51216d0fee1ba51dcd327496fdccd67f7"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "465b04012998ca87098d667a59e2126dc62f99d176c8efe3b24babe93e8ed397"
+          "hashValue": "d5f7c8b5754199067eb2281f58a789c74ad408295fb515481148b06ef2aa513e"
         }
       ]
     },
@@ -11914,7 +11914,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-libsubsys--input.a",
       "software_fileKind": "file",
-      "software_artifactSize": 54386,
+      "software_artifactSize": 51222,
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
@@ -11923,12 +11923,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "c2c993aacc0a7e9cf09f47db5e395a16e09796f9"
+          "hashValue": "f4689451bebcf8e957e3a5d7474d05569035dda7"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "f0a9c4b81646f7814d82f1cd817b2bc57b170e3ef4b4c40f0dff9c503d370520"
+          "hashValue": "4c81d285204adf999858da4c8f1630880e72ff051271b66efd3c6e964e4a6dcb"
         }
       ]
     },
@@ -11936,7 +11936,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-libsubsys--portability--posix--c-lib-ext.a",
       "software_fileKind": "file",
-      "software_artifactSize": 47476,
+      "software_artifactSize": 45020,
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
@@ -11945,12 +11945,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "233ed443dd501e60dd445a4da9c3d5dc55750d17"
+          "hashValue": "4502b207005d041b9bb09aa4abb0cb484a2e86d7"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "6554f25961fd2f97a87e8a0bed5f9b66daef1c38006d693372fe12a83f0f0115"
+          "hashValue": "2608954456739a4dc6b2577a37129d522d3989e754cdda214e28810634a2cbb4"
         }
       ]
     },
@@ -11958,7 +11958,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-libzephyr.a",
       "software_fileKind": "file",
-      "software_artifactSize": 7623144,
+      "software_artifactSize": 7364626,
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
@@ -11967,12 +11967,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "ad36784e349b00ddd2f8d9d5605db358ebc476ef"
+          "hashValue": "b509649f32c0d384641e16dd9dd8a5019e59ba60"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "ab58747899914328e4a83a01f3ce07307d50717405d32d413f100da60fe97a61"
+          "hashValue": "49d6c07d0a39201dfd6d46962596031a71bd556f73c4ad4aa0f7a4a570c682f2"
         }
       ]
     },
@@ -12024,7 +12024,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-offsets.c.obj",
       "software_fileKind": "file",
-      "software_artifactSize": 7652,
+      "software_artifactSize": 6640,
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
@@ -12033,12 +12033,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "6eb90a2270ea6b4d1b7e07f3929813e3e03eb104"
+          "hashValue": "24fd6517251a2f52da80d40003ca253703cbf8e9"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "aa3d30091a4cdf31dcb324005cdcdeee4d1b041fc808a718d7fc406ef7745c29"
+          "hashValue": "9a2d2b17700c1f26628bafbd598887a74bfc09fc6088cd37f6c36676046ebf39"
         }
       ]
     },
@@ -12209,12 +12209,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "e442c78ecd0e8ee8f267f553c3f381104afce21e"
+          "hashValue": "e1fe49ff378ee0a68444ff5a5ca0b74507178bc3"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "80428ed4ae3f791c8970877710cb3d0096f7a0cdaa8775ecb55002342c75e820"
+          "hashValue": "959b2995ef5c04508769ef0a9bc237155403528bfe92345a3ea56111e55cf7e0"
         }
       ]
     },
@@ -12222,7 +12222,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-zephyr-pre0.elf",
       "software_fileKind": "file",
-      "software_artifactSize": 7987448,
+      "software_artifactSize": 7780876,
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
@@ -12231,12 +12231,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "d13dd3c0a5a502ce43222bd9a69e9caf89c9f9b3"
+          "hashValue": "09296644fdf930d987a4edac2d8f8ef56a135824"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "57233823dd4c6879ba1859809d0ae850b729b394470b6ff2f2d8cc228e21ef04"
+          "hashValue": "d2e2b34c30004bc210d36b9c77e27f3d50c15a7ba721d58568fc83b7af84ff97"
         }
       ]
     },
@@ -12244,7 +12244,7 @@
       "type": "software_File",
       "spdxId": "zephyr:files/File-zephyr.elf",
       "software_fileKind": "file",
-      "software_artifactSize": 7987284,
+      "software_artifactSize": 7780580,
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "file",
       "creationInfo": "zephyr:creationinfo",
@@ -12253,12 +12253,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "f6ece01cac86373b419e31831b32a212946a8977"
+          "hashValue": "7815a84f9eb5cfa9a7b84649d1c1c85264d0a1cc"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "e8d70d2be2eef6f3e8f81848f6b915df3eea805655ca607631a91ab83138642d"
+          "hashValue": "f5b06fb00d0a76fabebe0728e12e6f31936cde9ab4e5125e30c4b0bdb5692e46"
         }
       ]
     },
