@@ -18,6 +18,10 @@ export const CHANGELOG = [
         text: 'A header prototype now reads as declaring the routine that implements it.'
       },
       {
+        tag: 'Fixed',
+        text: 'Snippet source is shown at the revision it was measured on, or not at all.'
+      },
+      {
         tag: 'Improved',
         text: 'A slow server no longer looks like a stalled load: the bar keeps easing and says it is waiting.'
       },
