@@ -1796,6 +1796,15 @@ export const accessorsMixin = {
   // requirement verification-status key (as returned by requirementSafetyStatus)
   // or the 'noimpl' traceability-gap key. Drives the rollup bar and the
   // status-filter chips, mirroring vexStatusMeta for the security view.
+  // Level a producer recorded on a Requirement ('system' or 'software'), from
+  // its `requirement-level:` external identifier. '' when it carries none.
+  requirementLevel(el) {
+    if (!el || !isA(el.type, CLASS.Requirement)) return '';
+    return producerMetaValue(el, 'requirement-level', (e) =>
+      this.externalIdentifiers(e)
+    ).toLowerCase();
+  },
+
   // "True traceability" adequacy verdict a producer recorded on a Requirement
   // as an `adequacy:<verdict>` external identifier. '' when it carries none,
   // which is what an SBOM generated without a coverage matrix looks like.
