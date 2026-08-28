@@ -119,6 +119,20 @@ export function formatBytes(bytes) {
   return `${rounded} ${units[i]}`;
 }
 
+// How much of the progress bar the download phase owns, from the sample's size.
+// Both the transfer and the parse grow with size, but only the transfer also
+// depends on the link, and on a slow one it dwarfs everything else: the 950 MB
+// sample spends minutes downloading and would otherwise creep across a fixed
+// 30% while reading "0%". Ramps from 15% of the bar at or below 5 MB to 60% at
+// or above 250 MB.
+export function downloadShareFor(size) {
+  const MB = 1000 * 1000;
+  if (!size || size <= 5 * MB) return 0.15;
+  if (size >= 250 * MB) return 0.6;
+  const t = (size - 5 * MB) / (245 * MB);
+  return 0.15 + t * 0.45;
+}
+
 export const loadingMixin = {
   // True once any of the user's own files is merged in, which the header chip
   // flags: from the parsed data alone there is no telling a sample apart from
@@ -164,6 +178,7 @@ export const loadingMixin = {
     this._beginParseSession(); // show the overlay during download too
     this.progressPhase = 'Downloading…';
     this.progressDetail = sample.sizeLabel ? `${sample.name} · ${sample.sizeLabel}` : sample.name;
+    this._downloadShare = downloadShareFor(sample.size);
     downloadAbort = new AbortController();
     try {
       // The manifest size is the uncompressed total; use it as the download
@@ -176,7 +191,7 @@ export const loadingMixin = {
           path: `${sample.dir}/${fname}`,
           expectedSize
         })),
-        (fraction) => this._setProgress('download', fraction),
+        (fraction, received, total) => this._onDownloadProgress(sample, fraction, received, total),
         downloadAbort.signal
       );
       this.loadedFiles = loaded; // replace: the drop zone starts empty
@@ -195,6 +210,39 @@ export const loadingMixin = {
     }
   },
 
+  // Download progress, reported per chunk. The transferred byte count goes in
+  // the detail line because it is the only part of a big download that visibly
+  // moves: the download owns the first 30% of the bar, so a 950 MB sample sits
+  // on "0%" for the first few seconds however fast the bytes arrive.
+  //
+  // The ETA comes from the measured byte rate rather than the bar's own rate.
+  // Extrapolating the bar across phase boundaries mixes a network transfer with
+  // synchronous parse work and reads far too low -- a load that then ran for
+  // another minute was advertising "about 2s remaining" at the end of its
+  // download.
+  _onDownloadProgress(sample, fraction, received = 0, total = 0) {
+    this._setProgress('download', fraction);
+    if (!total) return;
+
+    this.progressDetail = `${sample.name} · ${formatBytes(received)} of ${formatBytes(total)}`;
+
+    // Rate averaged over the whole transfer, not a recent window. A window
+    // seeded by the first chunks — which arrive out of the HTTP cache or a warm
+    // edge far faster than the link sustains — starts the ETA far too low and
+    // then makes it climb as it corrects. The cumulative average only ever
+    // settles toward the real rate.
+    const now = performance.now();
+    if (!this._downloadStart) this._downloadStart = now;
+    const elapsed = now - this._downloadStart;
+
+    // Wait for enough of a sample to be worth showing: a figure that appears
+    // instantly and then triples is worse than none at all.
+    if (elapsed >= 1000 && received >= total * 0.01 && received < total) {
+      const rate = (received * 1000) / elapsed; // bytes/second
+      if (rate > 0) this.progressEta = (total - received) / rate;
+    }
+  },
+
   // Downloads a batch of sample files concurrently and returns them tagged, in
   // the order given. Serial fetches cost one round trip each, which the
   // multi-file samples (six for zephyr-experimental, three for linux) paid in
@@ -207,9 +255,14 @@ export const loadingMixin = {
   // callers already treat as a failed load.
   async _downloadFiles(entries, onFraction, signal) {
     const fractions = new Array(entries.length).fill(0);
-    const advance = (i, f) => {
+    const bytesIn = new Array(entries.length).fill(0);
+    const bytesOf = new Array(entries.length).fill(0);
+    const sum = (a) => a.reduce((x, y) => x + y, 0);
+    const advance = (i, f, received = 0, total = 0) => {
       fractions[i] = f;
-      onFraction(fractions.reduce((a, b) => a + b, 0) / (entries.length || 1));
+      bytesIn[i] = received;
+      bytesOf[i] = total;
+      onFraction(sum(fractions) / (entries.length || 1), sum(bytesIn), sum(bytesOf));
     };
     return Promise.all(
       entries.map(async ({ name, path, expectedSize }, i) => {
@@ -217,7 +270,7 @@ export const loadingMixin = {
         if (!res.ok) throw new Error(`${name} (HTTP ${res.status})`);
         const result = await this._readResponseWithProgress(
           res,
-          (f) => advance(i, f),
+          (f, received, total) => advance(i, f, received, total),
           expectedSize
         );
         return tagLoadedFile(
@@ -245,7 +298,7 @@ export const loadingMixin = {
     const total = expectedSize || Number(res.headers.get('Content-Length')) || 0;
     if (!res.body || !total) {
       const blob = await res.blob();
-      onFraction(1);
+      onFraction(1, blob.size, blob.size);
       return blob.size >= INLINE_TEXT_MAX ? blob : blob.text();
     }
     const reader = res.body.getReader();
@@ -256,12 +309,12 @@ export const loadingMixin = {
       if (done) break;
       chunks.push(value);
       received += value.length;
-      onFraction(Math.min(1, received / total));
+      onFraction(Math.min(1, received / total), received, total);
     }
     // A finished file is a finished file, whatever `total` predicted. Sample
     // sizes are split evenly across a multi-file sample, so a file smaller than
     // its share would otherwise leave the download band permanently short.
-    onFraction(1);
+    onFraction(1, received, Math.max(total, received));
     const blob = new Blob(chunks);
     return blob.size >= INLINE_TEXT_MAX ? blob : blob.text();
   },
@@ -370,6 +423,8 @@ export const loadingMixin = {
     this.progressDetail = ''; // what is loading (file names + size), shown in the overlay
     this._progressMark = null; // last {t, p} used to measure the rate
     this._progressRate = null; // smoothed bar-fraction/second of recent progress
+    this._downloadStart = null; // first-byte timestamp, for the transfer rate
+    this._downloadShare = 0.3; // portion of the bar the download owns
   },
 
   // One line naming what is being loaded, so the overlay says which files (and
@@ -422,11 +477,22 @@ export const loadingMixin = {
   // average-since-start ETA is anchored to the fast early phases and reads far
   // too low. A recent-rate estimate re-converges within a second or two.
   _setProgress(phase, value) {
+    // The download's share of the bar scales with how much there is to fetch.
+    // A fixed share cannot suit both ends: at 30% a 950 MB sample reads "0%"
+    // for the first seconds of a transfer that dominates the whole load, while
+    // a 30 KB sample would spend most of the bar on a download that is over
+    // before it paints. The parse bands divide what is left, in their original
+    // proportions.
+    const dl = this._downloadShare ?? 0.3;
+    const rest = (lo, hi) => [
+      dl + (lo - 0.3) * ((0.99 - dl) / 0.69),
+      dl + (hi - 0.3) * ((0.99 - dl) / 0.69)
+    ];
     const bands = {
-      download: [0, 0.3],
-      json: [0.3, 0.5],
-      graph: [0.5, 0.78],
-      index: [0.78, 0.99]
+      download: [0, dl],
+      json: rest(0.3, 0.5),
+      graph: rest(0.5, 0.78),
+      index: rest(0.78, 0.99)
     };
     const labels = {
       download: 'Downloading…',
@@ -454,6 +520,10 @@ export const loadingMixin = {
         this._progressRate == null ? inst : this._progressRate * 0.6 + inst * 0.4;
       this._progressMark = { t: now, p };
     }
+    // The download reports a real byte-rate ETA of its own (see
+    // _onDownloadProgress); only the estimated parse phases fall back to
+    // extrapolating the bar.
+    if (phase === 'download') return;
     if (this._progressRate > 0 && p > 0.02 && p < 0.985) {
       this.progressEta = (1 - p) / this._progressRate;
     } else if (p >= 0.985) {
