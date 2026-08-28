@@ -3,7 +3,9 @@
   class="fade-in space-y-3"
   :class="licenseViewMode === 'compatibility' ? 'max-w-6xl' : 'max-w-4xl'"
 >
-  <div class="list-sticky flex items-center gap-2.5 flex-wrap">
+  <div
+    class="list-sticky flex flex-col items-stretch gap-2 sm:flex-row sm:flex-wrap sm:items-start sm:gap-2.5"
+  >
     <!-- One mode is no choice, so the switch itself goes with the tab. -->
     <div
       class="flex items-center gap-0.5 bg-slate-900/70 border border-slate-700 rounded-lg p-0.5 flex-shrink-0"
@@ -19,7 +21,7 @@
         <button
           type="button"
           @click="setLicenseViewMode(mode.key)"
-          class="px-2.5 py-1 rounded-md text-xs font-medium transition-colors"
+          class="px-2.5 py-1.5 sm:py-1 rounded-md text-xs font-medium transition-colors"
           :class="licenseViewMode === mode.key
             ? 'bg-pink-500/20 text-pink-300'
             : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700'"
@@ -52,7 +54,7 @@
 
     <!-- Compatibility controls -->
     <template x-if="licenseCompatAvailable && licenseViewMode === 'compatibility'">
-      <div class="flex-1 flex items-center gap-2 min-w-0 flex-wrap">
+      <div class="flex flex-wrap items-center gap-2 min-w-0 sm:flex-1">
         <div
           class="flex items-center gap-0.5 bg-slate-900/70 border border-slate-700 rounded-lg p-0.5 flex-shrink-0"
         >
@@ -66,7 +68,7 @@
             <button
               type="button"
               @click="setCompatPanel(panel.key)"
-              class="px-2.5 py-1 rounded-md text-xs font-medium transition-colors"
+              class="px-2.5 py-1.5 sm:py-1 rounded-md text-xs font-medium transition-colors"
               :class="compatPanel === panel.key
                 ? 'bg-slate-700 text-slate-100'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/60'"
@@ -75,7 +77,7 @@
           </template>
         </div>
 
-        <div class="ml-auto flex items-center gap-2 flex-wrap justify-end">
+        <div class="flex flex-wrap items-center gap-2 min-w-0 sm:ml-auto sm:justify-end">
           <!-- Outbound license picker -->
           <div
             class="relative"
@@ -85,7 +87,7 @@
             <button
               type="button"
               @click="compatOutboundPickerOpen = !compatOutboundPickerOpen"
-              class="flex items-center gap-2 bg-slate-800 border rounded-lg text-xs px-2.5 py-1.5 max-w-[19rem] transition-colors"
+              class="flex items-center gap-2 bg-slate-800 border rounded-lg text-xs px-2.5 py-1.5 min-w-0 max-w-full sm:max-w-[19rem] transition-colors"
               :class="compatOutboundPickerOpen ? 'border-pink-500' : 'border-slate-700 hover:border-slate-600'"
             >
               <span class="text-slate-500 flex-shrink-0">Ship all under</span>
@@ -111,7 +113,7 @@
             <div
               x-show="compatOutboundPickerOpen"
               x-cloak
-              class="search-dropdown absolute right-0 mt-1.5 w-72 bg-slate-800 border border-slate-700 rounded-lg shadow-2xl z-30 p-2"
+              class="search-dropdown absolute right-0 mt-1.5 w-[min(18rem,calc(100vw-2rem))] bg-slate-800 border border-slate-700 rounded-lg shadow-2xl z-30 p-2"
             >
               <input
                 x-model.debounce.100ms="compatOutboundSearch"
@@ -150,7 +152,7 @@
             <button
               type="button"
               @click="compatScopePickerOpen = !compatScopePickerOpen"
-              class="flex items-center gap-2 bg-slate-800 border rounded-lg text-xs px-2.5 py-1.5 max-w-[17rem] transition-colors"
+              class="flex items-center gap-2 bg-slate-800 border rounded-lg text-xs px-2.5 py-1.5 min-w-0 max-w-full sm:max-w-[17rem] transition-colors"
               :class="compatScopePickerOpen ? 'border-pink-500' : 'border-slate-700 hover:border-slate-600'"
             >
               <span class="text-slate-500 flex-shrink-0">Scope</span>
@@ -173,7 +175,7 @@
             <div
               x-show="compatScopePickerOpen"
               x-cloak
-              class="search-dropdown absolute right-0 mt-1.5 w-80 bg-slate-800 border border-slate-700 rounded-lg shadow-2xl z-30 p-2"
+              class="search-dropdown absolute right-0 mt-1.5 w-[min(20rem,calc(100vw-2rem))] bg-slate-800 border border-slate-700 rounded-lg shadow-2xl z-30 p-2"
             >
               <input
                 x-model.debounce.100ms="compatScopeSearch"
@@ -229,7 +231,7 @@
               <button
                 type="button"
                 @click="setCompatEdgeFilter(edge.key)"
-                class="px-2.5 py-1 rounded-md text-xs font-medium transition-colors"
+                class="px-2.5 py-1.5 sm:py-1 rounded-md text-xs font-medium transition-colors"
                 :class="compatEdgeFilter === edge.key
                   ? 'bg-slate-700 text-slate-100'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/60'"
@@ -741,7 +743,7 @@
 
               <p
                 x-show="compatReport.licenseCount > 0"
-                class="text-[11px] text-slate-600 leading-relaxed pt-1"
+                class="text-[11px] text-slate-400 leading-relaxed pt-1"
               >
                 Element counts overlap: one package often declares several licenses, so the four
                 figures above do not sum to the number of elements.
@@ -879,7 +881,14 @@
               <table class="border-separate" style="border-spacing: 2px">
                 <thead>
                   <tr>
-                    <th></th>
+                    <th
+                      class="sticky left-0 z-20 bg-slate-800"
+                      style="
+                        box-shadow:
+                          -1.5rem 0 0 0 #1e293b,
+                          0.4rem 0 0.4rem -0.4rem rgba(0, 0, 0, 0.6);
+                      "
+                    ></th>
                     <template x-for="lic in compatMatrix.licenses" :key="'h' + lic.id">
                       <th class="align-bottom p-0" style="height: 108px">
                         <div
@@ -898,7 +907,12 @@
                   <template x-for="(row, r) in compatMatrix.rows" :key="row.id">
                     <tr>
                       <th
-                        class="font-mono text-[11px] font-normal text-slate-300 text-right pr-2 whitespace-nowrap max-w-[15rem] truncate"
+                        class="sticky left-0 z-10 bg-slate-800 font-mono text-[11px] font-normal text-slate-300 text-right pr-2 whitespace-nowrap max-w-[15rem] truncate"
+                        style="
+                          box-shadow:
+                            -1.5rem 0 0 0 #1e293b,
+                            0.4rem 0 0.4rem -0.4rem rgba(0, 0, 0, 0.6);
+                        "
                         x-text="compatMatrix.licenses[r].label"
                       ></th>
                       <template x-for="(cell, c) in row.cells" :key="row.id + ':' + c">
@@ -971,7 +985,7 @@
 
       <!-- The matrix is CC-BY-4.0, so the attribution belongs on screen and not
            only in NOTICE. See scripts/gen-osadl-matrix.mjs. -->
-      <p class="text-[11px] text-slate-600 leading-relaxed">
+      <p class="text-[11px] text-slate-400 leading-relaxed">
         Compatibility rules from the
         <a
           :href="compatMatrixUrl"
