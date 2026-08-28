@@ -864,7 +864,15 @@ test('share hash round-trips a spot in a sample', () => {
     detail: null,
     graphSelected: null
   };
-  assert.deepEqual(parseShareHash('#' + buildShareHash(spot)), spot);
+  assert.deepEqual(parseShareHash('#' + buildShareHash(spot)), {
+    ...spot,
+    // Compatibility-tab defaults, which a link outside that tab never carries.
+    licenseMode: 'inventory',
+    compatPanel: 'check',
+    compatOutbound: null,
+    compatScope: null,
+    compatEdges: 'all'
+  });
 
   // The default view stays out of the hash, and parsing restores it
   const home = buildShareHash({ sample: 'zephyr', view: 'dashboard' });

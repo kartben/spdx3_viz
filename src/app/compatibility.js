@@ -32,6 +32,8 @@ let matrixKey = null;
 let matrixVal = { licenses: [], rows: [], conflictPairs: 0, hidden: 0 };
 let scopeKey = null;
 let scopeVal = null;
+let documentLicenseSrc = null;
+let documentLicenseVal = 0;
 
 // Licenses gridded in the matrix before "show all", and the hard ceiling after
 // it: the grid is O(n²) cells, so a rootfs SBOM with thousands of licenses gets
@@ -75,6 +77,7 @@ export const compatibilityMixin = {
     matrixKey = null;
     scopeKey = null;
     scopeVal = null;
+    documentLicenseSrc = null;
   },
 
   get compatMatrixDate() {
@@ -117,6 +120,14 @@ export const compatibilityMixin = {
   // license against its dependencies'. With the distributed-only filter on,
   // the walk follows just the edges that put a component inside what ships,
   // and at document scope it starts from the graph's roots instead.
+  //
+  // The walk also steps back through build lineage: from an artifact to the
+  // build that produced it, then to that build's inputs. Unlike the Impact
+  // view, which asks what depends on what, a license check has to follow how
+  // things were made. A source file compiled into a shipped binary carries its
+  // license into that binary, and some SBOMs (Zephyr's among them) record the
+  // link only this way, with the licensed sources on a package tree the build
+  // tree never points at.
   get compatScopeElements() {
     const focus = this.compatScope;
     const distributed = this.compatEdgeFilter === 'distributed';
@@ -129,12 +140,20 @@ export const compatibilityMixin = {
     const seen = new Set(roots);
     const queue = [...roots];
     let head = 0;
+    const visit = (id) => {
+      if (seen.has(id)) return;
+      seen.add(id);
+      queue.push(id);
+    };
     while (head < queue.length) {
-      for (const child of this.impactChildIndex.get(queue[head++]) || []) {
-        if (seen.has(child.id)) continue;
+      const node = queue[head++];
+      for (const child of this.impactChildIndex.get(node) || []) {
         if (distributed && !DISTRIBUTED_EDGE_TYPES.has(child.rel)) continue;
-        seen.add(child.id);
-        queue.push(child.id);
+        visit(child.id);
+      }
+      for (const build of this.producedByBuildIndex.get(node) || []) {
+        visit(build);
+        for (const input of this.buildInputIndex.get(build) || []) visit(input);
       }
     }
     scopeKey = key;
@@ -168,6 +187,7 @@ export const compatibilityMixin = {
   setCompatEdgeFilter(filter) {
     this.compatEdgeFilter = filter;
     this.compatStatusFilter = '';
+    this._scheduleNavPush();
   },
 
   // Packages offerable as a scope: only those that actually pull something in,
@@ -194,6 +214,7 @@ export const compatibilityMixin = {
     this.compatScopePickerOpen = false;
     this.compatScopeSearch = '';
     this.compatStatusFilter = '';
+    this._scheduleNavPush();
   },
 
   // ---- the licenses under analysis ---------------------------------------
@@ -301,6 +322,7 @@ export const compatibilityMixin = {
     this.compatOutboundPickerOpen = false;
     this.compatOutboundSearch = '';
     this.compatStatusFilter = '';
+    this._scheduleNavPush();
   },
 
   // ---- the report ---------------------------------------------------------
@@ -345,13 +367,50 @@ export const compatibilityMixin = {
     this.compatStatusFilter = this.compatStatusFilter === status ? '' : status;
   },
 
+  // How many elements the current scope covers, whether or not they carry a
+  // license. Used to explain an empty result rather than just reporting one.
+  get compatScopeSize() {
+    return this.compatScopeElements?.size ?? 0;
+  },
+
+  // Real licenses anywhere in the document, ignoring scope and the NoAssertion
+  // / None individuals. Tells "this scope cannot see the licenses" apart from
+  // "this document has none".
+  get compatDocumentLicenseCount() {
+    if (documentLicenseSrc === this.licenses) return documentLicenseVal;
+    documentLicenseVal = this.licenses.filter((lic) => !licenseIndividualToken(lic.id)).length;
+    documentLicenseSrc = this.licenses;
+    return documentLicenseVal;
+  },
+
+  // True when the scope holds elements, none of them names a license, and the
+  // document does have licenses elsewhere. Common where an SBOM records them on
+  // a separate tree of source packages that the build tree never reaches, which
+  // is worth explaining rather than reporting as an empty list.
+  get compatScopeHasNoLicenses() {
+    return (
+      this.compatReport.licenseCount === 0 &&
+      this.compatScopeSize > 0 &&
+      this.compatDocumentLicenseCount > 0
+    );
+  },
+
   // One sentence stating the outcome, so the answer does not have to be
   // reassembled from the tiles.
   get compatHeadline() {
     const report = this.compatReport;
     const outbound = report.outbound;
     if (!outbound) return 'No license in this document is covered by the OSADL matrix.';
-    if (!report.licenseCount) return 'No licenses to check in this scope.';
+    if (!report.licenseCount) {
+      const scope = this.compatScopeSentence;
+      if (!this.compatScopeSize) return `Nothing in ${scope} to check.`;
+      const size = this.compatScopeSize;
+      const unasserted = this.compatUnassertedCount;
+      const detail = unasserted
+        ? `all ${unasserted === size ? '' : `${unasserted} of `}${size} declare no license`
+        : `none of the ${size} carries a license relationship`;
+      return `Nothing to check: ${scope} covers ${size} ${size === 1 ? 'element' : 'elements'}, and ${detail}.`;
+    }
 
     const conflicts = report.totals.conflict.licenses;
     const scope = this.compatScopeSentence;
@@ -528,5 +587,11 @@ export const compatibilityMixin = {
     if (mode === 'compatibility' && !this.compatOutboundTouched && !this.compatOutbound) {
       this.compatOutbound = this.compatDefaultOutbound;
     }
+    this._scheduleNavPush();
+  },
+
+  setCompatPanel(panel) {
+    this.compatPanel = panel;
+    this._scheduleNavPush();
   }
 };

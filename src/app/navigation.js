@@ -175,7 +175,25 @@ export const navigationMixin = {
       expandedVuln: this.expandedVuln,
       expandedAgent: this.expandedAgent,
       detail: this.detailElement?.spdxId || null,
-      graphSelected: this.graphSelectedNodeId
+      graphSelected: this.graphSelectedNodeId,
+      ...this._compatNavState()
+    };
+  },
+
+  // The license compatibility settings, but only while that tab is on screen.
+  // compatOutboundLicense resolves the default guess, which is what a link
+  // should pin so a recipient sees the verdict that was actually shared; it
+  // walks the license list, so it is not worth computing from other views.
+  _compatNavState() {
+    if (this.currentView !== 'licenses' || this.licenseViewMode !== 'compatibility') {
+      return { licenseMode: 'inventory' };
+    }
+    return {
+      licenseMode: 'compatibility',
+      compatPanel: this.compatPanel,
+      compatOutbound: this.compatOutboundLicense || null,
+      compatScope: this.compatScope || null,
+      compatEdges: this.compatEdgeFilter
     };
   },
   _initNavHistory() {
@@ -210,7 +228,12 @@ export const navigationMixin = {
       view: state.view,
       expanded: state[expandedFieldByView[state.view]] || null,
       detail: state.detail,
-      graphSelected: state.graphSelected
+      graphSelected: state.graphSelected,
+      licenseMode: state.licenseMode,
+      compatPanel: state.compatPanel,
+      compatOutbound: state.compatOutbound,
+      compatScope: state.compatScope,
+      compatEdges: state.compatEdges
     });
     return hash ? `${base}#${hash}` : base;
   },
@@ -232,7 +255,12 @@ export const navigationMixin = {
       expandedVuln: null,
       expandedAgent: null,
       detail: link.detail,
-      graphSelected: link.graphSelected
+      graphSelected: link.graphSelected,
+      licenseMode: link.licenseMode,
+      compatPanel: link.compatPanel,
+      compatOutbound: link.compatOutbound,
+      compatScope: link.compatScope,
+      compatEdges: link.compatEdges
     };
     const field = expandedFieldByView[view];
     if (field && link.expanded) state[field] = link.expanded;
@@ -271,6 +299,7 @@ export const navigationMixin = {
       ? this.elementMap.get(state.detail) || this.placeholderElement(state.detail)
       : null;
     this.graphSelectedNodeId = state.graphSelected || null;
+    this._applyCompatNavState(state);
     // Switching into 'graph' triggers a full rebuild (see the currentView
     // $watch in init) which already reads graphSelectedNodeId fresh; only
     // nudge the live canvas here if it was already showing (no rebuild
@@ -294,6 +323,22 @@ export const navigationMixin = {
     }[state.view];
     if (expandedNavTarget?.[1]) this.scrollToNavTarget(...expandedNavTarget);
   },
+  // Restores the compatibility tab's settings from a history entry or a share
+  // link. An outbound license in the link is treated as a deliberate choice, so
+  // the default guess does not overwrite it.
+  _applyCompatNavState(state) {
+    this.licenseViewMode = state.licenseMode === 'compatibility' ? 'compatibility' : 'inventory';
+    if (this.licenseViewMode !== 'compatibility') return;
+    this.compatPanel = state.compatPanel === 'matrix' ? 'matrix' : 'check';
+    this.compatEdgeFilter = state.compatEdges === 'distributed' ? 'distributed' : 'all';
+    this.compatScope = state.compatScope || '';
+    this.compatStatusFilter = '';
+    if (state.compatOutbound) {
+      this.compatOutbound = state.compatOutbound;
+      this.compatOutboundTouched = true;
+    }
+  },
+
   switchView(id) {
     // Mark the target view mounted before switching so its content builds on
     // first visit (and stays cached for instant re-switching afterwards).
