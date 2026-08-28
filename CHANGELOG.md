@@ -9,6 +9,8 @@ via the "What's new" link.
 - **Improved:** A complete CPE now links to NVD's vulnerability search by exact CPE name, version included.
 - **Improved:** Graph stays smooth while other apps compete for the GPU.
 - **Fixed:** Build-heavy SBOMs no longer drag the graph down to a few frames per second.
+- **Improved:** The graph opens much faster the first time on huge SBOMs.
+- **Fixed:** Loading a huge SBOM no longer stalls in a background tab.
 
 ## [0.5.0] - 2026-08-22
 

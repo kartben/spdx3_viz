@@ -24,6 +24,14 @@ export const CHANGELOG = [
       {
         tag: 'Fixed',
         text: 'Build-heavy SBOMs no longer drag the graph down to a few frames per second.'
+      },
+      {
+        tag: 'Improved',
+        text: 'The graph opens much faster the first time on huge SBOMs.'
+      },
+      {
+        tag: 'Fixed',
+        text: 'Loading a huge SBOM no longer stalls in a background tab.'
       }
     ]
   },
