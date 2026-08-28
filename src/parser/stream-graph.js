@@ -32,6 +32,32 @@ function isWs(c) {
   return c === SPACE || c === TAB || c === LF || c === CR;
 }
 
+/**
+ * Hands control back to the event loop for one macrotask.
+ *
+ * Not `setTimeout`: a background tab clamps chained timers to one second, and
+ * after five minutes hidden to one a minute, so a stream that yields every 64 ms
+ * of work would crawl (or effectively stop) for anyone who switches away while a
+ * multi-hundred-MB SBOM loads. A MessageChannel message is an unthrottled
+ * macrotask, so the read keeps its pace whether or not the tab is being watched.
+ * Falls back to a timer where MessageChannel isn't available.
+ *
+ * @returns {Promise<void>}
+ */
+function yieldToEventLoop() {
+  if (typeof MessageChannel !== 'function') {
+    return new Promise((resolve) => setTimeout(resolve));
+  }
+  return new Promise((resolve) => {
+    const channel = new MessageChannel();
+    channel.port1.onmessage = () => {
+      channel.port1.close();
+      resolve();
+    };
+    channel.port2.postMessage(null);
+  });
+}
+
 // The next character that ends or escapes within a JSON string: a closing quote
 // or a backslash. Used to fast-forward through string bodies in one scan that
 // stops at the first hit, rather than two indexOf calls (indexOf for an absent
@@ -245,7 +271,7 @@ export async function forEachGraphItem(blob, onItem, onProgress) {
     if (done) break;
 
     if (Date.now() - lastYield >= 64) {
-      await new Promise((resolve) => setTimeout(resolve));
+      await yieldToEventLoop();
       lastYield = Date.now();
     }
   }
