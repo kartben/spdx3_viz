@@ -1,6 +1,356 @@
-<div x-show="currentView === 'licenses'" class="fade-in space-y-3 max-w-4xl">
-  <div class="list-sticky flex items-center gap-3">
+<div x-show="currentView === 'licenses'" class="fade-in space-y-3 max-w-6xl">
+  <!-- OSADL compatibility: outbound suggestions first, optional pairwise matrix. -->
+  <section
+    class="rounded-xl border border-slate-700/70 bg-slate-800/40 px-4 py-3.5 space-y-3"
+    x-show="licenses.length > 0"
+  >
+    <div class="flex items-start gap-3">
+      <span
+        class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
+        :class="licenseCompat.status === 'ready'
+          ? (licenseCompatVerdictMeta().badgeClass)
+          : 'bg-pink-500/15 text-pink-300'"
+      >
+        <svg
+          x-show="licenseCompat.status === 'loading'"
+          class="w-4 h-4 animate-spin text-pink-300"
+          fill="none"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <circle
+            class="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            stroke-width="4"
+          />
+          <path
+            class="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+          />
+        </svg>
+        <svg
+          x-show="licenseCompat.status !== 'loading'"
+          class="w-4 h-4"
+          :class="licenseCompat.status === 'ready' ? licenseCompatVerdictMeta().iconClass : 'text-pink-300'"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 9.797 9 11.622 5.176-1.825 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+          />
+        </svg>
+      </span>
+      <div class="min-w-0 flex-1">
+        <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <h2 class="text-sm font-semibold text-slate-100">Compatibility</h2>
+          <span
+            x-show="licenseCompat.status === 'ready'"
+            class="badge text-[10px]"
+            :class="licenseCompatVerdictMeta().badgeClass"
+            x-text="licenseCompatVerdictMeta().label"
+          ></span>
+        </div>
+        <p class="text-xs text-slate-400 mt-0.5" x-show="licenseCompat.status === 'loading'">
+          Checking this SBOM against the OSADL license matrix…
+        </p>
+        <p
+          class="text-xs text-amber-300/90 mt-0.5"
+          x-show="licenseCompat.status === 'error'"
+          x-text="licenseCompat.error"
+        ></p>
+        <template x-if="licenseCompat.status === 'ready' && licenseCompatReport">
+          <div class="mt-1 space-y-1">
+            <p
+              class="text-sm text-slate-200 font-medium leading-snug"
+              x-text="licenseCompatHeadline().title"
+            ></p>
+            <p
+              class="text-xs text-slate-400 leading-relaxed"
+              x-show="licenseCompatHeadline().detail"
+              x-text="licenseCompatHeadline().detail"
+            ></p>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <template x-if="licenseCompat.status === 'ready' && licenseCompatReport">
+      <div class="space-y-3">
+        <div
+          class="flex flex-wrap items-center gap-1.5"
+          x-show="licenseCompatReport.candidates.length"
+        >
+          <span class="text-[10px] uppercase tracking-wider text-slate-500 mr-0.5">Outbound</span>
+          <template x-for="cand in visibleCompatCandidates()" :key="'out-' + cand.id">
+            <button
+              type="button"
+              class="badge text-[11px] font-mono"
+              :class="cand.inSbom
+                ? 'bg-emerald-500/15 text-emerald-200 ring-1 ring-emerald-500/30 hover:bg-emerald-500/25'
+                : 'bg-slate-700/60 text-slate-300 ring-1 ring-slate-600/50 hover:bg-slate-700'"
+              :title="cand.inSbom
+                ? 'Already used in this SBOM. Click to open it.'
+                : 'Not used in this SBOM; listed because it can cover the inbound set.'"
+              @click="jumpToCandidate(cand)"
+              x-text="cand.id"
+            ></button>
+          </template>
+          <button
+            type="button"
+            class="text-[11px] text-slate-400 hover:text-slate-200"
+            x-show="hiddenCompatCandidateCount() > 0"
+            @click="licenseCompatShowAllCandidates = true"
+            x-text="'+' + hiddenCompatCandidateCount() + ' more'"
+          ></button>
+          <button
+            type="button"
+            class="text-[11px] text-slate-500 hover:text-slate-300"
+            x-show="licenseCompatShowAllCandidates && licenseCompatReport.candidates.length > 8"
+            @click="licenseCompatShowAllCandidates = false"
+          >
+            Show less
+          </button>
+        </div>
+
+        <div class="space-y-1" x-show="licenseCompatReport.conflicts.length">
+          <div class="text-[10px] uppercase tracking-wider text-slate-500">Cannot include</div>
+          <ul class="space-y-0.5">
+            <template
+              x-for="row in visibleCompatConflicts()"
+              :key="row.outbound + '>' + row.inbound"
+            >
+              <li>
+                <button
+                  type="button"
+                  class="text-xs text-left text-slate-300 hover:text-white w-full"
+                  :title="compatCellDescription(row.outbound, row.inbound)"
+                  @click="licenseCompatReport.showMatrix
+                    ? selectCompatCell(row.outbound, row.inbound)
+                    : jumpToCompatLicense(row.outbound)"
+                >
+                  <span class="font-mono text-rose-300" x-text="row.outbound"></span>
+                  <span class="text-slate-500"> cannot include </span>
+                  <span class="font-mono text-rose-200" x-text="row.inbound"></span>
+                </button>
+              </li>
+            </template>
+          </ul>
+          <button
+            type="button"
+            class="text-[11px] text-slate-400 hover:text-slate-200"
+            x-show="hiddenCompatConflictCount() > 0"
+            @click="licenseCompatShowAllConflicts = true"
+            x-text="'+' + hiddenCompatConflictCount() + ' more'"
+          ></button>
+        </div>
+
+        <div
+          class="flex flex-wrap items-center gap-1.5"
+          x-show="licenseCompatReport.unsupported.length"
+        >
+          <span class="text-[10px] uppercase tracking-wider text-slate-500 mr-0.5"
+            >Not in OSADL</span
+          >
+          <template x-for="u in licenseCompatReport.unsupported.slice(0, 8)" :key="'unsup-' + u.id">
+            <button
+              type="button"
+              class="badge text-[11px] font-mono bg-slate-700/50 text-slate-400 ring-1 ring-slate-600/40 hover:text-slate-200"
+              :title="u.userCount + (u.userCount === 1 ? ' element' : ' elements')"
+              @click="u.sourceIds[0] && navigateToLicense(u.sourceIds[0])"
+              x-text="u.label"
+            ></button>
+          </template>
+          <span
+            class="text-[11px] text-slate-500"
+            x-show="licenseCompatReport.unsupported.length > 8"
+            x-text="'+' + (licenseCompatReport.unsupported.length - 8) + ' more'"
+          ></span>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-700/60">
+          <div class="inline-flex rounded-lg border border-slate-700 bg-slate-900/40 p-0.5">
+            <button
+              type="button"
+              class="px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors"
+              :class="licenseCompatPanel === 'summary'
+                ? 'bg-slate-700 text-white'
+                : 'text-slate-400 hover:text-slate-200'"
+              @click="licenseCompatPanel = 'summary'"
+            >
+              Summary
+            </button>
+            <button
+              type="button"
+              class="px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors"
+              :class="licenseCompatPanel === 'matrix'
+                ? 'bg-slate-700 text-white'
+                : 'text-slate-400 hover:text-slate-200'"
+              :disabled="!licenseCompatReport.showMatrix"
+              :title="licenseCompatReport.showMatrix
+                ? 'Pairwise: rows are outbound (ship as), columns are inbound (include)'
+                : (licenseCompatReport.atomCount < 2
+                    ? 'Need at least two OSADL licenses for a matrix'
+                    : 'Too many distinct licenses for a readable matrix')"
+              @click="licenseCompatReport.showMatrix && (licenseCompatPanel = 'matrix')"
+            >
+              Matrix
+            </button>
+          </div>
+          <p class="text-[11px] text-slate-500 leading-snug min-w-0 flex-1">
+            OSADL
+            <a
+              :href="osadlChecklistsUrl()"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-slate-400 hover:text-pink-300 underline decoration-slate-600 underline-offset-2"
+              >checklists</a
+            >
+            (<span x-text="osadlLicenseId()"></span>,
+            <span x-text="formatOsadlDate() || 'bundled'"></span>). Not legal advice: whether a
+            project under the row can include the column.
+          </p>
+        </div>
+
+        <div
+          x-show="licenseCompatPanel === 'matrix' && licenseCompatReport.showMatrix"
+          class="space-y-2"
+        >
+          <div class="compat-matrix-wrap">
+            <table class="compat-matrix">
+              <thead>
+                <tr>
+                  <th class="compat-matrix-corner">
+                    <span class="sr-only">Outbound \ inbound</span>
+                    <span aria-hidden="true" class="text-[9px] text-slate-500 leading-tight"
+                      >Ship as \ Include</span
+                    >
+                  </th>
+                  <template x-for="col in licenseCompatReport.atoms" :key="'h-' + col">
+                    <th class="compat-matrix-col" :title="col">
+                      <button
+                        type="button"
+                        class="compat-matrix-col-label"
+                        @click="jumpToCompatLicense(col)"
+                        x-text="col"
+                      ></button>
+                    </th>
+                  </template>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="row in licenseCompatReport.atoms" :key="'r-' + row">
+                  <tr>
+                    <th class="compat-matrix-row" :title="row">
+                      <button
+                        type="button"
+                        class="compat-matrix-row-label"
+                        @click="jumpToCompatLicense(row)"
+                        x-text="row"
+                      ></button>
+                    </th>
+                    <template
+                      x-for="col in licenseCompatReport.atoms"
+                      :key="'c-' + row + '-' + col"
+                    >
+                      <td>
+                        <button
+                          type="button"
+                          class="compat-matrix-cell"
+                          :class="[
+                            compatStatusMeta(compatCellStatus(row, col)).cellClass,
+                            licenseCompatCell?.outbound === row && licenseCompatCell?.inbound === col
+                              ? 'ring-2 ring-white/70'
+                              : ''
+                          ]"
+                          :title="compatCellDescription(row, col)"
+                          :aria-label="compatCellDescription(row, col)"
+                          @click="selectCompatCell(row, col)"
+                          x-text="compatStatusMeta(compatCellStatus(row, col)).short"
+                        ></button>
+                      </td>
+                    </template>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+          <div class="flex flex-wrap gap-3 text-[10px] text-slate-500">
+            <span class="inline-flex items-center gap-1"
+              ><span class="w-2.5 h-2.5 rounded-sm bg-emerald-500/35"></span> Yes</span
+            >
+            <span class="inline-flex items-center gap-1"
+              ><span class="w-2.5 h-2.5 rounded-sm bg-rose-500/40"></span> No</span
+            >
+            <span class="inline-flex items-center gap-1"
+              ><span class="w-2.5 h-2.5 rounded-sm bg-amber-500/35"></span> Check</span
+            >
+            <span class="inline-flex items-center gap-1"
+              ><span class="w-2.5 h-2.5 rounded-sm bg-slate-600/50"></span> Same</span
+            >
+            <span class="inline-flex items-center gap-1"
+              ><span class="w-2.5 h-2.5 rounded-sm bg-slate-700"></span> Unknown</span
+            >
+          </div>
+          <p
+            class="text-xs text-slate-300 bg-slate-900/50 rounded-lg px-3 py-2"
+            x-show="licenseCompatCell"
+            x-text="licenseCompatCell && compatCellDescription(licenseCompatCell.outbound, licenseCompatCell.inbound)"
+          ></p>
+        </div>
+      </div>
+    </template>
+  </section>
+
+  <div class="list-sticky flex flex-wrap items-center gap-2 sm:gap-3">
     <span class="text-sm text-slate-400" x-text="`${filteredLicenses.length} licenses`"></span>
+    <div
+      class="flex flex-wrap items-center gap-1"
+      x-show="licenseCompat.status === 'ready' && licenseCompatReport"
+    >
+      <button
+        type="button"
+        class="badge text-[11px]"
+        :class="!licenseCompatFilter
+          ? 'bg-slate-600/40 text-slate-200 ring-1 ring-slate-500/40'
+          : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
+        @click="licenseCompatFilter = ''; restreamView('licenses')"
+      >
+        All
+      </button>
+      <button
+        type="button"
+        class="badge text-[11px]"
+        x-show="licenseCompatFilterCount('conflict') > 0"
+        :class="licenseCompatFilter === 'conflict'
+          ? 'bg-rose-500/20 text-rose-200 ring-1 ring-rose-500/40'
+          : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
+        @click="licenseCompatFilter = licenseCompatFilter === 'conflict' ? '' : 'conflict'; restreamView('licenses')"
+      >
+        Conflicts
+        <span class="ml-1 tabular-nums" x-text="licenseCompatFilterCount('conflict')"></span>
+      </button>
+      <button
+        type="button"
+        class="badge text-[11px]"
+        x-show="licenseCompatFilterCount('unsupported') > 0"
+        :class="licenseCompatFilter === 'unsupported'
+          ? 'bg-slate-500/30 text-slate-200 ring-1 ring-slate-400/40'
+          : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
+        @click="licenseCompatFilter = licenseCompatFilter === 'unsupported' ? '' : 'unsupported'; restreamView('licenses')"
+      >
+        Not in OSADL
+        <span class="ml-1 tabular-nums" x-text="licenseCompatFilterCount('unsupported')"></span>
+      </button>
+    </div>
     <input
       x-model.debounce.150ms="licenseSearch"
       @input.debounce.150ms="restreamView('licenses')"
@@ -51,6 +401,23 @@
         </div>
         <div class="flex items-center gap-2 flex-shrink-0">
           <span
+            x-show="licenseCompatKind(lic.id) === 'conflict'"
+            class="badge bg-rose-500/15 text-rose-300"
+            x-text="licenseCompatInfo(lic.id)?.conflictCount === 1
+              ? '1 conflict'
+              : licenseCompatInfo(lic.id)?.conflictCount + ' conflicts'"
+          ></span>
+          <span
+            x-show="licenseCompatKind(lic.id) === 'unsupported'"
+            class="badge bg-slate-600/30 text-slate-400"
+            >Not in OSADL</span
+          >
+          <span
+            x-show="licenseCompatKind(lic.id) === 'ok' && licenseCompatInfo(lic.id)?.isCandidate"
+            class="badge bg-emerald-500/15 text-emerald-300"
+            >Outbound</span
+          >
+          <span
             x-show="lic.declaredBy.length > 0"
             class="badge bg-pink-500/15 text-pink-400"
             x-text="lic.declaredBy.length + ' declared'"
@@ -99,6 +466,43 @@
                 class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-32 overflow-y-auto"
                 x-text="elementMap.get(lic.id)?.description"
               ></div>
+            </div>
+          </div>
+
+          <div
+            class="mb-4 sm:pl-11 space-y-2"
+            x-show="licenseCompatInfo(lic.id) && licenseCompatKind(lic.id) !== 'unsupported'"
+          >
+            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              If you ship as this license
+            </div>
+            <div
+              class="text-xs text-slate-300"
+              x-show="(licenseCompatInfo(lic.id)?.asOutbound.yes || []).length"
+            >
+              <span class="text-emerald-400">Can include</span>
+              <span class="text-slate-500"> · </span>
+              <span
+                class="font-mono text-slate-300"
+                x-text="(licenseCompatInfo(lic.id)?.asOutbound.yes || []).join(', ')"
+              ></span>
+            </div>
+            <div
+              class="text-xs text-slate-300"
+              x-show="(licenseCompatInfo(lic.id)?.asOutbound.no || []).length"
+            >
+              <span class="text-rose-400">Cannot include</span>
+              <span class="text-slate-500"> · </span>
+              <span
+                class="font-mono text-slate-300"
+                x-text="(licenseCompatInfo(lic.id)?.asOutbound.no || []).join(', ')"
+              ></span>
+            </div>
+            <div
+              class="text-xs text-slate-400"
+              x-show="!(licenseCompatInfo(lic.id)?.asOutbound.yes || []).length && !(licenseCompatInfo(lic.id)?.asOutbound.no || []).length && licenseCompatKind(lic.id) === 'ok'"
+            >
+              No other OSADL licenses in this SBOM to compare.
             </div>
           </div>
 

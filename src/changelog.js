@@ -10,6 +10,10 @@ export const CHANGELOG = [
     date: null,
     items: [
       {
+        tag: 'Added',
+        text: 'License view checks OSADL compatibility and suggests outbound licenses.'
+      },
+      {
         tag: 'Improved',
         text: 'Large downloads show bytes, an ETA, and never look stalled.'
       },

@@ -10,14 +10,32 @@ import {
   spdxLicenseJsonUrl,
   spdxLicenseExceptionJsonUrl,
   spdxLicensePageUrl,
-  spdxLicenseExceptionPageUrl
+  spdxLicenseExceptionPageUrl,
+  loadOsadlMatrix,
+  analyzeSbomLicenses,
+  compatStatusMeta,
+  describeCompatibility,
+  formatMatrixTimestamp,
+  COMPAT_VERDICT_META,
+  OSADL_CHECKLISTS_URL,
+  OSADL_LICENSE
 } from '../lib/index.js';
 
 /* Licenses: labels, expression resolution, and the license-text modal, which
    shows SBOM-embedded text directly and otherwise fetches from the SPDX License
-   List on demand (cached in licenseTextCache). */
+   List on demand (cached in licenseTextCache). Compatibility uses the bundled
+   OSADL matrix (loaded once, kept off the reactive state). */
 
 const licenseTextCache = new Map(); // licenseId -> { name, text }
+
+const CANDIDATE_PREVIEW = 8;
+const CONFLICT_PREVIEW = 8;
+
+let osadlMatrix = null;
+let osadlLoad = null;
+let compatReportLicenses = null;
+let compatReportMatrix = null;
+let compatReportVal = null;
 
 export const licensesMixin = {
   licenseUsers(id) {
@@ -299,5 +317,178 @@ export const licensesMixin = {
     }
 
     await this.fetchLicensePartText(this.licenseModalParts[0]);
+  },
+
+  osadlChecklistsUrl() {
+    return OSADL_CHECKLISTS_URL;
+  },
+  osadlLicenseId() {
+    return OSADL_LICENSE;
+  },
+
+  async ensureLicenseCompat() {
+    if (osadlMatrix) {
+      this.licenseCompat.status = 'ready';
+      this.licenseCompat.timestamp = osadlMatrix.timestamp;
+      this.licenseCompat.error = '';
+      return;
+    }
+    if (osadlLoad) return osadlLoad;
+    this.licenseCompat.status = 'loading';
+    osadlLoad = loadOsadlMatrix()
+      .then((matrix) => {
+        osadlMatrix = matrix;
+        this.licenseCompat.status = 'ready';
+        this.licenseCompat.timestamp = matrix.timestamp;
+        this.licenseCompat.error = '';
+      })
+      .catch((err) => {
+        osadlLoad = null;
+        this.licenseCompat.status = 'error';
+        this.licenseCompat.error = err.message || 'Failed to load the OSADL matrix';
+      });
+    return osadlLoad;
+  },
+
+  get licenseCompatReport() {
+    if (this.licenseCompat.status !== 'ready' || !osadlMatrix) return null;
+    if (compatReportLicenses === this.licenses && compatReportMatrix === osadlMatrix) {
+      return compatReportVal;
+    }
+    compatReportVal = analyzeSbomLicenses(this.licenses, this.elementMap, osadlMatrix);
+    compatReportLicenses = this.licenses;
+    compatReportMatrix = osadlMatrix;
+    return compatReportVal;
+  },
+
+  licenseCompatInfo(id) {
+    return this.licenseCompatReport?.byId[id] || null;
+  },
+
+  licenseCompatKind(id) {
+    return this.licenseCompatInfo(id)?.kind || '';
+  },
+
+  compatStatusMeta(status) {
+    return compatStatusMeta(status);
+  },
+
+  licenseCompatVerdictMeta() {
+    const verdict = this.licenseCompatReport?.verdict;
+    return COMPAT_VERDICT_META[verdict] || COMPAT_VERDICT_META.incomplete;
+  },
+
+  formatOsadlDate() {
+    return formatMatrixTimestamp(this.licenseCompat.timestamp);
+  },
+
+  licenseCompatHeadline() {
+    const report = this.licenseCompatReport;
+    if (!report) return { title: '', detail: '' };
+    if (report.verdict === 'empty') {
+      return { title: 'No licenses to check', detail: '' };
+    }
+    if (report.verdict === 'incomplete') {
+      return {
+        title: 'None of these licenses are in the OSADL matrix',
+        detail:
+          'Custom LicenseRef ids and uncommon licenses cannot be checked automatically. Open a license for its text.'
+      };
+    }
+    if (report.verdict === 'blocked') {
+      return {
+        title: 'No OSADL outbound license covers this combination',
+        detail:
+          'Among the licenses OSADL knows, nothing can include every inbound license in this SBOM. That often means GPLv2 and Apache-2.0 together.'
+      };
+    }
+    const sbomNames = report.sbomCandidates.map((c) => c.id);
+    if (report.verdict === 'constrained') {
+      if (sbomNames.length === 1) {
+        return {
+          title: `Shippable under ${sbomNames[0]}`,
+          detail:
+            'Some licenses in this SBOM cannot include others. Shipping under this one covers the combination OSADL knows about.'
+        };
+      }
+      if (sbomNames.length > 1) {
+        return {
+          title: `Shippable under ${sbomNames[0]} or ${sbomNames[1]}${sbomNames.length > 2 ? ` (+${sbomNames.length - 2})` : ''}`,
+          detail:
+            'Some licenses in this SBOM cannot include others. Any of these already-used licenses can cover the rest.'
+        };
+      }
+      return {
+        title: 'Shippable, but not under a license already in this SBOM',
+        detail:
+          'None of the licenses already used can include the rest. Pick one of the outbound candidates below.'
+      };
+    }
+    if (report.atomCount === 1) {
+      return {
+        title: `${report.atoms[0]} can cover this SBOM`,
+        detail: `${report.candidates.length} outbound licenses in the OSADL matrix can include it.`
+      };
+    }
+    return {
+      title: 'These licenses can be combined',
+      detail: `${report.candidates.length} outbound licenses in the OSADL matrix can cover this SBOM.`
+    };
+  },
+
+  visibleCompatCandidates() {
+    const all = this.licenseCompatReport?.candidates || [];
+    if (this.licenseCompatShowAllCandidates) return all;
+    return all.slice(0, CANDIDATE_PREVIEW);
+  },
+
+  hiddenCompatCandidateCount() {
+    const total = this.licenseCompatReport?.candidates?.length || 0;
+    if (this.licenseCompatShowAllCandidates) return 0;
+    return Math.max(0, total - CANDIDATE_PREVIEW);
+  },
+
+  visibleCompatConflicts() {
+    const all = this.licenseCompatReport?.conflicts || [];
+    if (this.licenseCompatShowAllConflicts) return all;
+    return all.slice(0, CONFLICT_PREVIEW);
+  },
+
+  hiddenCompatConflictCount() {
+    const total = this.licenseCompatReport?.conflicts?.length || 0;
+    return this.licenseCompatShowAllConflicts ? 0 : Math.max(0, total - CONFLICT_PREVIEW);
+  },
+
+  compatCellStatus(outbound, inbound) {
+    return this.licenseCompatReport?.pairwise?.[outbound]?.[inbound] || 'undef';
+  },
+
+  compatCellDescription(outbound, inbound) {
+    return describeCompatibility(outbound, inbound, this.compatCellStatus(outbound, inbound));
+  },
+
+  selectCompatCell(outbound, inbound) {
+    this.licenseCompatCell = { outbound, inbound };
+    this.licenseCompatPanel = 'matrix';
+  },
+
+  jumpToCompatLicense(atomId) {
+    const sources = this.licenseCompatReport?.atomSources?.[atomId];
+    const target = sources?.[0];
+    if (target) this.navigateToLicense(target);
+  },
+
+  jumpToCandidate(candidate) {
+    if (candidate?.inSbom) this.jumpToCompatLicense(candidate.id);
+  },
+
+  licenseCompatFilterCount(kind) {
+    const byId = this.licenseCompatReport?.byId;
+    if (!byId) return 0;
+    let n = 0;
+    for (const info of Object.values(byId)) {
+      if (info.kind === kind) n++;
+    }
+    return n;
   }
 };

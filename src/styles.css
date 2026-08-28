@@ -1129,3 +1129,101 @@ body.detail-resizing {
 .source-viewer .hljs-punctuation {
   color: #adbac7;
 }
+
+/* ==========================================================================
+   License compatibility matrix (OSADL)
+   Rows = outbound ("ship as"), columns = inbound ("include"). Sticky first
+   column so the outbound id stays visible while scrolling horizontally.
+   ========================================================================== */
+
+.compat-matrix-wrap {
+  overflow: auto;
+  max-height: 28rem;
+  border-radius: 0.5rem;
+  border: 1px solid #334155;
+  background: #0f172a;
+}
+
+.compat-matrix {
+  border-collapse: separate;
+  border-spacing: 2px;
+  font-size: 0.625rem;
+}
+
+.compat-matrix-corner {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  background: #0f172a;
+  min-width: 5.5rem;
+  max-width: 7.5rem;
+  padding: 0.35rem 0.4rem;
+  text-align: left;
+  vertical-align: bottom;
+}
+
+.compat-matrix-col {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #0f172a;
+  vertical-align: bottom;
+  padding: 0.25rem 0;
+}
+
+.compat-matrix-col-label {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  max-height: 8.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #94a3b8;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  padding: 0.25rem 0.15rem;
+}
+
+.compat-matrix-col-label:hover {
+  color: #e2e8f0;
+}
+
+.compat-matrix-row {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: #0f172a;
+  text-align: right;
+  padding: 0 0.35rem;
+  max-width: 7.5rem;
+}
+
+.compat-matrix-row-label {
+  display: block;
+  max-width: 7.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #94a3b8;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  text-align: right;
+}
+
+.compat-matrix-row-label:hover {
+  color: #e2e8f0;
+}
+
+.compat-matrix td {
+  padding: 0;
+}
+
+.compat-matrix-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1rem;
+  height: 1.7rem;
+  border-radius: 0.25rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}

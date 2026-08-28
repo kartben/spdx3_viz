@@ -5,6 +5,7 @@ via the "What's new" link.
 
 ## Unreleased
 
+- **Added:** License view checks OSADL compatibility and suggests outbound licenses.
 - **Improved:** Large downloads show bytes, an ETA, and never look stalled.
 - **Improved:** A complete CPE now links to NVD's vulnerability search by exact CPE name, version included.
 - **Improved:** Graph stays smooth while other apps compete for the GPU.

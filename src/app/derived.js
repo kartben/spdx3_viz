@@ -1470,7 +1470,7 @@ export const derivedMixin = {
 
   get filteredLicenses() {
     const licenses = this.licenses;
-    const key = `${licenses.length}|${this.licenseSearch}|${this.licenseSort}`;
+    const key = `${licenses.length}|${this.licenseSearch}|${this.licenseSort}|${this.licenseCompatFilter}|${this.licenseCompat?.status}`;
     if (key === filteredLicensesCacheKey) return filteredLicensesCacheVal;
 
     let lics = licenses;
@@ -1479,6 +1479,11 @@ export const derivedMixin = {
       lics = lics.filter(
         (l) => (l.label || '').toLowerCase().includes(q) || (l.id || '').toLowerCase().includes(q)
       );
+    }
+    const compatFilter = this.licenseCompatFilter;
+    if (compatFilter && this.licenseCompatReport) {
+      const byId = this.licenseCompatReport.byId;
+      lics = lics.filter((l) => (byId[l.id]?.kind || '') === compatFilter);
     }
     filteredLicensesCacheVal =
       this.licenseSort === 'name'

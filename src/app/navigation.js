@@ -1129,6 +1129,7 @@ export const navigationMixin = {
   },
   navigateToLicense(spdxId) {
     this.licenseSearch = '';
+    this.licenseCompatFilter = '';
     this.switchView('licenses');
     this.expandedLicense = spdxId;
     this.scrollToNavTarget('license', spdxId);

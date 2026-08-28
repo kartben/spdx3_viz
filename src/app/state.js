@@ -182,6 +182,14 @@ export function createState() {
     agentSearch: '', // in-view filter for the Agents list
     agentSort: 'links', // Agents list sort: 'links' (most connected) | 'name'
     licenseSearch: '',
+    licenseSort: 'usage',
+    licenseCompatFilter: '', // '' | 'conflict' | 'unsupported'
+    licenseCompatPanel: 'summary', // 'summary' | 'matrix'
+    licenseCompatShowAllCandidates: false,
+    licenseCompatShowAllConflicts: false,
+    licenseCompatCell: null, // { outbound, inbound } selected matrix cell
+    // Bundled OSADL matrix: idle until the Licenses view first opens.
+    licenseCompat: { status: 'idle', error: '', timestamp: '' },
     securitySearch: '',
     securitySort: 'severity',
     securityStatusFilter: '',
@@ -203,7 +211,6 @@ export function createState() {
     cveAffectedBundle: null, // Map<cveId, {f?,r?,m?}> once loaded
     cveAffectedBundleStatus: 'idle', // idle | loading | done | absent
     cveAffectedGenerated: '', // bundle build date, shown in the Security UI
-    licenseSort: 'usage',
     buildSort: 'output',
     pkgSort: 'name',
     pkgPurposeFilter: '', // '' = all, else a software_primaryPurpose facet key

@@ -797,6 +797,12 @@ export const loadingMixin = {
       this.collapsedReqs = {};
       // Prefer Decomposition when the SBOM has tracedToDetail hierarchy.
       this.requirementLayout = this.hasSafetyDecomposition ? 'tree' : 'list';
+      this.licenseSearch = '';
+      this.licenseCompatFilter = '';
+      this.licenseCompatPanel = 'summary';
+      this.licenseCompatShowAllCandidates = false;
+      this.licenseCompatShowAllConflicts = false;
+      this.licenseCompatCell = null;
       this.remediationCategoryFilter = '';
       this.remediationSeverityFilter = '';
       this.expandedClusters = new Set(); // fresh data: start fully collapsed
