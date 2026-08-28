@@ -6,13 +6,27 @@ import { compatibilityMixin } from '../src/app/compatibility.js';
 import { navigationMixin } from '../src/app/navigation.js';
 
 test('the compatibility check is withheld on SPDX own tools domain', () => {
-  assert.equal(isLicenseCompatAvailable('tools.spdx.org'), false);
-  assert.equal(isLicenseCompatAvailable('TOOLS.SPDX.ORG'), false, 'host case is irrelevant');
+  assert.equal(isLicenseCompatAvailable({ hostname: 'tools.spdx.org', framed: false }), false);
+  assert.equal(
+    isLicenseCompatAvailable({ hostname: 'TOOLS.SPDX.ORG', framed: false }),
+    false,
+    'host case is irrelevant'
+  );
   assert.ok(LICENSE_COMPAT_HIDDEN_HOSTS.has('tools.spdx.org'));
 });
 
-test('it stays available everywhere else', () => {
-  for (const host of [
+test('it is withheld in any frame, whatever the host', () => {
+  // tools.spdx.org does not serve the app, it embeds the GitHub Pages build
+  // cross-origin with referrerpolicy="no-referrer". Inside that frame the host
+  // is kartben.github.io and the referrer is empty, so the host check alone
+  // never fired and the panel showed on the SPDX site.
+  assert.equal(isLicenseCompatAvailable({ hostname: 'kartben.github.io', framed: true }), false);
+  assert.equal(isLicenseCompatAvailable({ hostname: 'localhost', framed: true }), false);
+  assert.equal(isLicenseCompatAvailable({ hostname: 'tools.spdx.org', framed: true }), false);
+});
+
+test('it stays available everywhere else, unframed', () => {
+  for (const hostname of [
     'kartben.github.io',
     'localhost',
     '127.0.0.1',
@@ -22,8 +36,15 @@ test('it stays available everywhere else', () => {
     'tools.spdx.org.example.com',
     'nottools.spdx.org'
   ]) {
-    assert.equal(isLicenseCompatAvailable(host), true, host);
+    assert.equal(isLicenseCompatAvailable({ hostname, framed: false }), true, hostname);
   }
+});
+
+test('outside a browser it reads as unframed rather than throwing', () => {
+  // Node has no window or location; the defaults have to survive that, since
+  // this module is imported by tests and by the parse worker.
+  assert.equal(isLicenseCompatAvailable(), true);
+  assert.equal(isLicenseCompatAvailable({}), true);
 });
 
 function makeApp(overrides = {}) {
