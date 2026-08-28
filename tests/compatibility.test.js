@@ -328,3 +328,32 @@ test('the distributed edge set is the shipped subset of the dependency edges', (
     assert.ok(DISTRIBUTED_EDGE_TYPES.has(type), `${type} ships`);
   }
 });
+
+test('outboundCandidates breaks ties toward the licenses already in use', () => {
+  // Every permissive license absorbs MIT, so a large group ties at zero
+  // conflicts and alphabetical order decides. That order is arbitrary, and it
+  // buried the licenses the document itself uses.
+  const subjects = [{ id: 'l1', expression: 'MIT', elements: ['pkg:a'] }];
+
+  const plain = outboundCandidates(subjects, { limit: 6 }).map((c) => c.id);
+  assert.equal(plain[0], '0BSD', 'alphabetical without a preference');
+  assert.ok(!plain.includes('MIT'), 'MIT sorts far down the alphabet');
+
+  const preferred = outboundCandidates(subjects, {
+    limit: 6,
+    prefer: new Set(['MIT', 'Apache-2.0'])
+  }).map((c) => c.id);
+  assert.deepEqual(preferred.slice(0, 2).sort(), ['Apache-2.0', 'MIT'], 'preferred ties lead');
+
+  // A preference never reorders across different scores, only within a tie.
+  const ranked = outboundCandidates(
+    [{ id: 'l1', expression: 'GPL-2.0-only', elements: ['pkg:a'] }],
+    { prefer: new Set(['MIT']) }
+  );
+  const mit = ranked.find((c) => c.id === 'MIT');
+  assert.equal(mit.conflict, 1, 'MIT cannot absorb GPL-2.0-only');
+  assert.ok(
+    ranked.indexOf(mit) > 0 && ranked[0].conflict === 0,
+    'a preferred but worse candidate stays behind the ones that actually work'
+  );
+});

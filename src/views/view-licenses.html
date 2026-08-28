@@ -610,7 +610,9 @@
                       <span
                         class="badge flex-shrink-0"
                         :class="compatStatusBadge(finding.status)"
-                        x-text="finding.sameLicense ? 'Same license' : compatStatusLabel(finding.status)"
+                        x-text="finding.sameLicense && !finding.choice
+                          ? 'Same license'
+                          : compatStatusLabel(finding.status)"
                       ></span>
                       <svg
                         class="w-3.5 h-3.5 text-slate-500 transition-transform flex-shrink-0"
@@ -715,38 +717,56 @@
 
             <!-- Candidates and coverage -->
             <div class="space-y-3">
-              <div class="card" x-show="compatReport.licenseCount > 0">
-                <h3 class="text-sm font-semibold text-white">Better outbound licenses</h3>
-                <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-                  Ranked by how many licenses here they cannot absorb. Pick one to re-run the check.
-                </p>
-                <div class="space-y-0.5 mt-3">
-                  <template x-for="candidate in compatCandidates" :key="candidate.id">
-                    <button
-                      type="button"
-                      @click="setCompatOutbound(candidate.id)"
-                      class="w-full grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg px-2.5 py-1.5 text-left border transition-colors"
-                      :class="candidate.id === compatReport.outbound
-                        ? 'border-pink-500/40 bg-pink-500/5'
-                        : 'border-transparent hover:bg-slate-700/40'"
-                    >
-                      <span
-                        class="font-mono text-xs text-slate-200 truncate"
-                        x-text="candidate.id"
-                      ></span>
-                      <span
-                        class="text-[11px] tabular-nums whitespace-nowrap"
-                        :class="candidate.conflict ? 'text-rose-400' : 'text-emerald-400'"
-                        x-text="candidate.conflict === 0
-                          ? 'no conflicts'
-                          : formatCount(candidate.conflict) + (candidate.review ? ' + ' + formatCount(candidate.review) + ' to check' : ' conflicts')"
-                      ></span>
-                    </button>
-                  </template>
-                </div>
+              <!-- Only shown when there is a genuinely better option, or when
+                   nothing in the matrix clears the scope. Listing the ranking
+                   whole reads as "switch to one of these" even where the
+                   current license is already the best answer. -->
+              <div
+                class="card"
+                x-show="compatBetterCandidates.length > 0 ||
+                  (compatHasConflicts && !compatHasCleanCandidate)"
+              >
+                <template x-if="compatBetterCandidates.length > 0">
+                  <div>
+                    <h3 class="text-sm font-semibold text-white">Better outbound licenses</h3>
+                    <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                      These conflict with less of what is in scope. Pick one to re-run the check.
+                    </p>
+                    <div class="space-y-0.5 mt-3">
+                      <template x-for="candidate in compatBetterCandidates" :key="candidate.id">
+                        <button
+                          type="button"
+                          @click="setCompatOutbound(candidate.id)"
+                          class="w-full grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg px-2.5 py-1.5 text-left border border-transparent hover:bg-slate-700/40 transition-colors"
+                        >
+                          <span class="flex items-center gap-1.5 min-w-0">
+                            <span
+                              class="font-mono text-xs text-slate-200 truncate"
+                              x-text="candidate.id"
+                            ></span>
+                            <span
+                              x-show="candidate.used"
+                              class="text-[10px] text-slate-500 flex-shrink-0"
+                              title="Already used somewhere in this document"
+                              >in use</span
+                            >
+                          </span>
+                          <span
+                            class="text-[11px] tabular-nums whitespace-nowrap"
+                            :class="candidate.conflict ? 'text-rose-400' : 'text-emerald-400'"
+                            x-text="candidate.conflict === 0
+                              ? 'no conflicts'
+                              : formatCount(candidate.conflict) + (candidate.review ? ' + ' + formatCount(candidate.review) + ' to check' : ' conflicts')"
+                          ></span>
+                        </button>
+                      </template>
+                    </div>
+                  </div>
+                </template>
                 <p
-                  x-show="!compatHasCleanCandidate"
-                  class="text-xs text-slate-500 mt-3 leading-relaxed"
+                  x-show="compatHasConflicts && !compatHasCleanCandidate"
+                  class="text-xs text-slate-500 leading-relaxed"
+                  :class="compatBetterCandidates.length > 0 && 'mt-3'"
                 >
                   No license in the matrix clears everything in scope. That is the normal answer for
                   a whole OS image, where packages ship alongside each other rather than as one

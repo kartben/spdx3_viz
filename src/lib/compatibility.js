@@ -435,7 +435,9 @@ export function buildCompatReport(subjects, outbound) {
  * component, not the outbound choice), so they do not affect the ranking.
  *
  * @param {CompatSubject[]} subjects
- * @param {{limit?: number}} [opts]
+ * @param {{limit?: number, prefer?: Set<string>}} [opts] - `prefer` breaks ties
+ *   ahead of the alphabetical fallback, so equally good candidates that mean
+ *   something to this document come first instead of whatever sorts first.
  * @returns {OutboundCandidate[]} best first
  */
 export function outboundCandidates(subjects, opts = {}) {
@@ -463,12 +465,14 @@ export function outboundCandidates(subjects, opts = {}) {
     return tally;
   });
 
+  const prefer = opts.prefer;
   candidates.sort(
     (a, b) =>
       a.conflict - b.conflict ||
       a.blockedElements - b.blockedElements ||
       a.review - b.review ||
       b.compatible - a.compatible ||
+      (prefer ? Number(prefer.has(b.id)) - Number(prefer.has(a.id)) : 0) ||
       a.id.localeCompare(b.id)
   );
   return opts.limit ? candidates.slice(0, opts.limit) : candidates;

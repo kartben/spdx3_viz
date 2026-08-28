@@ -282,3 +282,57 @@ test('build lineage is followed with the distributed-only filter too', () => {
   assert.deepEqual([...app.compatScopeElements].sort(), ['build:lib', 'final', 'lib.a', 'src.c']);
   assert.deepEqual(labels(app), ['MIT'], 'the prerequisite toolchain is still not shipped');
 });
+
+test('the candidate rail only offers licenses that beat the current one', () => {
+  const subjects = {
+    licenses: [
+      { id: 'lic:gpl2', label: 'GPL-2.0-only', declaredBy: ['a'], concludedBy: [] },
+      { id: 'lic:mit', label: 'MIT', declaredBy: ['b'], concludedBy: [] }
+    ],
+    impactChildIndex: new Map(),
+    impactRoots: new Set()
+  };
+
+  // A poor pick: MIT cannot absorb GPL-2.0-only, so better options exist.
+  const poor = makeApp({ ...subjects, compatOutbound: 'MIT', compatOutboundTouched: true });
+  assert.equal(poor.compatReport.totals.conflict.licenses, 1);
+  assert.ok(poor.compatBetterCandidates.length > 0);
+  assert.ok(
+    poor.compatBetterCandidates.every((candidate) => candidate.conflict === 0),
+    'every suggestion improves on the one conflict MIT has'
+  );
+  assert.ok(
+    !poor.compatBetterCandidates.some((candidate) => candidate.id === 'MIT'),
+    'the current pick is never offered as an improvement'
+  );
+
+  // A pick that already clears everything has nothing better to offer, so the
+  // rail stays hidden rather than listing alphabetically-first alternatives.
+  const good = makeApp({
+    ...subjects,
+    compatOutbound: 'GPL-2.0-only',
+    compatOutboundTouched: true
+  });
+  assert.equal(good.compatReport.totals.conflict.licenses, 0);
+  assert.deepEqual(good.compatBetterCandidates, []);
+});
+
+test('fewer licenses needing review counts as better at equal conflicts', () => {
+  const app = makeApp({
+    licenses: [{ id: 'lic:lgpl', label: 'LGPL-2.1-only', declaredBy: ['a'], concludedBy: [] }],
+    impactChildIndex: new Map(),
+    impactRoots: new Set(),
+    compatOutbound: 'AGPL-3.0-only',
+    compatOutboundTouched: true
+  });
+  // AGPL-3.0-only takes LGPL-2.1-only only depending on how it is used.
+  assert.equal(app.compatReport.totals.conflict.licenses, 0);
+  assert.equal(app.compatReport.totals.review.licenses, 1);
+  assert.ok(
+    app.compatBetterCandidates.every(
+      (candidate) => candidate.conflict === 0 && candidate.review === 0
+    ),
+    'suggestions resolve the review rather than trading it for a conflict'
+  );
+  assert.ok(app.compatBetterCandidates.length > 0);
+});
