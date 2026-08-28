@@ -120,11 +120,17 @@ export function formatBytes(bytes) {
 }
 
 // The bar's opening slice, earned by getting the request away and the first
-// bytes back rather than by any byte count. It is swept over STARTUP_RAMP_MS so
-// a load reads as started from the first moment: the download's own share of
-// the bar begins above it, so nothing has to be given back later.
+// bytes back rather than by any byte count. The download's own share of the bar
+// begins above it, so nothing has to be given back later.
 export const STARTUP_FLOOR = 0.08;
-const STARTUP_RAMP_MS = 2000;
+// Time constant of the ease across that slice. The wait it covers has no known
+// length — a cache miss on the 950 MB sample takes GitHub Pages 9-15s to answer,
+// during which there is nothing to measure — so the ease is asymptotic rather
+// than finishing on a deadline: quick enough to read as started (a third of the
+// slice in 2s), slow enough to still be moving fifteen seconds later.
+const STARTUP_RAMP_MS = 5000;
+// How long to wait with no bytes before saying so.
+const SERVER_WAIT_MS = 2500;
 
 // How much of the progress bar the download phase owns, from the sample's size.
 // Both the transfer and the parse grow with size, but only the transfer also
@@ -228,11 +234,18 @@ export const loadingMixin = {
     const t0 = performance.now();
     const step = () => {
       if (!this.parsing) return this._stopStartupRamp();
-      const k = Math.min(1, (performance.now() - t0) / STARTUP_RAMP_MS);
-      // Ease out, so it glides into the floor instead of stopping dead on it.
-      const v = STARTUP_FLOOR * (1 - (1 - k) * (1 - k));
+      const elapsed = performance.now() - t0;
+      // Approaches the floor without ever arriving, so the bar keeps easing for
+      // as long as the answer takes instead of parking on a number.
+      const v = STARTUP_FLOOR * (1 - Math.exp(-elapsed / STARTUP_RAMP_MS));
       if (v > this.progress) this.progress = v;
-      this._startupRamp = k < 1 ? requestAnimationFrame(step) : null;
+      // Nothing has been received yet and it has been a while: name the wait,
+      // rather than leaving a stalled bar to imply the app is stuck. The first
+      // byte replaces this with the download's own label.
+      if (elapsed >= SERVER_WAIT_MS && !this._downloadStart) {
+        this.progressPhase = 'Waiting for the server…';
+      }
+      this._startupRamp = requestAnimationFrame(step);
     };
     this._startupRamp = requestAnimationFrame(step);
   },
