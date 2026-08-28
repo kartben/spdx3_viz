@@ -454,13 +454,19 @@ export const compatibilityMixin = {
     if (!finding.parsed) {
       return `"${finding.label}" is not a license expression the matrix can be read for, so no claim is made about it.`;
     }
-    if (finding.sameLicense) return 'Same license as the outbound work.';
 
     // Read from the element's name rather than a declared expression, which is
     // worth saying: the name is free text, so the identifier is inferred.
     const source = finding.named
       ? ' This element declares no SPDX expression, so the check reads its name.'
       : '';
+    // A choice expression that resolves to the outbound license is worth
+    // explaining as the branch it took, not just as "the same license".
+    if (finding.sameLicense) {
+      return finding.choice
+        ? `Satisfied by taking ${finding.alternative[0]}, the same license as the outbound work.${source}`
+        : 'Same license as the outbound work.';
+    }
 
     if (finding.status === 'compatible') {
       const via = finding.choice
@@ -502,10 +508,28 @@ export const compatibilityMixin = {
 
   // ---- outbound candidates ------------------------------------------------
 
+  // Matrix identifiers this document already uses, so an equally good candidate
+  // the project has already adopted outranks one that merely sorts first.
+  get compatUsedLicenseIds() {
+    const used = new Set();
+    for (const subject of this.compatSubjects.subjects) {
+      for (const alternative of licenseAlternatives(subject.expression)) {
+        for (const token of alternative) {
+          const id = resolveLicenseToken(token).id;
+          if (id) used.add(id);
+        }
+      }
+    }
+    return used;
+  },
+
   get compatCandidates() {
     const { subjects } = this.compatSubjects;
     if (subjectsKey === candidatesKey) return candidatesVal;
-    candidatesVal = outboundCandidates(subjects, { limit: 12 });
+    candidatesVal = outboundCandidates(subjects, {
+      limit: 12,
+      prefer: this.compatUsedLicenseIds
+    });
     candidatesKey = subjectsKey;
     return candidatesVal;
   },
@@ -514,6 +538,28 @@ export const compatibilityMixin = {
   // answer for an OS image and worth saying out loud rather than implying.
   get compatHasCleanCandidate() {
     return this.compatCandidates.some((candidate) => candidate.conflict === 0);
+  },
+
+  // Candidates that actually beat the current outbound license. The ranking on
+  // its own is not an answer: offered whole it lists options worse than the one
+  // in use, and when the current pick already clears everything it is just the
+  // matrix in tie-break order. Either way it reads as a recommendation to switch
+  // when there is nothing to switch to, so the rail only shows these.
+  get compatBetterCandidates() {
+    const totals = this.compatReport.totals;
+    const conflicts = totals.conflict.licenses;
+    const review = totals.review.licenses;
+    const current = this.compatReport.outbound;
+    const used = this.compatUsedLicenseIds;
+    return this.compatCandidates
+      .filter(
+        (candidate) =>
+          candidate.id !== current &&
+          (candidate.conflict < conflicts ||
+            (candidate.conflict === conflicts && candidate.review < review))
+      )
+      .slice(0, 6)
+      .map((candidate) => ({ ...candidate, used: used.has(candidate.id) }));
   },
 
   // ---- the matrix ---------------------------------------------------------
