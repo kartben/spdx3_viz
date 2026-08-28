@@ -5,6 +5,7 @@ import {
   GRAPH_LAYOUTS,
   graphLayoutMeta
 } from '../lib/index.js';
+import { nextPaint } from './paint.js';
 
 /* Force graph: thin bridge between the Alpine component and the D3 renderer in
    graph-view.js, plus selecting a node into the detail panel.
@@ -12,7 +13,7 @@ import {
    The renderer (2,000 lines plus its d3 modules) loads on first use, mirroring
    the mermaid and highlight.js patterns, so a session that never opens the
    Graph view never downloads it. The dynamic import resolves from cache after
-   the first call, so re-renders stay effectively synchronous. */
+   the first call, so a re-render costs only the frame renderGraph defers by. */
 
 export const graphMixin = {
   selectGraphNode(spdxId) {
@@ -22,8 +23,21 @@ export const graphMixin = {
     this.detailElement = el || this.placeholderElement(spdxId);
     this._scheduleNavPush();
   },
+  // Building the graph is one long synchronous pass over every element and
+  // relationship in the SBOM, so it is worth running exactly once per request.
+  // Deferring by a frame lets same-moment requests collapse into one build:
+  // opening the Graph view schedules two of them (the currentView watcher, and
+  // the post-parse hook when a share link lands straight in the graph), and the
+  // whole build used to run twice back to back on that path.
   renderGraph() {
-    import('../graph/graph-view.js').then(({ renderGraph }) => renderGraph(this));
+    const build = ++this._graphBuildSeq;
+    return nextPaint()
+      .then(() => import('../graph/graph-view.js'))
+      .then(({ renderGraph }) => {
+        if (build !== this._graphBuildSeq) return; // a newer render took over
+        renderGraph(this);
+      })
+      .catch((err) => console.error('Graph render failed:', err));
   },
   updateGraph() {
     this.renderGraph();
