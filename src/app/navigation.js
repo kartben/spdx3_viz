@@ -185,7 +185,11 @@ export const navigationMixin = {
   // should pin so a recipient sees the verdict that was actually shared; it
   // walks the license list, so it is not worth computing from other views.
   _compatNavState() {
-    if (this.currentView !== 'licenses' || this.licenseViewMode !== 'compatibility') {
+    if (
+      !this.licenseCompatAvailable ||
+      this.currentView !== 'licenses' ||
+      this.licenseViewMode !== 'compatibility'
+    ) {
       return { licenseMode: 'inventory' };
     }
     return {
@@ -327,7 +331,13 @@ export const navigationMixin = {
   // link. An outbound license in the link is treated as a deliberate choice, so
   // the default guess does not overwrite it.
   _applyCompatNavState(state) {
-    this.licenseViewMode = state.licenseMode === 'compatibility' ? 'compatibility' : 'inventory';
+    // A link built elsewhere can carry the compatibility tab; on a host that
+    // withholds it, fall back to the inventory rather than restoring a tab the
+    // user cannot see.
+    this.licenseViewMode =
+      state.licenseMode === 'compatibility' && this.licenseCompatAvailable
+        ? 'compatibility'
+        : 'inventory';
     if (this.licenseViewMode !== 'compatibility') return;
     this.compatPanel = state.compatPanel === 'matrix' ? 'matrix' : 'check';
     this.compatEdgeFilter = state.compatEdges === 'distributed' ? 'distributed' : 'all';

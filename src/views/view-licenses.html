@@ -4,8 +4,10 @@
   :class="licenseViewMode === 'compatibility' ? 'max-w-6xl' : 'max-w-4xl'"
 >
   <div class="list-sticky flex items-center gap-2.5 flex-wrap">
+    <!-- One mode is no choice, so the switch itself goes with the tab. -->
     <div
       class="flex items-center gap-0.5 bg-slate-900/70 border border-slate-700 rounded-lg p-0.5 flex-shrink-0"
+      x-show="licenseCompatAvailable"
     >
       <template
         x-for="mode in [
@@ -27,7 +29,7 @@
     </div>
 
     <!-- Inventory controls -->
-    <template x-if="licenseViewMode === 'inventory'">
+    <template x-if="!licenseCompatAvailable || licenseViewMode === 'inventory'">
       <div class="flex-1 flex items-center gap-2.5 min-w-0">
         <span class="text-sm text-slate-400" x-text="`${filteredLicenses.length} licenses`"></span>
         <input
@@ -49,7 +51,7 @@
     </template>
 
     <!-- Compatibility controls -->
-    <template x-if="licenseViewMode === 'compatibility'">
+    <template x-if="licenseCompatAvailable && licenseViewMode === 'compatibility'">
       <div class="flex-1 flex items-center gap-2 min-w-0 flex-wrap">
         <div
           class="flex items-center gap-0.5 bg-slate-900/70 border border-slate-700 rounded-lg p-0.5 flex-shrink-0"
@@ -249,7 +251,7 @@
   </div>
 
   <!-- Inventory -->
-  <div x-show="licenseViewMode === 'inventory'" class="space-y-3">
+  <div x-show="!licenseCompatAvailable || licenseViewMode === 'inventory'" class="space-y-3">
     <template
       x-for="lic in (mountedViews.licenses ? renderSlice('licenses', filteredLicenses) : [])"
       :key="lic.id"
@@ -427,8 +429,39 @@
 
   <!-- Compatibility: the outbound check and the pairwise matrix, both computed
        against the vendored OSADL matrix (see lib/compatibility.js). -->
-  <template x-if="licenseViewMode === 'compatibility'">
+  <template x-if="licenseCompatAvailable && licenseViewMode === 'compatibility'">
     <div class="space-y-4 fade-in">
+      <!-- First thing on every compatibility screen, and deliberately not
+           dismissible. The panel below renders red crosses next to real
+           products, which is exactly the kind of output people quote at each
+           other; the amber is kept distinct from the verdict banner underneath
+           so it reads as a standing notice rather than as a result. -->
+      <div
+        class="rounded-xl border border-amber-500/50 bg-amber-500/10 px-4 py-3.5 flex items-start gap-3"
+      >
+        <svg
+          class="w-5 h-5 text-amber-400 flex-shrink-0 mt-px"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+          />
+        </svg>
+        <div class="min-w-0">
+          <p class="text-sm font-semibold text-amber-200">This is not legal advice.</p>
+          <p class="text-xs text-slate-300 mt-1 leading-relaxed">
+            Compatibility depends on many factors your SBOM may not capture, or may get wrong. Only
+            a lawyer can make that call.
+          </p>
+        </div>
+      </div>
+
       <template x-if="!compatOutboundLicense">
         <div class="card text-sm text-slate-400 leading-relaxed">
           None of the licenses in this document are covered by the OSADL compatibility matrix, so

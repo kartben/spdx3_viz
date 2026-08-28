@@ -986,3 +986,29 @@ export const RELATIONSHIP_SORT_ORDER = {
   'hasConcludedLicense:in': 29,
   'hasDeclaredLicense:in': 30
 };
+
+/**
+ * Hosts that serve this app without the license compatibility check.
+ *
+ * The check renders a verdict on whether licenses may be combined. Served from
+ * SPDX's own tools domain that reads as SPDX taking a position on license
+ * compatibility, which SPDX deliberately does not do: the specification
+ * describes how to record licensing, not how licenses interact. The analysis
+ * stays available everywhere else, where it is plainly this tool's own reading
+ * of the OSADL matrix.
+ *
+ * Matched on host alone, so any path under the host is covered.
+ * @constant {Set<string>}
+ */
+export const LICENSE_COMPAT_HIDDEN_HOSTS = new Set(['tools.spdx.org']);
+
+/**
+ * Whether the Licenses view offers its compatibility check on this host.
+ *
+ * @param {string} [hostname] - defaults to the current location's host
+ * @returns {boolean}
+ */
+export function isLicenseCompatAvailable(hostname) {
+  const host = hostname ?? (typeof location === 'undefined' ? '' : location.hostname || '');
+  return !LICENSE_COMPAT_HIDDEN_HOSTS.has(String(host).toLowerCase());
+}
