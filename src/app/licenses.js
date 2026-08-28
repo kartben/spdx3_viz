@@ -15,6 +15,7 @@ import {
   analyzeSbomLicenses,
   compatStatusMeta,
   describeCompatibility,
+  formatInboundList,
   formatMatrixTimestamp,
   COMPAT_VERDICT_META,
   OSADL_CHECKLISTS_URL,
@@ -449,14 +450,25 @@ export const licensesMixin = {
   },
 
   visibleCompatConflicts() {
-    const all = this.licenseCompatReport?.conflicts || [];
+    const all = this.licenseCompatReport?.groupedConflicts || [];
     if (this.licenseCompatShowAllConflicts) return all;
     return all.slice(0, CONFLICT_PREVIEW);
   },
 
   hiddenCompatConflictCount() {
-    const total = this.licenseCompatReport?.conflicts?.length || 0;
+    const total = this.licenseCompatReport?.groupedConflicts?.length || 0;
     return this.licenseCompatShowAllConflicts ? 0 : Math.max(0, total - CONFLICT_PREVIEW);
+  },
+
+  formatGroupedConflictInbounds(inbounds) {
+    return formatInboundList(inbounds);
+  },
+
+  groupedConflictTitle(row) {
+    const outbound = row?.outbound || 'this license';
+    return (row?.inbounds || [])
+      .map((inbound) => `A project under ${outbound} cannot include ${inbound}`)
+      .join('\n');
   },
 
   compatCellStatus(outbound, inbound) {

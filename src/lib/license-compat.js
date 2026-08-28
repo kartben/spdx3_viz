@@ -380,6 +380,27 @@ function expressionForLicense(id, elementMap, label, matrix) {
 }
 
 /**
+ * Short label for a license id that may be a URL or a LicenseRef.
+ *
+ * @param {string} id
+ * @returns {string}
+ */
+export function shortLicenseLabel(id) {
+  const raw = String(id || '').trim();
+  if (!raw) return '';
+  const ref = raw.match(/LicenseRef-[A-Za-z0-9.+-]+/);
+  if (ref) return ref[0];
+  if (/^https?:\/\//i.test(raw)) {
+    try {
+      return decodeURIComponent(raw.split('/').pop() || raw) || raw;
+    } catch {
+      return raw.split('/').pop() || raw;
+    }
+  }
+  return raw;
+}
+
+/**
  * Builds the license-view compatibility report for one SBOM.
  *
  * @param {Array<{id: string, label: string, userCount?: number}>} licenses
@@ -394,6 +415,7 @@ export function analyzeSbomLicenses(licenses, elementMap, matrix) {
     atoms: [],
     pairwise: {},
     conflicts: [],
+    groupedConflicts: [],
     checks: [],
     candidates: [],
     sbomCandidates: [],
@@ -460,7 +482,7 @@ export function analyzeSbomLicenses(licenses, elementMap, matrix) {
       if (!unsupportedMap.has(atom)) {
         unsupportedMap.set(atom, {
           id: atom,
-          label: atom,
+          label: shortLicenseLabel(atom),
           userCount: 0,
           sourceIds: []
         });
@@ -490,6 +512,8 @@ export function analyzeSbomLicenses(licenses, elementMap, matrix) {
       else if (status === COMPAT_STATUS.CHECK) checks.push({ outbound, inbound, status });
     }
   }
+
+  const groupedConflicts = groupConflictsByOutbound(conflicts);
 
   const supportedTrees = entries
     .filter((entry) => entry.tree && entry.supportedAtoms.length && !entry.unsupportedAtoms.length)
@@ -567,6 +591,7 @@ export function analyzeSbomLicenses(licenses, elementMap, matrix) {
     atoms,
     pairwise,
     conflicts,
+    groupedConflicts,
     checks,
     candidates,
     sbomCandidates,
@@ -577,6 +602,43 @@ export function analyzeSbomLicenses(licenses, elementMap, matrix) {
     atomCount: atoms.length,
     supportedEntryCount: entries.filter((e) => e.supportedAtoms.length).length
   };
+}
+
+/**
+ * Collapses pairwise "cannot include" rows into one row per outbound license
+ * so a large SBOM doesn't dump hundreds of lines.
+ *
+ * @param {Array<{outbound: string, inbound: string}>} conflicts
+ * @returns {Array<{outbound: string, inbounds: string[]}>}
+ */
+export function groupConflictsByOutbound(conflicts) {
+  const byOut = new Map();
+  for (const row of conflicts || []) {
+    if (!row?.outbound || !row?.inbound) continue;
+    if (!byOut.has(row.outbound)) byOut.set(row.outbound, []);
+    byOut.get(row.outbound).push(row.inbound);
+  }
+  return [...byOut.entries()]
+    .map(([outbound, inbounds]) => ({
+      outbound,
+      inbounds: [...new Set(inbounds)].sort((a, b) => a.localeCompare(b))
+    }))
+    .sort((a, b) => b.inbounds.length - a.inbounds.length || a.outbound.localeCompare(b.outbound));
+}
+
+/**
+ * Compact "A, B, and N more" label for a grouped cannot-include list.
+ *
+ * @param {string[]} inbounds
+ * @param {{preview?: number, maxPlain?: number}} [opts]
+ * @returns {string}
+ */
+export function formatInboundList(inbounds, opts = {}) {
+  const list = Array.isArray(inbounds) ? inbounds : [];
+  const preview = opts.preview ?? 2;
+  const maxPlain = opts.maxPlain ?? 3;
+  if (list.length <= maxPlain) return list.join(', ');
+  return `${list.slice(0, preview).join(', ')}, and ${list.length - preview} more`;
 }
 
 /**

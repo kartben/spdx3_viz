@@ -14,8 +14,11 @@ import {
   outboundCandidates,
   analyzeSbomLicenses,
   describeCompatibility,
+  formatInboundList,
   formatMatrixTimestamp,
+  groupConflictsByOutbound,
   isCompatYes,
+  shortLicenseLabel,
   COMPAT_STATUS,
   COMPAT_VERDICT,
   andTrees
@@ -194,6 +197,10 @@ describe('analyzeSbomLicenses', () => {
     );
     assert.equal(report.sbomCandidates[0].id, 'GPL-2.0-only');
     assert.ok(report.conflicts.some((c) => c.outbound === 'MIT' && c.inbound === 'GPL-2.0-only'));
+    assert.deepEqual(
+      report.groupedConflicts.map((g) => [g.outbound, g.inbounds]),
+      [['MIT', ['GPL-2.0-only']]]
+    );
     assert.equal(report.byId[licenses[0].id].kind, 'conflict');
     assert.equal(report.byId[licenses[1].id].kind, 'ok');
     assert.equal(report.showMatrix, true);
@@ -242,6 +249,36 @@ describe('analyzeSbomLicenses', () => {
     );
     assert.equal(report.verdict, COMPAT_VERDICT.INCOMPLETE);
     assert.equal(report.candidates.length, 0);
+  });
+
+  it('groups pairwise conflicts by outbound license', () => {
+    assert.deepEqual(
+      groupConflictsByOutbound([
+        { outbound: 'MIT', inbound: 'GPL-2.0-only' },
+        { outbound: 'MIT', inbound: 'GPL-3.0-only' },
+        { outbound: 'MIT', inbound: 'GPL-2.0-only' },
+        { outbound: 'Apache-2.0', inbound: 'GPL-2.0-only' }
+      ]).map((g) => [g.outbound, g.inbounds]),
+      [
+        ['MIT', ['GPL-2.0-only', 'GPL-3.0-only']],
+        ['Apache-2.0', ['GPL-2.0-only']]
+      ]
+    );
+  });
+
+  it('shortens LicenseRef URLs and SPDX license URLs', () => {
+    assert.equal(shortLicenseLabel('MIT'), 'MIT');
+    assert.equal(shortLicenseLabel('https://spdx.org/licenses/Apache-2.0'), 'Apache-2.0');
+    assert.equal(
+      shortLicenseLabel('https://example.com/LicenseRef-Arbor-Proprietary'),
+      'LicenseRef-Arbor-Proprietary'
+    );
+  });
+
+  it('summarizes long inbound lists', () => {
+    assert.equal(formatInboundList(['A', 'B']), 'A, B');
+    assert.equal(formatInboundList(['A', 'B', 'C']), 'A, B, C');
+    assert.equal(formatInboundList(['A', 'B', 'C', 'D']), 'A, B, and 2 more');
   });
 
   it('describes cells in outbound-includes-inbound language', () => {

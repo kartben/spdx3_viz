@@ -124,22 +124,22 @@
         <div class="space-y-1" x-show="licenseCompatReport.conflicts.length">
           <div class="text-[10px] uppercase tracking-wider text-slate-500">Cannot include</div>
           <ul class="space-y-0.5">
-            <template
-              x-for="row in visibleCompatConflicts()"
-              :key="row.outbound + '>' + row.inbound"
-            >
+            <template x-for="row in visibleCompatConflicts()" :key="'cf-' + row.outbound">
               <li>
                 <button
                   type="button"
                   class="text-xs text-left text-slate-300 hover:text-white w-full"
-                  :title="compatCellDescription(row.outbound, row.inbound)"
+                  :title="groupedConflictTitle(row)"
                   @click="licenseCompatReport.showMatrix
-                    ? selectCompatCell(row.outbound, row.inbound)
+                    ? selectCompatCell(row.outbound, row.inbounds[0])
                     : jumpToCompatLicense(row.outbound)"
                 >
                   <span class="font-mono text-rose-300" x-text="row.outbound"></span>
                   <span class="text-slate-500"> cannot include </span>
-                  <span class="font-mono text-rose-200" x-text="row.inbound"></span>
+                  <span
+                    class="font-mono text-rose-200"
+                    x-text="formatGroupedConflictInbounds(row.inbounds)"
+                  ></span>
                 </button>
               </li>
             </template>
@@ -151,6 +151,14 @@
             @click="licenseCompatShowAllConflicts = true"
             x-text="'+' + hiddenCompatConflictCount() + ' more'"
           ></button>
+          <button
+            type="button"
+            class="text-[11px] text-slate-500 hover:text-slate-300"
+            x-show="licenseCompatShowAllConflicts && licenseCompatReport.groupedConflicts.length > 8"
+            @click="licenseCompatShowAllConflicts = false"
+          >
+            Show less
+          </button>
         </div>
 
         <div
@@ -477,30 +485,68 @@
               If you ship as this license
             </div>
             <div
-              class="text-xs text-slate-300"
+              class="text-xs text-slate-300 space-y-1"
               x-show="(licenseCompatInfo(lic.id)?.asOutbound.yes || []).length"
             >
-              <span class="text-emerald-400">Can include</span>
-              <span class="text-slate-500"> · </span>
-              <span
-                class="font-mono text-slate-300"
-                x-text="(licenseCompatInfo(lic.id)?.asOutbound.yes || []).join(', ')"
-              ></span>
+              <div class="text-emerald-400">Can include</div>
+              <div class="flex flex-wrap gap-1">
+                <template
+                  x-for="id in licenseCompatInfo(lic.id)?.asOutbound.yes || []"
+                  :key="'yes-' + lic.id + '-' + id"
+                >
+                  <button
+                    type="button"
+                    class="badge font-mono text-[10px] bg-emerald-500/10 text-emerald-200 hover:bg-emerald-500/20"
+                    :title="'Open ' + id"
+                    @click.stop="jumpToCompatLicense(id)"
+                    x-text="id"
+                  ></button>
+                </template>
+              </div>
             </div>
             <div
-              class="text-xs text-slate-300"
+              class="text-xs text-slate-300 space-y-1"
               x-show="(licenseCompatInfo(lic.id)?.asOutbound.no || []).length"
             >
-              <span class="text-rose-400">Cannot include</span>
-              <span class="text-slate-500"> · </span>
-              <span
-                class="font-mono text-slate-300"
-                x-text="(licenseCompatInfo(lic.id)?.asOutbound.no || []).join(', ')"
-              ></span>
+              <div class="text-rose-400">Cannot include</div>
+              <div class="flex flex-wrap gap-1">
+                <template
+                  x-for="id in licenseCompatInfo(lic.id)?.asOutbound.no || []"
+                  :key="'no-' + lic.id + '-' + id"
+                >
+                  <button
+                    type="button"
+                    class="badge font-mono text-[10px] bg-rose-500/10 text-rose-200 hover:bg-rose-500/20"
+                    :title="'Open ' + id"
+                    @click.stop="jumpToCompatLicense(id)"
+                    x-text="id"
+                  ></button>
+                </template>
+              </div>
+            </div>
+            <div
+              class="text-xs text-slate-300 space-y-1"
+              x-show="(licenseCompatInfo(lic.id)?.asOutbound.check || []).length"
+            >
+              <div class="text-amber-400">Check</div>
+              <div class="flex flex-wrap gap-1">
+                <template
+                  x-for="id in licenseCompatInfo(lic.id)?.asOutbound.check || []"
+                  :key="'chk-' + lic.id + '-' + id"
+                >
+                  <button
+                    type="button"
+                    class="badge font-mono text-[10px] bg-amber-500/10 text-amber-200 hover:bg-amber-500/20"
+                    :title="'Open ' + id"
+                    @click.stop="jumpToCompatLicense(id)"
+                    x-text="id"
+                  ></button>
+                </template>
+              </div>
             </div>
             <div
               class="text-xs text-slate-400"
-              x-show="!(licenseCompatInfo(lic.id)?.asOutbound.yes || []).length && !(licenseCompatInfo(lic.id)?.asOutbound.no || []).length && licenseCompatKind(lic.id) === 'ok'"
+              x-show="!(licenseCompatInfo(lic.id)?.asOutbound.yes || []).length && !(licenseCompatInfo(lic.id)?.asOutbound.no || []).length && !(licenseCompatInfo(lic.id)?.asOutbound.check || []).length && licenseCompatKind(lic.id) === 'ok'"
             >
               No other OSADL licenses in this SBOM to compare.
             </div>
