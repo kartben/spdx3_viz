@@ -11,7 +11,7 @@ via the "What's new" link.
 - **Fixed:** Build-heavy SBOMs no longer drag the graph down to a few frames per second.
 - **Improved:** The graph opens much faster the first time on huge SBOMs.
 - **Fixed:** Loading a huge SBOM no longer stalls in a background tab.
-- **Added:** Check whether everything can ship under one license.
+- **Added:** License compatibility analyzer.
 
 ## [0.5.0] - 2026-08-22
 

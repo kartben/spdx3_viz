@@ -35,7 +35,7 @@ export const CHANGELOG = [
       },
       {
         tag: 'Added',
-        text: 'Check whether everything can ship under one license.'
+        text: 'License compatibility analyzer.'
       }
     ]
   },
