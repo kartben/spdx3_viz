@@ -344,6 +344,7 @@ export function createState() {
     graphExpandedCount: 0, // reactive mirror of expandedClusters.size (Set mutations aren't tracked)
     graphNodeCount: 0, // live readout of rendered nodes/edges
     graphEdgeCount: 0,
+    _graphBuildSeq: 0, // render request counter; a newer one supersedes a pending build
     graphTruncated: false, // true when the guard rail capped an un-aggregated render
     graphSearchQuery: '', // search box in the graph controls bar
     graphSearchFullText: false, // false = name/id only, true = whole element JSON

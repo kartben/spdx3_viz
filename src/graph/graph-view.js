@@ -279,13 +279,13 @@ export function renderGraph(app, retry = 0) {
   const scopeAllows = (scope) => !scopeFiltersActive || activeScopes.has(scope);
 
   // 1. Underlying nodes (one per SPDX element that passes the type filters).
-  const uNodeIds = new Set();
   const uNodes = [];
   const uNodeById = new Map();
 
   const addNode = (spdxId, rel = null, role = 'target') => {
     if (!spdxId) return null;
-    if (uNodeIds.has(spdxId)) return uNodeById.get(spdxId);
+    const seen = uNodeById.get(spdxId);
+    if (seen) return seen;
 
     // A virtual (online-scan) vulnerability isn't in elementMap (kept out so the
     // SBOM element count stays true), so fall back to the scan's own map.
@@ -307,7 +307,6 @@ export function renderGraph(app, retry = 0) {
     if (!activeNodeTypes.has(type)) return null;
 
     const node = { id: spdxId, name: el.name || cleanName(spdxId), type, data: el };
-    uNodeIds.add(spdxId);
     uNodeById.set(spdxId, node);
     uNodes.push(node);
     return node;
@@ -430,7 +429,6 @@ export function renderGraph(app, retry = 0) {
       const id = uNodes[i].id;
       if (!linked.has(id)) {
         uNodes.splice(i, 1);
-        uNodeIds.delete(id);
         uNodeById.delete(id);
       }
     }
