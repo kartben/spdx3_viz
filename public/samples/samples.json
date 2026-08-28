@@ -2,7 +2,7 @@
   {
     "id": "zephyr",
     "name": "Zephyr RTOS",
-    "emoji": "🪁",
+    "emoji": "\ud83e\ude81",
     "description": "A Zephyr application targeting an ESP32 board, and using LVGL for the GUI.",
     "dir": "samples/zephyr",
     "files": ["app.jsonld", "modules-deps.jsonld", "zephyr.jsonld", "build.jsonld"],
@@ -11,8 +11,8 @@
   {
     "id": "zephyr-experimental",
     "name": "Zephyr RTOS (SPDX 3.1)",
-    "emoji": "🪁",
-    "description": "Same application, but with an SPDX 3.1 SBOM.<br/>⚠️ SPDX 3.1 support is not yet available in upstream <code>west spdx</code> tooling.",
+    "emoji": "\ud83e\ude81",
+    "description": "Same application, but with an SPDX 3.1 SBOM.<br/>\u26a0\ufe0f SPDX 3.1 support is not yet available in upstream <code>west spdx</code> tooling.",
     "dir": "samples/zephyr-experimental",
     "files": [
       "app.jsonld",
@@ -25,9 +25,26 @@
     "size": 8892305
   },
   {
+    "id": "zephyr-uber",
+    "name": "Zephyr RTOS (everything)",
+    "emoji": "\ud83e\ude81",
+    "description": "The same application with every profile at once: Build, Hardware, Functional Safety, and the routines that reached the image, down to the line ranges they are made of.",
+    "dir": "samples/zephyr-uber",
+    "files": [
+      "app.jsonld",
+      "modules-deps.jsonld",
+      "zephyr.jsonld",
+      "build.jsonld",
+      "sdk.jsonld",
+      "safety.jsonld",
+      "snippets.jsonld"
+    ],
+    "size": 35332237
+  },
+  {
     "id": "linux",
     "name": "Linux kernel",
-    "emoji": "🐧",
+    "emoji": "\ud83d\udc27",
     "description": "Linux kernel build: source tree, build environment, and <code>bzImage</code> output.",
     "dir": "samples/linux",
     "files": ["sbom-source.spdx.json", "sbom-output.spdx.json", "sbom-build.spdx.json"],
@@ -130,7 +147,7 @@
   {
     "id": "ai",
     "name": "AI / ML model",
-    "emoji": "🤖",
+    "emoji": "\ud83e\udd16",
     "description": "AI-BOM for the SimpleHTR handwriting model, using the SPDX AI and Dataset profiles.",
     "dir": "samples/ai",
     "files": ["simplehtr-example.spdx3.json"],
@@ -158,7 +175,7 @@
   {
     "id": "paper-plane",
     "name": "Paper plane supply chain (synthetic)",
-    "emoji": "✈️",
+    "emoji": "\u2708\ufe0f",
     "description": "Minimalistic paper plane supply chain sample showing design, folding, and flight testing. (Other complex samples are commented out in the manifest.)",
     "dir": "samples/paper-plane",
     "files": ["paper-plane-supply-chain.spdx3.jsonld"],
