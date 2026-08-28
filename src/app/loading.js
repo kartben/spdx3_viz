@@ -812,6 +812,15 @@ export const loadingMixin = {
       this._resetListMemos(); // invalidate the build + vulnerability sort memos for new data
       this._resetSearchMemos(); // and the global-search corpus / results memos
       this._resetImpactMemos(); // and the impact ranking / blast-radius caches
+      this._resetCompatMemos(); // and the license compatibility report / matrix
+      // Drop the previous SBOM's compatibility choices: its outbound license and
+      // scoped package mean nothing here.
+      this.compatOutbound = '';
+      this.compatOutboundTouched = false;
+      this.compatScope = '';
+      this.compatEdgeFilter = 'all';
+      this.compatStatusFilter = '';
+      this.licenseViewMode = 'inventory';
       // Fresh data: reset the streaming cursors so every list view streams its
       // (new) content on next visit, and kick the one currently shown.
       this._resetStreaming();

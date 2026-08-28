@@ -32,6 +32,25 @@ export const IMPACT_EDGE_TYPES = new Set([
 // so nothing is missed, but flagged so paths through them can be de-prioritized.
 const SOFT_EDGE_TYPES = new Set(['hasOptionalComponent', 'hasProvidedDependency']);
 
+/**
+ * The subset of {@link IMPACT_EDGE_TYPES} that puts a component inside what you
+ * hand over. License obligations attach to distribution, so this is the edge set
+ * a compatibility check should follow: what ships, not merely what is needed.
+ *
+ * Excluded are `hasOptionalComponent` (may not ship at all),
+ * `hasProvidedDependency` (supplied by the runtime environment, not by you) and
+ * `hasPrerequisite` (has to be present before use, but is not part of the
+ * product).
+ * @type {Set<string>}
+ */
+export const DISTRIBUTED_EDGE_TYPES = new Set([
+  'dependsOn',
+  'contains',
+  'hasStaticLink',
+  'hasDynamicLink',
+  'hasDistributionArtifact'
+]);
+
 const EDGE_VERB = {
   dependsOn: 'depends on',
   contains: 'contains',

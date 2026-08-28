@@ -1,193 +1,874 @@
-<div x-show="currentView === 'licenses'" class="fade-in space-y-3 max-w-4xl">
-  <div class="list-sticky flex items-center gap-3">
-    <span class="text-sm text-slate-400" x-text="`${filteredLicenses.length} licenses`"></span>
-    <input
-      x-model.debounce.150ms="licenseSearch"
-      @input.debounce.150ms="restreamView('licenses')"
-      type="text"
-      placeholder="Search licenses…"
-      class="ml-auto bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-pink-500 w-48"
-    />
-    <select
-      x-model="licenseSort"
-      @change="restreamView('licenses')"
-      class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 text-slate-300 focus:outline-none focus:border-pink-500"
-    >
-      <option value="usage">Sort by usage</option>
-      <option value="name">Sort by name</option>
-    </select>
-  </div>
-  <template
-    x-for="lic in (mountedViews.licenses ? renderSlice('licenses', filteredLicenses) : [])"
-    :key="lic.id"
-  >
+<div
+  x-show="currentView === 'licenses'"
+  class="fade-in space-y-3"
+  :class="licenseViewMode === 'compatibility' ? 'max-w-6xl' : 'max-w-4xl'"
+>
+  <div class="list-sticky flex items-center gap-2.5 flex-wrap">
     <div
-      class="card"
-      data-nav-kind="license"
-      :data-nav-id="lic.id"
-      :class="isNavTarget('license', lic.id) && 'target-focus'"
+      class="flex items-center gap-0.5 bg-slate-900/70 border border-slate-700 rounded-lg p-0.5 flex-shrink-0"
     >
-      <div class="flex items-center gap-3 cursor-pointer" @click="toggleLicense(lic.id)">
-        <div
-          class="w-8 h-8 rounded-lg bg-pink-500/15 flex items-center justify-center flex-shrink-0"
-        >
-          <span
-            class="flex items-center justify-center text-pink-400"
-            x-html="nodeTypeIconSvg('license', 'w-4 h-4')"
-          ></span>
-        </div>
-        <div class="flex-1 min-w-0">
-          <button
-            type="button"
-            class="font-semibold text-pink-200 text-sm font-mono break-words text-left hover:text-pink-100 hover:underline decoration-pink-500/50 underline-offset-2"
-            :title="canShowLicenseText(lic.id) ? licenseTextActionLabel(lic.id) : (licenseIndividualTooltip(lic.id) || lic.label)"
-            @click.stop="showLicenseText(lic.id)"
-            x-text="lic.label"
-          ></button>
-          <div
-            class="text-xs text-slate-500"
-            x-text="lic.userCount + (lic.userCount === 1 ? ' element' : ' elements')"
-          ></div>
-        </div>
-        <div class="flex items-center gap-2 flex-shrink-0">
-          <span
-            x-show="lic.declaredBy.length > 0"
-            class="badge bg-pink-500/15 text-pink-400"
-            x-text="lic.declaredBy.length + ' declared'"
-          ></span>
-          <span
-            x-show="lic.concludedBy.length > 0"
-            class="badge bg-purple-500/15 text-purple-400"
-            x-text="lic.concludedBy.length + ' concluded'"
-          ></span>
-          <svg
-            class="w-4 h-4 text-slate-500 transition-transform"
-            :class="expandedLicense === lic.id && 'rotate-180'"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M19 9l-7 7-7-7"
-            />
-          </svg>
-        </div>
-      </div>
-      <!-- Expanded detail -->
-      <template x-if="expandedLicense === lic.id">
-        <div class="mt-4 pt-4 border-t border-slate-700 fade-in">
-          <!-- Summary / description from the underlying license element, when present -->
-          <div
-            class="space-y-3 mb-4 sm:pl-11"
-            x-show="isMeaningful(elementMap.get(lic.id)?.summary) || isMeaningful(elementMap.get(lic.id)?.description)"
-          >
-            <div x-show="isMeaningful(elementMap.get(lic.id)?.summary)">
-              <div class="text-xs text-slate-500 mb-1">Summary</div>
-              <div
-                class="text-xs text-slate-300 whitespace-pre-wrap break-words"
-                x-text="elementMap.get(lic.id)?.summary"
-              ></div>
-            </div>
-            <div
-              x-show="isMeaningful(elementMap.get(lic.id)?.description) && elementMap.get(lic.id)?.description !== elementMap.get(lic.id)?.summary"
-            >
-              <div class="text-xs text-slate-500 mb-1">Description</div>
-              <div
-                class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-32 overflow-y-auto"
-                x-text="elementMap.get(lic.id)?.description"
-              ></div>
-            </div>
-          </div>
+      <template
+        x-for="mode in [
+          { key: 'inventory', label: 'Inventory' },
+          { key: 'compatibility', label: 'Compatibility' }
+        ]"
+        :key="mode.key"
+      >
+        <button
+          type="button"
+          @click="setLicenseViewMode(mode.key)"
+          class="px-2.5 py-1 rounded-md text-xs font-medium transition-colors"
+          :class="licenseViewMode === mode.key
+            ? 'bg-pink-500/20 text-pink-300'
+            : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700'"
+          x-text="mode.label"
+        ></button>
+      </template>
+    </div>
 
-          <div class="flex flex-wrap items-center gap-2 mb-4 sm:pl-11">
+    <!-- Inventory controls -->
+    <template x-if="licenseViewMode === 'inventory'">
+      <div class="flex-1 flex items-center gap-2.5 min-w-0">
+        <span class="text-sm text-slate-400" x-text="`${filteredLicenses.length} licenses`"></span>
+        <input
+          x-model.debounce.150ms="licenseSearch"
+          @input.debounce.150ms="restreamView('licenses')"
+          type="text"
+          placeholder="Search licenses…"
+          class="ml-auto bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-pink-500 w-48"
+        />
+        <select
+          x-model="licenseSort"
+          @change="restreamView('licenses')"
+          class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 text-slate-300 focus:outline-none focus:border-pink-500"
+        >
+          <option value="usage">Sort by usage</option>
+          <option value="name">Sort by name</option>
+        </select>
+      </div>
+    </template>
+
+    <!-- Compatibility controls -->
+    <template x-if="licenseViewMode === 'compatibility'">
+      <div class="flex-1 flex items-center gap-2 min-w-0 flex-wrap">
+        <div
+          class="flex items-center gap-0.5 bg-slate-900/70 border border-slate-700 rounded-lg p-0.5 flex-shrink-0"
+        >
+          <template
+            x-for="panel in [
+              { key: 'check', label: 'Outbound check' },
+              { key: 'matrix', label: 'Matrix' }
+            ]"
+            :key="panel.key"
+          >
             <button
               type="button"
-              x-show="canShowLicenseText(lic.id)"
-              class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-pink-500/15 text-pink-300 hover:bg-pink-500/25 transition-colors"
-              @click.stop="showLicenseText(lic.id)"
+              @click="compatPanel = panel.key"
+              class="px-2.5 py-1 rounded-md text-xs font-medium transition-colors"
+              :class="compatPanel === panel.key
+                ? 'bg-slate-700 text-slate-100'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/60'"
+              x-text="panel.label"
+            ></button>
+          </template>
+        </div>
+
+        <div class="ml-auto flex items-center gap-2 flex-wrap justify-end">
+          <!-- Outbound license picker -->
+          <div
+            class="relative"
+            x-show="compatPanel === 'check'"
+            @click.outside="compatOutboundPickerOpen = false"
+          >
+            <button
+              type="button"
+              @click="compatOutboundPickerOpen = !compatOutboundPickerOpen"
+              class="flex items-center gap-2 bg-slate-800 border rounded-lg text-xs px-2.5 py-1.5 max-w-[19rem] transition-colors"
+              :class="compatOutboundPickerOpen ? 'border-pink-500' : 'border-slate-700 hover:border-slate-600'"
             >
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <span class="text-slate-500 flex-shrink-0">Ship all under</span>
+              <span
+                class="font-mono text-pink-300 truncate"
+                x-text="compatOutboundLicense || 'pick a license'"
+              ></span>
+              <svg
+                class="w-3 h-3 text-slate-500 flex-shrink-0 transition-transform"
+                :class="compatOutboundPickerOpen && 'rotate-180'"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   stroke-width="2"
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  d="M19 9l-7 7-7-7"
                 />
               </svg>
-              <span x-text="licenseTextActionLabel(lic.id)"></span>
             </button>
-          </div>
-          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <!-- Declared by -->
-            <div class="sm:pl-11">
-              <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-                Declared by
-              </div>
-              <div class="space-y-1" x-show="lic.declaredBy.length > 0">
-                <template
-                  x-for="u in lic.declaredBy.slice(0, revealLimit('licDecl:' + lic.id))"
-                  :key="u"
-                >
-                  <div
-                    class="text-xs text-pink-400 hover:text-pink-300 cursor-pointer flex items-center gap-1.5"
-                    @click.stop="navigateTo(u)"
-                  >
-                    <span class="w-1.5 h-1.5 rounded-full bg-pink-500/50"></span>
-                    <span class="truncate" x-text="relTargetDisplayName(u)"></span>
-                  </div>
+            <div
+              x-show="compatOutboundPickerOpen"
+              x-cloak
+              class="search-dropdown absolute right-0 mt-1.5 w-72 bg-slate-800 border border-slate-700 rounded-lg shadow-2xl z-30 p-2"
+            >
+              <input
+                x-model.debounce.100ms="compatOutboundSearch"
+                type="text"
+                placeholder="Search the OSADL matrix…"
+                class="w-full bg-slate-900 border border-slate-700 rounded-md text-xs px-2.5 py-1.5 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-pink-500"
+              />
+              <div class="mt-2 max-h-64 overflow-y-auto space-y-0.5">
+                <template x-for="id in compatOutboundOptions" :key="id">
+                  <button
+                    type="button"
+                    @click="setCompatOutbound(id)"
+                    class="w-full text-left font-mono text-xs px-2 py-1.5 rounded-md truncate transition-colors"
+                    :class="id === compatOutboundLicense
+                      ? 'bg-pink-500/15 text-pink-300'
+                      : 'text-slate-300 hover:bg-slate-700'"
+                    x-text="id"
+                  ></button>
                 </template>
-                <button
-                  x-show="lic.declaredBy.length > revealLimit('licDecl:' + lic.id)"
-                  @click.stop="revealMore('licDecl:' + lic.id)"
-                  class="text-xs text-slate-500 hover:text-slate-300 mt-1"
-                  x-text="'+' + formatCount(lic.declaredBy.length - revealLimit('licDecl:' + lic.id)) + ' more'"
-                ></button>
-              </div>
-              <div x-show="lic.declaredBy.length === 0" class="text-xs text-slate-600 italic">
-                None
+                <div
+                  x-show="compatOutboundOptions.length === 0"
+                  class="text-xs text-slate-500 italic px-2 py-3 text-center"
+                >
+                  No license matches
+                </div>
               </div>
             </div>
-            <!-- Concluded by -->
-            <div>
-              <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-                Concluded by
-              </div>
-              <div class="space-y-1" x-show="lic.concludedBy.length > 0">
-                <template
-                  x-for="u in lic.concludedBy.slice(0, revealLimit('licConc:' + lic.id))"
-                  :key="u"
+          </div>
+
+          <!-- Scope picker -->
+          <div
+            class="relative"
+            x-show="canScopeCompat"
+            @click.outside="compatScopePickerOpen = false"
+          >
+            <button
+              type="button"
+              @click="compatScopePickerOpen = !compatScopePickerOpen"
+              class="flex items-center gap-2 bg-slate-800 border rounded-lg text-xs px-2.5 py-1.5 max-w-[17rem] transition-colors"
+              :class="compatScopePickerOpen ? 'border-pink-500' : 'border-slate-700 hover:border-slate-600'"
+            >
+              <span class="text-slate-500 flex-shrink-0">Scope</span>
+              <span class="text-slate-200 truncate" x-text="compatScopeLabel"></span>
+              <svg
+                class="w-3 h-3 text-slate-500 flex-shrink-0 transition-transform"
+                :class="compatScopePickerOpen && 'rotate-180'"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+            <div
+              x-show="compatScopePickerOpen"
+              x-cloak
+              class="search-dropdown absolute right-0 mt-1.5 w-80 bg-slate-800 border border-slate-700 rounded-lg shadow-2xl z-30 p-2"
+            >
+              <input
+                x-model.debounce.100ms="compatScopeSearch"
+                type="text"
+                placeholder="Search packages…"
+                class="w-full bg-slate-900 border border-slate-700 rounded-md text-xs px-2.5 py-1.5 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-pink-500"
+              />
+              <p class="text-[11px] text-slate-500 mt-2 px-1 leading-relaxed">
+                Narrow to one package and everything it pulls in, which is the unit a compatibility
+                check is really about.
+              </p>
+              <div class="mt-1.5 max-h-64 overflow-y-auto space-y-0.5">
+                <button
+                  type="button"
+                  @click="setCompatScope('')"
+                  class="w-full text-left text-xs px-2 py-1.5 rounded-md transition-colors"
+                  :class="!compatScope ? 'bg-pink-500/15 text-pink-300' : 'text-slate-300 hover:bg-slate-700'"
                 >
-                  <div
-                    class="text-xs text-purple-400 hover:text-purple-300 cursor-pointer flex items-center gap-1.5"
-                    @click.stop="navigateTo(u)"
+                  Whole document
+                </button>
+                <template x-for="opt in compatScopeOptions" :key="opt.id">
+                  <button
+                    type="button"
+                    @click="setCompatScope(opt.id)"
+                    class="w-full grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 text-left text-xs px-2 py-1.5 rounded-md transition-colors"
+                    :class="compatScope === opt.id
+                      ? 'bg-pink-500/15 text-pink-300'
+                      : 'text-slate-300 hover:bg-slate-700'"
                   >
-                    <span class="w-1.5 h-1.5 rounded-full bg-purple-500/50"></span>
-                    <span class="truncate" x-text="relTargetDisplayName(u)"></span>
+                    <span class="font-mono truncate" x-text="opt.label"></span>
+                    <span
+                      class="text-[11px] text-slate-500 tabular-nums"
+                      x-text="opt.deps + ' deps'"
+                    ></span>
+                  </button>
+                </template>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="flex items-center gap-0.5 bg-slate-900/70 border border-slate-700 rounded-lg p-0.5 flex-shrink-0"
+            x-show="canFilterCompatEdges"
+            title="Distributed only follows just the edges that put a component inside what you hand over, dropping optional, environment-provided and prerequisite dependencies."
+          >
+            <template
+              x-for="edge in [
+                { key: 'all', label: 'All deps' },
+                { key: 'distributed', label: 'Distributed only' }
+              ]"
+              :key="edge.key"
+            >
+              <button
+                type="button"
+                @click="setCompatEdgeFilter(edge.key)"
+                class="px-2.5 py-1 rounded-md text-xs font-medium transition-colors"
+                :class="compatEdgeFilter === edge.key
+                  ? 'bg-slate-700 text-slate-100'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/60'"
+                x-text="edge.label"
+              ></button>
+            </template>
+          </div>
+
+          <button
+            type="button"
+            x-show="compatPanel === 'matrix' && compatMatrixCanExpand"
+            @click="compatMatrixAll = !compatMatrixAll"
+            class="bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 transition-colors"
+            x-text="compatMatrixAll ? 'Show most used' : 'Show all'"
+          ></button>
+        </div>
+      </div>
+    </template>
+  </div>
+
+  <!-- Inventory -->
+  <div x-show="licenseViewMode === 'inventory'" class="space-y-3">
+    <template
+      x-for="lic in (mountedViews.licenses ? renderSlice('licenses', filteredLicenses) : [])"
+      :key="lic.id"
+    >
+      <div
+        class="card"
+        data-nav-kind="license"
+        :data-nav-id="lic.id"
+        :class="isNavTarget('license', lic.id) && 'target-focus'"
+      >
+        <div class="flex items-center gap-3 cursor-pointer" @click="toggleLicense(lic.id)">
+          <div
+            class="w-8 h-8 rounded-lg bg-pink-500/15 flex items-center justify-center flex-shrink-0"
+          >
+            <span
+              class="flex items-center justify-center text-pink-400"
+              x-html="nodeTypeIconSvg('license', 'w-4 h-4')"
+            ></span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <button
+              type="button"
+              class="font-semibold text-pink-200 text-sm font-mono break-words text-left hover:text-pink-100 hover:underline decoration-pink-500/50 underline-offset-2"
+              :title="canShowLicenseText(lic.id) ? licenseTextActionLabel(lic.id) : (licenseIndividualTooltip(lic.id) || lic.label)"
+              @click.stop="showLicenseText(lic.id)"
+              x-text="lic.label"
+            ></button>
+            <div
+              class="text-xs text-slate-500"
+              x-text="lic.userCount + (lic.userCount === 1 ? ' element' : ' elements')"
+            ></div>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <span
+              x-show="lic.declaredBy.length > 0"
+              class="badge bg-pink-500/15 text-pink-400"
+              x-text="lic.declaredBy.length + ' declared'"
+            ></span>
+            <span
+              x-show="lic.concludedBy.length > 0"
+              class="badge bg-purple-500/15 text-purple-400"
+              x-text="lic.concludedBy.length + ' concluded'"
+            ></span>
+            <svg
+              class="w-4 h-4 text-slate-500 transition-transform"
+              :class="expandedLicense === lic.id && 'rotate-180'"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </div>
+        </div>
+        <!-- Expanded detail -->
+        <template x-if="expandedLicense === lic.id">
+          <div class="mt-4 pt-4 border-t border-slate-700 fade-in">
+            <!-- Summary / description from the underlying license element, when present -->
+            <div
+              class="space-y-3 mb-4 sm:pl-11"
+              x-show="isMeaningful(elementMap.get(lic.id)?.summary) || isMeaningful(elementMap.get(lic.id)?.description)"
+            >
+              <div x-show="isMeaningful(elementMap.get(lic.id)?.summary)">
+                <div class="text-xs text-slate-500 mb-1">Summary</div>
+                <div
+                  class="text-xs text-slate-300 whitespace-pre-wrap break-words"
+                  x-text="elementMap.get(lic.id)?.summary"
+                ></div>
+              </div>
+              <div
+                x-show="isMeaningful(elementMap.get(lic.id)?.description) && elementMap.get(lic.id)?.description !== elementMap.get(lic.id)?.summary"
+              >
+                <div class="text-xs text-slate-500 mb-1">Description</div>
+                <div
+                  class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-32 overflow-y-auto"
+                  x-text="elementMap.get(lic.id)?.description"
+                ></div>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2 mb-4 sm:pl-11">
+              <button
+                type="button"
+                x-show="canShowLicenseText(lic.id)"
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-pink-500/15 text-pink-300 hover:bg-pink-500/25 transition-colors"
+                @click.stop="showLicenseText(lic.id)"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+                <span x-text="licenseTextActionLabel(lic.id)"></span>
+              </button>
+            </div>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <!-- Declared by -->
+              <div class="sm:pl-11">
+                <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                  Declared by
+                </div>
+                <div class="space-y-1" x-show="lic.declaredBy.length > 0">
+                  <template
+                    x-for="u in lic.declaredBy.slice(0, revealLimit('licDecl:' + lic.id))"
+                    :key="u"
+                  >
+                    <div
+                      class="text-xs text-pink-400 hover:text-pink-300 cursor-pointer flex items-center gap-1.5"
+                      @click.stop="navigateTo(u)"
+                    >
+                      <span class="w-1.5 h-1.5 rounded-full bg-pink-500/50"></span>
+                      <span class="truncate" x-text="relTargetDisplayName(u)"></span>
+                    </div>
+                  </template>
+                  <button
+                    x-show="lic.declaredBy.length > revealLimit('licDecl:' + lic.id)"
+                    @click.stop="revealMore('licDecl:' + lic.id)"
+                    class="text-xs text-slate-500 hover:text-slate-300 mt-1"
+                    x-text="'+' + formatCount(lic.declaredBy.length - revealLimit('licDecl:' + lic.id)) + ' more'"
+                  ></button>
+                </div>
+                <div x-show="lic.declaredBy.length === 0" class="text-xs text-slate-600 italic">
+                  None
+                </div>
+              </div>
+              <!-- Concluded by -->
+              <div>
+                <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                  Concluded by
+                </div>
+                <div class="space-y-1" x-show="lic.concludedBy.length > 0">
+                  <template
+                    x-for="u in lic.concludedBy.slice(0, revealLimit('licConc:' + lic.id))"
+                    :key="u"
+                  >
+                    <div
+                      class="text-xs text-purple-400 hover:text-purple-300 cursor-pointer flex items-center gap-1.5"
+                      @click.stop="navigateTo(u)"
+                    >
+                      <span class="w-1.5 h-1.5 rounded-full bg-purple-500/50"></span>
+                      <span class="truncate" x-text="relTargetDisplayName(u)"></span>
+                    </div>
+                  </template>
+                  <button
+                    x-show="lic.concludedBy.length > revealLimit('licConc:' + lic.id)"
+                    @click.stop="revealMore('licConc:' + lic.id)"
+                    class="text-xs text-slate-500 hover:text-slate-300 mt-1"
+                    x-text="'+' + formatCount(lic.concludedBy.length - revealLimit('licConc:' + lic.id)) + ' more'"
+                  ></button>
+                </div>
+                <div x-show="lic.concludedBy.length === 0" class="text-xs text-slate-600 italic">
+                  None
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
+    </template>
+    <div
+      x-show="mountedViews.licenses && filteredLicenses.length === 0"
+      class="text-sm text-slate-500 italic text-center py-8"
+    >
+      No licenses found
+    </div>
+  </div>
+
+  <!-- Compatibility: the outbound check and the pairwise matrix, both computed
+       against the vendored OSADL matrix (see lib/compatibility.js). -->
+  <template x-if="licenseViewMode === 'compatibility'">
+    <div class="space-y-4 fade-in">
+      <template x-if="!compatOutboundLicense">
+        <div class="card text-sm text-slate-400 leading-relaxed">
+          None of the licenses in this document are covered by the OSADL compatibility matrix, so
+          there is nothing to check them against. The matrix rates 119 widely used licenses; custom
+          <code class="font-mono text-slate-300">LicenseRef-</code> licenses are never among them.
+        </div>
+      </template>
+
+      <!-- Outbound check -->
+      <template x-if="compatOutboundLicense && compatPanel === 'check'">
+        <div class="space-y-4">
+          <div
+            class="rounded-xl border px-4 py-3 flex items-start gap-3"
+            :class="compatHasConflicts
+              ? 'border-rose-500/40 bg-rose-500/5'
+              : 'border-emerald-500/40 bg-emerald-500/5'"
+          >
+            <svg
+              class="w-4 h-4 flex-shrink-0 mt-0.5"
+              :class="compatHasConflicts ? 'text-rose-400' : 'text-emerald-400'"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                x-show="compatHasConflicts"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+              <path
+                x-show="!compatHasConflicts"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+            <p class="text-sm text-slate-200 leading-relaxed" x-text="compatHeadline"></p>
+          </div>
+
+          <div
+            x-show="compatIsProprietary"
+            class="rounded-lg border border-slate-700 bg-slate-800/60 px-3.5 py-2.5 text-xs text-slate-400 leading-relaxed"
+          >
+            OSADL rates open source licenses against each other and has no proprietary row, so this
+            answer is derived: a component clears a closed-source product when every permissive
+            outbound license in the matrix can absorb it. Weak-copyleft licenses (LGPL, MPL, EPL and
+            the like) therefore show as conflicts here, though whether they are usable in a closed
+            product depends on how you link them, which the matrix does not model.
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <template x-for="tile in compatTiles" :key="tile.id">
+              <button
+                type="button"
+                @click="toggleCompatStatusFilter(tile.id)"
+                class="text-left rounded-xl border bg-slate-800 px-3.5 py-2.5 transition-colors"
+                :class="compatStatusFilter === tile.id
+                  ? 'border-slate-500'
+                  : 'border-slate-700 hover:border-slate-600'"
+              >
+                <div
+                  class="text-2xl font-semibold tabular-nums leading-tight text-white"
+                  x-text="formatCount(tile.licenses)"
+                ></div>
+                <div
+                  class="text-xs font-semibold mt-0.5"
+                  :class="compatStatusAccent(tile.id)"
+                  x-text="tile.label"
+                ></div>
+                <div
+                  class="text-[11px] text-slate-500 tabular-nums"
+                  x-text="tile.elements ? formatCount(tile.elements) + (tile.elements === 1 ? ' element' : ' elements') : 'none'"
+                ></div>
+              </button>
+            </template>
+          </div>
+
+          <div
+            class="grid grid-cols-1 xl:grid-cols-[minmax(0,1.6fr)_minmax(17rem,0.4fr)] gap-4 items-start"
+          >
+            <!-- Findings -->
+            <div class="space-y-2">
+              <div class="flex items-baseline gap-3">
+                <h3
+                  class="text-sm font-semibold text-white"
+                  x-text="compatStatusFilter ? compatStatusLabel(compatStatusFilter) : 'Every license in scope'"
+                ></h3>
+                <span
+                  class="text-xs text-slate-500 tabular-nums"
+                  x-text="formatCount(compatFindings.length)"
+                ></span>
+                <button
+                  type="button"
+                  x-show="compatStatusFilter"
+                  @click="compatStatusFilter = ''"
+                  class="ml-auto text-xs text-slate-400 hover:text-slate-200"
+                >
+                  Clear filter
+                </button>
+              </div>
+
+              <div class="space-y-1.5">
+                <template x-for="finding in compatVisibleFindings" :key="finding.id">
+                  <div
+                    class="bg-slate-800 border rounded-lg px-3.5 py-2.5 transition-colors"
+                    :class="expandedCompat === finding.id ? 'border-pink-500/40' : 'border-slate-700'"
+                  >
+                    <div
+                      class="flex items-center gap-3 cursor-pointer"
+                      @click="expandedCompat = expandedCompat === finding.id ? null : finding.id"
+                    >
+                      <span
+                        class="font-mono text-xs text-pink-200 truncate flex-1 min-w-0"
+                        x-text="finding.label"
+                      ></span>
+                      <span
+                        class="text-[11px] text-slate-500 tabular-nums flex-shrink-0"
+                        x-show="finding.elementCount"
+                        x-text="formatCount(finding.elementCount) + (finding.elementCount === 1 ? ' element' : ' elements')"
+                      ></span>
+                      <span
+                        class="badge flex-shrink-0"
+                        :class="compatStatusBadge(finding.status)"
+                        x-text="finding.sameLicense ? 'Same license' : compatStatusLabel(finding.status)"
+                      ></span>
+                      <svg
+                        class="w-3.5 h-3.5 text-slate-500 transition-transform flex-shrink-0"
+                        :class="expandedCompat === finding.id && 'rotate-180'"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </div>
+
+                    <template x-if="expandedCompat === finding.id">
+                      <div class="mt-3 pt-3 border-t border-slate-700 space-y-3 fade-in">
+                        <p
+                          class="text-xs text-slate-300 leading-relaxed"
+                          x-text="compatFindingReason(finding)"
+                        ></p>
+                        <div
+                          class="text-[11px] text-slate-500 font-mono"
+                          x-show="compatFindingRule(finding)"
+                          x-text="compatFindingRule(finding)"
+                        ></div>
+                        <div x-show="finding.elementCount">
+                          <div
+                            class="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-1.5"
+                          >
+                            Carried by
+                          </div>
+                          <div class="flex flex-wrap gap-1.5">
+                            <template x-for="id in compatFindingElements(finding)" :key="id">
+                              <button
+                                type="button"
+                                @click.stop="navigateTo(id)"
+                                class="font-mono text-[11px] bg-slate-900 border border-slate-700 hover:border-slate-500 text-blue-300 rounded px-2 py-1 truncate max-w-[16rem] transition-colors"
+                                x-text="relTargetDisplayName(id)"
+                              ></button>
+                            </template>
+                            <button
+                              type="button"
+                              x-show="compatFindingHiddenCount(finding)"
+                              @click.stop="revealMore('compatEl:' + finding.id)"
+                              class="text-[11px] text-slate-500 hover:text-slate-300 px-2 py-1"
+                              x-text="'+' + formatCount(compatFindingHiddenCount(finding)) + ' more'"
+                            ></button>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          x-show="canShowLicenseText(finding.id)"
+                          @click.stop="showLicenseText(finding.id)"
+                          class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-pink-500/15 text-pink-300 hover:bg-pink-500/25 transition-colors"
+                        >
+                          <svg
+                            class="w-3.5 h-3.5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                            />
+                          </svg>
+                          <span x-text="licenseTextActionLabel(finding.id)"></span>
+                        </button>
+                      </div>
+                    </template>
                   </div>
                 </template>
-                <button
-                  x-show="lic.concludedBy.length > revealLimit('licConc:' + lic.id)"
-                  @click.stop="revealMore('licConc:' + lic.id)"
-                  class="text-xs text-slate-500 hover:text-slate-300 mt-1"
-                  x-text="'+' + formatCount(lic.concludedBy.length - revealLimit('licConc:' + lic.id)) + ' more'"
-                ></button>
               </div>
-              <div x-show="lic.concludedBy.length === 0" class="text-xs text-slate-600 italic">
-                None
+
+              <button
+                type="button"
+                x-show="compatHiddenFindingCount"
+                @click="revealMore('compat:' + compatStatusFilter)"
+                class="text-xs text-slate-500 hover:text-slate-300"
+                x-text="'Show ' + formatCount(compatHiddenFindingCount) + ' more'"
+              ></button>
+
+              <div
+                x-show="compatFindings.length === 0"
+                class="text-sm text-slate-500 italic text-center py-8"
+              >
+                No licenses in this bucket
+              </div>
+
+              <p class="text-[11px] text-slate-600 leading-relaxed pt-1">
+                Element counts overlap: one package often declares several licenses, so the four
+                figures above do not sum to the number of elements.
+              </p>
+            </div>
+
+            <!-- Candidates and coverage -->
+            <div class="space-y-3">
+              <div class="card">
+                <h3 class="text-sm font-semibold text-white">Better outbound licenses</h3>
+                <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                  Ranked by how many licenses here they cannot absorb. Pick one to re-run the check.
+                </p>
+                <div class="space-y-0.5 mt-3">
+                  <template x-for="candidate in compatCandidates" :key="candidate.id">
+                    <button
+                      type="button"
+                      @click="setCompatOutbound(candidate.id)"
+                      class="w-full grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg px-2.5 py-1.5 text-left border transition-colors"
+                      :class="candidate.id === compatReport.outbound
+                        ? 'border-pink-500/40 bg-pink-500/5'
+                        : 'border-transparent hover:bg-slate-700/40'"
+                    >
+                      <span
+                        class="font-mono text-xs text-slate-200 truncate"
+                        x-text="candidate.id"
+                      ></span>
+                      <span
+                        class="text-[11px] tabular-nums whitespace-nowrap"
+                        :class="candidate.conflict ? 'text-rose-400' : 'text-emerald-400'"
+                        x-text="candidate.conflict === 0
+                          ? 'no conflicts'
+                          : formatCount(candidate.conflict) + (candidate.review ? ' + ' + formatCount(candidate.review) + ' to check' : ' conflicts')"
+                      ></span>
+                    </button>
+                  </template>
+                </div>
+                <p
+                  x-show="!compatHasCleanCandidate"
+                  class="text-xs text-slate-500 mt-3 leading-relaxed"
+                >
+                  No license in the matrix clears everything in scope. That is the normal answer for
+                  a whole OS image, where packages ship alongside each other rather than as one
+                  combined work. Narrow the scope to a single package to ask a sharper question.
+                </p>
+              </div>
+
+              <div class="card" x-show="compatUnassertedCount">
+                <h3 class="text-sm font-semibold text-white">Coverage</h3>
+                <div class="flex items-baseline gap-2 mt-2">
+                  <span
+                    class="text-2xl font-semibold text-slate-300 tabular-nums"
+                    x-text="formatCount(compatUnassertedCount)"
+                  ></span>
+                  <span class="text-xs text-slate-500">elements declare no license</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+                  Nothing can be checked for them, so the verdict above covers only the
+                  <span
+                    class="text-slate-400"
+                    x-text="formatCount(compatReport.elementCount)"
+                  ></span>
+                  elements that do carry one. That is a completeness gap in the SBOM rather than a
+                  compatibility problem.
+                </p>
+                <button
+                  type="button"
+                  @click="switchView('remediation')"
+                  class="mt-3 text-xs text-pink-300 hover:text-pink-200"
+                >
+                  See what else is missing
+                </button>
               </div>
             </div>
           </div>
         </div>
       </template>
+
+      <!-- Pairwise matrix -->
+      <template x-if="compatOutboundLicense && compatPanel === 'matrix'">
+        <div class="space-y-3">
+          <div class="flex items-center gap-3 flex-wrap">
+            <span class="badge bg-slate-700/60 text-slate-300">
+              <span x-text="formatCount(compatMatrix.conflictPairs)"></span>
+              <span
+                class="ml-1"
+                x-text="compatMatrix.conflictPairs === 1 ? 'pair conflicts both ways' : 'pairs conflict both ways'"
+              ></span>
+            </span>
+            <span
+              class="text-xs text-slate-500"
+              x-show="compatMatrix.unrated"
+              x-text="formatCount(compatMatrix.unrated) + ' not plotted: compound expressions, or not in the matrix'"
+            ></span>
+            <span
+              class="text-xs text-slate-500"
+              x-show="compatMatrix.hidden"
+              x-text="formatCount(compatMatrix.hidden) + ' more plottable licenses hidden'"
+            ></span>
+          </div>
+
+          <div
+            x-show="compatMatrix.rows.length === 0"
+            class="card text-sm text-slate-400 leading-relaxed"
+          >
+            None of this document's licenses resolve to a single identifier the matrix rates, so
+            there is no grid to draw. Compound expressions and custom
+            <code class="font-mono text-slate-300">LicenseRef-</code> licenses cannot be plotted.
+          </div>
+
+          <div
+            x-show="compatMatrix.rows.length > 0"
+            class="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_18rem] gap-4 items-start"
+          >
+            <div class="card overflow-x-auto">
+              <table class="border-separate" style="border-spacing: 2px">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <template x-for="lic in compatMatrix.licenses" :key="'h' + lic.id">
+                      <th class="align-bottom p-0" style="height: 108px">
+                        <div
+                          class="font-mono text-[11px] text-slate-400 whitespace-nowrap text-left w-[22px]"
+                          style="
+                            transform: rotate(-52deg) translateX(4px);
+                            transform-origin: bottom left;
+                          "
+                          x-text="lic.label"
+                        ></div>
+                      </th>
+                    </template>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template x-for="(row, r) in compatMatrix.rows" :key="row.id">
+                    <tr>
+                      <th
+                        class="font-mono text-[11px] font-normal text-slate-300 text-right pr-2 whitespace-nowrap max-w-[15rem] truncate"
+                        x-text="compatMatrix.licenses[r].label"
+                      ></th>
+                      <template x-for="(cell, c) in row.cells" :key="row.id + ':' + c">
+                        <td
+                          class="w-[22px] h-[22px] rounded"
+                          :class="[
+                            compatStatusCell(cell.status),
+                            cell.same && 'ring-1 ring-slate-500',
+                            compatMatrixHover && compatMatrixHover.row === r && compatMatrixHover.col === c
+                              ? 'outline outline-2 outline-offset-1 outline-pink-400'
+                              : ''
+                          ]"
+                          :title="'Outbound ' + compatMatrix.licenses[r].label + ' accepting inbound ' + compatMatrix.licenses[c].label + ': ' + (cell.same ? 'Same license' : compatStatusLabel(cell.status))"
+                          @mouseenter="setCompatMatrixHover(r, c)"
+                          @mouseleave="setCompatMatrixHover(null)"
+                        ></td>
+                      </template>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="card space-y-3">
+              <div>
+                <h3 class="text-sm font-semibold text-white">Reading the grid</h3>
+                <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                  A row is the license of the combined work, a column the license of a component
+                  going into it. The relation runs one way, so the two halves differ.
+                </p>
+              </div>
+
+              <template x-if="compatMatrixExplanation">
+                <div
+                  class="rounded-lg border border-slate-600 bg-slate-900/70 px-3 py-2.5 space-y-1.5"
+                >
+                  <div class="font-mono text-[11px] text-slate-200 leading-snug">
+                    <span x-text="compatMatrixExplanation.outbound"></span>
+                    <span class="text-slate-500 mx-1">&larr;</span>
+                    <span x-text="compatMatrixExplanation.inbound"></span>
+                  </div>
+                  <p
+                    class="text-xs text-slate-300 leading-relaxed"
+                    x-text="compatMatrixExplanation.sentence"
+                  ></p>
+                  <span
+                    class="badge"
+                    :class="compatStatusBadge(compatMatrixExplanation.status)"
+                    x-text="compatMatrixExplanation.label"
+                  ></span>
+                </div>
+              </template>
+              <p x-show="!compatMatrixExplanation" class="text-xs text-slate-500 italic">
+                Hover a cell to see what it means.
+              </p>
+
+              <div class="flex flex-wrap gap-1.5 pt-1">
+                <template x-for="status in compatStatuses" :key="status.id">
+                  <span
+                    class="badge"
+                    :class="compatStatusBadge(status.id)"
+                    x-text="status.label"
+                  ></span>
+                </template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <p class="text-[11px] text-slate-600 leading-relaxed">
+        Compatibility rules from the
+        <a
+          :href="compatMatrixUrl"
+          target="_blank"
+          rel="noopener"
+          class="text-slate-500 hover:text-slate-300 underline decoration-slate-700 underline-offset-2"
+          >OSADL license compatibility matrix</a
+        >, dated <span x-text="compatMatrixDate"></span>, covering 119 licenses. Informational only,
+        not legal advice.
+      </p>
     </div>
   </template>
-  <div
-    x-show="mountedViews.licenses && filteredLicenses.length === 0"
-    class="text-sm text-slate-500 italic text-center py-8"
-  >
-    No licenses found
-  </div>
 </div>

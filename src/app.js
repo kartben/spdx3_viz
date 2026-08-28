@@ -9,6 +9,7 @@ import { searchMixin } from './app/search.js';
 import { paletteMixin } from './app/palette.js';
 import { securityMixin } from './app/security.js';
 import { licensesMixin } from './app/licenses.js';
+import { compatibilityMixin } from './app/compatibility.js';
 import { graphMixin } from './app/graph.js';
 import { rawMixin } from './app/raw.js';
 import { changelogMixin } from './app/changelog.js';
@@ -76,6 +77,7 @@ const mixins = [
   paletteMixin,
   securityMixin,
   licensesMixin,
+  compatibilityMixin,
   graphMixin,
   rawMixin,
   changelogMixin,

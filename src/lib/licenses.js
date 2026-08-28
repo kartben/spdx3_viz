@@ -312,18 +312,39 @@ export function extractSpdxLicenseId(id, elementMap) {
  * @returns {LicenseExpressionPart[]}
  */
 export function extractLicenseExpressionParts(expression) {
+  const tree = parseLicenseExpression(expression);
+  return tree ? collectLicenseExpressionParts(tree) : [];
+}
+
+/**
+ * @typedef {{ type: 'id', id: string }
+ *   | { type: 'with', licenseId: string, exceptionId: string }
+ *   | { type: 'compound', op: 'AND' | 'OR', left: LicenseExpressionNode, right: LicenseExpressionNode }
+ * } LicenseExpressionNode
+ */
+
+/**
+ * Parses an SPDX license expression into a syntax tree. AND binds tighter than
+ * OR, per Annex D of the SPDX spec, so `A OR B AND C` reads as `A OR (B AND C)`.
+ * Returns null for anything that isn't a well-formed expression, including the
+ * NoAssertion / NONE individuals, which are values rather than expressions.
+ *
+ * @see https://spdx.github.io/spdx-spec/v3.0.1/annexes/spdx-license-expressions/
+ * @param {string} expression
+ * @returns {LicenseExpressionNode|null}
+ */
+export function parseLicenseExpression(expression) {
   const expr = String(expression || '').trim();
-  if (!expr || expr.includes('NoAssertion')) return [];
+  if (!expr || expr.includes('NoAssertion')) return null;
 
   try {
     const tokens = tokenizeLicenseExpression(expr);
-    if (!tokens.length) return [];
+    if (!tokens.length) return null;
     const parser = new LicenseExpressionParser(tokens);
     const tree = parser.parseExpression();
-    if (parser.peek()?.type !== 'EOF') return [];
-    return collectLicenseExpressionParts(tree);
+    return parser.peek()?.type === 'EOF' ? tree : null;
   } catch {
-    return [];
+    return null;
   }
 }
 
@@ -399,11 +420,20 @@ class LicenseExpressionParser {
     return this.advance();
   }
 
+  // OR is the loosest operator, so it sits at the top of the precedence chain:
+  // parseExpression -> parseAndExpr -> parseWithExpr -> parsePrimary.
   parseExpression() {
+    let node = this.parseAndExpr();
+    while (this.match('OR')) {
+      node = { type: 'compound', op: 'OR', left: node, right: this.parseAndExpr() };
+    }
+    return node;
+  }
+
+  parseAndExpr() {
     let node = this.parseWithExpr();
-    while (this.match('AND', 'OR')) {
-      const op = this.tokens[this.pos - 1].type;
-      node = { type: 'compound', op, left: node, right: this.parseWithExpr() };
+    while (this.match('AND')) {
+      node = { type: 'compound', op: 'AND', left: node, right: this.parseWithExpr() };
     }
     return node;
   }
