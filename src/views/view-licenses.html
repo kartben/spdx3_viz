@@ -877,63 +877,73 @@
             x-show="compatMatrix.rows.length > 0"
             class="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_18rem] gap-4 items-start"
           >
-            <div class="card overflow-x-auto">
-              <table class="border-separate" style="border-spacing: 2px">
-                <thead>
-                  <tr>
-                    <th
-                      class="sticky left-0 z-20 bg-slate-800"
-                      style="
-                        box-shadow:
-                          -1.5rem 0 0 0 #1e293b,
-                          0.4rem 0 0.4rem -0.4rem rgba(0, 0, 0, 0.6);
-                      "
-                    ></th>
-                    <template x-for="lic in compatMatrix.licenses" :key="'h' + lic.id">
-                      <th class="align-bottom p-0" style="height: 108px">
-                        <div
-                          class="font-mono text-[11px] text-slate-400 whitespace-nowrap text-left w-[22px]"
-                          style="
-                            transform: rotate(-52deg) translateX(4px);
-                            transform-origin: bottom left;
-                          "
-                          x-text="lic.label"
-                        ></div>
-                      </th>
-                    </template>
-                  </tr>
-                </thead>
-                <tbody>
-                  <template x-for="(row, r) in compatMatrix.rows" :key="row.id">
+            <div class="card">
+              <div class="overflow-x-auto">
+                <table class="border-separate" style="border-spacing: 2px">
+                  <thead>
                     <tr>
-                      <th
-                        class="sticky left-0 z-10 bg-slate-800 font-mono text-[11px] font-normal text-slate-300 text-right pr-2 whitespace-nowrap max-w-[15rem] truncate"
-                        style="
-                          box-shadow:
-                            -1.5rem 0 0 0 #1e293b,
-                            0.4rem 0 0.4rem -0.4rem rgba(0, 0, 0, 0.6);
-                        "
-                        x-text="compatMatrix.licenses[r].label"
-                      ></th>
-                      <template x-for="(cell, c) in row.cells" :key="row.id + ':' + c">
-                        <td
-                          class="w-[22px] h-[22px] rounded"
-                          :class="[
-                            compatStatusCell(cell.status),
-                            cell.same && 'ring-1 ring-slate-500',
-                            compatMatrixHover && compatMatrixHover.row === r && compatMatrixHover.col === c
-                              ? 'outline outline-2 outline-offset-1 outline-pink-400'
-                              : ''
-                          ]"
-                          :title="'Outbound ' + compatMatrix.licenses[r].label + ' accepting inbound ' + compatMatrix.licenses[c].label + ': ' + (cell.same ? 'Same license' : compatStatusLabel(cell.status))"
-                          @mouseenter="setCompatMatrixHover(r, c)"
-                          @mouseleave="setCompatMatrixHover(null)"
-                        ></td>
+                      <!-- Plain spacer, deliberately not pinned. The rotated
+                         labels lean up and to the left, so the first one
+                         reaches back over this cell; pinning it opaque clipped
+                         that label at every scroll position. The row labels
+                         below are in body rows, in their own horizontal band,
+                         so they still pin without touching this. -->
+                      <th></th>
+                      <template x-for="lic in compatMatrix.licenses" :key="'h' + lic.id">
+                        <th class="align-bottom p-0" style="height: 108px">
+                          <div
+                            class="font-mono text-[11px] text-slate-400 whitespace-nowrap text-left w-[22px]"
+                            style="
+                              transform: rotate(-52deg) translateX(4px);
+                              transform-origin: bottom left;
+                            "
+                            x-text="lic.label"
+                          ></div>
+                        </th>
                       </template>
                     </tr>
-                  </template>
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    <template x-for="(row, r) in compatMatrix.rows" :key="row.id">
+                      <tr>
+                        <!-- The first shadow fills the table's 2px
+                             border-spacing below each pinned label; without it
+                             the cells sliding underneath peek through the gaps
+                             between rows. The second marks the column as
+                             pinned. -->
+                        <th
+                          class="sticky left-0 z-10 bg-slate-800 font-mono text-[11px] font-normal text-slate-300 text-right pr-2 whitespace-nowrap max-w-[15rem] truncate"
+                          style="
+                            box-shadow:
+                              0 2px 0 0 #1e293b,
+                              0.4rem 0 0.4rem -0.4rem rgba(0, 0, 0, 0.6);
+                          "
+                          x-text="compatMatrix.licenses[r].label"
+                        ></th>
+                        <!-- The same-license marker and the hover ring are
+                             inset: an outset shadow or outline on a table cell
+                             paints above the pinned label column when the cell
+                             scrolls underneath it, dashing across the labels. -->
+                        <template x-for="(cell, c) in row.cells" :key="row.id + ':' + c">
+                          <td
+                            class="w-[22px] h-[22px] rounded"
+                            :class="[
+                            compatStatusCell(cell.status),
+                            cell.same && 'shadow-[inset_0_0_0_1px_#64748b]',
+                            compatMatrixHover && compatMatrixHover.row === r && compatMatrixHover.col === c
+                              ? 'shadow-[inset_0_0_0_2px_#f472b6]'
+                              : ''
+                          ]"
+                            :title="'Outbound ' + compatMatrix.licenses[r].label + ' accepting inbound ' + compatMatrix.licenses[c].label + ': ' + (cell.same ? 'Same license' : compatStatusLabel(cell.status))"
+                            @mouseenter="setCompatMatrixHover(r, c)"
+                            @mouseleave="setCompatMatrixHover(null)"
+                          ></td>
+                        </template>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             <div class="card space-y-3">
