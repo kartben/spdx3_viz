@@ -32,6 +32,10 @@ export const CHANGELOG = [
       {
         tag: 'Fixed',
         text: 'Loading a huge SBOM no longer stalls in a background tab.'
+      },
+      {
+        tag: 'Added',
+        text: 'License compatibility check, outbound candidates, and a pairwise matrix.'
       }
     ]
   },

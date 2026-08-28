@@ -204,6 +204,24 @@ export function createState() {
     cveAffectedBundleStatus: 'idle', // idle | loading | done | absent
     cveAffectedGenerated: '', // bundle build date, shown in the Security UI
     licenseSort: 'usage',
+    // Licenses view: 'inventory' is the license list, 'compatibility' the
+    // outbound check and matrix built on the OSADL matrix.
+    licenseViewMode: 'inventory',
+    compatPanel: 'check', // 'check' (outbound verdict) | 'matrix' (pairwise grid)
+    compatOutbound: '', // SPDX id to combine everything under; '' until guessed
+    compatOutboundTouched: false, // true once the user picks one, so the guess stops overriding
+    compatOutboundSearch: '', // filter inside the outbound picker
+    compatOutboundPickerOpen: false,
+    compatScope: '', // '' = whole document, else a package spdxId's dependency closure
+    // 'all' counts every license in scope; 'distributed' follows only the edges
+    // that put a component inside what ships (see DISTRIBUTED_EDGE_TYPES).
+    compatEdgeFilter: 'all',
+    compatScopeSearch: '', // filter inside the scope picker
+    compatScopePickerOpen: false,
+    compatStatusFilter: '', // '' = all, else a CompatStatus the findings list is filtered to
+    compatMatrixAll: false, // false = the most-used licenses only, true = every one
+    compatMatrixHover: null, // {row, col} of the matrix cell being explained
+    expandedCompat: null, // license id of the expanded compatibility finding
     buildSort: 'output',
     pkgSort: 'name',
     pkgPurposeFilter: '', // '' = all, else a software_primaryPurpose facet key
