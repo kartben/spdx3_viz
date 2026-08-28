@@ -9,10 +9,12 @@ import { isA, CLASS } from '../spdx/model.js';
 
 // An element's node type is a pure function of its immutable fields, but
 // computing it walks the SPDX class hierarchy up to ~20 times (one isA() per
-// candidate class, each allocating a Set). On a large SBOM the graph rebuild
-// calls this once per element (hundreds of thousands of times), so memoize on
-// the element object: the first call classifies, every later one is a lookup.
-// A WeakMap lets discarded placeholder objects be collected.
+// candidate class). On a large SBOM the graph rebuild calls this once per
+// element (hundreds of thousands of times), so memoize on the element object:
+// the first call classifies, every later one is a lookup. A WeakMap lets
+// discarded placeholder objects be collected. The hierarchy walk itself is
+// memoized a second time, by type string, so even the first pass over a fresh
+// SBOM does it once per class rather than once per element (see classNodeType).
 const NODE_TYPE_CACHE = new WeakMap();
 
 /**
@@ -35,9 +37,35 @@ function computeNodeType(item) {
   // element; grouped as one 'external' node type.
   if (item.placeholder || item.type === 'ExternalReference') return 'external';
 
+  const base = classNodeType(item.type);
+  // The one node type a class alone can't settle: a File declared as (or named
+  // like) build configuration reads as config rather than source.
+  if (base === 'file') {
+    if (item.software_primaryPurpose === 'configuration' || item.spdxId?.includes('build-config')) {
+      return 'config';
+    }
+  }
+  return base;
+}
+
+// The class-hierarchy half of the classification, which is the same answer for
+// every element sharing a type. Memoized on the type string: an SBOM has a few
+// dozen distinct classes but can have a million elements, and the walk below
+// asks isA() about ~20 candidate classes each time.
+const CLASS_TYPE_CACHE = new Map();
+
+function classNodeType(type) {
+  let cached = CLASS_TYPE_CACHE.get(type);
+  if (cached === undefined) {
+    cached = computeClassNodeType(type);
+    CLASS_TYPE_CACHE.set(type, cached);
+  }
+  return cached;
+}
+
+function computeClassNodeType(t) {
   // Classify by the SPDX class hierarchy, most specific first: AI and dataset
   // packages get their own node types before the generic package.
-  const t = item.type;
   if (isA(t, CLASS.ai_AIPackage)) return 'ai';
   if (isA(t, CLASS.dataset_DatasetPackage)) return 'dataset';
   if (isA(t, CLASS.software_Package)) return 'package';
@@ -68,12 +96,7 @@ function computeNodeType(item) {
   ) {
     return 'requirement';
   }
-  if (isA(t, CLASS.software_File)) {
-    if (item.software_primaryPurpose === 'configuration' || item.spdxId?.includes('build-config')) {
-      return 'config';
-    }
-    return 'file';
-  }
+  if (isA(t, CLASS.software_File)) return 'file';
   // A snippet is a region of a file; it reads as source, close to its file.
   if (isA(t, CLASS.software_Snippet)) return 'snippet';
   if (isA(t, CLASS.Tool)) return 'tool';
