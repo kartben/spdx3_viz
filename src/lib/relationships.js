@@ -178,13 +178,27 @@ export function snippetLineLabel(element) {
 }
 
 /**
+ * The name a snippet goes by once the file it belongs to is already known.
+ *
+ * A routine snippet is named "<routine>@<path>" so that it stays unambiguous
+ * across the whole SBOM (two files can each define a static `init`). Wherever
+ * the file is clear from context, only the routine half carries information.
+ */
+export function snippetShortName(element) {
+  const name = element?.name || '';
+  const at = name.indexOf('@');
+  // One producer writes "fn@path", another "fn @ path:a-b". Same routine.
+  return at > 0 ? name.slice(0, at).trimEnd() : name;
+}
+
+/**
  * File-flavored label for a snippet link: "<file> › <function-or-line-span>",
  * so it reads as "this points at a section of <file>".
  */
 export function snippetTargetLabel(element, elementMap) {
   const ref = snippetFileRef(element, elementMap);
   if (!ref) return '';
-  const detail = ref.name || snippetLineLabel(element);
+  const detail = snippetShortName(element) || snippetLineLabel(element);
   const base = ref.baseName || 'snippet';
   return detail ? `${base} › ${detail}` : base;
 }

@@ -1592,6 +1592,91 @@
       No relationships found
     </div>
 
+    <!-- What has been said about parts of this file, one group per producer
+         (see fileSnippetOverlays). Only the build overlay opens by default;
+         a routine expands to the line ranges it is made of. -->
+    <template x-for="overlay in (detailFileSnippets || [])" :key="overlay.key">
+      <div class="detail-rel-section">
+        <button
+          type="button"
+          class="flex items-center gap-2 mb-2 w-full text-left"
+          @click="toggleSnippetOverlay(overlay.key)"
+        >
+          <span class="detail-rel-line" :style="`background: ${nodeTypeColor('snippet')}`"></span>
+          <span
+            class="text-xs font-semibold uppercase tracking-wider"
+            :style="`color: ${nodeTypeColor('snippet')}`"
+            x-text="overlay.label"
+          ></span>
+          <span class="text-[10px] text-slate-500" x-text="'(' + overlay.total + ')'"></span>
+          <svg
+            class="w-3 h-3 text-slate-500 transition-transform ml-auto"
+            :class="isSnippetOverlayOpen(overlay) && 'rotate-180'"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </button>
+        <div x-show="isSnippetOverlayOpen(overlay)" class="space-y-1 ml-3">
+          <template x-for="row in overlay.rows" :key="row.id">
+            <div>
+              <div class="detail-rel-item group" @click="selectGraphNode(row.id)">
+                <button
+                  type="button"
+                  x-show="row.children.length"
+                  class="text-slate-500 hover:text-slate-300 flex-shrink-0 w-3"
+                  @click.stop="toggleSnippetOverlay(row.id)"
+                  x-text="isSnippetOverlayOpen({ key: row.id }) ? '▾' : '▸'"
+                ></button>
+                <span x-show="!row.children.length" class="w-3 flex-shrink-0"></span>
+                <span
+                  class="flex items-center flex-shrink-0"
+                  :style="`color: ${nodeTypeColor('snippet')}`"
+                  x-html="elementIcon({ spdxId: row.id, type: 'software_Snippet' }, 'w-3.5 h-3.5')"
+                ></span>
+                <span class="flex-1 truncate font-mono text-[11px]" x-text="row.label"></span>
+                <span
+                  x-show="row.inlined"
+                  class="text-[10px] text-slate-500 flex-shrink-0"
+                  title="Every use was inlined; the image holds no out-of-line copy"
+                  >inlined</span
+                >
+                <span class="text-[10px] text-slate-500 flex-shrink-0" x-text="row.lines"></span>
+              </div>
+              <div
+                x-show="row.children.length && isSnippetOverlayOpen({ key: row.id })"
+                class="ml-6 space-y-0.5"
+              >
+                <template x-for="child in row.children" :key="child.id">
+                  <div
+                    class="detail-rel-item group text-[10px]"
+                    @click.stop="selectGraphNode(child.id)"
+                  >
+                    <span
+                      class="flex-1 truncate font-mono text-slate-400"
+                      x-text="child.label"
+                    ></span>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </template>
+        </div>
+        <div
+          x-show="isSnippetOverlayOpen(overlay) && overlay.hidden > 0"
+          class="text-[10px] text-slate-500 italic ml-3 mt-1"
+          x-text="'+' + overlay.hidden + ' more'"
+        ></div>
+      </div>
+    </template>
+
     <!-- Snippet source: the file this snippet was carved from, with the
          snippet's lines highlighted. Fills the remaining panel height (only as
          much as the file needs) and scrolls both ways since the panel is narrow.

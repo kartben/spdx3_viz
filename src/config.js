@@ -780,6 +780,20 @@ export const TAILWIND_CONFIG = {
 };
 
 /**
+ * The group a snippet lands in when a build consumed it.
+ *
+ * `hasInput` is Build-profile vocabulary, not any one project's: it says a
+ * build took the code as input. That is the group a file is usually opened
+ * for, so it is the one left open.
+ */
+export const BUILD_SNIPPET_CLAIM = 'hasInput';
+
+/** Fallback group for a snippet nothing claims. */
+// Sorts last: whatever nothing in the document accounts for is the least
+// interesting thing to read about a file.
+export const UNCLAIMED_SNIPPET = { key: 'other', label: 'Other snippets', order: 999 };
+
+/**
  * Maps relationship types and directions to human-readable labels
  * @constant {Object}
  */
@@ -814,6 +828,10 @@ export const RELATIONSHIP_LABELS = {
   'configures:in': 'Configured by',
   'runsOn:out': 'Runs on',
   'runsOn:in': 'Runs',
+  // A routine snippet points at the header prototype that announces it, so read
+  // the pair as declares/implements rather than the generic spec wording.
+  'hasSpecification:out': 'Declared in',
+  'hasSpecification:in': 'Declares',
   // FunctionalSafety profile.
   'implementedBy:out': 'Implemented by',
   'implementedBy:in': 'Implements',
@@ -952,6 +970,8 @@ export const RELATIONSHIP_SORT_ORDER = {
   'hasVariant:in': 24,
   'usesTool:out': 25,
   'usesTool:in': 26,
+  'hasSpecification:out': 27,
+  'hasSpecification:in': 28,
   'runsOn:out': 35,
   'runsOn:in': 36,
   // FunctionalSafety profile: keep a requirement's implementation, verification, evidence and assumptions grouped.

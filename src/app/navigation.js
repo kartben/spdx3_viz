@@ -37,6 +37,7 @@ const expandedFieldByView = {
    state as pure bookkeeping. */
 const INITIAL_RENDER = 200; // cards rendered when a list view first opens
 const RENDER_CHUNK = 200; // cards added per scroll step toward either end
+const DETAIL_FILE_SNIPPET_CAP = 100; // routines listed on a file before "+N more"
 // Ceiling on how many cards stay mounted at once. The window used to only ever
 // grow: scrolling through the Kubernetes sample's file list reached 207,692 DOM
 // nodes and a 960 MB heap at 12,000 rows (~17 nodes and ~67 kB each), with the
@@ -1031,6 +1032,33 @@ export const navigationMixin = {
     const el = this.detailElement;
     if (!el || el.type !== 'software_Snippet') return null;
     return snippetFileRef(el, this.elementMap);
+  },
+  // The snippets carved from the selected file, in source order. An SBOM that
+  // records what each routine contributed puts a named routine in every row,
+  // which answers "what of this file actually shipped?" directly.
+  get detailFileSnippets() {
+    const el = this.detailElement;
+    if (!el || el.type === 'software_Snippet') return null;
+    const overlays = this.fileSnippetOverlays(el.spdxId);
+    if (!overlays.length) return null;
+    return overlays.map((overlay) => ({
+      ...overlay,
+      rows: overlay.rows.slice(0, DETAIL_FILE_SNIPPET_CAP),
+      hidden: Math.max(0, overlay.rows.length - DETAIL_FILE_SNIPPET_CAP)
+    }));
+  },
+  // Open/shut state for one snippet overlay, or for one routine's line ranges.
+  // Overlays other than the build one start shut so a header carrying hundreds
+  // of snippets does not unroll the moment the file is opened.
+  isSnippetOverlayOpen(overlay) {
+    const stored = this.snippetOverlayOpen[overlay.key];
+    return stored === undefined ? Boolean(overlay.openByDefault) : stored;
+  },
+  toggleSnippetOverlay(key) {
+    this.snippetOverlayOpen = {
+      ...this.snippetOverlayOpen,
+      [key]: !this.isSnippetOverlayOpen({ key })
+    };
   },
   // Lazily fetch the source behind the selected snippet and, once per selection,
   // scroll its highlighted lines into view. Driven by x-effect in the panel.

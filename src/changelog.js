@@ -10,8 +10,16 @@ export const CHANGELOG = [
     date: null,
     items: [
       {
+        tag: 'Added',
+        text: 'A file lists what reached the image, what implements a requirement, and what tests executed.'
+      },
+      {
         tag: 'Improved',
-        text: 'Large downloads show bytes, an ETA, and never look stalled.'
+        text: 'A header prototype now reads as declaring the routine that implements it.'
+      },
+      {
+        tag: 'Improved',
+        text: 'A slow server no longer looks like a stalled load: the bar keeps easing and says it is waiting.'
       },
       {
         tag: 'Improved',
@@ -19,7 +27,7 @@ export const CHANGELOG = [
       },
       {
         tag: 'Improved',
-        text: 'Graph stays smooth while other apps compete for the GPU.'
+        text: 'Downloading a large sample shows the bytes transferred, gives the download more of the progress bar, eases the bar off zero while the request is in flight, and estimates the time left from the measured transfer rate.'
       },
       {
         tag: 'Fixed',
