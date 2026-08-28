@@ -31,13 +31,20 @@ import {
   copyToClipboard,
   licenseIndividualDescription,
   requirementDisplayName as formatRequirementDisplayName,
+  producerMetaValue,
   primaryPurposeLabel as formatPrimaryPurpose,
   splitFilePath,
   PACKAGE_GAP_META,
   PACKAGE_GAP_ORDER,
   PACKAGE_DESCRIPTION_SEGMENTS
 } from '../lib/index.js';
-import { COLORS, getScopeColor, SAFETY_STATUSES, SAFETY_NO_IMPL_META } from '../config.js';
+import {
+  COLORS,
+  getScopeColor,
+  SAFETY_ADEQUACY,
+  SAFETY_STATUSES,
+  SAFETY_NO_IMPL_META
+} from '../config.js';
 import { CLASS, isA } from '../spdx/model.js';
 import { loadHighlighter } from '../lib/highlight.js';
 
@@ -1789,6 +1796,28 @@ export const accessorsMixin = {
   // requirement verification-status key (as returned by requirementSafetyStatus)
   // or the 'noimpl' traceability-gap key. Drives the rollup bar and the
   // status-filter chips, mirroring vexStatusMeta for the security view.
+  // "True traceability" adequacy verdict a producer recorded on a Requirement
+  // as an `adequacy:<verdict>` external identifier. '' when it carries none,
+  // which is what an SBOM generated without a coverage matrix looks like.
+  requirementAdequacyKey(el) {
+    if (!el || !isA(el.type, CLASS.Requirement)) return '';
+    const raw = producerMetaValue(el, 'adequacy', (e) => this.externalIdentifiers(e)).toLowerCase();
+    return Object.hasOwn(SAFETY_ADEQUACY, raw) ? raw : '';
+  },
+
+  safetyAdequacyMeta(key) {
+    return (
+      SAFETY_ADEQUACY[key] || {
+        key: key || 'unknown',
+        label: key || 'Unknown',
+        color: COLORS.default || '#64748b',
+        badgeClass: 'bg-slate-600/20 text-slate-300 ring-1 ring-slate-500/30',
+        dotClass: 'bg-slate-500',
+        hint: ''
+      }
+    );
+  },
+
   safetyStatusMeta(key) {
     if (key === SAFETY_NO_IMPL_META.key) return SAFETY_NO_IMPL_META;
     return (

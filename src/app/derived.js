@@ -12,6 +12,7 @@ import {
   summarizePackageDescription
 } from '../lib/index.js';
 import { isA, CLASS } from '../spdx/model.js';
+import { SAFETY_ADEQUACY } from '../config.js';
 
 /* Derived data: computed getters over the parsed model — filtered/sorted list
    views, the security summary, and the counts/labels templates read. */
@@ -81,6 +82,8 @@ let safetyCountsSrc = null;
 let safetyCountsVal = null;
 let safetyStatusSrc = null;
 let safetyStatusVal = null;
+let safetyAdequacySrc = null;
+let safetyAdequacyVal = null;
 let safetySpecFacetsRelsSrc = null;
 let safetySpecFacetsReqsSrc = null;
 let safetySpecFacetsVal = [];
@@ -136,6 +139,7 @@ export const derivedMixin = {
     scCountsSrc = null;
     safetyCountsSrc = null;
     safetyStatusSrc = null;
+    safetyAdequacySrc = null;
     safetySpecFacetsRelsSrc = null;
     safetySpecFacetsReqsSrc = null;
     securitySummarySrc = null;
@@ -1245,6 +1249,38 @@ export const derivedMixin = {
     return safetyStatusVal;
   },
 
+  // "True traceability" adequacy of every Requirement carrying an adequacy
+  // verdict. Empty (`total: 0`) for an SBOM whose producer recorded none, which
+  // keeps the whole chip row hidden rather than showing a row of zeroes.
+  get safetyAdequacySummary() {
+    if (safetyAdequacySrc === this.requirements) return safetyAdequacyVal;
+    const counts = {};
+    let total = 0;
+    this.requirements.forEach((r) => {
+      const key = this.requirementAdequacyKey(r);
+      if (!key) return;
+      counts[key] = (counts[key] || 0) + 1;
+      total++;
+    });
+    const exercised = counts.true || 0;
+    safetyAdequacyVal = {
+      total,
+      counts,
+      exercised,
+      exercisedPct: total ? Math.round((exercised / total) * 100) : 0
+    };
+    safetyAdequacySrc = this.requirements;
+    return safetyAdequacyVal;
+  },
+
+  // Adequacy verdicts that actually occur, gaps-first.
+  get safetyAdequacyOrder() {
+    const counts = this.safetyAdequacySummary.counts;
+    return Object.keys(SAFETY_ADEQUACY)
+      .filter((k) => counts[k] > 0)
+      .sort((a, b) => SAFETY_ADEQUACY[b].rank - SAFETY_ADEQUACY[a].rank);
+  },
+
   // Verification statuses that actually occur, gaps-first, so the rollup bar and
   // chips never render empty buckets.
   get safetyStatusOrder() {
@@ -1336,6 +1372,12 @@ export const derivedMixin = {
     } else if (this.requirementStatusFilter) {
       if (this.requirementSafetyStatus(r)?.key !== this.requirementStatusFilter) return false;
     }
+    if (
+      this.requirementAdequacyFilter &&
+      this.requirementAdequacyKey(r) !== this.requirementAdequacyFilter
+    ) {
+      return false;
+    }
     if (this.requirementSearch) {
       const q = this.requirementSearch.toLowerCase();
       const hay = [
@@ -1364,7 +1406,7 @@ export const derivedMixin = {
     // collapsedReqs is reassigned rather than mutated (see toggleReqCollapse),
     // so its identity is a sound cache key alongside the safety filters.
     const collapsed = this.collapsedReqs;
-    const key = `${this.requirements.length}|${this.requirementSearch}|${this.requirementStatusFilter}|${this.requirementSpecFilter}`;
+    const key = `${this.requirements.length}|${this.requirementSearch}|${this.requirementStatusFilter}|${this.requirementAdequacyFilter}|${this.requirementSpecFilter}`;
     if (
       safetyTreeCacheKey &&
       safetyTreeCacheKey.key === key &&
@@ -1428,7 +1470,7 @@ export const derivedMixin = {
 
   get filteredRequirements() {
     const requirements = this.requirements;
-    const key = `${requirements.length}|${this.requirementKindFilter}|${this.requirementStatusFilter}|${this.requirementSpecFilter}|${this.requirementSearch}`;
+    const key = `${requirements.length}|${this.requirementKindFilter}|${this.requirementStatusFilter}|${this.requirementAdequacyFilter}|${this.requirementSpecFilter}|${this.requirementSearch}`;
     if (key === filteredReqsCacheKey) return filteredReqsCacheVal;
 
     let reqs = requirements;
@@ -1441,10 +1483,15 @@ export const derivedMixin = {
     // search (and kind), so kind × outcome stay orthogonal without forcing
     // kind=Requirement when a status chip is clicked.
     const members = this.safetySpecMemberIds;
-    if (members || this.requirementStatusFilter || this.requirementSearch) {
+    if (
+      members ||
+      this.requirementStatusFilter ||
+      this.requirementAdequacyFilter ||
+      this.requirementSearch
+    ) {
       reqs = reqs.filter((r) => {
         if (isA(r.type, CLASS.Requirement)) return this._requirementMatchesSafetyFilters(r);
-        if (this.requirementStatusFilter || members) return false;
+        if (this.requirementStatusFilter || this.requirementAdequacyFilter || members) return false;
         if (!this.requirementSearch) return true;
         const q = this.requirementSearch.toLowerCase();
         return (

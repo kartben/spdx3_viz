@@ -1,13 +1,41 @@
 /**
- * Functional Safety display helpers: plain titles, evidence targets, and
- * Specification → hasRequirement grouping. Keeps SPDX-native structure readable
- * without producer jargon (adequacy, SYRS/SRS tags, …).
+ * Functional Safety display helpers: plain titles, producer metadata
+ * (adequacy, evidence, level), evidence targets, and Specification →
+ * hasRequirement grouping. Keeps SPDX-native structure readable without
+ * producer jargon (adequacy, SYRS/SRS tags, …).
  *
  * @module lib/safety
  */
 import { isMeaningfulValue } from './format.js';
 
-const PRODUCER_META_PREFIXES = ['status:', 'requirement-type:', 'adequacy:', 'requirement_type:'];
+const PRODUCER_META_PREFIXES = [
+  'status:',
+  'requirement-type:',
+  'requirement_type:',
+  'requirement-level:',
+  'component:',
+  'adequacy:',
+  'evidence:'
+];
+
+/**
+ * Read a `<prefix>:<value>` producer identifier off an element.
+ *
+ * @param {Object|null|undefined} el
+ * @param {string} prefix - without the colon, e.g. 'adequacy'
+ * @param {(el: Object) => Array<{identifier: string}>} [getIds]
+ * @returns {string} the value, or '' when the element carries no such identifier
+ */
+export function producerMetaValue(el, prefix, getIds) {
+  if (!el) return '';
+  const ids = typeof getIds === 'function' ? getIds(el) : el.externalIdentifier || [];
+  const want = `${prefix}:`;
+  for (const id of ids || []) {
+    const raw = String(id?.identifier || '').trim();
+    if (raw.toLowerCase().startsWith(want)) return raw.slice(want.length).trim();
+  }
+  return '';
+}
 
 /**
  * True when an externalIdentifier value is producer metadata rather than a UID.
