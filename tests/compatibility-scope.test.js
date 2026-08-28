@@ -48,6 +48,8 @@ function makeApp(overrides = {}) {
     licenses: LICENSES,
     packages: [{ spdxId: 'app' }],
     impactChildIndex: CHILDREN,
+    producedByBuildIndex: new Map(),
+    buildInputIndex: new Map(),
     impactRoots: new Set(['app']),
     hasImpactData: true,
     compatScope: '',
@@ -60,6 +62,7 @@ function makeApp(overrides = {}) {
     licenseExpressionFor: (id) => LICENSES.find((lic) => lic.id === id)?.label || '',
     relTargetDisplayName: (id) => id,
     elementLicenses: () => [],
+    _scheduleNavPush: () => {}, // the setters push a history entry; not under test here
     rootElementIds: new Set(['app']),
     ...overrides
   });
@@ -184,4 +187,98 @@ test('an element with a real license is not counted as a coverage gap', () => {
   });
   assert.equal(app.compatUnassertedCount, 1, 'only `other` is wholly unasserted');
   assert.deepEqual(app.compatUnassertedIds, ['other']);
+});
+
+test('a scope whose elements name no license explains itself', () => {
+  // `built` heads a binary tree; the licensed source tree is parallel to it and
+  // unreachable, which is how Zephyr's west-spdx output is shaped.
+  const app = makeApp({
+    compatScope: 'built',
+    packages: [{ spdxId: 'built' }],
+    impactChildIndex: new Map([['built', [{ id: 'obj', rel: 'contains', soft: false }]]]),
+    licenses: [
+      {
+        id: 'expandedlicensing_NoAssertionLicense',
+        label: 'No assertion',
+        declaredBy: ['built', 'obj'],
+        concludedBy: []
+      },
+      { id: 'lic:mit', label: 'MIT', declaredBy: ['sources'], concludedBy: [] }
+    ]
+  });
+
+  assert.equal(app.compatScopeSize, 2);
+  assert.equal(app.compatReport.licenseCount, 0, 'the MIT source tree is out of scope');
+  assert.equal(app.compatScopeHasNoLicenses, true);
+  assert.equal(app.compatUnassertedCount, 2);
+  // The old message was a bare "No licenses to check in this scope", which read
+  // as a failure rather than the finding it is.
+  assert.match(app.compatHeadline, /Nothing to check/);
+  assert.match(app.compatHeadline, /2 elements/);
+  assert.match(app.compatHeadline, /declare no license/);
+});
+
+test('an empty scope is distinguished from one with no licenses', () => {
+  const app = makeApp({ compatScope: 'nothing-here', impactChildIndex: new Map() });
+  assert.equal(app.compatScopeSize, 1, 'the focus itself is always in scope');
+  const bare = makeApp({ compatScope: 'nothing-here', impactChildIndex: new Map(), licenses: [] });
+  assert.equal(bare.compatScopeHasNoLicenses, false, 'nothing in the document to begin with');
+  assert.match(bare.compatHeadline, /Nothing to check/);
+});
+
+test('the scope follows build lineage back to the sources that went in', () => {
+  // Zephyr's SBOM shape: the binary tree never points at the licensed sources.
+  // The only link is the Build profile, artifact <- build -> input.
+  const app = makeApp({
+    compatScope: 'final',
+    packages: [{ spdxId: 'final' }],
+    impactChildIndex: new Map([['final', [{ id: 'lib.a', rel: 'contains', soft: false }]]]),
+    producedByBuildIndex: new Map([['lib.a', ['build:lib']]]),
+    buildInputIndex: new Map([['build:lib', ['src.c']]]),
+    licenses: [
+      { id: 'lic:mit', label: 'MIT', declaredBy: ['src.c'], concludedBy: [] },
+      {
+        id: 'expandedlicensing_NoAssertionLicense',
+        label: 'No assertion',
+        declaredBy: ['final', 'lib.a'],
+        concludedBy: []
+      }
+    ]
+  });
+
+  assert.deepEqual(
+    [...app.compatScopeElements].sort(),
+    ['build:lib', 'final', 'lib.a', 'src.c'],
+    'steps artifact -> producing build -> build inputs'
+  );
+  assert.deepEqual(labels(app), ['MIT'], 'the source license is in scope, not just NoAssertion');
+  assert.equal(app.compatScopeHasNoLicenses, false);
+});
+
+test('build lineage is followed with the distributed-only filter too', () => {
+  // A source compiled into a shipped binary travels inside it, so its license
+  // applies whichever edge set the dependency walk uses.
+  const app = makeApp({
+    compatScope: 'final',
+    compatEdgeFilter: 'distributed',
+    packages: [{ spdxId: 'final' }],
+    impactChildIndex: new Map([
+      [
+        'final',
+        [
+          { id: 'lib.a', rel: 'contains', soft: false },
+          { id: 'toolchain', rel: 'hasPrerequisite', soft: false }
+        ]
+      ]
+    ]),
+    producedByBuildIndex: new Map([['lib.a', ['build:lib']]]),
+    buildInputIndex: new Map([['build:lib', ['src.c']]]),
+    licenses: [
+      { id: 'lic:mit', label: 'MIT', declaredBy: ['src.c'], concludedBy: [] },
+      { id: 'lic:gpl3', label: 'GPL-3.0-only', declaredBy: ['toolchain'], concludedBy: [] }
+    ]
+  });
+
+  assert.deepEqual([...app.compatScopeElements].sort(), ['build:lib', 'final', 'lib.a', 'src.c']);
+  assert.deepEqual(labels(app), ['MIT'], 'the prerequisite toolchain is still not shipped');
 });

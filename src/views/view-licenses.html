@@ -63,7 +63,7 @@
           >
             <button
               type="button"
-              @click="compatPanel = panel.key"
+              @click="setCompatPanel(panel.key)"
               class="px-2.5 py-1 rounded-md text-xs font-medium transition-colors"
               :class="compatPanel === panel.key
                 ? 'bg-slate-700 text-slate-100'
@@ -442,26 +442,39 @@
         <div class="space-y-4">
           <div
             class="rounded-xl border px-4 py-3 flex items-start gap-3"
-            :class="compatHasConflicts
-              ? 'border-rose-500/40 bg-rose-500/5'
-              : 'border-emerald-500/40 bg-emerald-500/5'"
+            :class="compatReport.licenseCount === 0
+              ? 'border-slate-600 bg-slate-800/60'
+              : compatHasConflicts
+                ? 'border-rose-500/40 bg-rose-500/5'
+                : 'border-emerald-500/40 bg-emerald-500/5'"
           >
             <svg
               class="w-4 h-4 flex-shrink-0 mt-0.5"
-              :class="compatHasConflicts ? 'text-rose-400' : 'text-emerald-400'"
+              :class="compatReport.licenseCount === 0
+                ? 'text-slate-400'
+                : compatHasConflicts
+                  ? 'text-rose-400'
+                  : 'text-emerald-400'"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
             >
               <path
-                x-show="compatHasConflicts"
+                x-show="compatReport.licenseCount === 0"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+              <path
+                x-show="compatReport.licenseCount > 0 && compatHasConflicts"
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
                 d="M6 18L18 6M6 6l12 12"
               />
               <path
-                x-show="!compatHasConflicts"
+                x-show="compatReport.licenseCount > 0 && !compatHasConflicts"
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
@@ -469,6 +482,46 @@
               />
             </svg>
             <p class="text-sm text-slate-200 leading-relaxed" x-text="compatHeadline"></p>
+          </div>
+
+          <!-- A scope whose elements name no license at all. Common where an
+               SBOM keeps licenses on a source tree the build tree never
+               reaches, so say what was actually found and offer a way out. -->
+          <div
+            x-show="compatScopeHasNoLicenses"
+            class="rounded-xl border border-slate-700 bg-slate-800/60 px-4 py-4 space-y-3"
+          >
+            <p class="text-sm text-slate-300 leading-relaxed">
+              Every element this scope reaches declares
+              <span class="font-mono text-slate-400">NoAssertion</span>, so there is no license to
+              check. Some SBOMs record licenses on a separate tree of source packages that the build
+              tree does not link to; the licenses are in the document, just not reachable from here.
+            </p>
+            <div class="flex flex-wrap gap-2">
+              <button
+                type="button"
+                x-show="compatScope"
+                @click="setCompatScope('')"
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-pink-500/15 text-pink-300 hover:bg-pink-500/25 transition-colors"
+              >
+                Check the whole document instead
+              </button>
+              <button
+                type="button"
+                x-show="compatEdgeFilter === 'distributed'"
+                @click="setCompatEdgeFilter('all')"
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-slate-700 text-slate-200 hover:bg-slate-600 transition-colors"
+              >
+                Include every dependency edge
+              </button>
+              <button
+                type="button"
+                @click="switchView('remediation')"
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-slate-700 text-slate-200 hover:bg-slate-600 transition-colors"
+              >
+                See the missing license data
+              </button>
+            </div>
           </div>
 
           <div
@@ -482,7 +535,7 @@
             product depends on how you link them, which the matrix does not model.
           </div>
 
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" x-show="compatReport.licenseCount > 0">
             <template x-for="tile in compatTiles" :key="tile.id">
               <button
                 type="button"
@@ -510,11 +563,13 @@
           </div>
 
           <div
-            class="grid grid-cols-1 xl:grid-cols-[minmax(0,1.6fr)_minmax(17rem,0.4fr)] gap-4 items-start"
+            class="grid grid-cols-1 gap-4 items-start"
+            :class="compatReport.licenseCount > 0 &&
+              'xl:grid-cols-[minmax(0,1.6fr)_minmax(17rem,0.4fr)]'"
           >
             <!-- Findings -->
             <div class="space-y-2">
-              <div class="flex items-baseline gap-3">
+              <div class="flex items-baseline gap-3" x-show="compatReport.licenseCount > 0">
                 <h3
                   class="text-sm font-semibold text-white"
                   x-text="compatStatusFilter ? compatStatusLabel(compatStatusFilter) : 'Every license in scope'"
@@ -644,13 +699,15 @@
               ></button>
 
               <div
-                x-show="compatFindings.length === 0"
+                x-show="compatFindings.length === 0 && !compatScopeHasNoLicenses"
                 class="text-sm text-slate-500 italic text-center py-8"
-              >
-                No licenses in this bucket
-              </div>
+                x-text="compatStatusFilter ? 'No licenses in this bucket' : 'No licenses in this scope'"
+              ></div>
 
-              <p class="text-[11px] text-slate-600 leading-relaxed pt-1">
+              <p
+                x-show="compatReport.licenseCount > 0"
+                class="text-[11px] text-slate-600 leading-relaxed pt-1"
+              >
                 Element counts overlap: one package often declares several licenses, so the four
                 figures above do not sum to the number of elements.
               </p>
@@ -658,7 +715,7 @@
 
             <!-- Candidates and coverage -->
             <div class="space-y-3">
-              <div class="card">
+              <div class="card" x-show="compatReport.licenseCount > 0">
                 <h3 class="text-sm font-semibold text-white">Better outbound licenses</h3>
                 <p class="text-xs text-slate-500 mt-1 leading-relaxed">
                   Ranked by how many licenses here they cannot absorb. Pick one to re-run the check.
@@ -717,6 +774,7 @@
                 </p>
                 <button
                   type="button"
+                  x-show="!compatScopeHasNoLicenses"
                   @click="switchView('remediation')"
                   class="mt-3 text-xs text-pink-300 hover:text-pink-200"
                 >
