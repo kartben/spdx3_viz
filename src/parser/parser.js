@@ -1321,6 +1321,36 @@ export function createIndexAccessors(indexes) {
    ========================================================================== */
 
 const GH_DL_RE = /^git\+https:\/\/github\.com\/([^/]+\/[^@]+)@([a-f0-9]{40})$/;
+// A GitHub package URL: "pkg:github/<owner>/<repo>@<version>". A purl says
+// where a package came from and at which version, whatever produced the SBOM,
+// so it is the second place worth looking when there is no download location.
+const GH_PURL_RE = /^pkg:github\/([^/]+\/[^@]+)@(.+)$/;
+// west marks a checkout that is not on its manifest revision, or is dirty, by
+// suffixing the revision. The commit in front of it is still the commit.
+const REVISION_SUFFIX_RE = /[+-](dirty|off).*$/;
+
+/** The 40-hex commit in a revision string, suffixes and all, or ''. */
+function commitOf(revision) {
+  const clean = String(revision || '')
+    .replace(REVISION_SUFFIX_RE, '')
+    .trim();
+  return /^[a-f0-9]{40}$/.test(clean) ? clean : '';
+}
+
+/** "owner/repo" and commit for a package, from its download location or purl. */
+function githubSourceOf(pkg) {
+  const ghMatch = GH_DL_RE.exec(pkg.software_downloadLocation || '');
+  if (ghMatch) return { ghPath: ghMatch[1], sha: ghMatch[2] };
+
+  for (const ident of pkg.externalIdentifier || []) {
+    if (ident?.externalIdentifierType !== 'packageUrl') continue;
+    const purlMatch = GH_PURL_RE.exec(ident.identifier || '');
+    if (!purlMatch) continue;
+    const sha = commitOf(purlMatch[2]);
+    if (sha) return { ghPath: purlMatch[1], sha };
+  }
+  return null;
+}
 
 function longestCommonPathPrefix(paths) {
   if (!paths.length) return '';
@@ -1355,51 +1385,16 @@ export function buildFileSourceIndex(parsed, indexes) {
   const fileSourceIndex = new Map();
 
   for (const pkg of packages) {
-    const dloc = pkg.software_downloadLocation || '';
     const fileIds = containsIndex.get(pkg.spdxId) || [];
     if (!fileIds.length) continue;
 
-    let ghPath, sha; // ghPath = "org/repo"
-
-    const ghMatch = GH_DL_RE.exec(dloc);
-    if (ghMatch) {
-      ghPath = ghMatch[1];
-      sha = ghMatch[2];
-    } else if (dloc === 'NOASSERTION' || !dloc) {
-      // zephyr-sources falls here when the repo has multiple git remotes —
-      // git_remote() in zephyr_module.py returns None → NOASSERTION.
-      const pkgId = pkg.spdxId || '';
-      const pkgName = pkg.name || '';
-      if (pkgId.includes('zephyr-sources') || pkgName === 'zephyr-sources') {
-        ghPath = 'zephyrproject-rtos/zephyr';
-
-        // ███████████████████████████████████████████████████████████████████
-        // ██  ⚠️  TEMPORARY HACK — REMOVE ME  ⚠️                            ██
-        // ███████████████████████████████████████████████████████████████████
-        // The matching `snippets.jsonld` sample data was lost, and the SBOM's
-        // own zephyr-sources commit (software_packageVersion) no longer lines
-        // up with any source we can fetch. So instead of deriving the SHA from
-        // packageVersion (the correct, dynamic behaviour), we PIN every
-        // zephyr-sources file to a single hardcoded commit just so the demo
-        // resolves to real, fetchable source on GitHub.
-        //
-        // ❌ This means highlighted line ranges may NOT match the actual code
-        //    at this commit. It is a stopgap, not correct behaviour.
-        //
-        // ✅ TO RESTORE CORRECT BEHAVIOUR: delete this block and uncomment the
-        //    packageVersion-derived SHA logic below.
-        // ███████████████████████████████████████████████████████████████████
-        sha = '74442555d7308926225bc0aef85b3b6ca8a16d18'; // <-- HARDCODED HACK
-        // ███████████████████████████████████████████████████████████████████
-
-        // --- CORRECT (dynamic) behaviour, disabled by the hack above ---------
-        // const rawVer = pkg.software_packageVersion || '';
-        // const cleanSha = rawVer.replace(/[+\-](dirty|off).*$/, '').trim();
-        // if (/^[a-f0-9]{40}$/.test(cleanSha)) sha = cleanSha;
-      }
-    }
-
-    if (!ghPath || !sha) continue;
+    // Where this package's sources can be fetched from, and at which commit.
+    // Anything that does not say both is skipped rather than guessed at: a
+    // wrong revision renders real line ranges against the wrong file, which
+    // reads as a bug in the SBOM rather than a gap in the viewer.
+    const source = githubSourceOf(pkg);
+    if (!source) continue;
+    const { ghPath, sha } = source;
 
     // Strip the common path prefix shared by all files in this package to get
     // the repo-relative path (e.g. "modules/lib/gui/lvgl/" → "").

@@ -22,6 +22,8 @@ import {
   getPurlLink,
   getCdxProperties,
   snippetFileRef,
+  snippetLineLabel,
+  snippetShortName,
   isMeaningfulValue,
   enumValue,
   formatByteSize,
@@ -37,7 +39,14 @@ import {
   PACKAGE_GAP_ORDER,
   PACKAGE_DESCRIPTION_SEGMENTS
 } from '../lib/index.js';
-import { COLORS, getScopeColor, SAFETY_STATUSES, SAFETY_NO_IMPL_META } from '../config.js';
+import {
+  COLORS,
+  getScopeColor,
+  SAFETY_STATUSES,
+  SAFETY_NO_IMPL_META,
+  BUILD_SNIPPET_CLAIM,
+  UNCLAIMED_SNIPPET
+} from '../config.js';
 import { CLASS, isA } from '../spdx/model.js';
 import { loadHighlighter } from '../lib/highlight.js';
 
@@ -160,6 +169,157 @@ export const accessorsMixin = {
   },
   fileTools(spdxId) {
     return this.toolIndex.get(spdxId) || [];
+  },
+  // Every snippet carved from a file, in source order.
+  fileSnippets(spdxId) {
+    return this.snippetsByFileIndex.get(spdxId) || [];
+  },
+  // A file's snippets grouped into overlays and nested into layers.
+  //
+  // Several producers can carve snippets out of one file, each answering a
+  // different question: what of it reached an image, what of it implements a
+  // requirement, what of it a test executed. Those are *overlays* -- they can
+  // describe different builds, and even different revisions of the file, so
+  // they are never merged or nested into one another.
+  //
+  // Within an overlay, `contains` nests a snippet under the one it is part of,
+  // which is how a routine holds the line ranges it is made of. That nesting is
+  // the only one asserted by the document; none is inferred from line numbers.
+  fileSnippetOverlays(spdxId) {
+    const snippets = this.fileSnippets(spdxId);
+    if (!snippets.length) return [];
+    const claims = this._snippetClaims();
+    const parents = this._snippetParents();
+    const present = new Set(snippets.map((s) => s.spdxId));
+
+    const groups = new Map();
+    for (const snippet of snippets) {
+      // A snippet nested under another from this same file is shown with it.
+      const parent = parents.get(snippet.spdxId);
+      if (parent && present.has(parent)) continue;
+
+      const claim = this._claimFor(snippet.spdxId, claims, parents);
+      let group = groups.get(claim.key);
+      if (!group) {
+        group = { key: claim.key, label: claim.label, order: claim.order, rows: [] };
+        groups.set(claim.key, group);
+      }
+      group.rows.push(this._snippetRow(snippet, parents, present));
+    }
+
+    const overlays = [...groups.values()].sort((a, b) => a.order - b.order || a.label > b.label);
+    // The build overlay is what shipped, which is what a file is usually opened
+    // for; the rest stay shut so a busy header does not unroll on open.
+    overlays.forEach((o, i) => {
+      o.total = o.rows.length;
+      o.openByDefault = i === 0 && o.key === BUILD_SNIPPET_CLAIM;
+    });
+    return overlays;
+  },
+  // What speaks for a snippet, or for the one it is part of. A line range has
+  // the provenance of the routine it belongs to, which is what places a range
+  // whose routine lives in another file: a macro reaches the image through
+  // whoever expanded it.
+  _claimFor(id, claims, parents) {
+    const seen = new Set();
+    let at = id;
+    while (at && !seen.has(at)) {
+      const claim = claims.get(at);
+      if (claim) return claim;
+      seen.add(at);
+      at = parents.get(at);
+    }
+    return UNCLAIMED_SNIPPET;
+  },
+  _snippetRow(snippet, parents, present) {
+    const children = (this._snippetChildren().get(snippet.spdxId) || []).filter(
+      (id) => present.has(id) && parents.get(id) === snippet.spdxId
+    );
+    // A range shown apart from its routine says nothing on its own, so name the
+    // routine that pulled it in.
+    const owner = parents.get(snippet.spdxId);
+    const ownerName =
+      owner && !present.has(owner) ? this.snippetLabel(this.elementMap.get(owner)) : '';
+    const own = this.snippetLabel(snippet);
+    return {
+      id: snippet.spdxId,
+      label: ownerName ? `${ownerName} › ${this.snippetLines(snippet) || own}` : own,
+      lines: this.snippetLines(snippet),
+      inlined: Boolean(snippet.comment),
+      children: children.map((id) => ({
+        id,
+        label:
+          this.snippetLines(this.elementMap.get(id)) || this.snippetLabel(this.elementMap.get(id))
+      }))
+    };
+  },
+  // Snippet id -> what speaks for it. Any relationship pointing at a snippet is
+  // a claim over it, named and ordered by the same table the detail panel uses
+  // for that relationship read inbound, so there is one vocabulary rather than
+  // two and a profile this build has never heard of is described rather than
+  // guessed at. What a group means is therefore exactly what its relationship
+  // means -- `hasInput` says a build consumed the code, which is not the same
+  // as saying it survived into the output, and the label does not pretend
+  // otherwise.
+  _snippetClaims() {
+    if (this.__snippetClaims) return this.__snippetClaims;
+    const claims = new Map();
+    for (const rel of this.relationships || []) {
+      // Snippet-to-snippet containment is the nesting axis, not a claim: a
+      // range takes the provenance of the routine holding it, not "contained".
+      if (
+        rel.relationshipType === 'contains' &&
+        this.elementMap.get(rel.from)?.type === 'software_Snippet'
+      ) {
+        continue;
+      }
+      for (const target of rel.to || []) {
+        if (this.elementMap.get(target)?.type !== 'software_Snippet') continue;
+        if (claims.has(target)) continue;
+        claims.set(target, {
+          key: rel.relationshipType,
+          label: this.relGroupLabel(rel.relationshipType, 'in'),
+          order: this.relSortOrder(rel.relationshipType, 'in')
+        });
+      }
+    }
+    this.__snippetClaims = claims;
+    return claims;
+  },
+  _snippetParents() {
+    if (this.__snippetParents) return this.__snippetParents;
+    this._indexSnippetContainment();
+    return this.__snippetParents;
+  },
+  _snippetChildren() {
+    if (this.__snippetChildren) return this.__snippetChildren;
+    this._indexSnippetContainment();
+    return this.__snippetChildren;
+  },
+  // Snippet-to-snippet `contains`, both ways round.
+  _indexSnippetContainment() {
+    const parents = new Map();
+    const children = new Map();
+    for (const rel of this.relationships || []) {
+      if (rel.relationshipType !== 'contains') continue;
+      if (this.elementMap.get(rel.from)?.type !== 'software_Snippet') continue;
+      for (const target of rel.to || []) {
+        if (this.elementMap.get(target)?.type !== 'software_Snippet') continue;
+        if (!parents.has(target)) parents.set(target, rel.from);
+        if (!children.has(rel.from)) children.set(rel.from, []);
+        children.get(rel.from).push(target);
+      }
+    }
+    this.__snippetParents = parents;
+    this.__snippetChildren = children;
+  },
+  // Label for a snippet once its file is already known from context, e.g. the
+  // routine name alone rather than "routine@path/to/file.c".
+  snippetLabel(snippet) {
+    return snippetShortName(snippet) || snippetLineLabel(snippet) || 'snippet';
+  },
+  snippetLines(snippet) {
+    return snippetLineLabel(snippet);
   },
   buildInputs(spdxId) {
     return this.buildInputIndex.get(spdxId) || [];

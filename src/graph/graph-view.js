@@ -98,27 +98,11 @@ const ARROW_HALF_WIDTH = 3;
 // past this budget the shafts are drawn bare — heads return on zoom, filtering, or hover.
 const MAX_ARROWHEADS = 1200;
 // Hover "flow" animation: dashes march along a hovered node's directed edges in the flow direction.
-// Dash/gap are screen pixels; SPEED is screen px per second. Time-based rather than per-frame so
-// the dashes travel at one rate whatever the display runs at (a per-frame step doubles on a 120Hz
-// ProMotion panel and crawls whenever something else on the machine costs us frames).
+// Dash/gap are screen pixels; SPEED is screen px per frame.
 const FLOW_DASH = 5;
 const FLOW_GAP = 12;
 const FLOW_PERIOD = FLOW_DASH + FLOW_GAP;
-const FLOW_SPEED = 18;
-// Every flow frame is a full-canvas repaint just to move a dash offset, so the loop keeps its own
-// modest rate instead of the display's: at 120Hz the extra frames cost real bandwidth and read
-// identically. A long stall (blocked main thread, hidden tab) must not teleport the dashes either.
-const FLOW_FRAME_MS = 1000 / 30;
-const FLOW_MAX_STEP_MS = 100;
-
-// Canvas backing-store resolution. At the display's full devicePixelRatio a Retina screen means 4x
-// the pixels to clear and repaint every frame, and fill rate is the first thing to give when
-// something else on the machine (a screen share, a video call) is already eating memory bandwidth.
-// Full ratio is kept for the still image the user actually reads; while the whole view is in motion
-// the backing store drops to MOTION_DPR, where the lower resolution is masked by the movement.
-const MAX_DPR = 2; // past 2x the extra pixels cost quadratically for no visible gain
-const MOTION_DPR = 1;
-const QUALITY_RESTORE_MS = 180; // quiet time after the last motion before repainting at full res
+const FLOW_SPEED = 0.3;
 
 // Edge hover: how close (screen px) the pointer must be to a link to tooltip it, and
 // the edge count above which the per-move linear scan is skipped (a dense hairball is
@@ -242,10 +226,6 @@ export function renderGraph(app, retry = 0) {
   if (app.graphFlowRAF) {
     cancelAnimationFrame(app.graphFlowRAF); // stop a hover-flow loop from the old canvas
     app.graphFlowRAF = 0;
-  }
-  if (app.graphQualityTimer) {
-    clearTimeout(app.graphQualityTimer); // a full-res repaint queued for the canvas being replaced
-    app.graphQualityTimer = 0;
   }
 
   // clientWidth/Height can momentarily read 0 (some browsers lay out a just-shown flex view a frame
@@ -918,13 +898,9 @@ export function renderGraph(app, retry = 0) {
   canvas.className = 'graph-canvas';
   container.appendChild(canvas);
 
-  // Full resolution to start; `dpr` is read live by every draw so the motion/quality switch
-  // below can retune it without the draw code knowing.
-  const fullDpr = Math.min(globalThis.devicePixelRatio || 1, MAX_DPR);
-  const motionDpr = Math.min(fullDpr, MOTION_DPR);
-  let dpr = fullDpr;
-  canvas.width = Math.round(width * dpr);
-  canvas.height = Math.round(height * dpr);
+  const dpr = globalThis.devicePixelRatio || 1;
+  canvas.width = width * dpr;
+  canvas.height = height * dpr;
   canvas.style.width = `${width}px`;
   canvas.style.height = `${height}px`;
   const ctx = canvas.getContext('2d');
@@ -1602,65 +1578,23 @@ export function renderGraph(app, retry = 0) {
     });
   };
 
-  // Resizing the backing store clears it and resets context state, so repaint straight after.
-  const applyScale = (scale) => {
-    if (scale === dpr) return;
-    dpr = scale;
-    canvas.width = Math.round(width * scale);
-    canvas.height = Math.round(height * scale);
-    queueDraw();
-  };
-
-  // Called by anything that moves the whole view (settling simulation, pan/zoom, node drag): render
-  // those frames at the cheaper scale, then repaint at full resolution once the view holds still.
-  // The hover flow animation deliberately does not call this: it leaves the scene in place and only
-  // marches a dash, so softening the whole canvas under the pointer would be very visible; it pays
-  // for itself with a frame-rate cap instead. No-op on a 1x display, where there is nothing to drop.
-  const markMotion =
-    motionDpr >= fullDpr
-      ? () => {}
-      : () => {
-          applyScale(motionDpr);
-          if (app.graphQualityTimer) clearTimeout(app.graphQualityTimer);
-          app.graphQualityTimer = setTimeout(() => {
-            app.graphQualityTimer = 0;
-            applyScale(fullDpr);
-          }, QUALITY_RESTORE_MS);
-        };
-
-  // Dashes still draw when motion is reduced (direction stays legible), they just don't march.
-  const reducedMotion = () =>
-    globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
-
   // Self-perpetuating loop advancing the flow animation while a node with directed edges is hovered;
   // stops itself once the hover no longer applies. The handle lives on `app` so a rebuild can cancel a stale loop.
-  let flowLast = 0;
   const flowTick = () => {
     if (!highlightedDirectedLinks()) {
       app.graphFlowRAF = 0;
-      flowLast = 0;
       return;
     }
-    // Re-arm first: the frame budget check below returns early on most frames.
-    app.graphFlowRAF = requestAnimationFrame(flowTick);
-    const now = performance.now();
-    if (!flowLast) flowLast = now;
-    const dt = now - flowLast;
-    if (dt < FLOW_FRAME_MS) return;
-    flowLast = now;
-    flowPhase = (flowPhase + (FLOW_SPEED * Math.min(dt, FLOW_MAX_STEP_MS)) / 1000) % FLOW_PERIOD;
+    flowPhase = (flowPhase + FLOW_SPEED) % FLOW_PERIOD;
     drawCanvas();
+    app.graphFlowRAF = requestAnimationFrame(flowTick);
   };
   const setFlow = () => {
-    if (highlightedDirectedLinks() && !reducedMotion()) {
-      if (!app.graphFlowRAF) {
-        flowLast = 0;
-        app.graphFlowRAF = requestAnimationFrame(flowTick);
-      }
+    if (highlightedDirectedLinks()) {
+      if (!app.graphFlowRAF) app.graphFlowRAF = requestAnimationFrame(flowTick);
     } else if (app.graphFlowRAF) {
       cancelAnimationFrame(app.graphFlowRAF);
       app.graphFlowRAF = 0;
-      flowLast = 0;
     }
   };
   const syncHighlight = () => {
@@ -1807,7 +1741,6 @@ export function renderGraph(app, retry = 0) {
 
   sim.on('tick', () => {
     hitTreeDirty = true;
-    markMotion();
     queueDraw();
     autoFitTick();
   });
@@ -1899,7 +1832,6 @@ export function renderGraph(app, retry = 0) {
       // auto-fitting on rebuilds until they hit "reset zoom" again. Programmatic
       // transforms (fit/restore) have no sourceEvent and must not flip this.
       if (event.sourceEvent) app.graphAutoFit = false;
-      markMotion();
       queueDraw();
     });
 
@@ -1924,7 +1856,6 @@ export function renderGraph(app, retry = 0) {
       if (!event.subject) return;
       event.subject.fx = currentTransform.invertX(event.x);
       event.subject.fy = currentTransform.invertY(event.y);
-      markMotion();
       queueDraw();
     })
     .on('end', (event) => {
