@@ -336,3 +336,76 @@ test('fewer licenses needing review counts as better at equal conflicts', () => 
   );
   assert.ok(app.compatBetterCandidates.length > 0);
 });
+
+test('an unrated-only element is not called clear', () => {
+  // LicenseRef-ST-SLA0044 and its kind: the matrix has no entry, so nothing is
+  // known for or against. Counting those elements as "clear" read as verified.
+  const app = makeApp({
+    licenses: [
+      { id: 'lic:unknown', label: 'LicenseRef-ST-SLA0044', declaredBy: ['a'], concludedBy: [] },
+      { id: 'lic:gpl2', label: 'GPL-2.0-only', declaredBy: ['b'], concludedBy: [] }
+    ],
+    impactChildIndex: new Map(),
+    impactRoots: new Set(),
+    compatOutbound: 'MIT',
+    compatOutboundTouched: true
+  });
+
+  assert.equal(app.compatReport.totals.unrated.licenses, 1);
+  assert.equal(app.compatReport.totals.conflict.licenses, 1);
+  assert.equal(app.compatReport.clearElementCount, 1, 'the unrated element has no known conflict');
+  assert.match(app.compatHeadline, /free of conflicting licenses/);
+  assert.ok(!/elements clear/.test(app.compatHeadline), 'no longer claims they are clear');
+
+  const unrated = app.compatReport.findings.find((f) => f.status === 'unrated');
+  assert.match(app.compatFindingReason(unrated), /no entry for LicenseRef-ST-SLA0044/);
+  assert.match(app.compatFindingReason(unrated), /nothing is claimed either way/);
+});
+
+test('a conflict alongside an unrated license reports them separately', () => {
+  const app = makeApp({
+    licenses: [
+      {
+        id: 'lic:mixed',
+        label: 'GPL-2.0-only AND LicenseRef-ST-SLA0044',
+        declaredBy: ['a'],
+        concludedBy: []
+      }
+    ],
+    impactChildIndex: new Map(),
+    impactRoots: new Set(),
+    compatOutbound: 'Apache-2.0',
+    compatOutboundTouched: true
+  });
+
+  const reason = app.compatFindingReason(app.compatReport.findings[0]);
+  // The GPL term is what blocks it; the LicenseRef is simply unknown, and
+  // calling it a blocker would assert something the matrix never said.
+  assert.match(reason, /^GPL-2\.0-only cannot go into a work licensed Apache-2\.0/);
+  assert.match(reason, /LicenseRef-ST-SLA0044 is not in the matrix/);
+  assert.ok(
+    !/LicenseRef-ST-SLA0044 cannot go into/.test(reason),
+    'an unlisted license is never described as forbidden'
+  );
+});
+
+test('several blocking licenses read as a list, in the plural', () => {
+  const app = makeApp({
+    licenses: [
+      {
+        id: 'lic:two',
+        label: 'GPL-2.0-only AND LGPL-3.0-only',
+        declaredBy: ['a'],
+        concludedBy: []
+      }
+    ],
+    impactChildIndex: new Map(),
+    impactRoots: new Set(),
+    compatOutbound: 'Apache-2.0',
+    compatOutboundTouched: true
+  });
+
+  const reason = app.compatFindingReason(app.compatReport.findings[0]);
+  assert.match(reason, /GPL-2\.0-only and LGPL-3\.0-only cannot go into/);
+  assert.match(reason, /they are the blocking licenses/);
+});

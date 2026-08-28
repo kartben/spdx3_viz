@@ -4,6 +4,14 @@
  * GENERATED FILE: run `node scripts/gen-osadl-matrix.mjs` to refresh.
  * Source: https://www.osadl.org/fileadmin/checklists/matrix.json
  *
+ * A project by the Open Source Automation Development Lab (OSADL) eG. For
+ * further information about the project see the description at
+ * www.osadl.org/checklists.
+ *
+ * Copyright 2017 - 2026 Open Source Automation Development Lab
+ * (OSADL) eG and contributors. Licensed under CC-BY-4.0
+ * (https://creativecommons.org/licenses/by/4.0/). See the NOTICE file.
+ *
  * ROWS[i][j] is the verdict for taking license COMPAT_LICENSES[j] (inbound,
  * the component) into a work distributed under COMPAT_LICENSES[i] (outbound).
  * The relation is directional: rows and columns are not interchangeable.

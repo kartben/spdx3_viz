@@ -969,6 +969,8 @@
         </div>
       </template>
 
+      <!-- The matrix is CC-BY-4.0, so the attribution belongs on screen and not
+           only in NOTICE. See scripts/gen-osadl-matrix.mjs. -->
       <p class="text-[11px] text-slate-600 leading-relaxed">
         Compatibility rules from the
         <a
@@ -976,9 +978,17 @@
           target="_blank"
           rel="noopener"
           class="text-slate-500 hover:text-slate-300 underline decoration-slate-700 underline-offset-2"
-          >OSADL license compatibility matrix</a
-        >, dated <span x-text="compatMatrixDate"></span>, covering 119 licenses. Informational only,
-        not legal advice.
+          >OSADL Open Source License Checklists</a
+        >, dated <span x-text="compatMatrixDate"></span>, covering 119 licenses. A project by the
+        Open Source Automation Development Lab (OSADL) eG, copyright 2017 to
+        <span x-text="compatMatrixDate.slice(0, 4)"></span> OSADL eG and contributors, licensed
+        <a
+          href="https://creativecommons.org/licenses/by/4.0/"
+          target="_blank"
+          rel="noopener"
+          class="text-slate-500 hover:text-slate-300 underline decoration-slate-700 underline-offset-2"
+          >CC-BY-4.0</a
+        >. Informational only, not legal advice.
       </p>
     </div>
   </template>

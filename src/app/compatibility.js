@@ -62,6 +62,13 @@ const STATUS_CELL = {
   compatible: 'bg-emerald-500/35'
 };
 
+// "A", "A and B", "A, B and C": reasons read as sentences, so a bare comma join
+// between the last two items reads as a truncated list.
+function listPhrase(items) {
+  if (items.length <= 1) return items[0] || '';
+  return `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`;
+}
+
 const STATUS_BLURB = {
   conflict: 'cannot go into the outbound work',
   review: 'depends on how the component is used',
@@ -426,7 +433,9 @@ export const compatibilityMixin = {
         : '';
       return `All ${report.licenseCount} ${report.licenseCount === 1 ? 'license' : 'licenses'} in ${scope} can go into ${target}.${tail}`;
     }
-    return `${conflicts} of the ${report.licenseCount} licenses in ${scope} cannot go into ${target}, leaving ${report.clearElementCount} of ${report.elementCount} elements clear.`;
+    // "clear" overstated it: an element whose only license the matrix does not
+    // rate carries no *known* conflict, which is not the same as being safe.
+    return `${conflicts} of the ${report.licenseCount} licenses in ${scope} cannot go into ${target}, leaving ${report.clearElementCount} of ${report.elementCount} elements free of conflicting licenses.`;
   },
 
   get compatHasConflicts() {
@@ -474,19 +483,37 @@ export const compatibilityMixin = {
         : '';
       return `The OSADL matrix rates this as usable inside ${outbound}.${via}${source}`;
     }
-    const blockers = finding.blockers
-      .map((term) => (term.note ? `${term.token} (${term.note})` : term.token))
-      .join(', ');
+    // Only the terms that produced this verdict. An expression can mix a real
+    // conflict with a license the matrix simply does not list, and naming both
+    // as blocking would claim something is forbidden when nothing is known
+    // about it at all.
+    const named = (status) =>
+      listPhrase(
+        finding.blockers
+          .filter((term) => term.status === status)
+          .map((term) => (term.note ? `${term.token} (${term.note})` : term.token))
+      );
+    const unrated = named('unrated');
+    // An unrated term alongside a conflict is worth mentioning, but as an
+    // unknown rather than as part of the reason it is blocked.
+    const aside =
+      finding.status !== 'unrated' && unrated
+        ? ` ${unrated} ${unrated.includes(' and ') ? 'are' : 'is'} not in the matrix, so nothing is claimed about that either way.`
+        : '';
+
     if (finding.status === 'unrated') {
-      return `The matrix has no entry for ${blockers}, so nothing is claimed either way.${source}`;
+      return `The matrix has no entry for ${unrated}, so nothing is claimed either way.${source}`;
     }
     if (finding.status === 'review') {
-      return `Whether ${blockers} may go into ${outbound} depends on how it is used, typically on the linking model.${source}`;
+      const terms = named('review');
+      return `Whether ${terms} may go into ${outbound} depends on how it is used, typically on the linking model.${aside}${source}`;
     }
+    const blockers = named('conflict');
+    const plural = blockers.includes(' and ');
     if (finding.choice) {
-      return `No branch of this expression clears ${outbound}. The closest, ${finding.alternative.join(' AND ')}, is blocked by ${blockers}.${source}`;
+      return `No branch of this expression clears ${outbound}. The closest, ${finding.alternative.join(' AND ')}, is blocked by ${blockers}.${aside}${source}`;
     }
-    return `${blockers} cannot go into ${outbound}, so it is the blocking license.${source}`;
+    return `${blockers} cannot go into ${outbound}, so ${plural ? 'they are the blocking licenses' : 'it is the blocking license'}.${aside}${source}`;
   },
 
   // The verbatim matrix reading behind a finding, shown small under the reason
