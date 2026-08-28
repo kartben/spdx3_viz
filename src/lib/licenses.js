@@ -257,6 +257,128 @@ export function isSimpleSpdxLicenseId(value) {
   return SPDX_LICENSE_ID_RE.test(value);
 }
 
+// SPDX License List identifiers that were deprecated in favour of the
+// `-only` / `-or-later` split. Compatibility data (OSADL) uses the current
+// names, so expressions that still carry the old id need this mapping.
+const SPDX_LICENSE_ALIASES = {
+  'GPL-1.0': 'GPL-1.0-only',
+  'GPL-1.0+': 'GPL-1.0-or-later',
+  'GPL-2.0': 'GPL-2.0-only',
+  'GPL-2.0+': 'GPL-2.0-or-later',
+  'GPL-3.0': 'GPL-3.0-only',
+  'GPL-3.0+': 'GPL-3.0-or-later',
+  'LGPL-2.0': 'LGPL-2.0-only',
+  'LGPL-2.0+': 'LGPL-2.0-or-later',
+  'LGPL-2.1': 'LGPL-2.1-only',
+  'LGPL-2.1+': 'LGPL-2.1-or-later',
+  'LGPL-3.0': 'LGPL-3.0-only',
+  'LGPL-3.0+': 'LGPL-3.0-or-later',
+  'AGPL-1.0': 'AGPL-1.0-only',
+  'AGPL-1.0+': 'AGPL-1.0-or-later',
+  'AGPL-3.0': 'AGPL-3.0-only',
+  'AGPL-3.0+': 'AGPL-3.0-or-later',
+  'GFDL-1.1': 'GFDL-1.1-only',
+  'GFDL-1.1+': 'GFDL-1.1-or-later',
+  'GFDL-1.2': 'GFDL-1.2-only',
+  'GFDL-1.2+': 'GFDL-1.2-or-later',
+  'GFDL-1.3': 'GFDL-1.3-only',
+  'GFDL-1.3+': 'GFDL-1.3-or-later',
+  BSD: 'BSD-3-Clause',
+  'BSD-2': 'BSD-2-Clause',
+  'BSD-3': 'BSD-3-Clause'
+};
+
+/**
+ * Maps a license identifier onto the current SPDX License List id used by
+ * compatibility data. Understands the deprecated GPL-family names and the
+ * historical `+` "or later" suffix. Returns '' for empty input.
+ *
+ * @param {string} id
+ * @returns {string}
+ */
+export function normalizeSpdxLicenseId(id) {
+  const raw = String(id || '').trim();
+  if (!raw) return '';
+  if (SPDX_LICENSE_ALIASES[raw]) return SPDX_LICENSE_ALIASES[raw];
+  if (raw.endsWith('+')) {
+    const base = raw.slice(0, -1);
+    if (SPDX_LICENSE_ALIASES[`${base}+`]) return SPDX_LICENSE_ALIASES[`${base}+`];
+    if (base.endsWith('-only')) return `${base.slice(0, -5)}-or-later`;
+    return `${base}-or-later`;
+  }
+  return raw;
+}
+
+/**
+ * @typedef {{type: 'id', id: string} | {type: 'with', licenseId: string, exceptionId: string} | {type: 'compound', op: 'AND' | 'OR', left: LicenseExpressionNode, right: LicenseExpressionNode}} LicenseExpressionNode
+ */
+
+/**
+ * Parses an SPDX license expression into an AST. AND binds tighter than OR,
+ * matching the SPDX spec. Returns null when the expression is empty, contains
+ * NoAssertion, or cannot be parsed.
+ *
+ * @param {string} expression
+ * @returns {LicenseExpressionNode|null}
+ */
+export function parseLicenseExpression(expression) {
+  const expr = String(expression || '').trim();
+  if (!expr || /\bNoAssertion\b/i.test(expr)) return null;
+
+  try {
+    const tokens = tokenizeLicenseExpression(expr);
+    if (!tokens.length) return null;
+    const parser = new LicenseExpressionParser(tokens);
+    const tree = parser.parseOrExpr();
+    if (parser.peek()?.type !== 'EOF') return null;
+    return tree;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Unique license identifiers (and `WITH` pairs) in an expression tree, with
+ * SPDX ids already normalized. Used to build a pairwise matrix of the
+ * licenses actually present in an SBOM.
+ *
+ * @param {LicenseExpressionNode|null|undefined} node
+ * @returns {string[]}
+ */
+export function licenseExpressionAtomIds(node) {
+  const atoms = [];
+  const seen = new Set();
+
+  /** @param {LicenseExpressionNode|null|undefined} current */
+  function walk(current) {
+    if (!current) return;
+    if (current.type === 'id') {
+      const id = normalizeSpdxLicenseId(current.id) || current.id;
+      if (!seen.has(id)) {
+        seen.add(id);
+        atoms.push(id);
+      }
+      return;
+    }
+    if (current.type === 'with') {
+      const licenseId = normalizeSpdxLicenseId(current.licenseId) || current.licenseId;
+      const id = `${licenseId} WITH ${current.exceptionId}`;
+      if (!seen.has(id)) {
+        seen.add(id);
+        atoms.push(id);
+      }
+      return;
+    }
+    if (current.type === 'compound') {
+      walk(current.left);
+      walk(current.right);
+    }
+  }
+
+  walk(node);
+  return atoms;
+}
+
 /**
  * Resolves the SPDX license expression string for a license reference.
  *
@@ -408,6 +530,23 @@ class LicenseExpressionParser {
     return node;
   }
 
+  // SPDX: OR is lowest precedence, AND is tighter, WITH is tightest.
+  parseOrExpr() {
+    let node = this.parseAndExpr();
+    while (this.match('OR')) {
+      node = { type: 'compound', op: 'OR', left: node, right: this.parseAndExpr() };
+    }
+    return node;
+  }
+
+  parseAndExpr() {
+    let node = this.parseWithExpr();
+    while (this.match('AND')) {
+      node = { type: 'compound', op: 'AND', left: node, right: this.parseWithExpr() };
+    }
+    return node;
+  }
+
   parseWithExpr() {
     let node = this.parsePrimary();
     if (this.match('WITH')) {
@@ -422,7 +561,7 @@ class LicenseExpressionParser {
 
   parsePrimary() {
     if (this.match('LPAREN')) {
-      const node = this.parseExpression();
+      const node = this.parseOrExpr();
       this.consume('RPAREN');
       return node;
     }

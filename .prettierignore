@@ -11,3 +11,6 @@ public/samples/yocto6
 
 # Auto-generated from the official SPDX model (scripts/gen-spdx-model.mjs)
 src/spdx/hierarchy.js
+
+# OSADL compatibility matrix snapshot (CC-BY-4.0); kept compact, not reformatted
+src/data/osadl-matrix.json

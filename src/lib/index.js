@@ -6,6 +6,7 @@
 export * from './format.js';
 export * from './relationships.js';
 export * from './licenses.js';
+export * from './license-compat.js';
 export * from './nodes.js';
 export * from './icons.js';
 export * from './build.js';

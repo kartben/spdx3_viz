@@ -3,3 +3,9 @@ Copyright 2026 Benjamin Cabé
 
 Originally created by Benjamin Cabé.
 https://github.com/kartben/spdx3_viz
+
+The bundled OSADL Open Source License Checklist compatibility matrix
+(src/data/osadl-matrix.json) is licensed under CC-BY-4.0.
+Copyright 2017-2026 Open Source Automation Development Lab (OSADL) eG and contributors.
+https://www.osadl.org/OSADL-Open-Source-License-Checklists.oss-compliance-lists.0.html
+
