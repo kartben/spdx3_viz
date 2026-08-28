@@ -119,6 +119,13 @@ export function formatBytes(bytes) {
   return `${rounded} ${units[i]}`;
 }
 
+// The bar's opening slice, earned by getting the request away and the first
+// bytes back rather than by any byte count. It is swept over STARTUP_RAMP_MS so
+// a load reads as started from the first moment: the download's own share of
+// the bar begins above it, so nothing has to be given back later.
+export const STARTUP_FLOOR = 0.08;
+const STARTUP_RAMP_MS = 2000;
+
 // How much of the progress bar the download phase owns, from the sample's size.
 // Both the transfer and the parse grow with size, but only the transfer also
 // depends on the link, and on a slow one it dwarfs everything else: the 950 MB
@@ -179,6 +186,7 @@ export const loadingMixin = {
     this.progressPhase = 'Downloading…';
     this.progressDetail = sample.sizeLabel ? `${sample.name} · ${sample.sizeLabel}` : sample.name;
     this._downloadShare = downloadShareFor(sample.size);
+    this._startStartupRamp();
     downloadAbort = new AbortController();
     try {
       // The manifest size is the uncompressed total; use it as the download
@@ -202,12 +210,36 @@ export const loadingMixin = {
       // strand a failed parse in an empty app shell.
     } catch (err) {
       if (err && err.name === 'AbortError') return; // canceled: cancelParse reset the UI
+      this._stopStartupRamp();
       this.parsing = false;
       this.progressEta = null;
       this.sampleError = `Could not load ${sample.name}: ${err.message}`;
     } finally {
       this.loadingSample = null;
     }
+  },
+
+  // Eases the bar across the opening slice while the request is in flight. Real
+  // download progress overtakes it as soon as bytes land — _setProgress only
+  // ever moves the bar forward, so the two cannot fight — and the ramp stops on
+  // its own once it reaches the floor.
+  _startStartupRamp() {
+    this._stopStartupRamp();
+    const t0 = performance.now();
+    const step = () => {
+      if (!this.parsing) return this._stopStartupRamp();
+      const k = Math.min(1, (performance.now() - t0) / STARTUP_RAMP_MS);
+      // Ease out, so it glides into the floor instead of stopping dead on it.
+      const v = STARTUP_FLOOR * (1 - (1 - k) * (1 - k));
+      if (v > this.progress) this.progress = v;
+      this._startupRamp = k < 1 ? requestAnimationFrame(step) : null;
+    };
+    this._startupRamp = requestAnimationFrame(step);
+  },
+
+  _stopStartupRamp() {
+    if (this._startupRamp) cancelAnimationFrame(this._startupRamp);
+    this._startupRamp = null;
   },
 
   // Download progress, reported per chunk. The transferred byte count goes in
@@ -425,6 +457,7 @@ export const loadingMixin = {
     this._progressRate = null; // smoothed bar-fraction/second of recent progress
     this._downloadStart = null; // first-byte timestamp, for the transfer rate
     this._downloadShare = 0.3; // portion of the bar the download owns
+    this._stopStartupRamp();
   },
 
   // One line naming what is being loaded, so the overlay says which files (and
@@ -462,6 +495,7 @@ export const loadingMixin = {
       downloadAbort = null;
     }
     this.loadingSample = null;
+    this._stopStartupRamp();
     this.parsing = false;
     this.progressEta = null;
     if (!this.dataLoaded) {
@@ -489,7 +523,7 @@ export const loadingMixin = {
       dl + (hi - 0.3) * ((0.99 - dl) / 0.69)
     ];
     const bands = {
-      download: [0, dl],
+      download: [STARTUP_FLOOR, dl],
       json: rest(0.3, 0.5),
       graph: rest(0.5, 0.78),
       index: rest(0.78, 0.99)
@@ -577,6 +611,7 @@ export const loadingMixin = {
         return;
       }
 
+      this._stopStartupRamp();
       this.parsing = false;
       this.progress = 1;
       this.progressEta = null;
@@ -654,10 +689,12 @@ export const loadingMixin = {
       this.$nextTick(() => {
         this.progressAnimateMs = 150;
         this.progress = 1;
+        this._stopStartupRamp();
         this.parsing = false;
       });
     } catch (err) {
       if (reqId !== latestParseReqId) return;
+      this._stopStartupRamp();
       this.parsing = false;
       this.progressEta = null;
       this._onParseError(err && err.message ? err.message : String(err));

@@ -6,7 +6,7 @@ via the "What's new" link.
 ## Unreleased
 
 - **Improved:** A complete CPE now links to NVD's vulnerability search by exact CPE name, version included.
-- **Improved:** Downloading a large sample shows the bytes transferred, gives the download more of the progress bar, and estimates the time left from the measured transfer rate.
+- **Improved:** Downloading a large sample shows the bytes transferred, gives the download more of the progress bar, eases the bar off zero while the request is in flight, and estimates the time left from the measured transfer rate.
 - **Fixed:** Build-heavy SBOMs no longer drag the graph down to a few frames per second.
 
 ## [0.5.0] - 2026-08-22
