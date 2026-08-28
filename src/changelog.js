@@ -10,6 +10,10 @@ export const CHANGELOG = [
     date: null,
     items: [
       {
+        tag: 'Added',
+        text: 'Requirements roll up true traceability: is the implementation actually exercised?'
+      },
+      {
         tag: 'Improved',
         text: 'Large downloads show bytes, an ETA, and never look stalled.'
       },

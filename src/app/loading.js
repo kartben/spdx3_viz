@@ -793,6 +793,7 @@ export const loadingMixin = {
       this.requirementSearch = '';
       this.requirementKindFilter = '';
       this.requirementStatusFilter = '';
+      this.requirementAdequacyFilter = '';
       this.requirementSpecFilter = '';
       this.collapsedReqs = {};
       // Prefer Decomposition when the SBOM has tracedToDetail hierarchy.

@@ -1170,6 +1170,7 @@ export const navigationMixin = {
     // card can scroll into view (tree rows open the detail panel instead).
     this.requirementKindFilter = '';
     this.requirementStatusFilter = '';
+    this.requirementAdequacyFilter = '';
     this.requirementSpecFilter = '';
     this.requirementLayout = 'list';
     this.switchView('requirements');

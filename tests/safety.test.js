@@ -4,7 +4,8 @@ import {
   requirementDisplayName,
   specificationFacetLabel,
   buildSafetySpecFacets,
-  isProducerMetaIdentifier
+  isProducerMetaIdentifier,
+  producerMetaValue
 } from '../src/lib/safety.js';
 import { isA, CLASS } from '../src/spdx/model.js';
 
@@ -41,7 +42,37 @@ describe('isProducerMetaIdentifier', () => {
   it('detects StrictDoc-style meta prefixes', () => {
     assert.equal(isProducerMetaIdentifier('adequacy:no-impl'), true);
     assert.equal(isProducerMetaIdentifier('status:Draft'), true);
+    assert.equal(isProducerMetaIdentifier('evidence:passing'), true);
+    assert.equal(isProducerMetaIdentifier('component:Threads'), true);
+    assert.equal(isProducerMetaIdentifier('requirement-level:system'), true);
     assert.equal(isProducerMetaIdentifier('ZEP-SRS-1-1'), false);
+  });
+});
+
+describe('producerMetaValue', () => {
+  const el = {
+    externalIdentifier: [
+      { identifier: 'ZEP-SRS-1-1' },
+      { identifier: 'adequacy:broken' },
+      { identifier: 'evidence:passing' }
+    ]
+  };
+
+  it('reads the value of a prefixed producer identifier', () => {
+    assert.equal(producerMetaValue(el, 'adequacy'), 'broken');
+    assert.equal(producerMetaValue(el, 'evidence'), 'passing');
+  });
+
+  it('returns an empty string when the element carries none', () => {
+    assert.equal(producerMetaValue(el, 'component'), '');
+    assert.equal(producerMetaValue(null, 'adequacy'), '');
+  });
+
+  it('reads through a supplied accessor', () => {
+    assert.equal(
+      producerMetaValue({}, 'adequacy', () => [{ identifier: 'adequacy:true' }]),
+      'true'
+    );
   });
 });
 

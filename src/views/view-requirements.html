@@ -128,6 +128,54 @@
         </div>
       </div>
     </template>
+    <!-- True-traceability rollup: does a requirement's own verifying tests actually
+         execute its implementation? Only rendered when the producer recorded the
+         adequacy verdicts (an SBOM built without a coverage matrix has none). -->
+    <template x-if="safetyAdequacySummary.total > 0">
+      <div class="space-y-2">
+        <div class="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-2 sm:flex-wrap">
+          <span
+            class="text-sm font-semibold text-white"
+            x-text="`${safetyAdequacySummary.exercisedPct}% truly traced`"
+          ></span>
+          <span
+            class="text-xs text-slate-500"
+            x-text="`${formatCount(safetyAdequacySummary.exercised)} of ${formatCount(safetyAdequacySummary.total)} have their implementation exercised by their own tests`"
+          ></span>
+        </div>
+        <div class="flex h-2.5 w-full rounded-full overflow-hidden bg-slate-700">
+          <template x-for="a in safetyAdequacyOrder" :key="a">
+            <div
+              class="h-full first:rounded-l-full last:rounded-r-full"
+              :style="`width:${(safetyAdequacySummary.counts[a] / safetyAdequacySummary.total) * 100}%; background:${safetyAdequacyMeta(a).color}`"
+              :title="`${safetyAdequacyMeta(a).label}: ${safetyAdequacySummary.counts[a]}`"
+            ></div>
+          </template>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-xs text-slate-500 mr-0.5">Traceability</span>
+          <template x-for="a in safetyAdequacyOrder" :key="a">
+            <button
+              type="button"
+              @click="requirementAdequacyFilter = (requirementAdequacyFilter === a ? '' : a); restreamView('requirements')"
+              class="badge transition"
+              :class="requirementAdequacyFilter === a ? safetyAdequacyMeta(a).badgeClass + ' brightness-125' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
+              :title="safetyAdequacyMeta(a).hint"
+            >
+              <span
+                class="w-1.5 h-1.5 rounded-full mr-1.5"
+                :class="safetyAdequacyMeta(a).dotClass"
+              ></span>
+              <span x-text="safetyAdequacyMeta(a).label"></span>
+              <span
+                class="ml-1.5 font-semibold"
+                x-text="formatCount(safetyAdequacySummary.counts[a])"
+              ></span>
+            </button>
+          </template>
+        </div>
+      </div>
+    </template>
     <!-- Kind filter (list mode; only kinds actually present are offered) -->
     <div x-show="requirementLayout === 'list'" class="flex flex-wrap items-center gap-1.5 !mt-6">
       <template

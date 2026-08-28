@@ -201,6 +201,87 @@ export const SAFETY_NO_IMPL_META = {
 };
 
 /**
+ * FunctionalSafety profile: presentation metadata for a Requirement's
+ * "true traceability" adequacy, the verdict a producer records as an
+ * `adequacy:<verdict>` external identifier. It answers a different question
+ * from SAFETY_STATUSES: not whether the verifying tests passed, but whether
+ * they actually executed the code that implements the requirement. `rank`
+ * orders them gaps-first, matching the chip row.
+ */
+export const SAFETY_ADEQUACY = {
+  broken: {
+    key: 'broken',
+    label: 'Not exercised',
+    color: '#f43f5e',
+    badgeClass: 'bg-rose-500/15 text-rose-300 ring-1 ring-rose-500/30',
+    dotClass: 'bg-rose-500',
+    iconKey: 'status_fail',
+    hint: 'Verified on paper only: other tests reach the implementation, its own never do',
+    rank: 7
+  },
+  partial: {
+    key: 'partial',
+    label: 'Partly exercised',
+    color: '#f59e0b',
+    badgeClass: 'bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/30',
+    dotClass: 'bg-amber-500',
+    iconKey: 'status_inconclusive',
+    hint: 'Some implementing symbols are exercised by the verifying tests, others are not',
+    rank: 6
+  },
+  'no-impl': {
+    key: 'no-impl',
+    label: 'No implementation',
+    color: '#fb923c',
+    badgeClass: 'bg-orange-500/15 text-orange-300 ring-1 ring-orange-500/30',
+    dotClass: 'bg-orange-500',
+    iconKey: 'status_unverified',
+    hint: 'Nothing in the code claims to implement this requirement',
+    rank: 5
+  },
+  unresolved: {
+    key: 'unresolved',
+    label: 'Not resolvable',
+    color: '#a78bfa',
+    badgeClass: 'bg-violet-500/15 text-violet-300 ring-1 ring-violet-500/30',
+    dotClass: 'bg-violet-500',
+    iconKey: 'status_unverified',
+    hint: 'The implementation links point at macros or inlines, which have no body to cover',
+    rank: 4
+  },
+  unattributed: {
+    key: 'unattributed',
+    label: 'Never reached',
+    color: '#64748b',
+    badgeClass: 'bg-slate-600/20 text-slate-300 ring-1 ring-slate-500/30',
+    dotClass: 'bg-slate-500',
+    iconKey: 'status_unverified',
+    hint: 'No test in the run reached the implementation (boot-time, inlined away, or configured out)',
+    rank: 3
+  },
+  'no-cov': {
+    key: 'no-cov',
+    label: 'No coverage data',
+    color: '#94a3b8',
+    badgeClass: 'bg-slate-600/20 text-slate-300 ring-1 ring-slate-500/30',
+    dotClass: 'bg-slate-400',
+    iconKey: 'status_unverified',
+    hint: 'The verifying tests produced no coverage in this run',
+    rank: 2
+  },
+  true: {
+    key: 'true',
+    label: 'Exercised',
+    color: '#10b981',
+    badgeClass: 'bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30',
+    dotClass: 'bg-emerald-500',
+    iconKey: 'status_pass',
+    hint: "Every resolved implementing symbol is exercised by the requirement's own verifying tests",
+    rank: 1
+  }
+};
+
+/**
  * Presentation metadata for each CVSS qualitative severity, sourced directly
  * from the SBOM's own CVSS assessment relationships. `rank` orders them from
  * most to least severe (used to sort/filter the security view and to size the

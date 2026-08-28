@@ -140,6 +140,7 @@ export function createState() {
     requirementSearch: '', // in-view filter for the Functional Safety list
     requirementKindFilter: '', // '' = all, else an FS element type to show only
     requirementStatusFilter: '', // '' = all, else a verification-status key or 'noimpl'
+    requirementAdequacyFilter: '', // '' = all, else a true-traceability adequacy verdict
     requirementSpecFilter: '', // '' = all, else a Specification spdxId (hasRequirement facet)
     requirementLayout: 'list', // Functional Safety tab: 'list' | 'tree' (tracedToDetail decomposition)
     collapsedReqs: {}, // decomposition tree: spdxId -> true for collapsed subtrees
