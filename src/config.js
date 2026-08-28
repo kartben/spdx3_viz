@@ -997,18 +997,39 @@ export const RELATIONSHIP_SORT_ORDER = {
  * stays available everywhere else, where it is plainly this tool's own reading
  * of the OSADL matrix.
  *
- * Matched on host alone, so any path under the host is covered.
+ * Matched on host alone, so any path under the host is covered. Note that
+ * tools.spdx.org reaches the app through an iframe rather than serving it, so
+ * in practice isLicenseCompatAvailable's frame check is what covers it.
  * @constant {Set<string>}
  */
 export const LICENSE_COMPAT_HIDDEN_HOSTS = new Set(['tools.spdx.org']);
 
+// True when this document is not the top-level one. An opaque parent still
+// counts, so a throw is read as "framed" rather than shrugged off.
+function isFramed() {
+  try {
+    return typeof window !== 'undefined' && window.top !== window.self;
+  } catch {
+    return true;
+  }
+}
+
 /**
- * Whether the Licenses view offers its compatibility check on this host.
+ * Whether the Licenses view offers its compatibility check here.
  *
- * @param {string} [hostname] - defaults to the current location's host
+ * Withheld on the hosts above, and in any frame. tools.spdx.org does not serve
+ * the app itself: it embeds the GitHub Pages build cross-origin, with
+ * `referrerpolicy="no-referrer"`, so from inside that frame neither the host
+ * nor the referrer names the embedder. Rather than guess at the parent, treat
+ * being framed as enough on its own. Running inside someone else's page is what
+ * makes the verdict look like theirs, which is the impression to avoid, and the
+ * check is one click away in a tab of its own.
+ *
+ * @param {{hostname?: string, framed?: boolean}} [env] - defaults to this document's
  * @returns {boolean}
  */
-export function isLicenseCompatAvailable(hostname) {
-  const host = hostname ?? (typeof location === 'undefined' ? '' : location.hostname || '');
+export function isLicenseCompatAvailable(env = {}) {
+  if (env.framed ?? isFramed()) return false;
+  const host = env.hostname ?? (typeof location === 'undefined' ? '' : location.hostname || '');
   return !LICENSE_COMPAT_HIDDEN_HOSTS.has(String(host).toLowerCase());
 }
