@@ -629,6 +629,7 @@ export const compatibilityMixin = {
   // ---- view wiring --------------------------------------------------------
 
   setLicenseViewMode(mode) {
+    if (mode === 'compatibility' && !this.licenseCompatAvailable) return;
     this.licenseViewMode = mode;
     if (mode === 'compatibility' && !this.compatOutboundTouched && !this.compatOutbound) {
       this.compatOutbound = this.compatDefaultOutbound;

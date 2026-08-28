@@ -2,7 +2,8 @@ import {
   createGraphFilters,
   createScopeFilters,
   createViews,
-  createNavProfiles
+  createNavProfiles,
+  isLicenseCompatAvailable
 } from '../config.js';
 import { APP_VERSION } from '../version.js';
 import { CHANGELOG } from '../changelog.js';
@@ -206,6 +207,9 @@ export function createState() {
     licenseSort: 'usage',
     // Licenses view: 'inventory' is the license list, 'compatibility' the
     // outbound check and matrix built on the OSADL matrix.
+    // Withheld on SPDX's own tools domain (see isLicenseCompatAvailable), so the
+    // Licenses view there is the inventory alone.
+    licenseCompatAvailable: isLicenseCompatAvailable(),
     licenseViewMode: 'inventory',
     compatPanel: 'check', // 'check' (outbound verdict) | 'matrix' (pairwise grid)
     compatOutbound: '', // SPDX id to combine everything under; '' until guessed
