@@ -54,6 +54,10 @@ export const BUCKET = Object.freeze({
 
 /** @typedef {(typeof BUCKET)[keyof typeof BUCKET]} Bucket */
 
+// Deeper than any real SPDX class chain; only a cycle in a hand-edited
+// CLASS_PARENT could reach it, and stopping there beats looping forever.
+const MAX_CLASS_DEPTH = 64;
+
 /**
  * Returns the ancestry chain [type, superclass, …] up to a root.
  *
@@ -81,11 +85,14 @@ export function ancestors(type) {
  * @returns {boolean}
  */
 export function isA(type, base) {
-  const seen = new Set();
+  // Walked with a depth cap rather than a `seen` Set. CLASS_PARENT is a static,
+  // acyclic table, so the cap only guards against a malformed one, and this is
+  // the hottest function in the app: classifying one element for the graph asks
+  // it about ~20 candidate classes, which had a large SBOM's first graph build
+  // allocating tens of millions of Sets for nothing.
   let t = type;
-  while (t && !seen.has(t)) {
+  for (let depth = 0; t && depth < MAX_CLASS_DEPTH; depth++) {
     if (t === base) return true;
-    seen.add(t);
     t = CLASS_PARENT[t];
   }
   return false;
