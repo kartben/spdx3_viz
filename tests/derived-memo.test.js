@@ -77,14 +77,16 @@ test('securitySeveritySummary and hasCvssData', async (t) => {
 test('safetyCounts', () => {
   const app = makeApp({
     requirements: [
-      { spdxId: 'r1', type: CLASS.Requirement },
-      { spdxId: 'r2', type: CLASS.Requirement },
+      { spdxId: 'r1', type: CLASS.Requirement, _level: 'software' },
+      { spdxId: 'r2', type: CLASS.Requirement, _level: 'system' },
       { spdxId: 'ver1', type: CLASS.functionalsafety_RequirementVerification },
       { spdxId: 'as1', type: CLASS.functionalsafety_Assumption }
-    ]
+    ],
+    requirementLevel: (r) => r._level || ''
   });
   const c = app.safetyCounts;
   assert.equal(c.requirements, 2);
+  assert.equal(c.systemRequirements, 1);
   assert.equal(c.verifications, 1);
   assert.equal(c.assumptions, 1);
   assert.equal(app.safetyCounts, c, 'same list, same object');

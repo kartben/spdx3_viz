@@ -1208,10 +1208,21 @@ export const derivedMixin = {
   // summary and to decide which kind-filter chips to show.
   get safetyCounts() {
     if (safetyCountsSrc === this.requirements) return safetyCountsVal;
-    const c = { requirements: 0, verifications: 0, assumptions: 0, evaluations: 0 };
+    const c = {
+      requirements: 0,
+      systemRequirements: 0,
+      verifications: 0,
+      assumptions: 0,
+      evaluations: 0
+    };
     this.requirements.forEach((r) => {
-      if (isA(r.type, CLASS.Requirement)) c.requirements++;
-      else if (isA(r.type, CLASS.functionalsafety_RequirementVerification)) c.verifications++;
+      if (isA(r.type, CLASS.Requirement)) {
+        c.requirements++;
+        // A system requirement is refined into software ones rather than
+        // verified directly, so it is counted apart when the producer says which
+        // level a requirement is at.
+        if (this.requirementLevel(r) === 'system') c.systemRequirements++;
+      } else if (isA(r.type, CLASS.functionalsafety_RequirementVerification)) c.verifications++;
       else if (isA(r.type, CLASS.functionalsafety_Assumption)) c.assumptions++;
       else if (isA(r.type, CLASS.functionalsafety_EvaluationResult)) c.evaluations++;
     });

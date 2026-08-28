@@ -8,8 +8,13 @@
       <div class="flex items-center gap-2 min-w-0">
         <!-- Breakdown summary of the folded-in FunctionalSafety elements -->
         <span class="text-sm text-slate-400 min-w-0 truncate">
-          <span x-text="safetyCounts.requirements"></span> requirements<template
-            x-if="safetyCounts.verifications"
+          <span x-text="safetyCounts.requirements - safetyCounts.systemRequirements"></span>
+          requirements<template x-if="safetyCounts.systemRequirements"
+            ><span
+              ><span class="text-slate-600"> · </span
+              ><span x-text="safetyCounts.systemRequirements"></span> system</span
+            ></template
+          ><template x-if="safetyCounts.verifications"
             ><span
               ><span class="text-slate-600"> · </span
               ><span x-text="safetyCounts.verifications"></span> verifications</span
