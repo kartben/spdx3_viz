@@ -354,7 +354,9 @@ export function checkLicenseExpression(expression, outbound) {
  * @property {Record<CompatStatus, {licenses: number, elements: number}>} totals
  * @property {number} licenseCount - subjects checked
  * @property {number} elementCount - distinct elements covered
- * @property {number} clearElementCount - elements carrying no conflicting license
+ * @property {number} clearElementCount - elements carrying no conflicting license.
+ *   Not the same as verified: an element whose only license the matrix does not
+ *   rate is counted here, because nothing is known against it.
  */
 
 /**
