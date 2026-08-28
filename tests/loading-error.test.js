@@ -86,24 +86,24 @@ test('parseInWorker', async (t) => {
     assert.equal(parseInWorker([{ name: 'a.json', text: '{}' }]), true);
   });
 
-  await t.test('blob-backed files below streaming scale parse in the worker', () => {
+  await t.test('blob-backed files parse in the worker', () => {
     // A ~62 MB file (the Kubernetes sample's size): blob-backed because it is
-    // past INLINE_TEXT_MAX, but far from too big to clone back.
+    // past INLINE_TEXT_MAX.
     assert.equal(parseInWorker([{ name: 'k8s.json', blob: { size: 62e6 } }]), true);
   });
 
-  await t.test('a streaming-scale SBOM parses on the main thread', () => {
-    assert.equal(parseInWorker([{ name: 'yocto.json', blob: { size: STREAM_THRESHOLD } }]), false);
+  await t.test('a streaming-scale SBOM parses in the worker too', () => {
+    // It used to fall back to the main thread, because its model could not be
+    // cloned back out in one piece. It is handed over as chunks instead now.
+    assert.equal(parseInWorker([{ name: 'yocto.json', blob: { size: STREAM_THRESHOLD } }]), true);
+    assert.equal(
+      parseInWorker([{ name: 'yocto.json', blob: { size: 4 * STREAM_THRESHOLD } }]),
+      true
+    );
   });
 
-  await t.test('sizes sum across files', () => {
-    const half = { blob: { size: STREAM_THRESHOLD / 2 } };
-    assert.equal(parseInWorker([half]), true);
-    assert.equal(parseInWorker([half, half]), false);
-  });
-
-  await t.test('an empty set parses in the worker', () => {
-    assert.equal(parseInWorker([]), true);
+  await t.test('an empty set has nothing to parse', () => {
+    assert.equal(parseInWorker([]), false);
   });
 });
 

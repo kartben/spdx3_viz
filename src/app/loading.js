@@ -2,7 +2,7 @@
    progress bar, and applying the worker's parsed result to component state. */
 
 import { parseShareHash } from '../lib/index.js';
-import { STREAM_THRESHOLD } from '../parser/limits.js';
+import { decodeRefs } from '../parser/transfer.js';
 
 /* A single long-lived parser worker, kept off the reactive state so it is never
    proxied; parsing runs here to keep the main thread responsive.
@@ -61,15 +61,18 @@ const VEX_FILTER_KEYS = new Set([
   'underInvestigation'
 ]);
 
-// Decides where a parse runs. The worker is the default: it keeps the main
-// thread responsive, and a Blob posts to it by reference, for free. Only an
-// SBOM at streaming scale starts on the main thread, because its parsed model
-// is what can be too big to structured-clone back out of the worker; letting
-// the worker try anyway would parse the whole document twice. Exported for
-// tests.
+// Decides where a parse runs. Everything goes to the worker: it keeps the main
+// thread responsive, and a Blob posts to it by reference, for free. Size used
+// to send the largest SBOMs to the main thread instead, because their parsed
+// model cannot be structured-cloned back in one piece — that model is now
+// handed over in chunks (see parser/transfer), so size no longer decides.
+// Exported for tests.
 export function parseInWorker(files) {
-  const total = (files || []).reduce((sum, f) => sum + (f?.blob?.size || f?.text?.length || 0), 0);
-  return total < STREAM_THRESHOLD;
+  // Every parse runs in the worker now. A model too big to hand back in one
+  // piece is sent as chunks instead (see parser/transfer), so the size that
+  // used to force a main-thread parse no longer does; the main-thread path
+  // remains only as the fallback for a worker that fails outright.
+  return (files || []).length > 0;
 }
 
 function getParserWorker() {
@@ -570,15 +573,14 @@ export const loadingMixin = {
     this.parseData(this.loadedFiles);
   },
 
-  // Parse the loaded files, then apply the result. Normally this runs in
+  // Parse the loaded files, then apply the result. This runs in
   // parser.worker.js so the UI never freezes on large SBOMs; a Blob is
   // structured-cloned by reference, so posting one into the worker costs
-  // nothing. Only an SBOM at streaming scale (see parseInWorker) starts on the
-  // main thread: its parsed model is what can genuinely be too big to clone
-  // back out of the worker (postMessage OOMs), and a doomed worker attempt
-  // would just parse the whole thing twice. If the worker's result still turns
-  // out too big to post back, or the worker dies trying, the main-thread path
-  // runs as the fallback.
+  // nothing. A model small enough to clone back comes home in one message; one
+  // that is not arrives as chunks of elements plus the collections that
+  // reference them (see parser/transfer). The main-thread path remains only for
+  // a worker that fails outright — it freezes the UI for the length of the
+  // parse, which is what the chunked hand-over exists to avoid.
   parseData(files) {
     const reqId = ++parseReqSeq;
     latestParseReqId = reqId;
@@ -599,6 +601,57 @@ export const loadingMixin = {
 
       if (msg.type === 'progress') {
         this._setProgress(msg.phase, msg.value);
+        return;
+      }
+
+      // The model was too big to hand over in one piece, so it arrives as
+      // chunks of elements followed by everything else. Rebuilding it here
+      // costs a fraction of a re-parse and, unlike one, leaves the main thread
+      // free between chunks.
+      if (msg.type === 'chunkBegin') {
+        this._incoming = {
+          elementMap: new Map(),
+          received: 0,
+          chunks: msg.chunks,
+          parsed: {},
+          indexes: {}
+        };
+        this.progressPhase = 'Receiving model…';
+        return;
+      }
+      if (msg.type === 'chunk') {
+        const inc = this._incoming;
+        if (!inc) return;
+        for (const [id, element] of msg.entries) inc.elementMap.set(id, element);
+        inc.received++;
+        this._setProgress('index', inc.received / (inc.chunks || 1));
+        return;
+      }
+      if (msg.type === 'part') {
+        const inc = this._incoming;
+        if (!inc) return;
+        // Decode as each part lands rather than in one pass at the end: the
+        // markers resolve against an elementMap that is already complete, and
+        // the work is spread over messages the thread can paint between.
+        const data = decodeRefs(msg.data, inc.elementMap);
+        const target = inc[msg.scope];
+        if (msg.kind === 'array') (target[msg.key] ||= []).push(...data);
+        else if (msg.kind === 'map') {
+          const map = (target[msg.key] ||= new Map());
+          for (const [k, v] of data) map.set(k, v);
+        } else target[msg.key] = data;
+        return;
+      }
+      if (msg.type === 'chunkEnd') {
+        const inc = this._incoming;
+        this._incoming = null;
+        if (!inc) return;
+        inc.parsed.elementMap = inc.elementMap;
+        this._stopStartupRamp();
+        this.parsing = false;
+        this.progress = 1;
+        this.progressEta = null;
+        this._applyParsedResult(inc.parsed, inc.indexes);
         return;
       }
 
