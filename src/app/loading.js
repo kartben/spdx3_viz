@@ -3,6 +3,7 @@
 
 import { parseShareHash } from '../lib/index.js';
 import { STREAM_THRESHOLD } from '../parser/limits.js';
+import { nextPaint } from './paint.js';
 
 /* A single long-lived parser worker, kept off the reactive state so it is never
    proxied; parsing runs here to keep the main thread responsive.
@@ -664,13 +665,11 @@ export const loadingMixin = {
   // duration, started just before the block via onPhase. A brief stall on those
   // is the accepted cost of loading a multi-hundred-MB SBOM without a worker.
   async _parseOnMainThread(files, reqId) {
-    // Two rAFs guarantee a committed, painted frame, so the progress bar's
+    // nextPaint waits for a committed, painted frame, so the progress bar's
     // transform transition is handed to the compositor before the next
-    // synchronous phase blocks the main thread (a bare setTimeout may not have
-    // produced a frame yet, leaving the bar frozen).
-    const yieldToPaint = () =>
-      new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    await yieldToPaint(); // let the overlay paint before any blocking work
+    // synchronous phase blocks the main thread; it gives up on the frame in a
+    // hidden tab, which never paints and would otherwise strand the parse there.
+    await nextPaint(); // let the overlay paint before any blocking work
     try {
       const { parseFiles } = await import('../parser/parse-files.js');
       const { parsed, indexes } = await parseFiles(
@@ -684,7 +683,7 @@ export const loadingMixin = {
           if (reqId !== latestParseReqId) throw new Error('canceled');
           if (phase === 'json') this._setProgress(phase, value);
         },
-        (phase, count) => this._beginParsePhaseSweep(phase, count, yieldToPaint)
+        (phase, count) => this._beginParsePhaseSweep(phase, count)
       );
       if (reqId !== latestParseReqId) return; // superseded
 
@@ -697,7 +696,7 @@ export const loadingMixin = {
       this.progressEta = null;
       this.progressAnimateMs = this._estParsePhaseMs('finalize', parsed?.elementMap?.size || 0);
       this.progress = 0.99;
-      await yieldToPaint(); // commit the tail sweep before the render blocks
+      await nextPaint(); // commit the tail sweep before the render blocks
       this._applyParsedResult(parsed, indexes);
       this.$nextTick(() => {
         this.progressAnimateMs = 150;
@@ -725,7 +724,7 @@ export const loadingMixin = {
   // Sets the progress bar sweeping toward a phase's end over roughly how long
   // that phase will block, then yields once so the transition starts painting
   // before the synchronous work begins.
-  async _beginParsePhaseSweep(phase, count, yieldToPaint) {
+  async _beginParsePhaseSweep(phase, count) {
     const spec =
       phase === 'graph'
         ? { target: 0.75, label: 'Building graph…' }
@@ -735,7 +734,7 @@ export const loadingMixin = {
     this.progressEta = estMs / 1000;
     this.progressAnimateMs = estMs;
     this.progress = spec.target;
-    await yieldToPaint(); // start the transition before the block monopolizes the thread
+    await nextPaint(); // start the transition before the block monopolizes the thread
   },
 
   // A failed first load keeps the user on the landing screen, which renders
