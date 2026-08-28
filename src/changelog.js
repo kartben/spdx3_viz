@@ -11,15 +11,11 @@ export const CHANGELOG = [
     items: [
       {
         tag: 'Improved',
-        text: 'A slow server no longer looks like a stalled load: the bar keeps easing and says it is waiting.'
+        text: 'Large downloads show bytes, an ETA, and never look stalled.'
       },
       {
         tag: 'Improved',
         text: "A complete CPE now links to NVD's vulnerability search by exact CPE name, version included."
-      },
-      {
-        tag: 'Improved',
-        text: 'Downloading a large sample shows the bytes transferred, gives the download more of the progress bar, eases the bar off zero while the request is in flight, and estimates the time left from the measured transfer rate.'
       },
       {
         tag: 'Improved',
