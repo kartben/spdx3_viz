@@ -17,6 +17,7 @@ via the "What's new" link.
 - **Improved:** The graph opens much faster the first time on huge SBOMs.
 - **Fixed:** Loading a huge SBOM no longer stalls in a background tab.
 - **Added:** License compatibility analyzer.
+- **Fixed:** Share links restore Safety chips and Supply Chain angles.
 
 ## [0.5.0] - 2026-08-22
 

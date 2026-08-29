@@ -13,7 +13,7 @@
         >
           <button
             type="button"
-            @click="requirementLayout = 'list'; restreamView('requirements')"
+            @click="requirementLayout = 'list'; restreamView('requirements'); _scheduleNavPush()"
             class="px-2.5 sm:px-3 py-1.5 transition-colors"
             :class="requirementLayout === 'list' ? 'bg-slate-700 text-white' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
           >
@@ -21,7 +21,7 @@
           </button>
           <button
             type="button"
-            @click="requirementLayout = 'tree'"
+            @click="requirementLayout = 'tree'; _scheduleNavPush()"
             class="px-2.5 sm:px-3 py-1.5 transition-colors"
             :class="requirementLayout === 'tree' ? 'bg-slate-700 text-white' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
           >
@@ -159,7 +159,7 @@
       >
         <button
           type="button"
-          @click="requirementKindFilter = chip.key; restreamView('requirements')"
+          @click="requirementKindFilter = chip.key; restreamView('requirements'); _scheduleNavPush()"
           class="px-2.5 py-1 rounded-full text-xs border transition-colors"
           :class="requirementKindFilter === chip.key
                     ? 'bg-yellow-500/15 text-yellow-300 border-yellow-500/40'
@@ -342,7 +342,7 @@
             </div>
             <button
               type="button"
-              @click="requirementSearch = ''; requirementKindFilter = 'Requirement'; requirementStatusFilter = ''; requirementAdequacyFilter = ''; requirementSpecFilter = ''; restreamView('requirements')"
+              @click="requirementSearch = ''; requirementKindFilter = 'Requirement'; requirementStatusFilter = ''; requirementAdequacyFilter = ''; requirementSpecFilter = ''; restreamView('requirements'); _scheduleNavPush()"
               class="mt-3 rounded-md bg-slate-800 px-3 py-1.5 text-xs text-slate-300 hover:bg-slate-700 hover:text-white transition-colors"
             >
               Clear filters

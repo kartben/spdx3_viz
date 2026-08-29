@@ -30,7 +30,7 @@
         >
           <button
             type="button"
-            @click="supplyChainViewMode = mode.key; if (mode.key === 'states') renderSupplyChainStateDiagram()"
+            @click="supplyChainViewMode = mode.key; if (mode.key === 'states') renderSupplyChainStateDiagram(); _scheduleNavPush()"
             class="px-2.5 py-1 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5"
             :class="supplyChainViewMode === mode.key
               ? 'bg-cyan-500/20 text-cyan-300'
@@ -50,7 +50,7 @@
   <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
     <button
       type="button"
-      @click="supplyChainViewMode = 'timeline'"
+      @click="supplyChainViewMode = 'timeline'; _scheduleNavPush()"
       class="text-left rounded-lg border border-slate-700 bg-slate-900/50 px-3 py-2.5 transition-colors hover:border-slate-600"
       :class="supplyChainViewMode === 'timeline' && 'ring-1 ring-cyan-500/40'"
     >
@@ -59,7 +59,7 @@
     </button>
     <button
       type="button"
-      @click="supplyChainViewMode = 'processes'"
+      @click="supplyChainViewMode = 'processes'; _scheduleNavPush()"
       class="text-left rounded-lg border border-slate-700 bg-slate-900/50 px-3 py-2.5 transition-colors hover:border-slate-600"
       :class="supplyChainViewMode === 'processes' && 'ring-1 ring-cyan-500/40'"
     >
@@ -68,7 +68,7 @@
     </button>
     <button
       type="button"
-      @click="supplyChainViewMode = 'states'; renderSupplyChainStateDiagram()"
+      @click="supplyChainViewMode = 'states'; renderSupplyChainStateDiagram(); _scheduleNavPush()"
       class="text-left rounded-lg border border-slate-700 bg-slate-900/50 px-3 py-2.5 transition-colors hover:border-slate-600"
       :class="supplyChainViewMode === 'states' && 'ring-1 ring-cyan-500/40'"
     >

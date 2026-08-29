@@ -7,6 +7,38 @@
  * @module lib/share
  */
 
+/** @type {Record<string, string>} */
+const REQ_KIND_TO_CODE = {
+  '': 'all',
+  functionalsafety_RequirementVerification: 'ver',
+  functionalsafety_EvaluationResult: 'eval',
+  functionalsafety_Assumption: 'asm'
+};
+
+/** @type {Record<string, string>} */
+const REQ_CODE_TO_KIND = {
+  all: '',
+  ver: 'functionalsafety_RequirementVerification',
+  eval: 'functionalsafety_EvaluationResult',
+  asm: 'functionalsafety_Assumption'
+};
+
+/** @type {Record<string, string>} */
+const SC_MODE_TO_CODE = {
+  states: 'st',
+  processes: 'pr',
+  custody: 'cu',
+  map: 'mp'
+};
+
+/** @type {Record<string, string>} */
+const SC_CODE_TO_MODE = {
+  st: 'states',
+  pr: 'processes',
+  cu: 'custody',
+  mp: 'map'
+};
+
 /**
  * Builds the URL fragment (without the leading '#') for a spot in a sample.
  * Returns '' when there is no sample to anchor the link to.
@@ -18,7 +50,8 @@
  *          detail?: string|null, graphSelected?: string|null,
  *          licenseMode?: string|null, compatPanel?: string|null,
  *          compatOutbound?: string|null, compatScope?: string|null,
- *          compatEdges?: string|null}} spot
+ *          compatEdges?: string|null, requirementKind?: string|null,
+ *          requirementLayout?: string|null, supplyChainMode?: string|null}} spot
  * @returns {string}
  */
 export function buildShareHash(spot) {
@@ -38,6 +71,20 @@ export function buildShareHash(spot) {
     if (spot.compatScope) params.set('cs', spot.compatScope);
     if (spot.compatEdges === 'distributed') params.set('ce', 'd');
   }
+  // Functional Safety chips and layout. Requirement + unspecified layout stay
+  // out of the hash; a verification/test chip or an explicit list/tree does not,
+  // so a saved URL can reopen the same kind of card.
+  if (spot.view === 'requirements') {
+    const kindCode = REQ_KIND_TO_CODE[spot.requirementKind ?? 'Requirement'];
+    if (kindCode) params.set('rk', kindCode);
+    if (spot.requirementLayout === 'tree') params.set('rl', 't');
+    else if (spot.requirementLayout === 'list') params.set('rl', 'l');
+  }
+  // Supply Chain angle. Timeline is the default and stays out of the hash.
+  if (spot.view === 'supplychain') {
+    const modeCode = SC_MODE_TO_CODE[spot.supplyChainMode ?? 'timeline'];
+    if (modeCode) params.set('svm', modeCode);
+  }
   return params.toString();
 }
 
@@ -49,7 +96,9 @@ export function buildShareHash(spot) {
  * @returns {{sample: string, view: string, expanded: string|null,
  *            detail: string|null, graphSelected: string|null,
  *            licenseMode: string, compatPanel: string, compatOutbound: string|null,
- *            compatScope: string|null, compatEdges: string}|null}
+ *            compatScope: string|null, compatEdges: string,
+ *            requirementKind: string, requirementLayout: string|null,
+ *            supplyChainMode: string|null}|null}
  */
 export function parseShareHash(hash) {
   const raw = String(hash || '').replace(/^#/, '');
@@ -57,6 +106,9 @@ export function parseShareHash(hash) {
   const params = new URLSearchParams(raw);
   const sample = params.get('s');
   if (!sample) return null;
+  const rk = params.get('rk');
+  const rl = params.get('rl');
+  const svm = params.get('svm');
   return {
     sample,
     view: params.get('v') || 'dashboard',
@@ -67,6 +119,14 @@ export function parseShareHash(hash) {
     compatPanel: params.get('cp') === 'm' ? 'matrix' : 'check',
     compatOutbound: params.get('co') || null,
     compatScope: params.get('cs') || null,
-    compatEdges: params.get('ce') === 'd' ? 'distributed' : 'all'
+    compatEdges: params.get('ce') === 'd' ? 'distributed' : 'all',
+    // Omitted rk is the Requirements chip, the view's default.
+    requirementKind: rk == null ? 'Requirement' : (REQ_CODE_TO_KIND[rk] ?? 'Requirement'),
+    // null means the link did not pin a layout: keep the document default
+    // (tree when there is a decomposition) unless an expanded card forces list.
+    requirementLayout: rl === 't' ? 'tree' : rl === 'l' ? 'list' : null,
+    // null when omitted so an expanded card can still infer its angle; an
+    // explicit svm always wins.
+    supplyChainMode: svm ? SC_CODE_TO_MODE[svm] || 'timeline' : null
   };
 }
