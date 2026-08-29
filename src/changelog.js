@@ -10,6 +10,10 @@ export const CHANGELOG = [
     date: null,
     items: [
       {
+        tag: 'Improved',
+        text: 'Requirement cards group same-file snippets.'
+      },
+      {
         tag: 'Added',
         text: 'Requirements roll up true traceability: is the implementation actually exercised?'
       },

@@ -7,6 +7,13 @@ import {
   isProducerMetaIdentifier,
   producerMetaValue
 } from '../src/lib/safety.js';
+import {
+  snippetSymbolLabel,
+  snippetCompactLine,
+  snippetTargetLabel,
+  snippetFileGroupLabel,
+  groupSnippetsByFile
+} from '../src/lib/relationships.js';
 import { isA, CLASS } from '../src/spdx/model.js';
 
 describe('requirementDisplayName', () => {
@@ -124,5 +131,130 @@ describe('buildSafetySpecFacets', () => {
       new Set()
     );
     assert.deepEqual(facets, []);
+  });
+});
+
+describe('snippet labels', () => {
+  it('extracts the function from a producer "func @ path:lines" name', () => {
+    const el = {
+      type: 'software_Snippet',
+      name: 'z_impl_k_thread_create @ kernel/thread.c:1018-1032',
+      software_lineRange: { beginIntegerRange: 1018, endIntegerRange: 1032 }
+    };
+    assert.equal(snippetSymbolLabel(el), 'z_impl_k_thread_create');
+    assert.equal(snippetCompactLine(el), '1018-1032');
+  });
+
+  it('falls back to the line span for coverage-style path:lines names', () => {
+    const el = {
+      type: 'software_Snippet',
+      name: 'kernel/thread.c:1018-1018',
+      software_lineRange: { beginIntegerRange: 1018, endIntegerRange: 1018 }
+    };
+    assert.equal(snippetSymbolLabel(el), 'L1018');
+    assert.equal(snippetCompactLine(el), '1018');
+  });
+
+  it('labels a snippet as file › symbol, without repeating the path', () => {
+    const el = {
+      type: 'software_Snippet',
+      name: 'z_impl_k_thread_create @ kernel/thread.c:1018-1032',
+      software_snippetFromFile: 'file:a',
+      software_lineRange: { beginIntegerRange: 1018, endIntegerRange: 1032 }
+    };
+    const map = new Map([['file:a', { type: 'software_File', name: 'kernel/thread.c' }]]);
+    assert.equal(snippetTargetLabel(el, map), 'thread.c › z_impl_k_thread_create');
+  });
+
+  it('lists several symbols of one file instead of "N ranges"', () => {
+    const a = {
+      name: 'z_impl_k_thread_create @ kernel/thread.c:1018-1032',
+      software_lineRange: { beginIntegerRange: 1018, endIntegerRange: 1032 }
+    };
+    const b = {
+      name: 'z_vrfy_k_thread_create @ kernel/thread.c:1051-1112',
+      software_lineRange: { beginIntegerRange: 1051, endIntegerRange: 1112 }
+    };
+    assert.equal(
+      snippetFileGroupLabel('thread.c', [a, b]),
+      'thread.c › z_impl_k_thread_create, z_vrfy_k_thread_create'
+    );
+  });
+});
+
+describe('groupSnippetsByFile', () => {
+  const fileA = { type: 'software_File', spdxId: 'file:a', name: 'kernel/thread.c' };
+  const fileB = { type: 'software_File', spdxId: 'file:b', name: 'kernel/sched.c' };
+  const map = new Map([
+    ['file:a', fileA],
+    ['file:b', fileB]
+  ]);
+
+  it('groups snippets of the same file and keeps non-snippets aside', () => {
+    const snippets = [
+      {
+        type: 'software_Snippet',
+        spdxId: 's2',
+        name: 'beta @ kernel/thread.c:20-30',
+        software_snippetFromFile: 'file:a',
+        software_lineRange: { beginIntegerRange: 20, endIntegerRange: 30 }
+      },
+      {
+        type: 'software_Snippet',
+        spdxId: 's1',
+        name: 'alpha @ kernel/thread.c:1-5',
+        software_snippetFromFile: 'file:a',
+        software_lineRange: { beginIntegerRange: 1, endIntegerRange: 5 }
+      },
+      {
+        type: 'software_Snippet',
+        spdxId: 's3',
+        software_snippetFromFile: 'file:b',
+        software_lineRange: { beginIntegerRange: 8, endIntegerRange: 9 }
+      },
+      { type: 'software_Package', spdxId: 'pkg:1', name: 'lib' }
+    ];
+    const grouped = groupSnippetsByFile(snippets, map);
+    assert.equal(grouped.files.length, 2);
+    const thread = grouped.files.find((f) => f.baseName === 'thread.c');
+    assert.deepEqual(
+      thread.snippets.map((s) => s.label),
+      ['alpha', 'beta']
+    );
+    assert.deepEqual(thread.snippetIds, ['s1', 's2']);
+    assert.equal(grouped.others.length, 1);
+    assert.equal(grouped.others[0].spdxId, 'pkg:1');
+  });
+
+  it('dedupes identical coverage ranges of one file', () => {
+    const snippets = [
+      {
+        type: 'software_Snippet',
+        spdxId: 'c1',
+        name: 'kernel/thread.c:1018-1018',
+        software_snippetFromFile: 'file:a',
+        software_lineRange: { beginIntegerRange: 1018, endIntegerRange: 1018 }
+      },
+      {
+        type: 'software_Snippet',
+        spdxId: 'c2',
+        name: 'kernel/thread.c:1018-1018',
+        software_snippetFromFile: 'file:a',
+        software_lineRange: { beginIntegerRange: 1018, endIntegerRange: 1018 }
+      },
+      {
+        type: 'software_Snippet',
+        spdxId: 'c3',
+        name: 'kernel/thread.c:1024-1024',
+        software_snippetFromFile: 'file:a',
+        software_lineRange: { beginIntegerRange: 1024, endIntegerRange: 1024 }
+      }
+    ];
+    const grouped = groupSnippetsByFile(snippets, map, { dedupeRanges: true });
+    assert.equal(grouped.files.length, 1);
+    assert.deepEqual(
+      grouped.files[0].snippets.map((s) => s.label),
+      ['L1018', 'L1024']
+    );
   });
 });
