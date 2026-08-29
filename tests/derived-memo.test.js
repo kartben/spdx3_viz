@@ -86,7 +86,6 @@ test('safetyCounts', () => {
   });
   const c = app.safetyCounts;
   assert.equal(c.requirements, 2);
-  assert.equal(c.systemRequirements, 1);
   assert.equal(c.verifications, 1);
   assert.equal(c.assumptions, 1);
   assert.equal(app.safetyCounts, c, 'same list, same object');
@@ -97,12 +96,17 @@ test('safetyStatusSummary', () => {
     requirements: [
       { spdxId: 'r1', type: CLASS.Requirement, _status: 'passed' },
       { spdxId: 'r2', type: CLASS.Requirement, _status: 'failed' },
-      { spdxId: 'r3', type: CLASS.Requirement, _status: 'unverified' }
+      { spdxId: 'r3', type: CLASS.Requirement, _status: 'unverified' },
+      { spdxId: 'r4', type: CLASS.Requirement, _status: 'unverified', _level: 'system' }
     ],
-    requirementSafetyStatus: (r) => ({ key: r._status })
+    requirementSafetyStatus: (r) => ({ key: r._status }),
+    requirementLevel: (r) => r._level || ''
   });
   const s = app.safetyStatusSummary;
+  // r4 is refined into software requirements, never verified directly, so
+  // counting it would report a structural fact as an unverified gap
   assert.equal(s.total, 3);
+  assert.equal(s.counts.unverified, 1);
   assert.equal(s.counts.passed, 1);
   assert.equal(s.counts.failed, 1);
   assert.equal(s.passPct, 33);

@@ -1208,21 +1208,10 @@ export const derivedMixin = {
   // summary and to decide which kind-filter chips to show.
   get safetyCounts() {
     if (safetyCountsSrc === this.requirements) return safetyCountsVal;
-    const c = {
-      requirements: 0,
-      systemRequirements: 0,
-      verifications: 0,
-      assumptions: 0,
-      evaluations: 0
-    };
+    const c = { requirements: 0, verifications: 0, assumptions: 0, evaluations: 0 };
     this.requirements.forEach((r) => {
-      if (isA(r.type, CLASS.Requirement)) {
-        c.requirements++;
-        // A system requirement is refined into software ones rather than
-        // verified directly, so it is counted apart when the producer says which
-        // level a requirement is at.
-        if (this.requirementLevel(r) === 'system') c.systemRequirements++;
-      } else if (isA(r.type, CLASS.functionalsafety_RequirementVerification)) c.verifications++;
+      if (isA(r.type, CLASS.Requirement)) c.requirements++;
+      else if (isA(r.type, CLASS.functionalsafety_RequirementVerification)) c.verifications++;
       else if (isA(r.type, CLASS.functionalsafety_Assumption)) c.assumptions++;
       else if (isA(r.type, CLASS.functionalsafety_EvaluationResult)) c.evaluations++;
     });
@@ -1241,6 +1230,11 @@ export const derivedMixin = {
     let total = 0;
     this.requirements.forEach((r) => {
       if (!isA(r.type, CLASS.Requirement)) return;
+      // A system requirement is refined into software ones, never verified
+      // directly, so counting it here would report a structural fact as a gap.
+      // Without the producer's requirement-level identifier nothing is skipped
+      // and this behaves exactly as before.
+      if (this.requirementLevel(r) === 'system') return;
       total++;
       const status = this.requirementSafetyStatus(r);
       if (status && Object.hasOwn(counts, status.key)) counts[status.key]++;
@@ -1385,11 +1379,9 @@ export const derivedMixin = {
     if (!r || !isA(r.type, CLASS.Requirement)) return false;
     const members = this.safetySpecMemberIds;
     if (members && !members.has(r.spdxId)) return false;
-    if (
-      this.requirementStatusFilter &&
-      this.requirementSafetyStatus(r)?.key !== this.requirementStatusFilter
-    ) {
-      return false;
+    if (this.requirementStatusFilter) {
+      if (this.requirementLevel(r) === 'system') return false;
+      if (this.requirementSafetyStatus(r)?.key !== this.requirementStatusFilter) return false;
     }
     if (
       this.requirementAdequacyFilter &&

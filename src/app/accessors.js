@@ -1949,6 +1949,9 @@ export const accessorsMixin = {
   // its filter keep using requirementSafetyStatus, so their counts are
   // unchanged.
   requirementRowStatus(el) {
+    // Refined, not verified: a system requirement has no outcome of its own, so
+    // it carries no status pill and does not sort into the untested band.
+    if (this.requirementLevel(el) === 'system') return null;
     const status = this.requirementSafetyStatus(el);
     if (!status || status.key === 'failed') return status;
     const adequacy = this.requirementAdequacyKey(el);
@@ -1963,6 +1966,7 @@ export const accessorsMixin = {
   // because nothing else in the UI would draw the eye to it.
   requirementAttentionRank(el) {
     if (!el || !isA(el.type, CLASS.Requirement)) return 99;
+    if (this.requirementLevel(el) === 'system') return 8;
     const adequacy = this.requirementAdequacyKey(el);
     const outcome = this.requirementSafetyStatus(el)?.key;
     if (adequacy === 'broken') return 0;
