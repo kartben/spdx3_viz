@@ -4,7 +4,7 @@
   x-show="paletteOpen"
   x-transition.opacity.duration.150ms
   x-cloak
-  class="fixed inset-0 z-[80] flex items-start justify-center px-4 pt-[12vh] bg-slate-900/70 backdrop-blur-sm"
+  class="fixed inset-0 z-80 flex items-start justify-center px-4 pt-[12vh] bg-slate-900/70 backdrop-blur-xs"
   @click.self="closePalette()"
   @keydown.escape.window="paletteOpen && closePalette()"
 >
@@ -19,7 +19,7 @@
     <!-- Search input -->
     <div class="flex items-center gap-3 px-4 border-b border-slate-700/70">
       <svg
-        class="w-5 h-5 text-slate-500 flex-shrink-0"
+        class="w-5 h-5 text-slate-500 shrink-0"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -42,10 +42,10 @@
         aria-label="Search elements and commands"
         :aria-expanded="paletteOpen"
         placeholder="Search elements or jump to a view…"
-        class="flex-1 bg-transparent py-4 text-base text-slate-100 placeholder-slate-500 focus:outline-none"
+        class="flex-1 bg-transparent py-4 text-base text-slate-100 placeholder-slate-500 focus:outline-hidden"
       />
       <kbd
-        class="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-medium text-slate-400 bg-slate-700/60 border border-slate-600/60 rounded"
+        class="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-medium text-slate-400 bg-slate-700/60 border border-slate-600/60 rounded-sm"
         >Esc</kbd
       >
     </div>
@@ -78,7 +78,7 @@
             <!-- Icon tile -->
             <template x-if="item.kind === 'element'">
               <span
-                class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
                 :style="`background:${nodeTypeColor(item.nodeType)}26`"
               >
                 <span
@@ -90,7 +90,7 @@
             </template>
             <template x-if="item.kind === 'command'">
               <span
-                class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors"
+                class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors"
                 :class="i === paletteActiveIndex ? 'bg-blue-500/20 text-blue-300' : 'bg-slate-700/60 text-slate-400'"
                 x-html="item.icon"
               ></span>
@@ -113,14 +113,14 @@
                  clear they aren't carried by the SBOM. -->
             <template x-if="item.kind === 'element' && item.virtual">
               <span
-                class="text-[10px] font-medium px-1.5 py-0.5 rounded-full flex-shrink-0 bg-sky-500/15 text-sky-300 ring-1 ring-sky-500/30"
+                class="text-[10px] font-medium px-1.5 py-0.5 rounded-full shrink-0 bg-sky-500/15 text-sky-300 ring-1 ring-sky-500/30"
                 title="Found by an online scan, not present in the SBOM"
                 >scan</span
               >
             </template>
             <template x-if="item.kind === 'element'">
               <span
-                class="text-[10px] font-medium px-1.5 py-0.5 rounded-full flex-shrink-0"
+                class="text-[10px] font-medium px-1.5 py-0.5 rounded-full shrink-0"
                 :style="`background:${nodeTypeColor(item.nodeType)}1f;color:${nodeTypeColor(item.nodeType)}`"
                 x-text="item.typeLabel"
               ></span>
@@ -128,7 +128,7 @@
             <template x-if="item.kind === 'command'">
               <span
                 x-show="i === paletteActiveIndex"
-                class="hidden sm:inline text-[10px] font-medium text-slate-500 flex-shrink-0"
+                class="hidden sm:inline text-[10px] font-medium text-slate-500 shrink-0"
                 >↵</span
               >
             </template>
@@ -143,17 +143,17 @@
     >
       <span class="flex items-center gap-1.5">
         <kbd
-          class="px-1 py-0.5 font-mono bg-slate-700/60 border border-slate-600/60 rounded text-slate-400"
+          class="px-1 py-0.5 font-mono bg-slate-700/60 border border-slate-600/60 rounded-sm text-slate-400"
           >↑</kbd
         ><kbd
-          class="px-1 py-0.5 font-mono bg-slate-700/60 border border-slate-600/60 rounded text-slate-400"
+          class="px-1 py-0.5 font-mono bg-slate-700/60 border border-slate-600/60 rounded-sm text-slate-400"
           >↓</kbd
         >
         navigate
       </span>
       <span class="flex items-center gap-1.5">
         <kbd
-          class="px-1 py-0.5 font-mono bg-slate-700/60 border border-slate-600/60 rounded text-slate-400"
+          class="px-1 py-0.5 font-mono bg-slate-700/60 border border-slate-600/60 rounded-sm text-slate-400"
           >↵</kbd
         >
         open

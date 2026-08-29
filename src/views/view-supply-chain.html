@@ -16,7 +16,7 @@
       </div>
 
       <div
-        class="ml-auto flex items-center gap-0.5 bg-slate-900/70 border border-slate-700 rounded-lg p-0.5 flex-shrink-0"
+        class="ml-auto flex items-center gap-0.5 bg-slate-900/70 border border-slate-700 rounded-lg p-0.5 shrink-0"
       >
         <template
           x-for="mode in [
@@ -139,7 +139,7 @@
         @input.debounce.150ms="restreamView('supplychain')"
         type="text"
         placeholder="Filter timeline…"
-        class="ml-auto bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-cyan-500 w-40 sm:w-56"
+        class="ml-auto bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-hidden focus:border-cyan-500 w-40 sm:w-56"
       />
     </div>
 
@@ -193,7 +193,7 @@
               >
                 <div class="flex items-start gap-3">
                   <div
-                    class="w-8 h-8 rounded-lg bg-slate-700/60 flex items-center justify-center flex-shrink-0 mt-0.5"
+                    class="w-8 h-8 rounded-lg bg-slate-700/60 flex items-center justify-center shrink-0 mt-0.5"
                   >
                     <span
                       class="flex items-center justify-center text-slate-300"
@@ -264,7 +264,7 @@
                     ></div>
                   </div>
                   <svg
-                    class="w-4 h-4 text-slate-500 transition-transform flex-shrink-0 mt-2"
+                    class="w-4 h-4 text-slate-500 transition-transform shrink-0 mt-2"
                     :class="expandedSupplyChain === item.spdxId && 'rotate-180'"
                     fill="none"
                     stroke="currentColor"
@@ -296,7 +296,7 @@
                             x-text="row.label"
                           ></div>
                           <span
-                            class="text-xs text-slate-300 break-words"
+                            class="text-xs text-slate-300 wrap-break-word"
                             :class="row.mono && 'font-mono break-all'"
                             x-text="row.value"
                           ></span>
@@ -353,14 +353,14 @@
                                 x-text="rel.direction === 'out' ? '→' : '←'"
                               ></span>
                               <span
-                                class="flex items-center flex-shrink-0"
+                                class="flex items-center shrink-0"
                                 :style="`color: ${nodeTypeColor(getNodeType(elementMap.get(rel.id) || {}))}`"
                                 x-html="elementIcon(elementMap.get(rel.id) || { spdxId: rel.id }, 'w-3.5 h-3.5')"
                               ></span>
                               <span class="flex-1 truncate" x-text="rel.displayName"></span>
                               <span
                                 x-show="rel.scope"
-                                class="text-[10px] px-1.5 py-0.5 rounded bg-slate-700/60 text-slate-400 flex-shrink-0"
+                                class="text-[10px] px-1.5 py-0.5 rounded-sm bg-slate-700/60 text-slate-400 shrink-0"
                                 x-text="rel.scope"
                               ></span>
                             </div>
@@ -476,7 +476,7 @@
                 ></span>
                 <div class="flex items-start gap-3">
                   <div
-                    class="w-9 h-9 rounded-lg bg-slate-700/50 flex items-center justify-center flex-shrink-0 text-slate-200"
+                    class="w-9 h-9 rounded-lg bg-slate-700/50 flex items-center justify-center shrink-0 text-slate-200"
                     x-html="elementIcon(seg.holder || { type: 'Organization' }, 'w-5 h-5')"
                   ></div>
                   <div class="flex-1 min-w-0">
@@ -530,7 +530,7 @@
                           class="w-full text-left flex flex-wrap items-center gap-2 rounded-lg border border-slate-700 bg-slate-900/40 px-2.5 py-1.5 hover:bg-slate-800/70 transition"
                         >
                           <svg
-                            class="w-3.5 h-3.5 text-slate-400 flex-shrink-0"
+                            class="w-3.5 h-3.5 text-slate-400 shrink-0"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -614,22 +614,22 @@
         <div x-show="supplyChainStateMermaid" class="card p-4 overflow-x-auto">
           <div
             id="sc-state-diagram"
-            class="flex justify-center min-h-[6rem]"
+            class="flex justify-center min-h-24"
             x-effect="supplyChainStateMermaid; renderSupplyChainStateDiagram()"
           ></div>
         </div>
 
         <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-slate-500 px-0.5">
           <span class="flex items-center gap-1.5"
-            ><span class="w-2.5 h-2.5 rounded-sm bg-slate-700 ring-1 ring-slate-500"></span>
+            ><span class="w-2.5 h-2.5 rounded-xs bg-slate-700 ring-1 ring-slate-500"></span>
             state</span
           >
           <span class="flex items-center gap-1.5"
-            ><span class="w-2.5 h-2.5 rounded-sm bg-rose-500/20 ring-1 ring-rose-400"></span>
+            ><span class="w-2.5 h-2.5 rounded-xs bg-rose-500/20 ring-1 ring-rose-400"></span>
             out-of-spec</span
           >
           <span class="flex items-center gap-1.5"
-            ><span class="w-2.5 h-2.5 rounded-sm bg-emerald-500/20 ring-1 ring-emerald-400"></span>
+            ><span class="w-2.5 h-2.5 rounded-xs bg-emerald-500/20 ring-1 ring-emerald-400"></span>
             positive step</span
           >
           <span class="text-slate-600">Click a state to jump to its step below.</span>
@@ -640,7 +640,9 @@
         </div>
 
         <ol class="relative pl-7 space-y-4">
-          <div class="absolute left-[0.85rem] top-3 bottom-3 w-0.5 rounded bg-slate-700/70"></div>
+          <div
+            class="absolute left-[0.85rem] top-3 bottom-3 w-0.5 rounded-sm bg-slate-700/70"
+          ></div>
           <template x-for="(step, i) in supplyChainLifecycleSteps" :key="step.action.spdxId">
             <li class="relative">
               <span
@@ -761,7 +763,7 @@
               >
                 <div class="flex items-start gap-3">
                   <div
-                    class="w-8 h-8 rounded-lg bg-slate-700/60 flex items-center justify-center flex-shrink-0 mt-0.5 text-slate-300"
+                    class="w-8 h-8 rounded-lg bg-slate-700/60 flex items-center justify-center shrink-0 mt-0.5 text-slate-300"
                     x-html="elementIcon(proc, 'w-4 h-4')"
                   ></div>
                   <div class="flex-1 min-w-0">
@@ -799,7 +801,7 @@
                             class="w-full text-left flex flex-wrap items-center gap-2 rounded-lg border border-slate-700 bg-slate-900/40 px-2.5 py-1.5 hover:bg-slate-800/70 transition"
                           >
                             <span
-                              class="flex items-center flex-shrink-0 text-slate-400"
+                              class="flex items-center shrink-0 text-slate-400"
                               x-html="elementIcon(act, 'w-3.5 h-3.5')"
                             ></span>
                             <span
@@ -813,7 +815,7 @@
                             >
                             <span
                               x-show="supplyChainClock(act)"
-                              class="text-[10px] text-slate-500 flex-shrink-0"
+                              class="text-[10px] text-slate-500 shrink-0"
                               x-text="formatDate(act.startTime || act.endTime)"
                             ></span>
                           </button>

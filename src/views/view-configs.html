@@ -10,7 +10,7 @@
         x-model.debounce.150ms="configSearch"
         @input.debounce.150ms="restreamView('configs')"
         placeholder="Search configs..."
-        class="w-48 px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-teal-500 transition-colors"
+        class="w-48 px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-sm text-slate-200 placeholder-slate-500 focus:outline-hidden focus:border-teal-500 transition-colors"
       />
     </div>
   </div>
@@ -29,7 +29,7 @@
       <div class="flex items-start gap-3">
         <!-- Icon -->
         <div
-          class="w-10 h-10 rounded-xl bg-teal-500/15 flex items-center justify-center flex-shrink-0 mt-0.5"
+          class="w-10 h-10 rounded-xl bg-teal-500/15 flex items-center justify-center shrink-0 mt-0.5"
         >
           <span
             class="flex items-center justify-center text-teal-400"
@@ -82,7 +82,7 @@
 
         <!-- Expand icon -->
         <svg
-          class="w-4 h-4 text-slate-500 transition-transform flex-shrink-0 mt-1"
+          class="w-4 h-4 text-slate-500 transition-transform shrink-0 mt-1"
           :class="expandedConfig === cfg.spdxId && 'rotate-180'"
           fill="none"
           stroke="currentColor"
@@ -108,14 +108,14 @@
             <div x-show="isMeaningful(cfg.summary)">
               <div class="text-xs text-slate-500 mb-1">Summary</div>
               <div
-                class="text-xs text-slate-300 whitespace-pre-wrap break-words"
+                class="text-xs text-slate-300 whitespace-pre-wrap wrap-break-word"
                 x-text="cfg.summary"
               ></div>
             </div>
             <div x-show="isMeaningful(cfg.description) && cfg.description !== cfg.summary">
               <div class="text-xs text-slate-500 mb-1">Description</div>
               <div
-                class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-32 overflow-y-auto"
+                class="text-xs text-slate-300 whitespace-pre-wrap wrap-break-word max-h-32 overflow-y-auto"
                 x-text="cfg.description"
               ></div>
             </div>
@@ -139,7 +139,7 @@
             <div class="flex flex-wrap gap-1.5">
               <template x-for="flag in parseCompileFlags(cfg).flags.slice(0, 30)" :key="flag">
                 <span
-                  class="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono transition-colors"
+                  class="inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-mono transition-colors"
                   :class="flag.startsWith('-O') ? 'bg-green-500/15 text-green-400' :
                                   flag.startsWith('-W') ? 'bg-yellow-500/15 text-yellow-400' :
                                   flag.startsWith('-f') ? 'bg-blue-500/15 text-blue-400' :
@@ -160,22 +160,22 @@
             <!-- Flag Legend -->
             <div class="flex flex-wrap gap-3 mt-3 text-[10px] text-slate-500">
               <span class="flex items-center gap-1"
-                ><span class="w-2 h-2 rounded bg-green-500/40"></span> Optimization</span
+                ><span class="w-2 h-2 rounded-sm bg-green-500/40"></span> Optimization</span
               >
               <span class="flex items-center gap-1"
-                ><span class="w-2 h-2 rounded bg-yellow-500/40"></span> Warnings</span
+                ><span class="w-2 h-2 rounded-sm bg-yellow-500/40"></span> Warnings</span
               >
               <span class="flex items-center gap-1"
-                ><span class="w-2 h-2 rounded bg-blue-500/40"></span> Features</span
+                ><span class="w-2 h-2 rounded-sm bg-blue-500/40"></span> Features</span
               >
               <span class="flex items-center gap-1"
-                ><span class="w-2 h-2 rounded bg-purple-500/40"></span> Machine</span
+                ><span class="w-2 h-2 rounded-sm bg-purple-500/40"></span> Machine</span
               >
               <span class="flex items-center gap-1"
-                ><span class="w-2 h-2 rounded bg-pink-500/40"></span> Standard</span
+                ><span class="w-2 h-2 rounded-sm bg-pink-500/40"></span> Standard</span
               >
               <span class="flex items-center gap-1"
-                ><span class="w-2 h-2 rounded bg-orange-500/40"></span> Debug</span
+                ><span class="w-2 h-2 rounded-sm bg-orange-500/40"></span> Debug</span
               >
             </div>
           </div>
@@ -198,7 +198,7 @@
             <div class="flex flex-wrap gap-1.5">
               <template x-for="def in parseCompileFlags(cfg).defines" :key="def">
                 <span
-                  class="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono bg-amber-500/15 text-amber-400"
+                  class="inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-mono bg-amber-500/15 text-amber-400"
                   x-text="def"
                 ></span>
               </template>

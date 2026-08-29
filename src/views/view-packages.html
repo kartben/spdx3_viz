@@ -5,7 +5,7 @@
 >
   <div class="list-sticky space-y-3">
     <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
-      <span class="text-sm text-slate-400 flex-shrink-0">
+      <span class="text-sm text-slate-400 shrink-0">
         <span x-text="formatCount(currentPackageList.length)"></span>
         <span x-text="currentPackageNoun"></span>
         <template x-if="packageFiltersActive">
@@ -20,12 +20,12 @@
         @input.debounce.150ms="restreamView(currentView)"
         type="text"
         placeholder="Filter by name, version, or purl…"
-        class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-blue-500 w-full sm:w-56 sm:ml-auto md:w-72"
+        class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-hidden focus:border-blue-500 w-full sm:w-56 sm:ml-auto md:w-72"
       />
       <select
         x-model="pkgSort"
         @change="restreamView(currentView)"
-        class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 text-slate-300 focus:outline-none focus:border-blue-500"
+        class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 text-slate-300 focus:outline-hidden focus:border-blue-500"
       >
         <option value="name">Sort by name</option>
         <option value="deps">Sort by dependencies</option>
@@ -91,7 +91,7 @@
     <!-- Primary-purpose filter rail (software_primaryPurpose) -->
     <aside
       x-show="hasPackagePurposeFacets"
-      class="hidden lg:block w-44 flex-shrink-0 sticky top-[var(--list-sticky-offset,7rem)] max-h-[calc(100vh-9rem)] overflow-y-auto"
+      class="hidden lg:block w-44 shrink-0 sticky top-(--list-sticky-offset,7rem) max-h-[calc(100vh-9rem)] overflow-y-auto"
     >
       <div class="text-[10px] text-slate-500 uppercase tracking-wider px-2 mb-1.5">Purpose</div>
       <button
@@ -116,7 +116,7 @@
         >
           <span class="truncate" x-text="facet.label"></span>
           <span
-            class="text-slate-500 tabular-nums flex-shrink-0"
+            class="text-slate-500 tabular-nums shrink-0"
             x-text="formatCount(facet.count)"
           ></span>
         </button>
@@ -127,7 +127,7 @@
       <!-- Mobile purpose select (the rail is lg+) -->
       <div x-show="hasPackagePurposeFacets" class="lg:hidden">
         <select
-          class="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+          class="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-2 text-slate-300 focus:outline-hidden focus:border-blue-500"
           :value="pkgPurposeFilter"
           @change="pkgPurposeFilter = $event.target.value; restreamView(currentView)"
         >
@@ -174,7 +174,7 @@
         >
           <div class="flex items-center gap-3 cursor-pointer" @click="togglePkg(pkg.spdxId)">
             <div
-              class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+              class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
               :style="`background:${nodeTypeColor(getNodeType(pkg))}26`"
             >
               <span
@@ -188,7 +188,7 @@
                 <!-- min-w-0 so a long unbroken package id can wrap: as a flex item
                      it would otherwise refuse to shrink below its content width. -->
                 <span
-                  class="font-medium text-white text-sm break-words min-w-0"
+                  class="font-medium text-white text-sm wrap-break-word min-w-0"
                   x-text="pkg.name || cleanName(pkg.spdxId)"
                 ></span>
                 <!-- The version is the field people scan a package list for; show
@@ -197,7 +197,7 @@
                      than wrapping the row onto four lines on a phone. -->
                 <span
                   x-show="packageRowSummary(pkg).version"
-                  class="text-xs px-1.5 py-0.5 rounded bg-slate-700 text-slate-300 font-mono truncate max-w-[9rem] sm:max-w-[18rem]"
+                  class="text-xs px-1.5 py-0.5 rounded-sm bg-slate-700 text-slate-300 font-mono truncate max-w-36 sm:max-w-[18rem]"
                   :title="packageRowSummary(pkg).version"
                   x-text="packageRowSummary(pkg).version"
                 ></span>
@@ -231,7 +231,7 @@
                 ></span>
               </div>
             </div>
-            <div class="flex items-center gap-2 flex-shrink-0">
+            <div class="flex items-center gap-2 shrink-0">
               <!-- Structural and build badges are grouped so they can drop out on
                    narrow screens: .badge sets display:inline-flex, which would win
                    over a `hidden` utility on the badge itself. The vulnerability
@@ -329,7 +329,7 @@
                   <!-- The version shows on the collapsed row, so it isn't repeated here. -->
                   <!-- Size (software_artifactSize) -->
                   <div x-show="artifactSize(pkg)" class="flex items-center gap-2">
-                    <span class="text-xs text-slate-500 flex-shrink-0">Size</span>
+                    <span class="text-xs text-slate-500 shrink-0">Size</span>
                     <span
                       class="text-xs px-2 py-0.5 rounded-md bg-slate-700 text-slate-300 tabular-nums"
                       x-text="artifactSize(pkg)"
@@ -360,14 +360,14 @@
                               @click.stop="org.id && navigateTo(org.id)"
                             >
                               <span
-                                class="flex items-center flex-shrink-0"
+                                class="flex items-center shrink-0"
                                 :style="`color: ${nodeTypeColor(elementMap.get(org.id) ? getNodeType(elementMap.get(org.id)) : 'agent')}`"
                                 x-html="elementMap.get(org.id) ? elementIcon(elementMap.get(org.id), 'w-3.5 h-3.5') : nodeTypeIconSvg('agent', 'w-3.5 h-3.5')"
                               ></span>
                               <span class="flex-1 truncate" x-text="org.displayName"></span>
                               <svg
                                 x-show="org.id"
-                                class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors flex-shrink-0"
+                                class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors shrink-0"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -401,14 +401,14 @@
                               @click.stop="sup.id && navigateTo(sup.id)"
                             >
                               <span
-                                class="flex items-center flex-shrink-0"
+                                class="flex items-center shrink-0"
                                 :style="`color: ${nodeTypeColor(elementMap.get(sup.id) ? getNodeType(elementMap.get(sup.id)) : 'agent')}`"
                                 x-html="elementMap.get(sup.id) ? elementIcon(elementMap.get(sup.id), 'w-3.5 h-3.5') : nodeTypeIconSvg('agent', 'w-3.5 h-3.5')"
                               ></span>
                               <span class="flex-1 truncate" x-text="sup.displayName"></span>
                               <svg
                                 x-show="sup.id"
-                                class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors flex-shrink-0"
+                                class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors shrink-0"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -431,14 +431,14 @@
                   <div x-show="isMeaningful(pkg.summary)">
                     <div class="text-xs text-slate-500 mb-1">Summary</div>
                     <div
-                      class="text-xs text-slate-300 whitespace-pre-wrap break-words"
+                      class="text-xs text-slate-300 whitespace-pre-wrap wrap-break-word"
                       x-text="pkg.summary"
                     ></div>
                   </div>
                   <div x-show="isMeaningful(pkg.description) && pkg.description !== pkg.summary">
                     <div class="text-xs text-slate-500 mb-1">Description</div>
                     <div
-                      class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-32 overflow-y-auto"
+                      class="text-xs text-slate-300 whitespace-pre-wrap wrap-break-word max-h-32 overflow-y-auto"
                       x-text="pkg.description"
                     ></div>
                   </div>
@@ -493,7 +493,7 @@
                       >
                         <div class="flex items-start gap-2 group">
                           <span
-                            class="text-[10px] text-slate-500 uppercase tracking-wider w-20 pt-0.5 flex-shrink-0 text-right"
+                            class="text-[10px] text-slate-500 uppercase tracking-wider w-20 pt-0.5 shrink-0 text-right"
                             x-text="eid.label"
                           ></span>
                           <code
@@ -507,7 +507,7 @@
                             rel="noopener noreferrer"
                             @click.stop
                             :title="purlLink(eid)?.label"
-                            class="text-sky-400/70 hover:text-sky-300 transition-colors flex-shrink-0 pt-0.5"
+                            class="text-sky-400/70 hover:text-sky-300 transition-colors shrink-0 pt-0.5"
                           >
                             <svg
                               class="w-3.5 h-3.5"
@@ -530,7 +530,7 @@
                             rel="noopener noreferrer"
                             @click.stop
                             :title="vulnLookup(eid)?.label"
-                            class="text-rose-400/70 hover:text-rose-300 transition-colors flex-shrink-0 pt-0.5"
+                            class="text-rose-400/70 hover:text-rose-300 transition-colors shrink-0 pt-0.5"
                           >
                             <svg
                               class="w-3.5 h-3.5"
@@ -548,7 +548,7 @@
                           </a>
                           <button
                             @click.stop="copyHash(eid.identifier)"
-                            class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity flex-shrink-0 pt-0.5"
+                            class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity shrink-0 pt-0.5"
                             title="Copy"
                           >
                             <svg
@@ -574,7 +574,7 @@
                   <div x-show="isMeaningful(pkg.software_copyrightText)">
                     <div class="text-xs text-slate-500 mb-1">Copyright</div>
                     <div
-                      class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-32 overflow-y-auto bg-slate-900/50 rounded px-2 py-1.5"
+                      class="text-xs text-slate-300 whitespace-pre-wrap wrap-break-word max-h-32 overflow-y-auto bg-slate-900/50 rounded-sm px-2 py-1.5"
                       x-text="pkg.software_copyrightText"
                     ></div>
                   </div>
@@ -583,7 +583,7 @@
                   <div x-show="isMeaningful(pkg.comment)">
                     <div class="text-xs text-slate-500 mb-1">Note</div>
                     <div
-                      class="text-xs text-slate-300 whitespace-pre-wrap break-words bg-slate-900/50 rounded px-2 py-1.5"
+                      class="text-xs text-slate-300 whitespace-pre-wrap wrap-break-word bg-slate-900/50 rounded-sm px-2 py-1.5"
                       x-text="pkg.comment"
                     ></div>
                   </div>
@@ -606,12 +606,12 @@
                       ></span>
                       <div
                         x-show="f.kind === 'text'"
-                        class="text-xs text-slate-300 break-words"
+                        class="text-xs text-slate-300 wrap-break-word"
                         x-text="f.kind === 'text' ? f.value : ''"
                       ></div>
                       <div
                         x-show="f.kind === 'longtext'"
-                        class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-40 overflow-y-auto"
+                        class="text-xs text-slate-300 whitespace-pre-wrap wrap-break-word max-h-40 overflow-y-auto"
                         x-text="f.kind === 'longtext' ? f.value : ''"
                       ></div>
                       <div x-show="f.kind === 'chips'" class="flex flex-wrap gap-1">
@@ -627,12 +627,12 @@
                         class="list-disc list-inside space-y-1 text-xs text-slate-300"
                       >
                         <template x-for="(item, i) in (f.kind === 'list' ? f.value : [])" :key="i">
-                          <li class="break-words" x-text="item"></li>
+                          <li class="wrap-break-word" x-text="item"></li>
                         </template>
                       </ul>
                       <div x-show="f.kind === 'dict'" class="space-y-1">
                         <template x-for="(entry, i) in (f.kind === 'dict' ? f.value : [])" :key="i">
-                          <div class="rounded bg-slate-900/50 px-2 py-1">
+                          <div class="rounded-sm bg-slate-900/50 px-2 py-1">
                             <div
                               class="text-[10px] uppercase tracking-wider text-slate-500"
                               x-text="entry.key"
@@ -659,7 +659,7 @@
                   <template x-for="h in (pkg.verifiedUsing || [])" :key="h.hashValue">
                     <div class="flex items-start gap-2 group">
                       <span
-                        class="text-[10px] text-slate-500 uppercase w-10 pt-0.5 flex-shrink-0 text-right"
+                        class="text-[10px] text-slate-500 uppercase w-10 pt-0.5 shrink-0 text-right"
                         x-text="h.algorithm"
                       ></span>
                       <code
@@ -668,7 +668,7 @@
                       ></code>
                       <button
                         @click.stop="copyHash(h.hashValue)"
-                        class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity flex-shrink-0 pt-0.5"
+                        class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity shrink-0 pt-0.5"
                         title="Copy"
                       >
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -688,7 +688,7 @@
                   >
                     <div class="flex items-start gap-2 group">
                       <span
-                        class="text-[10px] text-slate-500 uppercase w-10 pt-0.5 flex-shrink-0 text-right"
+                        class="text-[10px] text-slate-500 uppercase w-10 pt-0.5 shrink-0 text-right"
                         x-text="ci.software_contentIdentifierType"
                       ></span>
                       <code
@@ -697,7 +697,7 @@
                       ></code>
                       <button
                         @click.stop="copyHash(ci.software_contentIdentifierValue)"
-                        class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity flex-shrink-0 pt-0.5"
+                        class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity shrink-0 pt-0.5"
                         title="Copy"
                       >
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -761,7 +761,7 @@
                           ></code>
                           <button
                             @click.stop="copyHash(prop.json ? prop.pretty : prop.value)"
-                            class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity flex-shrink-0"
+                            class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity shrink-0"
                             title="Copy"
                           >
                             <svg
@@ -781,7 +781,7 @@
                         </div>
                         <pre
                           x-show="prop.json"
-                          class="hash-text text-slate-300 bg-slate-900/50 rounded px-2 py-1.5 mt-0.5 overflow-x-auto whitespace-pre"
+                          class="hash-text text-slate-300 bg-slate-900/50 rounded-sm px-2 py-1.5 mt-0.5 overflow-x-auto whitespace-pre"
                           x-text="prop.pretty"
                         ></pre>
                         <code
@@ -861,19 +861,19 @@
                             x-text="item.direction === 'out' ? '→' : '←'"
                           ></span>
                           <span
-                            class="flex items-center flex-shrink-0"
+                            class="flex items-center shrink-0"
                             :style="`color: ${nodeTypeColor(getNodeType(elementMap.get(item.id) || {}))}`"
                             x-html="elementIcon(elementMap.get(item.id) || { spdxId: item.id }, 'w-3.5 h-3.5')"
                           ></span>
                           <span class="flex-1 truncate" x-text="item.displayName"></span>
                           <span
                             x-show="item.scope"
-                            class="text-[10px] px-1.5 py-0.5 rounded bg-slate-700/60 text-slate-400 flex-shrink-0"
+                            class="text-[10px] px-1.5 py-0.5 rounded-sm bg-slate-700/60 text-slate-400 shrink-0"
                             :title="'Lifecycle scope: ' + item.scope"
                             x-text="item.scope"
                           ></span>
                           <svg
-                            class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors flex-shrink-0"
+                            class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors shrink-0"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"

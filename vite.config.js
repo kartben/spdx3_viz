@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
+import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
 
 // Minimal HTML-partials plugin: expands `<include src="path/to/file.html">`
@@ -62,7 +63,7 @@ function legalNotice() {
 // paths, so the runtime `fetch('samples/samples.json')` still resolves.
 export default defineConfig({
   base: './',
-  plugins: [htmlPartials(), legalNotice()],
+  plugins: [tailwindcss(), htmlPartials(), legalNotice()],
   build: {
     outDir: 'dist',
     chunkSizeWarningLimit: 1500

@@ -2,7 +2,7 @@
   x-show="licenseModalOpen"
   x-transition.opacity
   @keydown.escape.window="closeLicenseModal()"
-  class="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm"
+  class="fixed inset-0 z-70 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-xs"
   @click.self="closeLicenseModal()"
 >
   <div
@@ -20,12 +20,12 @@
           :href="licenseModalMainPageUrl()"
           target="_blank"
           rel="noopener noreferrer"
-          class="font-semibold text-pink-200 hover:text-pink-100 text-sm break-words font-mono underline decoration-pink-500/40 underline-offset-2"
+          class="font-semibold text-pink-200 hover:text-pink-100 text-sm wrap-break-word font-mono underline decoration-pink-500/40 underline-offset-2"
           x-text="licenseModalExpression"
         ></a>
         <div
           x-show="!licenseModalMainPageUrl()"
-          class="font-semibold text-white text-sm break-words font-mono"
+          class="font-semibold text-white text-sm wrap-break-word font-mono"
           x-text="licenseModalExpression || licenseModalActivePart()?.name"
         ></div>
         <div
@@ -35,7 +35,7 @@
           License exception
         </div>
       </div>
-      <div class="flex items-center gap-2 flex-shrink-0">
+      <div class="flex items-center gap-2 shrink-0">
         <button
           type="button"
           class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
@@ -107,7 +107,7 @@
       ></div>
       <pre
         x-show="licenseModalText() && !licenseModalLoading()"
-        class="text-xs leading-relaxed text-slate-200 font-mono whitespace-pre-wrap break-words"
+        class="text-xs leading-relaxed text-slate-200 font-mono whitespace-pre-wrap wrap-break-word"
         x-text="licenseModalText()"
       ></pre>
     </div>

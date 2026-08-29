@@ -5,7 +5,7 @@
 >
   <div class="list-sticky space-y-3">
     <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
-      <span class="text-sm text-slate-400 flex-shrink-0">
+      <span class="text-sm text-slate-400 shrink-0">
         <span x-text="formatCount(filteredFiles.length)"></span> files
         <template x-if="fileFiltersActive">
           <span class="text-slate-500" x-text="` of ${formatCount(files.length)}`"></span>
@@ -16,12 +16,12 @@
         @input.debounce.150ms="restreamView('files')"
         type="text"
         placeholder="Filter files…"
-        class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-emerald-500 w-full sm:w-44 sm:ml-auto md:w-56"
+        class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-hidden focus:border-emerald-500 w-full sm:w-44 sm:ml-auto md:w-56"
       />
       <select
         x-model="fileSort"
         @change="restreamView('files')"
-        class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 text-slate-300 focus:outline-none focus:border-emerald-500"
+        class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 text-slate-300 focus:outline-hidden focus:border-emerald-500"
       >
         <option value="name">Sort by path</option>
         <option value="size">Sort by size</option>
@@ -58,7 +58,7 @@
          file list can be narrowed to one tree without typing a path. -->
     <aside
       x-show="hasFileDirFacets"
-      class="hidden lg:block w-48 flex-shrink-0 sticky top-[var(--list-sticky-offset,7rem)] max-h-[calc(100vh-9rem)] overflow-y-auto"
+      class="hidden lg:block w-48 shrink-0 sticky top-(--list-sticky-offset,7rem) max-h-[calc(100vh-9rem)] overflow-y-auto"
     >
       <div class="text-[10px] text-slate-500 uppercase tracking-wider px-2 mb-1.5">Directories</div>
       <button
@@ -80,7 +80,7 @@
         >
           <span class="truncate font-mono" x-text="facet.label"></span>
           <span
-            class="text-slate-500 tabular-nums flex-shrink-0"
+            class="text-slate-500 tabular-nums shrink-0"
             x-text="formatCount(facet.count)"
           ></span>
         </button>
@@ -91,7 +91,7 @@
       <!-- Mobile directory select (the rail is lg+) -->
       <div x-show="hasFileDirFacets" class="lg:hidden">
         <select
-          class="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-2 text-slate-300 focus:outline-none focus:border-emerald-500"
+          class="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-2 text-slate-300 focus:outline-hidden focus:border-emerald-500"
           :value="fileDirFilter"
           @change="fileDirFilter = $event.target.value; restreamView('files')"
         >
@@ -134,7 +134,7 @@
         >
           <div class="flex items-center gap-3">
             <div
-              class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+              class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
               :class="fileExt(f.name) === '.elf' ? 'bg-purple-500/15' : fileExt(f.name) === '.c' || fileExt(f.name) === '.obj' ? 'bg-amber-500/15' : 'bg-emerald-500/15'"
             >
               <span
@@ -180,7 +180,7 @@
               </div>
             </div>
             <svg
-              class="w-4 h-4 text-slate-500 transition-transform flex-shrink-0"
+              class="w-4 h-4 text-slate-500 transition-transform shrink-0"
               :class="expandedFile === f.spdxId && 'rotate-180'"
               fill="none"
               stroke="currentColor"
@@ -201,14 +201,14 @@
               <div x-show="isMeaningful(f.summary)">
                 <div class="text-xs text-slate-500 mb-1">Summary</div>
                 <div
-                  class="text-xs text-slate-300 whitespace-pre-wrap break-words"
+                  class="text-xs text-slate-300 whitespace-pre-wrap wrap-break-word"
                   x-text="f.summary"
                 ></div>
               </div>
               <div x-show="isMeaningful(f.description) && f.description !== f.summary">
                 <div class="text-xs text-slate-500 mb-1">Description</div>
                 <div
-                  class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-32 overflow-y-auto"
+                  class="text-xs text-slate-300 whitespace-pre-wrap wrap-break-word max-h-32 overflow-y-auto"
                   x-text="f.description"
                 ></div>
               </div>
@@ -235,7 +235,7 @@
               <template x-for="h in (f.verifiedUsing || [])" :key="h.hashValue">
                 <div class="flex items-center gap-2">
                   <span
-                    class="text-xs text-slate-500 w-12 flex-shrink-0 uppercase"
+                    class="text-xs text-slate-500 w-12 shrink-0 uppercase"
                     x-text="h.algorithm"
                   ></span>
                   <code
@@ -244,7 +244,7 @@
                   ></code>
                   <button
                     @click.stop="copyHash(h.hashValue)"
-                    class="text-xs px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded text-slate-400 hover:text-white transition-colors flex-shrink-0"
+                    class="text-xs px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded-sm text-slate-400 hover:text-white transition-colors shrink-0"
                   >
                     Copy
                   </button>

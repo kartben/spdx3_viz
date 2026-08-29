@@ -1,6 +1,6 @@
 <div x-show="currentView === 'remediation'" class="fade-in space-y-4 max-w-6xl">
   <div
-    class="list-sticky sticky top-0 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 py-3 bg-slate-900/95 backdrop-blur border-b border-slate-800/80 space-y-3"
+    class="list-sticky sticky top-0 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 py-3 bg-slate-900/95 backdrop-blur-sm border-b border-slate-800/80 space-y-3"
   >
     <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
       <div>
@@ -22,7 +22,7 @@
           <button
             type="button"
             @click="remediationCategoryFilter = ''; restreamView('remediation')"
-            class="badge flex-shrink-0 whitespace-nowrap transition"
+            class="badge shrink-0 whitespace-nowrap transition"
             :class="remediationCategoryFilter === '' ? 'bg-slate-600/40 text-white ring-1 ring-slate-400/40' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
           >
             All categories
@@ -31,7 +31,7 @@
             <button
               type="button"
               @click="setRemediationCategoryFilter(cat.key)"
-              class="badge flex-shrink-0 whitespace-nowrap transition"
+              class="badge shrink-0 whitespace-nowrap transition"
               :class="remediationCategoryFilter === cat.key ? 'bg-amber-500/15 text-amber-200 ring-1 ring-amber-500/30' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
               :title="`Show ${cat.label} findings`"
             >
@@ -94,7 +94,7 @@
             <div class="mt-3 flex flex-wrap items-center gap-2 text-xs text-slate-500">
               <span
                 x-show="finding.affectedCount > 0"
-                class="rounded bg-slate-800 px-2 py-1"
+                class="rounded-sm bg-slate-800 px-2 py-1"
                 x-text="`${formatCount(finding.affectedCount)} affected ${finding.affectedLabel}`"
               ></span>
               <button
@@ -108,17 +108,17 @@
               </button>
               <span
                 x-show="!finding.elementId && finding.elementName"
-                class="rounded bg-slate-800 px-2 py-1 text-slate-300"
+                class="rounded-sm bg-slate-800 px-2 py-1 text-slate-300"
                 x-text="finding.elementName"
               ></span>
               <span
                 x-show="finding.elementType"
-                class="rounded bg-slate-800 px-2 py-1"
+                class="rounded-sm bg-slate-800 px-2 py-1"
                 x-text="finding.elementType || 'Document'"
               ></span>
             </div>
           </div>
-          <div class="text-right flex-shrink-0">
+          <div class="text-right shrink-0">
             <div
               class="text-2xl font-bold text-white tabular-nums"
               x-text="Math.round(finding.score)"
@@ -137,7 +137,7 @@
             </div>
             <ul x-show="finding.evidence.length" class="space-y-1 text-xs text-slate-400">
               <template x-for="line in finding.evidence" :key="line">
-                <li class="break-words" x-text="line"></li>
+                <li class="wrap-break-word" x-text="line"></li>
               </template>
             </ul>
             <div x-show="finding.affectedSamples.length" class="mt-3">
@@ -149,10 +149,10 @@
                   <button
                     type="button"
                     @click="navigateTo(sample.id)"
-                    class="inline-flex max-w-full items-center gap-1 rounded bg-slate-800 px-1.5 py-0.5 text-[11px] text-slate-300 hover:bg-slate-700 hover:text-white"
+                    class="inline-flex max-w-full items-center gap-1 rounded-sm bg-slate-800 px-1.5 py-0.5 text-[11px] text-slate-300 hover:bg-slate-700 hover:text-white"
                   >
-                    <span class="truncate max-w-[12rem]" x-text="sample.name"></span>
-                    <span class="text-slate-500 truncate max-w-[10rem]" x-text="sample.id"></span>
+                    <span class="truncate max-w-48" x-text="sample.name"></span>
+                    <span class="text-slate-500 truncate max-w-40" x-text="sample.id"></span>
                   </button>
                 </template>
               </div>
@@ -184,7 +184,7 @@
                   <button
                     type="button"
                     @click="navigateTo(id)"
-                    class="rounded bg-slate-800 px-1.5 py-0.5 text-[11px] text-slate-300 hover:bg-slate-700 hover:text-white"
+                    class="rounded-sm bg-slate-800 px-1.5 py-0.5 text-[11px] text-slate-300 hover:bg-slate-700 hover:text-white"
                     x-text="id"
                   ></button>
                 </template>
@@ -192,7 +192,7 @@
                   type="button"
                   x-show="finding.relatedIds.length > revealLimit(finding.id + ':related')"
                   @click="revealMore(finding.id + ':related')"
-                  class="rounded bg-slate-800 px-1.5 py-0.5 text-[11px] text-blue-300 hover:bg-slate-700"
+                  class="rounded-sm bg-slate-800 px-1.5 py-0.5 text-[11px] text-blue-300 hover:bg-slate-700"
                   x-text="`+ ${formatCount(finding.relatedIds.length - revealLimit(finding.id + ':related'))} more`"
                 ></button>
               </div>

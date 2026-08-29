@@ -1,6 +1,41 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --color-spackage: #3b82f6;
+  --color-sfile: #10b981;
+  --color-stool: #f59e0b;
+  --color-sbuild: #8b5cf6;
+  --color-sagent: #ef4444;
+  --color-slicense: #ec4899;
+  --color-sconfig: #14b8a6;
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+
+  /* v3 Preflight used pointer cursors on buttons. Keep that so clickable
+     cards and chips still read as interactive. */
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+}
 
 /**
  * SPDX 3.0 SBOM Visualizer - Styles

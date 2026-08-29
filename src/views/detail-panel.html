@@ -8,7 +8,7 @@
   x-transition:leave-start="translate-x-0"
   x-transition:leave-end="translate-x-full"
   :style="`--detail-panel-w:${detailPanelWidth}px`"
-  class="detail-panel-resizable fixed inset-y-0 right-0 z-50 w-full max-w-md bg-slate-800 border-l border-slate-700/50 flex-shrink-0 flex flex-col overflow-hidden md:relative md:z-auto"
+  class="detail-panel-resizable fixed inset-y-0 right-0 z-50 w-full max-w-md bg-slate-800 border-l border-slate-700/50 shrink-0 flex flex-col overflow-hidden md:relative md:z-auto"
 >
   <!-- Resize grip (md+ only, where the panel is a static flex column) -->
   <div
@@ -25,7 +25,7 @@
       <div class="min-w-0">
         <div class="flex items-center gap-1.5 mb-1">
           <span
-            class="flex items-center flex-shrink-0"
+            class="flex items-center shrink-0"
             :style="detailElement && `color:${nodeTypeColor(getNodeType(detailElement))}`"
             x-html="detailElement ? elementIcon(detailElement, 'w-4 h-4') : ''"
           ></span>
@@ -46,7 +46,7 @@
       </div>
       <button
         @click="closeDetailPanel()"
-        class="p-1.5 hover:bg-slate-700 rounded-lg transition-colors text-slate-400 flex-shrink-0 mt-0.5"
+        class="p-1.5 hover:bg-slate-700 rounded-lg transition-colors text-slate-400 shrink-0 mt-0.5"
       >
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
@@ -95,7 +95,7 @@
     >
       <div class="flex items-center gap-2">
         <svg
-          class="w-3.5 h-3.5 text-sky-300 flex-shrink-0"
+          class="w-3.5 h-3.5 text-sky-300 shrink-0"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -133,12 +133,7 @@
               class="flex items-center gap-1.5 text-xs text-sky-400 hover:text-sky-300 transition-colors max-w-full"
               :title="m.purl || m.cpe || m.spdxId"
             >
-              <svg
-                class="w-3 h-3 flex-shrink-0"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -160,7 +155,7 @@
     >
       <div class="flex items-center gap-2">
         <svg
-          class="w-3.5 h-3.5 text-slate-400 flex-shrink-0"
+          class="w-3.5 h-3.5 text-slate-400 shrink-0"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -237,7 +232,7 @@
         >
           <div class="flex items-start gap-2 group">
             <span
-              class="text-[10px] text-slate-500 uppercase w-10 pt-0.5 flex-shrink-0 text-right"
+              class="text-[10px] text-slate-500 uppercase w-10 pt-0.5 shrink-0 text-right"
               x-text="h.algorithm"
             ></span>
             <code
@@ -246,7 +241,7 @@
             ></code>
             <button
               @click="copyHash(h.hashValue)"
-              class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity flex-shrink-0 pt-0.5"
+              class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity shrink-0 pt-0.5"
               title="Copy"
             >
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -287,7 +282,7 @@
       class="space-y-3"
     >
       <div class="flex items-center gap-2" x-show="hardwareManufacturer(detailElement)">
-        <span class="text-xs text-slate-500 flex-shrink-0">Manufacturer</span>
+        <span class="text-xs text-slate-500 shrink-0">Manufacturer</span>
         <button
           @click="navigateTo(hardwareManufacturer(detailElement)?.id)"
           class="text-xs px-2 py-0.5 rounded-md bg-red-500/15 text-red-400 hover:brightness-125 transition"
@@ -299,7 +294,7 @@
         <div>
           <div class="text-xs text-slate-500 mb-1" x-text="spec.label"></div>
           <span
-            class="text-xs text-slate-300 break-words"
+            class="text-xs text-slate-300 wrap-break-word"
             :class="spec.mono && 'font-mono break-all'"
             x-text="spec.value"
           ></span>
@@ -315,7 +310,7 @@
       class="space-y-3"
     >
       <div class="flex items-center gap-2" x-show="status">
-        <span class="text-xs text-slate-500 flex-shrink-0">Safety status</span>
+        <span class="text-xs text-slate-500 shrink-0">Safety status</span>
         <span
           class="w-7 h-7 rounded-full inline-flex items-center justify-center"
           :class="status?.badgeClass"
@@ -325,7 +320,7 @@
         ></span>
       </div>
       <div class="flex items-center gap-2" x-show="evaluationMeta">
-        <span class="text-xs text-slate-500 flex-shrink-0">Evaluation</span>
+        <span class="text-xs text-slate-500 shrink-0">Evaluation</span>
         <span
           class="w-7 h-7 rounded-full inline-flex items-center justify-center"
           :class="evaluationMeta?.badgeClass"
@@ -338,7 +333,7 @@
         <div>
           <div class="text-xs text-slate-500 mb-1" x-text="field.label"></div>
           <span
-            class="text-xs text-slate-300 break-words"
+            class="text-xs text-slate-300 wrap-break-word"
             :class="field.mono && 'font-mono break-all'"
             x-text="field.value"
           ></span>
@@ -366,7 +361,7 @@
         x-show="isMeaningful(detailElement?.software_packageVersion)"
         class="flex items-center gap-2"
       >
-        <span class="text-xs text-slate-500 flex-shrink-0">Version</span>
+        <span class="text-xs text-slate-500 shrink-0">Version</span>
         <span
           class="text-xs px-2 py-0.5 rounded-md bg-slate-700 text-slate-300 font-mono break-all"
           x-text="detailElement?.software_packageVersion"
@@ -375,7 +370,7 @@
 
       <!-- Size (software_artifactSize) -->
       <div x-show="artifactSize(detailElement)" class="flex items-center gap-2">
-        <span class="text-xs text-slate-500 flex-shrink-0">Size</span>
+        <span class="text-xs text-slate-500 shrink-0">Size</span>
         <span
           class="text-xs px-2 py-0.5 rounded-md bg-slate-700 text-slate-300 tabular-nums"
           x-text="artifactSize(detailElement)"
@@ -406,14 +401,14 @@
                   @click.stop="org.id && navigateTo(org.id)"
                 >
                   <span
-                    class="flex items-center flex-shrink-0"
+                    class="flex items-center shrink-0"
                     :style="`color: ${nodeTypeColor(elementMap.get(org.id) ? getNodeType(elementMap.get(org.id)) : 'agent')}`"
                     x-html="elementMap.get(org.id) ? elementIcon(elementMap.get(org.id), 'w-3.5 h-3.5') : nodeTypeIconSvg('agent', 'w-3.5 h-3.5')"
                   ></span>
                   <span class="flex-1 truncate" x-text="org.displayName"></span>
                   <svg
                     x-show="org.id"
-                    class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors flex-shrink-0"
+                    class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors shrink-0"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -447,14 +442,14 @@
                   @click.stop="sup.id && navigateTo(sup.id)"
                 >
                   <span
-                    class="flex items-center flex-shrink-0"
+                    class="flex items-center shrink-0"
                     :style="`color: ${nodeTypeColor(elementMap.get(sup.id) ? getNodeType(elementMap.get(sup.id)) : 'agent')}`"
                     x-html="elementMap.get(sup.id) ? elementIcon(elementMap.get(sup.id), 'w-3.5 h-3.5') : nodeTypeIconSvg('agent', 'w-3.5 h-3.5')"
                   ></span>
                   <span class="flex-1 truncate" x-text="sup.displayName"></span>
                   <svg
                     x-show="sup.id"
-                    class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors flex-shrink-0"
+                    class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors shrink-0"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -477,7 +472,7 @@
       <div x-show="isMeaningful(detailElement?.summary)">
         <div class="text-xs text-slate-500 mb-1">Summary</div>
         <div
-          class="text-xs text-slate-300 whitespace-pre-wrap break-words"
+          class="text-xs text-slate-300 whitespace-pre-wrap wrap-break-word"
           x-text="detailElement?.summary"
         ></div>
       </div>
@@ -486,7 +481,7 @@
       >
         <div class="text-xs text-slate-500 mb-1">Description</div>
         <div
-          class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-32 overflow-y-auto"
+          class="text-xs text-slate-300 whitespace-pre-wrap wrap-break-word max-h-32 overflow-y-auto"
           x-text="detailElement?.description"
         ></div>
       </div>
@@ -539,7 +534,7 @@
           >
             <div class="flex items-start gap-2 group">
               <span
-                class="text-[10px] text-slate-500 uppercase tracking-wider w-20 pt-0.5 flex-shrink-0 text-right"
+                class="text-[10px] text-slate-500 uppercase tracking-wider w-20 pt-0.5 shrink-0 text-right"
                 x-text="eid.label"
               ></span>
               <code
@@ -552,7 +547,7 @@
                 target="_blank"
                 rel="noopener noreferrer"
                 :title="purlLink(eid)?.label"
-                class="text-sky-400/70 hover:text-sky-300 transition-colors flex-shrink-0 pt-0.5"
+                class="text-sky-400/70 hover:text-sky-300 transition-colors shrink-0 pt-0.5"
               >
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
@@ -569,7 +564,7 @@
                 target="_blank"
                 rel="noopener noreferrer"
                 :title="vulnLookup(eid)?.label"
-                class="text-rose-400/70 hover:text-rose-300 transition-colors flex-shrink-0 pt-0.5"
+                class="text-rose-400/70 hover:text-rose-300 transition-colors shrink-0 pt-0.5"
               >
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
@@ -582,7 +577,7 @@
               </a>
               <button
                 @click="copyHash(eid.identifier)"
-                class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity flex-shrink-0 pt-0.5"
+                class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity shrink-0 pt-0.5"
                 title="Copy"
               >
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -603,7 +598,7 @@
       <div x-show="isMeaningful(detailElement?.software_copyrightText)">
         <div class="text-xs text-slate-500 mb-1">Copyright</div>
         <div
-          class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-32 overflow-y-auto bg-slate-900/50 rounded px-2 py-1.5"
+          class="text-xs text-slate-300 whitespace-pre-wrap wrap-break-word max-h-32 overflow-y-auto bg-slate-900/50 rounded-sm px-2 py-1.5"
           x-text="detailElement?.software_copyrightText"
         ></div>
       </div>
@@ -614,7 +609,7 @@
       >
         <div class="text-xs text-slate-500 mb-1">Note</div>
         <div
-          class="text-xs text-slate-300 whitespace-pre-wrap break-words bg-slate-900/50 rounded px-2 py-1.5"
+          class="text-xs text-slate-300 whitespace-pre-wrap wrap-break-word bg-slate-900/50 rounded-sm px-2 py-1.5"
           x-text="detailElement?.comment"
         ></div>
       </div>
@@ -651,7 +646,7 @@
             :key="flag"
           >
             <span
-              class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono"
+              class="inline-flex items-center px-1.5 py-0.5 rounded-sm text-[10px] font-mono"
               :class="flag.startsWith('-O') ? 'bg-green-500/15 text-green-400' :
                             flag.startsWith('-std') ? 'bg-pink-500/15 text-pink-400' :
                             flag.startsWith('-g') ? 'bg-orange-500/15 text-orange-400' :
@@ -670,7 +665,7 @@
         <div class="flex flex-wrap gap-1">
           <template x-for="def in parseCompileFlags(detailElement).defines.slice(0, 5)" :key="def">
             <span
-              class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono bg-amber-500/15 text-amber-400"
+              class="inline-flex items-center px-1.5 py-0.5 rounded-sm text-[10px] font-mono bg-amber-500/15 text-amber-400"
               x-text="def"
             ></span>
           </template>
@@ -707,7 +702,7 @@
           <span>Command</span>
           <button
             @click="copyHash(detailElement?.comment)"
-            class="text-slate-500 hover:text-white transition-colors flex-shrink-0"
+            class="text-slate-500 hover:text-white transition-colors shrink-0"
             title="Copy"
           >
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -721,7 +716,7 @@
           </button>
         </div>
         <code
-          class="block text-xs text-slate-300 font-mono whitespace-pre-wrap break-all bg-slate-900/50 rounded px-2 py-1.5 max-h-48 overflow-y-auto"
+          class="block text-xs text-slate-300 font-mono whitespace-pre-wrap break-all bg-slate-900/50 rounded-sm px-2 py-1.5 max-h-48 overflow-y-auto"
           x-text="detailElement?.comment"
         ></code>
       </div>
@@ -732,7 +727,7 @@
         </div>
         <div class="space-y-1">
           <template x-for="entry in (detailElement?.build_environment || [])" :key="entry.key">
-            <div class="rounded bg-slate-900/50 px-2 py-1">
+            <div class="rounded-sm bg-slate-900/50 px-2 py-1">
               <div
                 class="text-[10px] uppercase tracking-wider text-slate-500"
                 x-text="entry.key"
@@ -756,7 +751,7 @@
               ></div>
               <div class="space-y-2">
                 <template x-for="entry in group.entries" :key="entry.renderKey">
-                  <div class="rounded bg-slate-900/50 px-2 py-1.5">
+                  <div class="rounded-sm bg-slate-900/50 px-2 py-1.5">
                     <div
                       class="text-[10px] uppercase tracking-wider text-slate-500 mb-1"
                       x-text="entry.key"
@@ -821,12 +816,12 @@
           ></span>
           <div
             x-show="f.kind === 'text'"
-            class="text-xs text-slate-300 break-words"
+            class="text-xs text-slate-300 wrap-break-word"
             x-text="f.kind === 'text' ? f.value : ''"
           ></div>
           <div
             x-show="f.kind === 'longtext'"
-            class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-40 overflow-y-auto"
+            class="text-xs text-slate-300 whitespace-pre-wrap wrap-break-word max-h-40 overflow-y-auto"
             x-text="f.kind === 'longtext' ? f.value : ''"
           ></div>
           <div x-show="f.kind === 'chips'" class="flex flex-wrap gap-1">
@@ -842,12 +837,12 @@
             class="list-disc list-inside space-y-1 text-xs text-slate-300"
           >
             <template x-for="(item, i) in (f.kind === 'list' ? f.value : [])" :key="i">
-              <li class="break-words" x-text="item"></li>
+              <li class="wrap-break-word" x-text="item"></li>
             </template>
           </ul>
           <div x-show="f.kind === 'dict'" class="space-y-1">
             <template x-for="(entry, i) in (f.kind === 'dict' ? f.value : [])" :key="i">
-              <div class="rounded bg-slate-900/50 px-2 py-1">
+              <div class="rounded-sm bg-slate-900/50 px-2 py-1">
                 <div
                   class="text-[10px] uppercase tracking-wider text-slate-500"
                   x-text="entry.key"
@@ -872,7 +867,7 @@
       <template x-for="h in (detailElement?.verifiedUsing || [])" :key="h.hashValue">
         <div class="flex items-start gap-2 group">
           <span
-            class="text-[10px] text-slate-500 uppercase w-10 pt-0.5 flex-shrink-0 text-right"
+            class="text-[10px] text-slate-500 uppercase w-10 pt-0.5 shrink-0 text-right"
             x-text="h.algorithm"
           ></span>
           <code
@@ -881,7 +876,7 @@
           ></code>
           <button
             @click="copyHash(h.hashValue)"
-            class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity flex-shrink-0 pt-0.5"
+            class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity shrink-0 pt-0.5"
             title="Copy"
           >
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -902,7 +897,7 @@
       >
         <div class="flex items-start gap-2 group">
           <span
-            class="text-[10px] text-slate-500 uppercase w-10 pt-0.5 flex-shrink-0 text-right"
+            class="text-[10px] text-slate-500 uppercase w-10 pt-0.5 shrink-0 text-right"
             x-text="ci.software_contentIdentifierType"
           ></span>
           <code
@@ -911,7 +906,7 @@
           ></code>
           <button
             @click="copyHash(ci.software_contentIdentifierValue)"
-            class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity flex-shrink-0 pt-0.5"
+            class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity shrink-0 pt-0.5"
             title="Copy"
           >
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -967,7 +962,7 @@
               ></code>
               <button
                 @click="copyHash(prop.json ? prop.pretty : prop.value)"
-                class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity flex-shrink-0"
+                class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity shrink-0"
                 title="Copy"
               >
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -982,7 +977,7 @@
             </div>
             <pre
               x-show="prop.json"
-              class="hash-text text-slate-300 bg-slate-900/50 rounded px-2 py-1.5 mt-0.5 overflow-x-auto whitespace-pre"
+              class="hash-text text-slate-300 bg-slate-900/50 rounded-sm px-2 py-1.5 mt-0.5 overflow-x-auto whitespace-pre"
               x-text="prop.pretty"
             ></pre>
             <code
@@ -1092,7 +1087,7 @@
                         :title="'Open ' + link.name + ' in this SBOM'"
                       >
                         <svg
-                          class="w-3 h-3 flex-shrink-0 opacity-70 group-hover:opacity-100"
+                          class="w-3 h-3 shrink-0 opacity-70 group-hover:opacity-100"
                           fill="none"
                           stroke="currentColor"
                           stroke-width="2"
@@ -1260,7 +1255,7 @@
         @click="toggleImpactHook(detailElement)"
         class="w-full flex items-center gap-2.5 px-3 py-2.5 text-left hover:bg-slate-800/40 transition"
       >
-        <span class="text-indigo-400 flex-shrink-0">
+        <span class="text-indigo-400 shrink-0">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
@@ -1276,7 +1271,7 @@
           x-text="detailElement ? impactHookLabel(detailElement) : ''"
         ></span>
         <svg
-          class="w-4 h-4 ml-auto text-slate-500 transition-transform flex-shrink-0"
+          class="w-4 h-4 ml-auto text-slate-500 transition-transform shrink-0"
           :class="isImpactHookOpen(detailElement) && 'rotate-180'"
           fill="none"
           stroke="currentColor"
@@ -1322,7 +1317,7 @@
                     ></button>
                     <svg
                       x-show="i < prov.resolvedPaths[0].length - 1"
-                      class="w-3 h-3 text-slate-600 flex-shrink-0"
+                      class="w-3 h-3 text-slate-600 shrink-0"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -1371,10 +1366,10 @@
                 class="inline-flex items-center gap-1.5 text-[11px] bg-slate-900/50 border border-slate-700 rounded-md px-2 py-0.5 hover:border-slate-600 transition font-mono text-slate-300"
               >
                 <span
-                  class="rounded-sm flex-shrink-0"
+                  class="rounded-xs shrink-0"
                   :style="`width:6px;height:6px;background:${nodeTypeColor(d.type)}`"
                 ></span>
-                <span class="truncate max-w-[9rem]" x-text="d.name"></span>
+                <span class="truncate max-w-36" x-text="d.name"></span>
               </button>
             </template>
             <span
@@ -1445,7 +1440,7 @@
          originated / manufactured across the loaded document(s) -->
     <div x-show="isAgent(detailElement)" class="space-y-4">
       <div x-show="agentEmail(detailElement)" class="flex items-center gap-2">
-        <span class="text-xs text-slate-500 flex-shrink-0">Email</span>
+        <span class="text-xs text-slate-500 shrink-0">Email</span>
         <a
           :href="'mailto:' + agentEmail(detailElement)"
           class="text-xs text-sky-400 hover:text-sky-300 break-all"
@@ -1471,13 +1466,13 @@
               <div class="detail-rel-item group" @click="selectGraphNode(item.id)">
                 <span class="detail-rel-arrow" :style="`color: ${group.color}`">→</span>
                 <span
-                  class="flex items-center flex-shrink-0"
+                  class="flex items-center shrink-0"
                   :style="`color: ${nodeTypeColor(getNodeType(elementMap.get(item.id) || {}))}`"
                   x-html="elementIcon(elementMap.get(item.id) || { spdxId: item.id }, 'w-3.5 h-3.5')"
                 ></span>
                 <span class="flex-1 truncate" x-text="item.displayName"></span>
                 <svg
-                  class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors flex-shrink-0"
+                  class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -1533,7 +1528,7 @@
                 x-text="item.direction === 'out' ? '→' : '←'"
               ></span>
               <span
-                class="flex items-center flex-shrink-0"
+                class="flex items-center shrink-0"
                 :style="`color: ${nodeTypeColor(getNodeType(elementMap.get(item.id) || {}))}`"
                 x-html="elementIcon(elementMap.get(item.id) || { spdxId: item.id }, 'w-3.5 h-3.5')"
               ></span>
@@ -1544,7 +1539,7 @@
               ></span>
               <span
                 x-show="statusMeta"
-                class="w-6 h-6 rounded-full inline-flex items-center justify-center flex-shrink-0"
+                class="w-6 h-6 rounded-full inline-flex items-center justify-center shrink-0"
                 :class="statusMeta?.badgeClass"
                 :title="statusMeta ? `Safety status: ${statusMeta.label}` : null"
                 :aria-label="statusMeta ? `Safety status: ${statusMeta.label}` : null"
@@ -1552,13 +1547,13 @@
               ></span>
               <span
                 x-show="item.scope"
-                class="text-[10px] px-1.5 py-0.5 rounded flex-shrink-0 border"
+                class="text-[10px] px-1.5 py-0.5 rounded-sm shrink-0 border"
                 :style="`color:${scopeColor(item.scope)}; border-color:${scopeColor(item.scope)}55; background:${scopeColor(item.scope)}1a`"
                 :title="'Lifecycle scope: ' + item.scope"
                 x-text="item.scope"
               ></span>
               <svg
-                class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors flex-shrink-0"
+                class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors shrink-0"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -1682,7 +1677,7 @@
                   >
                     <span class="sv-gap-line"></span>
                     <svg
-                      class="h-3 w-3 flex-shrink-0"
+                      class="h-3 w-3 shrink-0"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"

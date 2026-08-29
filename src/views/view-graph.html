@@ -1,7 +1,7 @@
 <div x-show="currentView === 'graph'" class="fade-in absolute inset-0 flex flex-col">
   <!-- Graph controls -->
   <div
-    class="flex items-center gap-3 px-5 py-3 bg-slate-800/50 border-b border-slate-700/50 flex-shrink-0 flex-wrap"
+    class="flex items-center gap-3 px-5 py-3 bg-slate-800/50 border-b border-slate-700/50 shrink-0 flex-wrap"
   >
     <!-- Search -->
     <div class="flex items-center gap-2">
@@ -24,7 +24,7 @@
           x-model="graphSearchQuery"
           @input.debounce.150ms="graphSearch()"
           placeholder="Search nodes…"
-          class="w-40 sm:w-52 pl-8 pr-7 py-1 bg-slate-800 border border-slate-700 rounded-md text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
+          class="w-40 sm:w-52 pl-8 pr-7 py-1 bg-slate-800 border border-slate-700 rounded-md text-xs text-slate-200 placeholder-slate-500 focus:outline-hidden focus:border-blue-500 transition-colors"
         />
         <button
           x-show="graphSearchQuery"
@@ -43,7 +43,7 @@
           type="checkbox"
           x-model="graphSearchFullText"
           @change="graphSearch()"
-          class="rounded border-slate-600 bg-slate-700 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5"
+          class="rounded-sm border-slate-600 bg-slate-700 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5"
         />
         <span class="text-xs text-slate-300">Full-text</span>
       </label>
@@ -52,7 +52,7 @@
         x-model="graphSearchMode"
         @change="graphSearch()"
         title="How to treat non-matching nodes"
-        class="text-xs bg-slate-800 border border-slate-700 rounded-md text-slate-300 px-1.5 py-1 focus:outline-none focus:border-blue-500"
+        class="text-xs bg-slate-800 border border-slate-700 rounded-md text-slate-300 px-1.5 py-1 focus:outline-hidden focus:border-blue-500"
       >
         <option value="dim">Dim others</option>
         <option value="focus">Focus matches</option>
@@ -75,7 +75,7 @@
           type="button"
           @click="graphUseIcons = !graphUseIcons; toggleGraphIcons()"
           :class="graphUseIcons ? 'bg-blue-500/20 text-blue-400' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700'"
-          class="g-tip p-1.5 rounded transition-colors"
+          class="g-tip p-1.5 rounded-sm transition-colors"
           aria-label="Use type icons"
           data-tip="Represent each node with its type's icon (folder, package, chip, …) instead of a plain coloured dot."
           x-html="uiIconSvg('toggle_icons')"
@@ -92,7 +92,7 @@
             :disabled="graphTruncated"
             @click="graphAggregate = !graphAggregate; updateGraph()"
             :class="(graphAggregate || graphTruncated) ? 'bg-blue-500/20 text-blue-400' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700'"
-            class="p-1.5 rounded transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+            class="p-1.5 rounded-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
             aria-label="Aggregate nodes"
             x-html="uiIconSvg('toggle_aggregate')"
           ></button>
@@ -101,7 +101,7 @@
           type="button"
           @click="graphHideOrphans = !graphHideOrphans; updateGraph()"
           :class="graphHideOrphans ? 'bg-blue-500/20 text-blue-400' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700'"
-          class="g-tip p-1.5 rounded transition-colors"
+          class="g-tip p-1.5 rounded-sm transition-colors"
           aria-label="Hide orphans"
           data-tip="Hide nodes left with no edges once every other filter is applied."
           x-html="uiIconSvg('toggle_hide_orphans')"
@@ -111,7 +111,7 @@
           type="button"
           x-show="graphExpandedCount"
           @click="collapseAllClusters()"
-          class="g-tip p-1.5 rounded transition-colors text-slate-400 hover:text-slate-200 hover:bg-slate-700"
+          class="g-tip p-1.5 rounded-sm transition-colors text-slate-400 hover:text-slate-200 hover:bg-slate-700"
           aria-label="Collapse all clusters"
           data-tip="Collapse every drilled-in cluster back to its aggregated bubble."
           x-html="uiIconSvg('collapse_clusters')"
@@ -120,7 +120,7 @@
           type="button"
           @click="resetGraphZoom()"
           :class="graphAutoFit ? 'bg-blue-500/20 text-blue-400' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700'"
-          class="g-tip p-1.5 rounded transition-colors"
+          class="g-tip p-1.5 rounded-sm transition-colors"
           aria-label="Reset zoom"
           :data-tip="graphAutoFit ? 'Auto-fit is on: the graph reframes to fit on every change. Pan or zoom to take manual control.' : 'Reset the pan and zoom to fit the whole graph, and re-enable auto-fit.'"
           x-html="uiIconSvg('reset_zoom')"
@@ -183,7 +183,7 @@
               :class="graphLayout === l.key ? 'bg-slate-700/70' : 'hover:bg-slate-700/40'"
             >
               <span
-                class="mt-0.5 flex items-center justify-center flex-shrink-0"
+                class="mt-0.5 flex items-center justify-center shrink-0"
                 :class="graphLayout === l.key ? 'text-blue-300' : 'text-slate-400'"
                 x-html="uiIconSvg(l.icon, 'w-4 h-4')"
               ></span>
@@ -195,7 +195,7 @@
                 ></span>
               </span>
               <template x-if="graphLayout === l.key">
-                <span class="mt-0.5 flex-shrink-0 text-blue-300" title="Active">
+                <span class="mt-0.5 shrink-0 text-blue-300" title="Active">
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       stroke-linecap="round"
@@ -276,7 +276,7 @@
                           : 'hover:bg-slate-700/40'"
             >
               <span
-                class="mt-0.5 flex items-center justify-center flex-shrink-0"
+                class="mt-0.5 flex items-center justify-center shrink-0"
                 :style="`color:${m.color}`"
                 x-html="uiIconSvg(m.icon, 'w-4 h-4')"
               ></span>
@@ -295,7 +295,7 @@
                 ></span>
               </span>
               <template x-if="graphHeatMode === m.key">
-                <span class="mt-0.5 flex-shrink-0" :style="`color:${m.color}`" title="Active">
+                <span class="mt-0.5 shrink-0" :style="`color:${m.color}`" title="Active">
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       stroke-linecap="round"
@@ -329,7 +329,7 @@
   </div>
   <!-- Graph legend (click an entry to toggle that type on/off) -->
   <div
-    class="relative z-10 flex items-center gap-x-4 gap-y-1.5 px-5 py-2.5 bg-slate-900/90 backdrop-blur-sm border-t border-slate-700/50 flex-shrink-0 flex-wrap"
+    class="relative z-10 flex items-center gap-x-4 gap-y-1.5 px-5 py-2.5 bg-slate-900/90 backdrop-blur-xs border-t border-slate-700/50 shrink-0 flex-wrap"
   >
     <!-- Heatmap scale: only while an overlay is active, so the glow on the canvas
          is legible (which signal, and which end is hotter). -->
@@ -419,7 +419,7 @@
         :class="f.active ? 'text-slate-300' : 'text-slate-500 line-through'"
       >
         <span
-          class="w-4 h-0.5 rounded transition-opacity"
+          class="w-4 h-0.5 rounded-sm transition-opacity"
           :style="relEdgeSwatchStyle(f)"
           :class="f.active ? 'opacity-100' : 'opacity-30'"
         ></span>
@@ -448,7 +448,7 @@
         :class="f.active ? 'text-slate-300' : 'text-slate-500 line-through'"
       >
         <span
-          class="w-2.5 h-2.5 rounded-sm border transition-colors"
+          class="w-2.5 h-2.5 rounded-xs border transition-colors"
           :style="f.active
                       ? `background:${f.color}; border-color:${f.color}`
                       : `background:transparent; border-color:${f.color}`"

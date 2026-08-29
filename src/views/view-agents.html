@@ -1,7 +1,7 @@
 <div x-show="currentView === 'agents'" class="fade-in space-y-3 max-w-4xl">
   <div class="list-sticky flex flex-wrap items-center gap-3">
     <span
-      class="text-sm text-slate-400 flex-shrink-0"
+      class="text-sm text-slate-400 shrink-0"
       x-text="`${filteredAgents.length} ${filteredAgents.length === 1 ? 'agent' : 'agents'}`"
     ></span>
     <input
@@ -9,12 +9,12 @@
       @input.debounce.150ms="restreamView('agents')"
       type="text"
       placeholder="Filter agents…"
-      class="ml-auto bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-red-500 w-44 sm:w-56"
+      class="ml-auto bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-hidden focus:border-red-500 w-44 sm:w-56"
     />
     <select
       x-model="agentSort"
       @change="restreamView('agents')"
-      class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 text-slate-300 focus:outline-none focus:border-red-500"
+      class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 text-slate-300 focus:outline-hidden focus:border-red-500"
     >
       <option value="links">Sort by links</option>
       <option value="name">Sort by name</option>
@@ -38,7 +38,7 @@
     >
       <div class="flex items-center gap-3 cursor-pointer" @click="toggleAgent(agent.spdxId)">
         <div
-          class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+          class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
           :style="`background:${nodeTypeColor('agent')}26`"
         >
           <span
@@ -49,12 +49,12 @@
         </div>
         <div class="flex-1 min-w-0">
           <div
-            class="font-medium text-white text-sm break-words"
+            class="font-medium text-white text-sm wrap-break-word"
             x-text="agent.name || cleanName(agent.spdxId)"
           ></div>
           <div class="text-xs text-slate-500" x-text="agentTypeLabel(agent)"></div>
         </div>
-        <div class="flex items-center gap-2 flex-shrink-0">
+        <div class="flex items-center gap-2 shrink-0">
           <template x-for="group in agentLinkGroups(agent)" :key="group.key">
             <span
               class="badge"
@@ -89,14 +89,14 @@
               <div x-show="isMeaningful(agent.summary)">
                 <div class="text-xs text-slate-500 mb-1">Summary</div>
                 <div
-                  class="text-xs text-slate-300 whitespace-pre-wrap break-words"
+                  class="text-xs text-slate-300 whitespace-pre-wrap wrap-break-word"
                   x-text="agent.summary"
                 ></div>
               </div>
               <div x-show="isMeaningful(agent.description) && agent.description !== agent.summary">
                 <div class="text-xs text-slate-500 mb-1">Description</div>
                 <div
-                  class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-32 overflow-y-auto"
+                  class="text-xs text-slate-300 whitespace-pre-wrap wrap-break-word max-h-32 overflow-y-auto"
                   x-text="agent.description"
                 ></div>
               </div>
@@ -108,7 +108,7 @@
                 ></code>
               </div>
               <div x-show="agentEmail(agent)" class="flex items-center gap-2">
-                <span class="text-xs text-slate-500 flex-shrink-0">Email</span>
+                <span class="text-xs text-slate-500 shrink-0">Email</span>
                 <a
                   :href="'mailto:' + agentEmail(agent)"
                   @click.stop
@@ -120,7 +120,7 @@
               <div x-show="isMeaningful(agent.comment)">
                 <div class="text-xs text-slate-500 mb-1">Note</div>
                 <div
-                  class="text-xs text-slate-300 whitespace-pre-wrap break-words bg-slate-900/50 rounded px-2 py-1.5"
+                  class="text-xs text-slate-300 whitespace-pre-wrap wrap-break-word bg-slate-900/50 rounded-sm px-2 py-1.5"
                   x-text="agent.comment"
                 ></div>
               </div>
@@ -138,7 +138,7 @@
                 >
                   <div class="flex items-start gap-2 group">
                     <span
-                      class="text-[10px] text-slate-500 uppercase tracking-wider w-20 pt-0.5 flex-shrink-0 text-right"
+                      class="text-[10px] text-slate-500 uppercase tracking-wider w-20 pt-0.5 shrink-0 text-right"
                       x-text="eid.label"
                     ></span>
                     <code
@@ -147,7 +147,7 @@
                     ></code>
                     <button
                       @click.stop="copyHash(eid.identifier)"
-                      class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity flex-shrink-0 pt-0.5"
+                      class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-white transition-opacity shrink-0 pt-0.5"
                       title="Copy"
                     >
                       <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -184,13 +184,13 @@
                     <div class="detail-rel-item group" @click.stop="navigateTo(item.id)">
                       <span class="detail-rel-arrow" :style="`color: ${group.color}`">→</span>
                       <span
-                        class="flex items-center flex-shrink-0"
+                        class="flex items-center shrink-0"
                         :style="`color: ${nodeTypeColor(getNodeType(elementMap.get(item.id) || {}))}`"
                         x-html="elementIcon(elementMap.get(item.id) || { spdxId: item.id }, 'w-3.5 h-3.5')"
                       ></span>
                       <span class="flex-1 truncate" x-text="item.displayName"></span>
                       <svg
-                        class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors flex-shrink-0"
+                        class="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors shrink-0"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"

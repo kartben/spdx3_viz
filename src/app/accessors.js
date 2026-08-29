@@ -453,7 +453,7 @@ export const accessorsMixin = {
         border: 'border-rose-500/35',
         ring: 'ring-rose-500/20',
         surface: 'bg-rose-500/[0.07]',
-        hover: 'hover:bg-rose-500/[0.11]',
+        hover: 'hover:bg-rose-500/11',
         panel: 'bg-rose-950/30 border-rose-500/20',
         chip: 'bg-rose-500/15 text-rose-200 ring-1 ring-rose-500/25'
       },
@@ -500,8 +500,8 @@ export const accessorsMixin = {
         text: 'text-slate-300',
         border: 'border-slate-500/35',
         ring: 'ring-slate-500/20',
-        surface: 'bg-slate-500/[0.06]',
-        hover: 'hover:bg-slate-500/[0.10]',
+        surface: 'bg-slate-500/6',
+        hover: 'hover:bg-slate-500/10',
         panel: 'bg-slate-900/70 border-slate-700/60',
         chip: 'bg-slate-700/80 text-slate-200 ring-1 ring-slate-600/40'
       }
