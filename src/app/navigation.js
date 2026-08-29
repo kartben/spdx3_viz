@@ -226,7 +226,7 @@ export const navigationMixin = {
     // Push (not replace) so the pre-load landing entry survives underneath as
     // the previous history state; browser Back then returns to the home screen
     // (handled by the null-state branch of the popstate listener).
-    history.pushState(state, '', this._navUrl(state));
+    this._writeHistory(state, 'push');
   },
   _scheduleNavPush() {
     if (!this.dataLoaded || this._navPushQueued) return;
@@ -237,8 +237,17 @@ export const navigationMixin = {
       const key = JSON.stringify(state);
       if (key === this._lastNavKey) return;
       this._lastNavKey = key;
-      history.pushState(state, '', this._navUrl(state));
+      this._writeHistory(state, 'push');
     });
+  },
+
+  // Records the fragment we just wrote so a hashchange from our own
+  // push/replace (or a paired popstate) is not treated as a pasted share link.
+  _writeHistory(state, method) {
+    const url = this._navUrl(state);
+    this._lastWrittenHash = url.includes('#') ? url.slice(url.indexOf('#')) : '';
+    if (method === 'push') history.pushState(state, '', url);
+    else history.replaceState(state, '', url);
   },
 
   // URL for a history entry. Sample-loaded sessions get a share hash so the
@@ -295,7 +304,7 @@ export const navigationMixin = {
     const field = expandedFieldByView[view];
     if (field && link.expanded) state[field] = link.expanded;
     this._applyNavState(state);
-    history.replaceState(state, '', this._navUrl(state));
+    this._writeHistory(state, 'replace');
   },
 
   // Copies the current share link (the address bar URL) to the clipboard.
@@ -446,6 +455,7 @@ export const navigationMixin = {
     this.dataLoaded = false;
     this.loadedSampleId = null;
     this._pendingDeepLink = null;
+    this._lastWrittenHash = '';
     history.replaceState(null, '', location.pathname + location.search);
     this.currentView = 'dashboard';
     this.detailElement = null;

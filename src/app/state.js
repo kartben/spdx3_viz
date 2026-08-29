@@ -43,6 +43,7 @@ export function createState() {
     addFilesExpanded: {}, // sample id -> explicitly toggled open/closed
     addFilesError: '', // a failed batch, shown in the dialog it reopens
     _pendingDeepLink: null, // parsed share hash to apply once the sample finishes parsing
+    _lastWrittenHash: '', // last fragment we wrote via history; hashchange ignores it
     sampleError: '',
     parsing: false, // true while loading/parsing a freshly loaded SBOM
     parseError: '',
