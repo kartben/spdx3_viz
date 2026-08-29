@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import { derivedMixin } from '../src/app/derived.js';
 import { securityMixin } from '../src/app/security.js';
+import { supplyChainMixin } from '../src/app/supply-chain.js';
 import { CLASS } from '../src/spdx/model.js';
 
 // The summary getters are whole-collection scans memoized on their source
@@ -11,7 +12,7 @@ import { CLASS } from '../src/spdx/model.js';
 
 function makeApp(overrides = {}) {
   const app = {};
-  for (const mixin of [derivedMixin, securityMixin]) {
+  for (const mixin of [derivedMixin, securityMixin, supplyChainMixin]) {
     Object.defineProperties(app, Object.getOwnPropertyDescriptors(mixin));
   }
   return Object.assign(app, overrides);
@@ -130,6 +131,31 @@ test('supplyChainCounts', () => {
   assert.equal(c.states, 1);
   assert.equal(c.transports, 1);
   assert.equal(app.supplyChainCounts, c, 'same list, same object');
+});
+
+// The supply chain memos live in their own module (see app/supply-chain.js),
+// so _resetListMemos has to reach across to clear them. Without that call a
+// second loaded document would keep showing the first one's rollups.
+test('_resetListMemos clears the supply chain memos too', () => {
+  const first = [
+    { spdxId: 's1', type: CLASS.supplychain_TransportAction, _kind: 'action' },
+    { spdxId: 's2', type: CLASS.supplychain_CreateProcess, _kind: 'process' }
+  ];
+  const app = makeApp({
+    supplyChain: first,
+    supplyChainKind: (el) => el._kind,
+    supplyChainExceptionStatus: () => null
+  });
+  assert.equal(app.supplyChainCounts.actions, 1);
+
+  // A fresh parse replaces the array; the memo is keyed on identity, so this
+  // alone would already recompute. Mutating in place is what a stale memo
+  // survives, which is why the reset has to run.
+  first.push({ spdxId: 's3', type: CLASS.supplychain_TransportAction, _kind: 'action' });
+  assert.equal(app.supplyChainCounts.actions, 1, 'still memoized before the reset');
+
+  app._resetListMemos();
+  assert.equal(app.supplyChainCounts.actions, 2, 'recomputed after the reset');
 });
 
 test('vulnRecord', async (t) => {
