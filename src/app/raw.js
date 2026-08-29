@@ -1,4 +1,4 @@
-import { copyToClipboard, formatByteSize } from '../lib/index.js';
+import { copyToClipboard, escapeAttr, escapeHtml, formatByteSize } from '../lib/index.js';
 import { INLINE_TEXT_MAX } from './loading.js';
 
 /* Raw JSON-LD view: shows the underlying file(s) as loaded (or pretty-printed)
@@ -11,14 +11,6 @@ const HIGHLIGHT_MAX_CHARS = 10_000_000;
 // we refuse to inline is exactly a file whose text we don't bother holding.
 // Imported rather than restated so the two can't drift apart.
 const INLINE_MAX_CHARS = INLINE_TEXT_MAX;
-
-function escapeHtml(s) {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-
-function escapeAttr(s) {
-  return escapeHtml(s).replace(/"/g, '&quot;');
-}
 
 // Matches one JSON token: a string (optionally a key when followed by `:`),
 // true/false/null, or a number. Structural characters and whitespace fall in
