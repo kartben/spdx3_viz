@@ -81,3 +81,81 @@ test('the older link fields still round trip', () => {
   assert.equal(parsed.detail, 'pkg:b');
   assert.equal(parsed.graphSelected, 'pkg:c');
 });
+
+test('Functional Safety kind and layout survive a round trip', () => {
+  const hash = buildShareHash({
+    sample: 'functional-safety',
+    view: 'requirements',
+    expanded: 'ver:brake-test',
+    requirementKind: 'functionalsafety_RequirementVerification',
+    requirementLayout: 'list'
+  });
+  assert.equal(hash, 's=functional-safety&v=requirements&e=ver%3Abrake-test&rk=ver&rl=l');
+  const parsed = parseShareHash(`#${hash}`);
+  assert.equal(parsed.requirementKind, 'functionalsafety_RequirementVerification');
+  assert.equal(parsed.requirementLayout, 'list');
+  assert.equal(parsed.expanded, 'ver:brake-test');
+});
+
+test('the Requirements chip and an unpinned layout stay out of the hash', () => {
+  const hash = buildShareHash({
+    sample: 'functional-safety',
+    view: 'requirements',
+    requirementKind: 'Requirement'
+  });
+  assert.equal(hash, 's=functional-safety&v=requirements');
+  const parsed = parseShareHash(hash);
+  assert.equal(parsed.requirementKind, 'Requirement');
+  assert.equal(parsed.requirementLayout, null);
+});
+
+test('All / tree / evaluations encode as short codes', () => {
+  const all = parseShareHash(
+    buildShareHash({
+      sample: 'functional-safety',
+      view: 'requirements',
+      requirementKind: '',
+      requirementLayout: 'tree'
+    })
+  );
+  assert.equal(all.requirementKind, '');
+  assert.equal(all.requirementLayout, 'tree');
+
+  const evals = parseShareHash(
+    buildShareHash({
+      sample: 'functional-safety',
+      view: 'requirements',
+      requirementKind: 'functionalsafety_EvaluationResult'
+    })
+  );
+  assert.equal(evals.requirementKind, 'functionalsafety_EvaluationResult');
+});
+
+test('Supply Chain angles survive a round trip and timeline stays omitted', () => {
+  const map = buildShareHash({
+    sample: 'paper-plane',
+    view: 'supplychain',
+    supplyChainMode: 'map'
+  });
+  assert.equal(map, 's=paper-plane&v=supplychain&svm=mp');
+  assert.equal(parseShareHash(map).supplyChainMode, 'map');
+
+  const timeline = buildShareHash({
+    sample: 'paper-plane',
+    view: 'supplychain',
+    supplyChainMode: 'timeline'
+  });
+  assert.equal(timeline, 's=paper-plane&v=supplychain');
+  assert.equal(parseShareHash(timeline).supplyChainMode, null);
+});
+
+test('older Functional Safety and Supply Chain links still parse', () => {
+  const fs = parseShareHash('s=functional-safety&v=requirements&e=req:sg-01');
+  assert.equal(fs.requirementKind, 'Requirement');
+  assert.equal(fs.requirementLayout, null);
+  assert.equal(fs.expanded, 'req:sg-01');
+
+  const sc = parseShareHash('s=paper-plane&v=supplychain&e=act:fold');
+  assert.equal(sc.supplyChainMode, null);
+  assert.equal(sc.expanded, 'act:fold');
+});

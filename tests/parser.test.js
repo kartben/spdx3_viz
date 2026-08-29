@@ -871,7 +871,10 @@ test('share hash round-trips a spot in a sample', () => {
     compatPanel: 'check',
     compatOutbound: null,
     compatScope: null,
-    compatEdges: 'all'
+    compatEdges: 'all',
+    requirementKind: 'Requirement',
+    requirementLayout: null,
+    supplyChainMode: null
   });
 
   // The default view stays out of the hash, and parsing restores it

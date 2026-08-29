@@ -56,6 +56,10 @@ export const CHANGELOG = [
       {
         tag: 'Added',
         text: 'License compatibility analyzer.'
+      },
+      {
+        tag: 'Fixed',
+        text: 'Share links restore Safety chips and Supply Chain angles.'
       }
     ]
   },

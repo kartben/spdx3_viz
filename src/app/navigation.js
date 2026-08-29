@@ -176,8 +176,28 @@ export const navigationMixin = {
       expandedAgent: this.expandedAgent,
       detail: this.detailElement?.spdxId || null,
       graphSelected: this.graphSelectedNodeId,
-      ...this._compatNavState()
+      ...this._compatNavState(),
+      ...this._safetyNavState(),
+      ...this._supplyChainNavState()
     };
+  },
+
+  // Functional Safety chips and layout, only while that view is on screen.
+  // A link should reopen the same kind of card (requirements vs. tests) rather
+  // than always landing on the default Requirements chip / decomposition tree.
+  _safetyNavState() {
+    if (this.currentView !== 'requirements') return {};
+    return {
+      requirementKindFilter: this.requirementKindFilter,
+      requirementLayout: this.requirementLayout
+    };
+  },
+
+  // Supply Chain angle, only while that view is on screen, so a saved URL
+  // reopens the map / states / processes / custody tab rather than Timeline.
+  _supplyChainNavState() {
+    if (this.currentView !== 'supplychain') return {};
+    return { supplyChainViewMode: this.supplyChainViewMode };
   },
 
   // The license compatibility settings, but only while that tab is on screen.
@@ -237,7 +257,10 @@ export const navigationMixin = {
       compatPanel: state.compatPanel,
       compatOutbound: state.compatOutbound,
       compatScope: state.compatScope,
-      compatEdges: state.compatEdges
+      compatEdges: state.compatEdges,
+      requirementKind: state.requirementKindFilter,
+      requirementLayout: state.requirementLayout,
+      supplyChainMode: state.supplyChainViewMode
     });
     return hash ? `${base}#${hash}` : base;
   },
@@ -264,7 +287,10 @@ export const navigationMixin = {
       compatPanel: link.compatPanel,
       compatOutbound: link.compatOutbound,
       compatScope: link.compatScope,
-      compatEdges: link.compatEdges
+      compatEdges: link.compatEdges,
+      requirementKindFilter: link.requirementKind,
+      requirementLayout: link.requirementLayout,
+      supplyChainViewMode: link.supplyChainMode
     };
     const field = expandedFieldByView[view];
     if (field && link.expanded) state[field] = link.expanded;
@@ -285,6 +311,8 @@ export const navigationMixin = {
     this._lastNavKey = JSON.stringify(state);
     if (state.view in this.mountedViews) this.mountedViews[state.view] = true;
     this.ensureNavProfileExpanded(state.view);
+    this._applySafetyNavState(state);
+    this._applySupplyChainNavState(state);
     this.currentView = state.view;
     this._ensureViewRendered(state.view);
     this.sidebarOpen = false;
@@ -346,6 +374,54 @@ export const navigationMixin = {
     if (state.compatOutbound) {
       this.compatOutbound = state.compatOutbound;
       this.compatOutboundTouched = true;
+    }
+  },
+  // Opens the list card for a Functional Safety element: the kind chip that
+  // actually contains it (a verification is not on the Requirements chip),
+  // list layout so the expandable card exists, and no status/spec filter that
+  // would hide it. Shared by navigateToRequirement and deep-link restore.
+  _revealRequirementCard(spdxId) {
+    this.requirementSearch = '';
+    const el = this.elementMap?.get(spdxId);
+    this.requirementKindFilter = el?.type || 'Requirement';
+    this.requirementStatusFilter = '';
+    this.requirementAdequacyFilter = '';
+    this.requirementSpecFilter = '';
+    this.requirementLayout = 'list';
+  },
+  // Restores Functional Safety chips / layout from a history entry or share
+  // link. An expanded card wins: its type selects the kind chip and forces
+  // list layout, so a saved URL to a test is not swallowed by the default
+  // Requirements filter or the decomposition tree.
+  _applySafetyNavState(state) {
+    if (state.view === 'requirements' && state.expandedRequirement) {
+      this._revealRequirementCard(state.expandedRequirement);
+      return;
+    }
+    if ('requirementKindFilter' in state) {
+      this.requirementKindFilter = state.requirementKindFilter;
+    }
+    if (state.requirementLayout === 'list' || state.requirementLayout === 'tree') {
+      this.requirementLayout = state.requirementLayout;
+    }
+  },
+  // Restores the Supply Chain angle. An expanded card without an explicit
+  // mode reuses navigateToSupplyChain's inference so older links still land
+  // on the timeline / states / processes card that owns the element.
+  _applySupplyChainNavState(state) {
+    if (state.view !== 'supplychain') return;
+    if (state.supplyChainViewMode) {
+      this.supplyChainViewMode = state.supplyChainViewMode;
+      return;
+    }
+    if (!state.expandedSupplyChain) return;
+    const el = this.elementMap?.get(state.expandedSupplyChain);
+    const kind = this.supplyChainKind?.(el);
+    if (kind === 'process') this.supplyChainViewMode = 'processes';
+    else if (kind === 'state' || isA(el?.type, CLASS.supplychain_StateAction)) {
+      this.supplyChainViewMode = 'states';
+    } else {
+      this.supplyChainViewMode = 'timeline';
     }
   },
 
@@ -1165,14 +1241,9 @@ export const navigationMixin = {
     this.scrollToNavTarget('supplychain', spdxId);
   },
   navigateToRequirement(spdxId) {
-    this.requirementSearch = '';
-    // Clear filters so the target is visible; use list layout so the expandable
-    // card can scroll into view (tree rows open the detail panel instead).
-    this.requirementKindFilter = 'Requirement';
-    this.requirementStatusFilter = '';
-    this.requirementAdequacyFilter = '';
-    this.requirementSpecFilter = '';
-    this.requirementLayout = 'list';
+    // Kind chip + list layout so a verification/test/assumption/evaluation is
+    // actually in the rendered list (the default Requirements chip hides them).
+    this._revealRequirementCard(spdxId);
     this.switchView('requirements');
     this.expandedRequirement = spdxId;
     this.scrollToNavTarget('requirement', spdxId);
