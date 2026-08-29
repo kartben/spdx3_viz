@@ -28,9 +28,9 @@ jobs:
   build:
     name: Build & publish
     runs-on: ubuntu-latest
-    # A full no-key build pages NVD at 5 req/30s (~16 min) plus write time.
-    # An NVD_API_KEY secret cuts the fetch to ~2 min.
-    timeout-minutes: 90
+    # Full corpus comes from NVD's yearly JSON 2.0 gzip feeds (~25 files),
+    # not the rate-limited REST API. 60 min is generous headroom.
+    timeout-minutes: 60
 
     steps:
       - name: Checkout
@@ -46,8 +46,6 @@ jobs:
         run: npm ci
 
       - name: Build index
-        env:
-          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
         run: |
           node --max-old-space-size=8192 scripts/build-nvd-index.mjs \
             --out nvd-cpe \

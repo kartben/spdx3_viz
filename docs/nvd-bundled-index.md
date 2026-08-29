@@ -31,17 +31,18 @@ Approximate full-corpus size (measured): ~120k products, **~118 MB uncompressed 
 ## Building it
 
 ```bash
-# Full corpus (set an NVD API key to run ~8x faster):
-NVD_API_KEY=xxxx node --max-old-space-size=8192 scripts/build-nvd-index.mjs --out public/nvd-cpe
+# Full corpus (yearly JSON 2.0 gzip feeds; no API key):
+node --max-old-space-size=8192 scripts/build-nvd-index.mjs --out public/nvd-cpe
 
-# Quick test build (first 5 pages ≈ 10k CVEs):
+# Quick test build (first 5 × 2000 CVEs):
 node scripts/build-nvd-index.mjs --out /tmp/nvd-cpe --sample-pages 5
 ```
 
 The **Build NVD bundled index** GitHub workflow
 (`.github/workflows/build-nvd-index.yml`) does this weekly (and on demand) and
-publishes the files as assets on a rolling `nvd-index` pre-release. Set an
-`NVD_API_KEY` repository secret to speed it up.
+publishes the files as assets on a rolling `nvd-index` pre-release. It downloads
+NVD's yearly JSON 2.0 gzip feeds rather than paging the REST API, so it does
+not need an `NVD_API_KEY` and is not subject to the API's per-page rate limit.
 
 ## Hosting it
 
