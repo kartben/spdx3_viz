@@ -22,6 +22,9 @@ import {
   getPurlLink,
   getCdxProperties,
   snippetFileRef,
+  snippetFileGroupLabel,
+  snippetCompactLine,
+  groupSnippetsByFile,
   isMeaningfulValue,
   enumValue,
   formatByteSize,
@@ -33,6 +36,7 @@ import {
   licenseIndividualDescription,
   requirementDisplayName as formatRequirementDisplayName,
   producerMetaValue,
+  isProducerMetaIdentifier,
   primaryPurposeLabel as formatPrimaryPurpose,
   splitFilePath,
   PACKAGE_GAP_META,
@@ -65,6 +69,12 @@ const buildParameterCache = new WeakMap();
 // made scrolling a large package list stutter. Keyed on the element object, so a
 // newly parsed document's (fresh) objects miss and recompute.
 const packageRowCache = new WeakMap();
+
+// Implementation / evidence groups for a requirement card, memoized per element
+// so Alpine can read them several times per render without regrouping snippets.
+const requirementImplCache = new WeakMap();
+const requirementEvidenceCache = new WeakMap();
+const EMPTY_SNIPPET_GROUPS = Object.freeze({ files: [], others: [], total: 0 });
 
 // Licenses shown inline on a collapsed Packages row before the rest are summed up.
 const ROW_LICENSE_CAP = 2;
@@ -284,6 +294,14 @@ export const accessorsMixin = {
   externalIdentifiers(element) {
     return getExternalIdentifiers(element);
   },
+  // Identifiers that are not producer rollup tags (adequacy, status, …). Those
+  // already drive the status icon and filters; repeating them on the card
+  // just adds a field list.
+  requirementIdentifiers(element) {
+    return this.externalIdentifiers(element).filter(
+      (eid) => !isProducerMetaIdentifier(eid.identifier)
+    );
+  },
   purlLink(eid) {
     return getPurlLink(eid);
   },
@@ -427,30 +445,33 @@ export const accessorsMixin = {
     // source popup with every range highlighted (see openSnippetRanges).
     const snippetRow = (bucket) => {
       const ids = bucket.snippetIds;
-      if (ids.length === 1) {
-        return {
-          id: ids[0],
-          displayName: this.relTargetDisplayName(ids[0]),
-          direction: bucket.direction,
-          scope: ''
-        };
-      }
       const ordered = ids
         .map((id) => ({ id, el: this.elementMap.get(id) }))
         .sort(
           (a, b) =>
             (a.el?.software_lineRange?.beginIntegerRange ?? 0) -
             (b.el?.software_lineRange?.beginIntegerRange ?? 0)
-        )
-        .map((s) => s.id);
+        );
+      if (ordered.length === 1) {
+        return {
+          id: ordered[0].id,
+          displayName: this.relTargetDisplayName(ordered[0].id),
+          direction: bucket.direction,
+          scope: ''
+        };
+      }
+      const orderedIds = ordered.map((s) => s.id);
       const base = bucket.ref?.baseName || 'snippet';
       return {
-        id: ordered[0],
-        displayName: `${base} › ${ordered.length} ranges`,
+        id: orderedIds[0],
+        displayName: snippetFileGroupLabel(
+          base,
+          ordered.map((s) => s.el)
+        ),
         direction: bucket.direction,
         scope: '',
         multiRange: true,
-        snippetIds: ordered
+        snippetIds: orderedIds
       };
     };
 
@@ -848,14 +869,15 @@ export const accessorsMixin = {
     return out;
   },
 
-  // Ordered detail sequence for a requirement card: the relationship groups with
-  // the "Verification & evaluation" block spliced in at the verifiedBy slot, so
-  // the card reads implementation → verification → traceability. Verification is
-  // shown here (not as its own hoisted section) so it never sits ahead of the
-  // implementation it validates. Each entry is { kind: 'rel', group } or
-  // { kind: 'verification' }.
+  // Ordered detail sequence for a requirement card: remaining relationship
+  // groups with the "Verification & evaluation" block spliced in at the
+  // verifiedBy slot. Implementation (implementedBy) and verification are hoisted
+  // into their own sections so the card reads code → tests → other traces.
+  // Each entry is { kind: 'rel', group } or { kind: 'verification' }.
   requirementDetailSequence(el) {
-    const seq = this.detailRelGroupsFor(el, { excludeKeys: ['verifiedBy:out'] }).map((g) => ({
+    const seq = this.detailRelGroupsFor(el, {
+      excludeKeys: ['verifiedBy:out', 'implementedBy:out']
+    }).map((g) => ({
       kind: 'rel',
       key: g.key,
       group: g
@@ -920,21 +942,50 @@ export const accessorsMixin = {
     return el.name || this.cleanName(el.spdxId);
   },
 
+  // Files a requirement is implemented by, snippets grouped per source file so
+  // the card can show "thread.c" once with a chip per function instead of a
+  // relationship row per snippet. Non-snippet targets (a whole file, a package)
+  // stay in `others`.
+  requirementImplementationGroups(el) {
+    if (!el?.spdxId) return EMPTY_SNIPPET_GROUPS;
+    const cached = requirementImplCache.get(el);
+    if (cached) return cached;
+    const seen = new Set();
+    const targets = [];
+    (this.outgoingRels(el.spdxId) || []).forEach((rel) => {
+      if (rel.relationshipType !== 'implementedBy') return;
+      (Array.isArray(rel.to) ? rel.to : [rel.to]).forEach((id) => {
+        if (!id || seen.has(id)) return;
+        seen.add(id);
+        targets.push(this.elementMap.get(id) || { spdxId: id });
+      });
+    });
+    const grouped = groupSnippetsByFile(targets, this.elementMap);
+    const result = {
+      files: grouped.files,
+      others: grouped.others.map((item) => ({
+        id: item.spdxId,
+        displayName: this.relTargetDisplayName(item.spdxId)
+      })),
+      total: grouped.files.reduce((n, f) => n + f.snippets.length, 0) + grouped.others.length
+    };
+    requirementImplCache.set(el, result);
+    return result;
+  },
+
   // Evidence targets reachable from a requirement via
   // verifiedBy → EvaluationResult --hasEvidence--> artifact/snippet/file.
-  requirementEvidence(el, { limit = 8 } = {}) {
-    if (!el?.spdxId) return [];
+  // Coverage snippets of the same file collapse to one row of line chips.
+  requirementEvidence(el) {
+    if (!el?.spdxId) return EMPTY_SNIPPET_GROUPS;
+    const cached = requirementEvidenceCache.get(el);
+    if (cached) return cached;
     const seen = new Set();
-    const out = [];
+    const targets = [];
     const pushTarget = (id) => {
       if (!id || seen.has(id)) return;
       seen.add(id);
-      const target = this.elementMap.get(id);
-      out.push({
-        id,
-        name: target?.description || target?.name || this.cleanName(id),
-        el: target
-      });
+      targets.push(this.elementMap.get(id) || { spdxId: id });
     };
     this.requirementVerifications(el).forEach(({ evaluation }) => {
       if (!evaluation?.spdxId) return;
@@ -948,11 +999,20 @@ export const accessorsMixin = {
       if (rel.relationshipType !== 'hasEvidence') return;
       (Array.isArray(rel.to) ? rel.to : [rel.to]).forEach(pushTarget);
     });
-    return {
-      items: out.slice(0, limit),
-      total: out.length,
-      hiddenCount: Math.max(0, out.length - limit)
+    const grouped = groupSnippetsByFile(targets, this.elementMap, {
+      labelOf: snippetCompactLine,
+      dedupeRanges: true
+    });
+    const result = {
+      files: grouped.files,
+      others: grouped.others.map((item) => ({
+        id: item.spdxId,
+        name: item.description || item.name || this.cleanName(item.spdxId)
+      })),
+      total: grouped.files.reduce((n, f) => n + f.snippets.length, 0) + grouped.others.length
     };
+    requirementEvidenceCache.set(el, result);
+    return result;
   },
 
   // One quiet cue for a tree/list row: only surface the implementation gap.
@@ -976,10 +1036,16 @@ export const accessorsMixin = {
     const adequacy = this.requirementAdequacyKey(el);
     if (adequacy === 'broken') parts.push('implementation never exercised by its own tests');
     else if (adequacy === 'partial') parts.push('implementation only partly exercised');
-    const impl = this.implementedByCount(el.spdxId);
-    if (impl === 0) parts.push('no implementation');
-    else if (impl === 1) parts.push('implemented in 1 place');
-    else parts.push(`implemented in ${this.formatCount(impl)} places`);
+    const impl = this.requirementImplementationGroups(el);
+    if (impl.total === 0) parts.push('no implementation');
+    else if (impl.files.length === 1 && impl.others.length === 0) {
+      const file = impl.files[0];
+      const n = file.snippets.length;
+      parts.push(n === 1 ? `in ${file.baseName}` : `in ${file.baseName} (${this.formatCount(n)})`);
+    } else {
+      const n = impl.files.length + impl.others.length;
+      parts.push(n === 1 ? 'in 1 file' : `in ${this.formatCount(n)} files`);
+    }
     return parts.join(' · ');
   },
 

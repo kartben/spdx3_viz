@@ -178,15 +178,129 @@ export function snippetLineLabel(element) {
 }
 
 /**
+ * The interesting bit of a snippet name: the function/symbol when a producer
+ * named it "func @ path:lines", otherwise the line span. Drops the path so a
+ * file-grouped list can show just the symbol instead of repeating the file.
+ *
+ * @param {Object} element - A software_Snippet element
+ * @returns {string}
+ */
+export function snippetSymbolLabel(element) {
+  const name = (element?.name || '').trim();
+  if (name) {
+    const at = name.match(/^(.+?)\s+@\s+\S/);
+    if (at) {
+      const symbol = at[1].trim();
+      // A path-like left side is not a symbol (e.g. "kernel/foo.c @ ...").
+      if (symbol && !symbol.includes('/')) return symbol;
+    }
+    // Coverage snippets are often named "path:start-end" with no symbol.
+    if (/[/\\].*:\d+(-\d+)?$/.test(name) || /^\S+\.\w+:\d+(-\d+)?$/.test(name)) {
+      return snippetLineLabel(element) || name;
+    }
+    if (!name.includes('/')) return name;
+  }
+  return snippetLineLabel(element);
+}
+
+/** Line numbers only, for a dense coverage chip: "1018" or "1018-1032". */
+export function snippetCompactLine(element) {
+  const lr = element?.software_lineRange;
+  if (!lr || lr.beginIntegerRange == null) return snippetSymbolLabel(element);
+  const { beginIntegerRange: a, endIntegerRange: b } = lr;
+  return b != null && b !== a ? `${a}-${b}` : String(a);
+}
+
+/**
  * File-flavored label for a snippet link: "<file> › <function-or-line-span>",
  * so it reads as "this points at a section of <file>".
  */
 export function snippetTargetLabel(element, elementMap) {
   const ref = snippetFileRef(element, elementMap);
   if (!ref) return '';
-  const detail = ref.name || snippetLineLabel(element);
+  const detail = snippetSymbolLabel(element);
   const base = ref.baseName || 'snippet';
   return detail ? `${base} › ${detail}` : base;
+}
+
+/**
+ * One-line label for several snippets of the same file, listing symbols
+ * (or line spans) instead of a vague "N ranges".
+ *
+ * @param {string} baseName
+ * @param {Array<Object>} elements
+ * @param {{cap?: number}} [opts]
+ * @returns {string}
+ */
+export function snippetFileGroupLabel(baseName, elements, { cap = 3 } = {}) {
+  const base = baseName || 'snippet';
+  const labels = (elements || []).map(snippetSymbolLabel).filter(Boolean);
+  if (!labels.length) return base;
+  if (labels.length === 1) return `${base} › ${labels[0]}`;
+  const shown = labels.slice(0, cap);
+  const extra = labels.length - shown.length;
+  const detail = extra > 0 ? `${shown.join(', ')} +${extra}` : shown.join(', ');
+  return `${base} › ${detail}`;
+}
+
+/**
+ * Group snippet elements by the file they were carved from. Non-snippets (and
+ * unresolved ids) are returned separately so a card can render files as rows
+ * and everything else as ordinary links.
+ *
+ * @param {Array<Object>} elements
+ * @param {Map} [elementMap]
+ * @param {{labelOf?: (el: Object) => string, dedupeRanges?: boolean}} [opts]
+ * @returns {{files: Array<{fileId: string, fileName: string, baseName: string,
+ *   snippets: Array<{id: string, label: string, start: number|null, end: number|null}>,
+ *   snippetIds: string[] }>, others: Array<Object>}}
+ */
+export function groupSnippetsByFile(elements, elementMap, { labelOf, dedupeRanges } = {}) {
+  const label = typeof labelOf === 'function' ? labelOf : snippetSymbolLabel;
+  const files = new Map();
+  const others = [];
+  for (const el of elements || []) {
+    if (!el) continue;
+    if (el.type !== 'software_Snippet') {
+      others.push(el);
+      continue;
+    }
+    const ref = snippetFileRef(el, elementMap);
+    const fileKey = ref?.fileId || el.spdxId || '';
+    let bucket = files.get(fileKey);
+    if (!bucket) {
+      bucket = {
+        fileId: ref?.fileId || '',
+        fileName: ref?.fileName || '',
+        baseName: ref?.baseName || 'snippet',
+        snippets: [],
+        _seen: dedupeRanges ? new Set() : null
+      };
+      files.set(fileKey, bucket);
+    }
+    if (bucket._seen) {
+      const rangeKey = `${ref?.start ?? ''}:${ref?.end ?? ''}`;
+      if (bucket._seen.has(rangeKey)) continue;
+      bucket._seen.add(rangeKey);
+    }
+    bucket.snippets.push({
+      id: el.spdxId,
+      label: label(el) || 'snippet',
+      start: ref?.start ?? null,
+      end: ref?.end ?? null
+    });
+  }
+  const out = [];
+  for (const bucket of files.values()) {
+    bucket.snippets.sort(
+      (a, b) => (a.start ?? 0) - (b.start ?? 0) || a.label.localeCompare(b.label)
+    );
+    bucket.snippetIds = bucket.snippets.map((s) => s.id);
+    delete bucket._seen;
+    out.push(bucket);
+  }
+  out.sort((a, b) => (a.baseName || '').localeCompare(b.baseName || ''));
+  return { files: out, others };
 }
 
 /**

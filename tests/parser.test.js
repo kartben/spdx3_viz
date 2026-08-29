@@ -1282,7 +1282,7 @@ test('detailRelGroupsFor surfaces lifecycle-scoped relationships with their scop
   assert.equal(dyn.items[0].scope, 'runtime');
 });
 
-test('detailRelGroupsFor collapses same-file snippet endpoints into one N-ranges row', () => {
+test('detailRelGroupsFor collapses same-file snippet endpoints into one file row', () => {
   const app = spdxApp();
   const graph = [
     { type: 'Requirement', spdxId: 'req:1', name: 'REQ-1' },
@@ -1330,7 +1330,7 @@ test('detailRelGroupsFor collapses same-file snippet endpoints into one N-ranges
 
   const multi = group.items.find((i) => i.multiRange);
   assert.ok(multi, 'expected a collapsed multi-range row for thread.c');
-  assert.match(multi.displayName, /thread\.c › 2 ranges/);
+  assert.match(multi.displayName, /thread\.c › L10-20, L200-210/);
   // Snippet ids ordered by start line so the popup opens at the first range.
   assert.deepEqual(multi.snippetIds, ['snip:a1', 'snip:a2']);
 
@@ -1338,6 +1338,151 @@ test('detailRelGroupsFor collapses same-file snippet endpoints into one N-ranges
   const single = group.items.find((i) => !i.multiRange);
   assert.equal(single.id, 'snip:b1');
   assert.ok(!single.snippetIds);
+});
+
+function requirementSnippetApp() {
+  const app = spdxApp();
+  const graph = [
+    {
+      type: 'Requirement',
+      spdxId: 'req:1',
+      name: 'ZEP-SRS-1-1: Creating threads',
+      requirementStatement: 'The kernel shall create a thread.'
+    },
+    { type: 'software_File', spdxId: 'file:a', name: 'kernel/thread.c' },
+    { type: 'software_File', spdxId: 'file:b', name: 'include/zephyr/kernel.h' },
+    {
+      type: 'software_Snippet',
+      spdxId: 'snip:impl',
+      name: 'z_impl_k_thread_create @ kernel/thread.c:1018-1032',
+      software_snippetFromFile: 'file:a',
+      software_lineRange: { beginIntegerRange: 1018, endIntegerRange: 1032 }
+    },
+    {
+      type: 'software_Snippet',
+      spdxId: 'snip:vrfy',
+      name: 'z_vrfy_k_thread_create @ kernel/thread.c:1051-1112',
+      software_snippetFromFile: 'file:a',
+      software_lineRange: { beginIntegerRange: 1051, endIntegerRange: 1112 }
+    },
+    {
+      type: 'software_Snippet',
+      spdxId: 'snip:hdr',
+      name: 'include/zephyr/kernel.h:1409-1409',
+      software_snippetFromFile: 'file:b',
+      software_lineRange: { beginIntegerRange: 1409, endIntegerRange: 1409 }
+    },
+    {
+      type: 'software_Snippet',
+      spdxId: 'snip:cov1',
+      name: 'kernel/thread.c:1018-1018',
+      software_snippetFromFile: 'file:a',
+      software_lineRange: { beginIntegerRange: 1018, endIntegerRange: 1018 }
+    },
+    {
+      type: 'software_Snippet',
+      spdxId: 'snip:cov1b',
+      name: 'kernel/thread.c:1018-1018',
+      software_snippetFromFile: 'file:a',
+      software_lineRange: { beginIntegerRange: 1018, endIntegerRange: 1018 }
+    },
+    {
+      type: 'software_Snippet',
+      spdxId: 'snip:cov2',
+      name: 'kernel/thread.c:1024-1024',
+      software_snippetFromFile: 'file:a',
+      software_lineRange: { beginIntegerRange: 1024, endIntegerRange: 1024 }
+    },
+    {
+      type: 'functionalsafety_RequirementVerification',
+      spdxId: 'ver:1',
+      name: 'thread-create-test'
+    },
+    {
+      type: 'functionalsafety_EvaluationResult',
+      spdxId: 'eval:1',
+      functionalsafety_evaluationBasedOn: 'ver:1',
+      functionalsafety_evaluation: 'pass'
+    },
+    {
+      type: 'Relationship',
+      spdxId: 'rel:impl',
+      relationshipType: 'implementedBy',
+      from: 'req:1',
+      to: ['snip:impl', 'snip:vrfy', 'snip:hdr']
+    },
+    {
+      type: 'Relationship',
+      spdxId: 'rel:ver',
+      relationshipType: 'verifiedBy',
+      from: 'req:1',
+      to: ['ver:1']
+    },
+    {
+      type: 'Relationship',
+      spdxId: 'rel:ev',
+      relationshipType: 'hasEvidence',
+      from: 'eval:1',
+      to: ['snip:cov1', 'snip:cov1b', 'snip:cov2']
+    }
+  ];
+  const parsed = parseGraph(graph);
+  const indexes = buildRelationshipIndexes(parsed.relationships);
+  app.elementMap = parsed.elementMap;
+  app.relFromIndex = indexes.relFromIndex;
+  app.relToIndex = indexes.relToIndex;
+  app.requirements = parsed.requirements;
+  return app;
+}
+
+test('requirementImplementationGroups lists functions under one file', () => {
+  const app = requirementSnippetApp();
+  const impl = app.requirementImplementationGroups({ spdxId: 'req:1' });
+  assert.equal(impl.total, 3);
+  assert.equal(impl.files.length, 2);
+  const thread = impl.files.find((f) => f.baseName === 'thread.c');
+  assert.deepEqual(
+    thread.snippets.map((s) => s.label),
+    ['z_impl_k_thread_create', 'z_vrfy_k_thread_create']
+  );
+  const hdr = impl.files.find((f) => f.baseName === 'kernel.h');
+  assert.equal(hdr.snippets[0].label, 'L1409');
+});
+
+test('requirementEvidence groups coverage lines of one file and drops duplicates', () => {
+  const app = requirementSnippetApp();
+  const ev = app.requirementEvidence({ spdxId: 'req:1' });
+  assert.equal(ev.files.length, 1);
+  assert.deepEqual(
+    ev.files[0].snippets.map((s) => s.label),
+    ['1018', '1024']
+  );
+});
+
+test('requirementIdentifiers hides producer rollup tags', () => {
+  const app = requirementSnippetApp();
+  const el = {
+    type: 'Requirement',
+    spdxId: 'req:1',
+    name: 'Creating threads',
+    externalIdentifier: [
+      { identifier: 'ZEP-SRS-1-1' },
+      { identifier: 'adequacy:true' },
+      { identifier: 'status:Draft' }
+    ]
+  };
+  const ids = app.requirementIdentifiers(el).map((e) => e.identifier);
+  assert.deepEqual(ids, ['ZEP-SRS-1-1']);
+});
+
+test('requirementSummaryLine names the implementing file, not "places"', () => {
+  const app = requirementSnippetApp();
+  const line = app.requirementSummaryLine({
+    type: 'Requirement',
+    spdxId: 'req:1',
+    name: 'Creating threads'
+  });
+  assert.match(line, /in 2 files/);
 });
 
 test('_collapseSource keeps ranges with context and folds the gaps between them', () => {
