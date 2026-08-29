@@ -11,13 +11,14 @@
  * spans for the products in its SBOM. Descriptions are omitted to keep it small.
  *
  * Usage:
- *   NVD_API_KEY=xxxx node --max-old-space-size=8192 scripts/build-nvd-index.mjs --out public/nvd-cpe
+ *   node --max-old-space-size=8192 scripts/build-nvd-index.mjs --out public/nvd-cpe
  *
  * Options:
  *   --out <dir>         Output directory (required).
- *   --api-key <key>     NVD API key (or NVD_API_KEY env); ~8x faster.
- *   --cache-dir <dir>   Cache raw API pages (default .nvd-cache).
- *   --sample-pages <n>  Only fetch N pages (2000 CVEs each) — for a quick/test build.
+ *   --source feeds|api  Corpus source (default feeds: yearly JSON 2.0 gzip files).
+ *   --api-key <key>     NVD API key (or NVD_API_KEY env); only used with --source api.
+ *   --cache-dir <dir>   Cache downloaded feeds or API pages (default .nvd-cache).
+ *   --sample-pages <n>  Only keep N * 2000 CVEs: for a quick/test build.
  *   --part-mb <n>       Target part-file size in MB (default 40; keep < 100 for Pages).
  *   --generated <date>  Override the manifest `generated` stamp (default: today, UTC).
  *
@@ -34,7 +35,14 @@ import { fetchNvdPages } from './nvd-fetch.mjs';
 const SEV_CODE = { critical: 'c', high: 'h', medium: 'm', low: 'l', none: 'n' };
 
 function parseArgs(argv) {
-  const args = { cacheDir: '.nvd-cache', samplePages: 0, partMb: 40, out: '', generated: '' };
+  const args = {
+    cacheDir: '.nvd-cache',
+    samplePages: 0,
+    partMb: 40,
+    out: '',
+    generated: '',
+    source: 'feeds'
+  };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--out') args.out = argv[++i];
@@ -43,8 +51,10 @@ function parseArgs(argv) {
     else if (a === '--sample-pages') args.samplePages = Number(argv[++i]);
     else if (a === '--part-mb') args.partMb = Number(argv[++i]);
     else if (a === '--generated') args.generated = argv[++i];
+    else if (a === '--source') args.source = argv[++i];
   }
   args.apiKey = args.apiKey || process.env.NVD_API_KEY || '';
+  if (args.source !== 'api') args.source = 'feeds';
   return args;
 }
 
