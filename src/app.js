@@ -52,12 +52,21 @@ const lifecycleMixin = {
       if (e.state) this._applyNavState(e.state);
       else if (this.dataLoaded) this.goHome();
     });
-    // Pasting a saved URL into an already-open tab only changes the hash
-    // (no reload, so init does not run). Follow it unless we just wrote it.
-    window.addEventListener('hashchange', () => {
+    // Pasting a saved URL into an already-open tab is often a same-document
+    // navigation (no reload, so init does not run). Follow it unless we just
+    // wrote the fragment ourselves. hashchange covers links and history;
+    // the Navigation API covers Chromium address-bar fragment replacements
+    // that do not always emit hashchange.
+    const followPastedHash = () => {
       if ((location.hash || '') === (this._lastWrittenHash || '')) return;
       this._followShareHash();
-    });
+    };
+    window.addEventListener('hashchange', followPastedHash);
+    if (typeof window.navigation?.addEventListener === 'function') {
+      window.navigation.addEventListener('navigate', () => {
+        queueMicrotask(followPastedHash);
+      });
+    }
     // ⌘K / Ctrl-K opens the command palette from anywhere (once a document is
     // loaded), including the Graph view where the inline header search is hidden.
     window.addEventListener('keydown', (e) => {
