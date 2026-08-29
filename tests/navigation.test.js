@@ -242,6 +242,40 @@ test('pasting a same-sample share hash restores the spot without reloading', () 
   assert.deepEqual(app._loadCalls, []);
 });
 
+test('a typed share URL is not treated as Back-to-home', () => {
+  const app = makeApp({ dataLoaded: true, loadedSampleId: 'functional-safety' });
+  let wentHome = false;
+  app.goHome = () => {
+    wentHome = true;
+  };
+  const prevHash = globalThis.location.hash;
+  globalThis.location.hash = '#s=paper-plane&v=supplychain&svm=mp';
+  try {
+    app._onPopState({ state: null });
+  } finally {
+    globalThis.location.hash = prevHash;
+  }
+  assert.equal(wentHome, false);
+  assert.deepEqual(app._loadCalls, ['paper-plane']);
+});
+
+test('Back to the landing entry with no hash goes home', () => {
+  const app = makeApp({ dataLoaded: true });
+  let wentHome = false;
+  app.goHome = () => {
+    wentHome = true;
+  };
+  const prevHash = globalThis.location.hash;
+  globalThis.location.hash = '';
+  try {
+    app._onPopState({ state: null });
+  } finally {
+    globalThis.location.hash = prevHash;
+  }
+  assert.equal(wentHome, true);
+  assert.deepEqual(app._loadCalls, []);
+});
+
 test('pasting a share hash on the landing page loads that sample', () => {
   const app = makeApp({ dataLoaded: false, loadedSampleId: null });
   const prevHash = globalThis.location.hash;

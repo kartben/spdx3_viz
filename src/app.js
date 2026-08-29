@@ -46,12 +46,7 @@ const lifecycleMixin = {
     // A null history state is the pre-load landing entry: navigating back to it
     // (browser Back / "previous") returns to the home screen rather than leaving
     // the loaded document stuck on screen.
-    window.addEventListener('popstate', (e) => {
-      // Remember the restored fragment so the paired hashchange is ignored.
-      this._lastWrittenHash = location.hash || '';
-      if (e.state) this._applyNavState(e.state);
-      else if (this.dataLoaded) this.goHome();
-    });
+    window.addEventListener('popstate', (e) => this._onPopState(e));
     // Pasting a saved URL into an already-open tab is often a same-document
     // navigation (no reload, so init does not run). Follow it unless we just
     // wrote the fragment ourselves. hashchange covers links and history;
