@@ -1785,6 +1785,9 @@ export const accessorsMixin = {
     else if (status?.key === 'inconclusive') parts.push('Verification inconclusive');
     else if (status?.key === 'verified') parts.push('Has verification');
     else if (status?.key === 'unverified') parts.push('Not verified');
+    const adequacy = this.requirementAdequacyKey(el);
+    if (adequacy === 'broken') parts.push('implementation never exercised by its own tests');
+    else if (adequacy === 'partial') parts.push('implementation only partly exercised');
     const impl = this.implementedByCount(el.spdxId);
     if (impl === 0) parts.push('no implementation');
     else if (impl === 1) parts.push('implemented in 1 place');
@@ -1935,7 +1938,41 @@ export const accessorsMixin = {
   // results expose their own pass/fail/inconclusive value. This lets generic
   // relationship rows decorate both kinds consistently.
   safetyArtifactStatus(el) {
-    return this.requirementSafetyStatus(el) || this.evaluationResultMeta(el);
+    return this.requirementRowStatus(el) || this.evaluationResultMeta(el);
+  },
+
+  // What a requirement's row should show. The verification outcome alone reads
+  // "Passed" for a requirement whose own tests never touch the code that
+  // implements it, which is the one state this profile exists to surface: so an
+  // adequacy verdict of broken/partial overrides it, and the title spells out
+  // both halves. A real test failure still dominates. The Outcome rollup and
+  // its filter keep using requirementSafetyStatus, so their counts are
+  // unchanged.
+  requirementRowStatus(el) {
+    const status = this.requirementSafetyStatus(el);
+    if (!status || status.key === 'failed') return status;
+    const adequacy = this.requirementAdequacyKey(el);
+    if (adequacy !== 'broken' && adequacy !== 'partial') return status;
+    const meta = SAFETY_ADEQUACY[adequacy];
+    return { ...meta, title: `${status.label} · ${meta.hint}` };
+  },
+
+  // Sort key for "what should I look at next", worst first. Ordered by how
+  // misleading a state is rather than how bad it sounds: a requirement that
+  // passes without exercising its implementation outranks an honest failure,
+  // because nothing else in the UI would draw the eye to it.
+  requirementAttentionRank(el) {
+    if (!el || !isA(el.type, CLASS.Requirement)) return 99;
+    const adequacy = this.requirementAdequacyKey(el);
+    const outcome = this.requirementSafetyStatus(el)?.key;
+    if (adequacy === 'broken') return 0;
+    if (outcome === 'failed') return 1;
+    if (adequacy === 'partial') return 2;
+    if (outcome === 'unverified') return 3;
+    if (outcome === 'inconclusive') return 4;
+    if (adequacy === 'no-impl') return 5;
+    if (adequacy && adequacy !== 'true') return 6;
+    return 7;
   },
 
   // Normalize an SPDX enumerated (vocab) value for display in a template. Kept

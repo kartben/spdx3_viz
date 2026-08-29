@@ -1168,7 +1168,7 @@ export const navigationMixin = {
     this.requirementSearch = '';
     // Clear filters so the target is visible; use list layout so the expandable
     // card can scroll into view (tree rows open the detail panel instead).
-    this.requirementKindFilter = '';
+    this.requirementKindFilter = 'Requirement';
     this.requirementStatusFilter = '';
     this.requirementAdequacyFilter = '';
     this.requirementSpecFilter = '';

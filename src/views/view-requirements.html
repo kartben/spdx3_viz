@@ -55,13 +55,23 @@
           </button>
         </div>
       </div>
-      <input
-        x-model.debounce.150ms="requirementSearch"
-        @input.debounce.150ms="restreamView('requirements')"
-        type="text"
-        placeholder="Filter…"
-        class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-yellow-500 w-full sm:w-44 sm:ml-auto md:w-56"
-      />
+      <div class="flex items-center gap-2 sm:ml-auto">
+        <button
+          x-show="requirementLayout === 'list'"
+          type="button"
+          @click="requirementSort = requirementSort === 'attention' ? 'name' : 'attention'; restreamView('requirements')"
+          class="text-xs text-slate-400 hover:text-slate-200 transition-colors flex-shrink-0"
+          :title="requirementSort === 'attention' ? 'Sorted worst first. Switch to A-Z.' : 'Sorted A-Z. Switch to worst first.'"
+          x-text="requirementSort === 'attention' ? 'Most urgent first' : 'A–Z'"
+        ></button>
+        <input
+          x-model.debounce.150ms="requirementSearch"
+          @input.debounce.150ms="restreamView('requirements')"
+          type="text"
+          placeholder="Filter…"
+          class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-yellow-500 w-full sm:w-44 md:w-56"
+        />
+      </div>
     </div>
 
     <!-- Safety-case verification rollup: at-a-glance status bar + status filters -->
@@ -308,7 +318,7 @@
             <template x-for="row in safetyTreeRows" :key="row.id">
               <div
                 x-data="{ status: null }"
-                x-effect="status = requirementSafetyStatus(row.el)"
+                x-effect="status = requirementRowStatus(row.el)"
                 class="flex items-center gap-2 py-1.5 pr-2 rounded-lg hover:bg-slate-800/70 min-w-0"
                 :style="`padding-left:${Math.min(row.depth, 6) * 14 + 4}px`"
               >
@@ -355,8 +365,8 @@
                   x-show="status"
                   class="w-6 h-6 rounded-full inline-flex items-center justify-center flex-shrink-0"
                   :class="status?.badgeClass"
-                  :title="status?.label"
-                  :aria-label="status?.label"
+                  :title="status?.title || status?.label"
+                  :aria-label="status?.title || status?.label"
                   x-html="uiIconSvg(status?.iconKey, 'w-4 h-4')"
                 ></span>
                 <span
@@ -382,7 +392,7 @@
             </div>
             <button
               type="button"
-              @click="requirementSearch = ''; requirementKindFilter = ''; requirementStatusFilter = ''; requirementSpecFilter = ''; restreamView('requirements')"
+              @click="requirementSearch = ''; requirementKindFilter = 'Requirement'; requirementStatusFilter = ''; requirementAdequacyFilter = ''; requirementSpecFilter = ''; restreamView('requirements')"
               class="mt-3 rounded-md bg-slate-800 px-3 py-1.5 text-xs text-slate-300 hover:bg-slate-700 hover:text-white transition-colors"
             >
               Clear filters
@@ -438,8 +448,8 @@
                   x-show="statusMeta"
                   class="w-8 h-8 rounded-full inline-flex items-center justify-center flex-shrink-0"
                   :class="statusMeta?.badgeClass"
-                  :title="statusMeta?.label"
-                  :aria-label="statusMeta?.label"
+                  :title="statusMeta?.title || statusMeta?.label"
+                  :aria-label="statusMeta?.title || statusMeta?.label"
                   x-html="uiIconSvg(statusMeta?.iconKey, 'w-5 h-5')"
                 ></span>
                 <svg

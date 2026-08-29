@@ -791,7 +791,7 @@ export const loadingMixin = {
       this.views.find((v) => v.id === 'agents').count = this.agents.length;
       this.views.find((v) => v.id === 'remediation').count = this.remediationFindings.length;
       this.requirementSearch = '';
-      this.requirementKindFilter = '';
+      this.requirementKindFilter = 'Requirement';
       this.requirementStatusFilter = '';
       this.requirementAdequacyFilter = '';
       this.requirementSpecFilter = '';
