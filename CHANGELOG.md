@@ -5,20 +5,15 @@ via the "What's new" link.
 
 ## Unreleased
 
-- **Improved:** Requirement cards group snippets as file (N lines).
-- **Added:** Requirements roll up true traceability: is the implementation actually exercised?
-- **Fixed:** A requirement that passes without exercising its code no longer reads as passed.
-- **Improved:** Functional Safety opens on the requirements, most urgent first.
-- **Improved:** The Functional Safety rollups fit two lines instead of six.
-- **Fixed:** System requirements no longer count against the verification pass rate.
-- **Improved:** Large downloads show bytes, an ETA, and never look stalled.
-- **Improved:** A complete CPE now links to NVD's vulnerability search by exact CPE name, version included.
-- **Improved:** Graph stays smooth while other apps compete for the GPU.
-- **Fixed:** Build-heavy SBOMs no longer drag the graph down to a few frames per second.
-- **Improved:** The graph opens much faster the first time on huge SBOMs.
-- **Fixed:** Loading a huge SBOM no longer stalls in a background tab.
 - **Added:** License compatibility analyzer.
-- **Fixed:** Share links stay readable and restore Safety chips.
+- **Added:** Requirements roll up whether tests actually exercise the code.
+- **Improved:** Functional Safety opens on the requirements, most urgent first.
+- **Improved:** Requirement cards group snippets as file (N lines).
+- **Fixed:** System requirements no longer count against the pass rate.
+- **Improved:** Large downloads show bytes, an ETA, and never look stalled.
+- **Improved:** Complete CPEs link to NVD by exact name.
+- **Improved:** Graph opens faster and stays smoother on huge SBOMs.
+- **Fixed:** Share links stay readable and restore the view.
 
 ## [0.5.0] - 2026-08-22
 
