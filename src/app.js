@@ -47,8 +47,16 @@ const lifecycleMixin = {
     // (browser Back / "previous") returns to the home screen rather than leaving
     // the loaded document stuck on screen.
     window.addEventListener('popstate', (e) => {
+      // Remember the restored fragment so the paired hashchange is ignored.
+      this._lastWrittenHash = location.hash || '';
       if (e.state) this._applyNavState(e.state);
       else if (this.dataLoaded) this.goHome();
+    });
+    // Pasting a saved URL into an already-open tab only changes the hash
+    // (no reload, so init does not run). Follow it unless we just wrote it.
+    window.addEventListener('hashchange', () => {
+      if ((location.hash || '') === (this._lastWrittenHash || '')) return;
+      this._followShareHash();
     });
     // ⌘K / Ctrl-K opens the command palette from anywhere (once a document is
     // loaded), including the Graph view where the inline header search is hidden.

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
+import { loadingMixin } from '../src/app/loading.js';
 import { navigationMixin } from '../src/app/navigation.js';
 import { CLASS } from '../src/spdx/model.js';
 
@@ -52,8 +53,15 @@ function makeApp(overrides = {}) {
     filteredSupplyChain: [],
     dataLoaded: true,
     loadedSampleId: 'functional-safety',
+    samples: [
+      { id: 'functional-safety', files: [] },
+      { id: 'paper-plane', files: [] }
+    ],
+    loadingSample: null,
+    _loadCalls: [],
     _navPushQueued: false,
     _lastNavKey: null,
+    _lastWrittenHash: '',
     _scrollCalls: [],
     $nextTick(fn) {
       fn();
@@ -66,12 +74,16 @@ function makeApp(overrides = {}) {
     },
     ...overrides
   };
+  Object.defineProperties(app, Object.getOwnPropertyDescriptors(loadingMixin));
   Object.defineProperties(app, Object.getOwnPropertyDescriptors(navigationMixin));
   // Mixin methods talk to the DOM; keep these tests on the nav state only.
   app._ensureViewRendered = () => {};
   app._ensureScrollLoader = () => {};
   app.scrollToNavTarget = (kind, id) => {
     app._scrollCalls.push([kind, id]);
+  };
+  app.loadSample = (sample) => {
+    app._loadCalls.push(sample.id);
   };
   return app;
 }
@@ -209,4 +221,37 @@ test('an older Supply Chain link infers the angle from the expanded element', ()
 
   assert.equal(app.supplyChainViewMode, 'processes');
   assert.equal(app.expandedSupplyChain, 'proc:1');
+});
+
+test('pasting a same-sample share hash restores the spot without reloading', () => {
+  const app = makeApp({ dataLoaded: true, loadedSampleId: 'functional-safety' });
+  const hist = globalThis.history;
+  const prevReplace = hist.replaceState.bind(hist);
+  hist.replaceState = () => {};
+  const prevHash = globalThis.location.hash;
+  globalThis.location.hash = '#s=functional-safety&v=requirements&rk=ver&rl=l';
+  try {
+    app._followShareHash();
+  } finally {
+    hist.replaceState = prevReplace;
+    globalThis.location.hash = prevHash;
+  }
+  assert.equal(app.currentView, 'requirements');
+  assert.equal(app.requirementKindFilter, 'functionalsafety_RequirementVerification');
+  assert.equal(app.requirementLayout, 'list');
+  assert.deepEqual(app._loadCalls, []);
+});
+
+test('pasting a share hash on the landing page loads that sample', () => {
+  const app = makeApp({ dataLoaded: false, loadedSampleId: null });
+  const prevHash = globalThis.location.hash;
+  globalThis.location.hash = '#s=paper-plane&v=supplychain&svm=mp';
+  try {
+    app._followShareHash();
+  } finally {
+    globalThis.location.hash = prevHash;
+  }
+  assert.deepEqual(app._loadCalls, ['paper-plane']);
+  assert.equal(app._pendingDeepLink.view, 'supplychain');
+  assert.equal(app._pendingDeepLink.supplyChainMode, 'map');
 });

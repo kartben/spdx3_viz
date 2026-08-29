@@ -179,10 +179,24 @@ export const loadingMixin = {
   // Startup: a share link in the URL auto-loads its sample, then _applyDeepLink
   // restores the view/element once parsing completes.
   _maybeLoadFromUrl() {
+    this._followShareHash();
+  },
+  // Applies the current location.hash: loads its sample if needed, or restores
+  // the spot when that sample is already open. Used on startup and when the
+  // user pastes a saved URL into an already-open tab (hashchange, no reload).
+  _followShareHash() {
     const link = parseShareHash(location.hash);
     if (!link) return;
     const sample = this.samples.find((s) => s.id === link.sample);
     if (!sample) return;
+    if (this.loadingSample === sample.id) {
+      this._pendingDeepLink = link;
+      return;
+    }
+    if (this.dataLoaded && this.loadedSampleId === link.sample) {
+      this._applyDeepLink(link);
+      return;
+    }
     this._pendingDeepLink = link;
     this.loadSample(sample);
   },
