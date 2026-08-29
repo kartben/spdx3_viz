@@ -1232,27 +1232,23 @@ export const derivedMixin = {
   },
 
   // Rollup of every Requirement's overall verification outcome, for the
-  // safety-case status bar and status-filter chips. `noImpl` counts requirements
-  // carrying no implementedBy link (a traceability gap). `passPct` is the share
-  // that fully passed; `verifiedPct` is the share that has any verification link
-  // (passed + has-verification + inconclusive + failed).
+  // safety-case meter and status-filter chips. `passPct` is the share that fully
+  // passed; `verifiedPct` is the share that has any verification link (passed +
+  // has-verification + inconclusive + failed).
   get safetyStatusSummary() {
     if (safetyStatusSrc === this.requirements) return safetyStatusVal;
     const counts = { failed: 0, inconclusive: 0, unverified: 0, verified: 0, passed: 0 };
     let total = 0;
-    let noImpl = 0;
     this.requirements.forEach((r) => {
       if (!isA(r.type, CLASS.Requirement)) return;
       total++;
       const status = this.requirementSafetyStatus(r);
       if (status && Object.hasOwn(counts, status.key)) counts[status.key]++;
-      if (!this.implementedByCount(r.spdxId)) noImpl++;
     });
     const withVerification = total - counts.unverified;
     safetyStatusVal = {
       total,
       counts,
-      noImpl,
       passPct: total ? Math.round((counts.passed / total) * 100) : 0,
       verifiedPct: total ? Math.round((withVerification / total) * 100) : 0
     };
@@ -1290,6 +1286,17 @@ export const derivedMixin = {
     return Object.keys(SAFETY_ADEQUACY)
       .filter((k) => counts[k] > 0)
       .sort((a, b) => SAFETY_ADEQUACY[b].rank - SAFETY_ADEQUACY[a].rank);
+  },
+
+  // The meters run healthy-first, the chips gaps-first: the meter's leading edge
+  // then lands on the headline percentage, while the chips keep the order of the
+  // list they filter.
+  get safetyStatusMeterOrder() {
+    return [...this.safetyStatusOrder].reverse();
+  },
+
+  get safetyAdequacyMeterOrder() {
+    return [...this.safetyAdequacyOrder].reverse();
   },
 
   // Verification statuses that actually occur, gaps-first, so the rollup bar and
@@ -1378,10 +1385,11 @@ export const derivedMixin = {
     if (!r || !isA(r.type, CLASS.Requirement)) return false;
     const members = this.safetySpecMemberIds;
     if (members && !members.has(r.spdxId)) return false;
-    if (this.requirementStatusFilter === 'noimpl') {
-      if (this.implementedByCount(r.spdxId)) return false;
-    } else if (this.requirementStatusFilter) {
-      if (this.requirementSafetyStatus(r)?.key !== this.requirementStatusFilter) return false;
+    if (
+      this.requirementStatusFilter &&
+      this.requirementSafetyStatus(r)?.key !== this.requirementStatusFilter
+    ) {
+      return false;
     }
     if (
       this.requirementAdequacyFilter &&

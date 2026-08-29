@@ -23,6 +23,10 @@ export const CHANGELOG = [
       },
       {
         tag: 'Improved',
+        text: 'The Functional Safety rollups fit two lines instead of six.'
+      },
+      {
+        tag: 'Improved',
         text: 'Large downloads show bytes, an ETA, and never look stalled.'
       },
       {

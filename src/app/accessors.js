@@ -38,13 +38,7 @@ import {
   PACKAGE_GAP_ORDER,
   PACKAGE_DESCRIPTION_SEGMENTS
 } from '../lib/index.js';
-import {
-  COLORS,
-  getScopeColor,
-  SAFETY_ADEQUACY,
-  SAFETY_STATUSES,
-  SAFETY_NO_IMPL_META
-} from '../config.js';
+import { COLORS, getScopeColor, SAFETY_ADEQUACY, SAFETY_STATUSES } from '../config.js';
 import { CLASS, isA } from '../spdx/model.js';
 import { loadHighlighter } from '../lib/highlight.js';
 
@@ -1830,8 +1824,14 @@ export const accessorsMixin = {
     );
   },
 
+  // Share of a rollup one bucket holds, as a CSS width for its chip's fill.
+  // The fill is a coarse magnitude cue, not a measurement: under about 5% it is
+  // a hairline, and the count beside the label is what carries the size.
+  safetyShare(count, total) {
+    return total ? `${((count / total) * 100).toFixed(2)}%` : '0%';
+  },
+
   safetyStatusMeta(key) {
-    if (key === SAFETY_NO_IMPL_META.key) return SAFETY_NO_IMPL_META;
     return (
       SAFETY_STATUSES[key] || {
         key: key || 'unknown',
