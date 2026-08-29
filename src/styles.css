@@ -306,11 +306,9 @@ html {
   padding: 10px 14px;
 }
 
-.req-file-chip,
-.req-snip-chip {
+.req-file-chip {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
   max-width: 100%;
   padding: 1px 7px;
   border-radius: 5px;
@@ -320,9 +318,6 @@ html {
   font-size: 11px;
   line-height: 1.4;
   white-space: nowrap;
-}
-
-.req-file-chip {
   color: #cbd5e1;
   background: rgba(15, 23, 42, 0.55);
   border: 1px solid #334155;
@@ -331,16 +326,6 @@ html {
 .req-file-chip:hover {
   color: #f8fafc;
   border-color: #64748b;
-}
-
-.req-snip-chip {
-  color: #6ee7b7;
-  background: rgba(16, 185, 129, 0.1);
-}
-
-.req-snip-chip:hover {
-  color: #d1fae5;
-  background: rgba(16, 185, 129, 0.2);
 }
 
 .target-focus {

@@ -12,6 +12,7 @@ import {
   snippetCompactLine,
   snippetTargetLabel,
   snippetFileGroupLabel,
+  snippetGroupLineCount,
   groupSnippetsByFile
 } from '../src/lib/relationships.js';
 import { isA, CLASS } from '../src/spdx/model.js';
@@ -222,8 +223,21 @@ describe('groupSnippetsByFile', () => {
       ['alpha', 'beta']
     );
     assert.deepEqual(thread.snippetIds, ['s1', 's2']);
+    // alpha 1-5 (5) + beta 20-30 (11), no overlap.
+    assert.equal(thread.lineCount, 16);
     assert.equal(grouped.others.length, 1);
     assert.equal(grouped.others[0].spdxId, 'pkg:1');
+  });
+
+  it('counts unique lines across overlapping ranges', () => {
+    assert.equal(
+      snippetGroupLineCount([
+        { start: 10, end: 20 },
+        { start: 15, end: 25 },
+        { start: 40, end: 40 }
+      ]),
+      17
+    );
   });
 
   it('dedupes identical coverage ranges of one file', () => {

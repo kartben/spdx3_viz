@@ -1442,8 +1442,13 @@ test('requirementImplementationGroups lists functions under one file', () => {
     thread.snippets.map((s) => s.label),
     ['z_impl_k_thread_create', 'z_vrfy_k_thread_create']
   );
+  // L1018-1032 (15) + L1051-1112 (62).
+  assert.equal(thread.lineCount, 77);
+  assert.equal(app.requirementFileChipLabel(thread), 'thread.c (77)');
   const hdr = impl.files.find((f) => f.baseName === 'kernel.h');
   assert.equal(hdr.snippets[0].label, 'L1409');
+  assert.equal(hdr.lineCount, 1);
+  assert.equal(app.requirementFileChipLabel(hdr), 'kernel.h (1)');
 });
 
 test('requirementEvidence groups coverage lines of one file and drops duplicates', () => {
@@ -1454,6 +1459,8 @@ test('requirementEvidence groups coverage lines of one file and drops duplicates
     ev.files[0].snippets.map((s) => s.label),
     ['1018', '1024']
   );
+  assert.equal(ev.files[0].lineCount, 2);
+  assert.equal(app.requirementFileChipLabel(ev.files[0]), 'thread.c (2)');
 });
 
 test('requirementIdentifiers hides producer rollup tags', () => {
