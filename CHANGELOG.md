@@ -13,7 +13,6 @@ via the "What's new" link.
 - **Improved:** Large downloads show bytes, an ETA, and never look stalled.
 - **Improved:** Complete CPEs link to NVD by exact name.
 - **Improved:** Graph opens faster and stays smoother on huge SBOMs.
-- **Fixed:** Share links stay readable and restore the view.
 
 ## [0.5.0] - 2026-08-22
 
