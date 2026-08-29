@@ -3,6 +3,7 @@
  *
  * @module lib
  */
+export * from './escape.js';
 export * from './format.js';
 export * from './relationships.js';
 export * from './licenses.js';

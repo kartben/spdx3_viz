@@ -1,3 +1,5 @@
+import { escapeHtml } from '../lib/index.js';
+
 /* Search corpus + fuzzy scoring, shared by the ⌘K command palette (see
    app/palette.js). Builds a flat, pre-lowercased index of every navigable
    element in the loaded document and scores a query against it, and exposes the
@@ -183,24 +185,17 @@ export const searchMixin = {
     return Math.max(this._fieldScore(entry._n, q, 1), this._fieldScore(entry._e, q, 0.55));
   },
 
-  _escapeHtml(str) {
-    return String(str).replace(
-      /[&<>"']/g,
-      (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]
-    );
-  },
-
   // Escapes the label and wraps the matched run in a highlight span, so the part
   // the user typed stands out inside the result name.
   searchHighlight(text, query) {
-    const esc = this._escapeHtml(text || '');
+    const esc = escapeHtml(text || '');
     const q = (query || '').trim();
     if (!q) return esc;
     const i = (text || '').toLowerCase().indexOf(q.toLowerCase());
     if (i < 0) return esc;
-    const before = this._escapeHtml(text.slice(0, i));
-    const hit = this._escapeHtml(text.slice(i, i + q.length));
-    const after = this._escapeHtml(text.slice(i + q.length));
+    const before = escapeHtml(text.slice(0, i));
+    const hit = escapeHtml(text.slice(i, i + q.length));
+    const after = escapeHtml(text.slice(i + q.length));
     return `${before}<span class="search-hl">${hit}</span>${after}`;
   }
 };

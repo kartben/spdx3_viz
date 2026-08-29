@@ -18,6 +18,7 @@ import {
   getNodeTypeColor,
   cleanName,
   dirPrefix,
+  escapeHtml,
   iconKeyForElement,
   getNodeIconPath2D,
   snippetFileRef,
@@ -209,13 +210,6 @@ function dominantType(members) {
     }
   });
   return best;
-}
-
-function escapeHtml(value) {
-  return String(value).replace(
-    /[&<>"]/g,
-    (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]
-  );
 }
 
 // Squared distance from point (px,py) to the segment (ax,ay)-(bx,by); used for edge hit-testing.

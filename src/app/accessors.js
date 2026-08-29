@@ -29,6 +29,7 @@ import {
   formatHardwareDimensions,
   normalizeUrl,
   copyToClipboard,
+  escapeHtml,
   licenseIndividualDescription,
   requirementDisplayName as formatRequirementDisplayName,
   producerMetaValue,
@@ -227,9 +228,7 @@ export const accessorsMixin = {
   async _highlightSource(content, fileName) {
     const ext = getFileExtension(fileName || '');
     const rawLines = content.split('\n');
-    const escaped = rawLines.map((l) =>
-      l.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    );
+    const escaped = rawLines.map(escapeHtml);
 
     let highlighted = null;
     const langMap = { '.c': 'c', '.h': 'c', '.cpp': 'cpp', '.py': 'python', '.js': 'javascript' };

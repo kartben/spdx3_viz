@@ -3,6 +3,7 @@ import {
   buildPurposeFacets,
   buildSafetySpecFacets,
   dirPrefix,
+  escapeHtml,
   getExternalIdentifiers,
   isMeaningfulValue,
   licenseIndividualToken,
@@ -903,7 +904,10 @@ export const derivedMixin = {
   get supplyChainStateMermaid() {
     const steps = this.supplyChainLifecycleSteps;
     if (!steps.length) return '';
-    const esc = (value) =>
+    // Not HTML escaping: these characters are what break stateDiagram-v2 label
+    // syntax, so they are stripped rather than turned into entities (Mermaid
+    // would render an entity literally).
+    const mermaidLabel = (value) =>
       String(value || '')
         .replace(/[:<>"\n\r]+/g, ' ')
         .replace(/\s+/g, ' ')
@@ -918,10 +922,10 @@ export const derivedMixin = {
       'classDef positive fill:#053e30,stroke:#34d399,color:#a7f3d0',
       '[*] --> s0'
     ];
-    steps.forEach((step, i) => lines.push(`s${i} : ${esc(step.name) || 'State'}`));
+    steps.forEach((step, i) => lines.push(`s${i} : ${mermaidLabel(step.name) || 'State'}`));
     steps.forEach((step, i) => {
       if (i === 0) return;
-      const label = esc((step.decisionProcess || '').replace(/\s*process$/i, ''));
+      const label = mermaidLabel((step.decisionProcess || '').replace(/\s*process$/i, ''));
       lines.push(label ? `s${i - 1} --> s${i} : ${label}` : `s${i - 1} --> s${i}`);
     });
     lines.push(`s${steps.length - 1} --> [*]`);
@@ -1124,11 +1128,6 @@ export const derivedMixin = {
   get supplyChainRouteMapSvg() {
     const map = this.supplyChainRouteMap;
     if (!map.stops.length) return '';
-    const esc = (v) =>
-      String(v == null ? '' : v).replace(
-        /[&<>"]/g,
-        (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]
-      );
     const km = (v) => `${Math.round(v).toLocaleString()} km`;
     const grid =
       [92, 184, 276, 368].map((y) => `<line x1="0" y1="${y}" x2="1000" y2="${y}"/>`).join('') +
@@ -1138,20 +1137,20 @@ export const derivedMixin = {
         const label = this.formatCarbonKg(c.carbonKg) || (c.distanceKm ? km(c.distanceKm) : c.mode);
         return (
           `<path d="${c.d}" fill="none" stroke="${c.color}" stroke-width="2.5" stroke-linecap="round" class="sc-flow" opacity="0.9"/>` +
-          `<g class="cursor-pointer" data-sc-action="${esc(c.action.spdxId)}">` +
+          `<g class="cursor-pointer" data-sc-action="${escapeHtml(c.action.spdxId)}">` +
           `<rect x="${c.labelX - 36}" y="${c.labelY - 10}" width="72" height="18" rx="9" fill="#0f172a" stroke="#334155"/>` +
-          `<text x="${c.labelX}" y="${c.labelY + 3}" text-anchor="middle" font-size="10" font-weight="600" fill="${c.color}">${esc(label)}</text></g>`
+          `<text x="${c.labelX}" y="${c.labelY + 3}" text-anchor="middle" font-size="10" font-weight="600" fill="${c.color}">${escapeHtml(label)}</text></g>`
         );
       })
       .join('');
     const stops = map.stops
       .map(
         (s) =>
-          `<g class="cursor-pointer" data-sc-loc="${esc(s.spdxId)}">` +
+          `<g class="cursor-pointer" data-sc-loc="${escapeHtml(s.spdxId)}">` +
           `<circle cx="${s.x}" cy="${s.y}" r="12" fill="none" stroke="${s.role.color}" stroke-width="1" opacity="0.4"/>` +
           `<circle cx="${s.x}" cy="${s.y}" r="6.5" fill="${s.role.color}" stroke="#0b1220" stroke-width="2"/>` +
-          `<text x="${s.x}" y="${s.y - 16}" text-anchor="middle" font-size="11.5" font-weight="600" fill="#e2e8f0">${esc(s.place || s.name)}</text>` +
-          `<text x="${s.x}" y="${s.y + 23}" text-anchor="middle" font-size="9.5" fill="${s.role.color}">${esc(`#${s.order} · ${s.role.label}`)}</text></g>`
+          `<text x="${s.x}" y="${s.y - 16}" text-anchor="middle" font-size="11.5" font-weight="600" fill="#e2e8f0">${escapeHtml(s.place || s.name)}</text>` +
+          `<text x="${s.x}" y="${s.y + 23}" text-anchor="middle" font-size="9.5" fill="${s.role.color}">${escapeHtml(`#${s.order} · ${s.role.label}`)}</text></g>`
       )
       .join('');
     return (
