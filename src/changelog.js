@@ -10,16 +10,12 @@ export const CHANGELOG = [
     date: null,
     items: [
       {
-        tag: 'Improved',
-        text: 'Requirement cards group snippets as file (N lines).'
+        tag: 'Added',
+        text: 'License compatibility analyzer.'
       },
       {
         tag: 'Added',
-        text: 'Requirements roll up true traceability: is the implementation actually exercised?'
-      },
-      {
-        tag: 'Fixed',
-        text: 'A requirement that passes without exercising its code no longer reads as passed.'
+        text: 'Requirements roll up whether tests actually exercise the code.'
       },
       {
         tag: 'Improved',
@@ -27,11 +23,11 @@ export const CHANGELOG = [
       },
       {
         tag: 'Improved',
-        text: 'The Functional Safety rollups fit two lines instead of six.'
+        text: 'Requirement cards group snippets as file (N lines).'
       },
       {
         tag: 'Fixed',
-        text: 'System requirements no longer count against the verification pass rate.'
+        text: 'System requirements no longer count against the pass rate.'
       },
       {
         tag: 'Improved',
@@ -39,31 +35,15 @@ export const CHANGELOG = [
       },
       {
         tag: 'Improved',
-        text: "A complete CPE now links to NVD's vulnerability search by exact CPE name, version included."
+        text: 'Complete CPEs link to NVD by exact name.'
       },
       {
         tag: 'Improved',
-        text: 'Graph stays smooth while other apps compete for the GPU.'
+        text: 'Graph opens faster and stays smoother on huge SBOMs.'
       },
       {
         tag: 'Fixed',
-        text: 'Build-heavy SBOMs no longer drag the graph down to a few frames per second.'
-      },
-      {
-        tag: 'Improved',
-        text: 'The graph opens much faster the first time on huge SBOMs.'
-      },
-      {
-        tag: 'Fixed',
-        text: 'Loading a huge SBOM no longer stalls in a background tab.'
-      },
-      {
-        tag: 'Added',
-        text: 'License compatibility analyzer.'
-      },
-      {
-        tag: 'Fixed',
-        text: 'Share links restore Safety chips and Supply Chain angles.'
+        text: 'Share links stay readable and restore the view.'
       }
     ]
   },
