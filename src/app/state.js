@@ -138,7 +138,10 @@ export function createState() {
     supplyChainExceptionFilter: '', // '' = all, 'exception' | 'resolved'
     supplyChainViewMode: 'timeline', // Supply Chain angle: timeline | states | processes | custody | map
     requirementSearch: '', // in-view filter for the Functional Safety list
-    requirementKindFilter: '', // '' = all, else an FS element type to show only
+    // Land on the requirements themselves: verifications and evaluations are
+    // what a requirement is made of, not its peers, and they outnumber it 2:1.
+    requirementKindFilter: 'Requirement', // '' = all, else an FS element type to show only
+    requirementSort: 'attention', // 'attention' = worst first, 'name' = A-Z
     requirementStatusFilter: '', // '' = all, else a verification-status key or 'noimpl'
     requirementAdequacyFilter: '', // '' = all, else a true-traceability adequacy verdict
     requirementSpecFilter: '', // '' = all, else a Specification spdxId (hasRequirement facet)

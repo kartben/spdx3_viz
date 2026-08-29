@@ -6,6 +6,8 @@ via the "What's new" link.
 ## Unreleased
 
 - **Added:** Requirements roll up true traceability: is the implementation actually exercised?
+- **Fixed:** A requirement that passes without exercising its code no longer reads as passed.
+- **Improved:** Functional Safety opens on the requirements, most urgent first.
 - **Improved:** Large downloads show bytes, an ETA, and never look stalled.
 - **Improved:** A complete CPE now links to NVD's vulnerability search by exact CPE name, version included.
 - **Improved:** Graph stays smooth while other apps compete for the GPU.

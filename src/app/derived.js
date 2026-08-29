@@ -1481,7 +1481,7 @@ export const derivedMixin = {
 
   get filteredRequirements() {
     const requirements = this.requirements;
-    const key = `${requirements.length}|${this.requirementKindFilter}|${this.requirementStatusFilter}|${this.requirementAdequacyFilter}|${this.requirementSpecFilter}|${this.requirementSearch}`;
+    const key = `${requirements.length}|${this.requirementKindFilter}|${this.requirementStatusFilter}|${this.requirementAdequacyFilter}|${this.requirementSpecFilter}|${this.requirementSearch}|${this.requirementSort}`;
     if (key === filteredReqsCacheKey) return filteredReqsCacheVal;
 
     let reqs = requirements;
@@ -1515,12 +1515,14 @@ export const derivedMixin = {
       });
     }
     const rank = (r) => (r.type === CLASS.Requirement ? 0 : 1);
+    const label = (r) => this.requirementDisplayName(r) || r.name || this.cleanName(r.spdxId);
+    // Requirements first, then worst-first unless the reader asked for A-Z.
+    const attention =
+      this.requirementSort === 'attention'
+        ? (a, b) => this.requirementAttentionRank(a) - this.requirementAttentionRank(b)
+        : () => 0;
     filteredReqsCacheVal = [...reqs].sort(
-      (a, b) =>
-        rank(a) - rank(b) ||
-        (this.requirementDisplayName(a) || a.name || this.cleanName(a.spdxId)).localeCompare(
-          this.requirementDisplayName(b) || b.name || this.cleanName(b.spdxId)
-        )
+      (a, b) => rank(a) - rank(b) || attention(a, b) || label(a).localeCompare(label(b))
     );
     filteredReqsCacheKey = key;
     return filteredReqsCacheVal;

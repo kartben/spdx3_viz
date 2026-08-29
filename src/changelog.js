@@ -14,6 +14,14 @@ export const CHANGELOG = [
         text: 'Requirements roll up true traceability: is the implementation actually exercised?'
       },
       {
+        tag: 'Fixed',
+        text: 'A requirement that passes without exercising its code no longer reads as passed.'
+      },
+      {
+        tag: 'Improved',
+        text: 'Functional Safety opens on the requirements, most urgent first.'
+      },
+      {
         tag: 'Improved',
         text: 'Large downloads show bytes, an ETA, and never look stalled.'
       },
