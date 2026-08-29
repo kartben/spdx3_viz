@@ -3,7 +3,7 @@
 All notable changes to this project are documented here. Also viewable in-app
 via the "What's new" link.
 
-## Unreleased
+## [0.6.0] - 2026-08-29
 
 - **Added:** License compatibility analyzer.
 - **Added:** Requirements roll up whether tests actually exercise the code.
