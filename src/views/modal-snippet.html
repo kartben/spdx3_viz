@@ -2,7 +2,7 @@
   x-show="snippetModalOpen"
   x-transition.opacity
   @keydown.escape.window="closeSnippetModal()"
-  class="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm"
+  class="fixed inset-0 z-70 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-xs"
   @click.self="closeSnippetModal()"
   style="display: none"
 >
@@ -13,7 +13,7 @@
     <!-- Header -->
     <div class="flex items-center gap-3 border-b border-slate-700 px-5 py-3.5">
       <span
-        class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-400"
+        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-400"
       >
         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
@@ -36,14 +36,14 @@
       </div>
       <span
         x-show="snippetModal?.start != null"
-        class="badge flex-shrink-0 bg-amber-400/10 text-xs text-amber-300"
+        class="badge shrink-0 bg-amber-400/10 text-xs text-amber-300"
         x-text="snippetModal?.rangeCount > 1
           ? snippetModal.rangeCount + ' ranges'
           : 'L' + snippetModal?.start + (snippetModal?.end && snippetModal?.end !== snippetModal?.start ? '-' + snippetModal?.end : '')"
       ></span>
       <button
         type="button"
-        class="flex flex-shrink-0 items-center gap-1 rounded-lg bg-slate-700 px-2.5 py-1.5 text-xs font-medium text-slate-200 transition-colors hover:bg-slate-600"
+        class="flex shrink-0 items-center gap-1 rounded-lg bg-slate-700 px-2.5 py-1.5 text-xs font-medium text-slate-200 transition-colors hover:bg-slate-600"
         @click="openSnippetFile()"
       >
         Open file
@@ -56,12 +56,12 @@
         :href="snippetModal?.sourceUrl"
         target="_blank"
         rel="noopener"
-        class="flex-shrink-0 text-xs text-slate-500 hover:text-slate-300"
+        class="shrink-0 text-xs text-slate-500 hover:text-slate-300"
         >Raw ↗</a
       >
       <button
         type="button"
-        class="flex-shrink-0 rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-700 hover:text-white"
+        class="shrink-0 rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-700 hover:text-white"
         @click="closeSnippetModal()"
         title="Close"
       >
@@ -131,7 +131,7 @@
                     >
                       <span class="sv-gap-line"></span>
                       <svg
-                        class="h-3 w-3 flex-shrink-0"
+                        class="h-3 w-3 shrink-0"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"

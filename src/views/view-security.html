@@ -7,7 +7,7 @@
     >
       <div class="flex items-center gap-3 flex-wrap">
         <span
-          class="w-7 h-7 rounded-lg bg-sky-500/15 text-sky-300 flex items-center justify-center flex-shrink-0"
+          class="w-7 h-7 rounded-lg bg-sky-500/15 text-sky-300 flex items-center justify-center shrink-0"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -207,7 +207,7 @@
     >
       <div class="flex items-center gap-3 flex-wrap">
         <span
-          class="w-7 h-7 rounded-lg bg-rose-500/15 text-rose-300 flex items-center justify-center flex-shrink-0"
+          class="w-7 h-7 rounded-lg bg-rose-500/15 text-rose-300 flex items-center justify-center shrink-0"
         >
           <svg
             class="w-4 h-4"
@@ -287,12 +287,12 @@
         x-model.debounce.200ms="securitySearch"
         type="text"
         placeholder="Search CVE, package, statement…"
-        class="ml-auto bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-rose-500 w-56"
+        class="ml-auto bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-hidden focus:border-rose-500 w-56"
       />
       <select
         x-model="securitySort"
         @change="restreamView('security')"
-        class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 text-slate-300 focus:outline-none focus:border-rose-500"
+        class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 text-slate-300 focus:outline-hidden focus:border-rose-500"
       >
         <option value="severity">Sort by status</option>
         <option x-show="hasCvssData" value="cvss">Sort by CVSS severity</option>
@@ -398,7 +398,7 @@
         <!-- Identity: icon + CVE id (+ chevron on mobile) -->
         <div class="flex items-center gap-3 min-w-0 sm:flex-1">
           <div
-            class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+            class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
             :class="vexStatusMeta(vuln.overallStatus).badgeClass"
           >
             <span
@@ -418,7 +418,7 @@
                 target="_blank"
                 rel="noopener noreferrer"
                 @click.stop
-                class="text-slate-500 hover:text-rose-300 flex-shrink-0"
+                class="text-slate-500 hover:text-rose-300 shrink-0"
                 title="Open vulnerability record"
               >
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -435,7 +435,7 @@
           </div>
           <!-- Chevron sits in the identity row on mobile only. -->
           <svg
-            class="w-4 h-4 text-slate-500 transition-transform flex-shrink-0 sm:hidden"
+            class="w-4 h-4 text-slate-500 transition-transform shrink-0 sm:hidden"
             :class="expandedVuln === vuln.spdxId && 'rotate-180'"
             fill="none"
             stroke="currentColor"
@@ -451,7 +451,7 @@
         </div>
 
         <!-- Badges: wrap to their own line (indented) on mobile, right-aligned on sm+ -->
-        <div class="flex flex-wrap items-center gap-1.5 pl-11 sm:pl-0 sm:flex-shrink-0">
+        <div class="flex flex-wrap items-center gap-1.5 pl-11 sm:pl-0 sm:shrink-0">
           <span
             x-show="hasOnlineData"
             class="badge"
@@ -488,7 +488,7 @@
           </span>
           <!-- Chevron at the end of the badge row on sm+ only. -->
           <svg
-            class="w-4 h-4 text-slate-500 transition-transform flex-shrink-0 ml-auto hidden sm:block"
+            class="w-4 h-4 text-slate-500 transition-transform shrink-0 ml-auto hidden sm:block"
             :class="expandedVuln === vuln.spdxId && 'rotate-180'"
             fill="none"
             stroke="currentColor"
@@ -516,7 +516,7 @@
             :class="vexStatusMeta(vulnClearedByVex(vuln)).badgeClass"
           >
             <svg
-              class="w-4 h-4 mt-0.5 flex-shrink-0"
+              class="w-4 h-4 mt-0.5 shrink-0"
               fill="none"
               stroke="currentColor"
               stroke-width="2"
@@ -558,7 +558,7 @@
                 :title="'Open ' + p.name + ' in Packages'"
               >
                 <svg
-                  class="w-3 h-3 mr-1 flex-shrink-0 opacity-70"
+                  class="w-3 h-3 mr-1 shrink-0 opacity-70"
                   fill="none"
                   stroke="currentColor"
                   stroke-width="2"
@@ -584,7 +584,7 @@
           <div x-show="isMeaningful(vuln.el?.summary)">
             <div class="text-xs text-slate-500 mb-1">Summary</div>
             <div
-              class="text-xs text-slate-300 whitespace-pre-wrap break-words"
+              class="text-xs text-slate-300 whitespace-pre-wrap wrap-break-word"
               x-text="vuln.el?.summary"
             ></div>
           </div>
@@ -593,7 +593,7 @@
           >
             <div class="text-xs text-slate-500 mb-1">Description</div>
             <div
-              class="text-xs text-slate-300 whitespace-pre-wrap break-words max-h-32 overflow-y-auto"
+              class="text-xs text-slate-300 whitespace-pre-wrap wrap-break-word max-h-32 overflow-y-auto"
               x-text="vuln.el?.description"
             ></div>
           </div>
@@ -763,7 +763,7 @@
                             :title="'Open ' + d.name + ' in this SBOM'"
                           >
                             <svg
-                              class="w-3 h-3 flex-shrink-0 opacity-70 group-hover:opacity-100"
+                              class="w-3 h-3 shrink-0 opacity-70 group-hover:opacity-100"
                               fill="none"
                               stroke="currentColor"
                               stroke-width="2"
@@ -939,7 +939,7 @@
             ></p>
             <p
               x-show="vuln.online?.details && vuln.online?.details !== vuln.online?.summary"
-              class="text-xs text-slate-400 leading-relaxed max-h-32 overflow-y-auto whitespace-pre-wrap break-words"
+              class="text-xs text-slate-400 leading-relaxed max-h-32 overflow-y-auto whitespace-pre-wrap wrap-break-word"
               x-text="vuln.online?.details"
             ></p>
 

@@ -1,8 +1,8 @@
 <aside
-  class="fixed inset-y-0 left-0 z-50 w-60 bg-slate-800/50 border-r border-slate-700/50 flex flex-col flex-shrink-0 transition-transform duration-200 md:static md:z-auto md:translate-x-0"
+  class="fixed inset-y-0 left-0 z-50 w-60 bg-slate-800/50 border-r border-slate-700/50 flex flex-col shrink-0 transition-transform duration-200 md:static md:z-auto md:translate-x-0"
   :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
 >
-  <div class="p-4 border-b border-slate-700/50 flex-shrink-0">
+  <div class="p-4 border-b border-slate-700/50 shrink-0">
     <div
       class="flex items-center gap-2.5 cursor-pointer"
       role="button"
@@ -13,7 +13,7 @@
       @keydown.space.prevent="goHome()"
     >
       <div
-        class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0"
+        class="w-8 h-8 rounded-lg bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center shrink-0"
       >
         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
@@ -81,7 +81,7 @@
                     <span
                       x-show="viewById(vid)?.count"
                       x-text="viewById(vid)?.count"
-                      class="text-[10px] bg-slate-700/60 px-1.5 py-0.5 rounded text-slate-400"
+                      class="text-[10px] bg-slate-700/60 px-1.5 py-0.5 rounded-sm text-slate-400"
                     ></span>
                   </div>
                 </template>
@@ -106,7 +106,7 @@
               <span
                 x-show="viewById(availableNavProfileViews(p)[0])?.count"
                 x-text="viewById(availableNavProfileViews(p)[0])?.count"
-                class="text-[10px] bg-slate-700/60 px-1.5 py-0.5 rounded text-slate-400"
+                class="text-[10px] bg-slate-700/60 px-1.5 py-0.5 rounded-sm text-slate-400"
                 :class="availableNavProfileViews(p)[0] === 'security' && 'bg-rose-500/15 text-rose-300'"
               ></span>
             </div>
@@ -115,7 +115,7 @@
       </div>
     </div>
 
-    <div class="nav-insights flex-shrink-0 px-2 pb-2">
+    <div class="nav-insights shrink-0 px-2 pb-2">
       <span class="nav-section-label">Insights</span>
       <template x-for="v in insightsNavViews" :key="'insights-' + v.id">
         <div
@@ -129,19 +129,19 @@
           <span
             x-show="v.count"
             x-text="v.count"
-            class="text-[10px] bg-slate-700/60 px-1.5 py-0.5 rounded text-slate-400"
+            class="text-[10px] bg-slate-700/60 px-1.5 py-0.5 rounded-sm text-slate-400"
           ></span>
         </div>
       </template>
     </div>
   </nav>
 
-  <div class="px-4 py-3 border-t border-slate-700/50 flex-shrink-0">
+  <div class="px-4 py-3 border-t border-slate-700/50 shrink-0">
     <a
       href="https://github.com/kartben"
       target="_blank"
       rel="author noopener noreferrer"
-      class="block text-[11px] text-slate-500 hover:text-slate-300 transition-colors truncate focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded"
+      class="block text-[11px] text-slate-500 hover:text-slate-300 transition-colors truncate focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 rounded-sm"
       title="Created by Benjamin Cabé"
     >
       By Benjamin Cabé

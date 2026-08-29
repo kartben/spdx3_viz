@@ -2,7 +2,7 @@
   <div class="text-center max-w-xl mx-auto my-auto px-6 py-10">
     <div class="mb-8">
       <div
-        class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center"
+        class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center"
       >
         <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
@@ -75,7 +75,7 @@
     >
       <div class="flex items-start gap-2.5">
         <svg
-          class="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5"
+          class="w-5 h-5 text-red-400 shrink-0 mt-0.5"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -90,7 +90,7 @@
         </svg>
         <div class="min-w-0">
           <p class="text-sm font-medium text-red-300">Could not load this SBOM</p>
-          <p class="text-xs text-red-400/90 mt-1 break-words" x-text="parseError"></p>
+          <p class="text-xs text-red-400/90 mt-1 wrap-break-word" x-text="parseError"></p>
           <p class="text-xs text-slate-500 mt-1.5">
             Fix the file or pick another one, then drop it again.
           </p>
@@ -102,7 +102,7 @@
     <div x-show="samples.length" class="mt-8">
       <div class="flex items-center gap-3 mb-4">
         <div class="flex-1 h-px bg-slate-700/50"></div>
-        <span class="text-xs text-slate-500 flex-shrink-0">or explore sample SBOMs</span>
+        <span class="text-xs text-slate-500 shrink-0">or explore sample SBOMs</span>
         <div class="flex-1 h-px bg-slate-700/50"></div>
       </div>
       <div
@@ -116,12 +116,12 @@
             class="group flex flex-col text-left p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 hover:border-blue-500/50 hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-wait"
           >
             <div class="flex items-center gap-2 mb-1.5">
-              <span class="w-5 h-5 flex-shrink-0 flex items-center justify-center">
+              <span class="w-5 h-5 shrink-0 flex items-center justify-center">
                 <img
                   x-show="s.icon"
                   :src="`${s.dir}/${s.icon}`"
                   :alt="s.name"
-                  class="w-5 h-5 rounded-sm object-contain"
+                  class="w-5 h-5 rounded-xs object-contain"
                 />
                 <span x-show="!s.icon" class="text-xl leading-none" x-text="s.emoji"></span>
               </span>
@@ -148,7 +148,7 @@
               </svg>
             </div>
             <p
-              class="text-xs text-slate-400 leading-snug [&_code]:font-mono [&_code]:text-slate-300 [&_code]:bg-slate-700/50 [&_code]:rounded [&_code]:px-1 [&_code]:py-0.5 [&_code]:text-[11px] [&_a]:text-blue-400 [&_a]:underline [&_a:hover]:text-blue-300"
+              class="text-xs text-slate-400 leading-snug [&_code]:font-mono [&_code]:text-slate-300 [&_code]:bg-slate-700/50 [&_code]:rounded-sm [&_code]:px-1 [&_code]:py-0.5 [&_code]:text-[11px] [&_a]:text-blue-400 [&_a]:underline [&_a:hover]:text-blue-300"
               x-html="s.description"
             ></p>
             <p class="text-[10px] text-slate-500 mt-1.5">
@@ -169,7 +169,7 @@
       href="https://github.com/kartben/spdx3_viz"
       target="_blank"
       rel="noopener noreferrer"
-      class="group mt-8 inline-flex items-center gap-2 text-sm text-slate-500 transition-colors hover:text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 rounded-md"
+      class="group mt-8 inline-flex items-center gap-2 text-sm text-slate-500 transition-colors hover:text-slate-300 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 rounded-md"
       aria-label="View and fork SPDX 3 SBOM Visualizer on GitHub (opens in a new tab)"
     >
       <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -200,7 +200,7 @@
         href="https://github.com/kartben"
         target="_blank"
         rel="author noopener noreferrer"
-        class="underline decoration-slate-700 underline-offset-2 transition-colors hover:text-slate-300 hover:decoration-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 rounded"
+        class="underline decoration-slate-700 underline-offset-2 transition-colors hover:text-slate-300 hover:decoration-slate-500 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 rounded-sm"
         >Benjamin Cabé</a
       >
     </p>
@@ -211,7 +211,7 @@
       <button
         type="button"
         @click="openChangelogModal()"
-        class="underline decoration-slate-700 hover:text-slate-300 hover:decoration-slate-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 rounded"
+        class="underline decoration-slate-700 hover:text-slate-300 hover:decoration-slate-400 transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 rounded-sm"
       >
         What's new
       </button>

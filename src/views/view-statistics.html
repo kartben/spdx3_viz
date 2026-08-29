@@ -61,7 +61,7 @@
     <div class="card xl:col-span-2">
       <div class="flex flex-col sm:flex-row xl:flex-col items-center xl:items-start gap-6">
         <div
-          class="relative w-28 h-28 rounded-full flex items-center justify-center flex-shrink-0"
+          class="relative w-28 h-28 rounded-full flex items-center justify-center shrink-0"
           :style="qualityRingStyle(qualityReport.overall.score, qualityGradeMeta(qualityReport.overall.grade).color)"
         >
           <div
@@ -129,7 +129,7 @@
             :title="`${scope.label}: ${formatCount(scope.count)} edges (${scope.pct})`"
           >
             <span
-              class="w-2 h-2 rounded-sm border"
+              class="w-2 h-2 rounded-xs border"
               :style="`background:${scope.color}; border-color:${scope.color}`"
             ></span>
             <span x-text="scope.label"></span>
@@ -153,7 +153,7 @@
           <div
             id="relationshipRepartitionChart"
             x-effect="currentView === 'statistics' && renderRelationshipChart()"
-            class="h-72 min-h-[18rem]"
+            class="h-72 min-h-72"
           ></div>
           <div class="text-[11px] text-slate-500 text-center -mt-2">
             Click a slice to open the graph focused on that relationship type and scope.
@@ -170,12 +170,12 @@
               <div class="flex items-center justify-between gap-3 text-xs">
                 <span class="flex items-center gap-2 min-w-0">
                   <span
-                    class="w-3 h-3 rounded-full flex-shrink-0"
+                    class="w-3 h-3 rounded-full shrink-0"
                     :style="`background:${row.color}`"
                   ></span>
                   <span class="font-medium text-slate-200 truncate" x-text="row.label"></span>
                 </span>
-                <span class="text-slate-400 tabular-nums flex-shrink-0">
+                <span class="text-slate-400 tabular-nums shrink-0">
                   <span x-text="formatCount(row.count)"></span>
                   <span class="text-slate-600" x-text="' · ' + row.pctLabel"></span>
                 </span>
@@ -243,7 +243,7 @@
         <div class="flex items-center gap-2 mt-1.5">
           <span
             x-show="qualityReport.ntia.specVersion"
-            class="text-[11px] font-mono bg-slate-700/40 text-slate-300 px-2 py-0.5 rounded"
+            class="text-[11px] font-mono bg-slate-700/40 text-slate-300 px-2 py-0.5 rounded-sm"
             x-text="(String(qualityReport.ntia.specVersion).toUpperCase().startsWith('SPDX') ? '' : 'SPDX ') + qualityReport.ntia.specVersion"
           ></span>
           <span
@@ -253,12 +253,7 @@
         </div>
       </div>
       <div class="flex items-center gap-1.5 text-[11px] text-emerald-400/90 max-w-[230px]">
-        <svg
-          class="w-3.5 h-3.5 flex-shrink-0"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
+        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -296,7 +291,7 @@
               :title="(el.level === 'component' && el.missing.total > 0) ? 'Review these in Remediation' : ''"
             >
               <span
-                class="flex-shrink-0 flex items-center"
+                class="shrink-0 flex items-center"
                 :style="`color:${ntiaStatusColor(ntiaStatus(el))}`"
                 x-html="uiIconSvg(ntiaStatusIconKey(ntiaStatus(el)), 'w-[18px] h-[18px]')"
               ></span>
@@ -312,7 +307,7 @@
                 >
               </div>
               <template x-if="el.level === 'component'">
-                <div class="w-28 flex-shrink-0">
+                <div class="w-28 shrink-0">
                   <div class="flex items-center justify-between text-[11px] mb-1">
                     <span
                       :class="el.missing.total > 0 ? 'text-amber-500/90' : 'text-slate-500'"
@@ -333,7 +328,7 @@
               </template>
               <template x-if="el.level === 'document'">
                 <span
-                  class="badge flex-shrink-0"
+                  class="badge shrink-0"
                   :class="el.present ? 'bg-emerald-500/15 text-emerald-400' : 'bg-rose-500/15 text-rose-400'"
                   x-text="el.present ? 'Present' : 'Missing'"
                 ></span>
@@ -430,7 +425,7 @@
         <div class="flex items-center gap-2 mt-2 flex-wrap">
           <span
             x-show="qualityReport.cisa2026.specVersion"
-            class="text-[11px] font-mono bg-slate-700/40 text-slate-300 px-2 py-0.5 rounded"
+            class="text-[11px] font-mono bg-slate-700/40 text-slate-300 px-2 py-0.5 rounded-sm"
             x-text="(String(qualityReport.cisa2026.specVersion).toUpperCase().startsWith('SPDX') ? '' : 'SPDX ') + qualityReport.cisa2026.specVersion"
           ></span>
           <span
@@ -488,7 +483,7 @@
               @click="isClickable(el) && openRemediation(remediationCategoryFor(el.key))"
             >
               <span
-                class="flex-shrink-0 flex items-center"
+                class="shrink-0 flex items-center"
                 :style="`color:${statusColor(statusOf(el))}`"
                 x-html="uiIconSvg(statusIconKey(statusOf(el)), 'w-[18px] h-[18px]')"
               ></span>
@@ -531,7 +526,7 @@
                 </div>
               </div>
               <template x-if="el.level === 'component'">
-                <div class="w-28 flex-shrink-0">
+                <div class="w-28 shrink-0">
                   <div class="flex items-center justify-between text-[11px] mb-1">
                     <span
                       :class="el.missing.total > 0 ? 'text-amber-500/90' : 'text-slate-500'"
@@ -552,7 +547,7 @@
               </template>
               <template x-if="el.level !== 'component'">
                 <span
-                  class="badge flex-shrink-0"
+                  class="badge shrink-0"
                   :class="{
                     'bg-emerald-500/15 text-emerald-400': statusOf(el) === 'pass',
                     'bg-amber-500/15 text-amber-400': statusOf(el) === 'partial' || statusOf(el) === 'warn',
@@ -618,7 +613,7 @@
         type="button"
         x-show="qualityReport.insights.offenders[g.key].total > 0"
         @click="openRemediation(g.category)"
-        class="card text-left group hover:border-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40 transition"
+        class="card text-left group hover:border-slate-500 focus:outline-hidden focus:ring-2 focus:ring-amber-500/40 transition"
       >
         <div class="flex items-center justify-between">
           <h3 class="text-sm font-semibold text-white" x-text="g.label"></h3>
@@ -688,14 +683,14 @@
           >
             <span class="flex items-center gap-2 min-w-0">
               <span
-                class="flex items-center justify-center flex-shrink-0"
+                class="flex items-center justify-center shrink-0"
                 :style="`color:${nodeTypeColor('package')}`"
                 x-html="nodeTypeIconSvg('package', 'w-3.5 h-3.5')"
               ></span>
               <span class="text-sm text-slate-300 truncate" x-text="p.name"></span>
             </span>
             <span
-              class="text-xs text-slate-500 flex-shrink-0"
+              class="text-xs text-slate-500 shrink-0"
               x-text="formatCount(p.dependents) + ' dependents'"
             ></span>
           </button>

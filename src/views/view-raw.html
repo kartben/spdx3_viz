@@ -1,6 +1,6 @@
 <div x-show="currentView === 'raw'" class="fade-in absolute inset-0 flex flex-col gap-3 p-4 sm:p-6">
   <!-- Toolbar: file selector (when merged), format toggle, copy, download -->
-  <div class="flex flex-wrap items-center gap-2 flex-shrink-0">
+  <div class="flex flex-wrap items-center gap-2 shrink-0">
     <div x-show="loadedFiles.length > 1" class="flex flex-wrap items-center gap-1.5">
       <template x-for="(f, i) in loadedFiles" :key="i">
         <button
@@ -11,7 +11,7 @@
                       ? 'bg-blue-500/15 border-blue-500/40 text-blue-200'
                       : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-slate-200 hover:border-slate-600'"
         >
-          <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -77,7 +77,7 @@
   </div>
 
   <!-- Meta line: active file name + size (+ note when highlighting is skipped) -->
-  <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500 flex-shrink-0">
+  <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500 shrink-0">
     <span class="font-mono text-slate-400 break-all" x-text="rawFile?.name"></span>
     <template x-if="rawSizeLabel(rawIndex)">
       <span class="flex items-center gap-2">
