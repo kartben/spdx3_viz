@@ -26,6 +26,10 @@ export const CHANGELOG = [
         text: 'The Functional Safety rollups fit two lines instead of six.'
       },
       {
+        tag: 'Fixed',
+        text: 'System requirements no longer count against the verification pass rate.'
+      },
+      {
         tag: 'Improved',
         text: 'Large downloads show bytes, an ETA, and never look stalled.'
       },

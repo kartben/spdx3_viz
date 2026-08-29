@@ -9,6 +9,7 @@ via the "What's new" link.
 - **Fixed:** A requirement that passes without exercising its code no longer reads as passed.
 - **Improved:** Functional Safety opens on the requirements, most urgent first.
 - **Improved:** The Functional Safety rollups fit two lines instead of six.
+- **Fixed:** System requirements no longer count against the verification pass rate.
 - **Improved:** Large downloads show bytes, an ETA, and never look stalled.
 - **Improved:** A complete CPE now links to NVD's vulnerability search by exact CPE name, version included.
 - **Improved:** Graph stays smooth while other apps compete for the GPU.

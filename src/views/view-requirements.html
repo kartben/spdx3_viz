@@ -6,35 +6,10 @@
   <div class="list-sticky space-y-3">
     <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
       <div class="flex items-center gap-2 min-w-0">
-        <!-- Breakdown summary of the folded-in FunctionalSafety elements -->
-        <span class="text-sm text-slate-400 min-w-0 truncate">
-          <span x-text="safetyCounts.requirements - safetyCounts.systemRequirements"></span>
-          requirements<template x-if="safetyCounts.systemRequirements"
-            ><span
-              ><span class="text-slate-600"> · </span
-              ><span x-text="safetyCounts.systemRequirements"></span> system</span
-            ></template
-          ><template x-if="safetyCounts.verifications"
-            ><span
-              ><span class="text-slate-600"> · </span
-              ><span x-text="safetyCounts.verifications"></span> verifications</span
-            ></template
-          ><template x-if="safetyCounts.evaluations"
-            ><span
-              ><span class="text-slate-600"> · </span
-              ><span x-text="safetyCounts.evaluations"></span> evaluations</span
-            ></template
-          ><template x-if="safetyCounts.assumptions"
-            ><span
-              ><span class="text-slate-600"> · </span
-              ><span x-text="safetyCounts.assumptions"></span> assumptions</span
-            ></template
-          >
-        </span>
         <!-- Layout toggle: flat list vs. tracedToDetail decomposition tree -->
         <div
           x-show="hasSafetyDecomposition"
-          class="ml-auto inline-flex rounded-lg border border-slate-700 overflow-hidden text-xs flex-shrink-0"
+          class="inline-flex rounded-lg border border-slate-700 overflow-hidden text-xs flex-shrink-0"
         >
           <button
             type="button"
