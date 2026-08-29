@@ -1342,8 +1342,8 @@ function longestCommonPathPrefix(paths) {
  * *-sources packages (software_downloadLocation) and their contains relationships.
  *
  * For packages where downloadLocation is NOASSERTION (e.g. zephyr-sources when
- * the repo has multiple git remotes), falls back to packageVersion + a hardcoded
- * org/repo when the package is recognisably the Zephyr kernel.
+ * the repo has multiple git remotes), falls back to a hardcoded org/repo + commit
+ * when the package is recognisably the Zephyr kernel (see the HACK note below).
  *
  * @param {ParsedData} parsed
  * @param {RelationshipIndexes} indexes
@@ -1371,8 +1371,6 @@ export function buildFileSourceIndex(parsed, indexes) {
       const pkgId = pkg.spdxId || '';
       const pkgName = pkg.name || '';
       if (pkgId.includes('zephyr-sources') || pkgName === 'zephyr-sources') {
-        ghPath = 'zephyrproject-rtos/zephyr';
-
         // ███████████████████████████████████████████████████████████████████
         // ██  ⚠️  TEMPORARY HACK — REMOVE ME  ⚠️                            ██
         // ███████████████████████████████████████████████████████████████████
@@ -1380,19 +1378,22 @@ export function buildFileSourceIndex(parsed, indexes) {
         // own zephyr-sources commit (software_packageVersion) no longer lines
         // up with any source we can fetch. So instead of deriving the SHA from
         // packageVersion (the correct, dynamic behaviour), we PIN every
-        // zephyr-sources file to a single hardcoded commit just so the demo
-        // resolves to real, fetchable source on GitHub.
+        // zephyr-sources file to one hardcoded commit in a fork of the kernel,
+        // just so the demo resolves to real, fetchable source on GitHub:
+        // https://github.com/kartben/zephyr/commit/b0afeff4c183e11b21580b6aa80d6357e0d80b0c
         //
         // ❌ This means highlighted line ranges may NOT match the actual code
         //    at this commit. It is a stopgap, not correct behaviour.
         //
         // ✅ TO RESTORE CORRECT BEHAVIOUR: delete this block and uncomment the
-        //    packageVersion-derived SHA logic below.
+        //    upstream repo + packageVersion-derived SHA logic below.
         // ███████████████████████████████████████████████████████████████████
-        sha = '74442555d7308926225bc0aef85b3b6ca8a16d18'; // <-- HARDCODED HACK
+        ghPath = 'kartben/zephyr'; // <-- HARDCODED HACK (fork, not upstream)
+        sha = 'b0afeff4c183e11b21580b6aa80d6357e0d80b0c'; // <-- HARDCODED HACK
         // ███████████████████████████████████████████████████████████████████
 
         // --- CORRECT (dynamic) behaviour, disabled by the hack above ---------
+        // ghPath = 'zephyrproject-rtos/zephyr';
         // const rawVer = pkg.software_packageVersion || '';
         // const cleanSha = rawVer.replace(/[+\-](dirty|off).*$/, '').trim();
         // if (/^[a-f0-9]{40}$/.test(cleanSha)) sha = cleanSha;
