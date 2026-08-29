@@ -942,13 +942,14 @@ export const accessorsMixin = {
     return el.name || this.cleanName(el.spdxId);
   },
 
-  // One chip label: "thread.c (77)" when the grouped snippets cover 77 unique
-  // lines. Clicking the chip opens every range of that file.
+  // One chip label: "thread.c (77 lines)" when the grouped snippets cover 77
+  // unique lines. Clicking the chip opens every range of that file.
   requirementFileChipLabel(file) {
     if (!file) return '';
     const name = file.baseName || 'file';
     const n = file.lineCount || 0;
-    return n ? `${name} (${this.formatCount(n)})` : name;
+    if (!n) return name;
+    return `${name} (${this.formatCount(n)} ${n === 1 ? 'line' : 'lines'})`;
   },
   requirementFileChipTitle(file) {
     if (!file) return '';
@@ -959,7 +960,7 @@ export const accessorsMixin = {
   },
 
   // Files a requirement is implemented by, snippets grouped per source file so
-  // the card can show one "thread.c (N)" chip instead of a row per snippet.
+  // the card can show one "thread.c (N lines)" chip instead of a row per snippet.
   // Non-snippet targets (a whole file, a package) stay in `others`.
   requirementImplementationGroups(el) {
     if (!el?.spdxId) return EMPTY_SNIPPET_GROUPS;

@@ -5,7 +5,7 @@ via the "What's new" link.
 
 ## Unreleased
 
-- **Improved:** Requirement cards group snippets as file (lines).
+- **Improved:** Requirement cards group snippets as file (N lines).
 - **Added:** Requirements roll up true traceability: is the implementation actually exercised?
 - **Fixed:** A requirement that passes without exercising its code no longer reads as passed.
 - **Improved:** Functional Safety opens on the requirements, most urgent first.

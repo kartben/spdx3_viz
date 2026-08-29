@@ -11,7 +11,7 @@ export const CHANGELOG = [
     items: [
       {
         tag: 'Improved',
-        text: 'Requirement cards group snippets as file (lines).'
+        text: 'Requirement cards group snippets as file (N lines).'
       },
       {
         tag: 'Added',
