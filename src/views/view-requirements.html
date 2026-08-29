@@ -394,16 +394,10 @@
                       <button
                         type="button"
                         class="req-file-chip"
-                        :title="file.fileName || file.baseName"
+                        :title="requirementFileChipTitle(file)"
                         @click.stop="openSnippetRanges(file.snippetIds)"
-                      >
-                        <span x-text="file.baseName"></span>
-                        <span
-                          x-show="file.snippets.length > 1"
-                          class="text-slate-500 tabular-nums"
-                          x-text="file.snippets.length"
-                        ></span>
-                      </button>
+                        x-text="requirementFileChipLabel(file)"
+                      ></button>
                     </template>
                     <template x-for="item in impl?.others || []" :key="item.id">
                       <button
@@ -459,28 +453,15 @@
                       >
                         Implemented in
                       </div>
-                      <div class="space-y-1.5">
+                      <div class="flex flex-wrap gap-1.5">
                         <template x-for="file in impl.files" :key="file.fileId || file.baseName">
-                          <div class="flex items-start gap-2 min-w-0">
-                            <button
-                              type="button"
-                              class="req-file-chip shrink-0 mt-0.5"
-                              :title="(file.fileName || file.baseName) + ' · all ranges'"
-                              @click.stop="openSnippetRanges(file.snippetIds)"
-                              x-text="file.baseName"
-                            ></button>
-                            <div class="flex flex-wrap gap-1 min-w-0">
-                              <template x-for="snip in file.snippets" :key="snip.id">
-                                <button
-                                  type="button"
-                                  class="req-snip-chip"
-                                  :title="snip.start != null ? (snip.end && snip.end !== snip.start ? 'L' + snip.start + '-' + snip.end : 'L' + snip.start) : snip.label"
-                                  @click.stop="openSnippet(snip.id)"
-                                  x-text="snip.label"
-                                ></button>
-                              </template>
-                            </div>
-                          </div>
+                          <button
+                            type="button"
+                            class="req-file-chip"
+                            :title="requirementFileChipTitle(file)"
+                            @click.stop="openSnippetRanges(file.snippetIds)"
+                            x-text="requirementFileChipLabel(file)"
+                          ></button>
                         </template>
                         <template x-for="item in impl.others" :key="item.id">
                           <button
@@ -546,36 +527,23 @@
                       >
                         Covered by tests
                       </div>
-                      <div class="space-y-1.5">
+                      <div class="flex flex-wrap gap-1.5">
                         <template
                           x-for="file in requirementEvidence(req).files"
                           :key="file.fileId || file.baseName"
                         >
-                          <div class="flex items-start gap-2 min-w-0">
-                            <button
-                              type="button"
-                              class="req-file-chip shrink-0 mt-0.5"
-                              :title="(file.fileName || file.baseName) + ' · all covered lines'"
-                              @click.stop="openSnippetRanges(file.snippetIds)"
-                              x-text="file.baseName"
-                            ></button>
-                            <div class="flex flex-wrap gap-1 min-w-0">
-                              <template x-for="snip in file.snippets" :key="snip.id">
-                                <button
-                                  type="button"
-                                  class="req-snip-chip"
-                                  :title="'L' + snip.label"
-                                  @click.stop="openSnippet(snip.id)"
-                                  x-text="snip.label"
-                                ></button>
-                              </template>
-                            </div>
-                          </div>
+                          <button
+                            type="button"
+                            class="req-file-chip"
+                            :title="requirementFileChipTitle(file)"
+                            @click.stop="openSnippetRanges(file.snippetIds)"
+                            x-text="requirementFileChipLabel(file)"
+                          ></button>
                         </template>
                         <template x-for="item in requirementEvidence(req).others" :key="item.id">
                           <button
                             type="button"
-                            class="block text-left text-xs font-mono text-slate-300 hover:text-white truncate"
+                            class="req-file-chip"
                             @click.stop="navigateTo(item.id)"
                             x-text="item.name"
                           ></button>

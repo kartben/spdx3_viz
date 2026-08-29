@@ -942,10 +942,25 @@ export const accessorsMixin = {
     return el.name || this.cleanName(el.spdxId);
   },
 
+  // One chip label: "thread.c (77)" when the grouped snippets cover 77 unique
+  // lines. Clicking the chip opens every range of that file.
+  requirementFileChipLabel(file) {
+    if (!file) return '';
+    const name = file.baseName || 'file';
+    const n = file.lineCount || 0;
+    return n ? `${name} (${this.formatCount(n)})` : name;
+  },
+  requirementFileChipTitle(file) {
+    if (!file) return '';
+    const where = file.fileName || file.baseName || 'file';
+    const n = file.lineCount || 0;
+    if (!n) return where;
+    return `${this.formatCount(n)} ${n === 1 ? 'line' : 'lines'} in ${where}`;
+  },
+
   // Files a requirement is implemented by, snippets grouped per source file so
-  // the card can show "thread.c" once with a chip per function instead of a
-  // relationship row per snippet. Non-snippet targets (a whole file, a package)
-  // stay in `others`.
+  // the card can show one "thread.c (N)" chip instead of a row per snippet.
+  // Non-snippet targets (a whole file, a package) stay in `others`.
   requirementImplementationGroups(el) {
     if (!el?.spdxId) return EMPTY_SNIPPET_GROUPS;
     const cached = requirementImplCache.get(el);
@@ -975,7 +990,7 @@ export const accessorsMixin = {
 
   // Evidence targets reachable from a requirement via
   // verifiedBy → EvaluationResult --hasEvidence--> artifact/snippet/file.
-  // Coverage snippets of the same file collapse to one row of line chips.
+  // Coverage snippets of the same file collapse to one "file (N lines)" chip.
   requirementEvidence(el) {
     if (!el?.spdxId) return EMPTY_SNIPPET_GROUPS;
     const cached = requirementEvidenceCache.get(el);
@@ -1039,9 +1054,7 @@ export const accessorsMixin = {
     const impl = this.requirementImplementationGroups(el);
     if (impl.total === 0) parts.push('no implementation');
     else if (impl.files.length === 1 && impl.others.length === 0) {
-      const file = impl.files[0];
-      const n = file.snippets.length;
-      parts.push(n === 1 ? `in ${file.baseName}` : `in ${file.baseName} (${this.formatCount(n)})`);
+      parts.push(`in ${impl.files[0].baseName}`);
     } else {
       const n = impl.files.length + impl.others.length;
       parts.push(n === 1 ? 'in 1 file' : `in ${this.formatCount(n)} files`);

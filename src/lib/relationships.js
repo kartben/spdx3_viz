@@ -244,6 +244,40 @@ export function snippetFileGroupLabel(baseName, elements, { cap = 3 } = {}) {
 }
 
 /**
+ * Unique 1-based line count across snippet ranges of one file. Overlapping or
+ * adjacent spans merge so coverage chips do not double-count the same line.
+ *
+ * @param {Array<{start?: number|null, end?: number|null}>} snippets
+ * @returns {number}
+ */
+export function snippetGroupLineCount(snippets) {
+  const ranges = (snippets || [])
+    .map((s) => {
+      const start = s?.start;
+      if (start == null) return null;
+      const end = s.end == null || s.end < start ? start : s.end;
+      return { start, end };
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.start - b.start || a.end - b.end);
+  if (!ranges.length) return 0;
+  let count = 0;
+  let lo = ranges[0].start;
+  let hi = ranges[0].end;
+  for (let i = 1; i < ranges.length; i++) {
+    const r = ranges[i];
+    if (r.start <= hi + 1) {
+      hi = Math.max(hi, r.end);
+    } else {
+      count += hi - lo + 1;
+      lo = r.start;
+      hi = r.end;
+    }
+  }
+  return count + (hi - lo + 1);
+}
+
+/**
  * Group snippet elements by the file they were carved from. Non-snippets (and
  * unresolved ids) are returned separately so a card can render files as rows
  * and everything else as ordinary links.
@@ -253,7 +287,7 @@ export function snippetFileGroupLabel(baseName, elements, { cap = 3 } = {}) {
  * @param {{labelOf?: (el: Object) => string, dedupeRanges?: boolean}} [opts]
  * @returns {{files: Array<{fileId: string, fileName: string, baseName: string,
  *   snippets: Array<{id: string, label: string, start: number|null, end: number|null}>,
- *   snippetIds: string[] }>, others: Array<Object>}}
+ *   snippetIds: string[], lineCount: number }>, others: Array<Object>}}
  */
 export function groupSnippetsByFile(elements, elementMap, { labelOf, dedupeRanges } = {}) {
   const label = typeof labelOf === 'function' ? labelOf : snippetSymbolLabel;
@@ -296,6 +330,7 @@ export function groupSnippetsByFile(elements, elementMap, { labelOf, dedupeRange
       (a, b) => (a.start ?? 0) - (b.start ?? 0) || a.label.localeCompare(b.label)
     );
     bucket.snippetIds = bucket.snippets.map((s) => s.id);
+    bucket.lineCount = snippetGroupLineCount(bucket.snippets);
     delete bucket._seen;
     out.push(bucket);
   }
