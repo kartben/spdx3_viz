@@ -40,10 +40,6 @@ export const CHANGELOG = [
       {
         tag: 'Improved',
         text: 'Graph opens faster and stays smoother on huge SBOMs.'
-      },
-      {
-        tag: 'Fixed',
-        text: 'Share links stay readable and restore the view.'
       }
     ]
   },
