@@ -142,7 +142,7 @@ export function createState() {
     // what a requirement is made of, not its peers, and they outnumber it 2:1.
     requirementKindFilter: 'Requirement', // '' = all, else an FS element type to show only
     requirementSort: 'attention', // 'attention' = worst first, 'name' = A-Z
-    requirementStatusFilter: '', // '' = all, else a verification-status key or 'noimpl'
+    requirementStatusFilter: '', // '' = all, else a verification-status key
     requirementAdequacyFilter: '', // '' = all, else a true-traceability adequacy verdict
     requirementSpecFilter: '', // '' = all, else a Specification spdxId (hasRequirement facet)
     requirementLayout: 'list', // Functional Safety tab: 'list' | 'tree' (tracedToDetail decomposition)

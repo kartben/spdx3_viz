@@ -99,14 +99,12 @@ test('safetyStatusSummary', () => {
       { spdxId: 'r2', type: CLASS.Requirement, _status: 'failed' },
       { spdxId: 'r3', type: CLASS.Requirement, _status: 'unverified' }
     ],
-    requirementSafetyStatus: (r) => ({ key: r._status }),
-    implementedByCount: (id) => (id === 'r3' ? 0 : 1)
+    requirementSafetyStatus: (r) => ({ key: r._status })
   });
   const s = app.safetyStatusSummary;
   assert.equal(s.total, 3);
   assert.equal(s.counts.passed, 1);
   assert.equal(s.counts.failed, 1);
-  assert.equal(s.noImpl, 1);
   assert.equal(s.passPct, 33);
   assert.equal(s.verifiedPct, 67);
   assert.equal(app.safetyStatusSummary, s, 'same list, same object');

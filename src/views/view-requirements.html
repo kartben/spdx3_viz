@@ -74,116 +74,95 @@
       </div>
     </div>
 
-    <!-- Safety-case verification rollup: at-a-glance status bar + status filters -->
+    <!-- Two rollups, one line each. The meter runs healthy-first so its leading
+         edge lands on the headline percentage; the chips stay gaps-first
+         because they are what you click, and that matches the worst-first list
+         below. Each chip is filled to its share, so nobody has to read a
+         sub-pixel segment in a 120px meter to size a bucket. -->
     <template x-if="safetyCounts.requirements > 0 && safetyStatusOrder.length">
-      <div class="space-y-2">
-        <div class="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-2 sm:flex-wrap">
-          <span
-            class="text-sm font-semibold text-white"
-            x-text="`${safetyStatusSummary.passPct}% pass rate`"
-          ></span>
-          <span
-            class="text-xs text-slate-500"
-            x-text="`${formatCount(safetyStatusSummary.counts.passed)} of ${formatCount(safetyStatusSummary.total)} · ${safetyStatusSummary.verifiedPct}% have verification`"
-          ></span>
-        </div>
-        <!-- Stacked status bar -->
-        <div class="flex h-2.5 w-full rounded-full overflow-hidden bg-slate-700">
-          <template x-for="s in safetyStatusOrder" :key="s">
+      <div class="flex items-center gap-3 min-w-0">
+        <span
+          class="text-sm font-semibold text-white flex-shrink-0"
+          x-text="`${safetyStatusSummary.passPct}% pass`"
+        ></span>
+        <div
+          class="flex h-1.5 w-[120px] rounded-full overflow-hidden bg-slate-700 flex-shrink-0"
+          role="img"
+          :aria-label="`${formatCount(safetyStatusSummary.counts.passed)} of ${formatCount(safetyStatusSummary.total)} requirements pass, ${safetyStatusSummary.verifiedPct}% have verification`"
+          :title="`${formatCount(safetyStatusSummary.counts.passed)} of ${formatCount(safetyStatusSummary.total)} · ${safetyStatusSummary.verifiedPct}% have verification`"
+        >
+          <template x-for="s in safetyStatusMeterOrder" :key="s">
             <div
-              class="h-full first:rounded-l-full last:rounded-r-full"
               :style="`width:${(safetyStatusSummary.counts[s] / safetyStatusSummary.total) * 100}%; background:${safetyStatusMeta(s).color}`"
-              :title="`${safetyStatusMeta(s).label}: ${safetyStatusSummary.counts[s]}`"
             ></div>
           </template>
         </div>
-        <!-- Status filter chips (click to filter; click again to clear). Stay in
-             the current layout; do not force kind=Requirement. -->
-        <div class="flex flex-wrap items-center gap-2">
-          <span class="text-xs text-slate-500 mr-0.5">Outcome</span>
+        <div class="flex flex-wrap items-center gap-1.5 min-w-0">
           <template x-for="s in safetyStatusOrder" :key="s">
             <button
               type="button"
               @click="requirementStatusFilter = (requirementStatusFilter === s ? '' : s); restreamView('requirements')"
-              class="badge transition"
+              class="badge relative overflow-hidden !py-1 transition"
               :class="requirementStatusFilter === s ? safetyStatusMeta(s).badgeClass + ' brightness-125' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
               :title="`Show ${safetyStatusMeta(s).label} requirements`"
             >
               <span
-                class="mr-1.5 flex items-center"
-                x-html="uiIconSvg(safetyStatusMeta(s).iconKey, 'w-3.5 h-3.5')"
+                class="absolute inset-y-0 left-0 opacity-30"
+                :style="`width:${safetyShare(safetyStatusSummary.counts[s], safetyStatusSummary.total)}; background:${safetyStatusMeta(s).color}`"
               ></span>
-              <span x-text="safetyStatusMeta(s).label"></span>
               <span
-                class="ml-1.5 font-semibold"
+                class="relative w-1.5 h-1.5 rounded-full mr-1.5"
+                :class="safetyStatusMeta(s).dotClass"
+              ></span>
+              <span class="relative" x-text="safetyStatusMeta(s).label"></span>
+              <span
+                class="relative ml-1.5 font-semibold"
                 x-text="formatCount(safetyStatusSummary.counts[s])"
-              ></span>
-            </button>
-          </template>
-          <!-- Traceability gap: requirements carrying no implementedBy link -->
-          <template x-if="safetyStatusSummary.noImpl > 0">
-            <button
-              type="button"
-              @click="requirementStatusFilter = (requirementStatusFilter === 'noimpl' ? '' : 'noimpl'); restreamView('requirements')"
-              class="badge transition"
-              :class="requirementStatusFilter === 'noimpl' ? safetyStatusMeta('noimpl').badgeClass + ' brightness-125' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
-              title="Requirements with no implementedBy link"
-            >
-              <span
-                class="w-1.5 h-1.5 rounded-full mr-1.5"
-                :class="safetyStatusMeta('noimpl').dotClass"
-              ></span>
-              <span x-text="safetyStatusMeta('noimpl').label"></span>
-              <span
-                class="ml-1.5 font-semibold"
-                x-text="formatCount(safetyStatusSummary.noImpl)"
               ></span>
             </button>
           </template>
         </div>
       </div>
     </template>
-    <!-- True-traceability rollup: does a requirement's own verifying tests actually
-         execute its implementation? Only rendered when the producer recorded the
-         adequacy verdicts (an SBOM built without a coverage matrix has none). -->
+
     <template x-if="safetyAdequacySummary.total > 0">
-      <div class="space-y-2">
-        <div class="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-2 sm:flex-wrap">
-          <span
-            class="text-sm font-semibold text-white"
-            x-text="`${safetyAdequacySummary.exercisedPct}% truly traced`"
-          ></span>
-          <span
-            class="text-xs text-slate-500"
-            x-text="`${formatCount(safetyAdequacySummary.exercised)} of ${formatCount(safetyAdequacySummary.total)} have their implementation exercised by their own tests`"
-          ></span>
-        </div>
-        <div class="flex h-2.5 w-full rounded-full overflow-hidden bg-slate-700">
-          <template x-for="a in safetyAdequacyOrder" :key="a">
+      <div class="flex items-center gap-3 min-w-0">
+        <span
+          class="text-sm font-semibold text-white flex-shrink-0"
+          x-text="`${safetyAdequacySummary.exercisedPct}% traced`"
+        ></span>
+        <div
+          class="flex h-1.5 w-[120px] rounded-full overflow-hidden bg-slate-700 flex-shrink-0"
+          role="img"
+          :aria-label="`${formatCount(safetyAdequacySummary.exercised)} of ${formatCount(safetyAdequacySummary.total)} requirements have their implementation exercised by their own tests`"
+          :title="`${formatCount(safetyAdequacySummary.exercised)} of ${formatCount(safetyAdequacySummary.total)} have their implementation exercised by their own tests`"
+        >
+          <template x-for="a in safetyAdequacyMeterOrder" :key="a">
             <div
-              class="h-full first:rounded-l-full last:rounded-r-full"
               :style="`width:${(safetyAdequacySummary.counts[a] / safetyAdequacySummary.total) * 100}%; background:${safetyAdequacyMeta(a).color}`"
-              :title="`${safetyAdequacyMeta(a).label}: ${safetyAdequacySummary.counts[a]}`"
             ></div>
           </template>
         </div>
-        <div class="flex flex-wrap items-center gap-2">
-          <span class="text-xs text-slate-500 mr-0.5">Traceability</span>
+        <div class="flex flex-wrap items-center gap-1.5 min-w-0">
           <template x-for="a in safetyAdequacyOrder" :key="a">
             <button
               type="button"
               @click="requirementAdequacyFilter = (requirementAdequacyFilter === a ? '' : a); restreamView('requirements')"
-              class="badge transition"
+              class="badge relative overflow-hidden !py-1 transition"
               :class="requirementAdequacyFilter === a ? safetyAdequacyMeta(a).badgeClass + ' brightness-125' : 'bg-slate-800 text-slate-400 hover:text-slate-200'"
               :title="safetyAdequacyMeta(a).hint"
             >
               <span
-                class="w-1.5 h-1.5 rounded-full mr-1.5"
+                class="absolute inset-y-0 left-0 opacity-30"
+                :style="`width:${safetyShare(safetyAdequacySummary.counts[a], safetyAdequacySummary.total)}; background:${safetyAdequacyMeta(a).color}`"
+              ></span>
+              <span
+                class="relative w-1.5 h-1.5 rounded-full mr-1.5"
                 :class="safetyAdequacyMeta(a).dotClass"
               ></span>
-              <span x-text="safetyAdequacyMeta(a).label"></span>
+              <span class="relative" x-text="safetyAdequacyMeta(a).label"></span>
               <span
-                class="ml-1.5 font-semibold"
+                class="relative ml-1.5 font-semibold"
                 x-text="formatCount(safetyAdequacySummary.counts[a])"
               ></span>
             </button>

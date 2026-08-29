@@ -188,19 +188,6 @@ export const SAFETY_STATUSES = {
 };
 
 /**
- * FunctionalSafety profile: chip metadata for the "no implementation link" gap
- * (requirements carrying no `implementedBy` relationship). Kept separate from
- * SAFETY_STATUSES because it's a traceability gap, not a verification outcome.
- */
-export const SAFETY_NO_IMPL_META = {
-  key: 'noimpl',
-  label: 'No implementation',
-  color: '#fb923c',
-  badgeClass: 'bg-orange-500/15 text-orange-300 ring-1 ring-orange-500/30',
-  dotClass: 'bg-orange-500'
-};
-
-/**
  * FunctionalSafety profile: presentation metadata for a Requirement's
  * "true traceability" adequacy, the verdict a producer records as an
  * `adequacy:<verdict>` external identifier. It answers a different question

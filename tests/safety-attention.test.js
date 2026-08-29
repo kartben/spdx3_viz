@@ -71,3 +71,12 @@ test('requirementAttentionRank sorts the misleading states above the honest ones
   // non-requirements sort out of the way entirely
   assert.equal(app.requirementAttentionRank({ type: CLASS.functionalsafety_Assumption }), 99);
 });
+
+test('safetyShare sizes a chip fill by its share of the rollup', () => {
+  const app = makeApp({});
+  assert.equal(app.safetyShare(229, 580), '39.48%');
+  // the buckets that matter most are the ones the fill cannot show: 4 of 580 is
+  // under a pixel on a ~132px chip, so the count beside the label carries it
+  assert.equal(app.safetyShare(4, 580), '0.69%');
+  assert.equal(app.safetyShare(0, 0), '0%');
+});
