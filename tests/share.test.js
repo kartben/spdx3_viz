@@ -34,7 +34,7 @@ test('the compatibility settings survive a round trip', () => {
   const hash = buildShareHash(spot);
   assert.equal(
     hash,
-    's=zephyr&v=licenses&lm=c&cp=m&co=GPL-3.0-or-later&cs=zephyr%3Apackages%2Fzephyr-final&ce=d'
+    's=zephyr&v=licenses&lm=c&cp=m&co=GPL-3.0-or-later&cs=zephyr:packages/zephyr-final&ce=d'
   );
 
   const parsed = parseShareHash(`#${hash}`);
@@ -90,7 +90,7 @@ test('Functional Safety kind and layout survive a round trip', () => {
     requirementKind: 'functionalsafety_RequirementVerification',
     requirementLayout: 'list'
   });
-  assert.equal(hash, 's=functional-safety&v=requirements&e=ver%3Abrake-test&rk=ver&rl=l');
+  assert.equal(hash, 's=functional-safety&v=requirements&e=ver:brake-test&rk=ver&rl=l');
   const parsed = parseShareHash(`#${hash}`);
   assert.equal(parsed.requirementKind, 'functionalsafety_RequirementVerification');
   assert.equal(parsed.requirementLayout, 'list');
@@ -147,6 +147,33 @@ test('Supply Chain angles survive a round trip and timeline stays omitted', () =
   });
   assert.equal(timeline, 's=paper-plane&v=supplychain');
   assert.equal(parseShareHash(timeline).supplyChainMode, null);
+});
+
+test('a percent-encoded older link still parses', () => {
+  const parsed = parseShareHash('s=zephyr&v=licenses&lm=c&cs=zephyr%3Apackages%2Fzephyr-final');
+  assert.equal(parsed.compatScope, 'zephyr:packages/zephyr-final');
+});
+
+test('an HTTPS SPDX id keeps its colon and slash readable, and encodes #', () => {
+  const id = 'https://spdx.org/spdxdocs/helios-aeb-4.7.2#verification/sg-01';
+  const hash = buildShareHash({
+    sample: 'functional-safety',
+    view: 'requirements',
+    expanded: id
+  });
+  assert.equal(
+    hash,
+    's=functional-safety&v=requirements&e=https://spdx.org/spdxdocs/helios-aeb-4.7.2%23verification/sg-01'
+  );
+  assert.equal(parseShareHash(hash).expanded, id);
+  // Some browsers decode %23 in location.hash. '#' is not a query delimiter,
+  // so the SPDX id must still come back whole.
+  assert.equal(
+    parseShareHash(
+      '#s=functional-safety&v=requirements&e=https://spdx.org/spdxdocs/helios-aeb-4.7.2#verification/sg-01'
+    ).expanded,
+    id
+  );
 });
 
 test('older Functional Safety and Supply Chain links still parse', () => {

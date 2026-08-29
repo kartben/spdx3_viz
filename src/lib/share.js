@@ -85,7 +85,11 @@ export function buildShareHash(spot) {
     const modeCode = SC_MODE_TO_CODE[spot.supplyChainMode ?? 'timeline'];
     if (modeCode) params.set('svm', modeCode);
   }
-  return params.toString();
+  // URLSearchParams encodes ':' and '/' as %3A / %2F. SPDX ids and purls are
+  // full of both, so a saved URL looked broken (a wall of percent-escapes)
+  // even though it parsed. Those characters are not hash delimiters; leave
+  // them readable. '#' '&' '=' stay encoded so the fragment cannot split.
+  return params.toString().replace(/%3A/gi, ':').replace(/%2F/gi, '/').replace(/%40/gi, '@');
 }
 
 /**
