@@ -2,7 +2,7 @@
    view switching, load-on-scroll list rendering, expand/collapse of detail
    cards, and the navigateToX drill-downs with scroll-into-view. */
 
-import { buildShareHash, copyToClipboard, snippetFileRef } from '../lib/index.js';
+import { buildShareHash, copyToClipboard, parseShareHash, snippetFileRef } from '../lib/index.js';
 import { CLASS, isA } from '../spdx/model.js';
 import { NAV_CHEVRON_ICON, NAV_EXPLORE_VIEW_IDS, NAV_INSIGHTS_VIEW_IDS } from '../config.js';
 
@@ -305,6 +305,24 @@ export const navigationMixin = {
     if (field && link.expanded) state[field] = link.expanded;
     this._applyNavState(state);
     this._writeHistory(state, 'replace');
+  },
+
+  // Browser Back / a typed share URL. A history entry we pushed has state and
+  // restores that spot. A null state with a share hash is a pasted link (the
+  // browser does not attach our snapshot); follow it. A null state with no
+  // hash is the pre-load landing entry: go home.
+  _onPopState(e) {
+    if (e?.state) {
+      this._lastWrittenHash = location.hash || '';
+      this._applyNavState(e.state);
+      return;
+    }
+    if (parseShareHash(location.hash)) {
+      this._followShareHash();
+      return;
+    }
+    this._lastWrittenHash = location.hash || '';
+    if (this.dataLoaded) this.goHome();
   },
 
   // Copies the current share link (the address bar URL) to the clipboard.
