@@ -167,7 +167,9 @@ export const derivedMixin = {
     if (!scope) return all;
     const key = `${all.length}|${this.onlineSync.ranAt}|${this.securityScope}|${this.securityScopeReach}|${scope.packages.size}`;
     if (key === scopedVulnsCacheKey) return scopedVulnsCacheVal;
-    scopedVulnsCacheVal = all.filter((v) => vulnInScope(v, scope.packages));
+    scopedVulnsCacheVal = all.filter((v) =>
+      vulnInScope(v, scope.packages, this._vulnSubjects(v.spdxId))
+    );
     scopedVulnsCacheKey = key;
     return scopedVulnsCacheVal;
   },

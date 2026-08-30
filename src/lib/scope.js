@@ -77,6 +77,8 @@ export const SCOPE_REACH_MODES = ['compiled', 'declared'];
  * @property {Set<string>} packages - packages considered in scope
  * @property {number} reachedPackages - packages the closure named, before the
  *   contribution test; the gap against `packages.size` is what `requireFiles` removes
+ * @property {boolean} fellBack - `requireFiles` was asked for but not applied,
+ *   because nothing in the scope records a file (see {@link buildScope})
  */
 
 /**
@@ -202,19 +204,30 @@ export function buildScope(input) {
     (id) => elementMap?.get(id)?.type === 'software_Package'
   );
 
-  if (!requireFiles) {
-    return {
-      elements,
-      packages: new Set(reachedPackages),
-      reachedPackages: reachedPackages.length
-    };
-  }
+  const declared = {
+    elements,
+    packages: new Set(reachedPackages),
+    reachedPackages: reachedPackages.length,
+    fellBack: false
+  };
+  if (!requireFiles) return declared;
 
   const contributing = contributingPackages(elements, containsIndex, elementMap);
+
+  // Plenty of SBOMs record no files at all: a container scan or a dependency
+  // manifest lists packages and nothing below them. There, "contributes no
+  // file" is true of every package in the document and the test would answer
+  // "nothing is in scope", silently emptying the report. That is the worst
+  // possible failure for a vulnerability view, so when the scope contains
+  // packages but none of them owns a file, the document simply does not carry
+  // the detail the test needs: fall back to reachability and say so.
+  if (!contributing.size && reachedPackages.length) return { ...declared, fellBack: true };
+
   return {
     elements,
     packages: withVariantTwins(contributing, elements, relFromIndex, relToIndex),
-    reachedPackages: reachedPackages.length
+    reachedPackages: reachedPackages.length,
+    fellBack: false
   };
 }
 
@@ -233,22 +246,33 @@ export function buildSecurityScope({ root, reach, ...rest }) {
 /**
  * Whether a vulnerability applies within a scope.
  *
- * A finding counts when any package it is assessed against is in scope, or when
- * an online scan matched it to an element in scope. Unassessed findings that
- * name nothing at all are treated as out of scope: a scope answers "what
- * applies to this artifact", and a finding with no subject cannot answer it.
+ * A finding counts when any package it is assessed against is in scope, when an
+ * online scan matched it to an element in scope, or when `extraSubjects` names
+ * one. Unassessed findings that name nothing at all are out of scope: a scope
+ * answers "what applies to this artifact", and a finding with no subject cannot
+ * answer it.
+ *
+ * `extraSubjects` exists because a VEX assessment is not the only way to attach
+ * a vulnerability to a package. SPDX 3's `hasAssociatedVulnerability` says a
+ * package has a vulnerability with no verdict attached, and an SBOM may use
+ * only that, which would otherwise leave every one of its findings subjectless
+ * and hidden by any scope.
  *
  * @param {Object} vuln - enriched vulnerability
  * @param {Set<string>} scopePackages
+ * @param {Iterable<string>} [extraSubjects] - other elements the finding names
  * @returns {boolean}
  */
-export function vulnInScope(vuln, scopePackages) {
+export function vulnInScope(vuln, scopePackages, extraSubjects) {
   if (!scopePackages) return true;
   for (const a of vuln?.assessments || []) {
     if (a?.packageId && scopePackages.has(a.packageId)) return true;
   }
   for (const m of vuln?.online?.matched || []) {
     if (m?.spdxId && scopePackages.has(m.spdxId)) return true;
+  }
+  for (const id of extraSubjects || []) {
+    if (id && scopePackages.has(id)) return true;
   }
   return false;
 }

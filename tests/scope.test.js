@@ -116,6 +116,47 @@ test('buildSecurityScope', async (t) => {
     );
   });
 
+  await t.test('falls back to reachability when nothing in scope records a file', () => {
+    // A container scan or dependency manifest: packages, and nothing below them.
+    // The contribution test would answer "nothing is in scope" for every
+    // artifact, so it must not be applied at all.
+    const fileless = buildSecurityScope({
+      root: 'img',
+      reach: 'compiled',
+      impactChildIndex: IMPACT_CHILDREN,
+      producedByBuildIndex: PRODUCED_BY_BUILD,
+      buildInputIndex: BUILD_INPUTS,
+      containsIndex: new Map(),
+      elementMap: ELEMENTS,
+      relFromIndex: REL_FROM,
+      relToIndex: REL_TO
+    });
+    assert.equal(fileless.fellBack, true, 'callers can say why the narrowing is off');
+    assert.equal(fileless.packages.size, fileless.reachedPackages, 'nothing was removed');
+    assert.ok(fileless.packages.size > 0, 'the report is not silently emptied');
+  });
+
+  await t.test('a scope that legitimately reaches no package does not claim a fallback', () => {
+    const empty = buildSecurityScope({
+      root: 'nowhere',
+      reach: 'compiled',
+      impactChildIndex: new Map(),
+      producedByBuildIndex: new Map(),
+      buildInputIndex: new Map(),
+      containsIndex: new Map(),
+      elementMap: new Map(),
+      relFromIndex: new Map(),
+      relToIndex: new Map()
+    });
+    assert.equal(empty.fellBack, false);
+    assert.equal(empty.reachedPackages, 0);
+  });
+
+  await t.test('a normal scope reports no fallback', () => {
+    assert.equal(scope('compiled').fellBack, false);
+    assert.equal(scope('declared').fellBack, false);
+  });
+
   await t.test('scoping to a package with files puts that package in scope', () => {
     const empty = buildSecurityScope({
       root: 'offgraph-sources',
@@ -154,6 +195,14 @@ test('vulnInScope', async (t) => {
   await t.test('online matches count as subjects too', () => {
     const vuln = { assessments: [], online: { matched: [{ spdxId: 'used-sources' }] } };
     assert.equal(vulnInScope(vuln, inScope), true);
+  });
+
+  await t.test('a plain hasAssociatedVulnerability link counts as a subject', () => {
+    // An SBOM may attach vulnerabilities with no VEX verdict at all; those
+    // findings must not become invisible the moment a scope is chosen.
+    const vuln = { assessments: [] };
+    assert.equal(vulnInScope(vuln, inScope, ['used-sources']), true);
+    assert.equal(vulnInScope(vuln, inScope, ['unused-sources']), false);
   });
 
   await t.test('a finding naming nothing is out of scope', () => {
