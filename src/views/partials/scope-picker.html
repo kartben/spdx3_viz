@@ -1,0 +1,88 @@
+<!--
+  Shared scope picker.
+
+  Include this file inside an element that supplies `scopeKey` (an entry of
+  SCOPE_VIEWS in src/app/scope.js):
+
+      <div x-data="{ scopeKey: 'security' }"> ...this partial... </div>
+
+  Alpine resolves `scopeKey` from that wrapper and everything else from the root
+  component, so the widget stays a single copy while each view keeps its own
+  state fields and vocabulary.
+
+  Spelling the include tag out here would make the partial include itself: the
+  build's include regex does not skip comments.
+-->
+<div class="relative" x-show="canScope(scopeKey)" @click.outside="closeScopePicker(scopeKey)">
+  <button
+    type="button"
+    @click="toggleScopePicker(scopeKey)"
+    class="flex items-center gap-2 bg-slate-800 border rounded-lg text-xs px-2.5 py-1.5 min-w-0 max-w-full sm:max-w-68 transition-colors"
+    :class="scopePickerOpen(scopeKey)
+      ? scopeConfig(scopeKey).accent.border
+      : (scopeFocus(scopeKey) ? 'border-slate-600' : 'border-slate-700 hover:border-slate-600')"
+  >
+    <span class="text-slate-500 shrink-0">Scope</span>
+    <span class="text-slate-200 truncate" x-text="scopeLabel(scopeKey)"></span>
+    <svg
+      class="w-3 h-3 text-slate-500 shrink-0 transition-transform"
+      :class="scopePickerOpen(scopeKey) && 'rotate-180'"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+    </svg>
+  </button>
+  <div
+    x-show="scopePickerOpen(scopeKey)"
+    x-cloak
+    class="search-dropdown absolute left-0 mt-1.5 w-[min(22rem,calc(100vw-2rem))] bg-slate-800 border border-slate-700 rounded-lg shadow-2xl z-30 p-2"
+  >
+    <input
+      :value="scopeSearch(scopeKey)"
+      @input.debounce.100ms="setScopeSearch(scopeKey, $event.target.value)"
+      type="text"
+      placeholder="Search packages…"
+      class="w-full bg-slate-900 border border-slate-700 rounded-md text-xs px-2.5 py-1.5 text-slate-200 placeholder-slate-500 focus:outline-hidden"
+      :class="scopeConfig(scopeKey).accent.hint"
+    />
+    <p
+      class="text-[11px] text-slate-500 mt-2 px-1 leading-relaxed"
+      x-text="scopeConfig(scopeKey).help"
+    ></p>
+    <div class="mt-1.5 max-h-64 overflow-y-auto space-y-0.5">
+      <button
+        type="button"
+        @click="setScope(scopeKey, '')"
+        class="w-full text-left text-xs px-2 py-1.5 rounded-md transition-colors"
+        :class="!scopeFocus(scopeKey)
+          ? scopeConfig(scopeKey).accent.active
+          : 'text-slate-300 hover:bg-slate-700'"
+        x-text="scopeConfig(scopeKey).allLabel"
+      ></button>
+      <template x-for="opt in scopeOptions(scopeKey)" :key="opt.id">
+        <button
+          type="button"
+          @click="setScope(scopeKey, opt.id)"
+          class="w-full grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 text-left text-xs px-2 py-1.5 rounded-md transition-colors"
+          :class="scopeFocus(scopeKey) === opt.id
+            ? scopeConfig(scopeKey).accent.active
+            : 'text-slate-300 hover:bg-slate-700'"
+        >
+          <span class="font-mono truncate flex items-center gap-1.5">
+            <!-- Build outputs are what someone actually ships, so they are
+                 marked and sorted first where a view offers them. -->
+            <span
+              x-show="opt.isArtifact"
+              class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"
+              title="Build output"
+            ></span>
+            <span class="truncate" x-text="opt.label"></span>
+          </span>
+          <span class="text-[11px] text-slate-500 tabular-nums" x-text="opt.deps + ' deps'"></span>
+        </button>
+      </template>
+    </div>
+  </div>
+</div>

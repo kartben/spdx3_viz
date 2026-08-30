@@ -10,6 +10,7 @@ import { paletteMixin } from './app/palette.js';
 import { securityMixin } from './app/security.js';
 import { licensesMixin } from './app/licenses.js';
 import { compatibilityMixin } from './app/compatibility.js';
+import { scopeMixin } from './app/scope.js';
 import { supplyChainMixin } from './app/supply-chain.js';
 import { graphMixin } from './app/graph.js';
 import { rawMixin } from './app/raw.js';
@@ -91,6 +92,7 @@ const mixins = [
   securityMixin,
   licensesMixin,
   compatibilityMixin,
+  scopeMixin,
   supplyChainMixin,
   graphMixin,
   rawMixin,

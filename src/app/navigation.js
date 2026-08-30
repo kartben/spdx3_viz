@@ -177,6 +177,7 @@ export const navigationMixin = {
       detail: this.detailElement?.spdxId || null,
       graphSelected: this.graphSelectedNodeId,
       ...this._compatNavState(),
+      ...this._securityNavState(),
       ...this._safetyNavState(),
       ...this._supplyChainNavState()
     };
@@ -218,6 +219,17 @@ export const navigationMixin = {
       compatOutbound: this.compatOutboundLicense || null,
       compatScope: this.compatScope || null,
       compatEdges: this.compatEdgeFilter
+    };
+  },
+
+  // The Security view's scope, and only while that view is on screen with a
+  // scope actually chosen: an unscoped view is the default, and defaults stay
+  // out of the URL so the common link keeps its shape.
+  _securityNavState() {
+    if (this.currentView !== 'security' || !this.securityScope) return {};
+    return {
+      securityScope: this.securityScope,
+      securityScopeReach: this.securityScopeReach
     };
   },
   _initNavHistory() {
@@ -266,6 +278,8 @@ export const navigationMixin = {
       compatPanel: state.compatPanel,
       compatOutbound: state.compatOutbound,
       compatScope: state.compatScope,
+      securityScope: state.securityScope || null,
+      securityScopeReach: state.securityScopeReach || 'compiled',
       compatEdges: state.compatEdges,
       requirementKind: state.requirementKindFilter,
       requirementLayout: state.requirementLayout,
@@ -296,6 +310,8 @@ export const navigationMixin = {
       compatPanel: link.compatPanel,
       compatOutbound: link.compatOutbound,
       compatScope: link.compatScope,
+      securityScope: link.securityScope,
+      securityScopeReach: link.securityScopeReach,
       compatEdges: link.compatEdges,
       requirementKindFilter: link.requirementKind,
       requirementLayout: link.requirementLayout,
@@ -359,6 +375,7 @@ export const navigationMixin = {
       : null;
     this.graphSelectedNodeId = state.graphSelected || null;
     this._applyCompatNavState(state);
+    this._applySecurityNavState(state);
     // Switching into 'graph' triggers a full rebuild (see the currentView
     // $watch in init) which already reads graphSelectedNodeId fresh; only
     // nudge the live canvas here if it was already showing (no rebuild
@@ -385,6 +402,17 @@ export const navigationMixin = {
   // Restores the compatibility tab's settings from a history entry or a share
   // link. An outbound license in the link is treated as a deliberate choice, so
   // the default guess does not overwrite it.
+  // Restores the Security view's scope. Unlike the compatibility settings this
+  // is not gated on a mode, so it has to run for every link, not only the ones
+  // that also carry the licensing tab.
+  _applySecurityNavState(state) {
+    this.securityScope = state.securityScope || '';
+    this.securityScopeReach = state.securityScopeReach === 'declared' ? 'declared' : 'compiled';
+    // Optional: the nav tests drive this with a partial app that carries no
+    // security mixin.
+    this._resetSecurityScopeMemo?.();
+  },
+
   _applyCompatNavState(state) {
     // A link built elsewhere can carry the compatibility tab; on a host that
     // withholds it, fall back to the inventory rather than restoring a tab the

@@ -193,6 +193,10 @@ export function createState() {
     securityStatusFilter: '',
     securitySeverityFilter: '', // '' = all, else a CVSS severity band (critical…low)
     securitySourceFilter: '', // '' = all, else 'sbom' | 'online' (data provenance)
+    securityScope: '', // '' = whole document, else the artifact/package to scope findings to
+    securityScopeReach: 'compiled', // 'compiled' = only what put a file in; 'declared' = the whole closure
+    securityScopePickerOpen: false,
+    securityScopeSearch: '',
     remediationCategoryFilter: '', // '' = all, else a remediation sourceCategory key
     remediationSeverityFilter: '', // '' = all, else critical/high/medium/low
     impactSearch: '', // Impact tab picker query

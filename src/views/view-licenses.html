@@ -143,77 +143,9 @@
             </div>
           </div>
 
-          <!-- Scope picker -->
-          <div
-            class="relative"
-            x-show="canScopeCompat"
-            @click.outside="compatScopePickerOpen = false"
-          >
-            <button
-              type="button"
-              @click="compatScopePickerOpen = !compatScopePickerOpen"
-              class="flex items-center gap-2 bg-slate-800 border rounded-lg text-xs px-2.5 py-1.5 min-w-0 max-w-full sm:max-w-68 transition-colors"
-              :class="compatScopePickerOpen ? 'border-pink-500' : 'border-slate-700 hover:border-slate-600'"
-            >
-              <span class="text-slate-500 shrink-0">Scope</span>
-              <span class="text-slate-200 truncate" x-text="compatScopeLabel"></span>
-              <svg
-                class="w-3 h-3 text-slate-500 shrink-0 transition-transform"
-                :class="compatScopePickerOpen && 'rotate-180'"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </button>
-            <div
-              x-show="compatScopePickerOpen"
-              x-cloak
-              class="search-dropdown absolute right-0 mt-1.5 w-[min(20rem,calc(100vw-2rem))] bg-slate-800 border border-slate-700 rounded-lg shadow-2xl z-30 p-2"
-            >
-              <input
-                x-model.debounce.100ms="compatScopeSearch"
-                type="text"
-                placeholder="Search packages…"
-                class="w-full bg-slate-900 border border-slate-700 rounded-md text-xs px-2.5 py-1.5 text-slate-200 placeholder-slate-500 focus:outline-hidden focus:border-pink-500"
-              />
-              <p class="text-[11px] text-slate-500 mt-2 px-1 leading-relaxed">
-                Narrow to one package and everything it pulls in, which is the unit a compatibility
-                check is really about.
-              </p>
-              <div class="mt-1.5 max-h-64 overflow-y-auto space-y-0.5">
-                <button
-                  type="button"
-                  @click="setCompatScope('')"
-                  class="w-full text-left text-xs px-2 py-1.5 rounded-md transition-colors"
-                  :class="!compatScope ? 'bg-pink-500/15 text-pink-300' : 'text-slate-300 hover:bg-slate-700'"
-                >
-                  Whole document
-                </button>
-                <template x-for="opt in compatScopeOptions" :key="opt.id">
-                  <button
-                    type="button"
-                    @click="setCompatScope(opt.id)"
-                    class="w-full grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 text-left text-xs px-2 py-1.5 rounded-md transition-colors"
-                    :class="compatScope === opt.id
-                      ? 'bg-pink-500/15 text-pink-300'
-                      : 'text-slate-300 hover:bg-slate-700'"
-                  >
-                    <span class="font-mono truncate" x-text="opt.label"></span>
-                    <span
-                      class="text-[11px] text-slate-500 tabular-nums"
-                      x-text="opt.deps + ' deps'"
-                    ></span>
-                  </button>
-                </template>
-              </div>
-            </div>
+          <!-- Scope picker (shared widget; see src/app/scope.js) -->
+          <div x-data="{ scopeKey: 'licenses' }">
+            <include src="partials/scope-picker.html"></include>
           </div>
 
           <div

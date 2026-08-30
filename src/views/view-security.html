@@ -277,12 +277,43 @@
       </div>
     </div>
 
-    <!-- Controls: count + search + sort -->
+    <!-- Controls: count + scope + search + sort -->
     <div class="flex flex-wrap items-center gap-3">
       <span
         class="text-sm text-slate-400"
-        x-text="`${formatCount(filteredVulnerabilities.length)} of ${formatCount(allVulnerabilities.length)} vulnerabilities`"
+        x-text="`${formatCount(filteredVulnerabilities.length)} of ${formatCount(scopedVulnerabilities.length)} vulnerabilities`"
       ></span>
+
+      <!-- Scope picker (shared widget; see src/app/scope.js) -->
+      <div x-data="{ scopeKey: 'security' }">
+        <include src="partials/scope-picker.html"></include>
+      </div>
+
+      <!-- Reach: what counts as being in the scope -->
+      <div x-show="securityScope" class="flex items-center gap-1 text-xs">
+        <button
+          type="button"
+          @click="setSecurityScopeReach('compiled')"
+          class="px-2 py-1 rounded-md transition-colors"
+          :class="securityScopeReach === 'compiled'
+            ? 'bg-rose-500/15 text-rose-300'
+            : 'text-slate-400 hover:text-slate-200'"
+          title="Only components that put a file into this artifact"
+        >
+          Built in
+        </button>
+        <button
+          type="button"
+          @click="setSecurityScopeReach('declared')"
+          class="px-2 py-1 rounded-md transition-colors"
+          :class="securityScopeReach === 'declared'
+            ? 'bg-rose-500/15 text-rose-300'
+            : 'text-slate-400 hover:text-slate-200'"
+          title="Everything the dependency graph declares, compiled or not"
+        >
+          Declared
+        </button>
+      </div>
       <input
         x-model.debounce.200ms="securitySearch"
         type="text"
@@ -299,6 +330,41 @@
         <option value="packages">Sort by affected packages</option>
         <option value="cve">Sort by CVE id</option>
       </select>
+    </div>
+
+    <!-- What the scope is doing. A filter that silently removes findings is the
+         one thing a security view must never do, so state the count and the
+         reason, and offer the way back out. -->
+    <div
+      x-show="securityScope"
+      x-cloak
+      class="flex flex-wrap items-start gap-x-2 gap-y-1 text-xs bg-rose-500/5 border border-rose-500/20 rounded-lg px-3 py-2"
+    >
+      <span class="text-slate-300">
+        Showing findings that apply to
+        <span class="text-rose-300" x-text="securityScopeSentence"></span>.
+      </span>
+      <span x-show="securityScopeStats" class="text-slate-500">
+        <span
+          x-text="`${formatCount(securityScopeStats?.packages || 0)} of ${formatCount(packages.length)} packages in scope`"
+        ></span>
+        <span
+          x-show="securityScopeReach === 'compiled' && securityScopeStats?.dropped"
+          x-text="` · ${formatCount(securityScopeStats?.dropped || 0)} reachable but contributing no compiled file`"
+        ></span>
+      </span>
+      <span
+        x-show="securityScopeHiddenCount"
+        class="text-amber-300/90"
+        x-text="`${formatCount(securityScopeHiddenCount)} hidden`"
+      ></span>
+      <button
+        type="button"
+        @click="setSecurityScope('')"
+        class="ml-auto text-slate-400 hover:text-slate-200 underline underline-offset-2"
+      >
+        Clear scope
+      </button>
     </div>
 
     <!-- Status filter chips -->
@@ -1080,7 +1146,30 @@
     x-show="mountedViews.security && filteredVulnerabilities.length === 0"
     class="text-sm text-slate-500 italic text-center py-8"
   >
-    <span x-show="allVulnerabilities.length > 0">No vulnerabilities match your filters</span>
+    <span
+      x-show="allVulnerabilities.length > 0 && !(securityScope && scopedVulnerabilities.length === 0)"
+    >
+      No vulnerabilities match your filters
+    </span>
+    <!-- A scope that clears every finding is an answer, not an empty result:
+         say so, and say what would come back without it. -->
+    <span
+      x-show="securityScope && scopedVulnerabilities.length === 0 && allVulnerabilities.length > 0"
+    >
+      <span class="not-italic text-slate-400">
+        None of the
+        <span x-text="formatCount(allVulnerabilities.length)"></span>
+        findings in this document apply to
+        <span class="text-rose-300" x-text="securityScopeSentence"></span>.
+      </span>
+      <button
+        type="button"
+        @click="setSecurityScope('')"
+        class="not-italic ml-1 text-slate-400 hover:text-slate-200 underline underline-offset-2"
+      >
+        Show all findings
+      </button>
+    </span>
     <span x-show="allVulnerabilities.length === 0 && onlineSync.status === 'done'">
       No known vulnerabilities were found in the SBOM or online.
     </span>

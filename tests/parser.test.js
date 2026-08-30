@@ -872,6 +872,10 @@ test('share hash round-trips a spot in a sample', () => {
     compatOutbound: null,
     compatScope: null,
     compatEdges: 'all',
+    // Security-scope defaults: an unscoped view is the default, so a link that
+    // carries no scope parses back to the whole document.
+    securityScope: null,
+    securityScopeReach: 'compiled',
     requirementKind: 'Requirement',
     requirementLayout: null,
     supplyChainMode: null

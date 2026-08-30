@@ -50,7 +50,8 @@ const SC_CODE_TO_MODE = {
  *          detail?: string|null, graphSelected?: string|null,
  *          licenseMode?: string|null, compatPanel?: string|null,
  *          compatOutbound?: string|null, compatScope?: string|null,
- *          compatEdges?: string|null, requirementKind?: string|null,
+ *          compatEdges?: string|null, securityScope?: string|null,
+ *          securityScopeReach?: string|null, requirementKind?: string|null,
  *          requirementLayout?: string|null, supplyChainMode?: string|null}} spot
  * @returns {string}
  */
@@ -70,6 +71,13 @@ export function buildShareHash(spot) {
     if (spot.compatOutbound) params.set('co', spot.compatOutbound);
     if (spot.compatScope) params.set('cs', spot.compatScope);
     if (spot.compatEdges === 'distributed') params.set('ce', 'd');
+  }
+  // The Security view's scope: which artifact the findings were narrowed to,
+  // and how strictly, so a link reopens the same answer rather than the
+  // document-wide list.
+  if (spot.view === 'security' && spot.securityScope) {
+    params.set('ss', spot.securityScope);
+    if (spot.securityScopeReach === 'declared') params.set('sr', 'd');
   }
   // Functional Safety chips and layout. Requirement + unspecified layout stay
   // out of the hash; a verification/test chip or an explicit list/tree does not,
@@ -101,6 +109,7 @@ export function buildShareHash(spot) {
  *            detail: string|null, graphSelected: string|null,
  *            licenseMode: string, compatPanel: string, compatOutbound: string|null,
  *            compatScope: string|null, compatEdges: string,
+ *            securityScope: string|null, securityScopeReach: string,
  *            requirementKind: string, requirementLayout: string|null,
  *            supplyChainMode: string|null}|null}
  */
@@ -124,6 +133,8 @@ export function parseShareHash(hash) {
     compatOutbound: params.get('co') || null,
     compatScope: params.get('cs') || null,
     compatEdges: params.get('ce') === 'd' ? 'distributed' : 'all',
+    securityScope: params.get('ss') || null,
+    securityScopeReach: params.get('sr') === 'd' ? 'declared' : 'compiled',
     // Omitted rk is the Requirements chip, the view's default.
     requirementKind: rk == null ? 'Requirement' : (REQ_CODE_TO_KIND[rk] ?? 'Requirement'),
     // null means the link did not pin a layout: keep the document default

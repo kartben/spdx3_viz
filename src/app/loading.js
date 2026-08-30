@@ -828,6 +828,7 @@ export const loadingMixin = {
       this._resetSearchMemos(); // and the global-search corpus / results memos
       this._resetImpactMemos(); // and the impact ranking / blast-radius caches
       this._resetCompatMemos(); // and the license compatibility report / matrix
+      this._resetSecurityScopeMemo(); // and the security scope walk
       // Drop the previous SBOM's compatibility choices: its outbound license and
       // scoped package mean nothing here.
       this.compatOutbound = '';
@@ -836,6 +837,11 @@ export const loadingMixin = {
       this.compatEdgeFilter = 'all';
       this.compatStatusFilter = '';
       this.licenseViewMode = 'inventory';
+      // Same for the Security view's scope: it names an element of the SBOM
+      // that was just replaced.
+      this.securityScope = '';
+      this.securityScopeReach = 'compiled';
+      this.securityScopeSearch = '';
       // Fresh data: reset the streaming cursors so every list view streams its
       // (new) content on next visit, and kick the one currently shown.
       this._resetStreaming();

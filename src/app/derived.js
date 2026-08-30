@@ -9,7 +9,8 @@ import {
   mergeVulnLists,
   packageGaps,
   packageHasPurpose,
-  summarizePackageDescription
+  summarizePackageDescription,
+  vulnInScope
 } from '../lib/index.js';
 import { isA, CLASS } from '../spdx/model.js';
 import { resetSupplyChainMemos } from './supply-chain.js';
@@ -28,6 +29,8 @@ let filteredVulnsCacheKey = null;
 let filteredVulnsCacheVal = [];
 let allVulnsCacheKey = null;
 let allVulnsCacheVal = [];
+let scopedVulnsCacheKey = null;
+let scopedVulnsCacheVal = [];
 let filteredFilesCacheKey = null;
 let filteredFilesCacheVal = [];
 let fileTypesCacheKey = null;
@@ -112,6 +115,7 @@ export const derivedMixin = {
     fileTypesCacheKey = null;
     fileDirsCacheKey = null;
     allVulnsCacheKey = null;
+    scopedVulnsCacheKey = null;
     pkgListCacheKey = null;
     pkgGroupsSrc = null;
     pkgFacetsCacheKey = null;
@@ -149,6 +153,23 @@ export const derivedMixin = {
     allVulnsCacheVal = mergeVulnLists(this.vulnerabilities, this.onlineVulns);
     allVulnsCacheKey = key;
     return allVulnsCacheVal;
+  },
+
+  // The vulnerability list the Security view works from: every finding, or only
+  // those that apply within the chosen scope.
+  //
+  // Everything downstream (the status chips, the severity histogram, the
+  // filtered list) reads this rather than allVulnerabilities, so a scoped view
+  // never shows a chip counting findings its list cannot display.
+  get scopedVulnerabilities() {
+    const all = this.allVulnerabilities;
+    const scope = this.securityScopeElements;
+    if (!scope) return all;
+    const key = `${all.length}|${this.onlineSync.ranAt}|${this.securityScope}|${this.securityScopeReach}|${scope.packages.size}`;
+    if (key === scopedVulnsCacheKey) return scopedVulnsCacheVal;
+    scopedVulnsCacheVal = all.filter((v) => vulnInScope(v, scope.packages));
+    scopedVulnsCacheKey = key;
+    return scopedVulnsCacheVal;
   },
 
   get currentViewLabel() {
@@ -837,8 +858,8 @@ export const derivedMixin = {
     const statusFilter = this.securityStatusFilter;
     const severityFilter = this.securitySeverityFilter;
     const sourceFilter = this.securitySourceFilter;
-    const vulns = this.allVulnerabilities;
-    const key = `${vulns.length}|${this.onlineVulns.length}|${this.onlineSync.ranAt}|${search}|${sort}|${statusFilter}|${severityFilter}|${sourceFilter}`;
+    const vulns = this.scopedVulnerabilities;
+    const key = `${vulns.length}|${this.onlineVulns.length}|${this.onlineSync.ranAt}|${search}|${sort}|${statusFilter}|${severityFilter}|${sourceFilter}|${this.securityScope}|${this.securityScopeReach}`;
     if (key === filteredVulnsCacheKey) return filteredVulnsCacheVal;
 
     let list = vulns;
@@ -905,7 +926,7 @@ export const derivedMixin = {
   // Status breakdown across all vulnerabilities, for the dashboard + security
   // header. Counts each vulnerability once by its overall (most severe) status.
   get securitySummary() {
-    const all = this.allVulnerabilities;
+    const all = this.scopedVulnerabilities;
     if (securitySummarySrc === all) return securitySummaryVal;
     const counts = { fixed: 0, not_affected: 0, affected: 0, under_investigation: 0, unknown: 0 };
     let sbomOnly = 0;
@@ -942,8 +963,8 @@ export const derivedMixin = {
   // True when at least one vulnerability carries an in-SBOM CVSS severity, so the
   // severity histogram/filter/badges only appear when there's data behind them.
   get hasCvssData() {
-    if (hasCvssSrc === this.allVulnerabilities) return hasCvssVal;
-    hasCvssSrc = this.allVulnerabilities;
+    if (hasCvssSrc === this.scopedVulnerabilities) return hasCvssVal;
+    hasCvssSrc = this.scopedVulnerabilities;
     hasCvssVal = hasCvssSrc.some((v) => v.severity);
     return hasCvssVal;
   },
@@ -951,7 +972,7 @@ export const derivedMixin = {
   // CVSS-severity histogram across all scored vulnerabilities, counted once each
   // by their headline severity. `scored` is the total that carry a CVSS band.
   get securitySeveritySummary() {
-    const all = this.allVulnerabilities;
+    const all = this.scopedVulnerabilities;
     if (severitySummarySrc === all) return severitySummaryVal;
     const counts = { critical: 0, high: 0, medium: 0, low: 0, none: 0 };
     let scored = 0;
