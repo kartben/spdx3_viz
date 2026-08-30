@@ -9823,7 +9823,7 @@
       "namespaceMap": [
         {
           "type": "NamespaceMap",
-          "namespace": "http://spdx.org/spdxdocs/zephyr-07142409-28e8-48ac-8b7b-bb81961ca5ca/",
+          "namespace": "http://spdx.org/spdxdocs/zephyr-1156d55e-7855-4021-a092-abe307c66e1e/",
           "prefix": "zephyr"
         }
       ],
@@ -11616,7 +11616,7 @@
     {
       "type": "CreationInfo",
       "@id": "zephyr:creationinfo",
-      "created": "2026-08-30T16:13:54Z",
+      "created": "2026-08-30T16:49:19Z",
       "createdBy": [
         "zephyr:agents/west-spdx-agent",
         "zephyr:agents/the-zephyr-project"
@@ -12563,12 +12563,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "370e7247a287c7f5f974a00f5ea361e5cf1de29f"
+          "hashValue": "cdf9bb9a05748d335bfe7ccf538fc9ed4d2c464d"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "af21b0fc2750e6d1153dd8dd5ef2061af0bf87d3b7b993e5fbf7601cdde16a2d"
+          "hashValue": "24ebcc94b35fc89a3a19edad0f274cb0dc6da2bffdc6b602aea3c28d09d6f761"
         }
       ]
     },
@@ -12805,12 +12805,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "c0d6e71d6cc81af84efae6ed02559c6f1f71d216"
+          "hashValue": "207006d17caf49bc8650bd0f165fdb31c8ed4af3"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "a57469547408a6e90e6e3821ad639693da714909b615ca0e09cb8a444f8229d3"
+          "hashValue": "868d64bae0125f223ac372575715572aa1db1347e4e9754ac56d7b08e56179e4"
         }
       ]
     },
@@ -12827,12 +12827,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "a0e7cd3c6870930811ef7a659520b9b988ee91f1"
+          "hashValue": "9b395513eb83809dd55681ed4e4edd2f3d9d864f"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "1905479bc956d4b48a93c24c3f17ffdb142017a8c65a3278d83050cbee38fae7"
+          "hashValue": "3943c8cbdd10d73afeaa7c5b6891f4f3c3a108abaed90f5c443b346304a135bc"
         }
       ]
     },
@@ -12849,12 +12849,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "79e086bec0e89339c7112e066670928c15d13fec"
+          "hashValue": "ee9369c2655d67bc1937463ba7ef1673401792cc"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "57aea8260c9f93be8515d555d1575f53019e5e8722e0ec8f766d3a472d1eeacb"
+          "hashValue": "e60db38bf9997d159cd53b748d9e6844c2488c21212976f7e2b44ed873306440"
         }
       ]
     },
@@ -14047,7 +14047,7 @@
       "type": "software_Package",
       "spdxId": "zephyr:packages/app",
       "software_downloadLocation": "NOASSERTION",
-      "software_packageVersion": "fb5b73f345cbc9e371a7ef15bac574651f6e41e5",
+      "software_packageVersion": "107120db232f2ce699c6a871b12b844d85c11ab1",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "library",
       "suppliedBy": "zephyr:agents/the-zephyr-project",
@@ -14070,7 +14070,7 @@
       "type": "software_Package",
       "spdxId": "zephyr:packages/arch--common",
       "software_downloadLocation": "NOASSERTION",
-      "software_packageVersion": "fb5b73f345cbc9e371a7ef15bac574651f6e41e5",
+      "software_packageVersion": "107120db232f2ce699c6a871b12b844d85c11ab1",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "library",
       "suppliedBy": "zephyr:agents/the-zephyr-project",
@@ -14093,7 +14093,7 @@
       "type": "software_Package",
       "spdxId": "zephyr:packages/arch--xtensa--core",
       "software_downloadLocation": "NOASSERTION",
-      "software_packageVersion": "fb5b73f345cbc9e371a7ef15bac574651f6e41e5",
+      "software_packageVersion": "107120db232f2ce699c6a871b12b844d85c11ab1",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "library",
       "suppliedBy": "zephyr:agents/the-zephyr-project",
@@ -14116,7 +14116,7 @@
       "type": "software_Package",
       "spdxId": "zephyr:packages/drivers--cache",
       "software_downloadLocation": "NOASSERTION",
-      "software_packageVersion": "fb5b73f345cbc9e371a7ef15bac574651f6e41e5",
+      "software_packageVersion": "107120db232f2ce699c6a871b12b844d85c11ab1",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "library",
       "suppliedBy": "zephyr:agents/the-zephyr-project",
@@ -14139,7 +14139,7 @@
       "type": "software_Package",
       "spdxId": "zephyr:packages/drivers--clock-control",
       "software_downloadLocation": "NOASSERTION",
-      "software_packageVersion": "fb5b73f345cbc9e371a7ef15bac574651f6e41e5",
+      "software_packageVersion": "107120db232f2ce699c6a871b12b844d85c11ab1",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "library",
       "suppliedBy": "zephyr:agents/the-zephyr-project",
@@ -14162,7 +14162,7 @@
       "type": "software_Package",
       "spdxId": "zephyr:packages/drivers--console",
       "software_downloadLocation": "NOASSERTION",
-      "software_packageVersion": "fb5b73f345cbc9e371a7ef15bac574651f6e41e5",
+      "software_packageVersion": "107120db232f2ce699c6a871b12b844d85c11ab1",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "library",
       "suppliedBy": "zephyr:agents/the-zephyr-project",
@@ -14185,7 +14185,7 @@
       "type": "software_Package",
       "spdxId": "zephyr:packages/drivers--display",
       "software_downloadLocation": "NOASSERTION",
-      "software_packageVersion": "fb5b73f345cbc9e371a7ef15bac574651f6e41e5",
+      "software_packageVersion": "107120db232f2ce699c6a871b12b844d85c11ab1",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "library",
       "suppliedBy": "zephyr:agents/the-zephyr-project",
@@ -14208,7 +14208,7 @@
       "type": "software_Package",
       "spdxId": "zephyr:packages/drivers--gpio",
       "software_downloadLocation": "NOASSERTION",
-      "software_packageVersion": "fb5b73f345cbc9e371a7ef15bac574651f6e41e5",
+      "software_packageVersion": "107120db232f2ce699c6a871b12b844d85c11ab1",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "library",
       "suppliedBy": "zephyr:agents/the-zephyr-project",
@@ -14231,7 +14231,7 @@
       "type": "software_Package",
       "spdxId": "zephyr:packages/drivers--i2c",
       "software_downloadLocation": "NOASSERTION",
-      "software_packageVersion": "fb5b73f345cbc9e371a7ef15bac574651f6e41e5",
+      "software_packageVersion": "107120db232f2ce699c6a871b12b844d85c11ab1",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "library",
       "suppliedBy": "zephyr:agents/the-zephyr-project",
@@ -14254,7 +14254,7 @@
       "type": "software_Package",
       "spdxId": "zephyr:packages/drivers--input",
       "software_downloadLocation": "NOASSERTION",
-      "software_packageVersion": "fb5b73f345cbc9e371a7ef15bac574651f6e41e5",
+      "software_packageVersion": "107120db232f2ce699c6a871b12b844d85c11ab1",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "library",
       "suppliedBy": "zephyr:agents/the-zephyr-project",
@@ -14277,7 +14277,7 @@
       "type": "software_Package",
       "spdxId": "zephyr:packages/drivers--interrupt-controller",
       "software_downloadLocation": "NOASSERTION",
-      "software_packageVersion": "fb5b73f345cbc9e371a7ef15bac574651f6e41e5",
+      "software_packageVersion": "107120db232f2ce699c6a871b12b844d85c11ab1",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "library",
       "suppliedBy": "zephyr:agents/the-zephyr-project",
@@ -14300,7 +14300,7 @@
       "type": "software_Package",
       "spdxId": "zephyr:packages/drivers--mfd",
       "software_downloadLocation": "NOASSERTION",
-      "software_packageVersion": "fb5b73f345cbc9e371a7ef15bac574651f6e41e5",
+      "software_packageVersion": "107120db232f2ce699c6a871b12b844d85c11ab1",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "library",
       "suppliedBy": "zephyr:agents/the-zephyr-project",
@@ -14323,7 +14323,7 @@
       "type": "software_Package",
       "spdxId": "zephyr:packages/drivers--pinctrl",
       "software_downloadLocation": "NOASSERTION",
-      "software_packageVersion": "fb5b73f345cbc9e371a7ef15bac574651f6e41e5",
+      "software_packageVersion": "107120db232f2ce699c6a871b12b844d85c11ab1",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "library",
       "suppliedBy": "zephyr:agents/the-zephyr-project",
@@ -14346,7 +14346,7 @@
       "type": "software_Package",
       "spdxId": "zephyr:packages/drivers--regulator",
       "software_downloadLocation": "NOASSERTION",
-      "software_packageVersion": "fb5b73f345cbc9e371a7ef15bac574651f6e41e5",
+      "software_packageVersion": "107120db232f2ce699c6a871b12b844d85c11ab1",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "library",
       "suppliedBy": "zephyr:agents/the-zephyr-project",
@@ -14369,7 +14369,7 @@
       "type": "software_Package",
       "spdxId": "zephyr:packages/drivers--serial",
       "software_downloadLocation": "NOASSERTION",
-      "software_packageVersion": "fb5b73f345cbc9e371a7ef15bac574651f6e41e5",
+      "software_packageVersion": "107120db232f2ce699c6a871b12b844d85c11ab1",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "library",
       "suppliedBy": "zephyr:agents/the-zephyr-project",
@@ -14392,7 +14392,7 @@
       "type": "software_Package",
       "spdxId": "zephyr:packages/drivers--spi",
       "software_downloadLocation": "NOASSERTION",
-      "software_packageVersion": "fb5b73f345cbc9e371a7ef15bac574651f6e41e5",
+      "software_packageVersion": "107120db232f2ce699c6a871b12b844d85c11ab1",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "library",
       "suppliedBy": "zephyr:agents/the-zephyr-project",
@@ -14415,7 +14415,7 @@
       "type": "software_Package",
       "spdxId": "zephyr:packages/drivers--timer",
       "software_downloadLocation": "NOASSERTION",
-      "software_packageVersion": "fb5b73f345cbc9e371a7ef15bac574651f6e41e5",
+      "software_packageVersion": "107120db232f2ce699c6a871b12b844d85c11ab1",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "library",
       "suppliedBy": "zephyr:agents/the-zephyr-project",
@@ -14438,7 +14438,7 @@
       "type": "software_Package",
       "spdxId": "zephyr:packages/heap-constants",
       "software_downloadLocation": "NOASSERTION",
-      "software_packageVersion": "fb5b73f345cbc9e371a7ef15bac574651f6e41e5",
+      "software_packageVersion": "107120db232f2ce699c6a871b12b844d85c11ab1",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "library",
       "suppliedBy": "zephyr:agents/the-zephyr-project",
@@ -14461,7 +14461,7 @@
       "type": "software_Package",
       "spdxId": "zephyr:packages/isr-tables",
       "software_downloadLocation": "NOASSERTION",
-      "software_packageVersion": "fb5b73f345cbc9e371a7ef15bac574651f6e41e5",
+      "software_packageVersion": "107120db232f2ce699c6a871b12b844d85c11ab1",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "library",
       "suppliedBy": "zephyr:agents/the-zephyr-project",
@@ -14484,7 +14484,7 @@
       "type": "software_Package",
       "spdxId": "zephyr:packages/kernel",
       "software_downloadLocation": "NOASSERTION",
-      "software_packageVersion": "fb5b73f345cbc9e371a7ef15bac574651f6e41e5",
+      "software_packageVersion": "107120db232f2ce699c6a871b12b844d85c11ab1",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "library",
       "suppliedBy": "zephyr:agents/the-zephyr-project",
@@ -14507,7 +14507,7 @@
       "type": "software_Package",
       "spdxId": "zephyr:packages/lib--libc--common",
       "software_downloadLocation": "NOASSERTION",
-      "software_packageVersion": "fb5b73f345cbc9e371a7ef15bac574651f6e41e5",
+      "software_packageVersion": "107120db232f2ce699c6a871b12b844d85c11ab1",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "library",
       "suppliedBy": "zephyr:agents/the-zephyr-project",
@@ -14530,7 +14530,7 @@
       "type": "software_Package",
       "spdxId": "zephyr:packages/lib--libc--picolibc",
       "software_downloadLocation": "NOASSERTION",
-      "software_packageVersion": "fb5b73f345cbc9e371a7ef15bac574651f6e41e5",
+      "software_packageVersion": "107120db232f2ce699c6a871b12b844d85c11ab1",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "library",
       "suppliedBy": "zephyr:agents/the-zephyr-project",
@@ -14553,7 +14553,7 @@
       "type": "software_Package",
       "spdxId": "zephyr:packages/modules--lvgl",
       "software_downloadLocation": "NOASSERTION",
-      "software_packageVersion": "fb5b73f345cbc9e371a7ef15bac574651f6e41e5",
+      "software_packageVersion": "107120db232f2ce699c6a871b12b844d85c11ab1",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "library",
       "suppliedBy": "zephyr:agents/the-zephyr-project",
@@ -14576,7 +14576,7 @@
       "type": "software_Package",
       "spdxId": "zephyr:packages/offsets",
       "software_downloadLocation": "NOASSERTION",
-      "software_packageVersion": "fb5b73f345cbc9e371a7ef15bac574651f6e41e5",
+      "software_packageVersion": "107120db232f2ce699c6a871b12b844d85c11ab1",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "library",
       "suppliedBy": "zephyr:agents/the-zephyr-project",
@@ -14599,7 +14599,7 @@
       "type": "software_Package",
       "spdxId": "zephyr:packages/subsys--input",
       "software_downloadLocation": "NOASSERTION",
-      "software_packageVersion": "fb5b73f345cbc9e371a7ef15bac574651f6e41e5",
+      "software_packageVersion": "107120db232f2ce699c6a871b12b844d85c11ab1",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "library",
       "suppliedBy": "zephyr:agents/the-zephyr-project",
@@ -14622,7 +14622,7 @@
       "type": "software_Package",
       "spdxId": "zephyr:packages/subsys--portability--posix--c-lib-ext",
       "software_downloadLocation": "NOASSERTION",
-      "software_packageVersion": "fb5b73f345cbc9e371a7ef15bac574651f6e41e5",
+      "software_packageVersion": "107120db232f2ce699c6a871b12b844d85c11ab1",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "library",
       "suppliedBy": "zephyr:agents/the-zephyr-project",
@@ -14645,7 +14645,7 @@
       "type": "software_Package",
       "spdxId": "zephyr:packages/zephyr",
       "software_downloadLocation": "NOASSERTION",
-      "software_packageVersion": "fb5b73f345cbc9e371a7ef15bac574651f6e41e5",
+      "software_packageVersion": "107120db232f2ce699c6a871b12b844d85c11ab1",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "library",
       "suppliedBy": "zephyr:agents/the-zephyr-project",
@@ -14655,12 +14655,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "370e7247a287c7f5f974a00f5ea361e5cf1de29f"
+          "hashValue": "cdf9bb9a05748d335bfe7ccf538fc9ed4d2c464d"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "af21b0fc2750e6d1153dd8dd5ef2061af0bf87d3b7b993e5fbf7601cdde16a2d"
+          "hashValue": "24ebcc94b35fc89a3a19edad0f274cb0dc6da2bffdc6b602aea3c28d09d6f761"
         }
       ]
     },
@@ -14668,7 +14668,7 @@
       "type": "software_Package",
       "spdxId": "zephyr:packages/zephyr-final",
       "software_downloadLocation": "NOASSERTION",
-      "software_packageVersion": "fb5b73f345cbc9e371a7ef15bac574651f6e41e5",
+      "software_packageVersion": "107120db232f2ce699c6a871b12b844d85c11ab1",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "application",
       "suppliedBy": "zephyr:agents/the-zephyr-project",
@@ -14678,12 +14678,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "79e086bec0e89339c7112e066670928c15d13fec"
+          "hashValue": "ee9369c2655d67bc1937463ba7ef1673401792cc"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "57aea8260c9f93be8515d555d1575f53019e5e8722e0ec8f766d3a472d1eeacb"
+          "hashValue": "e60db38bf9997d159cd53b748d9e6844c2488c21212976f7e2b44ed873306440"
         }
       ]
     },
@@ -14691,7 +14691,7 @@
       "type": "software_Package",
       "spdxId": "zephyr:packages/zephyr-pre0",
       "software_downloadLocation": "NOASSERTION",
-      "software_packageVersion": "fb5b73f345cbc9e371a7ef15bac574651f6e41e5",
+      "software_packageVersion": "107120db232f2ce699c6a871b12b844d85c11ab1",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "library",
       "suppliedBy": "zephyr:agents/the-zephyr-project",
@@ -14701,12 +14701,12 @@
         {
           "type": "Hash",
           "algorithm": "sha1",
-          "hashValue": "a0e7cd3c6870930811ef7a659520b9b988ee91f1"
+          "hashValue": "9b395513eb83809dd55681ed4e4edd2f3d9d864f"
         },
         {
           "type": "Hash",
           "algorithm": "sha256",
-          "hashValue": "1905479bc956d4b48a93c24c3f17ffdb142017a8c65a3278d83050cbee38fae7"
+          "hashValue": "3943c8cbdd10d73afeaa7c5b6891f4f3c3a108abaed90f5c443b346304a135bc"
         }
       ]
     },
@@ -14726,7 +14726,7 @@
       "from": "zephyr:packages/zephyr-final",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/kernel"
+        "zephyr:packages/app"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -14736,7 +14736,7 @@
       "from": "zephyr:packages/zephyr-final",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/app"
+        "zephyr:packages/zephyr"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -14746,7 +14746,7 @@
       "from": "zephyr:packages/zephyr-final",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/zephyr"
+        "zephyr:packages/offsets"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -14756,7 +14756,7 @@
       "from": "zephyr:packages/zephyr-final",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/offsets"
+        "zephyr:packages/zephyr-pre0"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -14766,7 +14766,7 @@
       "from": "zephyr:packages/zephyr-final",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/zephyr-pre0"
+        "zephyr:packages/arch--common"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -14776,7 +14776,7 @@
       "from": "zephyr:packages/zephyr-final",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/arch--common"
+        "zephyr:packages/isr-tables"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -14786,7 +14786,7 @@
       "from": "zephyr:packages/zephyr-final",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/isr-tables"
+        "zephyr:packages/arch--xtensa--core"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -14796,7 +14796,7 @@
       "from": "zephyr:packages/zephyr-final",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/arch--xtensa--core"
+        "zephyr:packages/lib--libc--picolibc"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -14806,7 +14806,7 @@
       "from": "zephyr:packages/zephyr-final",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/lib--libc--picolibc"
+        "zephyr:packages/lib--libc--common"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -14816,7 +14816,7 @@
       "from": "zephyr:packages/zephyr-final",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/lib--libc--common"
+        "zephyr:packages/subsys--portability--posix--c-lib-ext"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -14826,7 +14826,7 @@
       "from": "zephyr:packages/zephyr-final",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/subsys--portability--posix--c-lib-ext"
+        "zephyr:packages/subsys--input"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -14836,7 +14836,7 @@
       "from": "zephyr:packages/zephyr-final",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/subsys--input"
+        "zephyr:packages/drivers--interrupt-controller"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -14846,7 +14846,7 @@
       "from": "zephyr:packages/zephyr-final",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/drivers--interrupt-controller"
+        "zephyr:packages/drivers--cache"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -14856,7 +14856,7 @@
       "from": "zephyr:packages/zephyr-final",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/drivers--cache"
+        "zephyr:packages/drivers--clock-control"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -14866,7 +14866,7 @@
       "from": "zephyr:packages/zephyr-final",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/drivers--clock-control"
+        "zephyr:packages/drivers--console"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -14876,7 +14876,7 @@
       "from": "zephyr:packages/zephyr-final",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/drivers--console"
+        "zephyr:packages/drivers--display"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -14886,7 +14886,7 @@
       "from": "zephyr:packages/zephyr-final",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/drivers--display"
+        "zephyr:packages/drivers--gpio"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -14896,7 +14896,7 @@
       "from": "zephyr:packages/zephyr-final",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/drivers--gpio"
+        "zephyr:packages/drivers--i2c"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -14906,7 +14906,7 @@
       "from": "zephyr:packages/zephyr-final",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/drivers--i2c"
+        "zephyr:packages/drivers--input"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -14916,7 +14916,7 @@
       "from": "zephyr:packages/zephyr-final",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/drivers--input"
+        "zephyr:packages/drivers--mfd"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -14926,7 +14926,7 @@
       "from": "zephyr:packages/zephyr-final",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/drivers--mfd"
+        "zephyr:packages/drivers--pinctrl"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -15006,7 +15006,7 @@
       "from": "zephyr:packages/zephyr-final",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/drivers--pinctrl"
+        "zephyr:packages/drivers--regulator"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -15116,7 +15116,7 @@
       "from": "zephyr:packages/zephyr-final",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/drivers--regulator"
+        "zephyr:packages/drivers--serial"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -15226,7 +15226,7 @@
       "from": "zephyr:packages/zephyr-final",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/drivers--serial"
+        "zephyr:packages/drivers--spi"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -15336,7 +15336,7 @@
       "from": "zephyr:packages/zephyr-final",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/drivers--spi"
+        "zephyr:packages/drivers--timer"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -15446,7 +15446,7 @@
       "from": "zephyr:packages/zephyr-final",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/drivers--timer"
+        "zephyr:packages/modules--lvgl"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -15556,7 +15556,7 @@
       "from": "zephyr:packages/zephyr-final",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/modules--lvgl"
+        "zephyr:packages/kernel"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -16333,7 +16333,7 @@
       "from": "zephyr:packages/zephyr-pre0",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/kernel"
+        "zephyr:packages/app"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -16945,7 +16945,7 @@
       "from": "zephyr:packages/zephyr-pre0",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/app"
+        "zephyr:packages/zephyr"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -17465,7 +17465,7 @@
       "from": "zephyr:packages/zephyr-pre0",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/zephyr"
+        "zephyr:packages/offsets"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -18249,7 +18249,7 @@
       "from": "zephyr:packages/zephyr-pre0",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/offsets"
+        "zephyr:packages/arch--common"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -18743,7 +18743,7 @@
       "from": "zephyr:packages/zephyr-pre0",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/arch--common"
+        "zephyr:packages/isr-tables"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -19404,7 +19404,7 @@
       "from": "zephyr:packages/zephyr-pre0",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/isr-tables"
+        "zephyr:packages/arch--xtensa--core"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -19957,7 +19957,7 @@
       "from": "zephyr:packages/zephyr-pre0",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/arch--xtensa--core"
+        "zephyr:packages/lib--libc--picolibc"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -20386,7 +20386,7 @@
       "from": "zephyr:packages/zephyr-pre0",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/lib--libc--picolibc"
+        "zephyr:packages/lib--libc--common"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -20929,7 +20929,7 @@
       "from": "zephyr:packages/zephyr-pre0",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/lib--libc--common"
+        "zephyr:packages/subsys--portability--posix--c-lib-ext"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -22415,7 +22415,7 @@
       "from": "zephyr:packages/zephyr-pre0",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/subsys--portability--posix--c-lib-ext"
+        "zephyr:packages/subsys--input"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -23730,7 +23730,7 @@
       "from": "zephyr:packages/zephyr-pre0",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/subsys--input"
+        "zephyr:packages/drivers--interrupt-controller"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24042,7 +24042,7 @@
       "from": "zephyr:packages/zephyr-pre0",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/drivers--interrupt-controller"
+        "zephyr:packages/drivers--cache"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24132,7 +24132,7 @@
       "from": "zephyr:packages/zephyr-pre0",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/drivers--cache"
+        "zephyr:packages/drivers--clock-control"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24212,7 +24212,7 @@
       "from": "zephyr:packages/zephyr-pre0",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/drivers--clock-control"
+        "zephyr:packages/drivers--console"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24292,7 +24292,7 @@
       "from": "zephyr:packages/zephyr-pre0",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/drivers--console"
+        "zephyr:packages/drivers--display"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24402,7 +24402,7 @@
       "from": "zephyr:packages/zephyr-pre0",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/drivers--display"
+        "zephyr:packages/drivers--gpio"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24492,7 +24492,7 @@
       "from": "zephyr:packages/zephyr-pre0",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/drivers--gpio"
+        "zephyr:packages/drivers--i2c"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24502,7 +24502,7 @@
       "from": "zephyr:packages/zephyr-pre0",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/drivers--i2c"
+        "zephyr:packages/drivers--input"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24512,7 +24512,7 @@
       "from": "zephyr:packages/zephyr-pre0",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/drivers--input"
+        "zephyr:packages/drivers--mfd"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24522,7 +24522,7 @@
       "from": "zephyr:packages/zephyr-pre0",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/drivers--mfd"
+        "zephyr:packages/drivers--pinctrl"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24532,7 +24532,7 @@
       "from": "zephyr:packages/zephyr-pre0",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/drivers--pinctrl"
+        "zephyr:packages/drivers--regulator"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24542,7 +24542,7 @@
       "from": "zephyr:packages/zephyr-pre0",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/drivers--regulator"
+        "zephyr:packages/drivers--serial"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24552,7 +24552,7 @@
       "from": "zephyr:packages/zephyr-pre0",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/drivers--serial"
+        "zephyr:packages/drivers--spi"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24562,7 +24562,7 @@
       "from": "zephyr:packages/zephyr-pre0",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/drivers--spi"
+        "zephyr:packages/drivers--timer"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24572,7 +24572,7 @@
       "from": "zephyr:packages/zephyr-pre0",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/drivers--timer"
+        "zephyr:packages/modules--lvgl"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24582,7 +24582,7 @@
       "from": "zephyr:packages/zephyr-pre0",
       "relationshipType": "hasPrerequisite",
       "to": [
-        "zephyr:packages/modules--lvgl"
+        "zephyr:packages/kernel"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24602,7 +24602,7 @@
       "from": "zephyr:files/File-zephyr.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libkernel.a"
+        "zephyr:files/File-libapp.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24612,7 +24612,7 @@
       "from": "zephyr:files/File-zephyr.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libapp.a"
+        "zephyr:files/File-libzephyr.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24622,7 +24622,7 @@
       "from": "zephyr:files/File-zephyr.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libzephyr.a"
+        "zephyr:files/File-offsets.c.obj"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24632,7 +24632,7 @@
       "from": "zephyr:files/File-zephyr.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-offsets.c.obj"
+        "zephyr:files/File-zephyr-pre0.elf"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24642,7 +24642,7 @@
       "from": "zephyr:files/File-zephyr.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-zephyr-pre0.elf"
+        "zephyr:files/File-libarch--common.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24652,7 +24652,7 @@
       "from": "zephyr:files/File-zephyr.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libarch--common.a"
+        "zephyr:files/File-libisr-tables.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24662,7 +24662,7 @@
       "from": "zephyr:files/File-zephyr.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libisr-tables.a"
+        "zephyr:files/File-libarch--xtensa--core.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24672,7 +24672,7 @@
       "from": "zephyr:files/File-zephyr.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libarch--xtensa--core.a"
+        "zephyr:files/File-liblib--libc--picolibc.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24682,7 +24682,7 @@
       "from": "zephyr:files/File-zephyr.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-liblib--libc--picolibc.a"
+        "zephyr:files/File-liblib--libc--common.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24692,7 +24692,7 @@
       "from": "zephyr:files/File-zephyr.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-liblib--libc--common.a"
+        "zephyr:files/File-libsubsys--portability--posix--c-lib-ext.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24702,7 +24702,7 @@
       "from": "zephyr:files/File-zephyr.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libsubsys--portability--posix--c-lib-ext.a"
+        "zephyr:files/File-libsubsys--input.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24712,7 +24712,7 @@
       "from": "zephyr:files/File-zephyr.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libsubsys--input.a"
+        "zephyr:files/File-libdrivers--interrupt-controller.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24722,7 +24722,7 @@
       "from": "zephyr:files/File-zephyr.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libdrivers--interrupt-controller.a"
+        "zephyr:files/File-libdrivers--cache.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24732,7 +24732,7 @@
       "from": "zephyr:files/File-zephyr.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libdrivers--cache.a"
+        "zephyr:files/File-libdrivers--clock-control.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24742,7 +24742,7 @@
       "from": "zephyr:files/File-zephyr.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libdrivers--clock-control.a"
+        "zephyr:files/File-libdrivers--console.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24752,7 +24752,7 @@
       "from": "zephyr:files/File-zephyr.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libdrivers--console.a"
+        "zephyr:files/File-libdrivers--display.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24762,7 +24762,7 @@
       "from": "zephyr:files/File-zephyr.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libdrivers--display.a"
+        "zephyr:files/File-libdrivers--gpio.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24842,7 +24842,7 @@
       "from": "zephyr:files/File-zephyr.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libdrivers--gpio.a"
+        "zephyr:files/File-libdrivers--i2c.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -24952,7 +24952,7 @@
       "from": "zephyr:files/File-zephyr.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libdrivers--i2c.a"
+        "zephyr:files/File-libdrivers--input.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -25062,7 +25062,7 @@
       "from": "zephyr:files/File-zephyr.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libdrivers--input.a"
+        "zephyr:files/File-libdrivers--mfd.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -25172,7 +25172,7 @@
       "from": "zephyr:files/File-zephyr.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libdrivers--mfd.a"
+        "zephyr:files/File-libdrivers--pinctrl.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -25282,7 +25282,7 @@
       "from": "zephyr:files/File-zephyr.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libdrivers--pinctrl.a"
+        "zephyr:files/File-libdrivers--regulator.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -25392,7 +25392,7 @@
       "from": "zephyr:files/File-zephyr.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libdrivers--regulator.a"
+        "zephyr:files/File-libdrivers--serial.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -25502,7 +25502,7 @@
       "from": "zephyr:files/File-zephyr.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libdrivers--serial.a"
+        "zephyr:files/File-libdrivers--spi.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -25612,7 +25612,7 @@
       "from": "zephyr:files/File-zephyr.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libdrivers--spi.a"
+        "zephyr:files/File-libdrivers--timer.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -25722,7 +25722,7 @@
       "from": "zephyr:files/File-zephyr.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libdrivers--timer.a"
+        "zephyr:files/File-libmodules--lvgl.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -25732,7 +25732,7 @@
       "from": "zephyr:files/File-zephyr.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libmodules--lvgl.a"
+        "zephyr:files/File-libkernel.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -25742,7 +25742,7 @@
       "from": "zephyr:files/File-zephyr-pre0.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libkernel.a"
+        "zephyr:files/File-libapp.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -25752,7 +25752,7 @@
       "from": "zephyr:files/File-zephyr-pre0.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libapp.a"
+        "zephyr:files/File-libzephyr.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -25762,7 +25762,7 @@
       "from": "zephyr:files/File-zephyr-pre0.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libzephyr.a"
+        "zephyr:files/File-offsets.c.obj"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -25772,7 +25772,7 @@
       "from": "zephyr:files/File-zephyr-pre0.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-offsets.c.obj"
+        "zephyr:files/File-libarch--common.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -25782,7 +25782,7 @@
       "from": "zephyr:files/File-zephyr-pre0.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libarch--common.a"
+        "zephyr:files/File-libisr-tables.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -25792,7 +25792,7 @@
       "from": "zephyr:files/File-zephyr-pre0.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libisr-tables.a"
+        "zephyr:files/File-libarch--xtensa--core.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -25802,7 +25802,7 @@
       "from": "zephyr:files/File-zephyr-pre0.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libarch--xtensa--core.a"
+        "zephyr:files/File-liblib--libc--picolibc.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -25912,7 +25912,7 @@
       "from": "zephyr:files/File-zephyr-pre0.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-liblib--libc--picolibc.a"
+        "zephyr:files/File-liblib--libc--common.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -25942,7 +25942,7 @@
       "from": "zephyr:files/File-zephyr-pre0.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-liblib--libc--common.a"
+        "zephyr:files/File-libsubsys--portability--posix--c-lib-ext.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -25952,7 +25952,7 @@
       "from": "zephyr:files/File-zephyr-pre0.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libsubsys--portability--posix--c-lib-ext.a"
+        "zephyr:files/File-libsubsys--input.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -25962,7 +25962,7 @@
       "from": "zephyr:files/File-zephyr-pre0.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libsubsys--input.a"
+        "zephyr:files/File-libdrivers--interrupt-controller.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -25972,7 +25972,7 @@
       "from": "zephyr:files/File-zephyr-pre0.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libdrivers--interrupt-controller.a"
+        "zephyr:files/File-libdrivers--cache.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -25982,7 +25982,7 @@
       "from": "zephyr:files/File-zephyr-pre0.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libdrivers--cache.a"
+        "zephyr:files/File-libdrivers--clock-control.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -25992,7 +25992,7 @@
       "from": "zephyr:files/File-zephyr-pre0.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libdrivers--clock-control.a"
+        "zephyr:files/File-libdrivers--console.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -26002,7 +26002,7 @@
       "from": "zephyr:files/File-zephyr-pre0.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libdrivers--console.a"
+        "zephyr:files/File-libdrivers--display.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -26012,7 +26012,7 @@
       "from": "zephyr:files/File-zephyr-pre0.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libdrivers--display.a"
+        "zephyr:files/File-libdrivers--gpio.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -26022,7 +26022,7 @@
       "from": "zephyr:files/File-zephyr-pre0.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libdrivers--gpio.a"
+        "zephyr:files/File-libdrivers--i2c.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -26032,7 +26032,7 @@
       "from": "zephyr:files/File-zephyr-pre0.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libdrivers--i2c.a"
+        "zephyr:files/File-libdrivers--input.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -26042,7 +26042,7 @@
       "from": "zephyr:files/File-zephyr-pre0.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libdrivers--input.a"
+        "zephyr:files/File-libdrivers--mfd.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -26052,7 +26052,7 @@
       "from": "zephyr:files/File-zephyr-pre0.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libdrivers--mfd.a"
+        "zephyr:files/File-libdrivers--pinctrl.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -26062,7 +26062,7 @@
       "from": "zephyr:files/File-zephyr-pre0.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libdrivers--pinctrl.a"
+        "zephyr:files/File-libdrivers--regulator.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -26072,7 +26072,7 @@
       "from": "zephyr:files/File-zephyr-pre0.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libdrivers--regulator.a"
+        "zephyr:files/File-libdrivers--serial.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -26082,7 +26082,7 @@
       "from": "zephyr:files/File-zephyr-pre0.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libdrivers--serial.a"
+        "zephyr:files/File-libdrivers--spi.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -26092,7 +26092,7 @@
       "from": "zephyr:files/File-zephyr-pre0.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libdrivers--spi.a"
+        "zephyr:files/File-libdrivers--timer.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -26102,7 +26102,7 @@
       "from": "zephyr:files/File-zephyr-pre0.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libdrivers--timer.a"
+        "zephyr:files/File-libmodules--lvgl.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },
@@ -26112,7 +26112,7 @@
       "from": "zephyr:files/File-zephyr-pre0.elf",
       "relationshipType": "hasStaticLink",
       "to": [
-        "zephyr:files/File-libmodules--lvgl.a"
+        "zephyr:files/File-libkernel.a"
       ],
       "creationInfo": "zephyr:creationinfo"
     },

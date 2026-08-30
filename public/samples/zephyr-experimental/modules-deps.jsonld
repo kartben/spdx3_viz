@@ -34,7 +34,7 @@
     {
       "type": "CreationInfo",
       "@id": "zephyr:creationinfo",
-      "created": "2026-08-30T16:13:54Z",
+      "created": "2026-08-30T16:49:19Z",
       "createdBy": [
         "zephyr:agents/west-spdx-agent",
         "zephyr:agents/the-zephyr-project"
@@ -51,7 +51,7 @@
       "namespaceMap": [
         {
           "type": "NamespaceMap",
-          "namespace": "http://spdx.org/spdxdocs/zephyr-07142409-28e8-48ac-8b7b-bb81961ca5ca/",
+          "namespace": "http://spdx.org/spdxdocs/zephyr-1156d55e-7855-4021-a092-abe307c66e1e/",
           "prefix": "zephyr"
         }
       ],
@@ -2011,7 +2011,7 @@
       "type": "software_Package",
       "spdxId": "zephyr:packages/zephyr-deps",
       "software_downloadLocation": "NOASSERTION",
-      "software_packageUrl": "pkg:github/zephyrproject-rtos/zephyr@fb5b73f345cbc9e371a7ef15bac574651f6e41e5-off",
+      "software_packageUrl": "pkg:github/zephyrproject-rtos/zephyr@107120db232f2ce699c6a871b12b844d85c11ab1-off",
       "software_packageVersion": "4.4.99",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "library",
@@ -2022,7 +2022,7 @@
         {
           "type": "ExternalIdentifier",
           "externalIdentifierType": "packageUrl",
-          "identifier": "pkg:github/zephyrproject-rtos/zephyr@fb5b73f345cbc9e371a7ef15bac574651f6e41e5-off"
+          "identifier": "pkg:github/zephyrproject-rtos/zephyr@107120db232f2ce699c6a871b12b844d85c11ab1-off"
         },
         {
           "type": "ExternalIdentifier",

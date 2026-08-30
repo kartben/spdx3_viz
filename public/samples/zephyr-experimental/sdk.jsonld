@@ -34,7 +34,7 @@
     {
       "type": "CreationInfo",
       "@id": "zephyr:creationinfo",
-      "created": "2026-08-30T16:13:54Z",
+      "created": "2026-08-30T16:49:19Z",
       "createdBy": [
         "zephyr:agents/west-spdx-agent",
         "zephyr:agents/the-zephyr-project"
@@ -1087,10 +1087,20 @@
     {
       "type": "software_Package",
       "spdxId": "zephyr:packages/sdk-sources",
-      "software_downloadLocation": "NOASSERTION",
+      "software_downloadLocation": "git+https://github.com/zephyrproject-rtos/sdk-ng@v1.0.1",
+      "software_packageUrl": "pkg:github/zephyrproject-rtos/sdk-ng@v1.0.1",
+      "software_packageVersion": "1.0.1",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "source",
+      "suppliedBy": "zephyr:agents/the-zephyr-project",
       "creationInfo": "zephyr:creationinfo",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "packageUrl",
+          "identifier": "pkg:github/zephyrproject-rtos/sdk-ng@v1.0.1"
+        }
+      ],
       "name": "sdk-sources"
     },
     {
@@ -2110,7 +2120,7 @@
       "namespaceMap": [
         {
           "type": "NamespaceMap",
-          "namespace": "http://spdx.org/spdxdocs/zephyr-07142409-28e8-48ac-8b7b-bb81961ca5ca/",
+          "namespace": "http://spdx.org/spdxdocs/zephyr-1156d55e-7855-4021-a092-abe307c66e1e/",
           "prefix": "zephyr"
         }
       ],
