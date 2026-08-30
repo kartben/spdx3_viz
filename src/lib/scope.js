@@ -11,6 +11,18 @@
  * a compatibility check can restrict the walk to the edges that put a component
  * inside what ships.
  *
+ * A security scope must not do that, and the Zephyr sample shows why. Zephyr
+ * records `hasPrerequisite` from `zephyr_final` to the object libraries the
+ * image is linked from (`zephyr`, `app`, `arch__common`, `offsets`, ...), and
+ * `hasPrerequisite` is one of the edges "distributed only" drops as
+ * not-part-of-the-product. Narrowing a vulnerability report that way would
+ * discard 27 packages that are literally the compiled contents of the binary.
+ * The edge an SBOM chooses says how its producer models the build, not whether
+ * the code runs, so {@link buildSecurityScope} always walks every dependency
+ * edge, including optional, provided and prerequisite ones: a vulnerable build
+ * tool or runtime-supplied library is a real finding even when it is not
+ * shipped.
+ *
  * **Which packages count** (`requireFiles`). Reachability alone is often too
  * generous: a build declares every component the manifest offers as an input,
  * whether or not a line of its code was compiled. In the bundled Zephyr sample
@@ -19,6 +31,14 @@
  * packages carry a file. A CVE against one of the other 64 is a finding about
  * code that was never compiled in. Requiring a file contribution is what
  * separates the two.
+ *
+ * Be precise about what that test proves. "Carries no file" is a fact about the
+ * document, not about the binary: a producer that records blobs, prebuilt
+ * libraries or vendored code without listing files would look identical to one
+ * whose component genuinely was not built. So the contribution test is a filter
+ * a reader chooses, never a verdict the UI reaches on its own, and the callers
+ * are expected to say how many findings it removed and offer them in one
+ * click.
  *
  * @module lib/scope
  */
