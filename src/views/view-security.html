@@ -292,7 +292,7 @@
       <!-- Reach: what counts as being in the scope. Both readings are offered
            because the narrower one is a filter the reader chooses, not a
            verdict: see the caveat in the banner below. -->
-      <div x-show="securityScope" class="flex items-center gap-1 text-xs">
+      <div x-show="securityScope && !securityScopeFellBack" class="flex items-center gap-1 text-xs">
         <button
           type="button"
           @click="setSecurityScopeReach('compiled')"
@@ -357,13 +357,22 @@
           ></span>
         </span>
         <span class="ml-auto flex items-center gap-3">
+          <!-- Widening the reach is only the way back when the contribution
+               test is what removed them. Where it never applied, the findings
+               are outside the scope itself and "Clear scope" is the answer, so
+               offer a count rather than a button that would do nothing. -->
           <button
-            x-show="securityScopeHiddenCount"
+            x-show="securityScopeHiddenCount && !securityScopeFellBack"
             type="button"
             @click="setSecurityScopeReach('declared')"
             class="text-amber-300/90 hover:text-amber-200 underline underline-offset-2"
             x-text="`${formatCount(securityScopeHiddenCount)} hidden · show them`"
           ></button>
+          <span
+            x-show="securityScopeHiddenCount && securityScopeFellBack"
+            class="text-amber-300/90"
+            x-text="`${formatCount(securityScopeHiddenCount)} outside this scope`"
+          ></span>
           <button
             type="button"
             @click="setSecurityScope('')"
@@ -373,6 +382,12 @@
           </button>
         </span>
       </div>
+      <!-- Why the narrowing is not on offer here. -->
+      <p x-show="securityScopeFellBack" class="text-[11px] text-slate-500 leading-relaxed">
+        This SBOM records no files for the packages in scope, so there is nothing to narrow by:
+        every finding the scope reaches is shown. Container scans and dependency manifests are
+        commonly like this.
+      </p>
       <!-- The caveat, stated wherever the narrowing is actually in effect. -->
       <p
         x-show="securityScopeReach === 'compiled' && securityScopeStats?.dropped"

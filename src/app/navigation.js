@@ -406,7 +406,10 @@ export const navigationMixin = {
   // is not gated on a mode, so it has to run for every link, not only the ones
   // that also carry the licensing tab.
   _applySecurityNavState(state) {
-    this.securityScope = state.securityScope || '';
+    // Drop a scope this document does not contain, so a link from another SBOM
+    // lands on the whole document rather than on an empty, unexplained view.
+    const scope = state.securityScope || '';
+    this.securityScope = !scope || this.elementMap?.has?.(scope) ? scope : '';
     this.securityScopeReach = state.securityScopeReach === 'declared' ? 'declared' : 'compiled';
     // Optional: the nav tests drive this with a partial app that carries no
     // security mixin.

@@ -786,7 +786,11 @@ export const securityMixin = {
   // component put a file into the image: see lib/security-scope.js.
   get securityScopeElements() {
     const focus = this.securityScope;
-    if (!focus) return null;
+    // A scope names an element of one specific document. A share link opened
+    // against a different SBOM, or against a rebuilt one, can carry an id this
+    // graph has never heard of; walking from it reaches nothing and would empty
+    // the report without saying why. Treat an unknown root as no scope at all.
+    if (!focus || !this.elementMap.has(focus)) return null;
 
     const key = `${focus}|${this.securityScopeReach}`;
     if (scopeKey === key && scopeVal) return scopeVal;
@@ -819,9 +823,10 @@ export const securityMixin = {
     const name = this.relTargetDisplayName(this.securityScope);
     // Deliberately not "what X is built from": the test is a file contribution
     // recorded in this document, which is weaker than a claim about the binary.
-    return this.securityScopeReach === 'compiled'
-      ? `components contributing files to ${name}`
-      : `everything ${name} reaches`;
+    // And when it could not be applied at all, say the broader thing, or the
+    // sentence would describe a narrowing that did not happen.
+    const narrowed = this.securityScopeReach === 'compiled' && !this.securityScopeFellBack;
+    return narrowed ? `components contributing files to ${name}` : `everything ${name} reaches`;
   },
 
   // How many packages the scope covers, and how many the contribution test
@@ -834,6 +839,38 @@ export const securityMixin = {
       reached: scope.reachedPackages,
       dropped: Math.max(0, scope.reachedPackages - scope.packages.size)
     };
+  },
+
+  // Elements a vulnerability names through a plain relationship rather than a
+  // VEX assessment, so scoping judges those findings by their subject too.
+  //
+  // SPDX 3's hasAssociatedVulnerability records "this package has this
+  // vulnerability" without a verdict, and a producer may use only that: the
+  // bundled Yocto image SBOM carries 31 such links alongside its VEX ones. Read
+  // from both relationship directions, since producers disagree about which end
+  // is the subject.
+  _vulnSubjects(vulnId) {
+    const out = new Set();
+    const collect = (rel, ids) => {
+      for (const id of ids) {
+        if (id && id !== vulnId && this.elementMap.get(id)?.type === 'software_Package')
+          out.add(id);
+      }
+    };
+    for (const rel of this.relToIndex.get(vulnId) || []) collect(rel, [rel.from]);
+    for (const rel of this.relFromIndex.get(vulnId) || []) {
+      collect(rel, Array.isArray(rel.to) ? rel.to : [rel.to]);
+    }
+    return out;
+  },
+
+  // True when the contribution test was asked for but could not be applied,
+  // because nothing in the scope records a file. Container scans and dependency
+  // manifests are like this: they list packages and nothing below them. The
+  // toggle is hidden and the banner explains, rather than offering a control
+  // that would answer "nothing is in scope" for every artifact.
+  get securityScopeFellBack() {
+    return !!this.securityScopeElements?.fellBack;
   },
 
   // Findings the current scope removes, for the "N hidden" note. Always shown
