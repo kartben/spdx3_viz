@@ -1374,29 +1374,31 @@ export function buildFileSourceIndex(parsed, indexes) {
         // ███████████████████████████████████████████████████████████████████
         // ██  ⚠️  TEMPORARY HACK — REMOVE ME  ⚠️                            ██
         // ███████████████████████████████████████████████████████████████████
-        // The matching `snippets.jsonld` sample data was lost, and the SBOM's
-        // own zephyr-sources commit (software_packageVersion) no longer lines
-        // up with any source we can fetch. So instead of deriving the SHA from
-        // packageVersion (the correct, dynamic behaviour), we PIN every
-        // zephyr-sources file to one hardcoded commit in a fork of the kernel,
-        // just so the demo resolves to real, fetchable source on GitHub:
-        // https://github.com/kartben/zephyr/commit/b0afeff4c183e11b21580b6aa80d6357e0d80b0c
+        // The bundled sample is generated from a fork branch whose commits are
+        // not upstream, and its generating checkout has several git remotes, so
+        // the SBOM records NOASSERTION instead of a download location. Nothing
+        // in the document names a repository we could fetch from, so we PIN
+        // every zephyr-sources file to one hardcoded commit in a fork:
+        // https://github.com/kartben/zephyr/commit/2920cb7790d6f61e073ec1e1eef6828ca05363cd
         //
-        // ❌ This means highlighted line ranges may NOT match the actual code
-        //    at this commit. It is a stopgap, not correct behaviour.
+        // ✅ That commit is the one the bundled sample was generated from, so
+        //    its line ranges do line up with the source fetched here.
+        //
+        // ❌ Any other SBOM reaching this branch gets that same fork tree, not
+        //    its own. It is a stopgap, not correct behaviour.
         //
         // ✅ TO RESTORE CORRECT BEHAVIOUR: delete this block and uncomment the
-        //    upstream repo + packageVersion-derived SHA logic below.
+        //    purl-derived logic below. software_packageVersion is the VERSION
+        //    file version ("4.4.99"), never a commit; the commit is in the purl.
         // ███████████████████████████████████████████████████████████████████
         ghPath = 'kartben/zephyr'; // <-- HARDCODED HACK (fork, not upstream)
-        sha = 'b0afeff4c183e11b21580b6aa80d6357e0d80b0c'; // <-- HARDCODED HACK
+        sha = '2920cb7790d6f61e073ec1e1eef6828ca05363cd'; // <-- HARDCODED HACK
         // ███████████████████████████████████████████████████████████████████
 
         // --- CORRECT (dynamic) behaviour, disabled by the hack above ---------
-        // ghPath = 'zephyrproject-rtos/zephyr';
-        // const rawVer = pkg.software_packageVersion || '';
-        // const cleanSha = rawVer.replace(/[+\-](dirty|off).*$/, '').trim();
-        // if (/^[a-f0-9]{40}$/.test(cleanSha)) sha = cleanSha;
+        // const purl = pkg.software_packageUrl || '';
+        // const m = /^pkg:github\/([^/]+\/[^@]+)@([a-f0-9]{40})/.exec(purl);
+        // if (m) { ghPath = m[1]; sha = m[2]; }
       }
     }
 
