@@ -16,7 +16,8 @@ import {
   collectPurlTargets,
   collectCpeTargets,
   buildOnlineVulns,
-  buildVirtualVulnGraph
+  buildVirtualVulnGraph,
+  buildSecurityScope
 } from '../lib/index.js';
 
 // Above this many synthesized vuln edges, keep the graph's vulnerability nodes
@@ -27,6 +28,15 @@ const VIRTUAL_VEX_AUTO_SHOW_MAX = 200;
 // fetch (so a huge advisory list can't hammer cve.org) and how many at once.
 const AFFECTED_FILES_RESOLVE_MAX = 300;
 const AFFECTED_FILES_RESOLVE_CONCURRENCY = 5;
+
+// Memo for the scope walk. It touches the whole graph, so recomputing it on
+// every keystroke in the search box would be felt on a large SBOM.
+let scopeKey = null;
+let scopeVal = null;
+
+// Scope picker entries are capped: the dropdown is a search box, not a list to
+// scroll, and a large SBOM has thousands of candidate packages.
+const SCOPE_OPTION_LIMIT = 200;
 
 /* Long-lived lookup workers, kept off the reactive state so they are never
    proxied. One queries OSV by PackageURL, the other NVD by CPE. onlineReqSeq
@@ -75,6 +85,13 @@ function getNvdWorker() {
    on-demand public-database lookup (OSV by PackageURL, NVD by CPE). */
 
 export const securityMixin = {
+  // Drops the scope walk's memo. Called when fresh data is applied, since the
+  // key is only the scope choice: the graph underneath it has changed.
+  _resetSecurityScopeMemo() {
+    scopeKey = null;
+    scopeVal = null;
+  },
+
   vulnLookup(eid) {
     return getVulnerabilityLookup(eid);
   },
@@ -755,6 +772,136 @@ export const securityMixin = {
     this.onlineNow = 0;
     this._resetListMemos();
     this._resetSearchMemos(); // drop the virtual vulns from the search corpus
+  },
+
+  // ---- scope ---------------------------------------------------------------
+
+  // The packages a finding has to touch to count, or null when the whole
+  // document counts.
+  //
+  // "Applies to this artifact" is not the same question as "is reachable from
+  // it". A Zephyr build declares every module in the manifest as an input, so
+  // the dependency closure of zephyr_final names 164 of the sample's 165
+  // packages and would filter out nothing. What separates them is whether a
+  // component put a file into the image: see lib/security-scope.js.
+  get securityScopeElements() {
+    const focus = this.securityScope;
+    if (!focus) return null;
+
+    const key = `${focus}|${this.securityScopeReach}`;
+    if (scopeKey === key && scopeVal) return scopeVal;
+
+    const scope = buildSecurityScope({
+      root: focus,
+      reach: this.securityScopeReach,
+      impactChildIndex: this.impactChildIndex,
+      producedByBuildIndex: this.producedByBuildIndex,
+      buildInputIndex: this.buildInputIndex,
+      containsIndex: this.containsIndex,
+      elementMap: this.elementMap,
+      relFromIndex: this.relFromIndex,
+      relToIndex: this.relToIndex
+    });
+    scopeKey = key;
+    scopeVal = scope;
+    return scope;
+  },
+
+  // Name for the scope chip in the toolbar.
+  get securityScopeLabel() {
+    if (!this.securityScope) return 'Whole document';
+    return this.relTargetDisplayName(this.securityScope);
+  },
+
+  // The same scope as a noun phrase that reads inside a sentence.
+  get securityScopeSentence() {
+    if (!this.securityScope) return 'this document';
+    const name = this.relTargetDisplayName(this.securityScope);
+    return this.securityScopeReach === 'compiled'
+      ? `what ${name} is built from`
+      : `${name} and everything it declares`;
+  },
+
+  // How many packages the scope covers, and how many the contribution test
+  // dropped. The gap is the point of the whole feature, so the UI states it.
+  get securityScopeStats() {
+    const scope = this.securityScopeElements;
+    if (!scope) return null;
+    return {
+      packages: scope.packages.size,
+      reached: scope.reachedPackages,
+      dropped: Math.max(0, scope.reachedPackages - scope.packages.size)
+    };
+  },
+
+  // Findings hidden by the current scope, for the "N hidden" note.
+  get securityScopeHiddenCount() {
+    if (!this.securityScope) return 0;
+    return Math.max(0, this.allVulnerabilities.length - this.scopedVulnerabilities.length);
+  },
+
+  // Scoping needs a graph to walk; on a flat package list every closure is a
+  // single node and the control would only ever empty the list.
+  get canScopeSecurity() {
+    return this.hasImpactData && this.packages.length > 0;
+  },
+
+  // Packages offerable as a scope. Build outputs come first: an image or an
+  // archive is what someone actually ships, and so what they mean by "does this
+  // apply to me". Everything else that pulls something in follows.
+  get securityScopeOptions() {
+    const query = this.securityScopeSearch.trim().toLowerCase();
+    const options = [];
+    for (const pkg of this.packages) {
+      if (!this.impactChildIndex.has(pkg.spdxId)) continue;
+      const label = this.relTargetDisplayName(pkg.spdxId);
+      if (query && !label.toLowerCase().includes(query)) continue;
+      options.push({
+        id: pkg.spdxId,
+        label,
+        isArtifact: this._isBuiltArtifact(pkg.spdxId),
+        deps: this.impactChildIndex.get(pkg.spdxId).length
+      });
+      if (options.length >= SCOPE_OPTION_LIMIT) break;
+    }
+    return options.sort(
+      (a, b) =>
+        Number(b.isArtifact) - Number(a.isArtifact) ||
+        b.deps - a.deps ||
+        a.label.localeCompare(b.label)
+    );
+  },
+
+  // Whether a package is something a build produced, and so a candidate for
+  // "what do I actually ship?". The build output is usually the binary rather
+  // than the package that wraps it (zephyr_final contains zephyr.elf, and it is
+  // the elf the Build profile names), so a package counts when it is a build
+  // output or holds one.
+  _isBuiltArtifact(spdxId) {
+    if (this.producedByBuildIndex.has(spdxId)) return true;
+    return (this.containsIndex.get(spdxId) || []).some((child) =>
+      this.producedByBuildIndex.has(child)
+    );
+  },
+
+  setSecurityScope(id) {
+    this.securityScope = id || '';
+    this.securityScopePickerOpen = false;
+    this.securityScopeSearch = '';
+    this.securityStatusFilter = '';
+    this.securitySeverityFilter = '';
+    this._resetListMemos?.();
+    this.restreamView?.('security');
+    this._scheduleNavPush?.();
+  },
+
+  setSecurityScopeReach(reach) {
+    this.securityScopeReach = reach === 'declared' ? 'declared' : 'compiled';
+    this.securityStatusFilter = '';
+    this.securitySeverityFilter = '';
+    this._resetListMemos?.();
+    this.restreamView?.('security');
+    this._scheduleNavPush?.();
   },
 
   // Deduplicated, severity-sorted assessments for a vulnerability detail view.

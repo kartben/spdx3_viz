@@ -1,7 +1,9 @@
 import {
   buildCompatMatrix,
   buildCompatReport,
+  buildScope,
   DISTRIBUTED_EDGE_TYPES,
+  IMPACT_EDGE_TYPES,
   COMPAT_MATRIX_DATE,
   COMPAT_MATRIX_URL,
   COMPAT_STATUS_META,
@@ -143,29 +145,17 @@ export const compatibilityMixin = {
     const key = `${focus}|${this.compatEdgeFilter}`;
     if (scopeKey === key && scopeVal) return scopeVal;
 
-    const roots = focus ? [focus] : [...this.impactRoots];
-    const seen = new Set(roots);
-    const queue = [...roots];
-    let head = 0;
-    const visit = (id) => {
-      if (seen.has(id)) return;
-      seen.add(id);
-      queue.push(id);
-    };
-    while (head < queue.length) {
-      const node = queue[head++];
-      for (const child of this.impactChildIndex.get(node) || []) {
-        if (distributed && !DISTRIBUTED_EDGE_TYPES.has(child.rel)) continue;
-        visit(child.id);
-      }
-      for (const build of this.producedByBuildIndex.get(node) || []) {
-        visit(build);
-        for (const input of this.buildInputIndex.get(build) || []) visit(input);
-      }
-    }
+    const { elements } = buildScope({
+      roots: focus ? [focus] : [...this.impactRoots],
+      edgeTypes: distributed ? DISTRIBUTED_EDGE_TYPES : IMPACT_EDGE_TYPES,
+      impactChildIndex: this.impactChildIndex,
+      producedByBuildIndex: this.producedByBuildIndex,
+      buildInputIndex: this.buildInputIndex,
+      elementMap: this.elementMap
+    });
     scopeKey = key;
-    scopeVal = seen;
-    return seen;
+    scopeVal = elements;
+    return elements;
   },
 
   // Name for the scope chip in the toolbar.
