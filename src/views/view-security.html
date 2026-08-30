@@ -289,7 +289,9 @@
         <include src="partials/scope-picker.html"></include>
       </div>
 
-      <!-- Reach: what counts as being in the scope -->
+      <!-- Reach: what counts as being in the scope. Both readings are offered
+           because the narrower one is a filter the reader chooses, not a
+           verdict: see the caveat in the banner below. -->
       <div x-show="securityScope" class="flex items-center gap-1 text-xs">
         <button
           type="button"
@@ -298,9 +300,9 @@
           :class="securityScopeReach === 'compiled'
             ? 'bg-rose-500/15 text-rose-300'
             : 'text-slate-400 hover:text-slate-200'"
-          title="Only components that put a file into this artifact"
+          title="Only components this SBOM records as contributing a file to this artifact"
         >
-          Built in
+          Contributes files
         </button>
         <button
           type="button"
@@ -309,9 +311,9 @@
           :class="securityScopeReach === 'declared'
             ? 'bg-rose-500/15 text-rose-300'
             : 'text-slate-400 hover:text-slate-200'"
-          title="Everything the dependency graph declares, compiled or not"
+          title="Everything the dependency graph reaches, whether or not it contributed a file"
         >
-          Declared
+          All reachable
         </button>
       </div>
       <input
@@ -332,39 +334,58 @@
       </select>
     </div>
 
-    <!-- What the scope is doing. A filter that silently removes findings is the
-         one thing a security view must never do, so state the count and the
-         reason, and offer the way back out. -->
+    <!-- What the scope is doing.
+
+         A security filter that quietly removes findings is worse than no
+         filter, and the thing being measured is easy to over-read: "carries no
+         file" is a fact about this document, not proof the code is absent from
+         the binary. So state the count, name the test, and keep the removed
+         findings one click away. -->
     <div
       x-show="securityScope"
       x-cloak
-      class="flex flex-wrap items-start gap-x-2 gap-y-1 text-xs bg-rose-500/5 border border-rose-500/20 rounded-lg px-3 py-2"
+      class="bg-rose-500/5 border border-rose-500/20 rounded-lg px-3 py-2 space-y-1"
     >
-      <span class="text-slate-300">
-        Showing findings that apply to
-        <span class="text-rose-300" x-text="securityScopeSentence"></span>.
-      </span>
-      <span x-show="securityScopeStats" class="text-slate-500">
-        <span
-          x-text="`${formatCount(securityScopeStats?.packages || 0)} of ${formatCount(packages.length)} packages in scope`"
-        ></span>
-        <span
-          x-show="securityScopeReach === 'compiled' && securityScopeStats?.dropped"
-          x-text="` · ${formatCount(securityScopeStats?.dropped || 0)} reachable but contributing no compiled file`"
-        ></span>
-      </span>
-      <span
-        x-show="securityScopeHiddenCount"
-        class="text-amber-300/90"
-        x-text="`${formatCount(securityScopeHiddenCount)} hidden`"
-      ></span>
-      <button
-        type="button"
-        @click="setSecurityScope('')"
-        class="ml-auto text-slate-400 hover:text-slate-200 underline underline-offset-2"
+      <div class="flex flex-wrap items-baseline gap-x-2 gap-y-1 text-xs">
+        <span class="text-slate-300">
+          Showing findings that apply to
+          <span class="text-rose-300" x-text="securityScopeSentence"></span>.
+        </span>
+        <span x-show="securityScopeStats" class="text-slate-500">
+          <span
+            x-text="`${formatCount(securityScopeStats?.packages || 0)} of ${formatCount(packages.length)} packages in scope`"
+          ></span>
+        </span>
+        <span class="ml-auto flex items-center gap-3">
+          <button
+            x-show="securityScopeHiddenCount"
+            type="button"
+            @click="setSecurityScopeReach('declared')"
+            class="text-amber-300/90 hover:text-amber-200 underline underline-offset-2"
+            x-text="`${formatCount(securityScopeHiddenCount)} hidden · show them`"
+          ></button>
+          <button
+            type="button"
+            @click="setSecurityScope('')"
+            class="text-slate-400 hover:text-slate-200 underline underline-offset-2"
+          >
+            Clear scope
+          </button>
+        </span>
+      </div>
+      <!-- The caveat, stated wherever the narrowing is actually in effect. -->
+      <p
+        x-show="securityScopeReach === 'compiled' && securityScopeStats?.dropped"
+        class="text-[11px] text-slate-500 leading-relaxed"
       >
-        Clear scope
-      </button>
+        <span
+          x-text="`${formatCount(securityScopeStats?.dropped || 0)} reachable packages record no file in this SBOM and are treated as not built in.`"
+        ></span>
+        That is what the document says, not proof the code is absent: a producer that ships blobs or
+        vendored code without listing files looks the same. Every dependency edge is followed,
+        including prerequisites and build-only ones, so nothing is dropped for merely not being
+        redistributed.
+      </p>
     </div>
 
     <!-- Status filter chips -->
@@ -1146,16 +1167,12 @@
     x-show="mountedViews.security && filteredVulnerabilities.length === 0"
     class="text-sm text-slate-500 italic text-center py-8"
   >
-    <span
-      x-show="allVulnerabilities.length > 0 && !(securityScope && scopedVulnerabilities.length === 0)"
-    >
+    <span x-show="allVulnerabilities.length > 0 && !securityScopeClearedAll">
       No vulnerabilities match your filters
     </span>
     <!-- A scope that clears every finding is an answer, not an empty result:
          say so, and say what would come back without it. -->
-    <span
-      x-show="securityScope && scopedVulnerabilities.length === 0 && allVulnerabilities.length > 0"
-    >
+    <span x-show="securityScopeClearedAll">
       <span class="not-italic text-slate-400">
         None of the
         <span x-text="formatCount(allVulnerabilities.length)"></span>

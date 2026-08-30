@@ -817,9 +817,11 @@ export const securityMixin = {
   get securityScopeSentence() {
     if (!this.securityScope) return 'this document';
     const name = this.relTargetDisplayName(this.securityScope);
+    // Deliberately not "what X is built from": the test is a file contribution
+    // recorded in this document, which is weaker than a claim about the binary.
     return this.securityScopeReach === 'compiled'
-      ? `what ${name} is built from`
-      : `${name} and everything it declares`;
+      ? `components contributing files to ${name}`
+      : `everything ${name} reaches`;
   },
 
   // How many packages the scope covers, and how many the contribution test
@@ -834,10 +836,24 @@ export const securityMixin = {
     };
   },
 
-  // Findings hidden by the current scope, for the "N hidden" note.
+  // Findings the current scope removes, for the "N hidden" note. Always shown
+  // and always one click from being restored: the narrowing is a reader's
+  // filter, not a judgement the view is entitled to make silently.
   get securityScopeHiddenCount() {
     if (!this.securityScope) return 0;
     return Math.max(0, this.allVulnerabilities.length - this.scopedVulnerabilities.length);
+  },
+
+  // True when a scope is set and it removes every finding in the document. The
+  // empty list then means "none of these apply here", which is an answer, and
+  // reads very differently from "this SBOM has no vulnerabilities".
+  //
+  // Computed here rather than spelled out in the template: the view needs it in
+  // two places, in one case negated, and a condition that decides whether
+  // security findings are shown should not live in a markup attribute.
+  get securityScopeClearedAll() {
+    if (!this.securityScope) return false;
+    return this.allVulnerabilities.length > 0 && this.scopedVulnerabilities.length === 0;
   },
 
   // Scoping needs a graph to walk; on a flat package list every closure is a
