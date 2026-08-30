@@ -1379,7 +1379,7 @@ export function buildFileSourceIndex(parsed, indexes) {
         // the SBOM records NOASSERTION instead of a download location. Nothing
         // in the document names a repository we could fetch from, so we PIN
         // every zephyr-sources file to one hardcoded commit in a fork:
-        // https://github.com/kartben/zephyr/commit/2920cb7790d6f61e073ec1e1eef6828ca05363cd
+        // https://github.com/kartben/zephyr/commit/fb5b73f345cbc9e371a7ef15bac574651f6e41e5
         //
         // ✅ That commit is the one the bundled sample was generated from, so
         //    its line ranges do line up with the source fetched here.
@@ -1392,7 +1392,7 @@ export function buildFileSourceIndex(parsed, indexes) {
         //    file version ("4.4.99"), never a commit; the commit is in the purl.
         // ███████████████████████████████████████████████████████████████████
         ghPath = 'kartben/zephyr'; // <-- HARDCODED HACK (fork, not upstream)
-        sha = '2920cb7790d6f61e073ec1e1eef6828ca05363cd'; // <-- HARDCODED HACK
+        sha = 'fb5b73f345cbc9e371a7ef15bac574651f6e41e5'; // <-- HARDCODED HACK
         // ███████████████████████████████████████████████████████████████████
 
         // --- CORRECT (dynamic) behaviour, disabled by the hack above ---------

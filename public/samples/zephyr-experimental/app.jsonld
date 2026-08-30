@@ -32,7 +32,7 @@
       "namespaceMap": [
         {
           "type": "NamespaceMap",
-          "namespace": "http://spdx.org/spdxdocs/zephyr-4b6c8925-4795-497f-b9a3-16f02e3b5865/",
+          "namespace": "http://spdx.org/spdxdocs/zephyr-07142409-28e8-48ac-8b7b-bb81961ca5ca/",
           "prefix": "zephyr"
         }
       ],
@@ -42,12 +42,12 @@
         "zephyr:agents/the-zephyr-project",
         "zephyr:packages/app-sources",
         "zephyr:files/File-main.c",
-        "zephyr:relationships/2148",
+        "zephyr:relationships/2155",
         "https://spdx.org/licenses/Apache-2.0",
-        "zephyr:relationships/2558",
-        "zephyr:relationships/2559",
-        "zephyr:relationships/2783",
-        "zephyr:relationships/2784",
+        "zephyr:relationships/2565",
+        "zephyr:relationships/2566",
+        "zephyr:relationships/2790",
+        "zephyr:relationships/2791",
         "https://spdx.org/licenses/CC0-1.0",
         "zephyr:app/sboms/app"
       ],
@@ -74,12 +74,12 @@
         "zephyr:agents/the-zephyr-project",
         "zephyr:packages/app-sources",
         "zephyr:files/File-main.c",
-        "zephyr:relationships/2148",
+        "zephyr:relationships/2155",
         "https://spdx.org/licenses/Apache-2.0",
-        "zephyr:relationships/2558",
-        "zephyr:relationships/2559",
-        "zephyr:relationships/2783",
-        "zephyr:relationships/2784",
+        "zephyr:relationships/2565",
+        "zephyr:relationships/2566",
+        "zephyr:relationships/2790",
+        "zephyr:relationships/2791",
         "https://spdx.org/licenses/CC0-1.0"
       ],
       "rootElement": [
@@ -91,7 +91,7 @@
     {
       "type": "CreationInfo",
       "@id": "zephyr:creationinfo",
-      "created": "2026-08-30T14:39:08Z",
+      "created": "2026-08-30T16:13:54Z",
       "createdBy": [
         "zephyr:agents/west-spdx-agent",
         "zephyr:agents/the-zephyr-project"
@@ -126,8 +126,8 @@
     {
       "type": "software_Package",
       "spdxId": "zephyr:packages/app-sources",
-      "software_downloadLocation": "git+https://github.com/zephyrproject-rtos/zephyr@2920cb7790d6f61e073ec1e1eef6828ca05363cd",
-      "software_packageVersion": "2920cb7790d6f61e073ec1e1eef6828ca05363cd",
+      "software_downloadLocation": "git+https://github.com/zephyrproject-rtos/zephyr@fb5b73f345cbc9e371a7ef15bac574651f6e41e5",
+      "software_packageVersion": "fb5b73f345cbc9e371a7ef15bac574651f6e41e5",
       "software_copyrightText": "NOASSERTION",
       "software_primaryPurpose": "source",
       "suppliedBy": "zephyr:agents/the-zephyr-project",
@@ -136,7 +136,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2148",
+      "spdxId": "zephyr:relationships/2155",
       "from": "zephyr:packages/app-sources",
       "relationshipType": "contains",
       "to": [
@@ -146,7 +146,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2558",
+      "spdxId": "zephyr:relationships/2565",
       "from": "zephyr:packages/app-sources",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -156,7 +156,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2559",
+      "spdxId": "zephyr:relationships/2566",
       "from": "zephyr:packages/app-sources",
       "relationshipType": "hasDeclaredLicense",
       "to": [
@@ -166,7 +166,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2783",
+      "spdxId": "zephyr:relationships/2790",
       "from": "zephyr:files/File-main.c",
       "relationshipType": "hasConcludedLicense",
       "to": [
@@ -176,7 +176,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "zephyr:relationships/2784",
+      "spdxId": "zephyr:relationships/2791",
       "from": "zephyr:files/File-main.c",
       "relationshipType": "hasDeclaredLicense",
       "to": [
