@@ -24,13 +24,19 @@ import { groupSnippetsByFile } from './relationships.js';
  *   coveredRows: number
  * }} CoverageMatrix */
 
+/**
+ * The four matrices, in the order a safety case is walked: where a requirement
+ * is stated, what builds it, what checks it, and what backs that check.
+ * Evidence follows Verification because that is how the data is reached
+ * (verifiedBy, then the evaluation's hasEvidence).
+ */
 export const COVERAGE_KINDS = Object.freeze([
   {
-    id: 'verification',
-    label: 'Verification',
+    id: 'specification',
+    label: 'Specifications',
     rowNoun: 'Requirements',
-    colNoun: 'Verifications',
-    hint: 'Which tests and analyses cover each requirement, and how they evaluated.'
+    colNoun: 'Specifications',
+    hint: 'Which specifications allocate each requirement.'
   },
   {
     id: 'implementation',
@@ -40,18 +46,18 @@ export const COVERAGE_KINDS = Object.freeze([
     hint: 'Which source files, snippets, or packages implement each requirement.'
   },
   {
+    id: 'verification',
+    label: 'Verification',
+    rowNoun: 'Requirements',
+    colNoun: 'Verifications',
+    hint: 'Which tests and analyses cover each requirement, and how they evaluated.'
+  },
+  {
     id: 'evidence',
     label: 'Evidence',
     rowNoun: 'Requirements',
     colNoun: 'Evidence',
     hint: 'Which work products back each requirement via evaluation hasEvidence links.'
-  },
-  {
-    id: 'specification',
-    label: 'Specifications',
-    rowNoun: 'Requirements',
-    colNoun: 'Specifications',
-    hint: 'Which specifications allocate each requirement.'
   }
 ]);
 
