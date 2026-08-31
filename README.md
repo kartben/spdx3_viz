@@ -14,6 +14,8 @@ builds, agents, etc. as an interactive graph.
   heatmaps to focus on vulnerabilities or functional-safety gaps.
 - Dig into software, files, licenses, builds, agents, hardware, AI datasets and models, security and
   VEX data, and functional-safety requirements when those profiles are present.
+- Plot functional-safety coverage as requirements-by-verification (and implementation, evidence,
+  specification) matrices, and export them to Excel.
 - Trace requirements down to source snippets, inspect SBOM completeness statistics, and share links
   to exact views of the bundled samples.
 - Keep the SBOM itself in your browser. Files loaded from your computer are parsed locally and are

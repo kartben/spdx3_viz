@@ -39,6 +39,8 @@ export const paletteMixin = {
         return this.hardware.length > 0;
       case 'requirements':
         return this.requirements.length > 0;
+      case 'coverage':
+        return this.safetyCounts.requirements > 0;
       case 'licenses':
         return this.licenses.length > 0;
       case 'configs':

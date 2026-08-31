@@ -878,6 +878,7 @@ test('share hash round-trips a spot in a sample', () => {
     securityScopeReach: 'compiled',
     requirementKind: 'Requirement',
     requirementLayout: null,
+    coverageKind: 'verification',
     supplyChainMode: null
   });
 

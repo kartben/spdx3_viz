@@ -71,6 +71,7 @@ export function createState() {
       hardware: false,
       supplychain: false,
       requirements: false,
+      coverage: false,
       licenses: false,
       security: false,
       configs: false,
@@ -148,6 +149,12 @@ export function createState() {
     requirementSpecFilter: '', // '' = all, else a Specification spdxId (hasRequirement facet)
     requirementLayout: 'list', // Functional Safety tab: 'list' | 'tree' (tracedToDetail decomposition)
     collapsedReqs: {}, // decomposition tree: spdxId -> true for collapsed subtrees
+    coverageKind: 'verification', // Coverage tab: verification | implementation | evidence | specification
+    coverageSearch: '',
+    coverageGapsOnly: false,
+    coverageHideEmptyCols: false,
+    coverageHover: null, // { r, c } | { r } | { c } | null
+    coverageWindow: { startRow: 0, endRow: 40, startCol: 0, endCol: 40 },
     sidebarOpen: false, // mobile off-canvas nav drawer (ignored at md+ where the sidebar is static)
     detailElement: null,
     detailPanelWidth: storedDetailPanelWidth(), // graph detail panel width (px) at md+, drag-resizable

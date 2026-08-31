@@ -6,6 +6,16 @@
  */
 export const CHANGELOG = [
   {
+    version: 'Unreleased',
+    date: null,
+    items: [
+      {
+        tag: 'Added',
+        text: 'Functional Safety coverage matrices, exportable to Excel.'
+      }
+    ]
+  },
+  {
     version: '0.6.0',
     date: '2026-08-29',
     items: [

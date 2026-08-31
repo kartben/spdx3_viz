@@ -812,6 +812,12 @@ export const loadingMixin = {
       this.collapsedReqs = {};
       // Prefer Decomposition when the SBOM has tracedToDetail hierarchy.
       this.requirementLayout = this.hasSafetyDecomposition ? 'tree' : 'list';
+      this.coverageKind = 'verification';
+      this.coverageSearch = '';
+      this.coverageGapsOnly = false;
+      this.coverageHideEmptyCols = false;
+      this.coverageHover = null;
+      this._resetCoverageMemos?.();
       this.remediationCategoryFilter = '';
       this.remediationSeverityFilter = '';
       this.expandedClusters = new Set(); // fresh data: start fully collapsed

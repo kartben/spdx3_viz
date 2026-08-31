@@ -39,6 +39,22 @@ const SC_CODE_TO_MODE = {
   mp: 'map'
 };
 
+/** @type {Record<string, string>} */
+const COVERAGE_KIND_TO_CODE = {
+  verification: 'v',
+  implementation: 'i',
+  evidence: 'e',
+  specification: 's'
+};
+
+/** @type {Record<string, string>} */
+const COVERAGE_CODE_TO_KIND = {
+  v: 'verification',
+  i: 'implementation',
+  e: 'evidence',
+  s: 'specification'
+};
+
 /**
  * Builds the URL fragment (without the leading '#') for a spot in a sample.
  * Returns '' when there is no sample to anchor the link to.
@@ -52,7 +68,8 @@ const SC_CODE_TO_MODE = {
  *          compatOutbound?: string|null, compatScope?: string|null,
  *          compatEdges?: string|null, securityScope?: string|null,
  *          securityScopeReach?: string|null, requirementKind?: string|null,
- *          requirementLayout?: string|null, supplyChainMode?: string|null}} spot
+ *          requirementLayout?: string|null, coverageKind?: string|null,
+ *          supplyChainMode?: string|null}} spot
  * @returns {string}
  */
 export function buildShareHash(spot) {
@@ -88,6 +105,11 @@ export function buildShareHash(spot) {
     if (spot.requirementLayout === 'tree') params.set('rl', 't');
     else if (spot.requirementLayout === 'list') params.set('rl', 'l');
   }
+  // Coverage matrix kind. Verification is the default and stays out of the hash.
+  if (spot.view === 'coverage') {
+    const cm = COVERAGE_KIND_TO_CODE[spot.coverageKind || 'verification'];
+    if (cm && cm !== 'v') params.set('cm', cm);
+  }
   // Supply Chain angle. Timeline is the default and stays out of the hash.
   if (spot.view === 'supplychain') {
     const modeCode = SC_MODE_TO_CODE[spot.supplyChainMode ?? 'timeline'];
@@ -111,7 +133,7 @@ export function buildShareHash(spot) {
  *            compatScope: string|null, compatEdges: string,
  *            securityScope: string|null, securityScopeReach: string,
  *            requirementKind: string, requirementLayout: string|null,
- *            supplyChainMode: string|null}|null}
+ *            coverageKind: string, supplyChainMode: string|null}|null}
  */
 export function parseShareHash(hash) {
   const raw = String(hash || '').replace(/^#/, '');
@@ -140,6 +162,7 @@ export function parseShareHash(hash) {
     // null means the link did not pin a layout: keep the document default
     // (tree when there is a decomposition) unless an expanded card forces list.
     requirementLayout: rl === 't' ? 'tree' : rl === 'l' ? 'list' : null,
+    coverageKind: COVERAGE_CODE_TO_KIND[params.get('cm') || ''] || 'verification',
     // null when omitted so an expanded card can still infer its angle; an
     // explicit svm always wins.
     supplyChainMode: svm ? SC_CODE_TO_MODE[svm] || 'timeline' : null
