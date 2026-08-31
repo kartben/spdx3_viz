@@ -207,6 +207,17 @@ export const coverageMixin = {
     return `width:${Math.max(m.cols.length, 1) * L.colW}px;height:${Math.max(m.rows.length, 1) * L.rowH}px;background-size:${L.colW}px ${L.rowH}px`;
   },
 
+  // Label for one plotted cell. A cell carries the coordinates it was built
+  // with, and the matrix underneath can be replaced (a new SBOM, a filter)
+  // before the grid is re-rendered, so never assume the pair still resolves.
+  coverageCellTitle(cell) {
+    const m = this.coverageMatrix;
+    const row = m.rows[cell.r];
+    const col = m.cols[cell.c];
+    if (!row || !col) return '';
+    return `${row.uid} × ${col.uid}: ${this.coverageCellStyle(cell.status).label}`;
+  },
+
   get coverageExplanation() {
     const hover = this.coverageHover;
     if (!hover) return null;
@@ -214,6 +225,7 @@ export const coverageMixin = {
     const row = hover.r != null ? m.rows[hover.r] : null;
     const col = hover.c != null ? m.cols[hover.c] : null;
     if (hover.r != null && hover.c != null) {
+      if (!row || !col) return null;
       const cell = m.rowCells[hover.r]?.get(hover.c);
       const meta = cell ? COVERAGE_CELL[cell.status] : null;
       return {

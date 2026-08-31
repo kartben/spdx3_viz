@@ -229,8 +229,8 @@
                     : ''
                 ]"
                 :style="coverageCellPosition(cell)"
-                :title="coverageMatrix.rows[cell.r].uid + ' × ' + coverageMatrix.cols[cell.c].uid + ': ' + coverageCellStyle(cell.status).label"
-                :aria-label="coverageMatrix.rows[cell.r].uid + ' × ' + coverageMatrix.cols[cell.c].uid + ': ' + coverageCellStyle(cell.status).label"
+                :title="coverageCellTitle(cell)"
+                :aria-label="coverageCellTitle(cell)"
                 @mouseenter="setCoverageHover({ r: cell.r, c: cell.c })"
                 @click.stop="openCoverageCell(cell)"
               ></button>
