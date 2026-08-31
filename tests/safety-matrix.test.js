@@ -453,6 +453,42 @@ describe('coverage export', () => {
     assert.ok(files['xl/styles.xml'].includes('FF10B981'));
   });
 
+  it('writes every worksheet row left to right, whatever order the links arrived in', () => {
+    // Excel refuses to open a sheet whose row cells run right to left, and
+    // links come in relationship order, not column order.
+    const scrambled = assembleCoverageMatrix({
+      kind: 'verification',
+      rows: [
+        { id: 'r1', uid: 'REQ-A', name: 'Alpha' },
+        { id: 'r2', uid: 'REQ-B', name: 'Beta' }
+      ],
+      cols: [
+        { id: 'v1', uid: 'VER-1', name: 'One' },
+        { id: 'v2', uid: 'VER-2', name: 'Two' }
+      ],
+      links: [
+        { rowId: 'r2', colId: 'v1', status: 'pass' },
+        { rowId: 'r1', colId: 'v2', status: 'pass' },
+        { rowId: 'r1', colId: 'v1', status: 'fail' }
+      ]
+    });
+    assert.deepEqual([...scrambled.rowCells[0].keys()], [0, 1]);
+
+    const sheet = unzipStore(coverageMatricesToXlsx({ verification: scrambled }))[
+      'xl/worksheets/sheet2.xml'
+    ];
+    for (const row of sheet.match(/<row r="\d+">.*?<\/row>/g) || []) {
+      const cols = [...row.matchAll(/<c r="([A-Z]+)\d+"/g)].map(([, ref]) =>
+        [...ref].reduce((n, ch) => n * 26 + (ch.charCodeAt(0) - 64), 0)
+      );
+      assert.deepEqual(
+        cols,
+        [...cols].sort((a, b) => a - b),
+        row
+      );
+    }
+  });
+
   it('round-trips zipStore entries', () => {
     const bytes = zipStore([{ name: 'hello.txt', data: new TextEncoder().encode('hi') }]);
     const files = unzipStore(bytes);

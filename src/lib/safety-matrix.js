@@ -19,7 +19,7 @@ import { groupSnippetsByFile } from './relationships.js';
  *   rows: Array<CoverageAxisItem & { linked: number }>,
  *   cols: CoverageAxisItem[],
  *   cells: Map<string, CoverageCell>,
- *   rowCells: Array<Map<number, CoverageCell>>,
+ *   rowCells: Array<Map<number, CoverageCell>>, // per row, ascending column
  *   filled: number,
  *   coveredRows: number
  * }} CoverageMatrix */
@@ -218,6 +218,20 @@ function cellKey(r, c) {
 }
 
 /**
+ * Rebuild every row's cell map in ascending column order. Links arrive in
+ * relationship order, so a row can otherwise hold column 5 before column 2, and
+ * Excel refuses to open a worksheet whose row cells are not left to right.
+ *
+ * @param {Array<Map<number, CoverageCell>>} rowCells
+ * @returns {Array<Map<number, CoverageCell>>}
+ */
+function orderRowCells(rowCells) {
+  return rowCells.map((row) =>
+    row.size < 2 ? row : new Map([...row.entries()].sort((a, b) => a[0] - b[0]))
+  );
+}
+
+/**
  * Assemble a sparse matrix from row/col items and (rowId, colId, status) links.
  * Columns cluster by the first row they cover so related links sit near the
  * diagonal of a typical requirements-traceability matrix.
@@ -280,7 +294,7 @@ export function assembleCoverageMatrix(spec) {
     rows,
     cols: colItems,
     cells,
-    rowCells,
+    rowCells: orderRowCells(rowCells),
     filled: cells.size,
     coveredRows
   };
@@ -384,7 +398,7 @@ function finishFiltered(matrix, rows, cols, cells) {
     rows: nextRows,
     cols,
     cells,
-    rowCells,
+    rowCells: orderRowCells(rowCells),
     filled: cells.size,
     coveredRows
   };
@@ -771,6 +785,10 @@ function concatBytes(parts) {
 
 const encoder = new TextEncoder();
 
+/** 1980-01-01 in DOS date form: day 1, month 1, year 0. A literal 0 encodes
+ *  day 0 of month 0, which strict readers reject. */
+const DOS_DATE = (1 << 5) | 1;
+
 /**
  * ZIP archive using STORE (no compression). Enough for an xlsx package.
  *
@@ -791,7 +809,7 @@ export function zipStore(files) {
       u16(0),
       u16(0),
       u16(0),
-      u16(0),
+      u16(DOS_DATE),
       u32(crc),
       u32(data.length),
       u32(data.length),
@@ -808,7 +826,7 @@ export function zipStore(files) {
       u16(0),
       u16(0),
       u16(0),
-      u16(0),
+      u16(DOS_DATE),
       u32(crc),
       u32(data.length),
       u32(data.length),
