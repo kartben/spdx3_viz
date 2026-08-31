@@ -127,18 +127,56 @@ export const coverageMixin = {
     coverageFilterVal = filterCoverageMatrix(raw, {
       search: this.coverageSearch,
       gapsOnly: this.coverageGapsOnly,
-      hideEmptyCols: this.coverageHideEmptyCols
+      // Every gap row is empty by definition, so keeping the columns would draw
+      // a grid that cannot hold a single cell.
+      hideEmptyCols: this.coverageHideEmptyCols || this.coverageGapsOnly
     });
     coverageFilterSrc = raw;
     coverageFilterKey = key;
     return coverageFilterVal;
   },
 
+  // How many requirements the current matrix leaves unlinked, before any
+  // filtering: the number "Gaps only" is about to show.
+  get coverageGapCount() {
+    const m = this.coverageBundle[this.coverageActiveKind];
+    return m ? m.rows.length - m.coveredRows : 0;
+  },
+
+  // The count line under the toolbar. Gaps only reports against the whole
+  // matrix, because "0 of 238 linked, 0%" says nothing once the rows with a
+  // link have been filtered out.
   get coverageSummaryLine() {
     const m = this.coverageMatrix;
-    if (!m?.rows.length) return 'No requirements to plot.';
-    const pct = m.rows.length ? Math.round((m.coveredRows / m.rows.length) * 100) : 0;
-    return `${this.formatCount(m.coveredRows)} of ${this.formatCount(m.rows.length)} ${m.rowNoun.toLowerCase()} linked · ${this.formatCount(m.cols.length)} ${m.colNoun.toLowerCase()} · ${this.formatCount(m.filled)} cells · ${pct}%`;
+    const all = this.coverageBundle[this.coverageActiveKind];
+    const noun = (all || m)?.rowNoun.toLowerCase() || 'requirements';
+    const colNoun = (all || m)?.colNoun.toLowerCase() || 'columns';
+    if (this.coverageGapsOnly && all) {
+      const gaps = this.coverageGapCount;
+      const shown = m?.rows.length ?? 0;
+      const scope = shown === gaps ? '' : ` · ${this.formatCount(shown)} match the filter`;
+      return `${this.formatCount(gaps)} of ${this.formatCount(all.rows.length)} ${noun} have no ${singular(colNoun)} link${scope}`;
+    }
+    if (!m?.rows.length) return `No ${noun} to plot.`;
+    const pct = Math.round((m.coveredRows / m.rows.length) * 100);
+    return `${this.formatCount(m.coveredRows)} of ${this.formatCount(m.rows.length)} ${noun} linked · ${this.formatCount(m.cols.length)} ${colNoun} · ${this.formatCount(m.filled)} cells · ${pct}%`;
+  },
+
+  // What the body area says when there is no grid to draw.
+  get coverageEmptyNote() {
+    const m = this.coverageMatrix;
+    const all = this.coverageBundle[this.coverageActiveKind];
+    const colNoun = singular((all || m)?.colNoun.toLowerCase() || 'column');
+    if (this.coverageGapsOnly) {
+      if (!m?.rows.length) {
+        return this.coverageSearch
+          ? `No requirement matching the filter is missing a ${colNoun} link.`
+          : `No gaps: every requirement has at least one ${colNoun} link.`;
+      }
+      return `Nothing to plot: these requirements have no ${colNoun} link at all. Click one to open it.`;
+    }
+    if (!m?.rows.length) return 'No requirements match the current filter.';
+    return `None of the requirements shown has a ${colNoun} link.`;
   },
 
   get coverageVisibleRows() {
@@ -413,3 +451,8 @@ export const coverageMixin = {
 };
 
 const COVERAGE_KINDS_FALLBACK = COVERAGE_KIND_BY_ID.verification;
+
+/** "verifications" -> "verification", for a sentence about a single link. */
+function singular(noun) {
+  return noun.replace(/s$/, '');
+}

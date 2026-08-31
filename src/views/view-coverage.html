@@ -40,14 +40,21 @@
           class="rounded-sm border-slate-600 bg-slate-700 text-yellow-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5"
         />
         Gaps only
+        <span
+          class="tabular-nums text-slate-500"
+          x-show="coverageGapCount > 0"
+          x-text="`(${formatCount(coverageGapCount)})`"
+        ></span>
       </label>
       <label
         class="flex items-center gap-1.5 text-xs text-slate-400 cursor-pointer select-none shrink-0"
+        :class="coverageGapsOnly ? 'opacity-50 cursor-not-allowed' : ''"
         title="Drop columns that none of the currently shown rows use"
       >
         <input
           type="checkbox"
           x-model="coverageHideEmptyCols"
+          :disabled="coverageGapsOnly"
           @change="_resetCoverageScroll()"
           class="rounded-sm border-slate-600 bg-slate-700 text-yellow-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5"
         />
@@ -90,9 +97,10 @@
 
   <template x-if="hasCoverageMatrices && coverageMatrix.rows.length === 0">
     <div class="flex-1 flex items-center justify-center p-6">
-      <p class="text-sm text-slate-400 max-w-md leading-relaxed text-center">
-        No requirements match the current filter.
-      </p>
+      <p
+        class="text-sm text-slate-400 max-w-md leading-relaxed text-center"
+        x-text="coverageEmptyNote"
+      ></p>
     </div>
   </template>
 
@@ -106,7 +114,10 @@
     x-init="$nextTick(() => bindCoverageScroll())"
     @mouseleave="setCoverageHover(null)"
   >
+    <!-- No columns (every shown row is a gap): the header band has nothing to
+         title, so give its height back to the list. -->
     <div
+      x-show="coverageMatrix.cols.length > 0"
       class="flex shrink-0 border-b border-slate-700/80"
       :style="`height:${coverageLayout.headH}px`"
       @wheel.prevent="onCoverageHeaderWheel($event)"
@@ -187,9 +198,20 @@
         x-ref="coverageBody"
         @scroll="onCoverageScroll()"
       >
+        <!-- No columns left to plot against (every shown row is a gap): say so
+             rather than parking the reader in front of a blank grid. -->
+        <p
+          x-show="coverageMatrix.cols.length === 0"
+          class="text-xs text-slate-500 leading-relaxed p-4 max-w-sm"
+          x-text="coverageEmptyNote"
+        ></p>
         <!-- The wrapper carries the same trailing slack as the header track, so
              scrolling to the last column leaves room to read its title. -->
-        <div class="flex" :style="`width:${coverageTrackWidth}px`">
+        <div
+          x-show="coverageMatrix.cols.length > 0"
+          class="flex"
+          :style="`width:${coverageTrackWidth}px`"
+        >
           <div
             class="coverage-grid-bg relative shrink-0"
             :style="coverageGridStyle"
