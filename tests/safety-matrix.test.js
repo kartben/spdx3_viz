@@ -329,7 +329,7 @@ describe('buildCoverageMatrices', () => {
     assert.equal(bundle.specification.filled, 2);
     assert.deepEqual(
       availableCoverageKinds(bundle).map((k) => k.id),
-      ['verification', 'implementation', 'evidence', 'specification']
+      ['specification', 'implementation', 'verification', 'evidence']
     );
   });
 
