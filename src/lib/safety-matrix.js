@@ -105,11 +105,23 @@ export const COVERAGE_CELL = Object.freeze({
 
 export const COVERAGE_CELL_ORDER = Object.freeze(['fail', 'inconclusive', 'pass', 'linked']);
 
+/**
+ * Grid geometry. Column titles are rotated by `headAngle` from the bottom-left
+ * corner of their column, so the header band's height is what caps how much of
+ * a title can be read: a title box `headLabelW` long stands `headLabelW *
+ * sin(headAngle)` tall. `headTrailW` is the matching horizontal reach, kept
+ * free to the right of the last column so its title is not cut off, and
+ * `headGutterW` is the line-height's lean to the left of the first one.
+ */
 export const COVERAGE_LAYOUT = Object.freeze({
   rowH: 28,
   colW: 26,
-  labelW: 256,
-  headH: 120,
+  headH: 140,
+  headAngle: 52,
+  headLineH: 15,
+  headLabelW: 150,
+  headTrailW: 100,
+  headGutterW: 14,
   overscan: 6
 });
 

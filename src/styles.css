@@ -379,6 +379,20 @@ html {
   scrollbar-gutter: stable;
 }
 
+/* Row labels (UID + requirement name) need real room, but must not eat the
+   grid on a narrow window. */
+.coverage-label-pane {
+  width: clamp(9rem, 40%, 21rem);
+}
+
+/* Reclaims the gutter the header track is inset by, so the first rotated title
+   is not shaved off; it paints above the corner in that sliver. */
+.coverage-col-head {
+  position: relative;
+  z-index: 30;
+  margin-left: -14px;
+}
+
 .coverage-grid-bg {
   background-image:
     linear-gradient(to right, rgba(51, 65, 85, 0.45) 1px, transparent 1px),

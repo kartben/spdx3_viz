@@ -57,6 +57,18 @@ export const coverageMixin = {
     return COVERAGE_CELL[status] || COVERAGE_CELL.linked;
   },
 
+  // Tooltip for a row or column label. The name usually already carries the
+  // short label, either as a code prefix ("VER-FSR-01: Confirm...") or as a
+  // path tail ("kernel/thread.c" for "thread.c"), so only prepend the UID when
+  // it would actually add something.
+  coverageAxisTitle(item) {
+    const uid = (item?.uid || '').trim();
+    const name = (item?.name || '').trim();
+    if (!uid || uid === name) return name || uid;
+    if (!name) return uid;
+    return name.startsWith(uid) || name.endsWith(uid) ? name : `${uid}: ${name}`;
+  },
+
   // The four raw matrices for this document, rebuilt only when the SBOM's
   // requirement or relationship arrays are replaced.
   get coverageBundle() {
@@ -241,6 +253,25 @@ export const coverageMixin = {
   coverageColPosition(index) {
     const L = COVERAGE_LAYOUT;
     return `left:${index * L.colW}px;width:${L.colW}px`;
+  },
+
+  // A rotated column title. It is anchored at its column's bottom-left corner
+  // and runs up and to the right, so it needs the length the header band can
+  // hold, not the 26px width of the column it names.
+  coverageColHeadStyle(index) {
+    const L = COVERAGE_LAYOUT;
+    return (
+      `left:${index * L.colW}px;width:${L.headLabelW}px;line-height:${L.headLineH}px;` +
+      `transform:rotate(-${L.headAngle}deg) translateX(6px)`
+    );
+  },
+
+  // The column-header track runs past the last column by the horizontal reach
+  // of a title, and the grid gets the same slack, so scrolling to the end still
+  // leaves room to read it.
+  get coverageTrackWidth() {
+    const L = COVERAGE_LAYOUT;
+    return Math.max(this.coverageMatrix.cols.length, 1) * L.colW + L.headTrailW;
   },
 
   _coverageCellFromEvent(e) {
