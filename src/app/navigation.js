@@ -183,15 +183,17 @@ export const navigationMixin = {
     };
   },
 
-  // Functional Safety chips and layout, only while that view is on screen.
-  // A link should reopen the same kind of card (requirements vs. tests) rather
-  // than always landing on the default Requirements chip / decomposition tree.
+  // Functional Safety chips, layout, and Coverage panel, only while that view
+  // is on screen. A link should reopen the same kind of card (requirements vs.
+  // tests) or the same matrix rather than always landing on the default
+  // Requirements chip / decomposition tree.
   _safetyNavState() {
-    if (this.currentView === 'coverage') {
-      return { coverageKind: this.coverageKind };
-    }
     if (this.currentView !== 'requirements') return {};
+    if (this.safetyViewMode === 'coverage') {
+      return { safetyViewMode: 'coverage', coverageKind: this.coverageKind };
+    }
     return {
+      safetyViewMode: 'requirements',
       requirementKindFilter: this.requirementKindFilter,
       requirementLayout: this.requirementLayout
     };
@@ -286,6 +288,7 @@ export const navigationMixin = {
       compatEdges: state.compatEdges,
       requirementKind: state.requirementKindFilter,
       requirementLayout: state.requirementLayout,
+      safetyViewMode: state.safetyViewMode,
       coverageKind: state.coverageKind,
       supplyChainMode: state.supplyChainViewMode
     });
@@ -295,7 +298,8 @@ export const navigationMixin = {
   // Applies a parsed share hash (see lib/share.js) once its sample has parsed.
   _applyDeepLink(link) {
     if (!link) return;
-    const view = this.views.some((v) => v.id === link.view) ? link.view : 'dashboard';
+    const rawView = link.view === 'coverage' ? 'requirements' : link.view;
+    const view = this.views.some((v) => v.id === rawView) ? rawView : 'dashboard';
     const state = {
       view,
       expandedPkg: null,
@@ -319,6 +323,10 @@ export const navigationMixin = {
       compatEdges: link.compatEdges,
       requirementKindFilter: link.requirementKind,
       requirementLayout: link.requirementLayout,
+      safetyViewMode:
+        link.safetyViewMode === 'coverage' || link.view === 'coverage'
+          ? 'coverage'
+          : 'requirements',
       coverageKind: link.coverageKind,
       supplyChainViewMode: link.supplyChainMode
     };
@@ -355,6 +363,11 @@ export const navigationMixin = {
   },
   _applyNavState(state) {
     if (!state) return;
+    // Coverage used to be a top-level view. History entries and older links
+    // that still name it land on the Functional Safety coverage panel instead.
+    if (state.view === 'coverage') {
+      state = { ...state, view: 'requirements', safetyViewMode: 'coverage' };
+    }
     const wasGraphView = this.currentView === 'graph';
     this._lastNavKey = JSON.stringify(state);
     if (state.view in this.mountedViews) this.mountedViews[state.view] = true;
@@ -444,6 +457,7 @@ export const navigationMixin = {
   // list layout so the expandable card exists, and no status/spec filter that
   // would hide it. Shared by navigateToRequirement and deep-link restore.
   _revealRequirementCard(spdxId) {
+    this.safetyViewMode = 'requirements';
     this.requirementSearch = '';
     const el = this.elementMap?.get(spdxId);
     this.requirementKindFilter = el?.type || 'Requirement';
@@ -457,6 +471,12 @@ export const navigationMixin = {
   // list layout, so a saved URL to a test is not swallowed by the default
   // Requirements filter or the decomposition tree.
   _applySafetyNavState(state) {
+    if (state.coverageKind) this.coverageKind = state.coverageKind;
+    if (state.safetyViewMode === 'coverage' && !state.expandedRequirement) {
+      this.safetyViewMode = 'coverage';
+      return;
+    }
+    this.safetyViewMode = 'requirements';
     if (state.view === 'requirements' && state.expandedRequirement) {
       this._revealRequirementCard(state.expandedRequirement);
       return;
@@ -467,7 +487,6 @@ export const navigationMixin = {
     if (state.requirementLayout === 'list' || state.requirementLayout === 'tree') {
       this.requirementLayout = state.requirementLayout;
     }
-    if (state.coverageKind) this.coverageKind = state.coverageKind;
   },
   // Restores the Supply Chain angle. An expanded card without an explicit
   // mode reuses navigateToSupplyChain's inference so older links still land

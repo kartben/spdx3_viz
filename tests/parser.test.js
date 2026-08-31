@@ -879,6 +879,7 @@ test('share hash round-trips a spot in a sample', () => {
     requirementKind: 'Requirement',
     requirementLayout: null,
     coverageKind: 'verification',
+    safetyViewMode: 'requirements',
     supplyChainMode: null
   });
 

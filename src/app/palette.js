@@ -39,8 +39,6 @@ export const paletteMixin = {
         return this.hardware.length > 0;
       case 'requirements':
         return this.requirements.length > 0;
-      case 'coverage':
-        return this.safetyCounts.requirements > 0;
       case 'licenses':
         return this.licenses.length > 0;
       case 'configs':
@@ -72,7 +70,13 @@ export const paletteMixin = {
         group: 'Go to view',
         name: v.label,
         icon: v.icon,
-        _hay: ('go to view ' + v.label + ' ' + v.id).toLowerCase(),
+        _hay: (
+          'go to view ' +
+          v.label +
+          ' ' +
+          v.id +
+          (v.id === 'requirements' ? ' coverage matrix' : '')
+        ).toLowerCase(),
         run: () => this.switchView(v.id)
       });
     }

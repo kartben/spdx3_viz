@@ -1,11 +1,12 @@
 <div
-  x-show="currentView === 'requirements'"
+  x-show="currentView === 'requirements' && safetyViewMode !== 'coverage'"
   class="fade-in space-y-3"
   :class="hasSafetySpecFacets ? 'max-w-6xl' : 'max-w-4xl'"
 >
   <div class="list-sticky space-y-3">
     <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
       <div class="flex items-center gap-2 min-w-0">
+        <include src="partials/safety-mode-tabs.html"></include>
         <!-- Layout toggle: flat list vs. tracedToDetail decomposition tree -->
         <div
           x-show="hasSafetyDecomposition"

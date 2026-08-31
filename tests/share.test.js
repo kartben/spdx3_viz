@@ -190,17 +190,31 @@ test('older Functional Safety and Supply Chain links still parse', () => {
 test('Coverage matrix kind survives a round trip and verification stays omitted', () => {
   const impl = buildShareHash({
     sample: 'functional-safety',
-    view: 'coverage',
+    view: 'requirements',
+    safetyViewMode: 'coverage',
     coverageKind: 'implementation'
   });
-  assert.equal(impl, 's=functional-safety&v=coverage&cm=i');
-  assert.equal(parseShareHash(impl).coverageKind, 'implementation');
+  assert.equal(impl, 's=functional-safety&v=requirements&fsm=c&cm=i');
+  const parsedImpl = parseShareHash(impl);
+  assert.equal(parsedImpl.view, 'requirements');
+  assert.equal(parsedImpl.safetyViewMode, 'coverage');
+  assert.equal(parsedImpl.coverageKind, 'implementation');
 
   const def = buildShareHash({
     sample: 'functional-safety',
-    view: 'coverage',
+    view: 'requirements',
+    safetyViewMode: 'coverage',
     coverageKind: 'verification'
   });
-  assert.equal(def, 's=functional-safety&v=coverage');
-  assert.equal(parseShareHash(def).coverageKind, 'verification');
+  assert.equal(def, 's=functional-safety&v=requirements&fsm=c');
+  const parsedDef = parseShareHash(def);
+  assert.equal(parsedDef.safetyViewMode, 'coverage');
+  assert.equal(parsedDef.coverageKind, 'verification');
+});
+
+test('older v=coverage links land on the Functional Safety coverage panel', () => {
+  const legacy = parseShareHash('s=functional-safety&v=coverage&cm=i');
+  assert.equal(legacy.view, 'requirements');
+  assert.equal(legacy.safetyViewMode, 'coverage');
+  assert.equal(legacy.coverageKind, 'implementation');
 });

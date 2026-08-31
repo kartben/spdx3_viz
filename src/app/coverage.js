@@ -204,6 +204,17 @@ export const coverageMixin = {
     return null;
   },
 
+  setSafetyViewMode(mode) {
+    const next = mode === 'coverage' ? 'coverage' : 'requirements';
+    if (next === this.safetyViewMode) return;
+    this.safetyViewMode = next;
+    if (next === 'coverage') {
+      this.coverageHover = null;
+      this.$nextTick?.(() => this.bindCoverageScroll());
+    }
+    this._scheduleNavPush();
+  },
+
   setCoverageKind(kind) {
     if (kind === this.coverageKind) return;
     this.coverageKind = kind;

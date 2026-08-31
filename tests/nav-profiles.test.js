@@ -19,12 +19,7 @@ test('createNavProfiles covers every non-explore, non-insights view exactly once
 
 test('collapsible profiles are the multi-view groups', () => {
   const multi = createNavProfiles().filter((p) => p.viewIds.length > 1);
-  assert.deepEqual(multi.map((p) => p.id).sort(), [
-    'ai-dataset',
-    'build',
-    'functional-safety',
-    'software'
-  ]);
+  assert.deepEqual(multi.map((p) => p.id).sort(), ['ai-dataset', 'build', 'software']);
 });
 
 test('sidebar view icons are Lucide stroke SVGs', () => {
