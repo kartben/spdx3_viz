@@ -812,6 +812,7 @@ export const loadingMixin = {
       this.collapsedReqs = {};
       // Prefer Decomposition when the SBOM has tracedToDetail hierarchy.
       this.requirementLayout = this.hasSafetyDecomposition ? 'tree' : 'list';
+      this.safetyViewMode = 'requirements';
       this.coverageKind = 'verification';
       this.coverageSearch = '';
       this.coverageGapsOnly = false;

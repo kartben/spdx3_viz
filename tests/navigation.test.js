@@ -146,20 +146,45 @@ test('a deep link to a verification is not swallowed by the Requirements chip', 
 
 test('a deep link to a Coverage matrix kind restores it', () => {
   const app = makeApp({
-    views: [
-      { id: 'dashboard' },
-      { id: 'requirements' },
-      { id: 'coverage' },
-      { id: 'supplychain' },
-      { id: 'packages' }
-    ],
+    views: [{ id: 'dashboard' }, { id: 'requirements' }, { id: 'supplychain' }, { id: 'packages' }],
     mountedViews: {
       dashboard: true,
       requirements: false,
-      coverage: false,
       supplychain: false,
       packages: false
     },
+    safetyViewMode: 'requirements',
+    coverageKind: 'verification'
+  });
+  const hist = globalThis.history;
+  const prevReplace = hist.replaceState.bind(hist);
+  hist.replaceState = () => {};
+  try {
+    app._applyDeepLink({
+      sample: 'functional-safety',
+      view: 'requirements',
+      expanded: null,
+      detail: null,
+      graphSelected: null,
+      licenseMode: 'inventory',
+      safetyViewMode: 'coverage',
+      coverageKind: 'implementation',
+      requirementKind: 'Requirement',
+      requirementLayout: null,
+      supplyChainMode: null
+    });
+  } finally {
+    hist.replaceState = prevReplace;
+  }
+  assert.equal(app.currentView, 'requirements');
+  assert.equal(app.safetyViewMode, 'coverage');
+  assert.equal(app.coverageKind, 'implementation');
+  assert.equal(app.mountedViews.requirements, true);
+});
+
+test('an older v=coverage deep link still opens the coverage panel', () => {
+  const app = makeApp({
+    safetyViewMode: 'requirements',
     coverageKind: 'verification'
   });
   const hist = globalThis.history;
@@ -181,9 +206,9 @@ test('a deep link to a Coverage matrix kind restores it', () => {
   } finally {
     hist.replaceState = prevReplace;
   }
-  assert.equal(app.currentView, 'coverage');
+  assert.equal(app.currentView, 'requirements');
+  assert.equal(app.safetyViewMode, 'coverage');
   assert.equal(app.coverageKind, 'implementation');
-  assert.equal(app.mountedViews.coverage, true);
 });
 
 test('a deep link to the Verifications chip restores it without an expanded card', () => {

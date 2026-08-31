@@ -71,7 +71,6 @@ export function createState() {
       hardware: false,
       supplychain: false,
       requirements: false,
-      coverage: false,
       licenses: false,
       security: false,
       configs: false,
@@ -149,6 +148,8 @@ export function createState() {
     requirementSpecFilter: '', // '' = all, else a Specification spdxId (hasRequirement facet)
     requirementLayout: 'list', // Functional Safety tab: 'list' | 'tree' (tracedToDetail decomposition)
     collapsedReqs: {}, // decomposition tree: spdxId -> true for collapsed subtrees
+    // In-view Functional Safety panel: the requirement list, or a coverage matrix.
+    safetyViewMode: 'requirements', // 'requirements' | 'coverage'
     coverageKind: 'verification', // Coverage tab: verification | implementation | evidence | specification
     coverageSearch: '',
     coverageGapsOnly: false,

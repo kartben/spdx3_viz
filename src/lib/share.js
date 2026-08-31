@@ -68,15 +68,19 @@ const COVERAGE_CODE_TO_KIND = {
  *          compatOutbound?: string|null, compatScope?: string|null,
  *          compatEdges?: string|null, securityScope?: string|null,
  *          securityScopeReach?: string|null, requirementKind?: string|null,
- *          requirementLayout?: string|null, coverageKind?: string|null,
- *          supplyChainMode?: string|null}} spot
+ *          requirementLayout?: string|null, safetyViewMode?: string|null,
+ *          coverageKind?: string|null, supplyChainMode?: string|null}} spot
  * @returns {string}
  */
 export function buildShareHash(spot) {
   if (!spot?.sample) return '';
   const params = new URLSearchParams();
   params.set('s', spot.sample);
-  if (spot.view && spot.view !== 'dashboard') params.set('v', spot.view);
+  // Coverage is a panel inside Functional Safety, not a top-level view. Older
+  // links used v=coverage; write the canonical profile view instead.
+  const view = spot.view === 'coverage' ? 'requirements' : spot.view;
+  const coveragePanel = spot.safetyViewMode === 'coverage' || spot.view === 'coverage';
+  if (view && view !== 'dashboard') params.set('v', view);
   if (spot.expanded) params.set('e', spot.expanded);
   if (spot.detail) params.set('d', spot.detail);
   if (spot.graphSelected) params.set('g', spot.graphSelected);
@@ -92,23 +96,27 @@ export function buildShareHash(spot) {
   // The Security view's scope: which artifact the findings were narrowed to,
   // and how strictly, so a link reopens the same answer rather than the
   // document-wide list.
-  if (spot.view === 'security' && spot.securityScope) {
+  if (view === 'security' && spot.securityScope) {
     params.set('ss', spot.securityScope);
     if (spot.securityScopeReach === 'declared') params.set('sr', 'd');
   }
-  // Functional Safety chips and layout. Requirement + unspecified layout stay
-  // out of the hash; a verification/test chip or an explicit list/tree does not,
-  // so a saved URL can reopen the same kind of card.
-  if (spot.view === 'requirements') {
-    const kindCode = REQ_KIND_TO_CODE[spot.requirementKind ?? 'Requirement'];
-    if (kindCode) params.set('rk', kindCode);
-    if (spot.requirementLayout === 'tree') params.set('rl', 't');
-    else if (spot.requirementLayout === 'list') params.set('rl', 'l');
-  }
-  // Coverage matrix kind. Verification is the default and stays out of the hash.
-  if (spot.view === 'coverage') {
-    const cm = COVERAGE_KIND_TO_CODE[spot.coverageKind || 'verification'];
-    if (cm && cm !== 'v') params.set('cm', cm);
+  // Functional Safety chips, layout, and the Coverage panel. Requirement +
+  // unspecified layout stay out of the hash; a verification/test chip, an
+  // explicit list/tree, or the coverage matrix does not, so a saved URL can
+  // reopen the same kind of card.
+  if (view === 'requirements') {
+    if (coveragePanel) {
+      // fsm (functional-safety mode) parallels lm on Licenses. svm is already
+      // the Supply Chain angle.
+      params.set('fsm', 'c');
+      const cm = COVERAGE_KIND_TO_CODE[spot.coverageKind || 'verification'];
+      if (cm && cm !== 'v') params.set('cm', cm);
+    } else {
+      const kindCode = REQ_KIND_TO_CODE[spot.requirementKind ?? 'Requirement'];
+      if (kindCode) params.set('rk', kindCode);
+      if (spot.requirementLayout === 'tree') params.set('rl', 't');
+      else if (spot.requirementLayout === 'list') params.set('rl', 'l');
+    }
   }
   // Supply Chain angle. Timeline is the default and stays out of the hash.
   if (spot.view === 'supplychain') {
@@ -133,7 +141,8 @@ export function buildShareHash(spot) {
  *            compatScope: string|null, compatEdges: string,
  *            securityScope: string|null, securityScopeReach: string,
  *            requirementKind: string, requirementLayout: string|null,
- *            coverageKind: string, supplyChainMode: string|null}|null}
+ *            safetyViewMode: string, coverageKind: string,
+ *            supplyChainMode: string|null}|null}
  */
 export function parseShareHash(hash) {
   const raw = String(hash || '').replace(/^#/, '');
@@ -144,9 +153,13 @@ export function parseShareHash(hash) {
   const rk = params.get('rk');
   const rl = params.get('rl');
   const svm = params.get('svm');
+  const rawView = params.get('v') || 'dashboard';
+  // v=coverage was a short-lived top-level view; fold it back into the
+  // Functional Safety profile with the Coverage panel selected.
+  const coveragePanel = rawView === 'coverage' || params.get('fsm') === 'c';
   return {
     sample,
-    view: params.get('v') || 'dashboard',
+    view: rawView === 'coverage' ? 'requirements' : rawView,
     expanded: params.get('e') || null,
     detail: params.get('d') || null,
     graphSelected: params.get('g') || null,
@@ -162,6 +175,7 @@ export function parseShareHash(hash) {
     // null means the link did not pin a layout: keep the document default
     // (tree when there is a decomposition) unless an expanded card forces list.
     requirementLayout: rl === 't' ? 'tree' : rl === 'l' ? 'list' : null,
+    safetyViewMode: coveragePanel ? 'coverage' : 'requirements',
     coverageKind: COVERAGE_CODE_TO_KIND[params.get('cm') || ''] || 'verification',
     // null when omitted so an expanded card can still infer its angle; an
     // explicit svm always wins.

@@ -35,7 +35,12 @@ const lifecycleMixin = {
       if (v === 'supplychain' && this.supplyChainViewMode === 'states') {
         this.renderSupplyChainStateDiagram();
       }
-      if (v === 'coverage') this.$nextTick(() => this.bindCoverageScroll());
+      if (v === 'requirements' && this.safetyViewMode === 'coverage') {
+        this.$nextTick(() => this.bindCoverageScroll());
+      }
+    });
+    this.$watch('safetyViewMode', (mode) => {
+      if (mode === 'coverage') this.$nextTick(() => this.bindCoverageScroll());
     });
     // The Supply Chain state machine is drawn with Mermaid, which is imported
     // lazily; (re)render it whenever the States angle becomes visible. The
