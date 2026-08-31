@@ -5,6 +5,7 @@ import {
   assembleCoverageMatrix,
   availableCoverageKinds,
   buildCoverageMatrices,
+  coverageAxisShortLabel,
   coverageElementUid,
   coverageEvalStatus,
   coverageMatricesToXlsx,
@@ -50,6 +51,67 @@ describe('coverageElementUid', () => {
 
   it('falls back to a CODE: name prefix', () => {
     assert.equal(coverageElementUid({ name: 'FSR-02: Bound deceleration' }), 'FSR-02');
+  });
+
+  it('skips locator identifiers such as https URLs and package URLs', () => {
+    assert.equal(
+      coverageElementUid({
+        externalIdentifier: [{ identifier: 'https://example.test/evidence.pdf' }]
+      }),
+      ''
+    );
+    assert.equal(
+      coverageElementUid({
+        software_packageUrl: 'pkg:generic/northstar/brake@4.7.2',
+        externalIdentifier: [{ identifier: 'pkg:generic/northstar/brake@4.7.2' }]
+      }),
+      ''
+    );
+  });
+});
+
+describe('coverageAxisShortLabel', () => {
+  it('keeps a compact verification or specification code', () => {
+    assert.equal(
+      coverageAxisShortLabel({
+        functionalsafety_verificationUID: { identifier: 'VER-SG-01' },
+        name: 'HIL campaign'
+      }),
+      'VER-SG-01'
+    );
+    assert.equal(
+      coverageAxisShortLabel({
+        name: 'Helios AEB Item Definition HID-4.7',
+        externalIdentifier: [{ identifier: 'HID-4.7' }]
+      }),
+      'HID-4.7'
+    );
+  });
+
+  it('uses a file basename instead of an HTTPS SPDX id', () => {
+    assert.equal(
+      coverageAxisShortLabel({
+        spdxId: 'https://spdx.org/spdxdocs/helios-aeb#file/evidence/hara-report',
+        name: 'evidence/hara-report.pdf'
+      }),
+      'hara-report.pdf'
+    );
+  });
+
+  it('uses the package name instead of a purl', () => {
+    assert.equal(
+      coverageAxisShortLabel(
+        {
+          spdxId: 'https://spdx.org/spdxdocs/helios-aeb#package/brake-arbitrator',
+          name: 'Brake demand arbitrator',
+          software_packageUrl: 'pkg:generic/northstar-mobility/brake-arbitrator@4.7.2'
+        },
+        {
+          uidOf: () => 'pkg:generic/northstar-mobility/brake-arbitrator@4.7.2'
+        }
+      ),
+      'Brake demand arbitrator'
+    );
   });
 });
 
@@ -258,8 +320,10 @@ describe('buildCoverageMatrices', () => {
     assert.equal(bundle.verification.cells.get('0:0').status, 'pass');
     assert.equal(bundle.verification.cells.get('1:1').status, 'fail');
     assert.equal(bundle.implementation.cols[0].name, 'brake-arbitrator');
+    assert.equal(bundle.implementation.cols[0].uid, 'brake-arbitrator');
     assert.equal(bundle.implementation.filled, 1);
     assert.equal(bundle.evidence.cols[0].name, 'hil-report.pdf');
+    assert.equal(bundle.evidence.cols[0].uid, 'hil-report.pdf');
     assert.equal(bundle.evidence.filled, 1);
     assert.equal(bundle.specification.cols.length, 1);
     assert.equal(bundle.specification.filled, 2);
@@ -296,6 +360,59 @@ describe('buildCoverageMatrices', () => {
     assert.equal(bundle.implementation.cols.length, 1);
     assert.equal(bundle.implementation.cols[0].uid, 'thread.c');
     assert.equal(bundle.implementation.filled, 1);
+  });
+
+  it('does not title implementation or evidence columns with locators', () => {
+    const pkg = {
+      spdxId: 'https://spdx.org/spdxdocs/helios#package/brake-arbitrator',
+      type: 'software_Package',
+      name: 'Brake demand arbitrator',
+      software_packageUrl: 'pkg:generic/northstar-mobility/brake-arbitrator@4.7.2',
+      externalIdentifier: [{ identifier: 'pkg:generic/northstar-mobility/brake-arbitrator@4.7.2' }]
+    };
+    const file = {
+      spdxId: 'https://spdx.org/spdxdocs/helios#file/evidence/hara-report',
+      type: 'software_File',
+      name: 'evidence/hara-report.pdf'
+    };
+    const spec = {
+      spdxId: 'https://spdx.org/spdxdocs/helios#specification/item-definition',
+      type: 'Specification',
+      name: 'Helios AEB Item Definition HID-4.7',
+      externalIdentifier: [{ identifier: 'HID-4.7' }]
+    };
+    const r1 = req('req:1', 'SG-01', 'Braking');
+    const elementMap = new Map([
+      ['req:1', r1],
+      [pkg.spdxId, pkg],
+      [file.spdxId, file],
+      [spec.spdxId, spec]
+    ]);
+    const bundle = buildCoverageMatrices(
+      {
+        requirements: [r1],
+        relationships: [
+          { relationshipType: 'implementedBy', from: 'req:1', to: [pkg.spdxId] },
+          { relationshipType: 'verifiedBy', from: 'req:1', to: ['ver:missing'] },
+          { relationshipType: 'hasEvidence', from: 'req:1', to: [file.spdxId] },
+          { relationshipType: 'hasRequirement', from: spec.spdxId, to: ['req:1'] }
+        ],
+        elementMap,
+        isA,
+        CLASS
+      },
+      {
+        ...labels,
+        uidOf: (el) =>
+          coverageElementUid(el, () => el.externalIdentifier || []) ||
+          'https://spdx.org/spdxdocs/helios#fallback'
+      }
+    );
+    assert.equal(bundle.implementation.cols[0].uid, 'Brake demand arbitrator');
+    assert.doesNotMatch(bundle.implementation.cols[0].uid, /^pkg:/);
+    assert.equal(bundle.evidence.cols[0].uid, 'hara-report.pdf');
+    assert.doesNotMatch(bundle.evidence.cols[0].uid, /^https?:/);
+    assert.equal(bundle.specification.cols[0].uid, 'HID-4.7');
   });
 });
 
