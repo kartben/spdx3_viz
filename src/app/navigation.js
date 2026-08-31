@@ -187,6 +187,9 @@ export const navigationMixin = {
   // A link should reopen the same kind of card (requirements vs. tests) rather
   // than always landing on the default Requirements chip / decomposition tree.
   _safetyNavState() {
+    if (this.currentView === 'coverage') {
+      return { coverageKind: this.coverageKind };
+    }
     if (this.currentView !== 'requirements') return {};
     return {
       requirementKindFilter: this.requirementKindFilter,
@@ -283,6 +286,7 @@ export const navigationMixin = {
       compatEdges: state.compatEdges,
       requirementKind: state.requirementKindFilter,
       requirementLayout: state.requirementLayout,
+      coverageKind: state.coverageKind,
       supplyChainMode: state.supplyChainViewMode
     });
     return hash ? `${base}#${hash}` : base;
@@ -315,6 +319,7 @@ export const navigationMixin = {
       compatEdges: link.compatEdges,
       requirementKindFilter: link.requirementKind,
       requirementLayout: link.requirementLayout,
+      coverageKind: link.coverageKind,
       supplyChainViewMode: link.supplyChainMode
     };
     const field = expandedFieldByView[view];
@@ -462,6 +467,7 @@ export const navigationMixin = {
     if (state.requirementLayout === 'list' || state.requirementLayout === 'tree') {
       this.requirementLayout = state.requirementLayout;
     }
+    if (state.coverageKind) this.coverageKind = state.coverageKind;
   },
   // Restores the Supply Chain angle. An expanded card without an explicit
   // mode reuses navigateToSupplyChain's inference so older links still land

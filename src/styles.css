@@ -368,6 +368,29 @@ html {
 }
 
 /* ==========================================================================
+   Functional Safety coverage matrix
+   A four-pane spreadsheet (corner, column headers, row labels, body). The body
+   is the scroll driver; headers follow it so a grid that is both very wide and
+   very tall keeps UID labels and test names on screen.
+   ========================================================================== */
+
+.coverage-body {
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.coverage-grid-bg {
+  background-image:
+    linear-gradient(to right, rgba(51, 65, 85, 0.45) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(51, 65, 85, 0.45) 1px, transparent 1px);
+}
+
+.coverage-cell {
+  box-sizing: border-box;
+  border: 1px solid #0f172a;
+}
+
+/* ==========================================================================
    Global Search
    The header search box's results dropdown + matched-substring highlight.
    ========================================================================== */

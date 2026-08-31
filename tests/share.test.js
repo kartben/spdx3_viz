@@ -186,3 +186,21 @@ test('older Functional Safety and Supply Chain links still parse', () => {
   assert.equal(sc.supplyChainMode, null);
   assert.equal(sc.expanded, 'act:fold');
 });
+
+test('Coverage matrix kind survives a round trip and verification stays omitted', () => {
+  const impl = buildShareHash({
+    sample: 'functional-safety',
+    view: 'coverage',
+    coverageKind: 'implementation'
+  });
+  assert.equal(impl, 's=functional-safety&v=coverage&cm=i');
+  assert.equal(parseShareHash(impl).coverageKind, 'implementation');
+
+  const def = buildShareHash({
+    sample: 'functional-safety',
+    view: 'coverage',
+    coverageKind: 'verification'
+  });
+  assert.equal(def, 's=functional-safety&v=coverage');
+  assert.equal(parseShareHash(def).coverageKind, 'verification');
+});

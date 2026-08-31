@@ -1,0 +1,238 @@
+<div
+  x-show="currentView === 'coverage'"
+  class="fade-in absolute inset-0 flex flex-col overflow-hidden bg-slate-900"
+>
+  <!-- Toolbar stays out of the scrollport so the grid can be both wide and tall. -->
+  <div class="shrink-0 px-4 sm:px-5 pt-3 pb-2 space-y-2 border-b border-slate-700/50 bg-slate-900">
+    <div class="flex flex-wrap items-center gap-2">
+      <div
+        class="inline-flex items-center gap-0.5 bg-slate-900/70 border border-slate-700 rounded-lg p-0.5 shrink-0"
+      >
+        <template x-for="kind in coverageKinds" :key="kind.id">
+          <button
+            type="button"
+            @click="setCoverageKind(kind.id)"
+            class="px-2.5 py-1 rounded-md text-xs font-medium transition-colors"
+            :class="coverageActiveKind === kind.id
+              ? 'bg-yellow-500/20 text-yellow-300'
+              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700'"
+            :title="kind.hint"
+            x-text="kind.label"
+          ></button>
+        </template>
+      </div>
+      <input
+        type="text"
+        x-model.debounce.150ms="coverageSearch"
+        @input.debounce.150ms="_resetCoverageScroll()"
+        placeholder="Filter requirements…"
+        class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-300 placeholder-slate-500 focus:outline-hidden focus:border-yellow-500 w-full sm:w-48 md:w-56"
+      />
+      <label
+        class="flex items-center gap-1.5 text-xs text-slate-400 cursor-pointer select-none shrink-0"
+        title="Show only requirements with no link in this matrix"
+      >
+        <input
+          type="checkbox"
+          x-model="coverageGapsOnly"
+          @change="_resetCoverageScroll()"
+          class="rounded-sm border-slate-600 bg-slate-700 text-yellow-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5"
+        />
+        Gaps only
+      </label>
+      <label
+        class="flex items-center gap-1.5 text-xs text-slate-400 cursor-pointer select-none shrink-0"
+        title="Drop columns that none of the currently shown rows use"
+      >
+        <input
+          type="checkbox"
+          x-model="coverageHideEmptyCols"
+          @change="_resetCoverageScroll()"
+          class="rounded-sm border-slate-600 bg-slate-700 text-yellow-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5"
+        />
+        Compact
+      </label>
+      <button
+        type="button"
+        @click="exportCoverageXlsx()"
+        class="ml-auto inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs border border-slate-700 bg-slate-800 text-slate-300 hover:text-white hover:border-slate-500 transition-colors shrink-0"
+        title="Download every matrix as a real .xlsx workbook (pure JavaScript, no server)"
+      >
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+          />
+        </svg>
+        Excel
+      </button>
+    </div>
+    <div class="flex flex-wrap items-center gap-x-3 gap-y-1 min-w-0">
+      <p class="text-xs text-slate-500 min-w-0 truncate" x-text="coverageKindMeta.hint"></p>
+      <span
+        class="text-xs text-slate-400 tabular-nums shrink-0"
+        x-text="coverageSummaryLine"
+      ></span>
+    </div>
+  </div>
+
+  <template x-if="!hasCoverageMatrices">
+    <div class="flex-1 flex items-center justify-center p-6">
+      <p class="text-sm text-slate-400 max-w-md leading-relaxed text-center">
+        This document has requirements, but none of the Functional Safety traceability relationships
+        (verifiedBy, implementedBy, hasEvidence, hasRequirement) needed to plot a coverage matrix.
+      </p>
+    </div>
+  </template>
+
+  <template x-if="hasCoverageMatrices && coverageMatrix.rows.length === 0">
+    <div class="flex-1 flex items-center justify-center p-6">
+      <p class="text-sm text-slate-400 max-w-md leading-relaxed text-center">
+        No requirements match the current filter.
+      </p>
+    </div>
+  </template>
+
+  <!-- Four-pane spreadsheet: pinned corner, column headers, row labels, body.
+       Each pane is its own overflow box; the body is the scroll driver and the
+       headers follow it, so a matrix that is both very wide and very tall still
+       keeps UID labels and test names on screen. -->
+  <div
+    x-show="hasCoverageMatrices && coverageMatrix.rows.length > 0"
+    class="flex-1 min-h-0 min-w-0 flex flex-col"
+    x-init="$nextTick(() => bindCoverageScroll())"
+    @mouseleave="setCoverageHover(null)"
+  >
+    <div
+      class="flex shrink-0 border-b border-slate-700/80"
+      :style="`height:${coverageLayout.headH}px`"
+      @wheel.prevent="onCoverageHeaderWheel($event)"
+    >
+      <div
+        class="shrink-0 z-20 bg-slate-900 border-r border-slate-700/80 flex flex-col justify-end px-2 pb-2"
+        :style="`width:${coverageLayout.labelW}px`"
+      >
+        <div
+          class="text-[10px] uppercase tracking-wider text-slate-500"
+          x-text="coverageMatrix.rowNoun"
+        ></div>
+        <div class="text-[10px] text-slate-600" x-text="`× ${coverageMatrix.colNoun}`"></div>
+      </div>
+      <div class="flex-1 min-w-0 overflow-hidden" x-ref="coverageColHead">
+        <div
+          class="relative h-full"
+          :style="`width:${Math.max(coverageMatrix.cols.length, 1) * coverageLayout.colW}px`"
+        >
+          <template x-for="col in coverageVisibleCols" :key="'h-' + col.id">
+            <button
+              type="button"
+              class="absolute bottom-0 text-left origin-bottom-left whitespace-nowrap text-[10px] font-mono truncate"
+              :class="coverageHover && coverageHover.c === col.index ? 'text-yellow-300' : 'text-slate-400 hover:text-slate-200'"
+              :style="coverageColPosition(col.index) + ';height:108px;transform:rotate(-52deg) translateX(6px);transform-origin:bottom left;max-width:108px'"
+              :title="(col.uid && col.name && col.uid !== col.name) ? (col.uid + ': ' + col.name) : (col.name || col.uid)"
+              @mouseenter="setCoverageHover({ c: col.index })"
+              @click="openCoverageCol(col)"
+              x-text="col.uid || col.name"
+            ></button>
+          </template>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex-1 min-h-0 min-w-0 flex">
+      <div
+        class="shrink-0 overflow-hidden z-10 bg-slate-900 border-r border-slate-700/80"
+        :style="`width:${coverageLayout.labelW}px`"
+        x-ref="coverageRowHead"
+        @wheel.prevent="onCoverageHeaderWheel($event)"
+      >
+        <div
+          class="relative"
+          :style="`height:${Math.max(coverageMatrix.rows.length, 1) * coverageLayout.rowH}px`"
+        >
+          <template x-for="row in coverageVisibleRows" :key="'r-' + row.id">
+            <button
+              type="button"
+              class="absolute left-0 right-0 flex items-center gap-1.5 px-2 text-left overflow-hidden"
+              :class="coverageHover && coverageHover.r === row.index ? 'bg-slate-800' : 'hover:bg-slate-800/70'"
+              :style="coverageRowPosition(row.index)"
+              :title="row.uid + ': ' + row.name"
+              @mouseenter="setCoverageHover({ r: row.index })"
+              @click="openCoverageRow(row)"
+            >
+              <span
+                class="w-1.5 h-1.5 rounded-full shrink-0"
+                :class="row.linked ? 'bg-emerald-500' : 'bg-slate-600'"
+              ></span>
+              <span
+                class="font-mono text-[10px] text-slate-400 shrink-0 w-16 truncate"
+                x-text="row.uid"
+              ></span>
+              <span class="text-[11px] text-slate-200 truncate" x-text="row.name"></span>
+              <span
+                class="ml-auto text-[10px] tabular-nums text-slate-500 shrink-0"
+                x-text="row.linked || ''"
+              ></span>
+            </button>
+          </template>
+        </div>
+      </div>
+
+      <div
+        class="flex-1 min-w-0 min-h-0 overflow-auto coverage-body"
+        x-ref="coverageBody"
+        @scroll="onCoverageScroll()"
+      >
+        <div
+          class="coverage-grid-bg relative"
+          :style="coverageGridStyle"
+          @mousemove="onCoverageGridMove($event)"
+          @click="onCoverageGridClick($event)"
+        >
+          <template x-for="cell in coverageVisibleCells" :key="cell.r + ':' + cell.c">
+            <button
+              type="button"
+              class="absolute rounded-sm coverage-cell"
+              :class="[
+                coverageCellStyle(cell.status).bgClass,
+                coverageHover && coverageHover.r === cell.r && coverageHover.c === cell.c
+                  ? 'ring-2 ring-yellow-300 z-10'
+                  : ''
+              ]"
+              :style="coverageCellPosition(cell)"
+              :title="coverageMatrix.rows[cell.r].uid + ' × ' + coverageMatrix.cols[cell.c].uid + ': ' + coverageCellStyle(cell.status).label"
+              :aria-label="coverageMatrix.rows[cell.r].uid + ' × ' + coverageMatrix.cols[cell.c].uid + ': ' + coverageCellStyle(cell.status).label"
+              @mouseenter="setCoverageHover({ r: cell.r, c: cell.c })"
+              @click.stop="openCoverageCell(cell)"
+            ></button>
+          </template>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="shrink-0 px-4 sm:px-5 py-2 border-t border-slate-700/50 bg-slate-900 flex flex-wrap items-center gap-2 min-h-[2.75rem]"
+  >
+    <template x-if="coverageExplanation">
+      <p class="text-xs text-slate-300 min-w-0 truncate" x-text="coverageExplanation.sentence"></p>
+    </template>
+    <p x-show="!coverageExplanation" class="text-xs text-slate-500">
+      Hover a cell for the pair it names. Click a label to open that element.
+    </p>
+    <div class="ml-auto flex flex-wrap items-center gap-1.5">
+      <template x-for="key in coverageCellOrder" :key="key">
+        <span class="inline-flex items-center gap-1 text-[10px] text-slate-400">
+          <span class="w-2 h-2 rounded-sm" :class="coverageCellStyle(key).bgClass"></span>
+          <span x-text="coverageCellStyle(key).label"></span>
+        </span>
+      </template>
+      <span class="inline-flex items-center gap-1 text-[10px] text-slate-400">
+        <span class="w-2 h-2 rounded-sm bg-slate-800 ring-1 ring-slate-600"></span>
+        Gap
+      </span>
+    </div>
+  </div>
+</div>

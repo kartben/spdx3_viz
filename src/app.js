@@ -12,6 +12,7 @@ import { licensesMixin } from './app/licenses.js';
 import { compatibilityMixin } from './app/compatibility.js';
 import { scopeMixin } from './app/scope.js';
 import { supplyChainMixin } from './app/supply-chain.js';
+import { coverageMixin } from './app/coverage.js';
 import { graphMixin } from './app/graph.js';
 import { rawMixin } from './app/raw.js';
 import { changelogMixin } from './app/changelog.js';
@@ -34,6 +35,7 @@ const lifecycleMixin = {
       if (v === 'supplychain' && this.supplyChainViewMode === 'states') {
         this.renderSupplyChainStateDiagram();
       }
+      if (v === 'coverage') this.$nextTick(() => this.bindCoverageScroll());
     });
     // The Supply Chain state machine is drawn with Mermaid, which is imported
     // lazily; (re)render it whenever the States angle becomes visible. The
@@ -94,6 +96,7 @@ const mixins = [
   compatibilityMixin,
   scopeMixin,
   supplyChainMixin,
+  coverageMixin,
   graphMixin,
   rawMixin,
   changelogMixin,

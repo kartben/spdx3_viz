@@ -140,6 +140,7 @@ export const derivedMixin = {
     severitySummarySrc = null;
     hasCvssSrc = null;
     resetSupplyChainMemos();
+    this._resetCoverageMemos?.();
   },
 
   // SBOM-derived vulnerabilities merged with any OSV online findings. Before a

@@ -144,6 +144,48 @@ test('a deep link to a verification is not swallowed by the Requirements chip', 
   assert.equal(replace.length, 1);
 });
 
+test('a deep link to a Coverage matrix kind restores it', () => {
+  const app = makeApp({
+    views: [
+      { id: 'dashboard' },
+      { id: 'requirements' },
+      { id: 'coverage' },
+      { id: 'supplychain' },
+      { id: 'packages' }
+    ],
+    mountedViews: {
+      dashboard: true,
+      requirements: false,
+      coverage: false,
+      supplychain: false,
+      packages: false
+    },
+    coverageKind: 'verification'
+  });
+  const hist = globalThis.history;
+  const prevReplace = hist.replaceState.bind(hist);
+  hist.replaceState = () => {};
+  try {
+    app._applyDeepLink({
+      sample: 'functional-safety',
+      view: 'coverage',
+      expanded: null,
+      detail: null,
+      graphSelected: null,
+      licenseMode: 'inventory',
+      coverageKind: 'implementation',
+      requirementKind: 'Requirement',
+      requirementLayout: null,
+      supplyChainMode: null
+    });
+  } finally {
+    hist.replaceState = prevReplace;
+  }
+  assert.equal(app.currentView, 'coverage');
+  assert.equal(app.coverageKind, 'implementation');
+  assert.equal(app.mountedViews.coverage, true);
+});
+
 test('a deep link to the Verifications chip restores it without an expanded card', () => {
   const app = makeApp();
   const hist = globalThis.history;

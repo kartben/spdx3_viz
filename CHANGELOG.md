@@ -5,6 +5,8 @@ via the "What's new" link.
 
 ## Unreleased
 
+- **Added:** Functional Safety coverage matrices, exportable to Excel.
+
 ## [0.6.0] - 2026-08-29
 
 - **Added:** License compatibility analyzer.

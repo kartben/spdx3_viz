@@ -714,6 +714,7 @@ const VIEW_ICONS = {
   hardware: LUCIDE_NAV_ICONS.hardware,
   supplychain: LUCIDE_NAV_ICONS.supplychain,
   requirements: LUCIDE_NAV_ICONS.requirements,
+  coverage: LUCIDE_NAV_ICONS.coverage,
   licenses: LUCIDE_NAV_ICONS.licenses,
   security: LUCIDE_NAV_ICONS.security,
   configs: LUCIDE_NAV_ICONS.configs,
@@ -740,7 +741,8 @@ export function createViews() {
     { id: 'files', label: 'Files', icon: VIEW_ICONS.files, count: null },
     { id: 'hardware', label: 'Hardware', icon: VIEW_ICONS.hardware, count: null },
     { id: 'supplychain', label: 'Supply Chain', icon: VIEW_ICONS.supplychain, count: null },
-    { id: 'requirements', label: 'Functional Safety', icon: VIEW_ICONS.requirements, count: null },
+    { id: 'requirements', label: 'Requirements', icon: VIEW_ICONS.requirements, count: null },
+    { id: 'coverage', label: 'Coverage', icon: VIEW_ICONS.coverage, count: null },
     { id: 'licenses', label: 'Licenses', icon: VIEW_ICONS.licenses, count: null },
     { id: 'security', label: 'Security', icon: VIEW_ICONS.security, count: null },
     { id: 'configs', label: 'Build Configs', icon: VIEW_ICONS.configs, count: null },
@@ -789,7 +791,7 @@ export function createNavProfiles() {
       id: 'functional-safety',
       label: 'Functional Safety',
       icon: VIEW_ICONS.requirements,
-      viewIds: ['requirements']
+      viewIds: ['requirements', 'coverage']
     },
     {
       id: 'hardware',
