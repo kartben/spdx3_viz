@@ -76,8 +76,7 @@ export const coverageMixin = {
       },
       {
         displayName: (el) => this.requirementDisplayName(el) || this.cleanName(el?.spdxId),
-        uidOf: (el) =>
-          coverageElementUid(el, (e) => this.externalIdentifiers(e)) || this.cleanName(el?.spdxId),
+        uidOf: (el) => coverageElementUid(el, (e) => this.externalIdentifiers(e)),
         cleanName: (id) => this.cleanName(id)
       }
     );

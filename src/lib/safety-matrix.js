@@ -112,9 +112,21 @@ export const EXCEL_MAX_COLS = 16384;
 /** Leave room for the UID + name stub columns. */
 export const EXCEL_DATA_COL_CAP = EXCEL_MAX_COLS - 2;
 
+/** Locators are real identifiers, but they make a terrible 26px column title. */
+const LOCATOR_ID_RE = /^(https?:\/\/|pkg:|cpe:\/|gitoid:|swh:1:|mailto:)/i;
+
+function isLocatorIdentifier(value) {
+  return LOCATOR_ID_RE.test(String(value || '').trim());
+}
+
+function isCompactAxisCode(value) {
+  const s = String(value || '').trim();
+  return !!s && s.length <= 40 && !/\s/.test(s) && !isLocatorIdentifier(s) && !s.includes('/');
+}
+
 /**
  * Controlled identifier for a matrix axis: requirementUID, then a non-meta
- * externalIdentifier, then a `CODE: rest` name prefix.
+ * non-locator externalIdentifier, then a `CODE: rest` name prefix.
  *
  * @param {Object|null|undefined} el
  * @param {(el: Object) => Array<{identifier: string}>} [getIds]
@@ -127,14 +139,52 @@ export function coverageElementUid(el, getIds) {
     el.functionalsafety_verificationUID?.identifier ||
     el.functionalsafety_assumptionUID?.identifier ||
     el.functionalsafety_evidenceUID?.identifier;
-  if (isMeaningfulValue(direct)) return String(direct).trim();
+  if (isMeaningfulValue(direct) && !isLocatorIdentifier(direct)) return String(direct).trim();
   const ids = typeof getIds === 'function' ? getIds(el) : el.externalIdentifier || [];
   for (const id of ids || []) {
     const raw = String(id?.identifier || '').trim();
-    if (raw && !isProducerMetaIdentifier(raw)) return raw;
+    if (raw && !isProducerMetaIdentifier(raw) && !isLocatorIdentifier(raw)) return raw;
   }
   const m = String(el.name || '').match(/^([A-Za-z][A-Za-z0-9._-]{1,}):/);
   return m ? m[1] : '';
+}
+
+/**
+ * Short label for a rotated matrix column: a compact FS code when the element
+ * has one, otherwise a file basename or the human name. HTTPS SPDX ids and
+ * package URLs are never used as the visible title.
+ *
+ * @param {Object|null|undefined} el
+ * @param {{ uidOf?: (el: Object) => string, cleanName?: (id: string) => string,
+ *           fallbackId?: string }} [opts]
+ * @returns {string}
+ */
+export function coverageAxisShortLabel(el, opts = {}) {
+  const fallbackId = opts.fallbackId || el?.spdxId || '';
+  const uid = typeof opts.uidOf === 'function' ? opts.uidOf(el) : coverageElementUid(el);
+  if (isCompactAxisCode(uid)) return uid;
+
+  const name = (el?.name || '').trim();
+  if (name) {
+    const prefixed = name.match(/^([A-Za-z][A-Za-z0-9._-]{1,24}):\s+\S/);
+    if (prefixed && isCompactAxisCode(prefixed[1])) return prefixed[1];
+    if (name.includes('/') || isLocatorIdentifier(name)) {
+      const base = name
+        .split(/[\\/#]/)
+        .filter(Boolean)
+        .pop();
+      if (base) return base;
+    }
+    return name;
+  }
+
+  const fromId = String(fallbackId);
+  const afterHash = fromId.includes('#') ? fromId.slice(fromId.lastIndexOf('#') + 1) : fromId;
+  const tail = afterHash.split('/').filter(Boolean).pop() || '';
+  if (isCompactAxisCode(tail)) return tail;
+  const cleaned = typeof opts.cleanName === 'function' ? opts.cleanName(fallbackId) : '';
+  if (cleaned && !isLocatorIdentifier(cleaned)) return cleaned;
+  return tail;
 }
 
 /**
@@ -452,6 +502,8 @@ export function buildCoverageMatrices(model, labels) {
       String(id || '')
         .split(/[#/]/)
         .pop());
+  const colLabel = (el, colId) =>
+    coverageAxisShortLabel(el, { uidOf, cleanName, fallbackId: colId });
 
   const reqs = [];
   const reqIds = new Set();
@@ -500,7 +552,7 @@ export function buildCoverageMatrices(model, labels) {
             : enumValue(el?.functionalsafety_verificationMethod);
           verCols.set(vid, {
             id: vid,
-            uid: uidOf(el || { spdxId: vid }) || cleanName(vid),
+            uid: colLabel(el || { spdxId: vid }, vid),
             name: displayName(el || { spdxId: vid, name: cleanName(vid) }) || cleanName(vid),
             subtitle: method || ''
           });
@@ -532,7 +584,7 @@ export function buildCoverageMatrices(model, labels) {
         if (!implCols.has(colId)) {
           implCols.set(colId, {
             id: colId,
-            uid: uidOf(other) || cleanName(colId),
+            uid: colLabel(other, colId),
             name: displayName(other) || nameOf(other, cleanName(colId))
           });
         }
@@ -548,7 +600,7 @@ export function buildCoverageMatrices(model, labels) {
       if (!specCols.has(rel.from)) {
         specCols.set(rel.from, {
           id: rel.from,
-          uid: uidOf(fromEl) || cleanName(rel.from),
+          uid: colLabel(fromEl, rel.from),
           name: displayName(fromEl) || nameOf(fromEl, cleanName(rel.from))
         });
       }
@@ -582,7 +634,7 @@ export function buildCoverageMatrices(model, labels) {
       if (!other.spdxId) continue;
       addCol(
         other.spdxId,
-        uidOf(other) || cleanName(other.spdxId),
+        colLabel(other, other.spdxId),
         displayName(other) || nameOf(other, cleanName(other.spdxId))
       );
     }
