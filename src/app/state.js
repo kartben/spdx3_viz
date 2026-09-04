@@ -269,6 +269,7 @@ export function createState() {
     packages: [],
     files: [],
     snippets: [],
+    snippetHubIds: new Set(), // snippets that stay as their own graph nodes
     snippetsByFileIndex: new Map(), // fileId → snippet[] (sorted by start line)
     tools: [],
     hardware: [], // hardware profile elements (SPDX 3.1)

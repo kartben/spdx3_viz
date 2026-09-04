@@ -447,6 +447,7 @@ export function createGraphFilters() {
     { key: 'ai', label: 'AI models', color: COLORS.ai, active: true },
     { key: 'dataset', label: 'Datasets', color: COLORS.dataset, active: true },
     { key: 'file', label: 'Files', color: COLORS.file, active: true },
+    { key: 'snippet', label: 'Snippets', color: COLORS.snippet, active: true },
     { key: 'hardware', label: 'Hardware', color: COLORS.hardware, active: true },
     { key: 'supplychain', label: 'Supply Chain', color: COLORS.supplychain, active: true },
     { key: 'requirement', label: 'Functional Safety', color: COLORS.requirement, active: true },
