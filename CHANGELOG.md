@@ -7,6 +7,7 @@ via the "What's new" link.
 
 - **Added:** Functional Safety coverage matrices, exportable to Excel.
 - **Fixed:** `hasTestCase` relationships now show on the graph (e.g. BASIL SBOMs).
+- **Fixed:** Graph keeps snippet hubs as nodes (BASIL), still folds Zephyr leaves into files.
 
 ## [0.6.0] - 2026-08-29
 

@@ -16,6 +16,10 @@ export const CHANGELOG = [
       {
         tag: 'Fixed',
         text: '`hasTestCase` relationships now show on the graph (e.g. BASIL SBOMs).'
+      },
+      {
+        tag: 'Fixed',
+        text: 'Graph keeps snippet hubs as nodes (BASIL), still folds Zephyr leaves into files.'
       }
     ]
   },
