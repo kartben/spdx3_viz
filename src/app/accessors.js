@@ -419,7 +419,10 @@ export const accessorsMixin = {
       const group = groups.get(key);
 
       const el = this.elementMap.get(endpointId);
-      if (el?.type === 'software_Snippet') {
+      // Leaf snippets (Zephyr implementedBy targets) still fold into one file
+      // row. Hub snippets (BASIL) stay as their own rows so each range can be
+      // selected on the graph.
+      if (el?.type === 'software_Snippet' && !this.snippetHubIds?.has(endpointId)) {
         const ref = snippetFileRef(el, this.elementMap);
         const fileKey = ref?.fileId || endpointId;
         let bucket = group.snippetBuckets.get(fileKey);

@@ -429,6 +429,9 @@ export function getElementDisplayName(element, elementMap) {
   const licenseExpr = renderLicenseExpression(element, elementMap);
   if (licenseExpr) return licenseExpr;
   if (element.type === 'security_Vulnerability') return getVulnerabilityId(element);
+  if (element.type === 'software_Snippet') {
+    return snippetTargetLabel(element, elementMap) || element.name || cleanName(element.spdxId);
+  }
   if (element.name) return element.name;
   return cleanName(element.spdxId);
 }

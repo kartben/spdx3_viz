@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { parseGraph } from '../src/parser/parser.js';
+import { buildRelationshipIndexes, parseGraph } from '../src/parser/parser.js';
 import {
   collectSnippetHubIds,
   resolveGraphSnippetEndpoint,
@@ -179,4 +179,38 @@ test('graph legend includes a Snippets toggle when hub snippets are present', ()
   const keys = app.visibleGraphFilters.map((f) => f.key);
   assert.ok(keys.includes('snippet'));
   assert.ok(createGraphFilters().some((f) => f.key === 'snippet' && !f.isRel));
+});
+
+test('detailRelGroupsFor lists hub snippets individually instead of folding them', () => {
+  const parsed = parseGraph([
+    { type: 'software_File', spdxId: 'file:api', name: 'API' },
+    { type: 'software_File', spdxId: 'file:spec', name: 'spec.md' },
+    basilHub,
+    basilContainedOnly,
+    {
+      type: 'Relationship',
+      relationshipType: 'contains',
+      from: 'file:api',
+      to: ['snip:api-1', 'snip:api-2']
+    },
+    {
+      type: 'Relationship',
+      relationshipType: 'hasRequirement',
+      from: 'snip:api-1',
+      to: ['file:req']
+    }
+  ]);
+  const app = spdxApp();
+  app.elementMap = parsed.elementMap;
+  app.snippetHubIds = parsed.snippetHubIds;
+  const rel = buildRelationshipIndexes(parsed.relationships);
+  app.relFromIndex = rel.relFromIndex;
+  app.relToIndex = rel.relToIndex;
+
+  const group = app
+    .detailRelGroupsFor({ spdxId: 'file:api' })
+    .find((g) => g.key === 'contains:out');
+  assert.equal(group.total, 2);
+  assert.ok(group.items.every((i) => !i.multiRange));
+  assert.deepEqual(group.items.map((i) => i.id).sort(), ['snip:api-1', 'snip:api-2']);
 });

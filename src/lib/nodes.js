@@ -152,6 +152,7 @@ export function getElementBadgeClass(type) {
   const classMap = {
     software_Package: 'bg-blue-500/15 text-blue-400',
     software_File: 'bg-emerald-500/15 text-emerald-400',
+    software_Snippet: 'bg-emerald-400/15 text-emerald-300',
     hardware_Hardware: 'bg-lime-500/15 text-lime-400',
     hardware_PhysicalHardware: 'bg-lime-500/15 text-lime-400',
     hardware_BulkHardware: 'bg-lime-500/15 text-lime-400',
