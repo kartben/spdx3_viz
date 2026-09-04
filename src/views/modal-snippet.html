@@ -35,11 +35,11 @@
         ></div>
       </div>
       <span
-        x-show="snippetModal?.start != null"
+        x-show="snippetModal?.rangeCount > 1 || snippetModal?.rangeLabel"
         class="badge shrink-0 bg-amber-400/10 text-xs text-amber-300"
         x-text="snippetModal?.rangeCount > 1
           ? snippetModal.rangeCount + ' ranges'
-          : 'L' + snippetModal?.start + (snippetModal?.end && snippetModal?.end !== snippetModal?.start ? '-' + snippetModal?.end : '')"
+          : snippetModal?.rangeLabel"
       ></span>
       <button
         type="button"

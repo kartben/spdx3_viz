@@ -154,7 +154,8 @@ export function getRelationshipTargetDisplayName(spdxId, elementMap) {
  * @param {Object} element - A software_Snippet element
  * @param {Map} [elementMap] - Map of SPDX IDs to elements
  * @returns {{fileId: string, fileName: string, baseName: string, name: string,
- *   start: (number|null), end: (number|null)}|null}
+ *   start: (number|null), end: (number|null), byteStart: (number|null),
+ *   byteEnd: (number|null), rangeLabel: string}|null}
  */
 export function snippetFileRef(element, elementMap) {
   if (!element || element.type !== 'software_Snippet') return null;
@@ -163,22 +164,31 @@ export function snippetFileRef(element, elementMap) {
   const fileName = file?.name || (fileId ? cleanName(fileId) : '');
   const baseName = fileName ? fileName.split('/').pop() : '';
   const lr = element.software_lineRange;
+  const br = element.software_byteRange;
   return {
     fileId,
     fileName,
     baseName,
     name: element.name || '',
     start: lr?.beginIntegerRange ?? null,
-    end: lr?.endIntegerRange ?? null
+    end: lr?.endIntegerRange ?? null,
+    byteStart: br?.beginIntegerRange ?? null,
+    byteEnd: br?.endIntegerRange ?? null,
+    rangeLabel: snippetRangeLabel(element)
   };
+}
+
+/** "start-end" (or a single number) for a PositiveIntegerRange, or empty. */
+export function integerRangeLabel(range) {
+  if (!range || range.beginIntegerRange == null) return '';
+  const { beginIntegerRange: a, endIntegerRange: b } = range;
+  return b != null && b !== a ? `${a}-${b}` : String(a);
 }
 
 /** Compact "1-based line span" label for a snippet, e.g. "L289-364" or "L633". */
 export function snippetLineLabel(element) {
-  const lr = element?.software_lineRange;
-  if (!lr || lr.beginIntegerRange == null) return '';
-  const { beginIntegerRange: a, endIntegerRange: b } = lr;
-  return b != null && b !== a ? `L${a}-${b}` : `L${a}`;
+  const span = integerRangeLabel(element?.software_lineRange);
+  return span ? `L${span}` : '';
 }
 
 /** Line span, or a byte span when the producer recorded only software_byteRange. */
@@ -446,7 +456,7 @@ export function getElementDisplayName(element, elementMap) {
 export function getDetailPromotedFields(element, elementMap) {
   if (!element) return [];
 
-  return DETAIL_PROMOTED_FIELDS.flatMap((spec) => {
+  const fields = DETAIL_PROMOTED_FIELDS.flatMap((spec) => {
     const value = element[spec.prop];
     if (value == null || value === '') return [];
     if (spec.types && !spec.types.includes(element.type)) return [];
@@ -462,4 +472,30 @@ export function getDetailPromotedFields(element, elementMap) {
       }
     ];
   });
+
+  // Snippet ranges are SPDX objects ({beginIntegerRange, endIntegerRange});
+  // stringify would print "[object Object]", so format them here. The source
+  // file id is resolved to a path so the card shows more than a bare SPDX id.
+  if (element.type === 'software_Snippet') {
+    const lines = integerRangeLabel(element.software_lineRange);
+    if (lines) {
+      fields.push({ prop: 'software_lineRange', label: 'Lines', value: lines, variant: 'badge' });
+    }
+    const bytes = integerRangeLabel(element.software_byteRange);
+    if (bytes) {
+      fields.push({ prop: 'software_byteRange', label: 'Bytes', value: bytes, variant: 'badge' });
+    }
+    const fileId = element.software_snippetFromFile;
+    if (fileId) {
+      const file = elementMap?.get(fileId);
+      fields.push({
+        prop: 'software_snippetFromFile',
+        label: 'From file',
+        value: file?.name || cleanName(fileId),
+        variant: 'badge'
+      });
+    }
+  }
+
+  return fields;
 }

@@ -1097,6 +1097,7 @@ export const navigationMixin = {
       name: refs.length === 1 ? first.name : '',
       start: effective[0].start,
       end: effective[0].end,
+      rangeLabel: first.rangeLabel,
       ranges: effective,
       rangeCount: ranges.length,
       sourceUrl: this.fileSourceIndex.get(fileId) || '',

@@ -20,6 +20,10 @@ export const CHANGELOG = [
       {
         tag: 'Fixed',
         text: 'Graph keeps snippet hubs as nodes (BASIL), still folds Zephyr leaves into files.'
+      },
+      {
+        tag: 'Improved',
+        text: 'Snippet detail card shows line and byte ranges.'
       }
     ]
   },

@@ -4,7 +4,9 @@ import test from 'node:test';
 import { buildRelationshipIndexes, parseGraph } from '../src/parser/parser.js';
 import {
   collectSnippetHubIds,
+  getDetailPromotedFields,
   resolveGraphSnippetEndpoint,
+  snippetFileRef,
   snippetTargetLabel
 } from '../src/lib/index.js';
 import { createGraphFilters } from '../src/config.js';
@@ -213,4 +215,52 @@ test('detailRelGroupsFor lists hub snippets individually instead of folding them
   assert.equal(group.total, 2);
   assert.ok(group.items.every((i) => !i.multiRange));
   assert.deepEqual(group.items.map((i) => i.id).sort(), ['snip:api-1', 'snip:api-2']);
+});
+
+test('snippetFileRef exposes line, byte, and a display range label', () => {
+  const map = new Map([['file:spec', { type: 'software_File', name: 'spec.md' }]]);
+  const bytes = snippetFileRef(basilHub, map);
+  assert.equal(bytes.byteStart, 40);
+  assert.equal(bytes.byteEnd, 68);
+  assert.equal(bytes.start, null);
+  assert.equal(bytes.rangeLabel, 'bytes 40-68');
+
+  const lines = snippetFileRef(zephyrLeaf, new Map());
+  assert.equal(lines.start, 1018);
+  assert.equal(lines.end, 1032);
+  assert.equal(lines.rangeLabel, 'L1018-1032');
+});
+
+test('getDetailPromotedFields lists snippet ranges and the source file', () => {
+  const map = new Map([
+    ['file:spec', { type: 'software_File', name: 'docs/spec.md' }],
+    ['file:thread', { type: 'software_File', name: 'kernel/thread.c' }]
+  ]);
+
+  const basilFields = getDetailPromotedFields(basilHub, map);
+  assert.deepEqual(
+    basilFields.map((f) => [f.label, f.value]),
+    [
+      ['Bytes', '40-68'],
+      ['From file', 'docs/spec.md']
+    ]
+  );
+
+  const both = getDetailPromotedFields(
+    {
+      ...zephyrLeaf,
+      software_byteRange: { beginIntegerRange: 200, endIntegerRange: 400 },
+      software_primaryPurpose: 'source'
+    },
+    map
+  );
+  assert.deepEqual(
+    both.map((f) => [f.label, f.value]),
+    [
+      ['Purpose', 'source'],
+      ['Lines', '1018-1032'],
+      ['Bytes', '200-400'],
+      ['From file', 'kernel/thread.c']
+    ]
+  );
 });
