@@ -44,6 +44,11 @@ const MAX_FLAT_EDGES = 15000;
 // Only draw labels past this zoom level, capped per frame, since they become noise when zoomed out.
 const LABEL_ZOOM_THRESHOLD = 1.1;
 const MAX_LABELS = 400;
+// Keep the hottest risks identifiable at overview zoom without turning the
+// heatmap into a wall of text. 0.8 includes high/critical risk signals and the
+// primary unverified-requirement signal, while the hard cap bounds dense SBOMs.
+const HEAT_LABEL_MIN_INTENSITY = 0.8;
+const MAX_HEAT_LABELS = 6;
 // World-space padding for viewport culling so edge-of-screen nodes/edges still draw.
 const CULL_PAD = 80;
 // Per-type dash signatures so a link's semantics read from the line style, not just colour.
@@ -1338,31 +1343,67 @@ export function renderGraph(app, retry = 0) {
     return true;
   };
 
-  const drawLabel = (d, isMatch) => {
+  const drawLabel = (d, emphasis = '') => {
     const sx = currentTransform.applyX(d.x);
     const sy = currentTransform.applyY(d.y);
     if (sx < -60 || sx > width + 60 || sy < -20 || sy > height + 20) return false;
     const r = radiusFor(d) * currentTransform.k;
     const text = d.isCluster ? `${d.name} · ${d.memberCount}` : d.name;
-    const tx = sx + r + 4;
     const tw = ctx.measureText(text).width;
-    // Reserve the label's box; bail if it would overlap a label already drawn.
-    if (!reserveLabel(tx - 1, sy - 6, tx + tw + 1, sy + 6)) return false;
-    if (isMatch) {
-      // Subtle backdrop so match labels stay legible over the busy edge mesh.
+    // Ordinary labels stay to the right. Priority heat labels try positions
+    // around the node so a dense hot cluster can expose several offenders
+    // without allowing annotations to overlap.
+    const positions =
+      emphasis === 'heat'
+        ? [
+            [sx + r + 4, sy],
+            [sx - r - tw - 4, sy],
+            [sx + 4, sy - r - 10],
+            [sx + 4, sy + r + 10],
+            [sx - tw - 4, sy - r - 10],
+            [sx - tw - 4, sy + r + 10]
+          ]
+        : [[sx + r + 4, sy]];
+    let placement = null;
+    for (const [tx, ty] of positions) {
+      if (reserveLabel(tx - 1, ty - 6, tx + tw + 1, ty + 6)) {
+        placement = { tx, ty };
+        break;
+      }
+    }
+    if (!placement) return false;
+    const { tx, ty } = placement;
+    if (emphasis) {
+      // Subtle backdrop so priority labels stay legible over the busy edge mesh.
       ctx.globalAlpha = 0.85;
       ctx.fillStyle = 'rgba(15,23,42,0.9)';
-      ctx.fillRect(tx - 2, sy - 7, tw + 4, 14);
+      ctx.fillRect(tx - 2, ty - 7, tw + 4, 14);
     }
-    ctx.globalAlpha = isMatch ? 1 : nodeSearchStyle(d.id).alpha;
-    ctx.fillStyle = isMatch ? '#fbbf24' : d.isCluster ? '#e2e8f0' : '#94a3b8';
-    ctx.fillText(text, tx, sy);
+    if (emphasis === 'heat') {
+      ctx.globalAlpha = 0.65;
+      ctx.strokeStyle = d._heat.color;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(sx, sy);
+      ctx.lineTo(tx > sx ? tx - 2 : tx + tw + 2, ty);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = emphasis ? 1 : nodeSearchStyle(d.id).alpha;
+    ctx.fillStyle =
+      emphasis === 'search'
+        ? '#fbbf24'
+        : emphasis === 'heat'
+          ? d._heat.color
+          : d.isCluster
+            ? '#e2e8f0'
+            : '#94a3b8';
+    ctx.fillText(text, tx, ty);
     return true;
   };
 
   const drawLabels = () => {
     const zoomedIn = currentTransform.k >= LABEL_ZOOM_THRESHOLD;
-    if (!searchActive && !zoomedIn) return;
+    if (!searchActive && !zoomedIn && !heatLabelList.length) return;
     ctx.save();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // screen space → constant-size text
     ctx.font = '11px ui-sans-serif, system-ui, -apple-system, sans-serif';
@@ -1375,7 +1416,14 @@ export function renderGraph(app, retry = 0) {
       for (const d of matchLabelList) {
         if (drawn >= MAX_LABELS) break;
         if (d.x == null) continue;
-        if (drawLabel(d, true)) drawn++;
+        if (drawLabel(d, 'search')) drawn++;
+      }
+    } else {
+      // Heat labels bypass the normal zoom threshold. They are deliberately
+      // few, hottest-first, and still pass through collision detection.
+      for (const d of heatLabelList) {
+        if (d.x == null) continue;
+        if (drawLabel(d, 'heat')) drawn++;
       }
     }
 
@@ -1389,10 +1437,11 @@ export function renderGraph(app, retry = 0) {
         if (drawn >= MAX_LABELS) break;
         if (d.x == null) continue;
         if (searchActive && matchSet.has(d.id)) continue; // already drawn above
+        if (!searchActive && heatLabelSet.has(d.id)) continue; // already drawn above
         const ss = nodeSearchStyle(d.id);
         if (ss.hidden) continue;
         if (!searchActive && connected && !connected.has(d.id)) continue;
-        if (drawLabel(d, false)) drawn++;
+        if (drawLabel(d)) drawn++;
       }
     }
 
@@ -1451,6 +1500,8 @@ export function renderGraph(app, retry = 0) {
   //     the hot regions. Purely additive layers around the normal draw, so the
   //     base graph is untouched and toggling a mode only repaints.
   let heatNodes = []; // render nodes carrying heat, precomputed for the draw loop
+  let heatLabelList = []; // bounded hottest-first subset labelled at every zoom
+  let heatLabelSet = new Set();
   const HEAT_MIN_PX = 26; // screen-space glow floor so heat still pools when zoomed out
   const HEAT_GLOW_ALPHA = 0.6; // peak core alpha before additive accumulation
   const heatGradientCache = new Map(); // `${color}|${level}` -> unit radial gradient
@@ -1482,6 +1533,8 @@ export function renderGraph(app, retry = 0) {
     const index = app.graphHeatActive ? app.graphHeatData() : null;
     if (!index || !index.size) {
       heatNodes = [];
+      heatLabelList = [];
+      heatLabelSet = new Set();
       return;
     }
     index.forEach((h, id) => {
@@ -1492,6 +1545,16 @@ export function renderGraph(app, retry = 0) {
       }
     });
     heatNodes = renderNodes.filter((d) => d._heat);
+    heatLabelList = heatNodes
+      .filter((d) => d._heat.intensity >= HEAT_LABEL_MIN_INTENSITY)
+      .sort(
+        (a, b) =>
+          b._heat.intensity - a._heat.intensity ||
+          b._r - a._r ||
+          String(a.name).localeCompare(String(b.name))
+      )
+      .slice(0, MAX_HEAT_LABELS);
+    heatLabelSet = new Set(heatLabelList.map((d) => d.id));
   };
 
   // Soft additive glow behind edges/nodes: neighbouring hot nodes pool into one
