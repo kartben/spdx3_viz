@@ -56,6 +56,8 @@ function dashPatternFor(type, lineWidth, k) {
       return [lineWidth, 4 / k];
     case 'hasDynamicLink':
     case 'implementedBy':
+    case 'hasTest':
+    case 'hasSpecification':
       return [7 / k, 5 / k];
     case 'conformsTo':
       // Longer dash than implementedBy so the two FunctionalSafety "dashed" edges don't read as one.
@@ -73,6 +75,7 @@ function dashPatternFor(type, lineWidth, k) {
     case 'suppliedBy':
     case 'originatedBy':
     case 'manufacturedBy':
+    case 'hasDocumentation':
       // Fine dots read as a lightweight provenance link, distinct from structural edges.
       return [lineWidth, 3 / k];
     case 'hasEvidence':

@@ -6,6 +6,7 @@ via the "What's new" link.
 ## Unreleased
 
 - **Added:** Functional Safety coverage matrices, exportable to Excel.
+- **Fixed:** `hasTestCase` relationships now show on the graph (e.g. BASIL SBOMs).
 
 ## [0.6.0] - 2026-08-29
 

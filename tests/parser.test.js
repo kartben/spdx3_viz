@@ -1260,6 +1260,120 @@ test('parseGraph supports hasPrerequisite relationships (as emitted by the Zephy
   assert.equal(inGroups.find((g) => g.key === 'hasPrerequisite:in')?.items[0].id, 'pkg:app');
 });
 
+test('parseGraph supports hasTestCase relationships (as emitted by BASIL SBOMs)', () => {
+  const app = spdxApp();
+  const graph = [
+    { type: 'software_File', spdxId: 'file:req', name: 'SW Requirement' },
+    { type: 'software_File', spdxId: 'file:tc', name: 'Test Case' },
+    {
+      type: 'Relationship',
+      spdxId: 'rel:testcase',
+      relationshipType: 'hasTestCase',
+      from: 'file:req',
+      to: ['file:tc']
+    }
+  ];
+
+  const parsed = parseGraph(graph);
+
+  assert.equal(parsed.relationships.length, 1);
+  assert.ok(parsed.presentRelTypes.includes('hasTestCase'));
+
+  const testCase = getRelationshipColor('hasTestCase');
+  assert.notEqual(testCase, getRelationshipColor('nonexistentRel'));
+  assert.notEqual(testCase, getRelationshipColor('dependsOn'));
+  assert.equal(getRelationshipGroupLabel('hasTestCase', 'out'), 'Has test case');
+  assert.equal(getRelationshipGroupLabel('hasTestCase', 'in'), 'Test case of');
+
+  // It has a graph legend toggle, so its edges actually render (they were being
+  // dropped when the type had no filter entry).
+  app.presentNodeTypes = parsed.presentNodeTypes;
+  app.presentRelTypes = parsed.presentRelTypes;
+  assert.ok(app.visibleGraphFilters.some((f) => f.isRel && f.key === 'hasTestCase'));
+
+  const indexes = buildRelationshipIndexes(parsed.relationships);
+  app.elementMap = parsed.elementMap;
+  app.relFromIndex = indexes.relFromIndex;
+  app.relToIndex = indexes.relToIndex;
+  const outGroups = app.detailRelGroupsFor({ spdxId: 'file:req' });
+  assert.equal(outGroups.find((g) => g.key === 'hasTestCase:out')?.items[0].id, 'file:tc');
+  const inGroups = app.detailRelGroupsFor({ spdxId: 'file:tc' });
+  assert.equal(inGroups.find((g) => g.key === 'hasTestCase:in')?.items[0].id, 'file:req');
+});
+
+test('parseGraph supports hasSpecification and hasDocumentation relationships', () => {
+  const app = spdxApp();
+  const graph = [
+    { type: 'software_File', spdxId: 'file:api', name: 'API' },
+    { type: 'software_File', spdxId: 'file:spec', name: 'Test Specification' },
+    { type: 'software_File', spdxId: 'file:doc', name: 'Reference doc' },
+    {
+      type: 'Relationship',
+      spdxId: 'rel:spec',
+      relationshipType: 'hasSpecification',
+      from: 'file:api',
+      to: ['file:spec']
+    },
+    {
+      type: 'Relationship',
+      spdxId: 'rel:doc',
+      relationshipType: 'hasDocumentation',
+      from: 'file:api',
+      to: ['file:doc']
+    }
+  ];
+
+  const parsed = parseGraph(graph);
+  assert.ok(parsed.presentRelTypes.includes('hasSpecification'));
+  assert.ok(parsed.presentRelTypes.includes('hasDocumentation'));
+  assert.equal(getRelationshipGroupLabel('hasSpecification', 'out'), 'Has specification');
+  assert.equal(getRelationshipGroupLabel('hasDocumentation', 'out'), 'Has documentation');
+
+  app.presentNodeTypes = parsed.presentNodeTypes;
+  app.presentRelTypes = parsed.presentRelTypes;
+  assert.ok(app.visibleGraphFilters.some((f) => f.isRel && f.key === 'hasSpecification'));
+  assert.ok(app.visibleGraphFilters.some((f) => f.isRel && f.key === 'hasDocumentation'));
+});
+
+test('parseGraph supports hasTest relationships', () => {
+  const app = spdxApp();
+  const graph = [
+    { type: 'software_Package', spdxId: 'pkg:app', name: 'app' },
+    { type: 'software_File', spdxId: 'file:test', name: 'test.sh' },
+    {
+      type: 'Relationship',
+      spdxId: 'rel:test',
+      relationshipType: 'hasTest',
+      from: 'pkg:app',
+      to: ['file:test']
+    }
+  ];
+
+  const parsed = parseGraph(graph);
+
+  assert.equal(parsed.relationships.length, 1);
+  assert.ok(parsed.presentRelTypes.includes('hasTest'));
+
+  const hasTest = getRelationshipColor('hasTest');
+  assert.notEqual(hasTest, getRelationshipColor('nonexistentRel'));
+  assert.equal(hasTest, getRelationshipColor('hasTestCase'));
+  assert.equal(getRelationshipGroupLabel('hasTest', 'out'), 'Has test');
+  assert.equal(getRelationshipGroupLabel('hasTest', 'in'), 'Test for');
+
+  app.presentNodeTypes = parsed.presentNodeTypes;
+  app.presentRelTypes = parsed.presentRelTypes;
+  assert.ok(app.visibleGraphFilters.some((f) => f.isRel && f.key === 'hasTest'));
+
+  const indexes = buildRelationshipIndexes(parsed.relationships);
+  app.elementMap = parsed.elementMap;
+  app.relFromIndex = indexes.relFromIndex;
+  app.relToIndex = indexes.relToIndex;
+  const outGroups = app.detailRelGroupsFor({ spdxId: 'pkg:app' });
+  assert.equal(outGroups.find((g) => g.key === 'hasTest:out')?.items[0].id, 'file:test');
+  const inGroups = app.detailRelGroupsFor({ spdxId: 'file:test' });
+  assert.equal(inGroups.find((g) => g.key === 'hasTest:in')?.items[0].id, 'pkg:app');
+});
+
 test('detailRelGroupsFor surfaces lifecycle-scoped relationships with their scope', () => {
   const app = spdxApp();
   const graph = [
