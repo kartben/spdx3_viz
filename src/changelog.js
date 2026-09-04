@@ -12,6 +12,10 @@ export const CHANGELOG = [
       {
         tag: 'Added',
         text: 'Functional Safety coverage matrices, exportable to Excel.'
+      },
+      {
+        tag: 'Fixed',
+        text: '`hasTestCase` relationships now show on the graph (e.g. BASIL SBOMs).'
       }
     ]
   },

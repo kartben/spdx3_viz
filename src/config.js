@@ -65,6 +65,12 @@ export const RELATIONSHIP_TYPES = {
   // AI profile relationship types (AI model ↔ training/test dataset).
   TRAINED_ON: 'trainedOn',
   TESTED_ON: 'testedOn',
+  // Core: a software element / requirement points at its test case or test artifact
+  // (`from` hasTestCase/hasTest `to`). Used by BASIL SBOM exports among others.
+  HAS_TEST_CASE: 'hasTestCase',
+  HAS_TEST: 'hasTest',
+  HAS_SPECIFICATION: 'hasSpecification',
+  HAS_DOCUMENTATION: 'hasDocumentation',
   // VEX relationship types (Security profile).
   FIXED_IN: 'fixedIn',
   DOES_NOT_AFFECT: 'doesNotAffect',
@@ -365,6 +371,10 @@ export const COLORS = {
   optionalComponent: '#d946ef',
   prerequisite: '#6366f1',
   variant: '#eab308',
+  // Core hasTestCase / hasTest edges; tinted to the test lifecycle scope.
+  testCase: '#a855f7',
+  specification: '#0d9488',
+  documentation: '#64748b',
   vulnerability: '#f43f5e',
   // VEX edge colors mirror the VEX_STATUSES palette so an edge reads as its status.
   vexFixed: '#10b981',
@@ -661,6 +671,37 @@ export function createGraphFilters() {
       isRel: true,
       lineStyle: 'dashed'
     },
+    {
+      key: 'hasTestCase',
+      label: 'hasTestCase',
+      color: COLORS.testCase,
+      active: true,
+      isRel: true
+    },
+    {
+      key: 'hasTest',
+      label: 'hasTest',
+      color: COLORS.testCase,
+      active: true,
+      isRel: true,
+      lineStyle: 'dashed'
+    },
+    {
+      key: 'hasSpecification',
+      label: 'hasSpecification',
+      color: COLORS.specification,
+      active: true,
+      isRel: true,
+      lineStyle: 'dashed'
+    },
+    {
+      key: 'hasDocumentation',
+      label: 'hasDocumentation',
+      color: COLORS.documentation,
+      active: true,
+      isRel: true,
+      lineStyle: 'dotted'
+    },
     // VEX assessment edges (vulnerability → package); start off, auto-enabled on load for small VEX sets.
     { key: 'fixedIn', label: 'fixedIn (VEX)', color: COLORS.vexFixed, active: false, isRel: true },
     {
@@ -903,6 +944,14 @@ export const RELATIONSHIP_LABELS = {
   'trainedOn:in': 'Training dataset for',
   'testedOn:out': 'Tested on',
   'testedOn:in': 'Test dataset for',
+  'hasTestCase:out': 'Has test case',
+  'hasTestCase:in': 'Test case of',
+  'hasTest:out': 'Has test',
+  'hasTest:in': 'Test for',
+  'hasSpecification:out': 'Has specification',
+  'hasSpecification:in': 'Specification of',
+  'hasDocumentation:out': 'Has documentation',
+  'hasDocumentation:in': 'Documents',
   'hasConcludedLicense:out': 'Concluded license',
   'hasConcludedLicense:in': 'Licensed (concluded)',
   'hasDeclaredLicense:out': 'Declared license',
@@ -1049,6 +1098,14 @@ export const RELATIONSHIP_SORT_ORDER = {
   'trainedOn:in': 32,
   'testedOn:out': 33,
   'testedOn:in': 34,
+  'hasTestCase:out': 34.3,
+  'hasTestCase:in': 34.6,
+  'hasTest:out': 34.7,
+  'hasTest:in': 34.8,
+  'hasSpecification:out': 34.85,
+  'hasSpecification:in': 34.9,
+  'hasDocumentation:out': 34.93,
+  'hasDocumentation:in': 34.96,
   'hasConcludedLicense:out': 27,
   'hasDeclaredLicense:out': 28,
   'hasConcludedLicense:in': 29,
