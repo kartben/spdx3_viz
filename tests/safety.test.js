@@ -10,6 +10,7 @@ import {
 import {
   snippetSymbolLabel,
   snippetCompactLine,
+  snippetRangeLabel,
   snippetTargetLabel,
   snippetFileGroupLabel,
   snippetGroupLineCount,
@@ -154,6 +155,16 @@ describe('snippet labels', () => {
     };
     assert.equal(snippetSymbolLabel(el), 'L1018');
     assert.equal(snippetCompactLine(el), '1018');
+  });
+
+  it('falls back to a byte span when the producer recorded no line range', () => {
+    const el = {
+      type: 'software_Snippet',
+      name: '/tmp/tmp07g1xn3q',
+      software_byteRange: { beginIntegerRange: 40, endIntegerRange: 68 }
+    };
+    assert.equal(snippetRangeLabel(el), 'bytes 40-68');
+    assert.equal(snippetSymbolLabel(el), 'bytes 40-68');
   });
 
   it('labels a snippet as file › symbol, without repeating the path', () => {

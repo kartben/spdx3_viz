@@ -181,6 +181,16 @@ export function snippetLineLabel(element) {
   return b != null && b !== a ? `L${a}-${b}` : `L${a}`;
 }
 
+/** Line span, or a byte span when the producer recorded only software_byteRange. */
+export function snippetRangeLabel(element) {
+  const line = snippetLineLabel(element);
+  if (line) return line;
+  const br = element?.software_byteRange;
+  if (!br || br.beginIntegerRange == null) return '';
+  const { beginIntegerRange: a, endIntegerRange: b } = br;
+  return b != null && b !== a ? `bytes ${a}-${b}` : `byte ${a}`;
+}
+
 /**
  * The interesting bit of a snippet name: the function/symbol when a producer
  * named it "func @ path:lines", otherwise the line span. Drops the path so a
@@ -204,7 +214,7 @@ export function snippetSymbolLabel(element) {
     }
     if (!name.includes('/')) return name;
   }
-  return snippetLineLabel(element);
+  return snippetRangeLabel(element);
 }
 
 /** Line numbers only, for a dense coverage chip: "1018" or "1018-1032". */
@@ -340,6 +350,68 @@ export function groupSnippetsByFile(elements, elementMap, { labelOf, dedupeRange
   }
   out.sort((a, b) => (a.baseName || '').localeCompare(b.baseName || ''));
   return { files: out, others };
+}
+
+function relationshipTargets(rel) {
+  if (!rel) return [];
+  return Array.isArray(rel.to) ? rel.to : rel.to ? [rel.to] : [];
+}
+
+/**
+ * Snippets that belong on the graph as their own nodes, rather than being
+ * redirected onto the file they were carved from.
+ *
+ * Zephyr-style snippets are leaf targets of implementedBy / hasEvidence: the
+ * interesting object is the file, so the graph folds them away. BASIL-style
+ * snippets are hubs: an API contains the snippet and the snippet then has
+ * requirements, tests, or documentation. Those stay as nodes so the chain
+ * LIBRARY → API → Snippet → Requirement remains visible.
+ *
+ * A snippet is a hub when it is the `from` of any relationship, or the `to` of
+ * a `contains` whose `from` is not its software_snippetFromFile (the parent is
+ * then a different element, typically the API, not just the source file).
+ *
+ * @param {Array<{spdxId?: string, software_snippetFromFile?: string}>} snippets
+ * @param {Array<{from?: string, to?: string|string[], relationshipType?: string}>} relationships
+ * @returns {Set<string>}
+ */
+export function collectSnippetHubIds(snippets, relationships) {
+  const snippetIds = new Set();
+  const fromFile = new Map();
+  for (const s of snippets || []) {
+    if (!s?.spdxId) continue;
+    snippetIds.add(s.spdxId);
+    fromFile.set(s.spdxId, s.software_snippetFromFile || '');
+  }
+  if (!snippetIds.size) return new Set();
+
+  const hubs = new Set();
+  for (const rel of relationships || []) {
+    if (rel.from && snippetIds.has(rel.from)) hubs.add(rel.from);
+    if (rel.relationshipType !== 'contains') continue;
+    for (const t of relationshipTargets(rel)) {
+      if (snippetIds.has(t) && rel.from !== fromFile.get(t)) hubs.add(t);
+    }
+  }
+  return hubs;
+}
+
+/**
+ * Resolves a graph endpoint that may be a snippet. Leaf snippets redirect to
+ * their source file (and carry the snippet name for the "via snippet" hint).
+ * Hub snippets, and anything that is not a snippet, pass through unchanged.
+ *
+ * @param {string} spdxId
+ * @param {{snippetIds?: Set<string>|null, hubIds?: Set<string>|null, elementMap?: Map<string, Object>}} ctx
+ * @returns {{id: string, snippet: string|null}}
+ */
+export function resolveGraphSnippetEndpoint(spdxId, { snippetIds, hubIds, elementMap } = {}) {
+  if (!spdxId || !snippetIds?.has(spdxId) || hubIds?.has(spdxId)) {
+    return { id: spdxId, snippet: null };
+  }
+  const ref = snippetFileRef(elementMap?.get(spdxId), elementMap);
+  if (!ref || !ref.fileId) return { id: spdxId, snippet: null };
+  return { id: ref.fileId, snippet: ref.name || cleanName(spdxId) };
 }
 
 /**
