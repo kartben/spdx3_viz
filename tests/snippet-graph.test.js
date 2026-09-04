@@ -1,7 +1,14 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { collectSnippetHubIds, resolveGraphSnippetEndpoint } from '../src/lib/index.js';
+import { parseGraph } from '../src/parser/parser.js';
+import {
+  collectSnippetHubIds,
+  resolveGraphSnippetEndpoint,
+  snippetTargetLabel
+} from '../src/lib/index.js';
+import { createGraphFilters } from '../src/config.js';
+import { spdxApp } from '../src/app.js';
 
 const zephyrLeaf = {
   type: 'software_Snippet',
@@ -97,4 +104,79 @@ test('resolveGraphSnippetEndpoint redirects leaves and keeps hubs', () => {
   const plain = resolveGraphSnippetEndpoint('file:api', { snippetIds, hubIds, elementMap });
   assert.equal(plain.id, 'file:api');
   assert.equal(plain.snippet, null);
+});
+
+test('parseGraph advertises snippet nodes only when hubs are present', () => {
+  const zephyr = parseGraph([
+    { type: 'software_File', spdxId: 'file:thread', name: 'kernel/thread.c' },
+    zephyrLeaf,
+    { type: 'Requirement', spdxId: 'req:srs', name: 'Create thread' },
+    {
+      type: 'Relationship',
+      spdxId: 'rel:impl',
+      relationshipType: 'implementedBy',
+      from: 'req:srs',
+      to: ['snip:thread']
+    }
+  ]);
+  assert.equal(zephyr.snippets.length, 1);
+  assert.equal(zephyr.snippetHubIds.size, 0);
+  assert.ok(!zephyr.presentNodeTypes.includes('snippet'));
+
+  const basil = parseGraph([
+    { type: 'software_File', spdxId: 'file:api', name: 'API' },
+    { type: 'software_File', spdxId: 'file:spec', name: 'spec.md' },
+    {
+      type: 'software_File',
+      spdxId: 'file:req',
+      name: 'SW req',
+      software_primaryPurpose: 'requirement'
+    },
+    basilHub,
+    {
+      type: 'Relationship',
+      spdxId: 'rel:contains',
+      relationshipType: 'contains',
+      from: 'file:api',
+      to: ['snip:api-1']
+    },
+    {
+      type: 'Relationship',
+      spdxId: 'rel:req',
+      relationshipType: 'hasRequirement',
+      from: 'snip:api-1',
+      to: ['file:req']
+    }
+  ]);
+  assert.ok(basil.snippetHubIds.has('snip:api-1'));
+  assert.ok(basil.presentNodeTypes.includes('snippet'));
+  assert.ok(basil.presentRelTypes.includes('hasRequirement'));
+  assert.equal(snippetTargetLabel(basilHub, basil.elementMap), 'spec.md › bytes 40-68');
+});
+
+test('graph legend includes a Snippets toggle when hub snippets are present', () => {
+  const parsed = parseGraph([
+    { type: 'software_File', spdxId: 'file:api', name: 'API' },
+    { type: 'software_File', spdxId: 'file:spec', name: 'spec.md' },
+    basilHub,
+    {
+      type: 'Relationship',
+      relationshipType: 'contains',
+      from: 'file:api',
+      to: ['snip:api-1']
+    },
+    {
+      type: 'Relationship',
+      relationshipType: 'hasRequirement',
+      from: 'snip:api-1',
+      to: ['file:req']
+    }
+  ]);
+
+  const app = spdxApp();
+  app.presentNodeTypes = parsed.presentNodeTypes;
+  app.presentRelTypes = parsed.presentRelTypes;
+  const keys = app.visibleGraphFilters.map((f) => f.key);
+  assert.ok(keys.includes('snippet'));
+  assert.ok(createGraphFilters().some((f) => f.key === 'snippet' && !f.isRel));
 });

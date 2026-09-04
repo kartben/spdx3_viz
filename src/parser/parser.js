@@ -15,7 +15,8 @@ import {
   getVulnerabilityLocators,
   vexStatusForRel,
   summarizeVulnAssessments,
-  buildImpactAdjacency
+  buildImpactAdjacency,
+  collectSnippetHubIds
 } from '../lib/index.js';
 
 /**
@@ -46,6 +47,7 @@ function makeThrottledReporter(onProgress, total) {
  * @property {Array<Object>} packages - Package elements
  * @property {Array<Object>} files - File elements (excluding build configs)
  * @property {Array<Object>} snippets - Snippet elements (regions of a file)
+ * @property {Set<string>} snippetHubIds - Snippets that stay as their own graph nodes
  * @property {Map<string, Array>} snippetsByFileIndex - fileId to its snippets
  * @property {Array<Object>} tools - Tool elements
  * @property {Array<Object>} relationships - Relationship elements
@@ -514,6 +516,8 @@ export function parseGraph(graph, onProgress) {
     );
   }
 
+  const snippetHubIds = collectSnippetHubIds(snippets, relationships);
+
   // Which node/relationship types actually occur, so the graph legend can hide
   // entries for types the SBOM doesn't contain.
   const { presentNodeTypes, presentRelTypes, presentScopes } = computePresentTypes({
@@ -527,6 +531,7 @@ export function parseGraph(graph, onProgress) {
     buildConfigs,
     agents,
     vulnerabilities,
+    snippetHubIds,
     relationships,
     vexRelationships,
     resolveCreationInfo,
@@ -538,6 +543,7 @@ export function parseGraph(graph, onProgress) {
     packages,
     files: regularFiles,
     snippets,
+    snippetHubIds,
     snippetsByFileIndex,
     tools,
     hardware,
@@ -813,6 +819,10 @@ function computePresentTypes(data) {
     else nodeTypes.add('package');
   });
   if (data.regularFiles.length) nodeTypes.add('file');
+  // Only advertise Snippets when some are graph hubs (BASIL-style). Zephyr-style
+  // leaf snippets stay redirected onto their files, so a legend toggle that
+  // would draw nothing is hidden.
+  if (data.snippetHubIds?.size) nodeTypes.add('snippet');
   if (data.hardware.length) nodeTypes.add('hardware');
   if (data.requirements.length) nodeTypes.add('requirement');
   if (data.supplyChain?.length) nodeTypes.add('supplychain');

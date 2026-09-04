@@ -21,7 +21,9 @@ import {
   escapeHtml,
   iconKeyForElement,
   getNodeIconPath2D,
-  snippetFileRef,
+  snippetTargetLabel,
+  collectSnippetHubIds,
+  resolveGraphSnippetEndpoint,
   computeLayers,
   bfsDepths,
   orderLaneTypes,
@@ -303,7 +305,11 @@ export function renderGraph(app, retry = 0) {
     const type = getNodeType(el);
     if (!activeNodeTypes.has(type)) return null;
 
-    const node = { id: spdxId, name: el.name || cleanName(spdxId), type, data: el };
+    const name =
+      type === 'snippet'
+        ? snippetTargetLabel(el, app.elementMap) || el.name || cleanName(spdxId)
+        : el.name || cleanName(spdxId);
+    const node = { id: spdxId, name, type, data: el };
     uNodeById.set(spdxId, node);
     uNodes.push(node);
     return node;
@@ -311,6 +317,10 @@ export function renderGraph(app, retry = 0) {
 
   app.packages.forEach((p) => addNode(p.spdxId));
   app.files.forEach((f) => addNode(f.spdxId));
+  const snippetHubIds = collectSnippetHubIds(app.snippets, app.relationships);
+  (app.snippets || []).forEach((s) => {
+    if (snippetHubIds.has(s.spdxId)) addNode(s.spdxId);
+  });
   (app.hardware || []).forEach((h) => addNode(h.spdxId));
   (app.supplyChain || []).forEach((s) => addNode(s.spdxId));
   (app.requirements || []).forEach((r) => addNode(r.spdxId));
@@ -326,25 +336,23 @@ export function renderGraph(app, retry = 0) {
   // right, so an agent shows even when the createdBy edge type is toggled off.
   (app.agents || []).forEach((a) => addNode(a.spdxId));
 
-  // A snippet is never its own graph node, so an edge that lands on one is redirected to the
-  // file it came from (via snippetFileRef, the same resolver the source/detail views use) and
-  // tagged with the snippet name. This surfaces requirement→snippet traceability (e.g. a
-  // Requirement's `implementedBy → snippet` reads as an edge to the file) while letting the
-  // tooltip hint it's routed "via snippet …" rather than a direct file relationship. Non-snippets,
-  // and snippets with no resolvable source file, pass through unchanged (the latter then drop as
-  // before instead of pointing at a phantom node).
+  // Leaf snippets (Zephyr-style implementedBy targets) still redirect to the file
+  // they were carved from, tagged with the snippet name for the "via snippet …"
+  // hover hint. Hub snippets (BASIL-style: an API contains the snippet, and the
+  // snippet then has requirements / tests / docs) stay as their own nodes so the
+  // parent→snippet→work-item chain is visible. Non-snippets, and snippets with no
+  // resolvable source file, pass through unchanged.
   //
-  // Only snippet endpoints ever redirect, but this runs for both ends of every relationship
-  // (millions of times on a big SBOM). Most SBOMs have no snippets at all, so gate the lookup on
-  // a set of the actual snippet ids: a non-snippet endpoint then skips the elementMap.get +
-  // snippetFileRef entirely and passes straight through, unchanged.
+  // Only snippet endpoints ever redirect, but this runs for both ends of every
+  // relationship (millions of times on a big SBOM). Most SBOMs have no snippets
+  // at all, so gate the lookup on a set of the actual snippet ids.
   const snippetIds = app.snippets?.length ? new Set(app.snippets.map((s) => s.spdxId)) : null;
-  const redirectSnippet = (spdxId) => {
-    if (!snippetIds || !snippetIds.has(spdxId)) return { id: spdxId, snippet: null };
-    const ref = snippetFileRef(app.elementMap.get(spdxId), app.elementMap);
-    if (!ref || !ref.fileId) return { id: spdxId, snippet: null };
-    return { id: ref.fileId, snippet: ref.name || cleanName(spdxId) };
-  };
+  const redirectSnippet = (spdxId) =>
+    resolveGraphSnippetEndpoint(spdxId, {
+      snippetIds,
+      hubIds: snippetHubIds,
+      elementMap: app.elementMap
+    });
 
   // 2. Underlying links.
   const uLinks = [];
