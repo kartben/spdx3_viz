@@ -12,6 +12,7 @@ const SEARCH_TYPE_LABELS = {
   ai: 'AI model',
   dataset: 'Dataset',
   file: 'File',
+  snippet: 'Snippet',
   hardware: 'Hardware',
   supplychain: 'Supply Chain',
   requirement: 'Requirement',
@@ -40,6 +41,7 @@ export const searchMixin = {
     const key = [
       this.packages.length,
       this.files.length,
+      this.snippets.length,
       this.hardware.length,
       this.supplyChain.length,
       this.requirements.length,
@@ -81,6 +83,10 @@ export const searchMixin = {
     }
     for (const f of this.files) {
       add(f.spdxId, 'file', f.name || this.cleanName(f.spdxId), '', f.spdxId);
+    }
+    for (const s of this.snippets) {
+      const name = this.elementDisplayName(s) || this.cleanName(s.spdxId);
+      add(s.spdxId, 'snippet', name, s.comment || '', `${s.spdxId} ${s.comment || ''} snippet`);
     }
     for (const h of this.hardware) {
       add(
