@@ -1602,9 +1602,9 @@
         <span class="detail-rel-line" style="background: #34d399"></span>
         <span class="text-xs font-semibold uppercase tracking-wider text-emerald-400">Source</span>
         <span
-          x-show="detailSnippet?.start != null"
+          x-show="detailSnippet?.rangeLabel"
           class="badge bg-amber-400/10 text-amber-300 text-[10px]"
-          x-text="'L' + detailSnippet?.start + (detailSnippet?.end && detailSnippet?.end !== detailSnippet?.start ? '-' + detailSnippet?.end : '')"
+          x-text="detailSnippet?.rangeLabel"
         ></span>
         <button
           type="button"

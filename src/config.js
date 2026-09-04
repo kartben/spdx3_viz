@@ -989,7 +989,7 @@ export const DETAIL_PROMOTED_FIELDS = [
   {
     prop: 'software_primaryPurpose',
     label: 'Purpose',
-    types: ['software_File', 'software_Package'],
+    types: ['software_File', 'software_Package', 'software_Snippet'],
     variant: 'badge'
   },
   {
