@@ -162,7 +162,7 @@
     "description": "Official BASIL example export: a software component mapped onto sections of the <a href=\"https://github.com/elisa-tech/BASIL\" target=\"_blank\" rel=\"noopener\">BASIL README</a>.",
     "dir": "samples/basil",
     "files": ["spdx.jsonld"],
-    "size": 13290
+    "size": 13158
   },
   {
     "id": "paper-plane",
