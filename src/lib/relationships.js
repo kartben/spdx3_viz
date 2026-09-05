@@ -191,6 +191,32 @@ export function snippetLineLabel(element) {
   return span ? `L${span}` : '';
 }
 
+/**
+ * Maps a 1-based inclusive byte span onto 1-based line numbers in `text`.
+ * BASIL snippets record software_byteRange from a character offset; the source
+ * viewer highlights lines, so we convert once the file text is in hand.
+ *
+ * @param {string} text
+ * @param {number} begin
+ * @param {number} [end]
+ * @returns {{start: (number|null), end: (number|null)}}
+ */
+export function byteRangeToLineRange(text, begin, end) {
+  if (text == null || begin == null) return { start: null, end: null };
+  const bytes = new TextEncoder().encode(String(text));
+  if (!bytes.length) return { start: null, end: null };
+  const startByte = Math.max(0, Math.min(bytes.length - 1, begin - 1));
+  const endByte = Math.max(startByte, Math.min(bytes.length - 1, (end ?? begin) - 1));
+  const lineAt = (byteIdx) => {
+    let line = 1;
+    for (let i = 0; i < byteIdx; i++) {
+      if (bytes[i] === 10) line++;
+    }
+    return line;
+  };
+  return { start: lineAt(startByte), end: lineAt(endByte) };
+}
+
 /** Line span, or a byte span when the producer recorded only software_byteRange. */
 export function snippetRangeLabel(element) {
   const line = snippetLineLabel(element);

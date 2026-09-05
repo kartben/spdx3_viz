@@ -24,6 +24,14 @@ export const CHANGELOG = [
       {
         tag: 'Improved',
         text: 'Snippet detail card shows line and byte ranges.'
+      },
+      {
+        tag: 'Added',
+        text: 'BASIL example design SBOM, mapped onto the project README.'
+      },
+      {
+        tag: 'Improved',
+        text: 'Fetch source from http(s) File names and highlight byte ranges.'
       }
     ]
   },

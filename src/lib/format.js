@@ -242,6 +242,39 @@ export function normalizeUrl(value) {
 }
 
 /**
+ * Turns a File download location or name into a fetchable source URL.
+ * GitHub blob/raw pages become raw.githubusercontent.com so the viewer can
+ * GET the file the same way *-sources packages do.
+ *
+ * @param {string} value
+ * @returns {string} An http(s) URL, or '' when not fetchable
+ */
+export function normalizeSourceFetchUrl(value) {
+  const url = normalizeUrl(value);
+  if (!url) return '';
+  const blob = url.match(/^https?:\/\/github\.com\/([^/]+\/[^/]+)\/blob\/([^/]+)\/(.+)$/i);
+  if (blob) return `https://raw.githubusercontent.com/${blob[1]}/${blob[2]}/${blob[3]}`;
+  const raw = url.match(/^https?:\/\/github\.com\/([^/]+\/[^/]+)\/raw\/([^/]+)\/(.+)$/i);
+  if (raw) return `https://raw.githubusercontent.com/${raw[1]}/${raw[2]}/${raw[3]}`;
+  return url;
+}
+
+/**
+ * First fetchable http(s) URL on a software_File (downloadLocation, then name).
+ *
+ * @param {Object} [file]
+ * @returns {string}
+ */
+export function fileHttpSourceUrl(file) {
+  if (!file) return '';
+  return (
+    normalizeSourceFetchUrl(file.software_downloadLocation) ||
+    normalizeSourceFetchUrl(file.name) ||
+    ''
+  );
+}
+
+/**
  * Extracts displayable external identifiers (PackageURL, CPE, gitoid, …) from a
  * package or tool element.
  *
