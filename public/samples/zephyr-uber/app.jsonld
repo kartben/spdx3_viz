@@ -1,0 +1,172 @@
+{
+  "@context": "https://spdx.org/rdf/3.1/spdx-context.jsonld",
+  "@graph": [
+    {
+      "type": "simplelicensing_LicenseExpression",
+      "spdxId": "https://spdx.org/licenses/Apache-2.0",
+      "simplelicensing_licenseExpression": "Apache-2.0",
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "simplelicensing_LicenseExpression",
+      "spdxId": "https://spdx.org/licenses/CC0-1.0",
+      "simplelicensing_licenseExpression": "CC0-1.0",
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Organization",
+      "spdxId": "zephyr:agents/the-zephyr-project",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "The Zephyr Project"
+    },
+    {
+      "type": "SoftwareAgent",
+      "spdxId": "zephyr:agents/west-spdx-agent",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "West SPDX Generator"
+    },
+    {
+      "type": "SpdxDocument",
+      "spdxId": "zephyr:app/documents/app",
+      "dataLicense": "https://spdx.org/licenses/CC0-1.0",
+      "namespaceMap": [
+        {
+          "type": "NamespaceMap",
+          "namespace": "http://spdx.org/spdxdocs/zephyr-uber-demo/",
+          "prefix": "zephyr"
+        }
+      ],
+      "element": [
+        "zephyr:agents/west-spdx-agent",
+        "zephyr:tools/west-spdx",
+        "zephyr:agents/the-zephyr-project",
+        "zephyr:packages/app-sources",
+        "zephyr:files/File-main.c",
+        "zephyr:relationships/2082",
+        "https://spdx.org/licenses/Apache-2.0",
+        "zephyr:relationships/2492",
+        "zephyr:relationships/2493",
+        "zephyr:relationships/2717",
+        "zephyr:relationships/2718",
+        "https://spdx.org/licenses/CC0-1.0"
+      ],
+      "profileConformance": [
+        "core",
+        "software",
+        "simpleLicensing"
+      ],
+      "rootElement": [
+        "zephyr:packages/app-sources"
+      ],
+      "creationInfo": "zephyr:creationinfo",
+      "name": "Zephyr Application"
+    },
+    {
+      "type": "CreationInfo",
+      "@id": "zephyr:creationinfo",
+      "created": "2026-08-28T11:56:17Z",
+      "createdBy": [
+        "zephyr:agents/west-spdx-agent",
+        "zephyr:agents/the-zephyr-project"
+      ],
+      "createdUsing": [
+        "zephyr:tools/west-spdx"
+      ],
+      "specVersion": "3.1.0"
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-main.c",
+      "software_fileKind": "file",
+      "software_artifactSize": 2565,
+      "software_copyrightText": "<text>\nCopyright (c) 2023 Fabian Blatz <fabianblatz@gmail.com>\n</text>",
+      "software_primaryPurpose": "file",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "src/main.c",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "bfe2026bb7a51c6edee0d6cf9eb8571d904b8915"
+        },
+        {
+          "type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "f3298c7defe2a81bec13fa78b89b9b5b16b021b418931f1803873c86cc997ec1"
+        }
+      ]
+    },
+    {
+      "type": "software_Package",
+      "spdxId": "zephyr:packages/app-sources",
+      "software_downloadLocation": "NOASSERTION",
+      "software_copyrightText": "NOASSERTION",
+      "software_primaryPurpose": "source",
+      "creationInfo": "zephyr:creationinfo",
+      "name": "app-sources"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2082",
+      "from": "zephyr:packages/app-sources",
+      "relationshipType": "contains",
+      "to": [
+        "zephyr:files/File-main.c"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2492",
+      "from": "zephyr:packages/app-sources",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://spdx.org/licenses/Apache-2.0"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2493",
+      "from": "zephyr:packages/app-sources",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "expandedlicensing_NoAssertionLicense"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2717",
+      "from": "zephyr:files/File-main.c",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://spdx.org/licenses/Apache-2.0"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "zephyr:relationships/2718",
+      "from": "zephyr:files/File-main.c",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://spdx.org/licenses/Apache-2.0"
+      ],
+      "creationInfo": "zephyr:creationinfo"
+    },
+    {
+      "type": "Tool",
+      "spdxId": "zephyr:tools/west-spdx",
+      "creationInfo": "zephyr:creationinfo",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "packageUrl",
+          "identifier": "pkg:generic/zephyr-spdx-builder@4.4.99"
+        }
+      ],
+      "name": "Zephyr SPDX builder"
+    }
+  ]
+}

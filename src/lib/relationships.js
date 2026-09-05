@@ -218,6 +218,9 @@ export function snippetSymbolLabel(element) {
       // A path-like left side is not a symbol (e.g. "kernel/foo.c @ ...").
       if (symbol && !symbol.includes('/')) return symbol;
     }
+    // west spdx --analyze-elf=snippets names routines "fn@path" with no spaces.
+    const tight = name.match(/^([^@/]+)@\S/);
+    if (tight) return tight[1].trimEnd();
     // Coverage snippets are often named "path:start-end" with no symbol.
     if (/[/\\].*:\d+(-\d+)?$/.test(name) || /^\S+\.\w+:\d+(-\d+)?$/.test(name)) {
       return snippetLineLabel(element) || name;

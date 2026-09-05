@@ -271,6 +271,7 @@ export function createState() {
     snippets: [],
     snippetHubIds: new Set(), // snippets that stay as their own graph nodes
     snippetsByFileIndex: new Map(), // fileId → snippet[] (sorted by start line)
+    snippetOverlayOpen: {}, // overlay/routine key → open, overriding its default
     tools: [],
     hardware: [], // hardware profile elements (SPDX 3.1)
     requirements: [], // requirements + FunctionalSafety artifacts (SPDX 3.1)

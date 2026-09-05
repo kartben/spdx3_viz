@@ -890,6 +890,20 @@ export const TAILWIND_CONFIG = {
 };
 
 /**
+ * The group a snippet lands in when a build consumed it.
+ *
+ * `hasInput` is Build-profile vocabulary, not any one project's: it says a
+ * build took the code as input. That is the group a file is usually opened
+ * for, so it is the one left open.
+ */
+export const BUILD_SNIPPET_CLAIM = 'hasInput';
+
+/** Fallback group for a snippet nothing claims. */
+// Sorts last: whatever nothing in the document accounts for is the least
+// interesting thing to read about a file.
+export const UNCLAIMED_SNIPPET = { key: 'other', label: 'Other snippets', order: 999 };
+
+/**
  * Maps relationship types and directions to human-readable labels
  * @constant {Object}
  */
@@ -949,8 +963,10 @@ export const RELATIONSHIP_LABELS = {
   'hasTestCase:in': 'Test case of',
   'hasTest:out': 'Has test',
   'hasTest:in': 'Test for',
-  'hasSpecification:out': 'Has specification',
-  'hasSpecification:in': 'Specification of',
+  // A routine snippet points at the header prototype that announces it, so read
+  // the pair as declares/implements rather than the generic spec wording.
+  'hasSpecification:out': 'Declared in',
+  'hasSpecification:in': 'Declares',
   'hasDocumentation:out': 'Has documentation',
   'hasDocumentation:in': 'Documents',
   'hasConcludedLicense:out': 'Concluded license',

@@ -1326,7 +1326,7 @@ test('parseGraph supports hasSpecification and hasDocumentation relationships', 
   const parsed = parseGraph(graph);
   assert.ok(parsed.presentRelTypes.includes('hasSpecification'));
   assert.ok(parsed.presentRelTypes.includes('hasDocumentation'));
-  assert.equal(getRelationshipGroupLabel('hasSpecification', 'out'), 'Has specification');
+  assert.equal(getRelationshipGroupLabel('hasSpecification', 'out'), 'Declared in');
   assert.equal(getRelationshipGroupLabel('hasDocumentation', 'out'), 'Has documentation');
 
   app.presentNodeTypes = parsed.presentNodeTypes;

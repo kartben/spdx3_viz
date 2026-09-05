@@ -172,6 +172,16 @@
                     x-text="lic.label"
                   ></button>
                 </template>
+                <template
+                  x-for="overlay in fileSnippetOverlays(f.spdxId).slice(0, 1)"
+                  :key="overlay.key"
+                >
+                  <span
+                    class="badge text-xs bg-emerald-400/15 text-emerald-300"
+                    :title="overlay.label"
+                    x-text="overlay.total + ' ' + overlay.label.toLowerCase()"
+                  ></span>
+                </template>
                 <span
                   x-show="artifactSize(f)"
                   class="text-[11px] text-slate-500 tabular-nums"
@@ -212,6 +222,64 @@
                   x-text="f.description"
                 ></div>
               </div>
+
+              <!-- What has been said about parts of this file, grouped by the
+                   producer that claims each (see fileSnippetOverlays). -->
+              <template x-for="overlay in fileSnippetOverlays(f.spdxId)" :key="overlay.key">
+                <div>
+                  <button
+                    type="button"
+                    class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1 flex items-center gap-1.5"
+                    @click.stop="toggleSnippetOverlay(f.spdxId + '|' + overlay.key, overlay.openByDefault)"
+                  >
+                    <span x-text="overlay.label"></span>
+                    <span
+                      class="text-slate-500 normal-case font-normal"
+                      x-text="'(' + overlay.total + ')'"
+                    ></span>
+                    <span
+                      class="text-slate-500"
+                      x-text="isSnippetOverlayOpen({ key: f.spdxId + '|' + overlay.key, openByDefault: overlay.openByDefault }) ? '▾' : '▸'"
+                    ></span>
+                  </button>
+                  <div
+                    x-show="isSnippetOverlayOpen({ key: f.spdxId + '|' + overlay.key, openByDefault: overlay.openByDefault })"
+                    class="flex flex-wrap gap-1.5 mb-2"
+                  >
+                    <template
+                      x-for="row in overlay.rows.slice(0, revealLimit('snippets:' + f.spdxId + overlay.key))"
+                      :key="row.id"
+                    >
+                      <button
+                        type="button"
+                        class="badge bg-emerald-400/10 text-emerald-300 hover:opacity-80 font-mono"
+                        :title="(row.inlined ? 'Inlined everywhere. ' : '') + row.lines + (row.children.length ? ' · ' + row.children.length + ' ranges' : '')"
+                        @click.stop="selectGraphNode(row.id)"
+                      >
+                        <span x-text="row.label"></span>
+                        <span
+                          x-show="row.children.length"
+                          class="text-emerald-500/70 ml-1"
+                          x-text="'+' + row.children.length"
+                        ></span>
+                        <span
+                          x-show="row.inlined"
+                          class="text-emerald-500/70 ml-1"
+                          aria-hidden="true"
+                          >&#8226;</span
+                        >
+                      </button>
+                    </template>
+                    <button
+                      type="button"
+                      x-show="overlay.rows.length > revealLimit('snippets:' + f.spdxId + overlay.key)"
+                      class="text-[11px] text-slate-400 hover:text-slate-200 self-center"
+                      @click.stop="revealMore('snippets:' + f.spdxId + overlay.key)"
+                      x-text="'+' + (overlay.rows.length - revealLimit('snippets:' + f.spdxId + overlay.key)) + ' more'"
+                    ></button>
+                  </div>
+                </div>
+              </template>
 
               <!-- Licenses -->
               <div x-show="elementLicenses(f.spdxId).length > 0">
