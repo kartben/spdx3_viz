@@ -773,7 +773,10 @@ export const loadingMixin = {
   _applyParsedResult(parsed, indexes) {
     Object.assign(this, markPayloadRaw(parsed));
     Object.assign(this, markPayloadRaw(indexes));
-    // Only now is there a document to show: flipping this earlier (during
+    // Snippet grouping is derived from the relationships; drop it with them.
+    this._resetSnippetMemos?.();
+    this.snippetOverlayOpen = {};
+    // Only now is there a document to show: flipping this earlier (during)
     // download or parse) would commit the app shell before knowing the parse
     // succeeds, leaving a failed load stranded in an empty app.
     this.dataLoaded = true;

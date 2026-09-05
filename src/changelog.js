@@ -11,6 +11,14 @@ export const CHANGELOG = [
     items: [
       {
         tag: 'Added',
+        text: 'Files group snippets by what claims them.'
+      },
+      {
+        tag: 'Fixed',
+        text: 'Snippet source follows the package purl commit.'
+      },
+      {
+        tag: 'Added',
         text: 'Functional Safety coverage matrices, exportable to Excel.'
       },
       {

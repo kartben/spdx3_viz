@@ -137,6 +137,15 @@ describe('buildSafetySpecFacets', () => {
 });
 
 describe('snippet labels', () => {
+  it('extracts the function from a west "fn@path" name', () => {
+    const el = {
+      type: 'software_Snippet',
+      name: 'spi_flash_restore_cache@components/spi_flash/cache_utils.c',
+      software_lineRange: { beginIntegerRange: 112, endIntegerRange: 118 }
+    };
+    assert.equal(snippetSymbolLabel(el), 'spi_flash_restore_cache');
+  });
+
   it('extracts the function from a producer "func @ path:lines" name', () => {
     const el = {
       type: 'software_Snippet',

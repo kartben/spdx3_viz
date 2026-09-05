@@ -1331,6 +1331,52 @@ export function createIndexAccessors(indexes) {
    ========================================================================== */
 
 const GH_DL_RE = /^git\+https:\/\/github\.com\/([^/]+\/[^@]+)@([a-f0-9]{40})$/;
+// A GitHub package URL: "pkg:github/<owner>/<repo>@<version>". A purl says
+// where a package came from and at which version, whatever produced the SBOM,
+// so it is the second place worth looking when there is no download location.
+const GH_PURL_RE = /^pkg:github\/([^/]+\/[^@]+)@(.+)$/;
+// west marks a checkout that is not on its manifest revision, or is dirty, by
+// suffixing the revision. The commit in front of it is still the commit.
+const REVISION_SUFFIX_RE = /[+-](dirty|off).*$/;
+// The bundled SPDX 3.1 Zephyr sample was generated from a fork whose commit is
+// not on upstream. Its purl names zephyrproject-rtos/zephyr at this SHA, which
+// 404s. Rewrite that one known SHA onto the fork that actually has it.
+const BUNDLED_ZEPHYR_FORK_SHA = '107120db232f2ce699c6a871b12b844d85c11ab1';
+const BUNDLED_ZEPHYR_FORK_PATH = 'kartben/zephyr';
+
+/** The 40-hex commit in a revision string, suffixes and all, or ''. */
+function commitOf(revision) {
+  const clean = String(revision || '')
+    .replace(REVISION_SUFFIX_RE, '')
+    .trim();
+  return /^[a-f0-9]{40}$/.test(clean) ? clean : '';
+}
+
+/** Purl strings recorded on a package, as a property or as identifiers. */
+function packagePurls(pkg) {
+  const out = [];
+  if (pkg?.software_packageUrl) out.push(String(pkg.software_packageUrl));
+  for (const ident of pkg?.externalIdentifier || []) {
+    if (ident?.externalIdentifierType === 'packageUrl' && ident.identifier) {
+      out.push(String(ident.identifier));
+    }
+  }
+  return out;
+}
+
+/** "owner/repo" and commit for a package, from its download location or purl. */
+function githubSourceOf(pkg) {
+  const ghMatch = GH_DL_RE.exec(pkg.software_downloadLocation || '');
+  if (ghMatch) return { ghPath: ghMatch[1], sha: ghMatch[2] };
+
+  for (const purl of packagePurls(pkg)) {
+    const purlMatch = GH_PURL_RE.exec(purl);
+    if (!purlMatch) continue;
+    const sha = commitOf(purlMatch[2]);
+    if (sha) return { ghPath: purlMatch[1], sha };
+  }
+  return null;
+}
 
 function longestCommonPathPrefix(paths) {
   if (!paths.length) return '';
@@ -1349,11 +1395,12 @@ function longestCommonPathPrefix(paths) {
 
 /**
  * Builds a Map from file spdxId to its raw GitHub URL, derived from the SBOM's
- * *-sources packages (software_downloadLocation) and their contains relationships.
+ * *-sources packages (software_downloadLocation or package URL) and their
+ * contains relationships.
  *
- * For packages where downloadLocation is NOASSERTION (e.g. zephyr-sources when
- * the repo has multiple git remotes), falls back to a hardcoded org/repo + commit
- * when the package is recognisably the Zephyr kernel (see the HACK note below).
+ * A package that does not say where its sources live, and at which commit,
+ * resolves to nothing rather than to a guess: drawing real line ranges against
+ * the wrong revision of a file reads as a bug in the SBOM.
  *
  * @param {ParsedData} parsed
  * @param {RelationshipIndexes} indexes
@@ -1365,54 +1412,16 @@ export function buildFileSourceIndex(parsed, indexes) {
   const fileSourceIndex = new Map();
 
   for (const pkg of packages) {
-    const dloc = pkg.software_downloadLocation || '';
     const fileIds = containsIndex.get(pkg.spdxId) || [];
     if (!fileIds.length) continue;
 
-    let ghPath, sha; // ghPath = "org/repo"
-
-    const ghMatch = GH_DL_RE.exec(dloc);
-    if (ghMatch) {
-      ghPath = ghMatch[1];
-      sha = ghMatch[2];
-    } else if (dloc === 'NOASSERTION' || !dloc) {
-      // zephyr-sources falls here when the repo has multiple git remotes —
-      // git_remote() in zephyr_module.py returns None → NOASSERTION.
-      const pkgId = pkg.spdxId || '';
-      const pkgName = pkg.name || '';
-      if (pkgId.includes('zephyr-sources') || pkgName === 'zephyr-sources') {
-        // ███████████████████████████████████████████████████████████████████
-        // ██  ⚠️  TEMPORARY HACK — REMOVE ME  ⚠️                            ██
-        // ███████████████████████████████████████████████████████████████████
-        // The bundled sample is generated from a fork branch whose commits are
-        // not upstream, and its generating checkout has several git remotes, so
-        // the SBOM records NOASSERTION instead of a download location. Nothing
-        // in the document names a repository we could fetch from, so we PIN
-        // every zephyr-sources file to one hardcoded commit in a fork:
-        // https://github.com/kartben/zephyr/commit/107120db232f2ce699c6a871b12b844d85c11ab1
-        //
-        // ✅ That commit is the one the bundled sample was generated from, so
-        //    its line ranges do line up with the source fetched here.
-        //
-        // ❌ Any other SBOM reaching this branch gets that same fork tree, not
-        //    its own. It is a stopgap, not correct behaviour.
-        //
-        // ✅ TO RESTORE CORRECT BEHAVIOUR: delete this block and uncomment the
-        //    purl-derived logic below. software_packageVersion is the VERSION
-        //    file version ("4.4.99"), never a commit; the commit is in the purl.
-        // ███████████████████████████████████████████████████████████████████
-        ghPath = 'kartben/zephyr'; // <-- HARDCODED HACK (fork, not upstream)
-        sha = '107120db232f2ce699c6a871b12b844d85c11ab1'; // <-- HARDCODED HACK
-        // ███████████████████████████████████████████████████████████████████
-
-        // --- CORRECT (dynamic) behaviour, disabled by the hack above ---------
-        // const purl = pkg.software_packageUrl || '';
-        // const m = /^pkg:github\/([^/]+\/[^@]+)@([a-f0-9]{40})/.exec(purl);
-        // if (m) { ghPath = m[1]; sha = m[2]; }
-      }
+    // Where this package's sources can be fetched from, and at which commit.
+    const source = githubSourceOf(pkg);
+    if (!source) continue;
+    let { ghPath, sha } = source;
+    if (sha === BUNDLED_ZEPHYR_FORK_SHA && ghPath === 'zephyrproject-rtos/zephyr') {
+      ghPath = BUNDLED_ZEPHYR_FORK_PATH;
     }
-
-    if (!ghPath || !sha) continue;
 
     // Strip the common path prefix shared by all files in this package to get
     // the repo-relative path (e.g. "modules/lib/gui/lvgl/" → "").
