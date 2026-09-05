@@ -25,6 +25,23 @@
     "size": 10157669
   },
   {
+    "id": "zephyr-uber",
+    "name": "Zephyr RTOS (everything)",
+    "emoji": "🪁",
+    "description": "The same application with every profile at once: Build, Hardware, Functional Safety, and the routines that reached the image, down to the line ranges they are made of.",
+    "dir": "samples/zephyr-uber",
+    "files": [
+      "app.jsonld",
+      "modules-deps.jsonld",
+      "zephyr.jsonld",
+      "build.jsonld",
+      "sdk.jsonld",
+      "safety.jsonld",
+      "snippets.jsonld"
+    ],
+    "size": 35332237
+  },
+  {
     "id": "linux",
     "name": "Linux kernel",
     "emoji": "🐧",
