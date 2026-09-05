@@ -2,7 +2,13 @@
    view switching, load-on-scroll list rendering, expand/collapse of detail
    cards, and the navigateToX drill-downs with scroll-into-view. */
 
-import { buildShareHash, copyToClipboard, parseShareHash, snippetFileRef } from '../lib/index.js';
+import {
+  buildShareHash,
+  byteRangeToLineRange,
+  copyToClipboard,
+  parseShareHash,
+  snippetFileRef
+} from '../lib/index.js';
 import { CLASS, isA } from '../spdx/model.js';
 import { NAV_CHEVRON_ICON, NAV_EXPLORE_VIEW_IDS, NAV_INSIGHTS_VIEW_IDS } from '../config.js';
 
@@ -1080,15 +1086,28 @@ export const navigationMixin = {
     if (!refs.length) return;
     const fileId = refs[0].ref.fileId;
     const first = refs[0].ref;
+    const content = this.fileSourceCache[fileId]?.content;
     const ranges = refs
-      .filter((s) => s.ref.fileId === fileId && s.ref.start != null)
-      .map((s) => ({ start: s.ref.start, end: s.ref.end ?? s.ref.start }))
-      .sort((a, b) => a.start - b.start);
+      .filter((s) => s.ref.fileId === fileId)
+      .map((s) => {
+        const resolved = this.resolveSnippetRef(s.ref, content);
+        return {
+          start: resolved.start,
+          end: resolved.end ?? resolved.start,
+          byteStart: s.ref.byteStart,
+          byteEnd: s.ref.byteEnd
+        };
+      })
+      .filter((r) => r.start != null || r.byteStart != null);
+    const lined = ranges.filter((r) => r.start != null).sort((a, b) => a.start - b.start);
     // Fall back to a single (possibly line-less) range so the header/highlight
-    // bindings always have something to read.
-    const effective = ranges.length
-      ? ranges
-      : [{ start: first.start, end: first.end ?? first.start }];
+    // bindings always have something to read. Byte-only ranges get line
+    // numbers once loadFileSource fills the cache.
+    const effective = lined.length
+      ? lined
+      : ranges.length
+        ? ranges
+        : [{ start: first.start, end: first.end ?? first.start }];
     this.snippetModal = {
       snippetId: refs[0].id,
       fileId,
@@ -1122,11 +1141,17 @@ export const navigationMixin = {
   // async), then centre it. Sequence guard drops retries from a stale open.
   _scrollSnippetModal() {
     const m = this.snippetModal;
-    if (!m || m.start == null) return;
+    if (!m) return;
+    const start =
+      m.start ??
+      (m.ranges || [])
+        .map((r) => this.resolveSnippetRef(r, this.fileSourceCache[m.fileId]?.content))
+        .find((r) => r?.start != null)?.start;
+    if (start == null) return;
     const seq = ++this._scrollSnippetSeq;
     const attempt = (retriesLeft) => {
       if (seq !== this._scrollSnippetSeq || !this.snippetModalOpen) return;
-      const line = document.querySelector(`#snippet-modal-body .sv-line[data-line="${m.start}"]`);
+      const line = document.querySelector(`#snippet-modal-body .sv-line[data-line="${start}"]`);
       if (line) {
         line.scrollIntoView({ block: 'center' });
       } else if (retriesLeft > 0) {
@@ -1211,7 +1236,14 @@ export const navigationMixin = {
     const m = this.snippetModal;
     const cache = m && this.fileSourceCache[m.fileId];
     if (!m || !cache?.lines) return null;
-    return this._collapseSource(cache.lines, m.ranges || [], m.expanded || {});
+    const ranges = (m.ranges || []).map((r) => {
+      if (r.start != null) return r;
+      if (r.byteStart != null && cache.content) {
+        return { ...r, ...byteRangeToLineRange(cache.content, r.byteStart, r.byteEnd) };
+      }
+      return r;
+    });
+    return this._collapseSource(cache.lines, ranges, m.expanded || {});
   },
   get detailSnippetSegments() {
     const ref = this.detailSnippet;
@@ -1246,18 +1278,36 @@ export const navigationMixin = {
   get detailSnippet() {
     const el = this.detailElement;
     if (!el || el.type !== 'software_Snippet') return null;
-    return snippetFileRef(el, this.elementMap);
+    const ref = snippetFileRef(el, this.elementMap);
+    return this.resolveSnippetRef(ref, this.fileSourceCache[ref?.fileId]?.content);
+  },
+  // Fill line start/end from a byte span once the file text is available.
+  resolveSnippetRef(ref, content) {
+    if (!ref) return null;
+    if (ref.start != null) return ref;
+    if (ref.byteStart == null || content == null) return ref;
+    const lines = byteRangeToLineRange(content, ref.byteStart, ref.byteEnd);
+    if (lines.start == null) return ref;
+    const rangeLabel =
+      lines.end != null && lines.end !== lines.start
+        ? `L${lines.start}-${lines.end}`
+        : `L${lines.start}`;
+    return { ...ref, start: lines.start, end: lines.end, rangeLabel };
   },
   // Lazily fetch the source behind the selected snippet and, once per selection,
   // scroll its highlighted lines into view. Driven by x-effect in the panel.
   ensureDetailSnippetSource() {
     const el = this.detailElement;
-    const ref = el?.type === 'software_Snippet' ? snippetFileRef(el, this.elementMap) : null;
+    const ref = this.detailSnippet;
     if (!ref?.fileId) return;
     this.loadFileSource(ref.fileId);
     if (this._detailSnippetId !== el.spdxId) {
       this._detailSnippetId = el.spdxId;
       this.detailSnippetExpanded = {}; // fresh collapse state per snippet
+      this._detailSnippetDidScroll = false;
+    }
+    if (ref.start != null && !this._detailSnippetDidScroll) {
+      this._detailSnippetDidScroll = true;
       this._scrollDetailSnippet(ref.start);
     }
   },

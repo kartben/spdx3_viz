@@ -159,9 +159,12 @@ export const accessorsMixin = {
       this.fileSourceCache[fileId] = {
         loading: false,
         error: null,
+        content,
         lines,
         totalLines: lines.length
       };
+      // Byte-only snippets (BASIL) get line numbers only after this fetch.
+      this._scrollSnippetModal?.();
     } catch (err) {
       this.fileSourceCache[fileId] = { loading: false, lines: null, error: err.message };
     }

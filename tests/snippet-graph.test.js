@@ -1,10 +1,17 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { buildRelationshipIndexes, parseGraph } from '../src/parser/parser.js';
 import {
+  buildFileSourceIndex,
+  buildRelationshipIndexes,
+  parseGraph
+} from '../src/parser/parser.js';
+import {
+  byteRangeToLineRange,
   collectSnippetHubIds,
+  fileHttpSourceUrl,
   getDetailPromotedFields,
+  normalizeSourceFetchUrl,
   resolveGraphSnippetEndpoint,
   snippetFileRef,
   snippetTargetLabel
@@ -262,5 +269,47 @@ test('getDetailPromotedFields lists snippet ranges and the source file', () => {
       ['Bytes', '200-400'],
       ['From file', 'kernel/thread.c']
     ]
+  );
+});
+
+test('normalizeSourceFetchUrl rewrites GitHub blob and raw pages', () => {
+  assert.equal(
+    normalizeSourceFetchUrl('https://github.com/elisa-tech/BASIL/blob/main/README.md'),
+    'https://raw.githubusercontent.com/elisa-tech/BASIL/main/README.md'
+  );
+  assert.equal(
+    normalizeSourceFetchUrl('https://github.com/elisa-tech/BASIL/raw/main/README.md'),
+    'https://raw.githubusercontent.com/elisa-tech/BASIL/main/README.md'
+  );
+  assert.equal(
+    fileHttpSourceUrl({
+      name: 'https://raw.githubusercontent.com/elisa-tech/BASIL/main/README.md'
+    }),
+    'https://raw.githubusercontent.com/elisa-tech/BASIL/main/README.md'
+  );
+});
+
+test('byteRangeToLineRange maps 1-based bytes onto lines', () => {
+  const text = 'one\ntwo\nthree\n';
+  assert.deepEqual(byteRangeToLineRange(text, 1, 3), { start: 1, end: 1 });
+  assert.deepEqual(byteRangeToLineRange(text, 5, 7), { start: 2, end: 2 });
+  assert.deepEqual(byteRangeToLineRange(text, 1, 10), { start: 1, end: 3 });
+});
+
+test('buildFileSourceIndex uses an http(s) File name when no sources package exists', () => {
+  const parsed = parseGraph([
+    {
+      type: 'software_File',
+      spdxId: 'file:spec',
+      name: 'https://raw.githubusercontent.com/elisa-tech/BASIL/main/README.md',
+      software_primaryPurpose: 'specification'
+    },
+    basilHub
+  ]);
+  const indexes = buildRelationshipIndexes(parsed.relationships);
+  const src = buildFileSourceIndex(parsed, indexes);
+  assert.equal(
+    src.get('file:spec'),
+    'https://raw.githubusercontent.com/elisa-tech/BASIL/main/README.md'
   );
 });

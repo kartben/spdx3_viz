@@ -16,7 +16,8 @@ import {
   vexStatusForRel,
   summarizeVulnAssessments,
   buildImpactAdjacency,
-  collectSnippetHubIds
+  collectSnippetHubIds,
+  fileHttpSourceUrl
 } from '../lib/index.js';
 
 /**
@@ -1348,8 +1349,10 @@ function longestCommonPathPrefix(paths) {
 }
 
 /**
- * Builds a Map from file spdxId to its raw GitHub URL, derived from the SBOM's
- * *-sources packages (software_downloadLocation) and their contains relationships.
+ * Builds a Map from file spdxId to a fetchable source URL. Derived from the
+ * SBOM's *-sources packages (software_downloadLocation) and their contains
+ * relationships, then any leftover File whose name or downloadLocation is
+ * already an http(s) URL (BASIL reference documents).
  *
  * For packages where downloadLocation is NOASSERTION (e.g. zephyr-sources when
  * the repo has multiple git remotes), falls back to a hardcoded org/repo + commit
@@ -1425,6 +1428,14 @@ export function buildFileSourceIndex(parsed, indexes) {
       const rel = file.name.startsWith(prefix) ? file.name.slice(prefix.length) : file.name;
       fileSourceIndex.set(fileId, `https://raw.githubusercontent.com/${ghPath}/${sha}/${rel}`);
     }
+  }
+
+  // BASIL (and similar) put a raw http(s) URL on the File itself instead of a
+  // *-sources package. Fill any file the package walk did not already resolve.
+  for (const el of elementMap.values()) {
+    if (el?.type !== 'software_File' || fileSourceIndex.has(el.spdxId)) continue;
+    const url = fileHttpSourceUrl(el);
+    if (url) fileSourceIndex.set(el.spdxId, url);
   }
 
   return fileSourceIndex;

@@ -9,6 +9,8 @@ via the "What's new" link.
 - **Fixed:** `hasTestCase` relationships now show on the graph (e.g. BASIL SBOMs).
 - **Fixed:** Graph keeps snippet hubs as nodes (BASIL), still folds Zephyr leaves into files.
 - **Improved:** Snippet detail card shows line and byte ranges.
+- **Added:** BASIL example design SBOM, mapped onto the project README.
+- **Improved:** Fetch source from http(s) File names and highlight byte ranges.
 
 ## [0.6.0] - 2026-08-29
 
