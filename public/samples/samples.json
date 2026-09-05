@@ -156,6 +156,15 @@
     "size": 165625
   },
   {
+    "id": "basil",
+    "name": "BASIL design SBOM",
+    "emoji": "🌿",
+    "description": "Official BASIL example export: a software component mapped onto sections of the <a href=\"https://github.com/elisa-tech/BASIL\" target=\"_blank\" rel=\"noopener\">BASIL README</a>.",
+    "dir": "samples/basil",
+    "files": ["spdx.jsonld"],
+    "size": 13290
+  },
+  {
     "id": "paper-plane",
     "name": "Paper plane supply chain (synthetic)",
     "emoji": "✈️",
