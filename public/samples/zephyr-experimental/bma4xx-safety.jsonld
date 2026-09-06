@@ -1,0 +1,2696 @@
+{
+  "@context": "https://spdx.org/rdf/3.1/spdx-context.jsonld",
+  "@graph": [
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-bma4xx.c",
+      "software_fileKind": "file",
+      "software_primaryPurpose": "source",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "name": "zephyr/drivers/sensor/bosch/bma4xx/bma4xx.c",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "7701d2339a8ecbe1009a51da4c76ad419c09d2dc"
+        }
+      ]
+    },
+    {
+      "type": "software_Snippet",
+      "spdxId": "zephyr:snippets/bma4xx-chip-init-280-343",
+      "software_lineRange": {
+        "type": "PositiveIntegerRange",
+        "beginIntegerRange": 280,
+        "endIntegerRange": 343
+      },
+      "software_snippetFromFile": "zephyr:files/File-bma4xx.c",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "description": "drivers/sensor/bosch/bma4xx/bma4xx.c:280-343",
+      "name": "bma4xx_chip_init @ drivers/sensor/bosch/bma4xx/bma4xx.c:280-343"
+    },
+    {
+      "type": "Requirement",
+      "spdxId": "zephyr:requirements/ZEP-SRS-39-1",
+      "requirementStatement": "The BMA4xx driver shall read the CHIP_ID register during device initialization and shall fail initialization with -ENODEV when the value read does not identify a device the driver supports.",
+      "comment": "Test evidence: no-run \u2014 the requirement has verifying tests, but none ran in this run\nTrue-traceability adequacy: no-cov \u2014 the verifying tests have no coverage data in this run\nGenerated from the source annotations, not from a twister campaign: no test in this document was executed, so no execution evidence is claimed.",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "StrictDoc requirement UID",
+          "externalIdentifierType": "other",
+          "identifier": "ZEP-SRS-39-1"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement level",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-level:software"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement component",
+          "externalIdentifierType": "other",
+          "identifier": "component:BMA4xx Accelerometer Driver"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement status",
+          "externalIdentifierType": "other",
+          "identifier": "status:Draft"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement type",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-type:Functional"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Test evidence verdict",
+          "externalIdentifierType": "other",
+          "identifier": "evidence:no-run"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "True-traceability verdict",
+          "externalIdentifierType": "other",
+          "identifier": "adequacy:no-cov"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement rationale",
+          "externalIdentifierType": "other",
+          "identifier": "source:BST-BMA423-DS006-00"
+        }
+      ],
+      "name": "ZEP-SRS-39-1: Device identification",
+      "summary": "Device identification"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-1",
+      "scope": "design",
+      "from": "zephyr:requirements/ZEP-SYRS-4",
+      "relationshipType": "tracedToDetail",
+      "to": [
+        "zephyr:requirements/ZEP-SRS-39-1"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-2",
+      "scope": "development",
+      "from": "zephyr:requirements/ZEP-SRS-39-1",
+      "relationshipType": "implementedBy",
+      "to": [
+        "zephyr:snippets/bma4xx-chip-init-280-343"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-3",
+      "scope": "test",
+      "from": "zephyr:requirements/ZEP-SRS-39-1",
+      "relationshipType": "verifiedBy",
+      "to": [
+        "zephyr:verifications/bma4xx--test-chip-id"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "Requirement",
+      "spdxId": "zephyr:requirements/ZEP-SRS-39-2",
+      "requirementStatement": "The BMA4xx driver shall issue the soft-reset command to the CMD register during device initialization, before applying its own configuration.",
+      "comment": "Test evidence: untested \u2014 no test declares that it verifies this requirement\nTrue-traceability adequacy: no-cov \u2014 the verifying tests have no coverage data in this run\nGenerated from the source annotations, not from a twister campaign: no test in this document was executed, so no execution evidence is claimed.",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "StrictDoc requirement UID",
+          "externalIdentifierType": "other",
+          "identifier": "ZEP-SRS-39-2"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement level",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-level:software"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement component",
+          "externalIdentifierType": "other",
+          "identifier": "component:BMA4xx Accelerometer Driver"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement status",
+          "externalIdentifierType": "other",
+          "identifier": "status:Draft"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement type",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-type:Functional"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Test evidence verdict",
+          "externalIdentifierType": "other",
+          "identifier": "evidence:untested"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "True-traceability verdict",
+          "externalIdentifierType": "other",
+          "identifier": "adequacy:no-cov"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement rationale",
+          "externalIdentifierType": "other",
+          "identifier": "source:BST-BMA423-DS006-00"
+        }
+      ],
+      "name": "ZEP-SRS-39-2: Soft reset during initialization",
+      "summary": "Soft reset during initialization"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-4",
+      "scope": "design",
+      "from": "zephyr:requirements/ZEP-SYRS-4",
+      "relationshipType": "tracedToDetail",
+      "to": [
+        "zephyr:requirements/ZEP-SRS-39-2"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-5",
+      "scope": "development",
+      "from": "zephyr:requirements/ZEP-SRS-39-2",
+      "relationshipType": "implementedBy",
+      "to": [
+        "zephyr:snippets/bma4xx-chip-init-280-343"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "software_Snippet",
+      "spdxId": "zephyr:snippets/bma4xx-attr-get-351-364",
+      "software_lineRange": {
+        "type": "PositiveIntegerRange",
+        "beginIntegerRange": 351,
+        "endIntegerRange": 364
+      },
+      "software_snippetFromFile": "zephyr:files/File-bma4xx.c",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "description": "drivers/sensor/bosch/bma4xx/bma4xx.c:351-364",
+      "name": "bma4xx_attr_get @ drivers/sensor/bosch/bma4xx/bma4xx.c:351-364"
+    },
+    {
+      "type": "Requirement",
+      "spdxId": "zephyr:requirements/ZEP-SRS-39-3",
+      "requirementStatement": "The BMA4xx driver shall report the chip identifier read during initialization when the application queries the SENSOR_ATTR_CHIP_ID attribute.",
+      "comment": "Test evidence: no-run \u2014 the requirement has verifying tests, but none ran in this run\nTrue-traceability adequacy: no-cov \u2014 the verifying tests have no coverage data in this run\nGenerated from the source annotations, not from a twister campaign: no test in this document was executed, so no execution evidence is claimed.",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "StrictDoc requirement UID",
+          "externalIdentifierType": "other",
+          "identifier": "ZEP-SRS-39-3"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement level",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-level:software"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement component",
+          "externalIdentifierType": "other",
+          "identifier": "component:BMA4xx Accelerometer Driver"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement status",
+          "externalIdentifierType": "other",
+          "identifier": "status:Draft"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement type",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-type:Functional"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Test evidence verdict",
+          "externalIdentifierType": "other",
+          "identifier": "evidence:no-run"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "True-traceability verdict",
+          "externalIdentifierType": "other",
+          "identifier": "adequacy:no-cov"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement rationale",
+          "externalIdentifierType": "other",
+          "identifier": "source:BST-BMA423-DS006-00"
+        }
+      ],
+      "name": "ZEP-SRS-39-3: Reporting the device identifier to the application",
+      "summary": "Reporting the device identifier to the application"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-6",
+      "scope": "design",
+      "from": "zephyr:requirements/ZEP-SYRS-4",
+      "relationshipType": "tracedToDetail",
+      "to": [
+        "zephyr:requirements/ZEP-SRS-39-3"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-7",
+      "scope": "development",
+      "from": "zephyr:requirements/ZEP-SRS-39-3",
+      "relationshipType": "implementedBy",
+      "to": [
+        "zephyr:snippets/bma4xx-attr-get-351-364"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-8",
+      "scope": "test",
+      "from": "zephyr:requirements/ZEP-SRS-39-3",
+      "relationshipType": "verifiedBy",
+      "to": [
+        "zephyr:verifications/bma4xx--test-chip-id"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "Requirement",
+      "spdxId": "zephyr:requirements/ZEP-SRS-39-4",
+      "requirementStatement": "On completion of initialization the BMA4xx driver shall have configured the device for a full-scale range of +/-4 g, an output data rate of 100 Hz and the norm_avg4 bandwidth parameter.",
+      "comment": "Test evidence: no-run \u2014 the requirement has verifying tests, but none ran in this run\nTrue-traceability adequacy: no-cov \u2014 the verifying tests have no coverage data in this run\nGenerated from the source annotations, not from a twister campaign: no test in this document was executed, so no execution evidence is claimed.",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "StrictDoc requirement UID",
+          "externalIdentifierType": "other",
+          "identifier": "ZEP-SRS-39-4"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement level",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-level:software"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement component",
+          "externalIdentifierType": "other",
+          "identifier": "component:BMA4xx Accelerometer Driver"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement status",
+          "externalIdentifierType": "other",
+          "identifier": "status:Draft"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement type",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-type:Functional"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Test evidence verdict",
+          "externalIdentifierType": "other",
+          "identifier": "evidence:no-run"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "True-traceability verdict",
+          "externalIdentifierType": "other",
+          "identifier": "adequacy:no-cov"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement rationale",
+          "externalIdentifierType": "other",
+          "identifier": "source:BST-BMA423-DS006-00"
+        }
+      ],
+      "name": "ZEP-SRS-39-4: Default measurement configuration",
+      "summary": "Default measurement configuration"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-9",
+      "scope": "design",
+      "from": "zephyr:requirements/ZEP-SYRS-4",
+      "relationshipType": "tracedToDetail",
+      "to": [
+        "zephyr:requirements/ZEP-SRS-39-4"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-10",
+      "scope": "development",
+      "from": "zephyr:requirements/ZEP-SRS-39-4",
+      "relationshipType": "implementedBy",
+      "to": [
+        "zephyr:snippets/bma4xx-chip-init-280-343"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-11",
+      "scope": "test",
+      "from": "zephyr:requirements/ZEP-SRS-39-4",
+      "relationshipType": "verifiedBy",
+      "to": [
+        "zephyr:verifications/bma4xx--test-default-configuration"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-bma4xx-common.c",
+      "software_fileKind": "file",
+      "software_primaryPurpose": "source",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "name": "zephyr/drivers/sensor/bosch/bma4xx/bma4xx_common.c",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "040f7a474487610fcf9d8a2ed9f6bd653fe21721"
+        }
+      ]
+    },
+    {
+      "type": "software_Snippet",
+      "spdxId": "zephyr:snippets/bma4xx-configure-69-194",
+      "software_lineRange": {
+        "type": "PositiveIntegerRange",
+        "beginIntegerRange": 69,
+        "endIntegerRange": 194
+      },
+      "software_snippetFromFile": "zephyr:files/File-bma4xx-common.c",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "description": "drivers/sensor/bosch/bma4xx/bma4xx_common.c:69-194",
+      "name": "bma4xx_configure @ drivers/sensor/bosch/bma4xx/bma4xx_common.c:69-194"
+    },
+    {
+      "type": "Requirement",
+      "spdxId": "zephyr:requirements/ZEP-SRS-39-5",
+      "requirementStatement": "The BMA4xx driver shall enable the accelerometer through PWR_CTRL.acc_en and shall disable advanced power save through PWR_CONF.adv_power_save whenever it applies a configuration with a non-zero output data rate.",
+      "comment": "Test evidence: no-run \u2014 the requirement has verifying tests, but none ran in this run\nTrue-traceability adequacy: no-cov \u2014 the verifying tests have no coverage data in this run\nGenerated from the source annotations, not from a twister campaign: no test in this document was executed, so no execution evidence is claimed.",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "StrictDoc requirement UID",
+          "externalIdentifierType": "other",
+          "identifier": "ZEP-SRS-39-5"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement level",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-level:software"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement component",
+          "externalIdentifierType": "other",
+          "identifier": "component:BMA4xx Accelerometer Driver"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement status",
+          "externalIdentifierType": "other",
+          "identifier": "status:Draft"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement type",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-type:Functional"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Test evidence verdict",
+          "externalIdentifierType": "other",
+          "identifier": "evidence:no-run"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "True-traceability verdict",
+          "externalIdentifierType": "other",
+          "identifier": "adequacy:no-cov"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement rationale",
+          "externalIdentifierType": "other",
+          "identifier": "source:BST-BMA423-DS006-00"
+        }
+      ],
+      "name": "ZEP-SRS-39-5: Enabling the accelerometer",
+      "summary": "Enabling the accelerometer"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-12",
+      "scope": "design",
+      "from": "zephyr:requirements/ZEP-SYRS-4",
+      "relationshipType": "tracedToDetail",
+      "to": [
+        "zephyr:requirements/ZEP-SRS-39-5"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-13",
+      "scope": "development",
+      "from": "zephyr:requirements/ZEP-SRS-39-5",
+      "relationshipType": "implementedBy",
+      "to": [
+        "zephyr:snippets/bma4xx-configure-69-194"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-14",
+      "scope": "test",
+      "from": "zephyr:requirements/ZEP-SRS-39-5",
+      "relationshipType": "verifiedBy",
+      "to": [
+        "zephyr:verifications/bma4xx--test-accelerometer-enabled"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "software_Snippet",
+      "spdxId": "zephyr:snippets/bma4xx-odr-to-reg-103-119",
+      "software_lineRange": {
+        "type": "PositiveIntegerRange",
+        "beginIntegerRange": 103,
+        "endIntegerRange": 119
+      },
+      "software_snippetFromFile": "zephyr:files/File-bma4xx.c",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "description": "drivers/sensor/bosch/bma4xx/bma4xx.c:103-119",
+      "name": "bma4xx_odr_to_reg @ drivers/sensor/bosch/bma4xx/bma4xx.c:103-119"
+    },
+    {
+      "type": "software_Snippet",
+      "spdxId": "zephyr:snippets/bma4xx-attr-set-odr-126-141",
+      "software_lineRange": {
+        "type": "PositiveIntegerRange",
+        "beginIntegerRange": 126,
+        "endIntegerRange": 141
+      },
+      "software_snippetFromFile": "zephyr:files/File-bma4xx.c",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "description": "drivers/sensor/bosch/bma4xx/bma4xx.c:126-141",
+      "name": "bma4xx_attr_set_odr @ drivers/sensor/bosch/bma4xx/bma4xx.c:126-141"
+    },
+    {
+      "type": "Requirement",
+      "spdxId": "zephyr:requirements/ZEP-SRS-39-6",
+      "requirementStatement": "The BMA4xx driver shall translate a requested sampling frequency into the lowest output data rate the device supports that is greater than or equal to the request, and shall reject a request above the highest supported rate, or a request of zero, with -ERANGE.",
+      "comment": "Test evidence: no-run \u2014 the requirement has verifying tests, but none ran in this run\nTrue-traceability adequacy: no-cov \u2014 the verifying tests have no coverage data in this run\nGenerated from the source annotations, not from a twister campaign: no test in this document was executed, so no execution evidence is claimed.",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "StrictDoc requirement UID",
+          "externalIdentifierType": "other",
+          "identifier": "ZEP-SRS-39-6"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement level",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-level:software"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement component",
+          "externalIdentifierType": "other",
+          "identifier": "component:BMA4xx Accelerometer Driver"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement status",
+          "externalIdentifierType": "other",
+          "identifier": "status:Draft"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement type",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-type:Functional"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Test evidence verdict",
+          "externalIdentifierType": "other",
+          "identifier": "evidence:no-run"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "True-traceability verdict",
+          "externalIdentifierType": "other",
+          "identifier": "adequacy:no-cov"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement rationale",
+          "externalIdentifierType": "other",
+          "identifier": "source:BST-BMA423-DS006-00"
+        }
+      ],
+      "name": "ZEP-SRS-39-6: Output data rate selection",
+      "summary": "Output data rate selection"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-15",
+      "scope": "design",
+      "from": "zephyr:requirements/ZEP-SYRS-4",
+      "relationshipType": "tracedToDetail",
+      "to": [
+        "zephyr:requirements/ZEP-SRS-39-6"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-16",
+      "scope": "development",
+      "from": "zephyr:requirements/ZEP-SRS-39-6",
+      "relationshipType": "implementedBy",
+      "to": [
+        "zephyr:snippets/bma4xx-odr-to-reg-103-119",
+        "zephyr:snippets/bma4xx-attr-set-odr-126-141"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-17",
+      "scope": "test",
+      "from": "zephyr:requirements/ZEP-SRS-39-6",
+      "relationshipType": "verifiedBy",
+      "to": [
+        "zephyr:verifications/bma4xx--test-odr-rounds-up",
+        "zephyr:verifications/bma4xx--test-odr-out-of-range"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "software_Snippet",
+      "spdxId": "zephyr:snippets/bma4xx-fs-to-reg-155-173",
+      "software_lineRange": {
+        "type": "PositiveIntegerRange",
+        "beginIntegerRange": 155,
+        "endIntegerRange": 173
+      },
+      "software_snippetFromFile": "zephyr:files/File-bma4xx.c",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "description": "drivers/sensor/bosch/bma4xx/bma4xx.c:155-173",
+      "name": "bma4xx_fs_to_reg @ drivers/sensor/bosch/bma4xx/bma4xx.c:155-173"
+    },
+    {
+      "type": "software_Snippet",
+      "spdxId": "zephyr:snippets/bma4xx-attr-set-range-180-195",
+      "software_lineRange": {
+        "type": "PositiveIntegerRange",
+        "beginIntegerRange": 180,
+        "endIntegerRange": 195
+      },
+      "software_snippetFromFile": "zephyr:files/File-bma4xx.c",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "description": "drivers/sensor/bosch/bma4xx/bma4xx.c:180-195",
+      "name": "bma4xx_attr_set_range @ drivers/sensor/bosch/bma4xx/bma4xx.c:180-195"
+    },
+    {
+      "type": "Requirement",
+      "spdxId": "zephyr:requirements/ZEP-SRS-39-7",
+      "requirementStatement": "The BMA4xx driver shall translate a requested full-scale range into the smallest of the +/-2 g, +/-4 g, +/-8 g and +/-16 g ranges that covers the request, and shall reject a request above +/-16 g with -ERANGE.",
+      "comment": "Test evidence: no-run \u2014 the requirement has verifying tests, but none ran in this run\nTrue-traceability adequacy: no-cov \u2014 the verifying tests have no coverage data in this run\nGenerated from the source annotations, not from a twister campaign: no test in this document was executed, so no execution evidence is claimed.",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "StrictDoc requirement UID",
+          "externalIdentifierType": "other",
+          "identifier": "ZEP-SRS-39-7"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement level",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-level:software"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement component",
+          "externalIdentifierType": "other",
+          "identifier": "component:BMA4xx Accelerometer Driver"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement status",
+          "externalIdentifierType": "other",
+          "identifier": "status:Draft"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement type",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-type:Functional"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Test evidence verdict",
+          "externalIdentifierType": "other",
+          "identifier": "evidence:no-run"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "True-traceability verdict",
+          "externalIdentifierType": "other",
+          "identifier": "adequacy:no-cov"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement rationale",
+          "externalIdentifierType": "other",
+          "identifier": "source:BST-BMA423-DS006-00"
+        }
+      ],
+      "name": "ZEP-SRS-39-7: Full-scale range selection",
+      "summary": "Full-scale range selection"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-18",
+      "scope": "design",
+      "from": "zephyr:requirements/ZEP-SYRS-4",
+      "relationshipType": "tracedToDetail",
+      "to": [
+        "zephyr:requirements/ZEP-SRS-39-7"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-19",
+      "scope": "development",
+      "from": "zephyr:requirements/ZEP-SRS-39-7",
+      "relationshipType": "implementedBy",
+      "to": [
+        "zephyr:snippets/bma4xx-fs-to-reg-155-173",
+        "zephyr:snippets/bma4xx-attr-set-range-180-195"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-20",
+      "scope": "test",
+      "from": "zephyr:requirements/ZEP-SRS-39-7",
+      "relationshipType": "verifiedBy",
+      "to": [
+        "zephyr:verifications/bma4xx--test-full-scale-rounds-up",
+        "zephyr:verifications/bma4xx--test-full-scale-out-of-range"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "software_Snippet",
+      "spdxId": "zephyr:snippets/bma4xx-attr-set-bwp-202-213",
+      "software_lineRange": {
+        "type": "PositiveIntegerRange",
+        "beginIntegerRange": 202,
+        "endIntegerRange": 213
+      },
+      "software_snippetFromFile": "zephyr:files/File-bma4xx.c",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "description": "drivers/sensor/bosch/bma4xx/bma4xx.c:202-213",
+      "name": "bma4xx_attr_set_bwp @ drivers/sensor/bosch/bma4xx/bma4xx.c:202-213"
+    },
+    {
+      "type": "Requirement",
+      "spdxId": "zephyr:requirements/ZEP-SRS-39-8",
+      "requirementStatement": "The BMA4xx driver shall accept a bandwidth parameter in the range osr4_avg1 to res_avg128 inclusive and shall reject any other value with -EINVAL.",
+      "comment": "Test evidence: no-run \u2014 the requirement has verifying tests, but none ran in this run\nTrue-traceability adequacy: no-cov \u2014 the verifying tests have no coverage data in this run\nGenerated from the source annotations, not from a twister campaign: no test in this document was executed, so no execution evidence is claimed.",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "StrictDoc requirement UID",
+          "externalIdentifierType": "other",
+          "identifier": "ZEP-SRS-39-8"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement level",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-level:software"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement component",
+          "externalIdentifierType": "other",
+          "identifier": "component:BMA4xx Accelerometer Driver"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement status",
+          "externalIdentifierType": "other",
+          "identifier": "status:Draft"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement type",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-type:Functional"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Test evidence verdict",
+          "externalIdentifierType": "other",
+          "identifier": "evidence:no-run"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "True-traceability verdict",
+          "externalIdentifierType": "other",
+          "identifier": "adequacy:no-cov"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement rationale",
+          "externalIdentifierType": "other",
+          "identifier": "source:BST-BMA423-DS006-00"
+        }
+      ],
+      "name": "ZEP-SRS-39-8: Bandwidth parameter selection",
+      "summary": "Bandwidth parameter selection"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-21",
+      "scope": "design",
+      "from": "zephyr:requirements/ZEP-SYRS-4",
+      "relationshipType": "tracedToDetail",
+      "to": [
+        "zephyr:requirements/ZEP-SRS-39-8"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-22",
+      "scope": "development",
+      "from": "zephyr:requirements/ZEP-SRS-39-8",
+      "relationshipType": "implementedBy",
+      "to": [
+        "zephyr:snippets/bma4xx-attr-set-bwp-202-213"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-23",
+      "scope": "test",
+      "from": "zephyr:requirements/ZEP-SRS-39-8",
+      "relationshipType": "verifiedBy",
+      "to": [
+        "zephyr:verifications/bma4xx--test-bandwidth-parameter-validation"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "software_Snippet",
+      "spdxId": "zephyr:snippets/bma4xx-offset-to-reg-val-31-41",
+      "software_lineRange": {
+        "type": "PositiveIntegerRange",
+        "beginIntegerRange": 31,
+        "endIntegerRange": 41
+      },
+      "software_snippetFromFile": "zephyr:files/File-bma4xx.c",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "description": "drivers/sensor/bosch/bma4xx/bma4xx.c:31-41",
+      "name": "bma4xx_offset_to_reg_val @ drivers/sensor/bosch/bma4xx/bma4xx.c:31-41"
+    },
+    {
+      "type": "software_Snippet",
+      "spdxId": "zephyr:snippets/bma4xx-attr-set-offset-48-80",
+      "software_lineRange": {
+        "type": "PositiveIntegerRange",
+        "beginIntegerRange": 48,
+        "endIntegerRange": 80
+      },
+      "software_snippetFromFile": "zephyr:files/File-bma4xx.c",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "description": "drivers/sensor/bosch/bma4xx/bma4xx.c:48-80",
+      "name": "bma4xx_attr_set_offset @ drivers/sensor/bosch/bma4xx/bma4xx.c:48-80"
+    },
+    {
+      "type": "Requirement",
+      "spdxId": "zephyr:requirements/ZEP-SRS-39-9",
+      "requirementStatement": "The BMA4xx driver shall convert a per-axis offset expressed in m/s^2 into the corresponding OFFSET register value at 3.9 mg per bit, and shall reject an offset outside the range the registers can express with -ERANGE.",
+      "comment": "Test evidence: no-run \u2014 the requirement has verifying tests, but none ran in this run\nTrue-traceability adequacy: no-cov \u2014 the verifying tests have no coverage data in this run\nGenerated from the source annotations, not from a twister campaign: no test in this document was executed, so no execution evidence is claimed.",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "StrictDoc requirement UID",
+          "externalIdentifierType": "other",
+          "identifier": "ZEP-SRS-39-9"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement level",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-level:software"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement component",
+          "externalIdentifierType": "other",
+          "identifier": "component:BMA4xx Accelerometer Driver"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement status",
+          "externalIdentifierType": "other",
+          "identifier": "status:Draft"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement type",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-type:Functional"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Test evidence verdict",
+          "externalIdentifierType": "other",
+          "identifier": "evidence:no-run"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "True-traceability verdict",
+          "externalIdentifierType": "other",
+          "identifier": "adequacy:no-cov"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement rationale",
+          "externalIdentifierType": "other",
+          "identifier": "source:BST-BMA423-DS006-00"
+        }
+      ],
+      "name": "ZEP-SRS-39-9: Offset compensation range",
+      "summary": "Offset compensation range"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-24",
+      "scope": "design",
+      "from": "zephyr:requirements/ZEP-SYRS-4",
+      "relationshipType": "tracedToDetail",
+      "to": [
+        "zephyr:requirements/ZEP-SRS-39-9"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-25",
+      "scope": "development",
+      "from": "zephyr:requirements/ZEP-SRS-39-9",
+      "relationshipType": "implementedBy",
+      "to": [
+        "zephyr:snippets/bma4xx-offset-to-reg-val-31-41",
+        "zephyr:snippets/bma4xx-attr-set-offset-48-80"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-26",
+      "scope": "test",
+      "from": "zephyr:requirements/ZEP-SRS-39-9",
+      "relationshipType": "verifiedBy",
+      "to": [
+        "zephyr:verifications/bma4xx--test-offset-within-range",
+        "zephyr:verifications/bma4xx--test-offset-out-of-range"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "software_Snippet",
+      "spdxId": "zephyr:snippets/bma4xx-safely-configure-199-211",
+      "software_lineRange": {
+        "type": "PositiveIntegerRange",
+        "beginIntegerRange": 199,
+        "endIntegerRange": 211
+      },
+      "software_snippetFromFile": "zephyr:files/File-bma4xx-common.c",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "description": "drivers/sensor/bosch/bma4xx/bma4xx_common.c:199-211",
+      "name": "bma4xx_safely_configure @ drivers/sensor/bosch/bma4xx/bma4xx_common.c:199-211"
+    },
+    {
+      "type": "Requirement",
+      "spdxId": "zephyr:requirements/ZEP-SRS-39-10",
+      "requirementStatement": "When the BMA4xx driver fails to apply a new configuration to the device, it shall restore the configuration that was last applied successfully.",
+      "comment": "Test evidence: untested \u2014 no test declares that it verifies this requirement\nTrue-traceability adequacy: no-cov \u2014 the verifying tests have no coverage data in this run\nGenerated from the source annotations, not from a twister campaign: no test in this document was executed, so no execution evidence is claimed.",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "StrictDoc requirement UID",
+          "externalIdentifierType": "other",
+          "identifier": "ZEP-SRS-39-10"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement level",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-level:software"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement component",
+          "externalIdentifierType": "other",
+          "identifier": "component:BMA4xx Accelerometer Driver"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement status",
+          "externalIdentifierType": "other",
+          "identifier": "status:Draft"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement type",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-type:Functional"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Test evidence verdict",
+          "externalIdentifierType": "other",
+          "identifier": "evidence:untested"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "True-traceability verdict",
+          "externalIdentifierType": "other",
+          "identifier": "adequacy:no-cov"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement rationale",
+          "externalIdentifierType": "other",
+          "identifier": "source:BST-BMA423-DS006-00"
+        }
+      ],
+      "name": "ZEP-SRS-39-10: Configuration rollback on failure",
+      "summary": "Configuration rollback on failure"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-27",
+      "scope": "design",
+      "from": "zephyr:requirements/ZEP-SYRS-4",
+      "relationshipType": "tracedToDetail",
+      "to": [
+        "zephyr:requirements/ZEP-SRS-39-10"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-28",
+      "scope": "development",
+      "from": "zephyr:requirements/ZEP-SRS-39-10",
+      "relationshipType": "implementedBy",
+      "to": [
+        "zephyr:snippets/bma4xx-safely-configure-199-211"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "software_Snippet",
+      "spdxId": "zephyr:snippets/bma4xx-attr-set-220-271",
+      "software_lineRange": {
+        "type": "PositiveIntegerRange",
+        "beginIntegerRange": 220,
+        "endIntegerRange": 271
+      },
+      "software_snippetFromFile": "zephyr:files/File-bma4xx.c",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "description": "drivers/sensor/bosch/bma4xx/bma4xx.c:220-271",
+      "name": "bma4xx_attr_set @ drivers/sensor/bosch/bma4xx/bma4xx.c:220-271"
+    },
+    {
+      "type": "Requirement",
+      "spdxId": "zephyr:requirements/ZEP-SRS-39-11",
+      "requirementStatement": "The BMA4xx driver shall reject an attribute it does not implement with -ENOTSUP and a channel it does not support with -EINVAL, without altering the device configuration.",
+      "comment": "Test evidence: no-run \u2014 the requirement has verifying tests, but none ran in this run\nTrue-traceability adequacy: no-cov \u2014 the verifying tests have no coverage data in this run\nGenerated from the source annotations, not from a twister campaign: no test in this document was executed, so no execution evidence is claimed.",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "StrictDoc requirement UID",
+          "externalIdentifierType": "other",
+          "identifier": "ZEP-SRS-39-11"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement level",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-level:software"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement component",
+          "externalIdentifierType": "other",
+          "identifier": "component:BMA4xx Accelerometer Driver"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement status",
+          "externalIdentifierType": "other",
+          "identifier": "status:Draft"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement type",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-type:Functional"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Test evidence verdict",
+          "externalIdentifierType": "other",
+          "identifier": "evidence:no-run"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "True-traceability verdict",
+          "externalIdentifierType": "other",
+          "identifier": "adequacy:no-cov"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement rationale",
+          "externalIdentifierType": "other",
+          "identifier": "source:BST-BMA423-DS006-00"
+        }
+      ],
+      "name": "ZEP-SRS-39-11: Rejecting unsupported attributes and channels",
+      "summary": "Rejecting unsupported attributes and channels"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-29",
+      "scope": "design",
+      "from": "zephyr:requirements/ZEP-SYRS-4",
+      "relationshipType": "tracedToDetail",
+      "to": [
+        "zephyr:requirements/ZEP-SRS-39-11"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-30",
+      "scope": "development",
+      "from": "zephyr:requirements/ZEP-SRS-39-11",
+      "relationshipType": "implementedBy",
+      "to": [
+        "zephyr:snippets/bma4xx-attr-set-220-271",
+        "zephyr:snippets/bma4xx-attr-get-351-364"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-31",
+      "scope": "test",
+      "from": "zephyr:requirements/ZEP-SRS-39-11",
+      "relationshipType": "verifiedBy",
+      "to": [
+        "zephyr:verifications/bma4xx--test-unsupported-attribute",
+        "zephyr:verifications/bma4xx--test-unsupported-channel"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-bma4xx-decoder.c",
+      "software_fileKind": "file",
+      "software_primaryPurpose": "source",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "name": "zephyr/drivers/sensor/bosch/bma4xx/bma4xx_decoder.c",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "6ddb9ea878ef4cb667d5774ddc2ea5213a6b9ed9"
+        }
+      ]
+    },
+    {
+      "type": "software_Snippet",
+      "spdxId": "zephyr:snippets/bma4xx-get-shift-143-173",
+      "software_lineRange": {
+        "type": "PositiveIntegerRange",
+        "beginIntegerRange": 143,
+        "endIntegerRange": 173
+      },
+      "software_snippetFromFile": "zephyr:files/File-bma4xx-decoder.c",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "description": "drivers/sensor/bosch/bma4xx/bma4xx_decoder.c:143-173",
+      "name": "bma4xx_get_shift @ drivers/sensor/bosch/bma4xx/bma4xx_decoder.c:143-173"
+    },
+    {
+      "type": "software_Snippet",
+      "spdxId": "zephyr:snippets/bma4xx-convert-raw-accel-to-q31-180-209",
+      "software_lineRange": {
+        "type": "PositiveIntegerRange",
+        "beginIntegerRange": 180,
+        "endIntegerRange": 209
+      },
+      "software_snippetFromFile": "zephyr:files/File-bma4xx-decoder.c",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "description": "drivers/sensor/bosch/bma4xx/bma4xx_decoder.c:180-209",
+      "name": "bma4xx_convert_raw_accel_to_q31 @ drivers/sensor/bosch/bma4xx/bma4xx_decoder.c:180-209"
+    },
+    {
+      "type": "Requirement",
+      "spdxId": "zephyr:requirements/ZEP-SRS-39-12",
+      "requirementStatement": "The BMA4xx driver shall decode each acceleration sample as a 12-bit two's complement value held in the upper bits of a little-endian register pair, and shall report it as a Q31 value in m/s^2 scaled by the shift that corresponds to the configured full-scale range.",
+      "comment": "Test evidence: no-run \u2014 the requirement has verifying tests, but none ran in this run\nTrue-traceability adequacy: no-cov \u2014 the verifying tests have no coverage data in this run\nGenerated from the source annotations, not from a twister campaign: no test in this document was executed, so no execution evidence is claimed.",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "StrictDoc requirement UID",
+          "externalIdentifierType": "other",
+          "identifier": "ZEP-SRS-39-12"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement level",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-level:software"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement component",
+          "externalIdentifierType": "other",
+          "identifier": "component:BMA4xx Accelerometer Driver"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement status",
+          "externalIdentifierType": "other",
+          "identifier": "status:Draft"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement type",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-type:Functional"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Test evidence verdict",
+          "externalIdentifierType": "other",
+          "identifier": "evidence:no-run"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "True-traceability verdict",
+          "externalIdentifierType": "other",
+          "identifier": "adequacy:no-cov"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement rationale",
+          "externalIdentifierType": "other",
+          "identifier": "source:BST-BMA423-DS006-00"
+        }
+      ],
+      "name": "ZEP-SRS-39-12: Acceleration data decoding",
+      "summary": "Acceleration data decoding"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-32",
+      "scope": "design",
+      "from": "zephyr:requirements/ZEP-SYRS-4",
+      "relationshipType": "tracedToDetail",
+      "to": [
+        "zephyr:requirements/ZEP-SRS-39-12"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-33",
+      "scope": "development",
+      "from": "zephyr:requirements/ZEP-SRS-39-12",
+      "relationshipType": "implementedBy",
+      "to": [
+        "zephyr:snippets/bma4xx-get-shift-143-173",
+        "zephyr:snippets/bma4xx-convert-raw-accel-to-q31-180-209"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-34",
+      "scope": "test",
+      "from": "zephyr:requirements/ZEP-SRS-39-12",
+      "relationshipType": "verifiedBy",
+      "to": [
+        "zephyr:verifications/bma4xx--test-decode-sign-extension",
+        "zephyr:verifications/bma4xx--test-decode-full-scale-shift"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-bma4xx-rtio.c",
+      "software_fileKind": "file",
+      "software_primaryPurpose": "source",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "name": "zephyr/drivers/sensor/bosch/bma4xx/bma4xx_rtio.c",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "1da4de4ab10059c8afda805457e140c9de84c2ca"
+        }
+      ]
+    },
+    {
+      "type": "software_Snippet",
+      "spdxId": "zephyr:snippets/bma4xx-submit-one-shot-55-148",
+      "software_lineRange": {
+        "type": "PositiveIntegerRange",
+        "beginIntegerRange": 55,
+        "endIntegerRange": 148
+      },
+      "software_snippetFromFile": "zephyr:files/File-bma4xx-rtio.c",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "description": "drivers/sensor/bosch/bma4xx/bma4xx_rtio.c:55-148",
+      "name": "bma4xx_submit_one_shot @ drivers/sensor/bosch/bma4xx/bma4xx_rtio.c:55-148"
+    },
+    {
+      "type": "Requirement",
+      "spdxId": "zephyr:requirements/ZEP-SRS-39-13",
+      "requirementStatement": "The BMA4xx driver shall read the acceleration registers of one sample set in a single bus transaction beginning at the least significant byte.",
+      "comment": "Test evidence: untested \u2014 no test declares that it verifies this requirement\nTrue-traceability adequacy: no-cov \u2014 the verifying tests have no coverage data in this run\nGenerated from the source annotations, not from a twister campaign: no test in this document was executed, so no execution evidence is claimed.",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "StrictDoc requirement UID",
+          "externalIdentifierType": "other",
+          "identifier": "ZEP-SRS-39-13"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement level",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-level:software"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement component",
+          "externalIdentifierType": "other",
+          "identifier": "component:BMA4xx Accelerometer Driver"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement status",
+          "externalIdentifierType": "other",
+          "identifier": "status:Draft"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement type",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-type:Functional"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Test evidence verdict",
+          "externalIdentifierType": "other",
+          "identifier": "evidence:untested"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "True-traceability verdict",
+          "externalIdentifierType": "other",
+          "identifier": "adequacy:no-cov"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement rationale",
+          "externalIdentifierType": "other",
+          "identifier": "source:BST-BMA423-DS006-00"
+        }
+      ],
+      "name": "ZEP-SRS-39-13: Acceleration data integrity",
+      "summary": "Acceleration data integrity"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-35",
+      "scope": "design",
+      "from": "zephyr:requirements/ZEP-SYRS-4",
+      "relationshipType": "tracedToDetail",
+      "to": [
+        "zephyr:requirements/ZEP-SRS-39-13"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-36",
+      "scope": "development",
+      "from": "zephyr:requirements/ZEP-SRS-39-13",
+      "relationshipType": "implementedBy",
+      "to": [
+        "zephyr:snippets/bma4xx-submit-one-shot-55-148"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "software_Snippet",
+      "spdxId": "zephyr:snippets/bma4xx-convert-raw-temp-to-q31-235-243",
+      "software_lineRange": {
+        "type": "PositiveIntegerRange",
+        "beginIntegerRange": 235,
+        "endIntegerRange": 243
+      },
+      "software_snippetFromFile": "zephyr:files/File-bma4xx-decoder.c",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "description": "drivers/sensor/bosch/bma4xx/bma4xx_decoder.c:235-243",
+      "name": "bma4xx_convert_raw_temp_to_q31 @ drivers/sensor/bosch/bma4xx/bma4xx_decoder.c:235-243"
+    },
+    {
+      "type": "Requirement",
+      "spdxId": "zephyr:requirements/ZEP-SRS-39-14",
+      "requirementStatement": "Where die temperature reporting is enabled, the BMA4xx driver shall decode the TEMPERATURE register as a signed offset from 23 degrees Celsius at 1 Kelvin per bit.",
+      "comment": "Test evidence: no-run \u2014 the requirement has verifying tests, but none ran in this run\nTrue-traceability adequacy: no-cov \u2014 the verifying tests have no coverage data in this run\nGenerated from the source annotations, not from a twister campaign: no test in this document was executed, so no execution evidence is claimed.",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "StrictDoc requirement UID",
+          "externalIdentifierType": "other",
+          "identifier": "ZEP-SRS-39-14"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement level",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-level:software"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement component",
+          "externalIdentifierType": "other",
+          "identifier": "component:BMA4xx Accelerometer Driver"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement status",
+          "externalIdentifierType": "other",
+          "identifier": "status:Draft"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement type",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-type:Functional"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Test evidence verdict",
+          "externalIdentifierType": "other",
+          "identifier": "evidence:no-run"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "True-traceability verdict",
+          "externalIdentifierType": "other",
+          "identifier": "adequacy:no-cov"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement rationale",
+          "externalIdentifierType": "other",
+          "identifier": "source:BST-BMA423-DS006-00"
+        }
+      ],
+      "name": "ZEP-SRS-39-14: Die temperature decoding",
+      "summary": "Die temperature decoding"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-37",
+      "scope": "design",
+      "from": "zephyr:requirements/ZEP-SYRS-4",
+      "relationshipType": "tracedToDetail",
+      "to": [
+        "zephyr:requirements/ZEP-SRS-39-14"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-38",
+      "scope": "development",
+      "from": "zephyr:requirements/ZEP-SRS-39-14",
+      "relationshipType": "implementedBy",
+      "to": [
+        "zephyr:snippets/bma4xx-convert-raw-temp-to-q31-235-243"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-39",
+      "scope": "test",
+      "from": "zephyr:requirements/ZEP-SRS-39-14",
+      "relationshipType": "verifiedBy",
+      "to": [
+        "zephyr:verifications/bma4xx--test-decode-die-temperature"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "Requirement",
+      "spdxId": "zephyr:requirements/ZEP-SRS-39-15",
+      "requirementStatement": "Where die temperature reporting is enabled, the BMA4xx driver shall not report a temperature reading when the TEMPERATURE register holds the value the device uses to signal that no valid measurement is available.",
+      "comment": "Test evidence: untested \u2014 no test declares that it verifies this requirement\nTrue-traceability adequacy: no-impl \u2014 the requirement has no implemented_by link\nGenerated from the source annotations, not from a twister campaign: no test in this document was executed, so no execution evidence is claimed.",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "StrictDoc requirement UID",
+          "externalIdentifierType": "other",
+          "identifier": "ZEP-SRS-39-15"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement level",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-level:software"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement component",
+          "externalIdentifierType": "other",
+          "identifier": "component:BMA4xx Accelerometer Driver"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement status",
+          "externalIdentifierType": "other",
+          "identifier": "status:Draft"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement type",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-type:Functional"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Test evidence verdict",
+          "externalIdentifierType": "other",
+          "identifier": "evidence:untested"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "True-traceability verdict",
+          "externalIdentifierType": "other",
+          "identifier": "adequacy:no-impl"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement rationale",
+          "externalIdentifierType": "other",
+          "identifier": "source:BST-BMA423-DS006-00"
+        }
+      ],
+      "name": "ZEP-SRS-39-15: Invalid die temperature",
+      "summary": "Invalid die temperature"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-40",
+      "scope": "design",
+      "from": "zephyr:requirements/ZEP-SYRS-4",
+      "relationshipType": "tracedToDetail",
+      "to": [
+        "zephyr:requirements/ZEP-SRS-39-15"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "software_Snippet",
+      "spdxId": "zephyr:snippets/bma4xx-decoder-get-frame-count-53-116",
+      "software_lineRange": {
+        "type": "PositiveIntegerRange",
+        "beginIntegerRange": 53,
+        "endIntegerRange": 116
+      },
+      "software_snippetFromFile": "zephyr:files/File-bma4xx-decoder.c",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "description": "drivers/sensor/bosch/bma4xx/bma4xx_decoder.c:53-116",
+      "name": "bma4xx_decoder_get_frame_count @ drivers/sensor/bosch/bma4xx/bma4xx_decoder.c:53-116"
+    },
+    {
+      "type": "software_Snippet",
+      "spdxId": "zephyr:snippets/bma4xx-fifo-decode-323-403",
+      "software_lineRange": {
+        "type": "PositiveIntegerRange",
+        "beginIntegerRange": 323,
+        "endIntegerRange": 403
+      },
+      "software_snippetFromFile": "zephyr:files/File-bma4xx-decoder.c",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "description": "drivers/sensor/bosch/bma4xx/bma4xx_decoder.c:323-403",
+      "name": "bma4xx_fifo_decode @ drivers/sensor/bosch/bma4xx/bma4xx_decoder.c:323-403"
+    },
+    {
+      "type": "Requirement",
+      "spdxId": "zephyr:requirements/ZEP-SRS-39-16",
+      "requirementStatement": "Where streaming is enabled, the BMA4xx driver shall parse the FIFO in header mode, deriving the length of each frame from its header, and shall stop parsing at a frame header that indicates uninitialized FIFO content.",
+      "comment": "Test evidence: untested \u2014 no test declares that it verifies this requirement\nTrue-traceability adequacy: no-cov \u2014 the verifying tests have no coverage data in this run\nGenerated from the source annotations, not from a twister campaign: no test in this document was executed, so no execution evidence is claimed.",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "StrictDoc requirement UID",
+          "externalIdentifierType": "other",
+          "identifier": "ZEP-SRS-39-16"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement level",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-level:software"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement component",
+          "externalIdentifierType": "other",
+          "identifier": "component:BMA4xx Accelerometer Driver"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement status",
+          "externalIdentifierType": "other",
+          "identifier": "status:Draft"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement type",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-type:Functional"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Test evidence verdict",
+          "externalIdentifierType": "other",
+          "identifier": "evidence:untested"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "True-traceability verdict",
+          "externalIdentifierType": "other",
+          "identifier": "adequacy:no-cov"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement rationale",
+          "externalIdentifierType": "other",
+          "identifier": "source:BST-BMA423-DS006-00"
+        }
+      ],
+      "name": "ZEP-SRS-39-16: FIFO frame parsing",
+      "summary": "FIFO frame parsing"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-41",
+      "scope": "design",
+      "from": "zephyr:requirements/ZEP-SYRS-4",
+      "relationshipType": "tracedToDetail",
+      "to": [
+        "zephyr:requirements/ZEP-SRS-39-16"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-42",
+      "scope": "development",
+      "from": "zephyr:requirements/ZEP-SRS-39-16",
+      "relationshipType": "implementedBy",
+      "to": [
+        "zephyr:snippets/bma4xx-decoder-get-frame-count-53-116",
+        "zephyr:snippets/bma4xx-fifo-decode-323-403"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "software_Snippet",
+      "spdxId": "zephyr:snippets/bma4xx-compute-fifo-wm-26-60",
+      "software_lineRange": {
+        "type": "PositiveIntegerRange",
+        "beginIntegerRange": 26,
+        "endIntegerRange": 60
+      },
+      "software_snippetFromFile": "zephyr:files/File-bma4xx-common.c",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "description": "drivers/sensor/bosch/bma4xx/bma4xx_common.c:26-60",
+      "name": "bma4xx_compute_fifo_wm @ drivers/sensor/bosch/bma4xx/bma4xx_common.c:26-60"
+    },
+    {
+      "type": "Requirement",
+      "spdxId": "zephyr:requirements/ZEP-SRS-39-17",
+      "requirementStatement": "Where streaming is enabled, the BMA4xx driver shall derive the FIFO watermark level from the requested batch duration and the configured output data rate, and shall limit it to the watermark the device can express.",
+      "comment": "Test evidence: untested \u2014 no test declares that it verifies this requirement\nTrue-traceability adequacy: no-cov \u2014 the verifying tests have no coverage data in this run\nGenerated from the source annotations, not from a twister campaign: no test in this document was executed, so no execution evidence is claimed.",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "StrictDoc requirement UID",
+          "externalIdentifierType": "other",
+          "identifier": "ZEP-SRS-39-17"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement level",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-level:software"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement component",
+          "externalIdentifierType": "other",
+          "identifier": "component:BMA4xx Accelerometer Driver"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement status",
+          "externalIdentifierType": "other",
+          "identifier": "status:Draft"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement type",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-type:Functional"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Test evidence verdict",
+          "externalIdentifierType": "other",
+          "identifier": "evidence:untested"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "True-traceability verdict",
+          "externalIdentifierType": "other",
+          "identifier": "adequacy:no-cov"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement rationale",
+          "externalIdentifierType": "other",
+          "identifier": "source:BST-BMA423-DS006-00"
+        }
+      ],
+      "name": "ZEP-SRS-39-17: FIFO watermark configuration",
+      "summary": "FIFO watermark configuration"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-43",
+      "scope": "design",
+      "from": "zephyr:requirements/ZEP-SYRS-4",
+      "relationshipType": "tracedToDetail",
+      "to": [
+        "zephyr:requirements/ZEP-SRS-39-17"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-44",
+      "scope": "development",
+      "from": "zephyr:requirements/ZEP-SRS-39-17",
+      "relationshipType": "implementedBy",
+      "to": [
+        "zephyr:snippets/bma4xx-compute-fifo-wm-26-60"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "Requirement",
+      "spdxId": "zephyr:requirements/ZEP-SRS-39-18",
+      "requirementStatement": "The BMA4xx driver shall configure the device's interrupt engine in non-latched mode.",
+      "comment": "Test evidence: no-run \u2014 the requirement has verifying tests, but none ran in this run\nTrue-traceability adequacy: no-cov \u2014 the verifying tests have no coverage data in this run\nGenerated from the source annotations, not from a twister campaign: no test in this document was executed, so no execution evidence is claimed.",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "StrictDoc requirement UID",
+          "externalIdentifierType": "other",
+          "identifier": "ZEP-SRS-39-18"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement level",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-level:software"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement component",
+          "externalIdentifierType": "other",
+          "identifier": "component:BMA4xx Accelerometer Driver"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement status",
+          "externalIdentifierType": "other",
+          "identifier": "status:Draft"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement type",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-type:Functional"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Test evidence verdict",
+          "externalIdentifierType": "other",
+          "identifier": "evidence:no-run"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "True-traceability verdict",
+          "externalIdentifierType": "other",
+          "identifier": "adequacy:no-cov"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement rationale",
+          "externalIdentifierType": "other",
+          "identifier": "source:BST-BMA423-DS006-00"
+        }
+      ],
+      "name": "ZEP-SRS-39-18: Non-latched interrupt mode",
+      "summary": "Non-latched interrupt mode"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-45",
+      "scope": "design",
+      "from": "zephyr:requirements/ZEP-SYRS-4",
+      "relationshipType": "tracedToDetail",
+      "to": [
+        "zephyr:requirements/ZEP-SRS-39-18"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-46",
+      "scope": "development",
+      "from": "zephyr:requirements/ZEP-SRS-39-18",
+      "relationshipType": "implementedBy",
+      "to": [
+        "zephyr:snippets/bma4xx-configure-69-194"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-47",
+      "scope": "test",
+      "from": "zephyr:requirements/ZEP-SRS-39-18",
+      "relationshipType": "verifiedBy",
+      "to": [
+        "zephyr:verifications/bma4xx--test-non-latched-interrupts"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-bma4xx-interrupt.c",
+      "software_fileKind": "file",
+      "software_primaryPurpose": "source",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "name": "zephyr/drivers/sensor/bosch/bma4xx/bma4xx_interrupt.c",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "4be3e15a88a934eeeab8b6bcffad30f361edd22e"
+        }
+      ]
+    },
+    {
+      "type": "software_Snippet",
+      "spdxId": "zephyr:snippets/bma4xx-enable-interrupt1-72-85",
+      "software_lineRange": {
+        "type": "PositiveIntegerRange",
+        "beginIntegerRange": 72,
+        "endIntegerRange": 85
+      },
+      "software_snippetFromFile": "zephyr:files/File-bma4xx-interrupt.c",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "description": "drivers/sensor/bosch/bma4xx/bma4xx_interrupt.c:72-85",
+      "name": "bma4xx_enable_interrupt1 @ drivers/sensor/bosch/bma4xx/bma4xx_interrupt.c:72-85"
+    },
+    {
+      "type": "Requirement",
+      "spdxId": "zephyr:requirements/ZEP-SRS-39-19",
+      "requirementStatement": "The BMA4xx driver shall map the data-ready interrupt to the INT1 pin when streaming is disabled, and the FIFO watermark and FIFO full interrupts when streaming is enabled.",
+      "comment": "Test evidence: no-run \u2014 the requirement has verifying tests, but none ran in this run\nTrue-traceability adequacy: no-cov \u2014 the verifying tests have no coverage data in this run\nGenerated from the source annotations, not from a twister campaign: no test in this document was executed, so no execution evidence is claimed.",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "StrictDoc requirement UID",
+          "externalIdentifierType": "other",
+          "identifier": "ZEP-SRS-39-19"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement level",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-level:software"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement component",
+          "externalIdentifierType": "other",
+          "identifier": "component:BMA4xx Accelerometer Driver"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement status",
+          "externalIdentifierType": "other",
+          "identifier": "status:Draft"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement type",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-type:Functional"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Test evidence verdict",
+          "externalIdentifierType": "other",
+          "identifier": "evidence:no-run"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "True-traceability verdict",
+          "externalIdentifierType": "other",
+          "identifier": "adequacy:no-cov"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement rationale",
+          "externalIdentifierType": "other",
+          "identifier": "source:BST-BMA423-DS006-00"
+        }
+      ],
+      "name": "ZEP-SRS-39-19: Interrupt source selection",
+      "summary": "Interrupt source selection"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-48",
+      "scope": "design",
+      "from": "zephyr:requirements/ZEP-SYRS-4",
+      "relationshipType": "tracedToDetail",
+      "to": [
+        "zephyr:requirements/ZEP-SRS-39-19"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-49",
+      "scope": "development",
+      "from": "zephyr:requirements/ZEP-SRS-39-19",
+      "relationshipType": "implementedBy",
+      "to": [
+        "zephyr:snippets/bma4xx-configure-69-194",
+        "zephyr:snippets/bma4xx-enable-interrupt1-72-85"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-50",
+      "scope": "test",
+      "from": "zephyr:requirements/ZEP-SRS-39-19",
+      "relationshipType": "verifiedBy",
+      "to": [
+        "zephyr:verifications/bma4xx--test-data-ready-interrupt-mapped"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-bma4xx-spi.c",
+      "software_fileKind": "file",
+      "software_primaryPurpose": "source",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "name": "zephyr/drivers/sensor/bosch/bma4xx/bma4xx_spi.c",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "5926f1d8fc4d5cd9f6c5f5d4f3a2388403c94797"
+        }
+      ]
+    },
+    {
+      "type": "software_Snippet",
+      "spdxId": "zephyr:snippets/bma4xx-spi-init-57-70",
+      "software_lineRange": {
+        "type": "PositiveIntegerRange",
+        "beginIntegerRange": 57,
+        "endIntegerRange": 70
+      },
+      "software_snippetFromFile": "zephyr:files/File-bma4xx-spi.c",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "description": "drivers/sensor/bosch/bma4xx/bma4xx_spi.c:57-70",
+      "name": "bma4xx_spi_init @ drivers/sensor/bosch/bma4xx/bma4xx_spi.c:57-70"
+    },
+    {
+      "type": "software_File",
+      "spdxId": "zephyr:files/File-bma4xx-i2c.c",
+      "software_fileKind": "file",
+      "software_primaryPurpose": "source",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "name": "zephyr/drivers/sensor/bosch/bma4xx/bma4xx_i2c.c",
+      "verifiedUsing": [
+        {
+          "type": "Hash",
+          "algorithm": "sha1",
+          "hashValue": "56143a950017b7a044bdfc01b7d585fb069b702e"
+        }
+      ]
+    },
+    {
+      "type": "software_Snippet",
+      "spdxId": "zephyr:snippets/bma4xx-i2c-init-121-134",
+      "software_lineRange": {
+        "type": "PositiveIntegerRange",
+        "beginIntegerRange": 121,
+        "endIntegerRange": 134
+      },
+      "software_snippetFromFile": "zephyr:files/File-bma4xx-i2c.c",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "description": "drivers/sensor/bosch/bma4xx/bma4xx_i2c.c:121-134",
+      "name": "bma4xx_i2c_init @ drivers/sensor/bosch/bma4xx/bma4xx_i2c.c:121-134"
+    },
+    {
+      "type": "Requirement",
+      "spdxId": "zephyr:requirements/ZEP-SRS-39-20",
+      "requirementStatement": "The BMA4xx driver shall support both the I2C and the SPI primary interface of the device through a single register-access abstraction, selected from the devicetree bus the device instance is attached to.",
+      "comment": "Test evidence: untested \u2014 no test declares that it verifies this requirement\nTrue-traceability adequacy: no-cov \u2014 the verifying tests have no coverage data in this run\nGenerated from the source annotations, not from a twister campaign: no test in this document was executed, so no execution evidence is claimed.",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "StrictDoc requirement UID",
+          "externalIdentifierType": "other",
+          "identifier": "ZEP-SRS-39-20"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement level",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-level:software"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement component",
+          "externalIdentifierType": "other",
+          "identifier": "component:BMA4xx Accelerometer Driver"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement status",
+          "externalIdentifierType": "other",
+          "identifier": "status:Draft"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement type",
+          "externalIdentifierType": "other",
+          "identifier": "requirement-type:Functional"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Test evidence verdict",
+          "externalIdentifierType": "other",
+          "identifier": "evidence:untested"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "True-traceability verdict",
+          "externalIdentifierType": "other",
+          "identifier": "adequacy:no-cov"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Requirement rationale",
+          "externalIdentifierType": "other",
+          "identifier": "source:BST-BMA423-DS006-00"
+        }
+      ],
+      "name": "ZEP-SRS-39-20: Primary interface support",
+      "summary": "Primary interface support"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-51",
+      "scope": "design",
+      "from": "zephyr:requirements/ZEP-SYRS-4",
+      "relationshipType": "tracedToDetail",
+      "to": [
+        "zephyr:requirements/ZEP-SRS-39-20"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-52",
+      "scope": "development",
+      "from": "zephyr:requirements/ZEP-SRS-39-20",
+      "relationshipType": "implementedBy",
+      "to": [
+        "zephyr:snippets/bma4xx-spi-init-57-70",
+        "zephyr:snippets/bma4xx-i2c-init-121-134"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "Specification",
+      "spdxId": "zephyr:specifications/DESIGN-BMA423-DATASHEET",
+      "specType": "spdx:Core/SpecificationType/specification",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Design element id",
+          "externalIdentifierType": "other",
+          "identifier": "DESIGN-BMA423-DATASHEET"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Document number",
+          "externalIdentifierType": "other",
+          "identifier": "BST-BMA423-DS006-00"
+        },
+        {
+          "type": "ExternalIdentifier",
+          "comment": "Document revision",
+          "externalIdentifierType": "other",
+          "identifier": "2.0"
+        }
+      ],
+      "name": "DESIGN-BMA423-DATASHEET: BMA423 Data Sheet",
+      "summary": "BMA423 Data Sheet",
+      "description": "Bosch Sensortec BMA423 data sheet, document BST-BMA423-DS006-00 revision 2.0 (August 2019). The external document every ZEP-SRS-39-* requirement derives from; each requirement's rationale cites the chapter it comes from."
+    },
+    {
+      "type": "LifecycleScopedRelationship",
+      "spdxId": "zephyr:relationships/bma4xx-53",
+      "scope": "design",
+      "from": "zephyr:specifications/DESIGN-BMA423-DATASHEET",
+      "relationshipType": "hasRequirement",
+      "to": [
+        "zephyr:requirements/ZEP-SRS-39-1",
+        "zephyr:requirements/ZEP-SRS-39-2",
+        "zephyr:requirements/ZEP-SRS-39-3",
+        "zephyr:requirements/ZEP-SRS-39-4",
+        "zephyr:requirements/ZEP-SRS-39-5",
+        "zephyr:requirements/ZEP-SRS-39-6",
+        "zephyr:requirements/ZEP-SRS-39-7",
+        "zephyr:requirements/ZEP-SRS-39-8",
+        "zephyr:requirements/ZEP-SRS-39-9",
+        "zephyr:requirements/ZEP-SRS-39-10",
+        "zephyr:requirements/ZEP-SRS-39-11",
+        "zephyr:requirements/ZEP-SRS-39-12",
+        "zephyr:requirements/ZEP-SRS-39-13",
+        "zephyr:requirements/ZEP-SRS-39-14",
+        "zephyr:requirements/ZEP-SRS-39-15",
+        "zephyr:requirements/ZEP-SRS-39-16",
+        "zephyr:requirements/ZEP-SRS-39-17",
+        "zephyr:requirements/ZEP-SRS-39-18",
+        "zephyr:requirements/ZEP-SRS-39-19",
+        "zephyr:requirements/ZEP-SRS-39-20"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx"
+    },
+    {
+      "type": "functionalsafety_RequirementVerification",
+      "spdxId": "zephyr:verifications/bma4xx--test-accelerometer-enabled",
+      "functionalsafety_verificationMethod": [
+        "spdx:FunctionalSafety/VerificationType/test"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "ztest case",
+          "externalIdentifierType": "other",
+          "identifier": "bma4xx__test_accelerometer_enabled"
+        }
+      ],
+      "name": "bma4xx__test_accelerometer_enabled",
+      "summary": "The accelerometer is enabled and advanced power save is disabled"
+    },
+    {
+      "type": "functionalsafety_RequirementVerification",
+      "spdxId": "zephyr:verifications/bma4xx--test-bandwidth-parameter-validation",
+      "functionalsafety_verificationMethod": [
+        "spdx:FunctionalSafety/VerificationType/test"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "ztest case",
+          "externalIdentifierType": "other",
+          "identifier": "bma4xx__test_bandwidth_parameter_validation"
+        }
+      ],
+      "name": "bma4xx__test_bandwidth_parameter_validation",
+      "summary": "Only the eight documented bandwidth parameters are accepted"
+    },
+    {
+      "type": "functionalsafety_RequirementVerification",
+      "spdxId": "zephyr:verifications/bma4xx--test-chip-id",
+      "functionalsafety_verificationMethod": [
+        "spdx:FunctionalSafety/VerificationType/test"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "ztest case",
+          "externalIdentifierType": "other",
+          "identifier": "bma4xx__test_chip_id"
+        }
+      ],
+      "name": "bma4xx__test_chip_id",
+      "summary": "Initialization identifies the device and publishes its identifier"
+    },
+    {
+      "type": "functionalsafety_RequirementVerification",
+      "spdxId": "zephyr:verifications/bma4xx--test-data-ready-interrupt-mapped",
+      "functionalsafety_verificationMethod": [
+        "spdx:FunctionalSafety/VerificationType/test"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "ztest case",
+          "externalIdentifierType": "other",
+          "identifier": "bma4xx__test_data_ready_interrupt_mapped"
+        }
+      ],
+      "name": "bma4xx__test_data_ready_interrupt_mapped",
+      "summary": "Data ready is the interrupt source when streaming is disabled"
+    },
+    {
+      "type": "functionalsafety_RequirementVerification",
+      "spdxId": "zephyr:verifications/bma4xx--test-decode-die-temperature",
+      "functionalsafety_verificationMethod": [
+        "spdx:FunctionalSafety/VerificationType/test"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "ztest case",
+          "externalIdentifierType": "other",
+          "identifier": "bma4xx__test_decode_die_temperature"
+        }
+      ],
+      "name": "bma4xx__test_decode_die_temperature",
+      "summary": "The die temperature is decoded as an offset from 23 degrees Celsius"
+    },
+    {
+      "type": "functionalsafety_RequirementVerification",
+      "spdxId": "zephyr:verifications/bma4xx--test-decode-full-scale-shift",
+      "functionalsafety_verificationMethod": [
+        "spdx:FunctionalSafety/VerificationType/test"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "ztest case",
+          "externalIdentifierType": "other",
+          "identifier": "bma4xx__test_decode_full_scale_shift"
+        }
+      ],
+      "name": "bma4xx__test_decode_full_scale_shift",
+      "summary": "Decoded samples carry the scale of the configured full-scale range"
+    },
+    {
+      "type": "functionalsafety_RequirementVerification",
+      "spdxId": "zephyr:verifications/bma4xx--test-decode-sign-extension",
+      "functionalsafety_verificationMethod": [
+        "spdx:FunctionalSafety/VerificationType/test"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "ztest case",
+          "externalIdentifierType": "other",
+          "identifier": "bma4xx__test_decode_sign_extension"
+        }
+      ],
+      "name": "bma4xx__test_decode_sign_extension",
+      "summary": "Acceleration samples are decoded as 12-bit two's complement values"
+    },
+    {
+      "type": "functionalsafety_RequirementVerification",
+      "spdxId": "zephyr:verifications/bma4xx--test-default-configuration",
+      "functionalsafety_verificationMethod": [
+        "spdx:FunctionalSafety/VerificationType/test"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "ztest case",
+          "externalIdentifierType": "other",
+          "identifier": "bma4xx__test_default_configuration"
+        }
+      ],
+      "name": "bma4xx__test_default_configuration",
+      "summary": "Initialization leaves the documented default measurement configuration"
+    },
+    {
+      "type": "functionalsafety_RequirementVerification",
+      "spdxId": "zephyr:verifications/bma4xx--test-full-scale-out-of-range",
+      "functionalsafety_verificationMethod": [
+        "spdx:FunctionalSafety/VerificationType/test"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "ztest case",
+          "externalIdentifierType": "other",
+          "identifier": "bma4xx__test_full_scale_out_of_range"
+        }
+      ],
+      "name": "bma4xx__test_full_scale_out_of_range",
+      "summary": "A full-scale range wider than the device supports is rejected"
+    },
+    {
+      "type": "functionalsafety_RequirementVerification",
+      "spdxId": "zephyr:verifications/bma4xx--test-full-scale-rounds-up",
+      "functionalsafety_verificationMethod": [
+        "spdx:FunctionalSafety/VerificationType/test"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "ztest case",
+          "externalIdentifierType": "other",
+          "identifier": "bma4xx__test_full_scale_rounds_up"
+        }
+      ],
+      "name": "bma4xx__test_full_scale_rounds_up",
+      "summary": "A full-scale range selects the smallest range that covers it"
+    },
+    {
+      "type": "functionalsafety_RequirementVerification",
+      "spdxId": "zephyr:verifications/bma4xx--test-non-latched-interrupts",
+      "functionalsafety_verificationMethod": [
+        "spdx:FunctionalSafety/VerificationType/test"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "ztest case",
+          "externalIdentifierType": "other",
+          "identifier": "bma4xx__test_non_latched_interrupts"
+        }
+      ],
+      "name": "bma4xx__test_non_latched_interrupts",
+      "summary": "The interrupt engine is left in non-latched mode"
+    },
+    {
+      "type": "functionalsafety_RequirementVerification",
+      "spdxId": "zephyr:verifications/bma4xx--test-odr-out-of-range",
+      "functionalsafety_verificationMethod": [
+        "spdx:FunctionalSafety/VerificationType/test"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "ztest case",
+          "externalIdentifierType": "other",
+          "identifier": "bma4xx__test_odr_out_of_range"
+        }
+      ],
+      "name": "bma4xx__test_odr_out_of_range",
+      "summary": "A sampling frequency the device cannot produce is rejected"
+    },
+    {
+      "type": "functionalsafety_RequirementVerification",
+      "spdxId": "zephyr:verifications/bma4xx--test-odr-rounds-up",
+      "functionalsafety_verificationMethod": [
+        "spdx:FunctionalSafety/VerificationType/test"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "ztest case",
+          "externalIdentifierType": "other",
+          "identifier": "bma4xx__test_odr_rounds_up"
+        }
+      ],
+      "name": "bma4xx__test_odr_rounds_up",
+      "summary": "A sampling frequency is rounded up to a rate the device supports"
+    },
+    {
+      "type": "functionalsafety_RequirementVerification",
+      "spdxId": "zephyr:verifications/bma4xx--test-offset-out-of-range",
+      "functionalsafety_verificationMethod": [
+        "spdx:FunctionalSafety/VerificationType/test"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "ztest case",
+          "externalIdentifierType": "other",
+          "identifier": "bma4xx__test_offset_out_of_range"
+        }
+      ],
+      "name": "bma4xx__test_offset_out_of_range",
+      "summary": "An offset the registers cannot express is rejected"
+    },
+    {
+      "type": "functionalsafety_RequirementVerification",
+      "spdxId": "zephyr:verifications/bma4xx--test-offset-within-range",
+      "functionalsafety_verificationMethod": [
+        "spdx:FunctionalSafety/VerificationType/test"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "ztest case",
+          "externalIdentifierType": "other",
+          "identifier": "bma4xx__test_offset_within_range"
+        }
+      ],
+      "name": "bma4xx__test_offset_within_range",
+      "summary": "A per-axis offset is scaled at 3.9 mg per bit"
+    },
+    {
+      "type": "functionalsafety_RequirementVerification",
+      "spdxId": "zephyr:verifications/bma4xx--test-unsupported-attribute",
+      "functionalsafety_verificationMethod": [
+        "spdx:FunctionalSafety/VerificationType/test"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "ztest case",
+          "externalIdentifierType": "other",
+          "identifier": "bma4xx__test_unsupported_attribute"
+        }
+      ],
+      "name": "bma4xx__test_unsupported_attribute",
+      "summary": "An attribute the driver does not implement is refused"
+    },
+    {
+      "type": "functionalsafety_RequirementVerification",
+      "spdxId": "zephyr:verifications/bma4xx--test-unsupported-channel",
+      "functionalsafety_verificationMethod": [
+        "spdx:FunctionalSafety/VerificationType/test"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "comment": "ztest case",
+          "externalIdentifierType": "other",
+          "identifier": "bma4xx__test_unsupported_channel"
+        }
+      ],
+      "name": "bma4xx__test_unsupported_channel",
+      "summary": "A channel the device does not have is refused"
+    },
+    {
+      "type": "SoftwareAgent",
+      "spdxId": "zephyr:agents/west-spdx-agent",
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "name": "West SPDX Generator"
+    },
+    {
+      "type": "CreationInfo",
+      "@id": "zephyr:creationinfo-bma4xx",
+      "created": "2026-09-06T00:00:00Z",
+      "createdBy": [
+        "zephyr:agents/west-spdx-agent"
+      ],
+      "createdUsing": [
+        "zephyr:tools/west-spdx"
+      ],
+      "specVersion": "3.1.0"
+    },
+    {
+      "type": "SpdxDocument",
+      "spdxId": "zephyr:documents/safety-bma4xx",
+      "dataLicense": "https://spdx.org/licenses/CC0-1.0",
+      "import": [
+        {
+          "type": "ExternalMap",
+          "externalSpdxId": "zephyr:requirements/ZEP-SYRS-4",
+          "locationHint": "./safety.jsonld"
+        }
+      ],
+      "namespaceMap": [
+        {
+          "type": "NamespaceMap",
+          "namespace": "http://spdx.org/spdxdocs/zephyr-1156d55e-7855-4021-a092-abe307c66e1e/",
+          "prefix": "zephyr"
+        }
+      ],
+      "element": [
+        "zephyr:files/File-bma4xx.c",
+        "zephyr:snippets/bma4xx-chip-init-280-343",
+        "zephyr:requirements/ZEP-SRS-39-1",
+        "zephyr:relationships/bma4xx-1",
+        "zephyr:relationships/bma4xx-2",
+        "zephyr:relationships/bma4xx-3",
+        "zephyr:requirements/ZEP-SRS-39-2",
+        "zephyr:relationships/bma4xx-4",
+        "zephyr:relationships/bma4xx-5",
+        "zephyr:snippets/bma4xx-attr-get-351-364",
+        "zephyr:requirements/ZEP-SRS-39-3",
+        "zephyr:relationships/bma4xx-6",
+        "zephyr:relationships/bma4xx-7",
+        "zephyr:relationships/bma4xx-8",
+        "zephyr:requirements/ZEP-SRS-39-4",
+        "zephyr:relationships/bma4xx-9",
+        "zephyr:relationships/bma4xx-10",
+        "zephyr:relationships/bma4xx-11",
+        "zephyr:files/File-bma4xx-common.c",
+        "zephyr:snippets/bma4xx-configure-69-194",
+        "zephyr:requirements/ZEP-SRS-39-5",
+        "zephyr:relationships/bma4xx-12",
+        "zephyr:relationships/bma4xx-13",
+        "zephyr:relationships/bma4xx-14",
+        "zephyr:snippets/bma4xx-odr-to-reg-103-119",
+        "zephyr:snippets/bma4xx-attr-set-odr-126-141",
+        "zephyr:requirements/ZEP-SRS-39-6",
+        "zephyr:relationships/bma4xx-15",
+        "zephyr:relationships/bma4xx-16",
+        "zephyr:relationships/bma4xx-17",
+        "zephyr:snippets/bma4xx-fs-to-reg-155-173",
+        "zephyr:snippets/bma4xx-attr-set-range-180-195",
+        "zephyr:requirements/ZEP-SRS-39-7",
+        "zephyr:relationships/bma4xx-18",
+        "zephyr:relationships/bma4xx-19",
+        "zephyr:relationships/bma4xx-20",
+        "zephyr:snippets/bma4xx-attr-set-bwp-202-213",
+        "zephyr:requirements/ZEP-SRS-39-8",
+        "zephyr:relationships/bma4xx-21",
+        "zephyr:relationships/bma4xx-22",
+        "zephyr:relationships/bma4xx-23",
+        "zephyr:snippets/bma4xx-offset-to-reg-val-31-41",
+        "zephyr:snippets/bma4xx-attr-set-offset-48-80",
+        "zephyr:requirements/ZEP-SRS-39-9",
+        "zephyr:relationships/bma4xx-24",
+        "zephyr:relationships/bma4xx-25",
+        "zephyr:relationships/bma4xx-26",
+        "zephyr:snippets/bma4xx-safely-configure-199-211",
+        "zephyr:requirements/ZEP-SRS-39-10",
+        "zephyr:relationships/bma4xx-27",
+        "zephyr:relationships/bma4xx-28",
+        "zephyr:snippets/bma4xx-attr-set-220-271",
+        "zephyr:requirements/ZEP-SRS-39-11",
+        "zephyr:relationships/bma4xx-29",
+        "zephyr:relationships/bma4xx-30",
+        "zephyr:relationships/bma4xx-31",
+        "zephyr:files/File-bma4xx-decoder.c",
+        "zephyr:snippets/bma4xx-get-shift-143-173",
+        "zephyr:snippets/bma4xx-convert-raw-accel-to-q31-180-209",
+        "zephyr:requirements/ZEP-SRS-39-12",
+        "zephyr:relationships/bma4xx-32",
+        "zephyr:relationships/bma4xx-33",
+        "zephyr:relationships/bma4xx-34",
+        "zephyr:files/File-bma4xx-rtio.c",
+        "zephyr:snippets/bma4xx-submit-one-shot-55-148",
+        "zephyr:requirements/ZEP-SRS-39-13",
+        "zephyr:relationships/bma4xx-35",
+        "zephyr:relationships/bma4xx-36",
+        "zephyr:snippets/bma4xx-convert-raw-temp-to-q31-235-243",
+        "zephyr:requirements/ZEP-SRS-39-14",
+        "zephyr:relationships/bma4xx-37",
+        "zephyr:relationships/bma4xx-38",
+        "zephyr:relationships/bma4xx-39",
+        "zephyr:requirements/ZEP-SRS-39-15",
+        "zephyr:relationships/bma4xx-40",
+        "zephyr:snippets/bma4xx-decoder-get-frame-count-53-116",
+        "zephyr:snippets/bma4xx-fifo-decode-323-403",
+        "zephyr:requirements/ZEP-SRS-39-16",
+        "zephyr:relationships/bma4xx-41",
+        "zephyr:relationships/bma4xx-42",
+        "zephyr:snippets/bma4xx-compute-fifo-wm-26-60",
+        "zephyr:requirements/ZEP-SRS-39-17",
+        "zephyr:relationships/bma4xx-43",
+        "zephyr:relationships/bma4xx-44",
+        "zephyr:requirements/ZEP-SRS-39-18",
+        "zephyr:relationships/bma4xx-45",
+        "zephyr:relationships/bma4xx-46",
+        "zephyr:relationships/bma4xx-47",
+        "zephyr:files/File-bma4xx-interrupt.c",
+        "zephyr:snippets/bma4xx-enable-interrupt1-72-85",
+        "zephyr:requirements/ZEP-SRS-39-19",
+        "zephyr:relationships/bma4xx-48",
+        "zephyr:relationships/bma4xx-49",
+        "zephyr:relationships/bma4xx-50",
+        "zephyr:files/File-bma4xx-spi.c",
+        "zephyr:snippets/bma4xx-spi-init-57-70",
+        "zephyr:files/File-bma4xx-i2c.c",
+        "zephyr:snippets/bma4xx-i2c-init-121-134",
+        "zephyr:requirements/ZEP-SRS-39-20",
+        "zephyr:relationships/bma4xx-51",
+        "zephyr:relationships/bma4xx-52",
+        "zephyr:specifications/DESIGN-BMA423-DATASHEET",
+        "zephyr:relationships/bma4xx-53",
+        "zephyr:verifications/bma4xx--test-accelerometer-enabled",
+        "zephyr:verifications/bma4xx--test-bandwidth-parameter-validation",
+        "zephyr:verifications/bma4xx--test-chip-id",
+        "zephyr:verifications/bma4xx--test-data-ready-interrupt-mapped",
+        "zephyr:verifications/bma4xx--test-decode-die-temperature",
+        "zephyr:verifications/bma4xx--test-decode-full-scale-shift",
+        "zephyr:verifications/bma4xx--test-decode-sign-extension",
+        "zephyr:verifications/bma4xx--test-default-configuration",
+        "zephyr:verifications/bma4xx--test-full-scale-out-of-range",
+        "zephyr:verifications/bma4xx--test-full-scale-rounds-up",
+        "zephyr:verifications/bma4xx--test-non-latched-interrupts",
+        "zephyr:verifications/bma4xx--test-odr-out-of-range",
+        "zephyr:verifications/bma4xx--test-odr-rounds-up",
+        "zephyr:verifications/bma4xx--test-offset-out-of-range",
+        "zephyr:verifications/bma4xx--test-offset-within-range",
+        "zephyr:verifications/bma4xx--test-unsupported-attribute",
+        "zephyr:verifications/bma4xx--test-unsupported-channel",
+        "zephyr:agents/west-spdx-agent"
+      ],
+      "profileConformance": [
+        "core",
+        "software"
+      ],
+      "rootElement": [
+        "zephyr:specifications/DESIGN-BMA423-DATASHEET"
+      ],
+      "creationInfo": "zephyr:creationinfo-bma4xx",
+      "name": "Zephyr Functional Safety: BMA4xx accelerometer driver",
+      "comment": "Requirements for the Bosch BMA4xx accelerometer driver, derived from the BMA423 data sheet. Companion to safety.jsonld: the requirements trace to ZEP-SYRS-4, \"Device Driver Abstraction\", which that document defines.\nGenerated from the @satisfies and @verifies annotations in the driver and its test suite rather than from a twister campaign, so it carries declared traceability only: no EvaluationResult and no EvidenceRelationship, and every requirement's evidence verdict says its tests were not run."
+    }
+  ]
+}

@@ -11,6 +11,7 @@ via the "What's new" link.
 - **Improved:** Snippet detail card shows line and byte ranges.
 - **Added:** BASIL example design SBOM, mapped onto the project README.
 - **Improved:** Fetch source from http(s) File names and highlight byte ranges.
+- **Added:** BMA4xx driver requirements traced from the data sheet (Zephyr sample).
 
 ## [0.6.0] - 2026-08-29
 

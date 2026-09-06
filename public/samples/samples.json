@@ -12,7 +12,7 @@
     "id": "zephyr-experimental",
     "name": "Zephyr RTOS (SPDX 3.1)",
     "emoji": "🪁",
-    "description": "Same application, but with an SPDX 3.1 SBOM.<br/>⚠️ SPDX 3.1 support is not yet available in upstream <code>west spdx</code> tooling.",
+    "description": "Same application, but with an SPDX 3.1 SBOM, plus requirements traced from the BMA423 data sheet into the BMA4xx driver.<br/>⚠️ SPDX 3.1 support is not yet available in upstream <code>west spdx</code> tooling.",
     "dir": "samples/zephyr-experimental",
     "files": [
       "app.jsonld",
@@ -20,9 +20,10 @@
       "zephyr.jsonld",
       "build.jsonld",
       "safety.jsonld",
-      "sdk.jsonld"
+      "sdk.jsonld",
+      "bma4xx-safety.jsonld"
     ],
-    "size": 10157669
+    "size": 10262698
   },
   {
     "id": "linux",

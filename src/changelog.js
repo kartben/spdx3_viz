@@ -32,6 +32,10 @@ export const CHANGELOG = [
       {
         tag: 'Improved',
         text: 'Fetch source from http(s) File names and highlight byte ranges.'
+      },
+      {
+        tag: 'Added',
+        text: 'BMA4xx driver requirements traced from the data sheet (Zephyr sample).'
       }
     ]
   },
