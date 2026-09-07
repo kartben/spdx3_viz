@@ -6,7 +6,8 @@ import {
   graphLayoutMeta,
   advanceNavTrail,
   trailColorAt,
-  trailRecap
+  trailRecap,
+  findTrailRelation
 } from '../lib/index.js';
 import { nextPaint } from './paint.js';
 
@@ -69,15 +70,45 @@ export const graphMixin = {
     return i < 0 ? null : trailColorAt(i, trail.length);
   },
   get graphTrailRecap() {
-    return trailRecap(this.graphNavTrail, (id) => {
-      const el =
-        this.elementMap.get(id) || this.virtualVulnMap?.get(id) || this.placeholderElement(id);
-      return {
-        name: this.elementDisplayName(el) || el.name || this.cleanName(id),
-        typeLabel: trailTypeLabel(el.type),
-        el
-      };
+    return trailRecap(
+      this.graphNavTrail,
+      (id) => {
+        const el =
+          this.elementMap.get(id) || this.virtualVulnMap?.get(id) || this.placeholderElement(id);
+        return {
+          name: this.elementDisplayName(el) || el.name || this.cleanName(id),
+          typeLabel: trailTypeLabel(el.type),
+          el
+        };
+      },
+      (fromId, toId) => this._trailHopRelation(fromId, toId)
+    );
+  },
+  _trailHopRelation(fromId, toId) {
+    const found = findTrailRelation(fromId, toId, {
+      outgoing: this.outgoingRels?.(fromId) || this.relFromIndex?.get(fromId) || [],
+      incoming: this.incomingRels?.(fromId) || this.relToIndex?.get(fromId) || []
     });
+    if (found) {
+      return {
+        label: this.relGroupLabel(found.type, found.direction),
+        color: this.relColor(found.type)
+      };
+    }
+    const entry = this.agentLinkIndex?.get(fromId);
+    if (entry) {
+      if (entry.created?.includes(toId))
+        return { label: 'Created', color: this.relColor('createdBy') };
+      if (entry.manufactured?.includes(toId)) {
+        return { label: 'Manufacturer of', color: this.relColor('manufacturedBy') };
+      }
+      if (entry.supplied?.includes(toId))
+        return { label: 'Supplier of', color: this.relColor('suppliedBy') };
+      if (entry.originated?.includes(toId)) {
+        return { label: 'Originator of', color: this.relColor('originatedBy') };
+      }
+    }
+    return null;
   },
   // Drop the walk but keep the current node selected. The next sidebar hop
   // seeds a fresh trail from here. (An empty-canvas click still deselects.)

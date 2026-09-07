@@ -13,6 +13,7 @@ import {
   focusScale,
   focusTransform,
   isDragGesture,
+  findTrailRelation,
   mapTrailToRenderIds,
   trailColorAt,
   trailFocusTransform,
@@ -60,32 +61,52 @@ test('trailColorAt is cyan at the start and pink on the current hop', () => {
   assert.notEqual(trailColorAt(1, 3), TRAIL_CURRENT);
 });
 
-test('trailRecap reads the walk with start/here roles and colours', () => {
+test('trailRecap reads the walk with relation names between hops', () => {
   assert.deepEqual(trailRecap([]).hops, []);
   assert.equal(trailRecap([]).summary, '');
 
-  const two = trailRecap(['a', 'b'], (id) => ({
-    name: id === 'a' ? 'Origin' : 'Here',
-    typeLabel: 'Thing'
-  }));
+  const two = trailRecap(
+    ['a', 'b'],
+    (id) => ({
+      name: id === 'a' ? 'Origin' : 'Here (screenshot)',
+      typeLabel: 'Thing'
+    }),
+    (from, to) => (from === 'a' && to === 'b' ? { label: 'Required by', color: '#fbbf24' } : null)
+  );
   assert.equal(two.hopCount, 1);
   assert.equal(two.summary, 'From Origin to Here.');
-  assert.equal(two.hops[0].roleLabel, 'Started');
+  assert.equal(two.hops[0].viaLabel, '');
   assert.equal(two.hops[0].color, TRAIL_START);
-  assert.equal(two.hops[1].roleLabel, 'Now');
+  assert.equal(two.hops[1].name, 'Here');
+  assert.equal(two.hops[1].viaLabel, 'Required by');
+  assert.equal(two.hops[1].viaColor, '#fbbf24');
   assert.equal(two.hops[1].color, TRAIL_CURRENT);
   assert.equal(two.hops[1].last, true);
 
   const three = trailRecap(['a', 'b', 'c'], (id) => ({ name: id.toUpperCase() }));
   assert.equal(three.summary, 'From A via B to C.');
-  assert.equal(three.hops[1].roleLabel, 'Then');
+  assert.equal(three.hops[1].viaLabel, '');
   assert.equal(three.hops[1].last, false);
 
   const four = trailRecap(['a', 'b', 'c', 'd'], (id) => ({ name: id }));
   assert.equal(four.summary, 'From a via 2 hops to d.');
 });
 
-test('graphTrailRecap uses element names and SPDX type labels', () => {
+test('findTrailRelation prefers an outgoing hop, then a reverse incoming one', () => {
+  const outgoing = [{ to: ['b', 'c'], relationshipType: 'hasRequirement' }];
+  const incoming = [{ from: 'd', relationshipType: 'performedBy' }];
+  assert.deepEqual(findTrailRelation('a', 'b', { outgoing, incoming }), {
+    type: 'hasRequirement',
+    direction: 'out'
+  });
+  assert.deepEqual(findTrailRelation('a', 'd', { outgoing, incoming }), {
+    type: 'performedBy',
+    direction: 'in'
+  });
+  assert.equal(findTrailRelation('a', 'ghost', { outgoing, incoming }), null);
+});
+
+test('graphTrailRecap uses element names and the relation walked', () => {
   const app = {
     graphNavTrail: ['a', 'b'],
     elementMap: new Map([
@@ -93,6 +114,8 @@ test('graphTrailRecap uses element names and SPDX type labels', () => {
       ['b', { spdxId: 'b', type: 'supplychain_PlanAction', name: 'Plan the folding run' }]
     ]),
     virtualVulnMap: new Map(),
+    relFromIndex: new Map(),
+    relToIndex: new Map([['a', [{ from: 'b', to: ['a'], relationshipType: 'hasRequirement' }]]]),
     elementDisplayName(el) {
       return el.name;
     },
@@ -101,12 +124,19 @@ test('graphTrailRecap uses element names and SPDX type labels', () => {
     },
     placeholderElement(id) {
       return { spdxId: id, type: 'ExternalReference', name: id, placeholder: true };
-    }
+    },
+    relGroupLabel(type, direction) {
+      return type === 'hasRequirement' && direction === 'in' ? 'Required by' : type;
+    },
+    relColor() {
+      return '#fbbf24';
+    },
+    _trailHopRelation: graphMixin._trailHopRelation
   };
   const recap = Reflect.get(graphMixin, 'graphTrailRecap', app);
   assert.equal(recap.summary, 'From GLIDE-REQ-01 distance to Plan the folding run.');
-  assert.equal(recap.hops[0].typeLabel, 'Requirement');
-  assert.equal(recap.hops[1].typeLabel, 'Plan Action');
+  assert.equal(recap.hops[0].viaLabel, '');
+  assert.equal(recap.hops[1].viaLabel, 'Required by');
   assert.equal(recap.hops[0].color, TRAIL_START);
 });
 
