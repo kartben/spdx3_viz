@@ -204,6 +204,33 @@ test('selectGraphNode seeds the trail from the open detail element', () => {
   assert.deepEqual(app.graphNavTrail, ['a', 'b']);
 });
 
+test('clearGraphTrail drops the walk and keeps the current node selected', () => {
+  const hovered = [];
+  let redraws = 0;
+  const app = {
+    graphNavTrail: ['a', 'b', 'c'],
+    graphSelectedNodeId: 'c',
+    graphPreviewNodeId: 'b',
+    detailElement: { spdxId: 'c' },
+    graphHoverNode(id) {
+      hovered.push(id);
+    },
+    graphRedraw() {
+      redraws++;
+    }
+  };
+  graphMixin.clearGraphTrail.call(app);
+  assert.deepEqual(app.graphNavTrail, []);
+  assert.equal(app.graphSelectedNodeId, 'c');
+  assert.equal(app.detailElement.spdxId, 'c');
+  assert.equal(app.graphPreviewNodeId, null);
+  assert.deepEqual(hovered, [null]);
+  assert.equal(redraws, 1);
+
+  graphMixin.clearGraphTrail.call(app);
+  assert.equal(redraws, 1, 'a second clear is a no-op');
+});
+
 test('graphTrailMark returns the hop colour, or null when the id is not on the path', () => {
   const app = { graphNavTrail: ['a', 'b', 'c'] };
   assert.equal(graphMixin.graphTrailMark.call(app, 'a'), TRAIL_START);

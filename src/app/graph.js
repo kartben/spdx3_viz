@@ -58,6 +58,15 @@ export const graphMixin = {
     const i = trail.indexOf(id);
     return i < 0 ? null : trailColorAt(i, trail.length);
   },
+  // Drop the walk but keep the current node selected. The next sidebar hop
+  // seeds a fresh trail from here. (An empty-canvas click still deselects.)
+  clearGraphTrail() {
+    if (!this.graphNavTrail?.length) return;
+    this.graphPreviewNodeId = null;
+    this.graphHoverNode?.(null);
+    this.graphNavTrail = [];
+    this.graphRedraw?.();
+  },
   // Building the graph is one long synchronous pass over every element and
   // relationship in the SBOM, so it is worth running exactly once per request.
   // Deferring by a frame lets same-moment requests collapse into one build:
