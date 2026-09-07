@@ -394,6 +394,8 @@ export function createState() {
     graphSelectedNodeId: null, // render-node id pinned by click (keeps hover-style focus)
     graphSyncSelection: null, // set by the graph renderer; re-pins the highlight without a rebuild
     graphFocusNode: null, // set by the graph renderer; pins a node and eases the camera onto it
+    graphHoverNode: null, // set by the graph renderer; previews a node from the detail panel
+    graphPreviewNodeId: null, // element id currently previewed by hovering a related row
     graphNavTrail: [], // element ids walked via the detail-panel relationships
 
     // Statistics view: relationship repartition scope chip ('all' or a lifecycle scope).

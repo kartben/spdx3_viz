@@ -34,7 +34,8 @@ import {
   focusScale,
   focusTransform,
   mapTrailToRenderIds,
-  trailColorAt
+  trailColorAt,
+  TRAIL_CURRENT
 } from '../lib/index.js';
 
 // Icon-node mode: below this on-screen node radius (px) icons are illegible, so
@@ -992,6 +993,7 @@ export function renderGraph(app, retry = 0) {
   const groupedLinks = groupLinksByColor(links);
   let currentTransform = d3.zoomIdentity;
   let hoverNodeId = null;
+  let panelHoverId = null; // render id previewed from the detail panel, not the canvas
   let selectedNodeId = app.graphSelectedNodeId;
   if (selectedNodeId && !renderById.has(selectedNodeId)) {
     selectedNodeId = renderKeyOf.get(selectedNodeId) || null;
@@ -1023,9 +1025,10 @@ export function renderGraph(app, retry = 0) {
     if (searchActive || !highlightedNodeId) return null;
     const base = connectedIndex.get(highlightedNodeId) || new Set([highlightedNodeId]);
     const keep = trailKeepSet();
-    if (!keep) return base;
+    if (!keep && !selectedNodeId) return base;
     const merged = new Set(base);
-    keep.forEach((id) => merged.add(id));
+    if (keep) keep.forEach((id) => merged.add(id));
+    if (selectedNodeId) merged.add(selectedNodeId);
     return merged;
   };
 
@@ -1393,7 +1396,7 @@ export function renderGraph(app, retry = 0) {
   const drawLabels = () => {
     const zoomedIn = currentTransform.k >= LABEL_ZOOM_THRESHOLD;
     const trailIds = trailRenderIds();
-    if (!searchActive && !zoomedIn && trailIds.length < 2) return;
+    if (!searchActive && !zoomedIn && trailIds.length < 2 && !panelHoverId) return;
     ctx.save();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // screen space → constant-size text
     ctx.font = '11px ui-sans-serif, system-ui, -apple-system, sans-serif';
@@ -1424,6 +1427,18 @@ export function renderGraph(app, retry = 0) {
           drawn++;
         }
       });
+    }
+
+    if (
+      panelHoverId &&
+      !trailLabeled.has(panelHoverId) &&
+      !(searchActive && matchSet.has(panelHoverId))
+    ) {
+      const d = renderById.get(panelHoverId);
+      if (d && d.x != null && drawn < MAX_LABELS && drawLabel(d, false, TRAIL_CURRENT)) {
+        trailLabeled.add(panelHoverId);
+        drawn++;
+      }
     }
 
     // Remaining (non-match) labels only once zoomed in, respecting hover focus when not searching.
@@ -1646,6 +1661,52 @@ export function renderGraph(app, retry = 0) {
     ctx.restore();
   };
 
+  // Dashed hop from the pinned node to a related element the pointer is
+  // hovering in the detail panel, so the next click is previewed in place.
+  const drawTrailPreview = () => {
+    if (!panelHoverId || searchActive) return;
+    const target = renderById.get(panelHoverId);
+    if (!target || target.x == null) return;
+    const from = selectedNodeId ? renderById.get(selectedNodeId) : null;
+    const k = currentTransform.k;
+    ctx.save();
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    if (
+      from &&
+      from.x != null &&
+      from.id !== target.id &&
+      (nodeInView(from) || nodeInView(target))
+    ) {
+      ctx.setLineDash([6 / k, 5 / k]);
+      ctx.strokeStyle = TRAIL_CURRENT;
+      ctx.globalAlpha = 0.28;
+      ctx.lineWidth = 7 / k;
+      ctx.beginPath();
+      ctx.moveTo(from.x, from.y);
+      ctx.lineTo(target.x, target.y);
+      ctx.stroke();
+      ctx.globalAlpha = 0.95;
+      ctx.lineWidth = 2.2 / k;
+      ctx.beginPath();
+      ctx.moveTo(from.x, from.y);
+      ctx.lineTo(target.x, target.y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    if (nodeInView(target) && target.id !== selectedNodeId) {
+      ctx.strokeStyle = TRAIL_CURRENT;
+      ctx.globalAlpha = 1;
+      ctx.lineWidth = 2.6 / k;
+      ctx.setLineDash([4 / k, 3 / k]);
+      ctx.beginPath();
+      ctx.arc(target.x, target.y, radiusFor(target) + 6 / k, 0, 2 * Math.PI);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  };
+
   const drawCanvas = () => {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, width, height);
@@ -1688,6 +1749,7 @@ export function renderGraph(app, retry = 0) {
     drawNodes();
     drawHeatMarkers(); // crisp rings on top so each hot element stays pinpointable
     drawTrail();
+    drawTrailPreview();
 
     ctx.restore();
     ctx.globalAlpha = 1;
@@ -2048,6 +2110,7 @@ export function renderGraph(app, retry = 0) {
   }
 
   canvas.addEventListener('mousemove', (event) => {
+    panelHoverId = null;
     const found = pointerNode(event);
     hoverNodeId = found ? found.id : null;
     syncHighlight();
@@ -2094,7 +2157,7 @@ export function renderGraph(app, retry = 0) {
   });
 
   canvas.addEventListener('mouseleave', () => {
-    hoverNodeId = null;
+    hoverNodeId = panelHoverId;
     syncHighlight();
     document.getElementById('graphTooltip')?.classList.add('hidden');
   });
@@ -2189,6 +2252,24 @@ export function renderGraph(app, retry = 0) {
   app.graphSyncSelection = (id) => {
     selectedNodeId = renderById.has(id) ? id : null;
     app.graphSelectedNodeId = selectedNodeId;
+    syncHighlight();
+    queueDraw();
+  };
+
+  // Preview a related element hovered in the detail panel: same neighbour
+  // emphasis as canvas hover, plus a dashed hop from the pinned node. Does
+  // not pan; a click calls graphFocusNode for that.
+  app.graphHoverNode = (spdxId) => {
+    if (!spdxId) {
+      panelHoverId = null;
+      hoverNodeId = null;
+      syncHighlight();
+      queueDraw();
+      return;
+    }
+    const rid = renderKeyOf.get(spdxId) || (renderById.has(spdxId) ? spdxId : null);
+    panelHoverId = rid;
+    hoverNodeId = rid;
     syncHighlight();
     queueDraw();
   };

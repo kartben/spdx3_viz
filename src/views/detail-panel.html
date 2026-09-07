@@ -1465,8 +1465,13 @@
             <template x-for="item in group.items" :key="item.id">
               <div
                 class="detail-rel-item group"
-                :class="graphTrailMark(item.id) && 'detail-rel-item-trail'"
+                :class="[
+                  graphTrailMark(item.id) && 'detail-rel-item-trail',
+                  graphPreviewNodeId === item.id && 'detail-rel-item-preview'
+                ]"
                 :style="graphTrailMark(item.id) && `--trail-color:${graphTrailMark(item.id)}`"
+                @mouseenter="previewGraphNode(item.id)"
+                @mouseleave="clearGraphPreview()"
                 @click="selectGraphNode(item.id)"
               >
                 <span class="detail-rel-arrow" :style="`color: ${group.color}`">→</span>
@@ -1525,8 +1530,13 @@
               x-data="{ statusMeta: null }"
               x-effect="statusMeta = safetyArtifactStatus(elementMap.get(item.id))"
               class="detail-rel-item group"
-              :class="graphTrailMark(item.id) && 'detail-rel-item-trail'"
+              :class="[
+                graphTrailMark(item.id) && 'detail-rel-item-trail',
+                graphPreviewNodeId === item.id && 'detail-rel-item-preview'
+              ]"
               :style="graphTrailMark(item.id) && `--trail-color:${graphTrailMark(item.id)}`"
+              @mouseenter="item.multiRange ? null : previewGraphNode(item.id)"
+              @mouseleave="clearGraphPreview()"
               @click="item.multiRange ? openSnippetRanges(item.snippetIds) : selectGraphNode(item.id)"
             >
               <span
