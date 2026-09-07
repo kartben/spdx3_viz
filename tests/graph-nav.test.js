@@ -14,7 +14,8 @@ import {
   focusTransform,
   isDragGesture,
   mapTrailToRenderIds,
-  trailColorAt
+  trailColorAt,
+  trailFocusTransform
 } from '../src/lib/index.js';
 
 test('advanceNavTrail starts, appends, and rewinds', () => {
@@ -73,6 +74,63 @@ test('focusTransform centres a world point in the viewport', () => {
   assert.equal(t.k, 2);
   assert.equal(t.x, 800 / 2 - 2 * 100);
   assert.equal(t.y, 600 / 2 - 2 * 50);
+});
+
+test('trailFocusTransform frames every hop so the walk stays on screen', () => {
+  const viewport = { width: 800, height: 600, minK: 0.02, maxK: 8, currentK: 1 };
+  assert.equal(trailFocusTransform({ ...viewport, points: [] }), null);
+
+  const one = trailFocusTransform({
+    ...viewport,
+    points: [{ x: 100, y: 50, r: 8 }]
+  });
+  const centred = focusTransform({
+    width: 800,
+    height: 600,
+    x: 100,
+    y: 50,
+    k: focusScale({ currentK: 1, nodeR: 8, minK: 0.02, maxK: 8 })
+  });
+  assert.deepEqual(one, centred);
+
+  const nearby = trailFocusTransform({
+    ...viewport,
+    points: [
+      { x: 0, y: 0, r: 8 },
+      { x: 40, y: 0, r: 8 }
+    ]
+  });
+  assert.equal(nearby.k, 1, 'a short trail keeps the current zoom');
+
+  const far = trailFocusTransform({
+    ...viewport,
+    points: [
+      { x: 0, y: 0, r: 8 },
+      { x: 2000, y: 0, r: 8 }
+    ]
+  });
+  const sx = (t, x) => t.k * x + t.x;
+  const sy = (t, y) => t.k * y + t.y;
+  assert.ok(sx(far, 0) >= -1, 'origin stays in the viewport');
+  assert.ok(sx(far, 2000) <= 800 + 1, 'current hop stays in the viewport');
+  assert.ok(far.k < 1, 'a long walk zooms out');
+
+  const tall = trailFocusTransform({
+    ...viewport,
+    points: [
+      { x: 0, y: 0, r: 8 },
+      { x: 80, y: 1800, r: 8 },
+      { x: 1200, y: 900, r: 8 }
+    ]
+  });
+  for (const p of [
+    { x: 0, y: 0 },
+    { x: 80, y: 1800 },
+    { x: 1200, y: 900 }
+  ]) {
+    assert.ok(sx(tall, p.x) >= -1 && sx(tall, p.x) <= 801, `x of (${p.x},${p.y}) stays in view`);
+    assert.ok(sy(tall, p.y) >= -1 && sy(tall, p.y) <= 601, `y of (${p.x},${p.y}) stays in view`);
+  }
 });
 
 test('focusScale keeps a readable node without yanking a close-up', () => {
