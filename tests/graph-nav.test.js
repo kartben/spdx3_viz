@@ -76,9 +76,11 @@ test('trailRecap reads the walk with relation names between hops', () => {
   assert.equal(two.hopCount, 1);
   assert.equal(two.summary, 'From Origin to Here.');
   assert.equal(two.hops[0].viaLabel, '');
+  assert.equal(two.hops[0].nextViaLabel, 'Required by');
   assert.equal(two.hops[0].color, TRAIL_START);
   assert.equal(two.hops[1].name, 'Here');
   assert.equal(two.hops[1].viaLabel, 'Required by');
+  assert.equal(two.hops[1].nextViaLabel, '');
   assert.equal(two.hops[1].viaColor, '#fbbf24');
   assert.equal(two.hops[1].color, TRAIL_CURRENT);
   assert.equal(two.hops[1].last, true);
