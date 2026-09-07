@@ -88,8 +88,6 @@
             x-text="'· ' + (graphNavTrail.length - 1) + (graphNavTrail.length === 2 ? ' hop' : ' hops')"
           ></span>
           <div class="graph-trail-card" role="tooltip">
-            <div class="graph-trail-card-kicker">Trail</div>
-            <p class="graph-trail-card-summary" x-text="graphTrailRecap.summary"></p>
             <div class="graph-trail-card-hops">
               <template x-for="hop in graphTrailRecap.hops" :key="hop.id">
                 <button
@@ -100,26 +98,23 @@
                   @click="selectGraphNode(hop.id)"
                   @mouseenter="previewGraphNode(hop.id)"
                 >
-                  <span class="graph-trail-hop-rail" aria-hidden="true">
-                    <span class="graph-trail-hop-dot"></span>
-                    <span class="graph-trail-hop-stem" x-show="!hop.last"></span>
-                  </span>
-                  <span class="graph-trail-hop-body">
+                  <span class="graph-trail-hop-in" x-show="hop.viaLabel" aria-hidden="true"></span>
+                  <span
+                    class="graph-trail-hop-via"
+                    x-show="hop.viaLabel"
+                    x-text="hop.viaLabel"
+                    :style="hop.viaColor && `color:${hop.viaColor}`"
+                  ></span>
+                  <span class="graph-trail-hop-dot" aria-hidden="true"></span>
+                  <span class="graph-trail-hop-name">
                     <span
-                      class="graph-trail-hop-via"
-                      x-show="hop.viaLabel"
-                      x-text="hop.viaLabel"
-                      :style="hop.viaColor && `color:${hop.viaColor}`"
+                      class="flex items-center shrink-0"
+                      :style="`color:${nodeTypeColor(getNodeType(hop.el))}`"
+                      x-html="elementIcon(hop.el, 'w-3.5 h-3.5')"
                     ></span>
-                    <span class="graph-trail-hop-name">
-                      <span
-                        class="flex items-center shrink-0"
-                        :style="`color:${nodeTypeColor(getNodeType(hop.el))}`"
-                        x-html="elementIcon(hop.el, 'w-3.5 h-3.5')"
-                      ></span>
-                      <span class="truncate" x-text="hop.name" :title="hop.name"></span>
-                    </span>
+                    <span class="truncate" x-text="hop.name" :title="hop.name"></span>
                   </span>
+                  <span class="graph-trail-hop-out" x-show="!hop.last" aria-hidden="true"></span>
                 </button>
               </template>
             </div>
