@@ -33,8 +33,10 @@ import {
   focusPanDuration,
   focusScale,
   focusTransform,
+  isDragGesture,
   mapTrailToRenderIds,
   trailColorAt,
+  NODE_CLICK_PX,
   TRAIL_CURRENT
 } from '../lib/index.js';
 
@@ -1960,6 +1962,7 @@ export function renderGraph(app, retry = 0) {
   // only ever called here asynchronously, by which point it is assigned.
   let building = true;
   let dragging = false;
+  let dragState = null; // { originX, originY, didDrag } while a node is pressed
   let lastFitAt = 0;
   const autoFitTick = () => {
     if (!building || dragging || app.graphAutoFit === false || !app.graphFitView) return;
@@ -2069,6 +2072,7 @@ export function renderGraph(app, retry = 0) {
 
   const drag = d3
     .drag()
+    .clickDistance(NODE_CLICK_PX)
     .subject((event) => {
       const wx = currentTransform.invertX(event.x);
       const wy = currentTransform.invertY(event.y);
@@ -2079,13 +2083,22 @@ export function renderGraph(app, retry = 0) {
     })
     .on('start', (event) => {
       if (!event.subject) return;
-      dragging = true; // hold auto-fit while the user repositions a node
-      if (!event.active) sim.alphaTarget(0.3).restart();
+      // Pin the node so a click cannot be shoved by leftover forces, but do
+      // not reheat until the pointer actually moves: mousedown used to restart
+      // the sim at alpha 0.3, so a click made the graph jump and d3-drag ate
+      // the click event.
+      dragging = true;
+      dragState = { originX: event.x, originY: event.y, didDrag: false };
       event.subject.fx = event.subject.x;
       event.subject.fy = event.subject.y;
     })
     .on('drag', (event) => {
-      if (!event.subject) return;
+      if (!event.subject || !dragState) return;
+      if (!dragState.didDrag) {
+        if (!isDragGesture(event.x - dragState.originX, event.y - dragState.originY)) return;
+        dragState.didDrag = true;
+        if (!event.active) sim.alphaTarget(0.3).restart();
+      }
       event.subject.fx = currentTransform.invertX(event.x);
       event.subject.fy = currentTransform.invertY(event.y);
       markMotion();
@@ -2093,10 +2106,12 @@ export function renderGraph(app, retry = 0) {
     })
     .on('end', (event) => {
       if (!event.subject) return;
+      const didDrag = dragState?.didDrag;
+      dragState = null;
       dragging = false;
-      if (!event.active) sim.alphaTarget(0);
       event.subject.fx = null;
       event.subject.fy = null;
+      if (didDrag && !event.active) sim.alphaTarget(0);
     });
 
   sel.call(app.graphZoom).on('dblclick.zoom', null);
@@ -2162,19 +2177,9 @@ export function renderGraph(app, retry = 0) {
     document.getElementById('graphTooltip')?.classList.add('hidden');
   });
 
-  // Click selects and pins hover-style focus (suppressed by d3.drag after a real drag).
-  // A canvas click starts a fresh walk; hopping from the detail panel appends to it.
-  canvas.addEventListener('click', (event) => {
-    const found = pointerNode(event);
-    if (!found) {
-      selectedNodeId = null;
-      app.graphSelectedNodeId = null;
-      app.graphNavTrail = [];
-      syncHighlight();
-      queueDraw();
-      app._scheduleNavPush();
-      return;
-    }
+  // Select on pointerdown so a click is not lost if d3-drag later swallows it,
+  // and interrupt a camera ease so the node stays under the pointer.
+  const applyNodeSelection = (found) => {
     selectedNodeId = found.id;
     app.graphSelectedNodeId = found.id;
     app.graphNavTrail = [found.data?.spdxId || found.id];
@@ -2186,6 +2191,29 @@ export function renderGraph(app, retry = 0) {
       app.detailElement = found.data;
     }
     app._scheduleNavPush();
+  };
+
+  canvas.addEventListener('pointerdown', (event) => {
+    if (event.button !== 0) return;
+    sel.interrupt();
+    const found = pointerNode(event);
+    if (found) applyNodeSelection(found);
+  });
+
+  // Empty-canvas click still clears the pin. A node click is already handled
+  // on pointerdown; keep this as a fallback if the press missed a moving node.
+  canvas.addEventListener('click', (event) => {
+    const found = pointerNode(event);
+    if (!found) {
+      selectedNodeId = null;
+      app.graphSelectedNodeId = null;
+      app.graphNavTrail = [];
+      syncHighlight();
+      queueDraw();
+      app._scheduleNavPush();
+      return;
+    }
+    applyNodeSelection(found);
   });
 
   // Double-click drills into a collapsed cluster.

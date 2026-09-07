@@ -6,6 +6,7 @@ via the "What's new" link.
 ## Unreleased
 
 - **Added:** Hover previews related nodes; click pans with a trail.
+- **Fixed:** Clicking a graph node selects it without shoving the layout.
 - **Added:** Functional Safety coverage matrices, exportable to Excel.
 - **Fixed:** `hasTestCase` relationships now show on the graph (e.g. BASIL SBOMs).
 - **Fixed:** Graph keeps snippet hubs as nodes (BASIL), still folds Zephyr leaves into files.

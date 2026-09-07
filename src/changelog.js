@@ -14,6 +14,10 @@ export const CHANGELOG = [
         text: 'Hover previews related nodes; click pans with a trail.'
       },
       {
+        tag: 'Fixed',
+        text: 'Clicking a graph node selects it without shoving the layout.'
+      },
+      {
         tag: 'Added',
         text: 'Functional Safety coverage matrices, exportable to Excel.'
       },
