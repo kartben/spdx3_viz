@@ -105,7 +105,12 @@
                     <span class="graph-trail-hop-stem" x-show="!hop.last"></span>
                   </span>
                   <span class="graph-trail-hop-body">
-                    <span class="graph-trail-hop-role" x-text="hop.roleLabel"></span>
+                    <span
+                      class="graph-trail-hop-via"
+                      x-show="hop.viaLabel"
+                      x-text="hop.viaLabel"
+                      :style="hop.viaColor && `color:${hop.viaColor}`"
+                    ></span>
                     <span class="graph-trail-hop-name">
                       <span
                         class="flex items-center shrink-0"
@@ -114,11 +119,6 @@
                       ></span>
                       <span class="truncate" x-text="hop.name" :title="hop.name"></span>
                     </span>
-                    <span
-                      class="graph-trail-hop-type"
-                      x-show="hop.typeLabel"
-                      x-text="hop.typeLabel"
-                    ></span>
                   </span>
                 </button>
               </template>

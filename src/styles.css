@@ -1079,7 +1079,7 @@ body.detail-resizing {
   align-items: center;
   width: 10px;
   flex-shrink: 0;
-  padding-top: 5px;
+  padding-top: 6px;
 }
 
 .graph-trail-hop-dot {
@@ -1106,13 +1106,14 @@ body.detail-resizing {
   padding-bottom: 6px;
 }
 
-.graph-trail-hop-role {
+.graph-trail-hop-via {
   display: block;
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  color: var(--trail-color);
+  color: #94a3b8;
+  margin-bottom: 2px;
 }
 
 .graph-trail-hop-name {
@@ -1123,13 +1124,6 @@ body.detail-resizing {
   font-size: 12px;
   font-weight: 500;
   color: #e2e8f0;
-}
-
-.graph-trail-hop-type {
-  display: block;
-  margin-top: 1px;
-  font-size: 10px;
-  color: #64748b;
 }
 
 /* CISA / guideline definition tips: longer verbatim text, styled panel. */

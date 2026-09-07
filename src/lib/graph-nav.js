@@ -92,26 +92,29 @@ export function trailColorAt(i, n) {
 }
 
 /**
- * Recap of a walk for the toolbar chip card: start/then/now roles, trail
- * colours, and a short sentence that reads the path.
+ * Recap of a walk for the toolbar chip card: trail colours, a short sentence
+ * that reads the path, and the relationship that connected each hop.
  *
  * @param {string[]|null|undefined} trail
  * @param {(id: string) => {name?: string, typeLabel?: string, el?: unknown}|null|undefined} [resolve]
- * @returns {{hops: Array<{id: string, name: string, typeLabel: string, color: string, role: string, roleLabel: string, last: boolean, el: unknown}>, hopCount: number, summary: string}}
+ * @param {(fromId: string, toId: string) => {label?: string, color?: string}|null|undefined} [relationBetween]
+ * @returns {{hops: Array<{id: string, name: string, typeLabel: string, color: string, role: string, viaLabel: string, viaColor: string, last: boolean, el: unknown}>, hopCount: number, summary: string}}
  */
-export function trailRecap(trail, resolve = () => null) {
+export function trailRecap(trail, resolve = () => null, relationBetween = () => null) {
   const ids = Array.isArray(trail) ? trail.filter(Boolean) : [];
   const n = ids.length;
   const hops = ids.map((id, i) => {
     const info = resolve(id) || {};
+    const via = i > 0 ? relationBetween(ids[i - 1], id) || {} : {};
     const role = i === 0 ? 'start' : i === n - 1 ? 'here' : 'hop';
     return {
       id,
-      name: info.name || id,
+      name: recapDisplayName(info.name || id),
       typeLabel: info.typeLabel || '',
       color: trailColorAt(i, n),
       role,
-      roleLabel: role === 'start' ? 'Started' : role === 'here' ? 'Now' : 'Then',
+      viaLabel: via.label || '',
+      viaColor: via.color || '',
       last: i === n - 1,
       el: info.el ?? null
     };
@@ -122,6 +125,38 @@ export function trailRecap(trail, resolve = () => null) {
   else if (n === 3) summary = `From ${hops[0].name} via ${hops[1].name} to ${hops[2].name}.`;
   else if (n > 3) summary = `From ${hops[0].name} via ${n - 2} hops to ${hops[n - 1].name}.`;
   return { hops, hopCount: Math.max(0, n - 1), summary };
+}
+
+function recapDisplayName(name) {
+  return String(name || '')
+    .replace(/\s*\(screenshot\)\s*$/i, '')
+    .trim();
+}
+
+/**
+ * The relationship walked from `fromId` to `toId`. Prefers an outgoing edge
+ * (the usual sidebar hop); falls back to an incoming edge when the hop was a
+ * reverse group such as "Required by".
+ *
+ * @param {string} fromId
+ * @param {string} toId
+ * @param {{outgoing?: Array<{to?: string|string[], relationshipType?: string}>, incoming?: Array<{from?: string, relationshipType?: string}>}} [rels]
+ * @returns {{type: string, direction: 'out'|'in'}|null}
+ */
+export function findTrailRelation(fromId, toId, rels = {}) {
+  if (!fromId || !toId) return null;
+  for (const rel of rels.outgoing || []) {
+    const targets = Array.isArray(rel.to) ? rel.to : [rel.to];
+    if (targets.includes(toId) && rel.relationshipType) {
+      return { type: rel.relationshipType, direction: 'out' };
+    }
+  }
+  for (const rel of rels.incoming || []) {
+    if (rel.from === toId && rel.relationshipType) {
+      return { type: rel.relationshipType, direction: 'in' };
+    }
+  }
+  return null;
 }
 
 /**
