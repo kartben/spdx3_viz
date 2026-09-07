@@ -11,7 +11,7 @@ export const CHANGELOG = [
     items: [
       {
         tag: 'Added',
-        text: 'Hover previews related nodes; click pans to fit the trail.'
+        text: 'Hover previews related nodes; click pans to fit a clearable trail.'
       },
       {
         tag: 'Fixed',
