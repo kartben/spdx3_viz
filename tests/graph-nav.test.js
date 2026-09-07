@@ -106,7 +106,7 @@ test('graphTrailRecap uses element names and SPDX type labels', () => {
   const recap = Reflect.get(graphMixin, 'graphTrailRecap', app);
   assert.equal(recap.summary, 'From GLIDE-REQ-01 distance to Plan the folding run.');
   assert.equal(recap.hops[0].typeLabel, 'Requirement');
-  assert.equal(recap.hops[1].typeLabel, 'PlanAction');
+  assert.equal(recap.hops[1].typeLabel, 'Plan Action');
   assert.equal(recap.hops[0].color, TRAIL_START);
 });
 
