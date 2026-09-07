@@ -5,7 +5,7 @@ via the "What's new" link.
 
 ## Unreleased
 
-- **Added:** Hover previews related nodes; click pans to fit a clearable trail.
+- **Added:** Hover previews related nodes; trail recap; click pans to fit.
 - **Fixed:** Clicking a graph node selects it without shoving the layout.
 - **Added:** Functional Safety coverage matrices, exportable to Excel.
 - **Fixed:** `hasTestCase` relationships now show on the graph (e.g. BASIL SBOMs).

@@ -981,6 +981,157 @@ body.detail-resizing {
   transform: translateY(0);
 }
 
+/* Trail chip recap: a card under start → here that reads the walk in trail
+   colours. Hidden until hover so the toolbar stays compact. */
+.graph-trail-chip {
+  position: relative;
+}
+
+.graph-trail-chip-label {
+  position: relative;
+  cursor: default;
+}
+
+.graph-trail-card {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 70;
+  width: min(22rem, calc(100vw - 3rem));
+  padding: 10px 12px 8px;
+  background: #0f172a;
+  border: 1px solid #475569;
+  border-radius: 10px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+  text-align: left;
+  white-space: normal;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition:
+    opacity 0.12s ease,
+    transform 0.12s ease,
+    visibility 0.12s ease;
+}
+
+.graph-trail-card::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 0;
+  right: 0;
+  height: 8px;
+}
+
+.graph-trail-chip-label:hover .graph-trail-card,
+.graph-trail-chip-label:focus-within .graph-trail-card {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.graph-trail-card-kicker {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #67e8f9;
+}
+
+.graph-trail-card-summary {
+  margin: 4px 0 10px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #cbd5e1;
+}
+
+.graph-trail-card-hops {
+  display: flex;
+  flex-direction: column;
+  max-height: 16rem;
+  overflow-y: auto;
+}
+
+.graph-trail-hop {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  width: 100%;
+  padding: 4px 6px;
+  margin: 0 -6px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.graph-trail-hop:hover,
+.graph-trail-hop-preview {
+  background: color-mix(in srgb, var(--trail-color) 14%, transparent);
+}
+
+.graph-trail-hop-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 10px;
+  flex-shrink: 0;
+  padding-top: 5px;
+}
+
+.graph-trail-hop-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--trail-color);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--trail-color) 28%, transparent);
+  flex-shrink: 0;
+}
+
+.graph-trail-hop-stem {
+  width: 2px;
+  flex: 1;
+  min-height: 10px;
+  margin-top: 3px;
+  border-radius: 1px;
+  background: color-mix(in srgb, var(--trail-color) 45%, transparent);
+}
+
+.graph-trail-hop-body {
+  min-width: 0;
+  flex: 1;
+  padding-bottom: 6px;
+}
+
+.graph-trail-hop-role {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--trail-color);
+}
+
+.graph-trail-hop-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: #e2e8f0;
+}
+
+.graph-trail-hop-type {
+  display: block;
+  margin-top: 1px;
+  font-size: 10px;
+  color: #64748b;
+}
+
 /* CISA / guideline definition tips: longer verbatim text, styled panel. */
 .cisa-tip {
   position: relative;

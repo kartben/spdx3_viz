@@ -92,6 +92,39 @@ export function trailColorAt(i, n) {
 }
 
 /**
+ * Recap of a walk for the toolbar chip card: start/then/now roles, trail
+ * colours, and a short sentence that reads the path.
+ *
+ * @param {string[]|null|undefined} trail
+ * @param {(id: string) => {name?: string, typeLabel?: string, el?: unknown}|null|undefined} [resolve]
+ * @returns {{hops: Array<{id: string, name: string, typeLabel: string, color: string, role: string, roleLabel: string, last: boolean, el: unknown}>, hopCount: number, summary: string}}
+ */
+export function trailRecap(trail, resolve = () => null) {
+  const ids = Array.isArray(trail) ? trail.filter(Boolean) : [];
+  const n = ids.length;
+  const hops = ids.map((id, i) => {
+    const info = resolve(id) || {};
+    const role = i === 0 ? 'start' : i === n - 1 ? 'here' : 'hop';
+    return {
+      id,
+      name: info.name || id,
+      typeLabel: info.typeLabel || '',
+      color: trailColorAt(i, n),
+      role,
+      roleLabel: role === 'start' ? 'Started' : role === 'here' ? 'Now' : 'Then',
+      last: i === n - 1,
+      el: info.el ?? null
+    };
+  });
+  let summary = '';
+  if (n === 1) summary = `At ${hops[0].name}.`;
+  else if (n === 2) summary = `From ${hops[0].name} to ${hops[1].name}.`;
+  else if (n === 3) summary = `From ${hops[0].name} via ${hops[1].name} to ${hops[2].name}.`;
+  else if (n > 3) summary = `From ${hops[0].name} via ${n - 2} hops to ${hops[n - 1].name}.`;
+  return { hops, hopCount: Math.max(0, n - 1), summary };
+}
+
+/**
  * Quartic ease-in-out: slow start, quick middle, gentle stop. Used as the
  * d3-transition ease so a camera pan accelerates and decelerates.
  *

@@ -72,18 +72,59 @@
       ></span>
       <span
         x-show="graphNavTrail.length > 1"
-        class="text-xs text-slate-400 whitespace-nowrap flex items-center gap-1.5 pl-2 pr-0.5 py-0.5 rounded-md border border-slate-700/70 bg-slate-800/70"
-        title="Nodes visited from the detail panel. Cyan is where the walk started, pink is the current element."
+        class="graph-trail-chip text-xs text-slate-400 whitespace-nowrap flex items-center gap-1.5 pl-2 pr-0.5 py-0.5 rounded-md border border-slate-700/70 bg-slate-800/70"
       >
-        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
-        start
-        <span class="text-slate-600">→</span>
-        <span class="w-1.5 h-1.5 rounded-full bg-pink-400"></span>
-        here
         <span
-          class="text-slate-500"
-          x-text="'· ' + (graphNavTrail.length - 1) + (graphNavTrail.length === 2 ? ' hop' : ' hops')"
-        ></span>
+          class="graph-trail-chip-label flex items-center gap-1.5"
+          @mouseleave="clearGraphPreview()"
+        >
+          <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+          start
+          <span class="text-slate-600">→</span>
+          <span class="w-1.5 h-1.5 rounded-full bg-pink-400"></span>
+          here
+          <span
+            class="text-slate-500"
+            x-text="'· ' + (graphNavTrail.length - 1) + (graphNavTrail.length === 2 ? ' hop' : ' hops')"
+          ></span>
+          <div class="graph-trail-card" role="tooltip">
+            <div class="graph-trail-card-kicker">Trail</div>
+            <p class="graph-trail-card-summary" x-text="graphTrailRecap.summary"></p>
+            <div class="graph-trail-card-hops">
+              <template x-for="hop in graphTrailRecap.hops" :key="hop.id">
+                <button
+                  type="button"
+                  class="graph-trail-hop"
+                  :class="graphPreviewNodeId === hop.id && 'graph-trail-hop-preview'"
+                  :style="`--trail-color:${hop.color}`"
+                  @click="selectGraphNode(hop.id)"
+                  @mouseenter="previewGraphNode(hop.id)"
+                >
+                  <span class="graph-trail-hop-rail" aria-hidden="true">
+                    <span class="graph-trail-hop-dot"></span>
+                    <span class="graph-trail-hop-stem" x-show="!hop.last"></span>
+                  </span>
+                  <span class="graph-trail-hop-body">
+                    <span class="graph-trail-hop-role" x-text="hop.roleLabel"></span>
+                    <span class="graph-trail-hop-name">
+                      <span
+                        class="flex items-center shrink-0"
+                        :style="`color:${nodeTypeColor(getNodeType(hop.el))}`"
+                        x-html="elementIcon(hop.el, 'w-3.5 h-3.5')"
+                      ></span>
+                      <span class="truncate" x-text="hop.name" :title="hop.name"></span>
+                    </span>
+                    <span
+                      class="graph-trail-hop-type"
+                      x-show="hop.typeLabel"
+                      x-text="hop.typeLabel"
+                    ></span>
+                  </span>
+                </button>
+              </template>
+            </div>
+          </div>
+        </span>
         <button
           type="button"
           @click="clearGraphTrail()"
