@@ -5,9 +5,18 @@ import {
   GRAPH_LAYOUTS,
   graphLayoutMeta,
   advanceNavTrail,
-  trailColorAt
+  trailColorAt,
+  trailRecap
 } from '../lib/index.js';
 import { nextPaint } from './paint.js';
+
+function trailTypeLabel(type) {
+  if (!type) return 'Element';
+  return String(type).replace(
+    /^(software_|build_|simplelicensing_|security_|ai_|dataset_|hardware_|functionalsafety_|supplychain_)/,
+    ''
+  );
+}
 
 /* Force graph: thin bridge between the Alpine component and the D3 renderer in
    graph-view.js, plus selecting a node into the detail panel. On the Graph
@@ -57,6 +66,17 @@ export const graphMixin = {
     if (!trail?.length) return null;
     const i = trail.indexOf(id);
     return i < 0 ? null : trailColorAt(i, trail.length);
+  },
+  get graphTrailRecap() {
+    return trailRecap(this.graphNavTrail, (id) => {
+      const el =
+        this.elementMap.get(id) || this.virtualVulnMap?.get(id) || this.placeholderElement(id);
+      return {
+        name: this.elementDisplayName(el) || el.name || this.cleanName(id),
+        typeLabel: trailTypeLabel(el.type),
+        el
+      };
+    });
   },
   // Drop the walk but keep the current node selected. The next sidebar hop
   // seeds a fresh trail from here. (An empty-canvas click still deselects.)

@@ -15,7 +15,8 @@ import {
   isDragGesture,
   mapTrailToRenderIds,
   trailColorAt,
-  trailFocusTransform
+  trailFocusTransform,
+  trailRecap
 } from '../src/lib/index.js';
 
 test('advanceNavTrail starts, appends, and rewinds', () => {
@@ -53,11 +54,60 @@ test('mapTrailToRenderIds folds members into clusters and skips gaps', () => {
 
 test('trailColorAt is cyan at the start and pink on the current hop', () => {
   assert.equal(trailColorAt(0, 1), TRAIL_CURRENT);
-  assert.equal(trailColorAt(0, 4), TRAIL_START);
-  assert.equal(trailColorAt(3, 4), TRAIL_CURRENT);
-  assert.match(trailColorAt(1, 4), /^#[0-9a-f]{6}$/);
-  assert.notEqual(trailColorAt(1, 4), TRAIL_START);
-  assert.notEqual(trailColorAt(1, 4), TRAIL_CURRENT);
+  assert.equal(trailColorAt(0, 3), TRAIL_START);
+  assert.equal(trailColorAt(2, 3), TRAIL_CURRENT);
+  assert.notEqual(trailColorAt(1, 3), TRAIL_START);
+  assert.notEqual(trailColorAt(1, 3), TRAIL_CURRENT);
+});
+
+test('trailRecap reads the walk with start/here roles and colours', () => {
+  assert.deepEqual(trailRecap([]).hops, []);
+  assert.equal(trailRecap([]).summary, '');
+
+  const two = trailRecap(['a', 'b'], (id) => ({
+    name: id === 'a' ? 'Origin' : 'Here',
+    typeLabel: 'Thing'
+  }));
+  assert.equal(two.hopCount, 1);
+  assert.equal(two.summary, 'From Origin to Here.');
+  assert.equal(two.hops[0].roleLabel, 'Started');
+  assert.equal(two.hops[0].color, TRAIL_START);
+  assert.equal(two.hops[1].roleLabel, 'Now');
+  assert.equal(two.hops[1].color, TRAIL_CURRENT);
+  assert.equal(two.hops[1].last, true);
+
+  const three = trailRecap(['a', 'b', 'c'], (id) => ({ name: id.toUpperCase() }));
+  assert.equal(three.summary, 'From A via B to C.');
+  assert.equal(three.hops[1].roleLabel, 'Then');
+  assert.equal(three.hops[1].last, false);
+
+  const four = trailRecap(['a', 'b', 'c', 'd'], (id) => ({ name: id }));
+  assert.equal(four.summary, 'From a via 2 hops to d.');
+});
+
+test('graphTrailRecap uses element names and SPDX type labels', () => {
+  const app = {
+    graphNavTrail: ['a', 'b'],
+    elementMap: new Map([
+      ['a', { spdxId: 'a', type: 'Requirement', name: 'GLIDE-REQ-01 distance' }],
+      ['b', { spdxId: 'b', type: 'supplychain_PlanAction', name: 'Plan the folding run' }]
+    ]),
+    virtualVulnMap: new Map(),
+    elementDisplayName(el) {
+      return el.name;
+    },
+    cleanName(id) {
+      return id;
+    },
+    placeholderElement(id) {
+      return { spdxId: id, type: 'ExternalReference', name: id, placeholder: true };
+    }
+  };
+  const recap = Reflect.get(graphMixin, 'graphTrailRecap', app);
+  assert.equal(recap.summary, 'From GLIDE-REQ-01 distance to Plan the folding run.');
+  assert.equal(recap.hops[0].typeLabel, 'Requirement');
+  assert.equal(recap.hops[1].typeLabel, 'PlanAction');
+  assert.equal(recap.hops[0].color, TRAIL_START);
 });
 
 test('easeInOutQuart starts and ends still, and is symmetric', () => {
