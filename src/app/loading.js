@@ -822,6 +822,8 @@ export const loadingMixin = {
       this.remediationCategoryFilter = '';
       this.remediationSeverityFilter = '';
       this.expandedClusters = new Set(); // fresh data: start fully collapsed
+      this.graphNavTrail = [];
+      this.graphSelectedNodeId = null;
       this._resetGraphHeat(); // drop a heat lens the new SBOM can't honour
       this.cveDetails = {}; // drop cached CVE fetches from the previous SBOM
       this.resetOnlineSync(); // drop OSV online findings from the previous SBOM

@@ -11,6 +11,10 @@ export const CHANGELOG = [
     items: [
       {
         tag: 'Added',
+        text: 'Graph pans to related nodes with a colored trail.'
+      },
+      {
+        tag: 'Added',
         text: 'Functional Safety coverage matrices, exportable to Excel.'
       },
       {

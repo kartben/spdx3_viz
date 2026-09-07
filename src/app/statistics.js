@@ -332,6 +332,7 @@ export const statisticsMixin = {
     this.graphMatchCount = 0;
     this.detailElement = null;
     this.graphSelectedNodeId = null;
+    this.graphNavTrail = [];
 
     const msg = `Graph focused on ${relFilter.label}${
       narrowScope ? ` · ${scopeMeta(scope).label}` : ''

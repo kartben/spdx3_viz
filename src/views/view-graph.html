@@ -70,6 +70,21 @@
         class="text-xs text-slate-400 whitespace-nowrap"
         x-text="`${formatCount(graphNodeCount)} nodes · ${formatCount(graphEdgeCount)} edges`"
       ></span>
+      <span
+        x-show="graphNavTrail.length > 1"
+        class="text-xs text-slate-400 whitespace-nowrap flex items-center gap-1.5"
+        title="Nodes visited from the detail panel. Cyan is where the walk started, pink is the current element."
+      >
+        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+        start
+        <span class="text-slate-600">→</span>
+        <span class="w-1.5 h-1.5 rounded-full bg-pink-400"></span>
+        here
+        <span
+          class="text-slate-500"
+          x-text="'· ' + (graphNavTrail.length - 1) + (graphNavTrail.length === 2 ? ' hop' : ' hops')"
+        ></span>
+      </span>
       <div class="flex items-center gap-0.5 bg-slate-800 border border-slate-700 rounded-md p-0.5">
         <button
           type="button"

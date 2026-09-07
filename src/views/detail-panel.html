@@ -1463,7 +1463,12 @@
           </div>
           <div class="space-y-1 ml-3">
             <template x-for="item in group.items" :key="item.id">
-              <div class="detail-rel-item group" @click="selectGraphNode(item.id)">
+              <div
+                class="detail-rel-item group"
+                :class="graphTrailMark(item.id) && 'detail-rel-item-trail'"
+                :style="graphTrailMark(item.id) && `--trail-color:${graphTrailMark(item.id)}`"
+                @click="selectGraphNode(item.id)"
+              >
                 <span class="detail-rel-arrow" :style="`color: ${group.color}`">→</span>
                 <span
                   class="flex items-center shrink-0"
@@ -1520,6 +1525,8 @@
               x-data="{ statusMeta: null }"
               x-effect="statusMeta = safetyArtifactStatus(elementMap.get(item.id))"
               class="detail-rel-item group"
+              :class="graphTrailMark(item.id) && 'detail-rel-item-trail'"
+              :style="graphTrailMark(item.id) && `--trail-color:${graphTrailMark(item.id)}`"
               @click="item.multiRange ? openSnippetRanges(item.snippetIds) : selectGraphNode(item.id)"
             >
               <span
