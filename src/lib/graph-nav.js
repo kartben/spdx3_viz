@@ -115,10 +115,16 @@ export function trailRecap(trail, resolve = () => null, relationBetween = () => 
       role,
       viaLabel: via.label || '',
       viaColor: via.color || '',
+      nextViaLabel: '',
+      nextViaColor: '',
       last: i === n - 1,
       el: info.el ?? null
     };
   });
+  for (let i = 0; i < hops.length - 1; i++) {
+    hops[i].nextViaLabel = hops[i + 1].viaLabel;
+    hops[i].nextViaColor = hops[i + 1].viaColor;
+  }
   let summary = '';
   if (n === 1) summary = `At ${hops[0].name}.`;
   else if (n === 2) summary = `From ${hops[0].name} to ${hops[1].name}.`;
