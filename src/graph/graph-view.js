@@ -31,11 +31,10 @@ import {
   easeInOutQuart,
   focusNeedsMove,
   focusPanDuration,
-  focusScale,
-  focusTransform,
   isDragGesture,
   mapTrailToRenderIds,
   trailColorAt,
+  trailFocusTransform,
   NODE_CLICK_PX,
   TRAIL_CURRENT
 } from '../lib/index.js';
@@ -2302,8 +2301,9 @@ export function renderGraph(app, retry = 0) {
     queueDraw();
   };
 
-  // Pin a node (by element id or render id) and ease the camera onto it so a
-  // relationship click in the detail panel actually moves the graph.
+  // Pin a node (by element id or render id) and ease the camera so the whole
+  // walk stays in view: a single hop centres that node, further hops frame
+  // every trail point so the origin is never panned off-screen.
   app.graphFocusNode = (spdxId) => {
     const rid = renderKeyOf.get(spdxId) || (renderById.has(spdxId) ? spdxId : null);
     selectedNodeId = rid;
@@ -2314,13 +2314,24 @@ export function renderGraph(app, retry = 0) {
     if (!node || node.x == null || !app.graphCanvasSel || !app.graphZoom) return;
     app.graphAutoFit = false;
     const [minK, maxK] = app.graphZoom.scaleExtent();
-    const k = focusScale({
-      currentK: currentTransform.k,
-      nodeR: radiusFor(node),
+    const pts = [];
+    const seen = new Set();
+    for (const id of trailRenderIds()) {
+      const n = renderById.get(id);
+      if (!n || n.x == null || seen.has(n.id)) continue;
+      seen.add(n.id);
+      pts.push({ x: n.x, y: n.y, r: radiusFor(n) });
+    }
+    if (!seen.has(node.id)) pts.push({ x: node.x, y: node.y, r: radiusFor(node) });
+    const to = trailFocusTransform({
+      points: pts,
+      width,
+      height,
       minK,
-      maxK
+      maxK,
+      currentK: currentTransform.k
     });
-    const to = focusTransform({ width, height, x: node.x, y: node.y, k });
+    if (!to) return;
     const from = { x: currentTransform.x, y: currentTransform.y, k: currentTransform.k };
     if (!focusNeedsMove(from, to)) return;
     const t = d3.zoomIdentity.translate(to.x, to.y).scale(to.k);

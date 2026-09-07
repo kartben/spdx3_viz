@@ -173,6 +173,53 @@ export function focusNeedsMove(from, to, epsilon = 6) {
   return pan > epsilon || zoomDelta > 0.02;
 }
 
+/**
+ * Camera transform that keeps every trail point in the viewport. Zoom only
+ * changes when a hop would clip the walk, or when a single node is too small
+ * to read; a short trail at a comfortable zoom just pans.
+ *
+ * @param {{points: Array<{x?: number, y?: number, r?: number}>, width: number, height: number, minK: number, maxK: number, currentK: number, margin?: number, capK?: number}} opts
+ * @returns {{x: number, y: number, k: number}|null}
+ */
+export function trailFocusTransform({
+  points,
+  width,
+  height,
+  minK,
+  maxK,
+  currentK,
+  margin = 0.86,
+  capK = 1.6
+}) {
+  const pts = (points || []).filter((p) => p && p.x != null && p.y != null);
+  if (!pts.length) return null;
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  for (const p of pts) {
+    const pad = Math.max(p.r || 0, 4) * 1.35 + 18;
+    if (p.x - pad < minX) minX = p.x - pad;
+    if (p.y - pad < minY) minY = p.y - pad;
+    if (p.x + pad > maxX) maxX = p.x + pad;
+    if (p.y + pad > maxY) maxY = p.y + pad;
+  }
+  const bw = Math.max(maxX - minX, 1);
+  const bh = Math.max(maxY - minY, 1);
+  const cx = (minX + maxX) / 2;
+  const cy = (minY + maxY) / 2;
+  const fitK = margin * Math.min(width / bw, height / bh);
+  const readableK = focusScale({
+    currentK,
+    nodeR: pts[pts.length - 1].r,
+    minK,
+    maxK,
+    capK
+  });
+  const k = Math.max(minK, Math.min(readableK, fitK));
+  return { x: width / 2 - k * cx, y: height / 2 - k * cy, k };
+}
+
 /** Screen pixels the pointer must move before a node press counts as a drag. */
 export const NODE_CLICK_PX = 6;
 
