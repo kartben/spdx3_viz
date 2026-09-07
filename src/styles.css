@@ -1096,11 +1096,13 @@ body.detail-resizing {
   min-width: 0;
   width: 100%;
   margin: 0;
+  height: 18px;
   padding: 2px 6px;
   border: 0;
   border-radius: 6px;
   background: transparent;
   font-size: 12px;
+  line-height: 14px;
   font-weight: 500;
   color: #e2e8f0;
   text-align: left;
@@ -1115,7 +1117,10 @@ body.detail-resizing {
 .graph-trail-hop-via {
   grid-column: 2;
   grid-row: 2;
-  padding: 4px 6px 8px;
+  display: flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 6px;
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.03em;

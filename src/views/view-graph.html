@@ -112,12 +112,13 @@
                     ></span>
                     <span class="truncate" x-text="hop.name" :title="hop.name"></span>
                   </button>
-                  <span
-                    class="graph-trail-hop-via"
-                    x-show="hop.nextViaLabel"
-                    x-text="hop.nextViaLabel"
-                    :style="hop.nextViaColor && `color:${hop.nextViaColor}`"
-                  ></span>
+                  <template x-if="hop.nextViaLabel">
+                    <span
+                      class="graph-trail-hop-via"
+                      x-text="hop.nextViaLabel"
+                      :style="hop.nextViaColor && `color:${hop.nextViaColor}`"
+                    ></span>
+                  </template>
                 </div>
               </template>
             </div>
