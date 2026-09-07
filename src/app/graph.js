@@ -3,12 +3,16 @@ import {
   heatModeMeta,
   HEAT_MODES,
   GRAPH_LAYOUTS,
-  graphLayoutMeta
+  graphLayoutMeta,
+  advanceNavTrail,
+  trailColorAt
 } from '../lib/index.js';
 import { nextPaint } from './paint.js';
 
 /* Force graph: thin bridge between the Alpine component and the D3 renderer in
-   graph-view.js, plus selecting a node into the detail panel.
+   graph-view.js, plus selecting a node into the detail panel. On the Graph
+   view a relationship click also focuses the camera and records a coloured
+   trail so the walk stays visible.
 
    The renderer (2,000 lines plus its d3 modules) loads on first use, mirroring
    the mermaid and highlight.js patterns, so a session that never opens the
@@ -20,8 +24,28 @@ export const graphMixin = {
     // Virtual (online-scan) vulns live outside elementMap; resolve them too so a
     // deep link or restore lands on the real node, not a bare placeholder.
     const el = this.elementMap.get(spdxId) || this.virtualVulnMap?.get(spdxId);
+    const fromId = this.detailElement?.spdxId || this.graphSelectedNodeId;
     this.detailElement = el || this.placeholderElement(spdxId);
+    // On the graph, a relationship click is a hop: pin the new node, keep the
+    // walk as a coloured trail, and ease the camera onto it. Other views only
+    // swap the detail panel (the existing inspect-in-place behaviour).
+    if (this.currentView === 'graph') {
+      let trail = this.graphNavTrail || [];
+      if (!trail.length && fromId && fromId !== spdxId) trail = [fromId];
+      this.graphNavTrail = advanceNavTrail(trail, spdxId);
+      if (this.graphFocusNode) this.graphFocusNode(spdxId);
+      else {
+        this.graphSelectedNodeId = spdxId;
+        this.graphRedraw?.();
+      }
+    }
     this._scheduleNavPush();
+  },
+  graphTrailMark(id) {
+    const trail = this.graphNavTrail;
+    if (!trail?.length) return null;
+    const i = trail.indexOf(id);
+    return i < 0 ? null : trailColorAt(i, trail.length);
   },
   // Building the graph is one long synchronous pass over every element and
   // relationship in the SBOM, so it is worth running exactly once per request.

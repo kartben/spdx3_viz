@@ -393,6 +393,8 @@ export function createState() {
     graphRecomputeSearch: null, // set by the graph renderer; updates the overlay only
     graphSelectedNodeId: null, // render-node id pinned by click (keeps hover-style focus)
     graphSyncSelection: null, // set by the graph renderer; re-pins the highlight without a rebuild
+    graphFocusNode: null, // set by the graph renderer; pins a node and eases the camera onto it
+    graphNavTrail: [], // element ids walked via the detail-panel relationships
 
     // Statistics view: relationship repartition scope chip ('all' or a lifecycle scope).
     relationshipScopeFilter: 'all',

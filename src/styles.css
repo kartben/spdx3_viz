@@ -841,6 +841,11 @@ html {
   color: #f1f5f9;
 }
 
+.detail-rel-item-trail {
+  box-shadow: inset 3px 0 0 var(--trail-color);
+  background: color-mix(in srgb, var(--trail-color) 12%, transparent);
+}
+
 .detail-rel-arrow {
   font-size: 0.7rem;
   flex-shrink: 0;

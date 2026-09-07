@@ -27,7 +27,14 @@ import {
   computeLayers,
   bfsDepths,
   orderLaneTypes,
-  DEFAULT_GRAPH_LAYOUT
+  DEFAULT_GRAPH_LAYOUT,
+  easeInOutQuart,
+  focusNeedsMove,
+  focusPanDuration,
+  focusScale,
+  focusTransform,
+  mapTrailToRenderIds,
+  trailColorAt
 } from '../lib/index.js';
 
 // Icon-node mode: below this on-screen node radius (px) icons are illegible, so
@@ -987,8 +994,8 @@ export function renderGraph(app, retry = 0) {
   let hoverNodeId = null;
   let selectedNodeId = app.graphSelectedNodeId;
   if (selectedNodeId && !renderById.has(selectedNodeId)) {
-    selectedNodeId = null;
-    app.graphSelectedNodeId = null;
+    selectedNodeId = renderKeyOf.get(selectedNodeId) || null;
+    app.graphSelectedNodeId = selectedNodeId;
   }
   let highlightedNodeId = hoverNodeId ?? selectedNodeId;
   let drawFrame = 0;
@@ -1000,6 +1007,27 @@ export function renderGraph(app, retry = 0) {
     d.x <= view.x1 + CULL_PAD &&
     d.y >= view.y0 - CULL_PAD &&
     d.y <= view.y1 + CULL_PAD;
+
+  // Element ids walked via the detail-panel relationships, folded onto the
+  // render nodes currently on screen (a collapsed cluster shares one id).
+  const trailRenderIds = () => mapTrailToRenderIds(app.graphNavTrail, renderKeyOf, renderById);
+
+  const trailKeepSet = () => {
+    const ids = trailRenderIds();
+    return ids.length ? new Set(ids) : null;
+  };
+
+  // Neighbours of the hovered/selected node, plus every trail hop so the walk
+  // stays readable while the rest of the graph fades.
+  const connectedForDraw = () => {
+    if (searchActive || !highlightedNodeId) return null;
+    const base = connectedIndex.get(highlightedNodeId) || new Set([highlightedNodeId]);
+    const keep = trailKeepSet();
+    if (!keep) return base;
+    const merged = new Set(base);
+    keep.forEach((id) => merged.add(id));
+    return merged;
+  };
 
   // headAlpha keeps arrowheads opaque while the shaft is dimmed; defaults to the shaft alpha.
   const drawLinkGroups = (groups, alpha, lineWidth, headAlpha = alpha) => {
@@ -1240,10 +1268,7 @@ export function renderGraph(app, retry = 0) {
   const drawNodesIcons = () => {
     const k = currentTransform.k;
     const minR = ICON_MIN_PX / k;
-    const connected =
-      !searchActive && highlightedNodeId
-        ? connectedIndex.get(highlightedNodeId) || new Set([highlightedNodeId])
-        : null;
+    const connected = connectedForDraw();
     renderNodes.forEach((d) => {
       if (d.x == null || !nodeInView(d)) return;
       const ss = nodeSearchStyle(d.id);
@@ -1291,10 +1316,7 @@ export function renderGraph(app, retry = 0) {
     }
     // Hover emphasis is suppressed while a search overlay is active so the
     // search visualization stays stable as the pointer moves.
-    const connected =
-      !searchActive && highlightedNodeId
-        ? connectedIndex.get(highlightedNodeId) || new Set([highlightedNodeId])
-        : null;
+    const connected = connectedForDraw();
     const k = currentTransform.k;
     renderNodes.forEach((d) => {
       if (d.x == null || !nodeInView(d)) return;
@@ -1346,7 +1368,7 @@ export function renderGraph(app, retry = 0) {
     return true;
   };
 
-  const drawLabel = (d, isMatch) => {
+  const drawLabel = (d, isMatch, color) => {
     const sx = currentTransform.applyX(d.x);
     const sy = currentTransform.applyY(d.y);
     if (sx < -60 || sx > width + 60 || sy < -20 || sy > height + 20) return false;
@@ -1356,27 +1378,29 @@ export function renderGraph(app, retry = 0) {
     const tw = ctx.measureText(text).width;
     // Reserve the label's box; bail if it would overlap a label already drawn.
     if (!reserveLabel(tx - 1, sy - 6, tx + tw + 1, sy + 6)) return false;
-    if (isMatch) {
-      // Subtle backdrop so match labels stay legible over the busy edge mesh.
+    if (isMatch || color) {
+      // Subtle backdrop so match/trail labels stay legible over the busy edge mesh.
       ctx.globalAlpha = 0.85;
       ctx.fillStyle = 'rgba(15,23,42,0.9)';
       ctx.fillRect(tx - 2, sy - 7, tw + 4, 14);
     }
-    ctx.globalAlpha = isMatch ? 1 : nodeSearchStyle(d.id).alpha;
-    ctx.fillStyle = isMatch ? '#fbbf24' : d.isCluster ? '#e2e8f0' : '#94a3b8';
+    ctx.globalAlpha = isMatch || color ? 1 : nodeSearchStyle(d.id).alpha;
+    ctx.fillStyle = color || (isMatch ? '#fbbf24' : d.isCluster ? '#e2e8f0' : '#94a3b8');
     ctx.fillText(text, tx, sy);
     return true;
   };
 
   const drawLabels = () => {
     const zoomedIn = currentTransform.k >= LABEL_ZOOM_THRESHOLD;
-    if (!searchActive && !zoomedIn) return;
+    const trailIds = trailRenderIds();
+    if (!searchActive && !zoomedIn && trailIds.length < 2) return;
     ctx.save();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // screen space → constant-size text
     ctx.font = '11px ui-sans-serif, system-ui, -apple-system, sans-serif';
     ctx.textBaseline = 'middle';
     labelCells = new Set(); // reset the occupancy grid each frame
     let drawn = 0;
+    const trailLabeled = new Set();
 
     // Search hits always get a label, even zoomed out, so they're findable.
     if (searchActive) {
@@ -1387,16 +1411,29 @@ export function renderGraph(app, retry = 0) {
       }
     }
 
+    // The walk's hops are labelled even zoomed out, in trail colours, so the
+    // start and "you are here" stay named while hopping from the sidebar.
+    if (trailIds.length >= 2) {
+      trailIds.forEach((id, i) => {
+        if (drawn >= MAX_LABELS) return;
+        const d = renderById.get(id);
+        if (!d || d.x == null) return;
+        if (searchActive && matchSet.has(id)) return;
+        if (drawLabel(d, false, trailColorAt(i, trailIds.length))) {
+          trailLabeled.add(id);
+          drawn++;
+        }
+      });
+    }
+
     // Remaining (non-match) labels only once zoomed in, respecting hover focus when not searching.
     if (zoomedIn) {
-      const connected =
-        !searchActive && highlightedNodeId
-          ? connectedIndex.get(highlightedNodeId) || new Set([highlightedNodeId])
-          : null;
+      const connected = connectedForDraw();
       for (const d of labelOrder) {
         if (drawn >= MAX_LABELS) break;
         if (d.x == null) continue;
         if (searchActive && matchSet.has(d.id)) continue; // already drawn above
+        if (trailLabeled.has(d.id)) continue;
         const ss = nodeSearchStyle(d.id);
         if (ss.hidden) continue;
         if (!searchActive && connected && !connected.has(d.id)) continue;
@@ -1552,6 +1589,63 @@ export function renderGraph(app, retry = 0) {
 
   buildHeat();
 
+  // Coloured breadcrumb for the nodes walked via the detail panel: a glowing
+  // polyline plus rings (cyan origin, pink current, violet in between).
+  const drawTrail = () => {
+    const ids = trailRenderIds();
+    if (ids.length < 2) return;
+    const k = currentTransform.k;
+    ctx.save();
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.setLineDash([]);
+
+    for (let i = 0; i < ids.length - 1; i++) {
+      const a = renderById.get(ids[i]);
+      const b = renderById.get(ids[i + 1]);
+      if (!a || !b || a.x == null || b.x == null) continue;
+      if (!nodeInView(a) && !nodeInView(b)) continue;
+      const color = trailColorAt(i, ids.length);
+      ctx.strokeStyle = color;
+      ctx.globalAlpha = 0.28;
+      ctx.lineWidth = 8 / k;
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+      ctx.globalAlpha = 0.95;
+      ctx.lineWidth = 2.4 / k;
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+    }
+
+    ids.forEach((id, i) => {
+      const d = renderById.get(id);
+      if (!d || d.x == null || !nodeInView(d)) return;
+      const color = trailColorAt(i, ids.length);
+      const isCurrent = i === ids.length - 1;
+      const isStart = i === 0;
+      const r = radiusFor(d);
+      ctx.strokeStyle = color;
+      ctx.globalAlpha = 1;
+      ctx.lineWidth = (isCurrent ? 3.2 : 2.2) / k;
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, r + (isCurrent ? 6 : 4) / k, 0, 2 * Math.PI);
+      ctx.stroke();
+      if (isStart) {
+        ctx.lineWidth = 1.4 / k;
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, r + 9 / k, 0, 2 * Math.PI);
+        ctx.stroke();
+      }
+    });
+
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  };
+
   const drawCanvas = () => {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, width, height);
@@ -1593,6 +1687,7 @@ export function renderGraph(app, retry = 0) {
     }
     drawNodes();
     drawHeatMarkers(); // crisp rings on top so each hot element stays pinpointable
+    drawTrail();
 
     ctx.restore();
     ctx.globalAlpha = 1;
@@ -1715,6 +1810,8 @@ export function renderGraph(app, retry = 0) {
   };
 
   const nodeSearchStyle = (id) => {
+    const keep = trailKeepSet();
+    if (id === selectedNodeId || (keep && keep.has(id))) return SS_VISIBLE;
     if (!searchActive || matchSet.has(id)) return SS_VISIBLE;
     if (searchFocusMode) return neighborSet.has(id) ? SS_NEIGHBOR : SS_HIDDEN;
     return SS_DIM;
@@ -2003,18 +2100,23 @@ export function renderGraph(app, retry = 0) {
   });
 
   // Click selects and pins hover-style focus (suppressed by d3.drag after a real drag).
+  // A canvas click starts a fresh walk; hopping from the detail panel appends to it.
   canvas.addEventListener('click', (event) => {
     const found = pointerNode(event);
     if (!found) {
       selectedNodeId = null;
       app.graphSelectedNodeId = null;
+      app.graphNavTrail = [];
       syncHighlight();
+      queueDraw();
       app._scheduleNavPush();
       return;
     }
     selectedNodeId = found.id;
     app.graphSelectedNodeId = found.id;
+    app.graphNavTrail = [found.data?.spdxId || found.id];
     syncHighlight();
+    queueDraw();
     if (found.isCluster) {
       app.detailElement = found.data && !found.data.placeholder ? found.data : null;
     } else {
@@ -2067,6 +2169,7 @@ export function renderGraph(app, retry = 0) {
     // ballooning to fill the canvas.
     const k = Math.max(minK, Math.min(maxK, 1, 0.9 * Math.min(width / bw, height / bh)));
     const t = d3.zoomIdentity.translate(width / 2 - k * cx, height / 2 - k * cy).scale(k);
+    app.graphCanvasSel.interrupt();
     const target = duration
       ? app.graphCanvasSel.transition().duration(duration)
       : app.graphCanvasSel;
@@ -2087,6 +2190,37 @@ export function renderGraph(app, retry = 0) {
     selectedNodeId = renderById.has(id) ? id : null;
     app.graphSelectedNodeId = selectedNodeId;
     syncHighlight();
+    queueDraw();
+  };
+
+  // Pin a node (by element id or render id) and ease the camera onto it so a
+  // relationship click in the detail panel actually moves the graph.
+  app.graphFocusNode = (spdxId) => {
+    const rid = renderKeyOf.get(spdxId) || (renderById.has(spdxId) ? spdxId : null);
+    selectedNodeId = rid;
+    app.graphSelectedNodeId = rid;
+    syncHighlight();
+    queueDraw();
+    const node = rid ? renderById.get(rid) : null;
+    if (!node || node.x == null || !app.graphCanvasSel || !app.graphZoom) return;
+    app.graphAutoFit = false;
+    const [minK, maxK] = app.graphZoom.scaleExtent();
+    const k = focusScale({
+      currentK: currentTransform.k,
+      nodeR: radiusFor(node),
+      minK,
+      maxK
+    });
+    const to = focusTransform({ width, height, x: node.x, y: node.y, k });
+    const from = { x: currentTransform.x, y: currentTransform.y, k: currentTransform.k };
+    if (!focusNeedsMove(from, to)) return;
+    const t = d3.zoomIdentity.translate(to.x, to.y).scale(to.k);
+    const duration = reducedMotion() ? 0 : focusPanDuration(from, to);
+    app.graphCanvasSel.interrupt();
+    const target = duration
+      ? app.graphCanvasSel.transition().duration(duration).ease(easeInOutQuart)
+      : app.graphCanvasSel;
+    target.call(app.graphZoom.transform, t);
   };
 
   app.graphSim = sim;
