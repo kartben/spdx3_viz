@@ -1084,9 +1084,10 @@ body.detail-resizing {
   width: 2px;
   margin-left: -1px;
   /* Dot center is 9px (4px top + 5px radius). Rail is both rows; -9px
-     meets the next step's dot instead of dying at this hop. */
+     meets the next step's dot, so this box IS the interval. */
   top: 9px;
   bottom: -9px;
+  overflow: visible;
   background: color-mix(in srgb, var(--trail-color) 72%, #64748b);
 }
 
@@ -1117,16 +1118,28 @@ body.detail-resizing {
   background: color-mix(in srgb, var(--trail-color) 14%, transparent);
 }
 
-.graph-trail-hop-via {
+/* Holds the name-to-name gap. The verb itself is centered on the line. */
+.graph-trail-hop-gap {
   grid-column: 2;
   grid-row: 2;
-  display: flex;
-  align-items: center;
-  min-height: 28px;
-  padding: 0 6px;
+  height: 32px;
+}
+
+.graph-trail-hop-via {
+  position: absolute;
+  z-index: 1;
+  /* Align with hop name text: 16px rail + 10px column gap + 6px pad. */
+  left: 32px;
+  /* Line runs from 9px (this dot) to 100% + 9px (next dot). Midpoint is
+     50% of the rail plus that 9px offset. */
+  top: calc(50% + 9px);
+  transform: translateY(-50%);
+  white-space: nowrap;
+  pointer-events: none;
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.03em;
+  line-height: 1;
   text-transform: uppercase;
   color: #94a3b8;
 }

@@ -95,9 +95,15 @@
                   :class="graphPreviewNodeId === hop.id && 'graph-trail-hop-preview'"
                   :style="`--trail-color:${hop.color}`"
                 >
-                  <span class="graph-trail-hop-rail" aria-hidden="true">
-                    <span class="graph-trail-hop-dot"></span>
-                    <span class="graph-trail-hop-line" x-show="!hop.last"></span>
+                  <span class="graph-trail-hop-rail">
+                    <span class="graph-trail-hop-dot" aria-hidden="true"></span>
+                    <span class="graph-trail-hop-line" x-show="!hop.last" aria-hidden="true"></span>
+                    <span
+                      class="graph-trail-hop-via"
+                      x-show="hop.nextViaLabel"
+                      x-text="hop.nextViaLabel"
+                      :style="hop.nextViaColor && `color:${hop.nextViaColor}`"
+                    ></span>
                   </span>
                   <button
                     type="button"
@@ -112,13 +118,11 @@
                     ></span>
                     <span class="truncate" x-text="hop.name" :title="hop.name"></span>
                   </button>
-                  <template x-if="hop.nextViaLabel">
-                    <span
-                      class="graph-trail-hop-via"
-                      x-text="hop.nextViaLabel"
-                      :style="hop.nextViaColor && `color:${hop.nextViaColor}`"
-                    ></span>
-                  </template>
+                  <span
+                    class="graph-trail-hop-gap"
+                    x-show="hop.nextViaLabel"
+                    aria-hidden="true"
+                  ></span>
                 </div>
               </template>
             </div>
