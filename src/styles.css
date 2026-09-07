@@ -1038,37 +1038,40 @@ body.detail-resizing {
   flex-direction: column;
   max-height: 16rem;
   overflow-y: auto;
-  /* 8px fill + 2px ring. Keep the whole circle inside the scrollport
-     (overflow-y: auto also clips the x axis). */
-  padding: 12px 12px 14px 16px;
+  /* 10px fill + 2px ring. overflow-y: auto also clips the x axis, so pad
+     enough that the whole circle stays inside the scrollport. */
+  padding: 14px 14px 16px 18px;
 }
 
-/* Rail is a grid column that spans the name and the relation label, so the
-   connector is one stroke through the via, not a segment that dies at the
-   hop button. The rail is not a <button> child: those often will not stretch. */
+/* Two explicit rows (name + via). grid-row 1 / -1 only covers explicit
+   tracks, so the rail would otherwise stop at the name and leave a gap
+   through the relation label. */
 .graph-trail-step {
   display: grid;
-  grid-template-columns: 12px minmax(0, 1fr);
+  grid-template-columns: 16px minmax(0, 1fr);
+  grid-template-rows: auto auto;
   column-gap: 10px;
   align-items: stretch;
+  overflow: visible;
 }
 
 .graph-trail-hop-rail {
   grid-column: 1;
-  grid-row: 1 / -1;
+  grid-row: 1 / span 2;
   position: relative;
+  width: 16px;
   overflow: visible;
 }
 
 .graph-trail-hop-dot {
   position: absolute;
   z-index: 1;
-  /* 2px hop pad + (14px icon - 8px dot) / 2 */
-  top: 5px;
+  /* 2px hop pad + (14px icon - 10px dot) / 2 */
+  top: 4px;
   left: 50%;
-  width: 8px;
-  height: 8px;
-  margin-left: -4px;
+  width: 10px;
+  height: 10px;
+  margin-left: -5px;
   border-radius: 50%;
   background: var(--trail-color);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--trail-color) 32%, transparent);
@@ -1080,8 +1083,8 @@ body.detail-resizing {
   left: 50%;
   width: 2px;
   margin-left: -1px;
-  /* Dot center is 9px (5px top + 4px radius). Extend the same distance into
-     the next step so the stroke meets that dot instead of stopping short. */
+  /* Dot center is 9px (4px top + 5px radius). Rail is both rows; -9px
+     meets the next step's dot instead of dying at this hop. */
   top: 9px;
   bottom: -9px;
   background: color-mix(in srgb, var(--trail-color) 72%, #64748b);
