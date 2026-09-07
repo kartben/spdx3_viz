@@ -5,7 +5,8 @@
  * Pure (no DOM, no d3) so the hop rules and the pan timing stay testable.
  * The canvas renderer maps trail ids onto render nodes and interpolates the
  * zoom transform; this module only decides *what* the trail is and *how*
- * the camera should move.
+ * the camera should move. Also the click-vs-drag threshold so a node press
+ * does not reheat the force layout.
  *
  * @module lib/graph-nav
  */
@@ -170,4 +171,21 @@ export function focusNeedsMove(from, to, epsilon = 6) {
   const pan = Math.hypot((to.x ?? 0) - (from.x ?? 0), (to.y ?? 0) - (from.y ?? 0));
   const zoomDelta = Math.abs((to.k || 1) - (from.k || 1));
   return pan > epsilon || zoomDelta > 0.02;
+}
+
+/** Screen pixels the pointer must move before a node press counts as a drag. */
+export const NODE_CLICK_PX = 6;
+
+/**
+ * True when a pointer movement is large enough to treat as dragging a node
+ * rather than a click. d3-drag otherwise reheats the layout on mousedown and
+ * swallows the subsequent click.
+ *
+ * @param {number} dx
+ * @param {number} dy
+ * @param {number} [thresholdPx]
+ * @returns {boolean}
+ */
+export function isDragGesture(dx, dy, thresholdPx = NODE_CLICK_PX) {
+  return dx * dx + dy * dy >= thresholdPx * thresholdPx;
 }

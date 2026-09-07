@@ -5,12 +5,14 @@ import { graphMixin } from '../src/app/graph.js';
 import {
   TRAIL_CURRENT,
   TRAIL_START,
+  NODE_CLICK_PX,
   advanceNavTrail,
   easeInOutQuart,
   focusNeedsMove,
   focusPanDuration,
   focusScale,
   focusTransform,
+  isDragGesture,
   mapTrailToRenderIds,
   trailColorAt
 } from '../src/lib/index.js';
@@ -90,6 +92,13 @@ test('focusPanDuration grows with distance and stays clamped', () => {
   assert.ok(long <= 980);
   assert.equal(focusNeedsMove({ x: 0, y: 0, k: 1 }, { x: 1, y: 0, k: 1 }), false);
   assert.equal(focusNeedsMove({ x: 0, y: 0, k: 1 }, { x: 40, y: 0, k: 1 }), true);
+});
+
+test('isDragGesture ignores click jitter and trips after a real move', () => {
+  assert.equal(isDragGesture(0, 0), false);
+  assert.equal(isDragGesture(3, 3), false);
+  assert.equal(isDragGesture(NODE_CLICK_PX, 0), true);
+  assert.equal(isDragGesture(5, 5), true);
 });
 
 test('selectGraphNode on the graph pins, trails, and asks the camera to follow', () => {
