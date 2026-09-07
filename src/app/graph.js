@@ -12,10 +12,11 @@ import { nextPaint } from './paint.js';
 
 function trailTypeLabel(type) {
   if (!type) return 'Element';
-  return String(type).replace(
+  const short = String(type).replace(
     /^(software_|build_|simplelicensing_|security_|ai_|dataset_|hardware_|functionalsafety_|supplychain_)/,
     ''
   );
+  return short.replace(/([a-z])([A-Z])/g, '$1 $2');
 }
 
 /* Force graph: thin bridge between the Alpine component and the D3 renderer in
