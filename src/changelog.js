@@ -11,7 +11,7 @@ export const CHANGELOG = [
     items: [
       {
         tag: 'Added',
-        text: 'Graph pans to related nodes with a colored trail.'
+        text: 'Hover previews related nodes; click pans with a trail.'
       },
       {
         tag: 'Added',

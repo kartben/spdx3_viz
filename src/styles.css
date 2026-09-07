@@ -846,6 +846,10 @@ html {
   background: color-mix(in srgb, var(--trail-color) 12%, transparent);
 }
 
+.detail-rel-item-preview {
+  background: color-mix(in srgb, #f472b6 16%, transparent);
+}
+
 .detail-rel-arrow {
   font-size: 0.7rem;
   flex-shrink: 0;

@@ -165,3 +165,33 @@ test('selectGraphNode off the graph only updates the detail panel', () => {
   assert.deepEqual(app.graphNavTrail, []);
   assert.deepEqual(focused, []);
 });
+
+test('previewGraphNode on the graph asks the renderer to hover the target', () => {
+  const hovered = [];
+  const app = {
+    currentView: 'graph',
+    graphPreviewNodeId: null,
+    graphHoverNode(id) {
+      hovered.push(id);
+    }
+  };
+  graphMixin.previewGraphNode.call(app, 'b');
+  assert.equal(app.graphPreviewNodeId, 'b');
+  graphMixin.clearGraphPreview.call(app);
+  assert.equal(app.graphPreviewNodeId, null);
+  assert.deepEqual(hovered, ['b', null]);
+});
+
+test('previewGraphNode off the graph is a no-op', () => {
+  const hovered = [];
+  const app = {
+    currentView: 'packages',
+    graphPreviewNodeId: null,
+    graphHoverNode(id) {
+      hovered.push(id);
+    }
+  };
+  graphMixin.previewGraphNode.call(app, 'b');
+  assert.equal(app.graphPreviewNodeId, null);
+  assert.deepEqual(hovered, []);
+});

@@ -5,7 +5,7 @@ via the "What's new" link.
 
 ## Unreleased
 
-- **Added:** Graph pans to related nodes with a colored trail.
+- **Added:** Hover previews related nodes; click pans with a trail.
 - **Added:** Functional Safety coverage matrices, exportable to Excel.
 - **Fixed:** `hasTestCase` relationships now show on the graph (e.g. BASIL SBOMs).
 - **Fixed:** Graph keeps snippet hubs as nodes (BASIL), still folds Zephyr leaves into files.
