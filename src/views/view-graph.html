@@ -90,35 +90,35 @@
           <div class="graph-trail-card" role="tooltip">
             <div class="graph-trail-card-hops">
               <template x-for="hop in graphTrailRecap.hops" :key="hop.id">
-                <button
-                  type="button"
-                  class="graph-trail-hop"
+                <div
+                  class="graph-trail-step"
                   :class="graphPreviewNodeId === hop.id && 'graph-trail-hop-preview'"
                   :style="`--trail-color:${hop.color}`"
-                  @click="selectGraphNode(hop.id)"
-                  @mouseenter="previewGraphNode(hop.id)"
                 >
                   <span class="graph-trail-hop-rail" aria-hidden="true">
                     <span class="graph-trail-hop-dot"></span>
                     <span class="graph-trail-hop-line" x-show="!hop.last"></span>
                   </span>
-                  <span class="graph-trail-hop-body">
-                    <span class="graph-trail-hop-name">
-                      <span
-                        class="flex items-center shrink-0"
-                        :style="`color:${nodeTypeColor(getNodeType(hop.el))}`"
-                        x-html="elementIcon(hop.el, 'w-3.5 h-3.5')"
-                      ></span>
-                      <span class="truncate" x-text="hop.name" :title="hop.name"></span>
-                    </span>
+                  <button
+                    type="button"
+                    class="graph-trail-hop"
+                    @click="selectGraphNode(hop.id)"
+                    @mouseenter="previewGraphNode(hop.id)"
+                  >
                     <span
-                      class="graph-trail-hop-via"
-                      x-show="hop.nextViaLabel"
-                      x-text="hop.nextViaLabel"
-                      :style="hop.nextViaColor && `color:${hop.nextViaColor}`"
+                      class="flex items-center shrink-0"
+                      :style="`color:${nodeTypeColor(getNodeType(hop.el))}`"
+                      x-html="elementIcon(hop.el, 'w-3.5 h-3.5')"
                     ></span>
-                  </span>
-                </button>
+                    <span class="truncate" x-text="hop.name" :title="hop.name"></span>
+                  </button>
+                  <span
+                    class="graph-trail-hop-via"
+                    x-show="hop.nextViaLabel"
+                    x-text="hop.nextViaLabel"
+                    :style="hop.nextViaColor && `color:${hop.nextViaColor}`"
+                  ></span>
+                </div>
               </template>
             </div>
           </div>
