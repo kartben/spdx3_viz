@@ -171,6 +171,6 @@
     "description": "Minimalistic paper plane supply chain sample showing design, folding, flight testing, and a Core Action flight log. (Other complex samples are commented out in the manifest.)",
     "dir": "samples/paper-plane",
     "files": ["paper-plane-supply-chain.spdx3.jsonld"],
-    "size": 56482
+    "size": 56479
   }
 ]

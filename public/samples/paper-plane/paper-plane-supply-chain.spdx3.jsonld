@@ -694,7 +694,7 @@
         }
       ],
       "summary": "Core Action recorded just after certification: Charlie writes the measured glide into the flight book.",
-      "description": "SPDX Core Action describes an event that has occurred. This entry keeps the measured distance and wind as additionalInformation, names Charlie in originatedBy, and shares the timeline with the supply-chain actions around the flight test."
+      "description": "SPDX Core Action is a Core-profile event, separate from the SupplyChain classes. This entry keeps the measured distance and wind as additionalInformation and names Charlie in originatedBy. It shows on the graph as its own Action node."
     },
     {
       "type": "supplychain_ResponsibilityChangeAction",

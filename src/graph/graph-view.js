@@ -332,6 +332,7 @@ export function renderGraph(app, retry = 0) {
   });
   (app.hardware || []).forEach((h) => addNode(h.spdxId));
   (app.supplyChain || []).forEach((s) => addNode(s.spdxId));
+  (app.actions || []).forEach((a) => addNode(a.spdxId));
   (app.requirements || []).forEach((r) => addNode(r.spdxId));
   app.tools.forEach((t) => addNode(t.spdxId));
   app.buildConfigs.forEach((c) => addNode(c.spdxId));

@@ -134,7 +134,7 @@ test('parseGraph categorizes SPDX 3.1 SupplyChain actions, processes, and states
   );
 });
 
-test('Core Action elements join the supply chain timeline', () => {
+test('Core Action elements are their own graph nodes, outside supply chain', () => {
   const graph = JSON.parse(
     readFileSync('public/samples/paper-plane/paper-plane-supply-chain.spdx3.jsonld', 'utf8')
   )['@graph'];
@@ -143,27 +143,21 @@ test('Core Action elements join the supply chain timeline', () => {
   const app = spdxApp();
   Object.assign(app, parsed, indexes);
 
-  const log = parsed.supplyChain.find((el) => el.type === 'Action');
+  const log = parsed.actions.find((el) => el.type === 'Action');
   assert.equal(log?.name, 'Log the certified glide in the studio flight book');
-  assert.equal(app.getNodeType(log), 'supplychain');
-  assert.equal(app.supplyChainKind(log), 'action');
-  assert.equal(app.supplyChainFamily(log), 'core');
+  assert.equal(
+    parsed.supplyChain.some((el) => el.spdxId === log.spdxId),
+    false
+  );
+  assert.equal(app.getNodeType(log), 'action');
+  assert.equal(parsed.presentNodeTypes.includes('action'), true);
   assert.equal(
     app.supplyChainEvents.some((el) => el.spdxId === log.spdxId),
-    true
+    false
   );
-  assert.deepEqual(
-    app.supplyChainActionLanes.find((lane) => lane.key === 'core')?.items.map((el) => el.spdxId),
-    [log.spdxId]
-  );
-  assert.equal(
-    app.supplyChainEventFamilies.some((family) => family.key === 'core' && family.n === 1),
-    true
-  );
+  assert.equal(app.searchCorpus.find((entry) => entry.id === log.spdxId)?.nodeType, 'action');
 
-  const facts = Object.fromEntries(
-    app.supplyChainSpecRows(log).map((row) => [row.label, row.value])
-  );
+  const facts = Object.fromEntries(app.actionDetailRows(log).map((row) => [row.label, row.value]));
   assert.match(facts.Time, /2026/);
   assert.match(facts.Location, /Berlin/);
   assert.match(facts['Originated by'], /Charlie/);

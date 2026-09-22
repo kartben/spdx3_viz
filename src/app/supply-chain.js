@@ -212,9 +212,6 @@ export const supplyChainMixin = {
     ) {
       return 'operate';
     }
-    // Exactly the Core Action class. Its SupplyChain subclasses already matched
-    // a family above, so this is the unspecialized event.
-    if (t === CLASS.Action) return 'core';
     if (this.supplyChainKind(el) === 'process') return 'process';
     if (this.supplyChainKind(el) === 'state') return 'state';
     return 'other';
@@ -318,18 +315,6 @@ export const supplyChainMixin = {
         panel: 'bg-slate-900/70 border-slate-700/60',
         chip: 'bg-slate-700/70 text-slate-200 ring-1 ring-slate-600/40'
       },
-      core: {
-        label: 'Core action',
-        dot: 'bg-slate-400',
-        iconBg: 'bg-slate-500/15',
-        text: 'text-slate-300',
-        border: 'border-slate-500/35',
-        ring: 'ring-slate-500/20',
-        surface: 'bg-slate-500/6',
-        hover: 'hover:bg-slate-500/10',
-        panel: 'bg-slate-900/70 border-slate-700/60',
-        chip: 'bg-slate-700/80 text-slate-200 ring-1 ring-slate-600/40'
-      },
       other: {
         label: 'Supply chain',
         dot: 'bg-slate-400',
@@ -356,7 +341,6 @@ export const supplyChainMixin = {
         exception: 'Exception',
         operate: 'Use / retire',
         process: 'Defined process',
-        core: 'Core action',
         other: 'Other'
       }[key] || 'Other'
     );
@@ -942,7 +926,7 @@ export const supplyChainMixin = {
   // its count. Drives the timeline's filter chips (replacing the old
   // action/state/process kind chips, which mixed three different concepts).
   get supplyChainEventFamilies() {
-    const order = ['create', 'modify', 'move', 'verify', 'exception', 'operate', 'core', 'other'];
+    const order = ['create', 'modify', 'move', 'verify', 'exception', 'operate', 'other'];
     const counts = {};
     this.supplyChainEvents.forEach((el) => {
       const family = this.supplyChainFamily(el);
@@ -1179,12 +1163,6 @@ export const supplyChainMixin = {
             isA(el.type, CLASS.supplychain_PlanAction) ||
             isA(el.type, CLASS.supplychain_DestroyAction)
         )
-      },
-      {
-        key: 'core',
-        label: 'Core action',
-        color: '#94a3b8',
-        items: this.supplyChainActions.filter((el) => el.type === CLASS.Action)
       }
     ];
     return lanes.filter((lane) => lane.items.length);

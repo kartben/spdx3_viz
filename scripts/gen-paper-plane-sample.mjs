@@ -567,7 +567,7 @@ const actionFlightLog = element('Action', 'action/022-flight-log', {
   summary:
     'Core Action recorded just after certification: Charlie writes the measured glide into the flight book.',
   description:
-    'SPDX Core Action describes an event that has occurred. This entry keeps the measured distance and wind as additionalInformation, names Charlie in originatedBy, and shares the timeline with the supply-chain actions around the flight test.'
+    'SPDX Core Action is a Core-profile event, separate from the SupplyChain classes. This entry keeps the measured distance and wind as additionalInformation and names Charlie in originatedBy. It shows on the graph as its own Action node.'
 });
 
 const actionStateArchived = element('supplychain_StateAction', 'action/021-state-archived', {
