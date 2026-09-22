@@ -102,7 +102,7 @@ const doc = {
   profileConformance: ['core', 'dataset', 'hardware', 'simpleLicensing', 'supplyChain'],
   rootElement: [id('hardware/paper-airplane')],
   summary:
-    'A friendly end-to-end origami supply chain: plan, design, fold, inspect, quarantine, re-fold, flight-test, log the glide as a Core Action, demonstrate, and archive a single paper airplane.'
+    'A friendly end-to-end origami supply chain: plan, design, fold, inspect, quarantine, re-fold, flight-test, log the glide, demonstrate, and archive a single paper airplane.'
 };
 
 const creationInfo = {
@@ -564,10 +564,7 @@ const actionFlightLog = element('Action', 'action/022-flight-log', {
     { type: 'DictionaryEntry', key: 'glide.distance.m', value: '6.2' },
     { type: 'DictionaryEntry', key: 'wind', value: 'light crosswind' }
   ],
-  summary:
-    'Core Action recorded just after certification: Charlie writes the measured glide into the flight book.',
-  description:
-    'SPDX Core Action is a Core-profile event, separate from the SupplyChain classes. This entry keeps the measured distance and wind as additionalInformation and names Charlie in originatedBy. It shows on the graph as its own Action node.'
+  summary: 'Charlie writes the measured glide into the studio flight book just after certification.'
 });
 
 const actionStateArchived = element('supplychain_StateAction', 'action/021-state-archived', {
