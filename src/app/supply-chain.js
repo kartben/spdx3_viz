@@ -212,6 +212,9 @@ export const supplyChainMixin = {
     ) {
       return 'operate';
     }
+    // Exactly the Core Action class. Its SupplyChain subclasses already matched
+    // a family above, so this is the unspecialized event.
+    if (t === CLASS.Action) return 'core';
     if (this.supplyChainKind(el) === 'process') return 'process';
     if (this.supplyChainKind(el) === 'state') return 'state';
     return 'other';
@@ -315,6 +318,18 @@ export const supplyChainMixin = {
         panel: 'bg-slate-900/70 border-slate-700/60',
         chip: 'bg-slate-700/70 text-slate-200 ring-1 ring-slate-600/40'
       },
+      core: {
+        label: 'Core action',
+        dot: 'bg-slate-400',
+        iconBg: 'bg-slate-500/15',
+        text: 'text-slate-300',
+        border: 'border-slate-500/35',
+        ring: 'ring-slate-500/20',
+        surface: 'bg-slate-500/6',
+        hover: 'hover:bg-slate-500/10',
+        panel: 'bg-slate-900/70 border-slate-700/60',
+        chip: 'bg-slate-700/80 text-slate-200 ring-1 ring-slate-600/40'
+      },
       other: {
         label: 'Supply chain',
         dot: 'bg-slate-400',
@@ -341,6 +356,7 @@ export const supplyChainMixin = {
         exception: 'Exception',
         operate: 'Use / retire',
         process: 'Defined process',
+        core: 'Core action',
         other: 'Other'
       }[key] || 'Other'
     );
@@ -649,19 +665,27 @@ export const supplyChainMixin = {
     return id ? this.relTargetDisplayName(id) : '';
   },
 
-  // BoundaryDefinitionAction.boundaryParameter is a set of DictionaryEntry
-  // values ("key=value"). Older data may instead carry a single element
-  // reference, so fall back to a ref-name lookup for a plain string.
-  supplyChainBoundaryParamLabel(el) {
-    const bp = el?.supplychain_boundaryParameter;
-    if (!bp) return '';
-    const entries = Array.isArray(bp) ? bp : [bp];
+  // One element reference or a list of them (actionLocation, originatedBy).
+  supplyChainRefNames(ref) {
+    if (!ref) return '';
+    const ids = Array.isArray(ref) ? ref : [ref];
+    return ids
+      .map((id) => (typeof id === 'string' ? this.supplyChainRefName(id) : ''))
+      .filter(Boolean)
+      .join(', ');
+  },
+
+  // DictionaryEntry values ("key=value"). A plain string falls back to a
+  // reference name, which is how older boundary parameters were written.
+  supplyChainDictionaryLabel(value) {
+    if (!value) return '';
+    const entries = Array.isArray(value) ? value : [value];
     return entries
       .map((entry) => {
         if (entry && typeof entry === 'object') {
           const key = entry.key ?? '';
-          const value = entry.value ?? '';
-          return key ? `${key}=${value}` : String(value);
+          const entryValue = entry.value ?? '';
+          return key ? `${key}=${entryValue}` : String(entryValue);
         }
         return this.supplyChainRefName(entry);
       })
@@ -669,12 +693,17 @@ export const supplyChainMixin = {
       .join(' · ');
   },
 
+  // BoundaryDefinitionAction.boundaryParameter is a set of DictionaryEntry values.
+  supplyChainBoundaryParamLabel(el) {
+    return this.supplyChainDictionaryLabel(el?.supplychain_boundaryParameter);
+  },
+
   supplyChainRoute(el) {
     if (!el) return '';
     const from = this.supplyChainRefName(el.supplychain_pickupLocation);
     const to = this.supplyChainRefName(el.supplychain_dropoffLocation);
     if (from && to) return `${from} → ${to}`;
-    return from || to || this.supplyChainRefName(el.actionLocation);
+    return from || to || this.supplyChainRefNames(el.actionLocation);
   },
 
   supplyChainStateName(el) {
@@ -727,7 +756,9 @@ export const supplyChainMixin = {
       if (this.isMeaningful(value)) rows.push({ label, value, mono });
     };
     push('Time', this.supplyChainTimeRange(el));
-    push('Location', this.supplyChainRefName(el?.actionLocation));
+    push('Location', this.supplyChainRefNames(el?.actionLocation));
+    push('Originated by', this.supplyChainRefNames(el?.originatedBy));
+    push('Additional information', this.supplyChainDictionaryLabel(el?.additionalInformation));
     push('Route', el?.supplychain_transportRoute);
     push('Pickup', this.supplyChainRefName(el?.supplychain_pickupLocation));
     push('Dropoff', this.supplyChainRefName(el?.supplychain_dropoffLocation));
@@ -911,7 +942,7 @@ export const supplyChainMixin = {
   // its count. Drives the timeline's filter chips (replacing the old
   // action/state/process kind chips, which mixed three different concepts).
   get supplyChainEventFamilies() {
-    const order = ['create', 'modify', 'move', 'verify', 'exception', 'operate', 'other'];
+    const order = ['create', 'modify', 'move', 'verify', 'exception', 'operate', 'core', 'other'];
     const counts = {};
     this.supplyChainEvents.forEach((el) => {
       const family = this.supplyChainFamily(el);
@@ -1148,6 +1179,12 @@ export const supplyChainMixin = {
             isA(el.type, CLASS.supplychain_PlanAction) ||
             isA(el.type, CLASS.supplychain_DestroyAction)
         )
+      },
+      {
+        key: 'core',
+        label: 'Core action',
+        color: '#94a3b8',
+        items: this.supplyChainActions.filter((el) => el.type === CLASS.Action)
       }
     ];
     return lanes.filter((lane) => lane.items.length);

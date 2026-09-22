@@ -102,7 +102,7 @@ const doc = {
   profileConformance: ['core', 'dataset', 'hardware', 'simpleLicensing', 'supplyChain'],
   rootElement: [id('hardware/paper-airplane')],
   summary:
-    'A friendly end-to-end origami supply chain: plan, design, fold, inspect, quarantine, re-fold, flight-test, demonstrate, and archive a single paper airplane.'
+    'A friendly end-to-end origami supply chain: plan, design, fold, inspect, quarantine, re-fold, flight-test, log the glide as a Core Action, demonstrate, and archive a single paper airplane.'
 };
 
 const creationInfo = {
@@ -551,6 +551,25 @@ const actionArchive = element('supplychain_StorageAction', 'action/020-archive',
   summary: 'Places the glider under climate-controlled glass with its full provenance record.'
 });
 
+// A Core Action: an event with no SupplyChain subclass. It uses only the Core
+// properties (startTime, endTime, actionLocation, originatedBy, additionalInformation)
+// and still belongs on the same timeline as the profile actions around it.
+const actionFlightLog = element('Action', 'action/022-flight-log', {
+  name: 'Log the certified glide in the studio flight book',
+  startTime: '2026-07-05T15:10:00Z',
+  endTime: '2026-07-05T15:25:00Z',
+  actionLocation: locFlightZone.spdxId,
+  originatedBy: [charlie.spdxId],
+  additionalInformation: [
+    { type: 'DictionaryEntry', key: 'glide.distance.m', value: '6.2' },
+    { type: 'DictionaryEntry', key: 'wind', value: 'light crosswind' }
+  ],
+  summary:
+    'Core Action recorded just after certification: Charlie writes the measured glide into the flight book.',
+  description:
+    'SPDX Core Action describes an event that has occurred. This entry keeps the measured distance and wind as additionalInformation, names Charlie in originatedBy, and shares the timeline with the supply-chain actions around the flight test.'
+});
+
 const actionStateArchived = element('supplychain_StateAction', 'action/021-state-archived', {
   name: 'Mark glider archived',
   startTime: '2026-07-07T09:35:00Z',
@@ -639,6 +658,12 @@ linkAction(actionTest.spdxId, [
   ['conformsTo', testProcess.spdxId]
 ]);
 
+linkAction(actionFlightLog.spdxId, [
+  ['performedBy', charlie.spdxId],
+  ['hasInput', paperAirplane.spdxId],
+  ['hasEvidence', flightTelemetry.spdxId]
+]);
+
 linkAction(actionDemo.spdxId, [
   ['performedBy', [charlie.spdxId, studio.spdxId]],
   ['hasInput', paperAirplane.spdxId],
@@ -701,6 +726,7 @@ graph.push(
   actionHandoffPlane,
   actionTest,
   actionStateTested,
+  actionFlightLog,
   actionHandoffMuseum,
   actionDemo,
   actionStateInService,
@@ -772,6 +798,20 @@ function validateGraph() {
     errors.push('SpdxDocument profileConformance does not include supplyChain');
   }
 
+  const coreActions = graph.filter((item) => item.type === 'Action');
+  if (coreActions.length !== 1) {
+    errors.push(`expected one Core Action, found ${coreActions.length}`);
+  } else {
+    const log = coreActions[0];
+    if (!log.originatedBy?.length) errors.push('Core Action is missing originatedBy');
+    if (!log.additionalInformation?.length) {
+      errors.push('Core Action is missing additionalInformation');
+    }
+    if (!log.startTime || !log.endTime || !log.actionLocation) {
+      errors.push('Core Action is missing startTime, endTime, or actionLocation');
+    }
+  }
+
   if (errors.length) {
     throw new Error(
       `Paper plane supply-chain validation failed:\n${errors.map((e) => `- ${e}`).join('\n')}`
@@ -791,7 +831,9 @@ await writeFile(OUTPUT, `${JSON.stringify(output, null, 2)}\n`);
 
 console.log(`Wrote ${OUTPUT}`);
 console.log(
-  `Elements: ${graph.length}; actions: ${actionsListCount()}; relationships: ${relationships.length}`
+  `Elements: ${graph.length}; supply-chain actions: ${actionsListCount()}; core actions: ${
+    graph.filter((item) => item.type === 'Action').length
+  }; relationships: ${relationships.length}`
 );
 
 function actionsListCount() {

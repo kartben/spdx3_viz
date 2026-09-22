@@ -5,6 +5,7 @@ via the "What's new" link.
 
 ## Unreleased
 
+- **Added:** Core Actions show on the supply chain timeline.
 - **Added:** Hover previews related nodes; trail recap; click pans to fit.
 - **Fixed:** Clicking a graph node selects it without shoving the layout.
 - **Added:** Functional Safety coverage matrices, exportable to Excel.

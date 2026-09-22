@@ -111,16 +111,12 @@ const BUCKET_RULES = [
   // Non-VEX vuln assessments (CVSS, EPSS, …) aren't surfaced; catch the base so
   // they don't fall into the generic Relationship bucket.
   [CLASS.security_VulnAssessmentRelationship, BUCKET.VULN_ASSESSMENT],
-  // SupplyChain profile: actions, defined processes and state artifacts. Do not
-  // bucket the generic Core Action / DefinedProcess classes here; only the
-  // profile-specific subclasses belong in the Supply Chain view.
+  // Supply chain states and processes, plus every Action. Core Action is the
+  // event class (startTime, endTime, actionLocation, originatedBy,
+  // additionalInformation); SupplyChain actions subclass it, so one rule covers
+  // both. A bare DefinedProcess stays uncategorized until a profile subclasses it.
   [CLASS.supplychain_State, BUCKET.SUPPLY_CHAIN],
-  [CLASS.supplychain_CreateAction, BUCKET.SUPPLY_CHAIN],
-  [CLASS.supplychain_ModifyAction, BUCKET.SUPPLY_CHAIN],
-  [CLASS.supplychain_UseAction, BUCKET.SUPPLY_CHAIN],
-  [CLASS.supplychain_BoundaryDefinitionAction, BUCKET.SUPPLY_CHAIN],
-  [CLASS.supplychain_ResponsibilityChangeAction, BUCKET.SUPPLY_CHAIN],
-  [CLASS.supplychain_DestroyAction, BUCKET.SUPPLY_CHAIN],
+  [CLASS.Action, BUCKET.SUPPLY_CHAIN],
   [CLASS.supplychain_CreateProcess, BUCKET.SUPPLY_CHAIN],
   [CLASS.supplychain_ModifyProcess, BUCKET.SUPPLY_CHAIN],
   [CLASS.supplychain_UseProcess, BUCKET.SUPPLY_CHAIN],

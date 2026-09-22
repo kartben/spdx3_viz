@@ -11,6 +11,10 @@ export const CHANGELOG = [
     items: [
       {
         tag: 'Added',
+        text: 'Core Actions show on the supply chain timeline.'
+      },
+      {
+        tag: 'Added',
         text: 'Hover previews related nodes; trail recap; click pans to fit.'
       },
       {

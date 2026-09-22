@@ -72,12 +72,8 @@ function computeClassNodeType(t) {
   if (isA(t, CLASS.hardware_Hardware)) return 'hardware';
   if (
     isA(t, CLASS.supplychain_State) ||
-    isA(t, CLASS.supplychain_CreateAction) ||
-    isA(t, CLASS.supplychain_ModifyAction) ||
-    isA(t, CLASS.supplychain_UseAction) ||
-    isA(t, CLASS.supplychain_BoundaryDefinitionAction) ||
-    isA(t, CLASS.supplychain_ResponsibilityChangeAction) ||
-    isA(t, CLASS.supplychain_DestroyAction) ||
+    // Core Action and every subclass, including the SupplyChain action hierarchy.
+    isA(t, CLASS.Action) ||
     isA(t, CLASS.supplychain_CreateProcess) ||
     isA(t, CLASS.supplychain_ModifyProcess) ||
     isA(t, CLASS.supplychain_UseProcess) ||
@@ -157,6 +153,7 @@ export function getElementBadgeClass(type) {
     hardware_PhysicalHardware: 'bg-lime-500/15 text-lime-400',
     hardware_BulkHardware: 'bg-lime-500/15 text-lime-400',
     hardware_VirtualHardware: 'bg-lime-500/15 text-lime-400',
+    Action: 'bg-cyan-500/15 text-cyan-300',
     supplychain_State: 'bg-cyan-500/15 text-cyan-300',
     supplychain_AssemblyAction: 'bg-cyan-500/15 text-cyan-300',
     supplychain_BoundaryCrossingAction: 'bg-cyan-500/15 text-cyan-300',
