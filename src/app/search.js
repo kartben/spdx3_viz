@@ -15,6 +15,7 @@ const SEARCH_TYPE_LABELS = {
   snippet: 'Snippet',
   hardware: 'Hardware',
   supplychain: 'Supply Chain',
+  action: 'Action',
   requirement: 'Requirement',
   config: 'Build config',
   build: 'Build',
@@ -44,6 +45,7 @@ export const searchMixin = {
       this.snippets.length,
       this.hardware.length,
       this.supplyChain.length,
+      (this.actions || []).length,
       this.requirements.length,
       this.buildConfigs.length,
       this.builds.length,
@@ -107,6 +109,16 @@ export const searchMixin = {
         time || kind,
         `${kind} ${this.supplyChainTypeLabel(sc)} ${sc.description || ''} ${sc.summary || ''} ${sc.spdxId}`,
         this.supplyChainTypeLabel(sc)
+      );
+    }
+    for (const action of this.actions || []) {
+      const time = action.startTime || action.endTime || '';
+      add(
+        action.spdxId,
+        'action',
+        action.name || this.cleanName(action.spdxId),
+        time,
+        `${action.summary || ''} ${action.description || ''} ${action.spdxId}`
       );
     }
     for (const r of this.requirements) {

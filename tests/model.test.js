@@ -35,17 +35,18 @@ test('bucketOf categorizes by hierarchy, most-specific rule first', () => {
   assert.equal(bucketOf(CLASS.Relationship), BUCKET.RELATIONSHIPS);
   // FunctionalSafety artifacts group with Requirement despite subclassing Element.
   assert.equal(bucketOf(CLASS.functionalsafety_EvaluationResult), BUCKET.REQUIREMENTS);
-  // SupplyChain profile actions, processes, and states group together while
-  // generic Core Action / DefinedProcess remain uncategorized.
+  // SupplyChain subclasses stay in the supply-chain bucket. A generic Core
+  // Action is its own bucket. A bare DefinedProcess stays uncategorized.
   assert.equal(bucketOf(CLASS.supplychain_TransportAction), BUCKET.SUPPLY_CHAIN);
   assert.equal(bucketOf(CLASS.supplychain_ResponsibilityChangeProcess), BUCKET.SUPPLY_CHAIN);
   assert.equal(bucketOf(CLASS.supplychain_State), BUCKET.SUPPLY_CHAIN);
-  assert.equal(bucketOf(CLASS.Action), null);
+  assert.equal(bucketOf(CLASS.Action), BUCKET.ACTIONS);
   assert.equal(bucketOf(CLASS.DefinedProcess), null);
   assert.equal(bucketOf('DictionaryEntry'), null);
 });
 
 test('SupplyChain elements use the supplychain graph node type', () => {
+  assert.equal(getNodeType({ type: CLASS.Action }), 'action');
   assert.equal(getNodeType({ type: CLASS.supplychain_TransportAction }), 'supplychain');
   assert.equal(getNodeType({ type: CLASS.supplychain_ResponsibilityChangeProcess }), 'supplychain');
   assert.equal(getNodeType({ type: CLASS.supplychain_State }), 'supplychain');

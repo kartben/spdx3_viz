@@ -134,6 +134,37 @@ test('parseGraph categorizes SPDX 3.1 SupplyChain actions, processes, and states
   );
 });
 
+test('Core Action elements are their own graph nodes, outside supply chain', () => {
+  const graph = JSON.parse(
+    readFileSync('public/samples/paper-plane/paper-plane-supply-chain.spdx3.jsonld', 'utf8')
+  )['@graph'];
+  const parsed = parseGraph(graph);
+  const indexes = buildRelationshipIndexes(parsed.relationships);
+  const app = spdxApp();
+  Object.assign(app, parsed, indexes);
+
+  const log = parsed.actions.find((el) => el.type === 'Action');
+  assert.equal(log?.name, 'Log the certified glide in the studio flight book');
+  assert.equal(
+    parsed.supplyChain.some((el) => el.spdxId === log.spdxId),
+    false
+  );
+  assert.equal(app.getNodeType(log), 'action');
+  assert.equal(parsed.presentNodeTypes.includes('action'), true);
+  assert.equal(
+    app.supplyChainEvents.some((el) => el.spdxId === log.spdxId),
+    false
+  );
+  assert.equal(app.searchCorpus.find((entry) => entry.id === log.spdxId)?.nodeType, 'action');
+
+  const facts = Object.fromEntries(app.actionDetailRows(log).map((row) => [row.label, row.value]));
+  assert.match(facts.Time, /2026/);
+  assert.match(facts.Location, /Berlin/);
+  assert.match(facts['Originated by'], /Charlie/);
+  assert.match(facts['Additional information'], /glide\.distance\.m=6\.2/);
+  assert.match(facts['Additional information'], /wind=light crosswind/);
+});
+
 test('SupplyChain sample embeds LicenseRef-Arbor-Proprietary text', async () => {
   const graph = JSON.parse(
     readFileSync('public/samples/supply-chain/arborlink-sg1-supply-chain.spdx3.jsonld', 'utf8')
