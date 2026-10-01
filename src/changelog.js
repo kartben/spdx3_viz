@@ -11,7 +11,31 @@ export const CHANGELOG = [
     items: [
       {
         tag: 'Added',
-        text: 'Hover previews related nodes; trail recap; click pans to fit.'
+        text: 'Functional Safety coverage matrices, exportable to Excel.'
+      },
+      {
+        tag: 'Added',
+        text: 'Security view can scope findings to one artifact.'
+      },
+      {
+        tag: 'Added',
+        text: 'Graph previews related nodes on hover, pans along a trail.'
+      },
+      {
+        tag: 'Added',
+        text: 'BASIL example design SBOM sample.'
+      },
+      {
+        tag: 'Improved',
+        text: 'Zephyr sample carries VEX statements and fuller NTIA fields.'
+      },
+      {
+        tag: 'Improved',
+        text: 'Snippets show byte ranges and fetch source from URLs.'
+      },
+      {
+        tag: 'Fixed',
+        text: 'Graph shows `hasTestCase` edges and snippet hubs (e.g. BASIL).'
       },
       {
         tag: 'Fixed',
@@ -20,30 +44,6 @@ export const CHANGELOG = [
       {
         tag: 'Fixed',
         text: 'Ctrl-K palette no longer stalls while typing on large SBOMs.'
-      },
-      {
-        tag: 'Added',
-        text: 'Functional Safety coverage matrices, exportable to Excel.'
-      },
-      {
-        tag: 'Fixed',
-        text: '`hasTestCase` relationships now show on the graph (e.g. BASIL SBOMs).'
-      },
-      {
-        tag: 'Fixed',
-        text: 'Graph keeps snippet hubs as nodes (BASIL), still folds Zephyr leaves into files.'
-      },
-      {
-        tag: 'Improved',
-        text: 'Snippet detail card shows line and byte ranges.'
-      },
-      {
-        tag: 'Added',
-        text: 'BASIL example design SBOM, mapped onto the project README.'
-      },
-      {
-        tag: 'Improved',
-        text: 'Fetch source from http(s) File names and highlight byte ranges.'
       }
     ]
   },

@@ -5,15 +5,15 @@ via the "What's new" link.
 
 ## Unreleased
 
-- **Added:** Hover previews related nodes; trail recap; click pans to fit.
+- **Added:** Functional Safety coverage matrices, exportable to Excel.
+- **Added:** Security view can scope findings to one artifact.
+- **Added:** Graph previews related nodes on hover, pans along a trail.
+- **Added:** BASIL example design SBOM sample.
+- **Improved:** Zephyr sample carries VEX statements and fuller NTIA fields.
+- **Improved:** Snippets show byte ranges and fetch source from URLs.
+- **Fixed:** Graph shows `hasTestCase` edges and snippet hubs (e.g. BASIL).
 - **Fixed:** Clicking a graph node selects it without shoving the layout.
 - **Fixed:** Ctrl-K palette no longer stalls while typing on large SBOMs.
-- **Added:** Functional Safety coverage matrices, exportable to Excel.
-- **Fixed:** `hasTestCase` relationships now show on the graph (e.g. BASIL SBOMs).
-- **Fixed:** Graph keeps snippet hubs as nodes (BASIL), still folds Zephyr leaves into files.
-- **Improved:** Snippet detail card shows line and byte ranges.
-- **Added:** BASIL example design SBOM, mapped onto the project README.
-- **Improved:** Fetch source from http(s) File names and highlight byte ranges.
 
 ## [0.6.0] - 2026-08-29
 
