@@ -1,4 +1,5 @@
 import { escapeHtml } from '../lib/index.js';
+import { markRaw } from './loading.js';
 
 /* Search corpus + fuzzy scoring, shared by the ⌘K command palette (see
    app/palette.js). Builds a flat, pre-lowercased index of every navigable
@@ -164,7 +165,9 @@ export const searchMixin = {
     }
 
     searchCorpusKey = key;
-    searchCorpusVal = out;
+    // Raw, so the palette's per-keystroke scan reads plain objects instead of
+    // building a reactive proxy for every entry it touches.
+    searchCorpusVal = markRaw(out);
     return out;
   },
 

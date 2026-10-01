@@ -18,6 +18,10 @@ export const CHANGELOG = [
         text: 'Clicking a graph node selects it without shoving the layout.'
       },
       {
+        tag: 'Fixed',
+        text: 'Ctrl-K palette no longer stalls while typing on large SBOMs.'
+      },
+      {
         tag: 'Added',
         text: 'Functional Safety coverage matrices, exportable to Excel.'
       },

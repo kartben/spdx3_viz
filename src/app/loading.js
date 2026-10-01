@@ -86,7 +86,7 @@ function getParserWorker() {
    large and immutable, so deep-proxying only adds per-access overhead. `__v_skip`
    is the flag @vue/reactivity checks; set non-enumerable so it never leaks into
    iteration. */
-function markRaw(value) {
+export function markRaw(value) {
   if (
     value &&
     typeof value === 'object' &&

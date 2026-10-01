@@ -6,6 +6,10 @@
 
 const PALETTE_ELEMENT_LIMIT = 7; // element rows shown alongside command matches
 
+let elementMatchesQuery = null;
+let elementMatchesCorpus = null;
+let elementMatchesVal = [];
+
 // Small stroke icons for the action commands, matching the header's icon style.
 const ACTION_ICONS = {
   share:
@@ -140,8 +144,18 @@ export const paletteMixin = {
     }
     scoredCmds.sort((a, b) => b.s - a.s || a.c.name.length - b.c.name.length);
 
+    return [...scoredCmds.map((x) => x.c), ...this._paletteElementMatches(q)];
+  },
+
+  // Top element rows for a query. The template reads paletteItems once per row
+  // (group headers) plus for the counters, so the corpus scan is memoized on
+  // the query and the corpus it ran against rather than repeated per read.
+  _paletteElementMatches(q) {
+    const corpus = this.searchCorpus;
+    if (q === elementMatchesQuery && corpus === elementMatchesCorpus) return elementMatchesVal;
+
     const elements = [];
-    for (const e of this.searchCorpus) {
+    for (const e of corpus) {
       const s = this._entryScore(e, q);
       if (s > 0) elements.push({ e, s });
     }
@@ -149,12 +163,12 @@ export const paletteMixin = {
       (a, b) => b.s - a.s || a.e._n.length - b.e._n.length || a.e._n.localeCompare(b.e._n)
     );
 
-    return [
-      ...scoredCmds.map((x) => x.c),
-      ...elements
-        .slice(0, PALETTE_ELEMENT_LIMIT)
-        .map((x) => ({ kind: 'element', ...x.e, group: 'Results' }))
-    ];
+    elementMatchesQuery = q;
+    elementMatchesCorpus = corpus;
+    elementMatchesVal = elements
+      .slice(0, PALETTE_ELEMENT_LIMIT)
+      .map((x) => ({ kind: 'element', ...x.e, group: 'Results' }));
+    return elementMatchesVal;
   },
 
   // True when this row starts a new section, so the template can print a header.
