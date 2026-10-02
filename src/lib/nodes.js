@@ -87,6 +87,8 @@ function computeClassNodeType(t) {
   ) {
     return 'supplychain';
   }
+  // Core Action, and any Action subclass outside the SupplyChain profile.
+  if (isA(t, CLASS.Action)) return 'action';
   // The Requirement and its FunctionalSafety lifecycle artifacts share one type.
   if (
     isA(t, CLASS.Requirement) ||
@@ -130,6 +132,7 @@ export function getNodeTypeColor(nodeType) {
     snippet: COLORS.snippet,
     hardware: COLORS.hardware,
     supplychain: COLORS.supplychain,
+    action: COLORS.action,
     requirement: COLORS.requirement,
     tool: COLORS.tool,
     build: COLORS.build,
@@ -157,6 +160,7 @@ export function getElementBadgeClass(type) {
     hardware_PhysicalHardware: 'bg-lime-500/15 text-lime-400',
     hardware_BulkHardware: 'bg-lime-500/15 text-lime-400',
     hardware_VirtualHardware: 'bg-lime-500/15 text-lime-400',
+    Action: 'bg-indigo-500/15 text-indigo-300',
     supplychain_State: 'bg-cyan-500/15 text-cyan-300',
     supplychain_AssemblyAction: 'bg-cyan-500/15 text-cyan-300',
     supplychain_BoundaryCrossingAction: 'bg-cyan-500/15 text-cyan-300',

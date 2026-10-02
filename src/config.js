@@ -352,6 +352,8 @@ export const COLORS = {
   hardware: '#a3e635',
   // SupplyChain profile node type and exception/resolution lifecycle edges.
   supplychain: '#06b6d4',
+  // Core Action: an event that is not itself a SupplyChain class.
+  action: '#818cf8',
   // FunctionalSafety profile: Requirement node type + its safety relationship edges.
   requirement: '#eab308',
   tool: '#f59e0b',
@@ -450,6 +452,7 @@ export function createGraphFilters() {
     { key: 'snippet', label: 'Snippets', color: COLORS.snippet, active: true },
     { key: 'hardware', label: 'Hardware', color: COLORS.hardware, active: true },
     { key: 'supplychain', label: 'Supply Chain', color: COLORS.supplychain, active: true },
+    { key: 'action', label: 'Actions', color: COLORS.action, active: true },
     { key: 'requirement', label: 'Functional Safety', color: COLORS.requirement, active: true },
     { key: 'tool', label: 'Tools', color: COLORS.tool, active: true },
     { key: 'build', label: 'Build', color: COLORS.build, active: true },

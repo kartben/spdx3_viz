@@ -92,6 +92,45 @@ export const accessorsMixin = {
   formatDate(date) {
     return formatDisplayDate(date);
   },
+  // Core Action properties for the graph detail panel. SupplyChain subclasses
+  // stay on the Supply Chain view; this is only the generic Core class.
+  actionDetailRows(el) {
+    if (this.getNodeType(el) !== 'action') return [];
+    const rows = [];
+    const push = (label, value) => {
+      if (this.isMeaningful(value)) rows.push({ label, value });
+    };
+    const names = (ref) => {
+      if (!ref) return '';
+      const ids = Array.isArray(ref) ? ref : [ref];
+      return ids
+        .map((id) => (typeof id === 'string' ? this.relTargetDisplayName(id) : ''))
+        .filter(Boolean)
+        .join(', ');
+    };
+    const dictionary = (value) => {
+      if (!value) return '';
+      const entries = Array.isArray(value) ? value : [value];
+      return entries
+        .map((entry) => {
+          if (entry && typeof entry === 'object') {
+            const key = entry.key ?? '';
+            const entryValue = entry.value ?? '';
+            return key ? `${key}=${entryValue}` : String(entryValue);
+          }
+          return typeof entry === 'string' ? this.relTargetDisplayName(entry) : '';
+        })
+        .filter(Boolean)
+        .join(' · ');
+    };
+    const start = el.startTime ? this.formatDate(el.startTime) : '';
+    const end = el.endTime ? this.formatDate(el.endTime) : '';
+    push('Time', start && end && start !== end ? `${start} → ${end}` : start || end);
+    push('Location', names(el.actionLocation));
+    push('Originated by', names(el.originatedBy));
+    push('Additional information', dictionary(el.additionalInformation));
+    return rows;
+  },
   depsOf(spdxId) {
     return this.depIndex.get(spdxId) || [];
   },

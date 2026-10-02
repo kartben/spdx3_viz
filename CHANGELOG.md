@@ -5,6 +5,7 @@ via the "What's new" link.
 
 ## Unreleased
 
+- **Added:** Core Actions show on the graph as their own nodes.
 - **Added:** Hover previews related nodes; trail recap; click pans to fit.
 - **Fixed:** Clicking a graph node selects it without shoving the layout.
 - **Fixed:** Ctrl-K palette no longer stalls while typing on large SBOMs.

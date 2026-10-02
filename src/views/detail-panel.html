@@ -88,6 +88,19 @@
       </svg>
     </button>
 
+    <!-- Core Action: time, place, originator, and extra facts. Not a supply-chain event. -->
+    <div x-show="getNodeType(detailElement) === 'action'" class="grid grid-cols-1 gap-2">
+      <template x-for="row in actionDetailRows(detailElement)" :key="row.label">
+        <div>
+          <div
+            class="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5"
+            x-text="row.label"
+          ></div>
+          <div class="text-xs text-slate-300 wrap-break-word" x-text="row.value"></div>
+        </div>
+      </template>
+    </div>
+
     <!-- Virtual vulnerability: found by an online scan (OSV/NVD), not in the SBOM -->
     <div
       x-show="detailElement?.virtual"

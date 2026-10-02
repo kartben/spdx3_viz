@@ -56,6 +56,7 @@ const ICONS = {
   vulnerability: 'bug_report',
   hardware: 'memory',
   supplychain: 'route',
+  action: 'bolt',
   requirement: 'assignment',
   requirement_verification: 'fact_check',
   assumption: 'help',

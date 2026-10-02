@@ -24,7 +24,7 @@
       "rootElement": [
         "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/paper-airplane"
       ],
-      "summary": "A friendly end-to-end origami supply chain: plan, design, fold, inspect, quarantine, re-fold, flight-test, demonstrate, and archive a single paper airplane."
+      "summary": "A friendly end-to-end origami supply chain: plan, design, fold, inspect, quarantine, re-fold, flight-test, log the glide, demonstrate, and archive a single paper airplane."
     },
     {
       "type": "CreationInfo",
@@ -671,6 +671,31 @@
       "summary": "Transitions product state to Tested and certified."
     },
     {
+      "type": "Action",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/022-flight-log",
+      "creationInfo": "_:paper-plane-creation-info",
+      "name": "Log the certified glide in the studio flight book",
+      "startTime": "2026-07-05T15:10:00Z",
+      "endTime": "2026-07-05T15:25:00Z",
+      "actionLocation": "https://spdx.org/spdxdocs/paper-plane-supply-chain#loc/flight-zone",
+      "originatedBy": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/person/charlie-pilot"
+      ],
+      "additionalInformation": [
+        {
+          "type": "DictionaryEntry",
+          "key": "glide.distance.m",
+          "value": "6.2"
+        },
+        {
+          "type": "DictionaryEntry",
+          "key": "wind",
+          "value": "light crosswind"
+        }
+      ],
+      "summary": "Charlie writes the measured glide into the studio flight book just after certification."
+    },
+    {
       "type": "supplychain_ResponsibilityChangeAction",
       "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/017-handoff-museum",
       "creationInfo": "_:paper-plane-creation-info",
@@ -1145,18 +1170,17 @@
       "type": "Relationship",
       "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/042-performedby",
       "creationInfo": "_:paper-plane-creation-info",
-      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/018-demo-flight",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/022-flight-log",
       "relationshipType": "performedBy",
       "to": [
-        "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/person/charlie-pilot",
-        "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/org/origami-studio"
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/person/charlie-pilot"
       ]
     },
     {
       "type": "Relationship",
       "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/043-hasinput",
       "creationInfo": "_:paper-plane-creation-info",
-      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/018-demo-flight",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/022-flight-log",
       "relationshipType": "hasInput",
       "to": [
         "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/paper-airplane"
@@ -1166,7 +1190,7 @@
       "type": "Relationship",
       "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/044-hasevidence",
       "creationInfo": "_:paper-plane-creation-info",
-      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/018-demo-flight",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/022-flight-log",
       "relationshipType": "hasEvidence",
       "to": [
         "https://spdx.org/spdxdocs/paper-plane-supply-chain#dataset/flight-telemetry"
@@ -1176,6 +1200,37 @@
       "type": "Relationship",
       "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/045-performedby",
       "creationInfo": "_:paper-plane-creation-info",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/018-demo-flight",
+      "relationshipType": "performedBy",
+      "to": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/person/charlie-pilot",
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#agent/org/origami-studio"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/046-hasinput",
+      "creationInfo": "_:paper-plane-creation-info",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/018-demo-flight",
+      "relationshipType": "hasInput",
+      "to": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#hardware/paper-airplane"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/047-hasevidence",
+      "creationInfo": "_:paper-plane-creation-info",
+      "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/018-demo-flight",
+      "relationshipType": "hasEvidence",
+      "to": [
+        "https://spdx.org/spdxdocs/paper-plane-supply-chain#dataset/flight-telemetry"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/048-performedby",
+      "creationInfo": "_:paper-plane-creation-info",
       "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/020-archive",
       "relationshipType": "performedBy",
       "to": [
@@ -1184,7 +1239,7 @@
     },
     {
       "type": "Relationship",
-      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/046-hasinput",
+      "spdxId": "https://spdx.org/spdxdocs/paper-plane-supply-chain#relationship/049-hasinput",
       "creationInfo": "_:paper-plane-creation-info",
       "from": "https://spdx.org/spdxdocs/paper-plane-supply-chain#action/020-archive",
       "relationshipType": "hasInput",

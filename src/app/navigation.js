@@ -979,6 +979,14 @@ export const navigationMixin = {
       this.navigateToSupplyChain(spdxId);
       return;
     }
+    // A Core Action has no list view. Open it on the graph, where it is its own
+    // node type rather than a Supply Chain element.
+    if (this.getNodeType(el) === 'action') {
+      this.graphSelectedNodeId = spdxId;
+      this.switchView('graph');
+      this.selectGraphNode(spdxId);
+      return;
+    }
     // A snippet isn't a page of its own: open it in a popup showing its file's
     // source with the snippet's lines highlighted.
     if (this.getNodeType(el) === 'snippet') {

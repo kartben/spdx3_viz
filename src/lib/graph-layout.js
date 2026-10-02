@@ -92,6 +92,7 @@ const LANE_TYPE_ORDER = [
   'snippet',
   'hardware',
   'supplychain',
+  'action',
   'requirement',
   'vulnerability',
   'agent',

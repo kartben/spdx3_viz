@@ -649,19 +649,27 @@ export const supplyChainMixin = {
     return id ? this.relTargetDisplayName(id) : '';
   },
 
-  // BoundaryDefinitionAction.boundaryParameter is a set of DictionaryEntry
-  // values ("key=value"). Older data may instead carry a single element
-  // reference, so fall back to a ref-name lookup for a plain string.
-  supplyChainBoundaryParamLabel(el) {
-    const bp = el?.supplychain_boundaryParameter;
-    if (!bp) return '';
-    const entries = Array.isArray(bp) ? bp : [bp];
+  // One element reference or a list of them (actionLocation, originatedBy).
+  supplyChainRefNames(ref) {
+    if (!ref) return '';
+    const ids = Array.isArray(ref) ? ref : [ref];
+    return ids
+      .map((id) => (typeof id === 'string' ? this.supplyChainRefName(id) : ''))
+      .filter(Boolean)
+      .join(', ');
+  },
+
+  // DictionaryEntry values ("key=value"). A plain string falls back to a
+  // reference name, which is how older boundary parameters were written.
+  supplyChainDictionaryLabel(value) {
+    if (!value) return '';
+    const entries = Array.isArray(value) ? value : [value];
     return entries
       .map((entry) => {
         if (entry && typeof entry === 'object') {
           const key = entry.key ?? '';
-          const value = entry.value ?? '';
-          return key ? `${key}=${value}` : String(value);
+          const entryValue = entry.value ?? '';
+          return key ? `${key}=${entryValue}` : String(entryValue);
         }
         return this.supplyChainRefName(entry);
       })
@@ -669,12 +677,17 @@ export const supplyChainMixin = {
       .join(' · ');
   },
 
+  // BoundaryDefinitionAction.boundaryParameter is a set of DictionaryEntry values.
+  supplyChainBoundaryParamLabel(el) {
+    return this.supplyChainDictionaryLabel(el?.supplychain_boundaryParameter);
+  },
+
   supplyChainRoute(el) {
     if (!el) return '';
     const from = this.supplyChainRefName(el.supplychain_pickupLocation);
     const to = this.supplyChainRefName(el.supplychain_dropoffLocation);
     if (from && to) return `${from} → ${to}`;
-    return from || to || this.supplyChainRefName(el.actionLocation);
+    return from || to || this.supplyChainRefNames(el.actionLocation);
   },
 
   supplyChainStateName(el) {
@@ -727,7 +740,9 @@ export const supplyChainMixin = {
       if (this.isMeaningful(value)) rows.push({ label, value, mono });
     };
     push('Time', this.supplyChainTimeRange(el));
-    push('Location', this.supplyChainRefName(el?.actionLocation));
+    push('Location', this.supplyChainRefNames(el?.actionLocation));
+    push('Originated by', this.supplyChainRefNames(el?.originatedBy));
+    push('Additional information', this.supplyChainDictionaryLabel(el?.additionalInformation));
     push('Route', el?.supplychain_transportRoute);
     push('Pickup', this.supplyChainRefName(el?.supplychain_pickupLocation));
     push('Dropoff', this.supplyChainRefName(el?.supplychain_dropoffLocation));

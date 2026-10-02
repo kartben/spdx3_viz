@@ -275,6 +275,7 @@ export function createState() {
     hardware: [], // hardware profile elements (SPDX 3.1)
     requirements: [], // requirements + FunctionalSafety artifacts (SPDX 3.1)
     supplyChain: [], // supplychain actions, processes, and states (SPDX 3.1)
+    actions: [], // Core Action elements, outside the SupplyChain profile
     relationships: [],
     builds: [],
     buildInfo: null,
