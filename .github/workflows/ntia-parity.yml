@@ -38,8 +38,11 @@ jobs:
         with:
           python-version: '3.12'
 
+      # Pinned so a new reference release cannot fail unrelated PRs. 6.0.0 no
+      # longer counts dataset_DatasetPackage elements as components (the AI
+      # sample's IAMdataset), which the app still does; revisit before bumping.
       - name: Install ntia-conformance-checker
-        run: pip install ntia-conformance-checker
+        run: pip install ntia-conformance-checker==5.0.3
 
       - name: Run the reference tool on the bundled samples
         run: |
