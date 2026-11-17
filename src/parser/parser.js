@@ -1332,6 +1332,10 @@ export function createIndexAccessors(indexes) {
    ========================================================================== */
 
 const GH_DL_RE = /^git\+https:\/\/github\.com\/([^/]+\/[^@]+)@([a-f0-9]{40})$/;
+// pkg:github/org/repo@<commit>, where west may suffix the commit ("-off").
+const GH_PURL_RE = /^pkg:github\/([^/]+\/[^@]+)@([a-f0-9]{40})(?![0-9a-f])/;
+// Commit the SPDX 3.1 Zephyr sample was generated from; it only exists in a fork.
+const ZEPHYR_FORK_ONLY_SHA = '107120db232f2ce699c6a871b12b844d85c11ab1';
 
 function longestCommonPathPrefix(paths) {
   if (!paths.length) return '';
@@ -1355,8 +1359,9 @@ function longestCommonPathPrefix(paths) {
  * already an http(s) URL (BASIL reference documents).
  *
  * For packages where downloadLocation is NOASSERTION (e.g. zephyr-sources when
- * the repo has multiple git remotes), falls back to a hardcoded org/repo + commit
- * when the package is recognisably the Zephyr kernel (see the HACK note below).
+ * the checkout has no single git remote, as in a west workspace), falls back
+ * to the commit pinned in the package's GitHub purl. One fork-only commit is
+ * redirected to the fork that holds it (see the HACK note below).
  *
  * @param {ParsedData} parsed
  * @param {RelationshipIndexes} indexes
@@ -1379,40 +1384,24 @@ export function buildFileSourceIndex(parsed, indexes) {
       ghPath = ghMatch[1];
       sha = ghMatch[2];
     } else if (dloc === 'NOASSERTION' || !dloc) {
-      // zephyr-sources falls here when the repo has multiple git remotes —
-      // git_remote() in zephyr_module.py returns None → NOASSERTION.
-      const pkgId = pkg.spdxId || '';
-      const pkgName = pkg.name || '';
-      if (pkgId.includes('zephyr-sources') || pkgName === 'zephyr-sources') {
-        // ███████████████████████████████████████████████████████████████████
-        // ██  ⚠️  TEMPORARY HACK — REMOVE ME  ⚠️                            ██
-        // ███████████████████████████████████████████████████████████████████
-        // The bundled sample is generated from a fork branch whose commits are
-        // not upstream, and its generating checkout has several git remotes, so
-        // the SBOM records NOASSERTION instead of a download location. Nothing
-        // in the document names a repository we could fetch from, so we PIN
-        // every zephyr-sources file to one hardcoded commit in a fork:
-        // https://github.com/kartben/zephyr/commit/107120db232f2ce699c6a871b12b844d85c11ab1
-        //
-        // ✅ That commit is the one the bundled sample was generated from, so
-        //    its line ranges do line up with the source fetched here.
-        //
-        // ❌ Any other SBOM reaching this branch gets that same fork tree, not
-        //    its own. It is a stopgap, not correct behaviour.
-        //
-        // ✅ TO RESTORE CORRECT BEHAVIOUR: delete this block and uncomment the
-        //    purl-derived logic below. software_packageVersion is the VERSION
-        //    file version ("4.4.99"), never a commit; the commit is in the purl.
-        // ███████████████████████████████████████████████████████████████████
-        ghPath = 'kartben/zephyr'; // <-- HARDCODED HACK (fork, not upstream)
-        sha = '107120db232f2ce699c6a871b12b844d85c11ab1'; // <-- HARDCODED HACK
-        // ███████████████████████████████████████████████████████████████████
-
-        // --- CORRECT (dynamic) behaviour, disabled by the hack above ---------
-        // const purl = pkg.software_packageUrl || '';
-        // const m = /^pkg:github\/([^/]+\/[^@]+)@([a-f0-9]{40})/.exec(purl);
-        // if (m) { ghPath = m[1]; sha = m[2]; }
+      // zephyr-sources lands here when its checkout has no single git remote
+      // (git_remote() in zephyr_module.py returns None), which is the case in
+      // any west workspace. west spdx still pins the commit in the purl,
+      // possibly followed by west's "-off"/"-dirty" suffix.
+      const purlMatch = GH_PURL_RE.exec(pkg.software_packageUrl || '');
+      if (purlMatch) {
+        ghPath = purlMatch[1];
+        sha = purlMatch[2];
       }
+      // ███████████████████████████████████████████████████████████████████
+      // ██  ⚠️  TEMPORARY HACK: REMOVE ME  ⚠️                            ██
+      // ███████████████████████████████████████████████████████████████████
+      // The bundled SPDX 3.1 sample (samples/zephyr-experimental) is built
+      // from a fork branch whose commit is not upstream, yet its purl names
+      // zephyrproject-rtos/zephyr. Fetch that one commit from the fork. Remove
+      // once the 3.1 sample is regenerated from upstream Zephyr.
+      if (sha === ZEPHYR_FORK_ONLY_SHA) ghPath = 'kartben/zephyr';
+      // ███████████████████████████████████████████████████████████████████
     }
 
     if (!ghPath || !sha) continue;

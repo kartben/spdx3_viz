@@ -12,7 +12,7 @@
     "id": "zephyr-experimental",
     "name": "Zephyr RTOS (SPDX 3.1)",
     "emoji": "🪁",
-    "description": "Same application, but with an SPDX 3.1 SBOM.<br/>⚠️ SPDX 3.1 support is not yet available in upstream <code>west spdx</code> tooling.",
+    "description": "LVGL demos on an ESP32-S3, with an SPDX 3.1 SBOM.<br/>⚠️ Preview from a <code>west spdx</code> development branch: functional safety, hardware, and VEX data are not in Zephyr <code>main</code>.",
     "dir": "samples/zephyr-experimental",
     "files": [
       "app.jsonld",

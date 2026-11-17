@@ -1,0 +1,17 @@
+# West workspace for .github/workflows/zephyr-sbom.yml, which builds the
+# bundled "Zephyr RTOS" sample SBOM (public/samples/zephyr/) from Zephyr main.
+#
+# Only the modules the LVGL demos sample needs on the M5Stack CoreS3 are
+# fetched, so the SBOM's module list reflects what the build actually uses.
+manifest:
+  remotes:
+    - name: zephyrproject-rtos
+      url-base: https://github.com/zephyrproject-rtos
+  projects:
+    - name: zephyr
+      remote: zephyrproject-rtos
+      revision: main
+      import:
+        name-allowlist:
+          - hal_espressif
+          - lvgl
