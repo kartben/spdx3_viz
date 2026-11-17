@@ -313,3 +313,58 @@ test('buildFileSourceIndex uses an http(s) File name when no sources package exi
     'https://raw.githubusercontent.com/elisa-tech/BASIL/main/README.md'
   );
 });
+
+function zephyrSourcesGraph(purl) {
+  return [
+    {
+      type: 'software_Package',
+      spdxId: 'pkg:zephyr-sources',
+      name: 'zephyr-sources',
+      software_downloadLocation: 'NOASSERTION',
+      software_packageUrl: purl
+    },
+    {
+      type: 'software_File',
+      spdxId: 'file:main',
+      name: '/ws/zephyr/kernel/main_weak.c'
+    },
+    {
+      type: 'software_File',
+      spdxId: 'file:sched',
+      name: '/ws/zephyr/kernel/sched.c'
+    },
+    {
+      type: 'Relationship',
+      spdxId: 'rel:contains',
+      relationshipType: 'contains',
+      from: 'pkg:zephyr-sources',
+      to: ['file:main', 'file:sched']
+    }
+  ];
+}
+
+test('buildFileSourceIndex falls back to the commit in a GitHub purl', () => {
+  const sha = '29d3d75b7ef638a5323815fa94f78af54c96d1a5';
+  const parsed = parseGraph(zephyrSourcesGraph(`pkg:github/zephyrproject-rtos/zephyr@${sha}`));
+  const src = buildFileSourceIndex(parsed, buildRelationshipIndexes(parsed.relationships));
+  assert.equal(
+    src.get('file:sched'),
+    `https://raw.githubusercontent.com/zephyrproject-rtos/zephyr/${sha}/sched.c`
+  );
+});
+
+test('buildFileSourceIndex ignores a purl without a full commit', () => {
+  const parsed = parseGraph(zephyrSourcesGraph('pkg:github/zephyrproject-rtos/zephyr@v4.3.0'));
+  const src = buildFileSourceIndex(parsed, buildRelationshipIndexes(parsed.relationships));
+  assert.equal(src.has('file:sched'), false);
+});
+
+test('buildFileSourceIndex fetches the fork-only 3.1 sample commit from the fork', () => {
+  const sha = '107120db232f2ce699c6a871b12b844d85c11ab1';
+  const parsed = parseGraph(zephyrSourcesGraph(`pkg:github/zephyrproject-rtos/zephyr@${sha}-off`));
+  const src = buildFileSourceIndex(parsed, buildRelationshipIndexes(parsed.relationships));
+  assert.equal(
+    src.get('file:main'),
+    `https://raw.githubusercontent.com/kartben/zephyr/${sha}/main_weak.c`
+  );
+});
