@@ -61,9 +61,9 @@ if (!entry) {
   process.exit(1);
 }
 entry.description =
-  'LVGL demos on an M5Stack CoreS3 (ESP32-S3), built by CI from Zephyr <code>main</code> at ' +
-  `<a href="${commitUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()">` +
-  `<code>${sha.slice(0, 12)}</code></a>, SBOM from <code>west spdx --spdx-version 3.0</code>.`;
+  'LVGL demos on M5Stack CoreS3, rebuilt weekly from Zephyr <code>main</code> ' +
+  `(<a href="${commitUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()">` +
+  `<code>${sha.slice(0, 7)}</code></a>).`;
 entry.files = files;
 entry.size = size;
 
