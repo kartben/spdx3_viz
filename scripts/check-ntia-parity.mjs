@@ -10,9 +10,9 @@
  *
  * Two classes of facts are compared:
  *
- *   - ALIGNED facts share a definition between the two tools (component name,
- *     version, and the document-level author / timestamp / spec-version checks).
- *     A mismatch here is a real regression and fails the check.
+ *   - ALIGNED facts share a definition between the two tools (component count,
+ *     name, version, and the document-level author / timestamp / spec-version
+ *     checks). A mismatch here is a real regression and fails the check.
  *
  *   - DIVERGENT facts are ones where this app deliberately uses a stricter or
  *     more meaningful definition than the reference tool's experimental SPDX 3.0
@@ -27,6 +27,13 @@
  *
  * Only single-document SPDX 3.0 samples are in scope: the reference tool
  * supports one SBOM per document and rejects SPDX 3.1.
+ *
+ * Component scope: since 6.0.0 the reference tool only runs its per-component
+ * checks on packages reachable from the document's rootElement through
+ * composition and dependency relationships, and lists the rest as "floating".
+ * This app scores every package (see DIVERGENCES.componentsScored), so the
+ * aligned per-component facts are compared on the reference's scope: the app's
+ * report is recomputed without the floating packages for those keys.
  *
  * @module scripts/check-ntia-parity
  */
@@ -55,14 +62,14 @@ const PARITY_SAMPLES = [
 // are reported but never gated: the app's definition is intentionally the more
 // useful one for a viewer.
 const DIVERGENCES = {
-  totalNumberComponents:
-    'reference counts every SPDX object in the graph; this app counts packages',
+  componentsScored:
+    'reference (6.0+) scores only packages reachable from rootElement via composition/dependency relationships, so e.g. models and datasets linked only by trainedOn/testedOn are skipped; this app scores every package it lists',
   'componentIdentifiers.missing':
     'reference treats the mandatory SPDX ID as the identifier (so always present); this app requires a PURL/CPE/external identifier',
   'componentSuppliers.missing':
     'reference checks suppliedBy only; this app also accepts originatedBy',
   dependencyRelationshipsProvided:
-    'reference checks the BOM rootElement structure (see their issue #392); this app checks for a dependsOn relationship',
+    'reference accepts contains, dependsOn, hasDynamicLink or hasStaticLink; this app requires a dependsOn relationship',
   'componentConcludedLicenses.missing':
     'reference and app resolve SPDX 3.0 concluded licenses differently',
   'componentCopyrightTexts.missing':
@@ -70,20 +77,25 @@ const DIVERGENCES = {
   isNtiaConformant: 'composite verdict, derived from the diverging elements above'
 };
 
+// Per-component aligned facts, compared on the reference's component scope.
+const SCOPED_KEYS = ['componentNames.missing', 'componentVersions.missing'];
 const ALIGNED_KEYS = [
-  'componentNames.missing',
-  'componentVersions.missing',
+  'totalNumberComponents',
+  ...SCOPED_KEYS,
   'authorNameProvided',
   'timestampProvided',
   'specVersionProvided'
 ];
 const DIVERGENT_KEYS = Object.keys(DIVERGENCES);
 
-function loadReport(sampleFile) {
+// `excludeIds` drops those packages before scoring, to match the reference's
+// component scope (its floating components).
+function loadReport(sampleFile, excludeIds = new Set()) {
   const graph = JSON.parse(readFileSync(join(SAMPLES_DIR, sampleFile), 'utf8'))['@graph'] || [];
   const parsed = parseGraph(graph);
   const indexes = buildRelationshipIndexes(parsed.relationships);
-  return computeQualityReport({ ...parsed, ...indexes });
+  const packages = parsed.packages.filter((p) => !excludeIds.has(p.spdxId));
+  return computeQualityReport({ ...parsed, ...indexes, packages });
 }
 
 // Flatten our ntia report into the reference tool's vocabulary so a single loop
@@ -96,6 +108,7 @@ function ourFacts(report) {
   return {
     isNtiaConformant: report.ntia.isConformant,
     totalNumberComponents: report.ntia.totalComponents,
+    componentsScored: report.ntia.totalComponents,
     authorNameProvided: byKey.author.present,
     timestampProvided: byKey.timestamp.present,
     dependencyRelationshipsProvided: byKey.dependency.present,
@@ -109,11 +122,17 @@ function ourFacts(report) {
   };
 }
 
+// Packages the reference tool (6.0+) left out of its per-component checks.
+function refFloatingIds(ref) {
+  return new Set(ref.graphValidation?.floatingComponents?.floatingComponentIds || []);
+}
+
 function refFacts(ref) {
   const missing = (refKey) => (ref[refKey]?.nonconformantComponents || []).length;
   return {
     isNtiaConformant: !!(ref.isNtiaConformant ?? ref.isConformant),
     totalNumberComponents: ref.totalNumberComponents,
+    componentsScored: ref.totalNumberComponents - refFloatingIds(ref).size,
     authorNameProvided: !!ref.authorNameProvided,
     timestampProvided: !!ref.timestampProvided,
     dependencyRelationshipsProvided: !!ref.dependencyRelationshipsProvided,
@@ -137,10 +156,13 @@ function compareSample(id, sampleFile, refDir) {
     return { id, skipped: true, reason: 'reference tool reported a parsing error' };
   }
   const ours = ourFacts(loadReport(sampleFile));
+  const floating = refFloatingIds(ref);
+  const oursScoped = floating.size ? ourFacts(loadReport(sampleFile, floating)) : ours;
   const theirs = refFacts(ref);
-  const alignedMismatches = ALIGNED_KEYS.filter((k) => ours[k] !== theirs[k]).map((k) => ({
+  const alignedOurs = (k) => (SCOPED_KEYS.includes(k) ? oursScoped[k] : ours[k]);
+  const alignedMismatches = ALIGNED_KEYS.filter((k) => alignedOurs(k) !== theirs[k]).map((k) => ({
     key: k,
-    ours: ours[k],
+    ours: alignedOurs(k),
     ref: theirs[k]
   }));
   const divergences = DIVERGENT_KEYS.map((k) => ({
@@ -149,7 +171,7 @@ function compareSample(id, sampleFile, refDir) {
     ref: theirs[k],
     same: ours[k] === theirs[k]
   }));
-  return { id, alignedMismatches, divergences };
+  return { id, alignedMismatches, divergences, floatingCount: floating.size };
 }
 
 function main() {
@@ -183,6 +205,11 @@ function main() {
       for (const m of result.alignedMismatches) {
         console.log(`    ${m.key}: ours=${m.ours} reference=${m.ref}`);
       }
+    }
+    if (result.floatingCount) {
+      console.log(
+        `    (${result.floatingCount} package(s) unreachable from rootElement left out of aligned per-component checks)`
+      );
     }
     const divergedHere = result.divergences.filter((d) => !d.same);
     if (divergedHere.length) {

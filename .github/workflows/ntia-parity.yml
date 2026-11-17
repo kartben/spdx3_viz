@@ -38,8 +38,9 @@ jobs:
         with:
           python-version: '3.12'
 
+      # Pinned so a new reference release cannot fail unrelated PRs.
       - name: Install ntia-conformance-checker
-        run: pip install ntia-conformance-checker
+        run: pip install ntia-conformance-checker==6.0.0
 
       - name: Run the reference tool on the bundled samples
         run: |
